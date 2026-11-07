@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { w } from "../words";
+import { w, wIn, wordV, dateText, type Val, type WordKey } from "../words";
 import { kitchenMark } from "../recipeMark";
 import { Check, Copy, Download, Image as ImageIcon, X } from "lucide-react";
 import type { Feedback, Meal, PubContent, PublishDraft } from "../pilot";
@@ -14,7 +14,6 @@ import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 import { StepsEditor } from "./StepsEditor";
 import { stepText } from "../steps";
 import { isAiPhoto, isDrawnPhoto } from "../covers";
-import { CHEF_NAME } from "./Mark";
 
 // Canvas board R5 (7 October 2026), redrawn as RG1 to RG3 with RF4 (8 October): a cook publishes a recipe that's already
 // in the app. The foods and grams come from the app; the cook adds what a reader needs. What is typed is kept with the
@@ -22,6 +21,8 @@ import { CHEF_NAME } from "./Mark";
 // down and the link says so; Publish again brings it back on the same link. Everyone sees a recipe (Q6); the steps live
 // with the recipe (Q1); the names start without brands (Q2); the photos offered are the plate photos (Q4).
 // A cook who isn't a coach sends the recipe to their coach, who sees the page and makes it live or sends it back (RG1, RG5)
+// a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
+const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 export type Published = PublicRecipe & { status?: "live" | "down" | "waiting" | "back"; waiting?: boolean; note?: string };
 
 // What the live page holds and what is about to go there (0.2.5+r13, board S4, R12). The defaults are the sheet's own,
@@ -66,17 +67,17 @@ export function changedParts(now: PubContent, sent: PubContent | null | undefine
   const base = sent ?? (published ? fromPublished(published) : null);
   if (!base) return [];
   const out: string[] = [];
-  if (now.title !== base.title) out.push("Name");
-  if (now.lines !== base.lines) out.push("Two lines about it");
-  if (now.makes !== base.makes || now.servingName !== base.servingName) out.push("Makes");
-  if (now.minutes !== base.minutes) out.push("Time");
-  if (!same(now.grams, base.grams)) out.push("The foods and grams");
-  else if (!same(now.names, base.names)) out.push("The foods' names");
-  if (!same(now.steps, base.steps)) out.push("Steps");
+  if (now.title !== base.title) out.push(w("publish.name"));
+  if (now.lines !== base.lines) out.push(w("publish.twoLinesAboutIt"));
+  if (now.makes !== base.makes || now.servingName !== base.servingName) out.push(w("publish.makes"));
+  if (now.minutes !== base.minutes) out.push(w("publish.partTime"));
+  if (!same(now.grams, base.grams)) out.push(w("publish.partFoodsAndGrams"));
+  else if (!same(now.names, base.names)) out.push(w("publish.partFoodsNames"));
+  if (!same(now.steps, base.steps)) out.push(w("publish.steps"));
   // a photo still loading from the account is not a change
-  if (base.photo !== undefined && now.photo !== undefined && now.photo !== null && now.photo !== base.photo) out.push("Photo");
+  if (base.photo !== undefined && now.photo !== undefined && now.photo !== null && now.photo !== base.photo) out.push(w("publish.photo"));
   // the AI label: a page published before the label says nothing, so a picture made with AI is a change to publish
-  else if (now.photo !== undefined && Boolean(now.photoAi) !== Boolean(base.photoAi)) out.push("AI label");
+  else if (now.photo !== undefined && Boolean(now.photoAi) !== Boolean(base.photoAi)) out.push(w("publish.partAiLabel"));
   return out;
 }
 // the recipe's page (R12c): what is not on the live page yet, from the saved draft
@@ -89,9 +90,9 @@ const timeOf = (iso?: string) => {
   if (!iso) return "";
   const t = new Date(iso); if (Number.isNaN(t.getTime())) return "";
   const hm = t.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-  return t.toDateString() === new Date().toDateString() ? hm : `${t.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}, ${hm}`;
+  return t.toDateString() === new Date().toDateString() ? hm : `${dateText(t, { day: "numeric", month: "long" })}, ${hm}`;
 };
-export function PublishSheet({ meal, cards, author, published, close, onDone, onMeal, direct = true, approver = "your coach", client = false, publishNow = false }: {
+export function PublishSheet({ meal, cards, author, published, close, onDone, onMeal, direct = true, approver = w("publish.yourCoach"), client = false, publishNow = false }: {
   meal: Meal; cards: Feedback[]; author: string; published: Published | null; close: () => void; onDone: (r: Published | null) => void; onMeal: (patch: Partial<Meal>) => void;
   direct?: boolean; approver?: string; client?: boolean; publishNow?: boolean;
 }) {
@@ -166,7 +167,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   const photoNow = async () => (photos[photoAt] ? await resizeImageBase64(photos[photoAt], 1080, 1080).catch(() => photos[photoAt]) : null);
   const publish = async () => {
     const r = recipe(); if (!r || claim) return;
-    setBusy("Publishing…"); setErr("");
+    setBusy(w("publish.publishing")); setErr("");
     try {
       const res = await fetch("/api/recipes", { method: "POST", headers: { "Content-Type": "application/json", ...localAs(client) }, body: JSON.stringify({ recipe: r, photo: await photoNow() }) });
       const d = await res.json().catch(() => ({}));
@@ -192,39 +193,39 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   }, []);
   const unpublish = async () => {
     if (!live) return;
-    setBusy("Taking it down…");
-    try { const res = await fetch(`/api/recipes/${live.slug}`, { method: "DELETE", headers: localAs(client) }); if (!res.ok) throw new Error(); const down: Published = { ...live, status: "down" }; setDone(down); onDone(down); } catch { setErr("It couldn't be taken down. Try again."); } finally { setBusy(""); }
+    setBusy(w("publish.takingItDown"));
+    try { const res = await fetch(`/api/recipes/${live.slug}`, { method: "DELETE", headers: localAs(client) }); if (!res.ok) throw new Error(); const down: Published = { ...live, status: "down" }; setDone(down); onDone(down); } catch { setErr(w("publish.itCouldnTBeTakenDown")); } finally { setBusy(""); }
   };
   const link = live ? `${location.origin}/r/${live.slug}` : "";
   const [copied, setCopied] = useState(false);
   const images = async () => {
     const done = live; if (!done) return;
-    setBusy("Making the images…");
+    setBusy(w("publish.makingTheImages"));
     try {
       const imgs = await instagramImages(done, await photoNow());
       const files = await Promise.all(imgs.map(async (x) => new File([await (await fetch(x.dataUrl)).blob()], `${done.slug}-${x.name}`, { type: "image/jpeg" })));
       const nav: any = navigator;
       if (nav.canShare?.({ files })) await nav.share({ files, title: done.title });
       else for (const f of files) { const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; a.click(); await new Promise((r) => setTimeout(r, 300)); }
-    } catch (e: any) { if (e?.name !== "AbortError") setErr("The images couldn't be made. Try again."); } finally { setBusy(""); }
+    } catch (e: any) { if (e?.name !== "AbortError") setErr(w("publish.theImagesCouldnTBe")); } finally { setBusy(""); }
   };
 
   const state = waits ? "waiting" : live ? "live" : done?.status === "down" ? "down" : done?.status === "back" ? "back" : "draft";
-  const go = busy || (waits ? `Waiting for ${approver}` : asleep ? (direct ? w("publish.publishedNoChanges") : w("publish.noChangesToSend")) : !direct ? `Send to ${approver}` : live ? w("publish.publishTheChanges") : state === "down" ? w("publish.publishAgain") : "Publish");
+  const go = busy || (waits ? w("publish.waitingFor", { who: approver }) : asleep ? (direct ? w("publish.publishedNoChanges") : w("publish.noChangesToSend")) : !direct ? w("publish.sendTo", { who: approver }) : live ? w("publish.publishTheChanges") : state === "down" ? w("publish.publishAgain") : w("publish.publish"));
   const preview = previewing ? recipe() : null;
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet publish-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={w("publish.publishThisRecipe")}>
         <div className="card-top"><span>{meal.title}</span><button className="link" onClick={close}>{w("publish.close")}</button></div>
-        <div className="pub-head"><h2>{live ? "Published" : w("publish.publishThisRecipe")}</h2><span className={`pub-state ${state}`}>{state === "live" ? "Live" : state === "down" ? w("publish.takenDown") : state === "waiting" ? `Waiting for ${approver}` : state === "back" ? w("publish.sentBack") : "Draft"}</span></div>
-        {waits && <p className="small muted">{approver.charAt(0).toUpperCase() + approver.slice(1)} sees the page first and makes it live, or sends it back with a note.{live ? " The live page stays as it is until then." : ""}</p>}
+        <div className="pub-head"><h2>{live ? w("publish.published") : w("publish.publishThisRecipe")}</h2><span className={`pub-state ${state}`}>{state === "live" ? w("publish.live") : state === "down" ? w("publish.takenDown") : state === "waiting" ? w("publish.waitingFor", { who: approver }) : state === "back" ? w("publish.sentBack") : w("publish.draft")}</span></div>
+        {waits && <p className="small muted">{w("publish.approverSeesThePage", { who: approver.charAt(0).toUpperCase() + approver.slice(1) })}{live ? ` ${w("publish.theLivePageStays")}` : ""}</p>}
         {!waits && done?.note && <p className="small pub-note">{approver.charAt(0).toUpperCase() + approver.slice(1)}: “{done.note}”</p>}
         {!live && !waits && <p className="small muted">{state === "down" ? w("publish.theLinkSaysThisRecipe") : w("publish.savedAsYouTypeOnly")}</p>}
         {live && !waits && justPublished && !changes.length && (
-          <div className="pub-band done" role="status"><b>✓ Published</b><span>{w("publish.anyoneWithTheLinkSees")}</span><a className="pill pill-small pill-primary" href={`/r/${live.slug}`} target="_blank" rel="noreferrer">{w("publish.seeLivePage")}</a></div>
+          <div className="pub-band done" role="status"><b>✓ {w("publish.published")}</b><span>{w("publish.anyoneWithTheLinkSees")}</span><a className="pill pill-small pill-primary" href={`/r/${live.slug}`} target="_blank" rel="noreferrer">{w("publish.seeLivePage")}</a></div>
         )}
         {changes.length > 0 && (
-          <div className="pub-band changed" role="status"><b>{w("publish.changesNotPublishedYet")}</b><span>{timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt) ? `The live page shows the version from ${timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt)}. ` : w("publish.theLivePageShowsThe")}Changed: {changes.join(", ")}.</span></div>
+          <div className="pub-band changed" role="status"><b>{w("publish.changesNotPublishedYet")}</b><span>{timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt) ? `${w("publish.theVersionFrom", { time: timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt) })} ` : w("publish.theLivePageShowsThe")}{w("publish.changedList", { list: changes.join(", ") })}</span></div>
         )}
         {live && (
           <div className="publish-done">
@@ -233,33 +234,33 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
               <button className="pill pill-small" onClick={async () => { try { await navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* the link is there to copy by hand */ } }}>{copied ? <><Check size={15} /> {w("publish.copied")}</> : <><Copy size={15} /> {w("publish.copyLink")}</>}</button>
               <button className="pill pill-small pill-primary" onClick={images} disabled={Boolean(busy)}><Download size={15} /> {w("publish.theInstagramImages")}</button>
             </div>
-            <small className="muted">Four images for a carousel, and the numbers as a reel's last frame. Change anything below, See the page, then {direct ? w("publish.publishTheChanges") : `send the changes to ${approver}`}.</small>
+            <small className="muted">{w("publish.fourImages", { then: direct ? wordV("publish.publishTheChanges") : lineV("publish.sendTheChangesTo", { who: approver }) })}</small>
           </div>
         )}
         <div className="setting-block">
           <b className="field-label">{w("publish.photo")}</b>
           <div className="publish-photos">
-            {photos.map((src, i) => <button key={i} className={`publish-photo ${photoAt === i ? "on" : ""}`} onClick={() => setPhotoAt(i)} aria-label={`Photo ${i + 1}${photoAt === i ? ", the one shown" : ""}`}><img src={src} alt="" /></button>)}
+            {photos.map((src, i) => <button key={i} className={`publish-photo ${photoAt === i ? "on" : ""}`} onClick={() => setPhotoAt(i)} aria-label={w("publish.photoAria", { n: i + 1, shown: photoAt === i ? wordV("publish.photoAriaShown") : "" })}><img src={src} alt="" /></button>)}
             <button className="publish-photo add" onClick={() => fileRef.current?.click()} aria-label={w("publish.uploadAPhoto")}><ImageIcon size={20} /></button>
             <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (!f) return; const r = new FileReader(); r.onload = async () => { const raw = String(r.result); const data = await resizeImageBase64(raw, 1080, 1080).catch(() => raw); const list = own.includes(data) ? own : [...own, data].slice(0, MAX_RECIPE_PHOTOS); onMeal(withRecipePhotos(list)); setPhotoAt(Math.max(0, list.indexOf(data))); }; r.readAsDataURL(f); }} />
           </div>
           {chosen && (
             <label className="pub-ai"><input type="checkbox" checked={chosenAi} disabled={chosenDrawn} onChange={(e) => { const s = sig(chosen); const list = (meal.aiSigs ?? []).filter((x) => x !== s); onMeal({ aiSigs: e.target.checked ? [...list, s] : list }); }} />
-              <span>Made with AI{chosenDrawn ? `: drawn by ${CHEF_NAME}` : ""}. The page and the images say Picture made with AI.</span></label>
+              <span>{chosenDrawn ? w("publish.madeWithAiDrawn") : w("publish.madeWithAi")}</span></label>
           )}
           <small className="muted">{photos.length ? w("publish.theRecipeSPhotosThe") : w("publish.uploadAPhotoOfThe")}</small>
         </div>
         <label className="field-label">{w("publish.name")}<input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} /></label>
         <label className="field-label">{w("publish.twoLinesAboutIt")}<textarea value={lines} onChange={(e) => setLines(e.target.value)} maxLength={240} placeholder={w("publish.thinSoftAndTheyRoll")} /></label>
         <div className="two-fields">
-          <label className="field-label">{w("publish.makes")}<span className="makes"><input inputMode="numeric" value={makes} onChange={(e) => setMakes(e.target.value.replace(/[^\d]/g, ""))} /><input value={servingName} onChange={(e) => setServingName(e.target.value)} placeholder="crepe" aria-label={w("publish.whatOneServingIsCalled")} /></span></label>
+          <label className="field-label">{w("publish.makes")}<span className="makes"><input inputMode="numeric" value={makes} onChange={(e) => setMakes(e.target.value.replace(/[^\d]/g, ""))} /><input value={servingName} onChange={(e) => setServingName(e.target.value)} placeholder={w("publish.crepePlaceholder")} aria-label={w("publish.whatOneServingIsCalled")} /></span></label>
           <label className="field-label">{w("publish.timeMinutes")}<input inputMode="numeric" value={minutes} onChange={(e) => setMinutes(e.target.value.replace(/[^\d]/g, ""))} placeholder="35" /></label>
         </div>
         <div className="setting-block">
           <b className="field-label">{w("publish.theFoodsAsThePage")}</b>
           <small className="muted">{w("publish.chefMealanLeftOutThe")}</small>
           {meal.items.map((i, k) => i.grams > 0 && (
-            <div className="publish-item" key={k}><input value={names[k] ?? ""} onChange={(e) => setNames((xs) => xs.map((x, j) => (j === k ? e.target.value : x)))} aria-label={`Name of food ${k + 1}`} /><span>{amountOf(i.grams)}</span></div>
+            <div className="publish-item" key={k}><input value={names[k] ?? ""} onChange={(e) => setNames((xs) => xs.map((x, j) => (j === k ? e.target.value : x)))} aria-label={w("publish.nameOfFood", { n: k + 1 })} /><span>{amountOf(i.grams)}</span></div>
           ))}
         </div>
         <div className="setting-block">
@@ -268,9 +269,9 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
           <small className="muted">{w("publish.theStepsStayWithThe")}</small>
         </div>
         <div className="publish-checks">
-          {nums ? <span className={nums.proteinShare >= 20 ? "ok" : "plain"}>{nums.proteinShare >= 20 ? "✓ High protein: " : w("publish.protein")}{nums.proteinShare} % of the energy is protein</span> : <span className="no">{w("publish.someFoodsHaveNoEnergy")}</span>}
-          {nums && <span className="ok">✓ One {servingName || "serving"}: {nums.perServing.kcal} kcal · {nums.perServing.protein} g protein · PD {nums.pd}</span>}
-          <span className={rating ? "ok" : "plain"}>{rating === "daam" ? "✓ Your rating: DaaM good" : rating === "good" ? "✓ Your rating: Good" : w("publish.noRatingYetRateIt")}</span>
+          {nums ? <span className={nums.proteinShare >= 20 ? "ok" : "plain"}>{nums.proteinShare >= 20 ? w("publish.highProtein") : w("publish.protein")}{w("publish.shareOfEnergy", { n: nums.proteinShare })}</span> : <span className="no">{w("publish.someFoodsHaveNoEnergy")}</span>}
+          {nums && <span className="ok">{w("publish.oneServing", { serving: servingName || wordV("publish.serving"), kcal: nums.perServing.kcal, protein: nums.perServing.protein, pd: nums.pd })}</span>}
+          <span className={rating ? "ok" : "plain"}>{rating === "daam" ? w("publish.ratingDaam") : rating === "good" ? w("publish.ratingGood") : w("publish.noRatingYetRateIt")}</span>
           {claim && <span className="no">{claim}</span>}
         </div>
         <label className="pub-cooked"><input type="checkbox" checked={cooked} onChange={(e) => setCooked(e.target.checked)} /><span><b>{w("publish.iCookedThis")}</b><small>{w("publish.thePageSaysFromThe")}</small></span></label>
@@ -286,7 +287,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
         <div className="rp-preview" role="dialog" aria-label={w("publish.seeThePage")} onClick={(e) => e.stopPropagation()}>
           <RecipeView r={preview} member={null} photoSrc={photos[photoAt] ?? null} top={
             <div className="rp-preview-bar" style={{ margin: "-14px -18px 0" }}>
-              <b>Preview: only you see this. {live ? w("publish.theLivePageChangesWhen") : w("publish.nothingIsLiveYet")}{!direct ? ` ${approver.charAt(0).toUpperCase() + approver.slice(1)} sees it before it goes live.` : ""}</b>
+              <b>{w("publish.previewOnlyYou")} {live ? w("publish.theLivePageChangesWhen") : w("publish.nothingIsLiveYet")}{!direct ? ` ${w("publish.approverSeesItBefore", { who: approver.charAt(0).toUpperCase() + approver.slice(1) })}` : ""}</b>
               <div className="ways"><button className="pill" onClick={() => setPreviewing(false)}>{w("publish.backToTheSheet")}</button><button className="pill pill-primary" onClick={publish} disabled={Boolean(claim) || Boolean(busy) || waits || asleep}>{go}</button></div>
             </div>} />
         </div>

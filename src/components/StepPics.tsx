@@ -2,7 +2,7 @@
 // the camera or the gallery (a photo while cooking, or one made in ChatGPT or Gemini with the Step Picture Checks prompts);
 // who made it is asked, and the checks show before it is kept. Watch the steps plays them, made on the phone from the
 // pictures: no video file. Labels sit under a picture, never on it; nothing under 12 px; every button 44 px or more.
-import { w } from "../words";
+import { w, wIn, type Val, type WordKey } from "../words";
 import { ChefLine } from "./ChefLine";
 import { say } from "../chefScript";
 import { useEffect, useRef, useState } from "react";
@@ -13,6 +13,8 @@ import { resizeImageBase64 } from "../utils/image";
 import { secondsIn, clock } from "../cook";
 import type { StepPic } from "../photos";
 
+// a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
+const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const words = (step: string, items: Ingredient[]) => stepParts(tempsIn(step), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>));
 export const picLabel = (p: StepPic) => (p.by === "ai" ? w("steppics.pictureDrawnByAiBeta") : w("steppics.yourPhoto"));
@@ -22,8 +24,8 @@ export function StepPicShown({ pic, k, onOpen }: { pic: StepPic | null; k: numbe
   if (!pic) return null;
   return (
     <div className="rq-step-pic">
-      <button type="button" onClick={onOpen} aria-label={`Change or remove the photo of step ${k + 1}`}><img src={pic.src} alt="" /></button>
-      <small>{pic.by === "ai" ? "AI · Beta" : "Yours"}</small>
+      <button type="button" onClick={onOpen} aria-label={w("steppics.changeOrRemoveThePhoto", { n: k + 1 })}><img src={pic.src} alt="" /></button>
+      <small>{pic.by === "ai" ? w("steppics.aiBeta") : w("steppics.yours")}</small>
     </div>
   );
 }
@@ -31,10 +33,10 @@ export function StepPicShown({ pic, k, onOpen }: { pic: StepPic | null; k: numbe
 export function StepPicSlot({ pic, k, onOpen }: { pic: StepPic | null; k: number; onOpen: () => void }) {
   return (
     <div className="rq-step-pic">
-      <button type="button" onClick={onOpen} aria-label={pic ? `Change the picture of step ${k + 1}` : `Add a picture to step ${k + 1}`}>
-        {pic ? <img src={pic.src} alt="" /> : <span className="add">＋ Picture</span>}
+      <button type="button" onClick={onOpen} aria-label={pic ? w("steppics.changeThePictureOf", { n: k + 1 }) : w("steppics.addAPictureTo", { n: k + 1 })}>
+        {pic ? <img src={pic.src} alt="" /> : <span className="add">{w("steppics.addPicture")}</span>}
       </button>
-      {pic && <small>{pic.by === "ai" ? "AI · Beta" : "Yours"}</small>}
+      {pic && <small>{pic.by === "ai" ? w("steppics.aiBeta") : w("steppics.yours")}</small>}
     </div>
   );
 }
@@ -52,11 +54,11 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, f
   const take = async (f?: File) => {
     if (!f) return; setBusy(true); setErr("");
     try { const raw = await readFile(f); const small = await resizeImageBase64(raw, 960, 960).catch(() => raw); setSrc(small); if (!pic) setBy(null); }
-    catch { setErr("That picture didn't open. Try another one."); } finally { setBusy(false); }
+    catch { setErr(w("steppics.thatPictureDidnTOpen")); } finally { setBusy(false); }
   };
   return (
-    <div className="sp-sheet" role="dialog" aria-label={`Picture for step ${k + 1}`}>
-      <div className="cook-top"><button className="pill pill-small" style={{ height: 44 }} onClick={onClose}>✕ Close</button><b className="cook-title">Picture for step {k + 1}</b><span /></div>
+    <div className="sp-sheet" role="dialog" aria-label={w("steppics.pictureForStep", { n: k + 1 })}>
+      <div className="cook-top"><button className="pill pill-small" style={{ height: 44 }} onClick={onClose}>{w("steppics.close")}</button><b className="cook-title">{w("steppics.pictureForStep", { n: k + 1 })}</b><span /></div>
       <small className="sp-step" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.45 }}>{words(step, items)}</small>
       <div className="sp-grid">
         <button className="pill" disabled={busy} onClick={() => cam.current?.click()}>{w("steppics.takeAPhoto")}</button>
@@ -67,11 +69,11 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, f
       {/* DT211 v8 (0.3.53): the photos taken on this step while cooking it; one can be the step's photo */}
       {fromCooks.length > 0 && <>
         <b>{w("steppics.fromYourCooks")}</b>
-        <div className="sp-cooks">{fromCooks.slice(0, 8).map((x, i) => <button key={i} type="button" className={`publish-photo${src === x ? " on" : ""}`} aria-label={`Photo ${i + 1} from your cooks`} onClick={() => { setSrc(x); setBy("me"); }}><img src={x} alt="" /></button>)}</div>
+        <div className="sp-cooks">{fromCooks.slice(0, 8).map((x, i) => <button key={i} type="button" className={`publish-photo${src === x ? " on" : ""}`} aria-label={w("steppics.photoFromYourCooks", { n: i + 1 })} onClick={() => { setSrc(x); setBy("me"); }}><img src={x} alt="" /></button>)}</div>
       </>}
       {err && <small className="error">{err}</small>}
       {src && <>
-        <img className="sp-preview" src={src} alt={`The picture for step ${k + 1}`} />
+        <img className="sp-preview" src={src} alt={w("steppics.thePictureForStep", { n: k + 1 })} />
         <ChefLine text={say("whoMadePhoto")} />
         <div className="sp-grid">
           <button className={`choice ${by === "me" ? "on" : ""}`} aria-pressed={by === "me"} onClick={() => setBy("me")}>{w("steppics.myPhoto")}</button>
@@ -123,26 +125,26 @@ export function StepPlayer({ title, steps, items, pics, onClose, onCook }: {
   const sec = secondsIn(steps[k]);
   const elapsed = Math.round(k * PER + Math.min(t, PER));
   return (
-    <div className="cook-mode sp-player" role="dialog" aria-label={`Watch the steps of ${title}`}>
+    <div className="cook-mode sp-player" role="dialog" aria-label={w("steppics.watchTheStepsOf", { title })}>
       <div className="cook-top">
-        <button className="pill pill-small" style={{ height: 44 }} onClick={onClose}>✕ Close</button>
+        <button className="pill pill-small" style={{ height: 44 }} onClick={onClose}>{w("steppics.close")}</button>
         <b className="cook-title">{title}</b>
         <small className="cook-count">{clock(elapsed)}</small>
       </div>
       <div className="cook-steps" role="tablist" aria-label={w("steppics.steps")}>{steps.map((_, j) => (
-        <button key={j} role="tab" aria-selected={j === k} aria-label={`Step ${j + 1}`} className={`cook-step-btn${j === k ? " on" : ""}`} onClick={() => go(j)}>{j + 1}</button>))}</div>
+        <button key={j} role="tab" aria-selected={j === k} aria-label={w("steppics.stepN", { n: j + 1 })} className={`cook-step-btn${j === k ? " on" : ""}`} onClick={() => go(j)}>{j + 1}</button>))}</div>
       <section className="cook-card sp-frame" aria-live="polite">
-        <img src={pics[k].src} alt={`Step ${k + 1}`} />
+        <img src={pics[k].src} alt={w("steppics.stepN", { n: k + 1 })} />
         <div className="sp-words">
-          <small style={{ fontWeight: 800, color: "var(--muted)", letterSpacing: ".04em" }}>STEP {k + 1} OF {steps.length}{sec ? ` · TIMER ${clock(sec)}` : ""}</small>
+          <small style={{ fontWeight: 800, color: "var(--muted)", letterSpacing: ".04em" }}>{w("steppics.stepOf", { n: k + 1, of: steps.length, timer: sec ? lineV("steppics.timer", { time: clock(sec) }) : "" })}</small>
           <div className="cook-text">{words(steps[k], items)}</div>
           <small className="muted" style={{ fontSize: 13, fontWeight: 700 }}>{picLabel(pics[k])}</small>
         </div>
       </section>
       <div className="sp-controls">
-        <button className="pill" disabled={k === 0} onClick={() => go(k - 1)}>‹ Step {Math.max(1, k)}</button>
-        <button className="pill pill-primary" onClick={() => { if (!playing && k >= steps.length - 1 && t >= PER) { go(0); setPlaying(true); } else setPlaying(!playing); }}>{playing ? "❚❚ Pause" : k >= steps.length - 1 && t >= PER ? "↻ Again" : "▶ Play"}</button>
-        <button className="pill" disabled={k >= steps.length - 1} onClick={() => go(k + 1)}>Step {Math.min(steps.length, k + 2)} ›</button>
+        <button className="pill" disabled={k === 0} onClick={() => go(k - 1)}>{w("steppics.stepBack", { n: Math.max(1, k) })}</button>
+        <button className="pill pill-primary" onClick={() => { if (!playing && k >= steps.length - 1 && t >= PER) { go(0); setPlaying(true); } else setPlaying(!playing); }}>{playing ? w("steppics.pause") : k >= steps.length - 1 && t >= PER ? w("steppics.again") : w("steppics.play")}</button>
+        <button className="pill" disabled={k >= steps.length - 1} onClick={() => go(k + 1)}>{w("steppics.stepNext", { n: Math.min(steps.length, k + 2) })}</button>
       </div>
       {onCook && <button className="pill pill-wide" style={{ height: 52 }} onClick={onCook}>{w("steppics.startCooking")}</button>}
       <small className="muted cook-under">{w("steppics.madeOnYourPhoneFrom")}</small>

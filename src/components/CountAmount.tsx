@@ -17,7 +17,7 @@ export function CountAmount({ item, editable, open, onToggle, onGrams, whole }: 
     const by = (d: 1 | -1) => onGrams(Math.max(0, (d > 0 ? Math.floor(item.grams / s.grams + 1e-6) + 1 : Math.ceil(item.grams / s.grams - 1e-6) - 1) * s.grams));
     return (
       <span className="ct-num">
-        {editable ? <span className="ct-step"><button type="button" aria-label={`One ${s.name} less`} onClick={() => by(-1)}>−</button><b>{label}</b><button type="button" aria-label={`One ${s.name} more`} onClick={() => by(1)}>+</button></span> : <b>{label}</b>}
+        {editable ? <span className="ct-step"><button type="button" aria-label={w("count.oneLess", { piece: s.name })} onClick={() => by(-1)}>−</button><b>{label}</b><button type="button" aria-label={w("count.oneMore", { piece: s.name })} onClick={() => by(1)}>+</button></span> : <b>{label}</b>}
         <small>{Math.round(item.grams)} g</small>
       </span>
     );
@@ -26,9 +26,9 @@ export function CountAmount({ item, editable, open, onToggle, onGrams, whole }: 
   return (
     <span className="ct-num">
       {editable
-        ? <span className="ct-step"><button type="button" aria-label={`One ${k.one} less`} onClick={() => onGrams(stepCount(c, item.grams, -1), { ...c, weighed: false })}>−</button><b>{l.main}</b><button type="button" aria-label={`One ${k.one} more`} onClick={() => onGrams(stepCount(c, item.grams, 1), { ...c, weighed: false })}>+</button></span>
+        ? <span className="ct-step"><button type="button" aria-label={w("count.oneLess", { piece: k.one })} onClick={() => onGrams(stepCount(c, item.grams, -1), { ...c, weighed: false })}>−</button><b>{l.main}</b><button type="button" aria-label={w("count.oneMore", { piece: k.one })} onClick={() => onGrams(stepCount(c, item.grams, 1), { ...c, weighed: false })}>+</button></span>
         : <b>{l.main}</b>}
-      {onToggle ? <button type="button" className="ct-small" aria-expanded={Boolean(open)} aria-label={`Size of ${item.food.name}: ${l.small}`} onClick={onToggle}>{l.small}</button> : <small>{l.small}</small>}
+      {onToggle ? <button type="button" className="ct-small" aria-expanded={Boolean(open)} aria-label={w("count.sizeOfIs", { food: item.food.name, size: l.small })} onClick={onToggle}>{l.small}</button> : <small>{l.small}</small>}
     </span>
   );
 }
@@ -39,14 +39,14 @@ export function SizePicker({ item, onGrams }: { item: Ingredient; onGrams: (gram
   const [typed, setTyped] = useState("");
   const weigh = () => { const g = Math.round(Number(typed.replace(",", "."))); if (g > 0 && g < 2000) { onGrams(g, weighed(c, g)); setTyped(""); } };
   return (
-    <div className="ct-pick" role="group" aria-label={`Size of ${item.food.name}`}>
+    <div className="ct-pick" role="group" aria-label={w("count.sizeOf", { food: item.food.name })}>
       <b>{w("count.size")}</b>
       <div className="ct-sizes">{sizesOf(c.kind).map(([s, g]) => (
         <button key={s} type="button" className={c.size === s ? "on" : ""} aria-pressed={c.size === s} onClick={() => { const r = resize(c, item.grams, s); onGrams(r.grams, r.count); }}>{s}<small>{g} g</small></button>
       ))}</div>
-      <small>{c.kind === "egg" ? w("count.eachEggWithoutTheShell") : c.kind === "apple" ? "A whole apple, with the core. Apples vary, so the size is a guide." : w("count.peeledBananasVaryMoreThan")}</small>
+      <small>{c.kind === "egg" ? w("count.eachEggWithoutTheShell") : c.kind === "apple" ? w("count.wholeApple") : w("count.peeledBananasVaryMoreThan")}</small>
       {c.kind !== "egg" && (
-        <span className="ct-weigh">{w("count.weighedIt")} <input inputMode="numeric" aria-label={`Grams of ${k.one}, weighed`} placeholder="134" value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d.,]/g, ""))} onBlur={weigh} onKeyDown={(e) => { if (e.key === "Enter") weigh(); }} /> g {k.note}</span>
+        <span className="ct-weigh">{w("count.weighedIt")} <input inputMode="numeric" aria-label={w("count.gramsWeighed", { piece: k.one })} placeholder="134" value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d.,]/g, ""))} onBlur={weigh} onKeyDown={(e) => { if (e.key === "Enter") weigh(); }} /> g {k.note}</span>
       )}
     </div>
   );

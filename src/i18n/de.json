@@ -12360,6 +12360,3666 @@
     "lang.nameDe": {
       "text": "Deutsch",
       "checked": true
+    },
+    "busy.busyInYourCalendarAt": {
+      "text": "In deinem Kalender belegt, {block}",
+      "checked": true
+    },
+    "busy.toTime": {
+      "text": "bis {time}",
+      "checked": true
+    },
+    "busy.isAtOn": {
+      "text": "{meal}: {day} um {time}.",
+      "checked": true
+    },
+    "busy.isAtOnBack": {
+      "text": "{meal}: {day} um {time}. Zurück auf {usual} steht darunter im Plan.",
+      "checked": true
+    },
+    "busy.keepTime": {
+      "text": "{time} behalten",
+      "checked": true
+    },
+    "busy.quickIdeas": {
+      "text": "Schnelle Ideen: {meal}",
+      "checked": true
+    },
+    "busy.quickQuestion": {
+      "text": "Etwas Schnelles für {meal}, {day}: Ich bin bis {until} beschäftigt und esse um {time}, also habe ich etwa {free} Minuten zum Kochen.",
+      "checked": true
+    },
+    "busy.cookAheadOn": {
+      "text": "Vorkochen: {day}",
+      "checked": true
+    },
+    "busy.isCookedOn": {
+      "text": "{title} wird vorgekocht: {ahead}, für {day}.",
+      "checked": true
+    },
+    "busy.keepIt": {
+      "text": "Behalten",
+      "checked": true
+    },
+    "busy.toCarry": {
+      "text": "{meal} zum Mitnehmen",
+      "checked": true
+    },
+    "busy.carryQuestion": {
+      "text": "{meal} zum Mitnehmen, {day}: Ich bin von {block} unterwegs. Etwas, das ich am Vorabend machen und mitnehmen kann.",
+      "checked": true
+    },
+    "busy.moveTo": {
+      "text": "Auf {time} verschieben",
+      "checked": true
+    },
+    "busy.trainingIsAt": {
+      "text": "Training ist um {time}, {day}, nur an diesem Datum.",
+      "checked": true
+    },
+    "busy.restDay": {
+      "text": "Ruhetag",
+      "checked": true
+    },
+    "busy.isARestDay": {
+      "text": "{day} ist ein Ruhetag, nur an diesem Datum.",
+      "checked": true
+    },
+    "busy.movedInGoogle": {
+      "text": "In Google Kalender verschoben, von {time}",
+      "checked": true
+    },
+    "busy.atOnThisDate": {
+      "text": "Um {time}, nur an diesem Datum",
+      "checked": true
+    },
+    "busy.backTo": {
+      "text": "Zurück auf {time}",
+      "checked": true
+    },
+    "busy.cookedAheadOn": {
+      "text": "Vorgekocht: {day}",
+      "checked": true
+    },
+    "recipes.noneLeft": {
+      "text": "nichts mehr übrig",
+      "checked": true
+    },
+    "recipes.nLeft": {
+      "text": "noch {n} {unit} übrig",
+      "checked": true
+    },
+    "recipes.nOnDay": {
+      "text": "{n}: {day}, {slot}",
+      "checked": true
+    },
+    "recipes.batchLine": {
+      "text": "{makes} {unit}: {uses}. {left}.",
+      "checked": true
+    },
+    "recipes.batchCooking": {
+      "text": "{makes} {unit}: {uses}. Gekocht werden {cook}, {left}.",
+      "checked": true
+    },
+    "recipes.batchBatches": {
+      "text": "{makes} {unit}: {uses}. {n} Durchgang, {left}.|{makes} {unit}: {uses}. {n} Durchgänge, {left}.",
+      "checked": true
+    },
+    "recipes.savedCooking": {
+      "text": "Kochen, {when}",
+      "checked": true
+    },
+    "recipes.savedCookingTicked": {
+      "text": "Kochen, {when} · {ticked} von {n} Schritten abgehakt",
+      "checked": true
+    },
+    "recipes.savedPlate": {
+      "text": "Ein Teller, {when}",
+      "checked": true
+    },
+    "recipes.savedInMyRecipes": {
+      "text": "✓ In Meine Rezepte gespeichert",
+      "checked": true
+    },
+    "recipes.yourCoach": {
+      "text": "dein Coach",
+      "checked": true
+    },
+    "recipes.open": {
+      "text": "{title} öffnen",
+      "checked": true
+    },
+    "recipes.drawnByChef": {
+      "text": "Von Chef Mealan gezeichnet",
+      "checked": true
+    },
+    "recipes.tileOne": {
+      "text": "1 {word} · {kcal} kcal · {protein} g Protein · {pd}",
+      "checked": true
+    },
+    "recipes.tileOneMakes": {
+      "text": "1 {word} · {kcal} kcal · {protein} g Protein · {pd} · ergibt {n}",
+      "checked": true
+    },
+    "recipes.nFoods": {
+      "text": "{n} Lebensmittel|{n} Lebensmittel",
+      "checked": true
+    },
+    "recipes.madeTimes": {
+      "text": "{n}-mal zubereitet|{n}-mal zubereitet",
+      "checked": true
+    },
+    "recipes.chefSIdea": {
+      "text": "Idee von Chef Mealan, noch nicht zubereitet",
+      "checked": true
+    },
+    "recipes.sharedWithMembers": {
+      "text": "Mit Mitgliedern geteilt",
+      "checked": true
+    },
+    "recipes.sharedWithMembersNoName": {
+      "text": "Mit Mitgliedern geteilt, ohne deinen Namen",
+      "checked": true
+    },
+    "recipes.waitingFor": {
+      "text": "Wartet auf {who}",
+      "checked": true
+    },
+    "recipes.sentBackBy": {
+      "text": "Zurückgeschickt von {who}",
+      "checked": true
+    },
+    "recipes.draft": {
+      "text": "Entwurf",
+      "checked": true
+    },
+    "recipes.couldntTakeBackFromMembers": {
+      "text": "Es konnte nicht aus Mitglieder zurückgezogen werden. Nichts wurde gelöscht. Versuch es nochmal.",
+      "checked": true
+    },
+    "recipes.takenBackButPageNotDown": {
+      "text": "Es wurde aus Mitglieder zurückgezogen, aber die Seite konnte nicht offline genommen werden. Sonst wurde nichts gelöscht. Versuch es nochmal.",
+      "checked": true
+    },
+    "recipes.pageNotDown": {
+      "text": "Die Seite konnte nicht offline genommen werden. Sonst wurde nichts gelöscht. Versuch es nochmal.",
+      "checked": true
+    },
+    "recipes.publishedIsLive": {
+      "text": "✓ Veröffentlicht. {title} ist live auf chefmealan.com.",
+      "checked": true
+    },
+    "recipes.takenDownForEveryMember": {
+      "text": "Für jedes Mitglied entfernt.",
+      "checked": true
+    },
+    "recipes.savedInMine": {
+      "text": "✓ Unter Meine gespeichert",
+      "checked": true
+    },
+    "recipes.today": {
+      "text": "Heute",
+      "checked": true
+    },
+    "recipes.plan": {
+      "text": "Plan",
+      "checked": true
+    },
+    "recipes.sharedWithCoach": {
+      "text": "✓ Mit {coach} geteilt",
+      "checked": true
+    },
+    "recipes.shareWithCoach": {
+      "text": "Mit {coach} teilen ›",
+      "checked": true
+    },
+    "recipes.whatShouldCoachDo": {
+      "text": "Was soll {coach} damit machen?",
+      "checked": true
+    },
+    "recipes.plannedForHint": {
+      "text": "Geplant für {day}, {meal}. Ändere die Lebensmittel oder Mengen für diesen Tag; das Rezept bleibt, wie es ist. Zubereiten und Gegessen erscheinen unter Heute, {day}.",
+      "checked": true
+    },
+    "recipes.goneByHint": {
+      "text": "{day}, {meal}: schon vorbei. Ändere es in das, was du gegessen hast, dann wird es um {time} eingetragen. Das Rezept bleibt, wie es ist.",
+      "checked": true
+    },
+    "recipes.isDeleted": {
+      "text": "{title} ist gelöscht.",
+      "checked": true
+    },
+    "recipes.saveInMyRecipes": {
+      "text": "In Meine Rezepte speichern",
+      "checked": true
+    },
+    "recipes.moreOfMine": {
+      "text": "{n} weitere von mir ›",
+      "checked": true
+    },
+    "recipes.moreFromCoach": {
+      "text": "{n} weitere von {coach} ›",
+      "checked": true
+    },
+    "recipes.moreFromMembers": {
+      "text": "{n} weitere von Mitgliedern ›",
+      "checked": true
+    },
+    "recipes.loadingWhatMembersShared": {
+      "text": "Lade, was Mitglieder geteilt haben…",
+      "checked": true
+    },
+    "recipes.slotByThePlanToday": {
+      "text": "{meal}, {time} · nach Plan · heute",
+      "checked": true
+    },
+    "recipes.slotPlannedNotAdded": {
+      "text": "{day}, {meal}, {time} · geplant, nicht hinzugefügt",
+      "checked": true
+    },
+    "recipes.slotInThePlan": {
+      "text": "{day}, {meal}, {time} · im Plan",
+      "checked": true
+    },
+    "publish.partTime": {
+      "text": "Zeit",
+      "checked": true
+    },
+    "publish.partFoodsAndGrams": {
+      "text": "Die Lebensmittel und Gramm",
+      "checked": true
+    },
+    "publish.partFoodsNames": {
+      "text": "Die Namen der Lebensmittel",
+      "checked": true
+    },
+    "publish.partAiLabel": {
+      "text": "KI-Kennzeichnung",
+      "checked": true
+    },
+    "publish.yourCoach": {
+      "text": "dein Coach",
+      "checked": true
+    },
+    "publish.publishing": {
+      "text": "Wird veröffentlicht…",
+      "checked": true
+    },
+    "publish.takingItDown": {
+      "text": "Wird offline genommen…",
+      "checked": true
+    },
+    "publish.itCouldnTBeTakenDown": {
+      "text": "Es konnte nicht offline genommen werden. Versuch es nochmal.",
+      "checked": true
+    },
+    "publish.makingTheImages": {
+      "text": "Bilder werden erstellt…",
+      "checked": true
+    },
+    "publish.theImagesCouldnTBe": {
+      "text": "Die Bilder konnten nicht erstellt werden. Versuch es nochmal.",
+      "checked": true
+    },
+    "publish.waitingFor": {
+      "text": "Wartet auf {who}",
+      "checked": true
+    },
+    "publish.sendTo": {
+      "text": "An {who} senden",
+      "checked": true
+    },
+    "publish.publish": {
+      "text": "Veröffentlichen",
+      "checked": true
+    },
+    "publish.published": {
+      "text": "Veröffentlicht",
+      "checked": true
+    },
+    "publish.live": {
+      "text": "Live",
+      "checked": true
+    },
+    "publish.draft": {
+      "text": "Entwurf",
+      "checked": true
+    },
+    "publish.approverSeesThePage": {
+      "text": "{who} sieht die Seite zuerst und stellt sie live oder schickt sie mit einer Notiz zurück.",
+      "checked": true
+    },
+    "publish.theLivePageStays": {
+      "text": "Die veröffentlichte Seite bleibt bis dahin, wie sie ist.",
+      "checked": true
+    },
+    "publish.theVersionFrom": {
+      "text": "Die veröffentlichte Seite zeigt die Version von {time}.",
+      "checked": true
+    },
+    "publish.changedList": {
+      "text": "Geändert: {list}.",
+      "checked": true
+    },
+    "publish.fourImages": {
+      "text": "Vier Bilder für ein Karussell und die Zahlen als letztes Bild eines Reels. Ändere unten, was du willst, dann Seite ansehen, dann {then}.",
+      "checked": true
+    },
+    "publish.sendTheChangesTo": {
+      "text": "die Änderungen an {who} senden",
+      "checked": true
+    },
+    "publish.photoAria": {
+      "text": "Foto {n}{shown}",
+      "checked": true
+    },
+    "publish.photoAriaShown": {
+      "text": ", wird angezeigt",
+      "checked": true
+    },
+    "publish.madeWithAiDrawn": {
+      "text": "Mit KI erstellt: von Chef Mealan gezeichnet. Die Seite und die Bilder sagen Bild mit KI erstellt.",
+      "checked": true
+    },
+    "publish.madeWithAi": {
+      "text": "Mit KI erstellt. Die Seite und die Bilder sagen Bild mit KI erstellt.",
+      "checked": true
+    },
+    "publish.crepePlaceholder": {
+      "text": "Crêpe",
+      "checked": true
+    },
+    "publish.nameOfFood": {
+      "text": "Name von Lebensmittel {n}",
+      "checked": true
+    },
+    "publish.highProtein": {
+      "text": "✓ Proteinreich: ",
+      "checked": true
+    },
+    "publish.shareOfEnergy": {
+      "text": "{n} % der Energie stammen aus Protein",
+      "checked": true
+    },
+    "publish.oneServing": {
+      "text": "✓ 1 {serving}: {kcal} kcal · {protein} g Protein · PD {pd}",
+      "checked": true
+    },
+    "publish.serving": {
+      "text": "Portion",
+      "checked": true
+    },
+    "publish.ratingDaam": {
+      "text": "✓ Deine Bewertung: DaaM good",
+      "checked": true
+    },
+    "publish.ratingGood": {
+      "text": "✓ Deine Bewertung: Gut",
+      "checked": true
+    },
+    "publish.previewOnlyYou": {
+      "text": "Vorschau: Nur du siehst das.",
+      "checked": true
+    },
+    "publish.approverSeesItBefore": {
+      "text": "{who} sieht es, bevor es live geht.",
+      "checked": true
+    },
+    "members.sharedByYou": {
+      "text": "von dir geteilt",
+      "checked": true
+    },
+    "members.sharedByYouWithoutName": {
+      "text": "von dir geteilt, ohne deinen Namen",
+      "checked": true
+    },
+    "members.sharedBy": {
+      "text": "geteilt von {name}",
+      "checked": true
+    },
+    "members.sharedByAMember": {
+      "text": "von einem Mitglied geteilt",
+      "checked": true
+    },
+    "members.madeTimes": {
+      "text": "{n}-mal zubereitet|{n}-mal zubereitet",
+      "checked": true
+    },
+    "members.photoBy": {
+      "text": "Foto von {name}",
+      "checked": true
+    },
+    "members.drawnByChef": {
+      "text": "Von Chef Mealan gezeichnet",
+      "checked": true
+    },
+    "members.leadForYourDay": {
+      "text": "Rezepte der Mitglieder, berechnet für deinen Tag. {meal}: etwa {kcal} kcal{first}.",
+      "checked": true
+    },
+    "members.leadFirst": {
+      "text": " bei {pd} oder mehr, deshalb stehen diese oben",
+      "checked": true
+    },
+    "members.open": {
+      "text": "{title} öffnen",
+      "checked": true
+    },
+    "members.yourMealPortion": {
+      "text": "{meal}, deine Portion: {grams} g · {kcal} kcal · {pd}",
+      "checked": true
+    },
+    "members.wholeRecipePortion": {
+      "text": "Das ganze Rezept: {grams} g · {kcal} kcal · {pd}",
+      "checked": true
+    },
+    "members.underYour": {
+      "text": ", unter deinem {pd}",
+      "checked": true
+    },
+    "members.theCoverOf": {
+      "text": "Titelbild von {title}",
+      "checked": true
+    },
+    "members.byMembers": {
+      "text": "von Mitgliedern",
+      "checked": true
+    },
+    "members.adaptedFrom": {
+      "text": "Angepasst nach {source}",
+      "checked": true
+    },
+    "members.allOfRecipes": {
+      "text": "Alle Rezepte von {name} ›",
+      "checked": true
+    },
+    "members.yourPortionOfTotal": {
+      "text": "{meal}, deine Portion: {grams} g von den {total} g, die es ergibt",
+      "checked": true
+    },
+    "members.foods": {
+      "text": "Lebensmittel",
+      "checked": true
+    },
+    "members.sharedNoSteps": {
+      "text": "{name} hat keine Schritte geteilt.",
+      "checked": true
+    },
+    "members.yourPortionGoesOn": {
+      "text": "Deine Portion kommt auf den Teller: {grams} g, {kcal} kcal. An mein Ziel anpassen kann sie noch verändern.",
+      "checked": true
+    },
+    "members.aCopyInMine": {
+      "text": "Eine Kopie unter Meine, zum Ändern, wie du willst. {whose} Rezept bleibt unangetastet.",
+      "checked": true
+    },
+    "members.nameS": {
+      "text": "{name}s",
+      "checked": true
+    },
+    "members.theCoverDidnTChange": {
+      "text": "Das Titelbild hat sich nicht geändert. Versuch es nochmal.",
+      "checked": true
+    },
+    "members.membersSeeTheNewCover": {
+      "text": "Mitglieder sehen das neue Titelbild.",
+      "checked": true
+    },
+    "members.takingItBackDidnT": {
+      "text": "Zurückziehen hat nicht geklappt. Versuch es nochmal.",
+      "checked": true
+    },
+    "members.thePictureByChef": {
+      "text": "das Bild von Chef Mealan",
+      "checked": true
+    },
+    "members.yourPhotoLower": {
+      "text": "dein Foto",
+      "checked": true
+    },
+    "members.noCover": {
+      "text": "keins",
+      "checked": true
+    },
+    "members.shared": {
+      "text": "Geteilt",
+      "checked": true
+    },
+    "members.seeItSince": {
+      "text": "Mitglieder sehen es seit {date}, als {as}. Titelbild: {cover}.",
+      "checked": true
+    },
+    "members.you": {
+      "text": "du",
+      "checked": true
+    },
+    "members.aMember": {
+      "text": "ein Mitglied",
+      "checked": true
+    },
+    "members.madeZeroSoFar": {
+      "text": "Bisher 0-mal zubereitet.",
+      "checked": true
+    },
+    "members.madeLine": {
+      "text": "{n}-mal zubereitet.|{n}-mal zubereitet.",
+      "checked": true
+    },
+    "members.aChangeReachesThem": {
+      "text": "Eine Änderung, die du hier machst, erreicht auch sie.",
+      "checked": true
+    },
+    "members.nameIsFree": {
+      "text": "Der Name {name} ist frei. Er gehört dir, sobald du teilst.",
+      "checked": true
+    },
+    "members.switchOn": {
+      "text": "An: Mitglieder sehen es als {as}. Aus: als Rezept eines Mitglieds.",
+      "checked": true
+    },
+    "members.switchOff": {
+      "text": "Aus: Mitglieder sehen es als Rezept eines Mitglieds. An: als {as}.",
+      "checked": true
+    },
+    "members.yoursByYourName": {
+      "text": "deins, unter deinem Namen bei Mitglieder",
+      "checked": true
+    },
+    "steppics.changeOrRemoveThePhoto": {
+      "text": "Foto von Schritt {n} ändern oder entfernen",
+      "checked": true
+    },
+    "steppics.aiBeta": {
+      "text": "KI · Beta",
+      "checked": true
+    },
+    "steppics.yours": {
+      "text": "Deins",
+      "checked": true
+    },
+    "steppics.changeThePictureOf": {
+      "text": "Bild von Schritt {n} ändern",
+      "checked": true
+    },
+    "steppics.addAPictureTo": {
+      "text": "Bild zu Schritt {n} hinzufügen",
+      "checked": true
+    },
+    "steppics.addPicture": {
+      "text": "＋ Bild",
+      "checked": true
+    },
+    "steppics.thatPictureDidnTOpen": {
+      "text": "Das Bild ließ sich nicht öffnen. Versuch ein anderes.",
+      "checked": true
+    },
+    "steppics.pictureForStep": {
+      "text": "Bild für Schritt {n}",
+      "checked": true
+    },
+    "steppics.close": {
+      "text": "✕ Schließen",
+      "checked": true
+    },
+    "steppics.photoFromYourCooks": {
+      "text": "Foto {n} aus deinem Kochen",
+      "checked": true
+    },
+    "steppics.thePictureForStep": {
+      "text": "Das Bild für Schritt {n}",
+      "checked": true
+    },
+    "steppics.watchTheStepsOf": {
+      "text": "Schritte von {title} ansehen",
+      "checked": true
+    },
+    "steppics.stepN": {
+      "text": "Schritt {n}",
+      "checked": true
+    },
+    "steppics.stepOf": {
+      "text": "SCHRITT {n} VON {of}{timer}",
+      "checked": true
+    },
+    "steppics.timer": {
+      "text": " · TIMER {time}",
+      "checked": true
+    },
+    "steppics.stepBack": {
+      "text": "‹ Schritt {n}",
+      "checked": true
+    },
+    "steppics.stepNext": {
+      "text": "Schritt {n} ›",
+      "checked": true
+    },
+    "steppics.pause": {
+      "text": "❚❚ Pause",
+      "checked": true
+    },
+    "steppics.again": {
+      "text": "↻ Nochmal",
+      "checked": true
+    },
+    "steppics.play": {
+      "text": "▶ Abspielen",
+      "checked": true
+    },
+    "delrecipe.deleteTitle": {
+      "text": "{title} löschen",
+      "checked": true
+    },
+    "delrecipe.deleteTitleAsk": {
+      "text": "{title} löschen?",
+      "checked": true
+    },
+    "delrecipe.theRecipe": {
+      "text": "Das Rezept: {list}.",
+      "checked": true
+    },
+    "delrecipe.listAnd": {
+      "text": "{list} und {last}",
+      "checked": true
+    },
+    "delrecipe.yourScreenshots": {
+      "text": "Dein {n} Screenshot|Deine {n} Screenshots",
+      "checked": true
+    },
+    "delrecipe.itsPhotos": {
+      "text": "Sein {n} Foto|Seine {n} Fotos",
+      "checked": true
+    },
+    "delrecipe.fromThisPhone": {
+      "text": "von diesem Handy und aus deinem Konto.",
+      "checked": true
+    },
+    "delrecipe.thePictureChefDrew": {
+      "text": "Das Bild, das Chef Mealan gezeichnet hat.",
+      "checked": true
+    },
+    "delrecipe.membersWhoKeptACopy": {
+      "text": "Wer eine Kopie behalten hat, behält sie.",
+      "checked": true
+    },
+    "delrecipe.withdrawItFrom": {
+      "text": "Bei {who} zurückziehen",
+      "checked": true
+    },
+    "delrecipe.noLongerSeesIt": {
+      "text": "Bei {who} wartet es nicht mehr.",
+      "checked": true
+    },
+    "delrecipe.stopsShowingIt": {
+      "text": "chefmealan.com/r/{slug} zeigt es nicht mehr.",
+      "checked": true
+    },
+    "delrecipe.theVersionWaitingFor": {
+      "text": "Die Version, die auf {who} wartet, wird zurückgezogen.",
+      "checked": true
+    },
+    "delrecipe.yourMeals": {
+      "text": "Deine {n} Mahlzeit|Deine {n} Mahlzeiten",
+      "checked": true
+    },
+    "delrecipe.withItOnToday": {
+      "text": "damit, unter Heute und in deinem Verlauf: Was du gegessen hast, bleibt, was du gegessen hast.",
+      "checked": true
+    },
+    "delrecipe.theFoodsItUses": {
+      "text": "Das {n} Lebensmittel, das es verwendet|Die {n} Lebensmittel, die es verwendet",
+      "checked": true
+    },
+    "delrecipe.inYourFoods": {
+      "text": "in deinen Lebensmitteln. Ein Lebensmittel enthält nichts Persönliches.",
+      "checked": true
+    },
+    "delrecipe.deleting": {
+      "text": "Wird gelöscht…",
+      "checked": true
+    },
+    "yourcooks.good": {
+      "text": "Gut",
+      "checked": true
+    },
+    "yourcooks.daamGood": {
+      "text": "DaaM good",
+      "checked": true
+    },
+    "yourcooks.timesTheLastOn": {
+      "text": "{n}-mal, zuletzt am {date}|{n}-mal, zuletzt am {date}",
+      "checked": true
+    },
+    "yourcooks.asTheStepsSay": {
+      "text": "Wie in den Schritten:",
+      "checked": true
+    },
+    "yourcooks.nOfTotal": {
+      "text": "{n} von {total}",
+      "checked": true
+    },
+    "yourcooks.tasted": {
+      "text": "Geschmack:",
+      "checked": true
+    },
+    "yourcooks.carriedYou": {
+      "text": "So ist es dir bekommen:",
+      "checked": true
+    },
+    "yourcooks.today": {
+      "text": "Heute",
+      "checked": true
+    },
+    "yourcooks.yesterday": {
+      "text": "Gestern",
+      "checked": true
+    },
+    "yourcooks.cooked": {
+      "text": "gekocht",
+      "checked": true
+    },
+    "yourcooks.theRestOfABatch": {
+      "text": "der Rest vom Vorrat",
+      "checked": true
+    },
+    "yourcooks.logged": {
+      "text": "eingetragen",
+      "checked": true
+    },
+    "yourcooks.onePortion": {
+      "text": "1 Portion, {g} g",
+      "checked": true
+    },
+    "yourcooks.halfAPortion": {
+      "text": "Eine halbe Portion, {g} g",
+      "checked": true
+    },
+    "yourcooks.twoPortions": {
+      "text": "2 Portionen, {g} g",
+      "checked": true
+    },
+    "yourcooks.carriedYouHow": {
+      "text": "so ist es dir bekommen: {how}",
+      "checked": true
+    },
+    "yourcooks.fewer": {
+      "text": "Weniger",
+      "checked": true
+    },
+    "yourcooks.allN": {
+      "text": "Alle {n} ›",
+      "checked": true
+    },
+    "photoask.ateAtTime": {
+      "text": "Gegessen um {time}",
+      "checked": true
+    },
+    "photoask.eatingNow": {
+      "text": "Ich esse gerade",
+      "checked": true
+    },
+    "photoask.exploring": {
+      "text": "Entdecken",
+      "checked": true
+    },
+    "photoask.notYourMeal": {
+      "text": "Nicht deine Mahlzeit, wird nicht eingetragen. Chef Mealan liest sie: Koch sie, heb sie als Idee auf oder plane sie ein.",
+      "checked": true
+    },
+    "photoask.nowAs": {
+      "text": "Wie von der Kamera: der Teller vor dir, als {meal}.",
+      "checked": true
+    },
+    "photoask.now": {
+      "text": "Wie von der Kamera: der Teller vor dir.",
+      "checked": true
+    },
+    "photoask.loggedAtAs": {
+      "text": "Eingetragen um {time}, als {meal}. Tippe auf die Uhrzeit, um sie zu ändern.",
+      "checked": true
+    },
+    "photoask.loggedAt": {
+      "text": "Eingetragen um {time}. Tippe auf die Uhrzeit, um sie zu ändern.",
+      "checked": true
+    },
+    "photoask.notePlaceholder": {
+      "text": "Schweineschnitzel, paniert, Augustiner",
+      "checked": true
+    },
+    "count.oneLess": {
+      "text": "{piece}: eins weniger",
+      "checked": true
+    },
+    "count.oneMore": {
+      "text": "{piece}: eins mehr",
+      "checked": true
+    },
+    "count.sizeOfIs": {
+      "text": "Größe von {food}: {size}",
+      "checked": true
+    },
+    "count.sizeOf": {
+      "text": "Größe von {food}",
+      "checked": true
+    },
+    "count.wholeApple": {
+      "text": "Ein ganzer Apfel, mit Kerngehäuse. Äpfel sind unterschiedlich, die Größe ist also ein Richtwert.",
+      "checked": true
+    },
+    "count.gramsWeighed": {
+      "text": "{piece}, in Gramm gewogen",
+      "checked": true
+    },
+    "sayhave.listening": {
+      "text": "Ich höre zu",
+      "checked": true
+    },
+    "sayhave.eggsSpinachFeta": {
+      "text": "Eier, Spinat, Feta, eine halbe Zwiebel",
+      "checked": true
+    },
+    "out.tagPlate": {
+      "text": "VON DEINEM TELLER",
+      "checked": true
+    },
+    "out.tagDay": {
+      "text": "AUS DEINEM TAG",
+      "checked": true
+    },
+    "out.tagPlan": {
+      "text": "DEIN PLAN",
+      "checked": true
+    },
+    "out.tagChef": {
+      "text": "CHEF MEALAN",
+      "checked": true
+    },
+    "out.aboutDay": {
+      "text": "{day}: {what}.",
+      "checked": true
+    },
+    "out.everySlotSet": {
+      "text": "alle Mahlzeiten eingeplant",
+      "checked": true
+    },
+    "out.toPlace": {
+      "text": "{kcal} kcal und {g} g zu verteilen",
+      "checked": true
+    },
+    "out.slotsToCome": {
+      "text": "Noch offen: {open} von {n} Mahlzeit.|Noch offen: {open} von {n} Mahlzeiten.",
+      "checked": true
+    },
+    "out.slotsToComeExtra": {
+      "text": "Noch offen: {open} von {n} Mahlzeit, bisher {extra} extra.|Noch offen: {open} von {n} Mahlzeiten, bisher {extra} extra.",
+      "checked": true
+    },
+    "out.onThePlate": {
+      "text": "Auf dem Teller: {foods}, {pd}.",
+      "checked": true
+    },
+    "out.onThePlateAgainst": {
+      "text": "Auf dem Teller: {foods}, {pd} gegenüber deinem {ref}.",
+      "checked": true
+    },
+    "out.fillDay": {
+      "text": "{day} füllen",
+      "checked": true
+    },
+    "out.swapForLighter": {
+      "text": "{meal} gegen etwas Leichteres tauschen",
+      "checked": true
+    },
+    "out.moveToAfterTraining": {
+      "text": "{meal} auf nach dem Training verschieben",
+      "checked": true
+    },
+    "out.imOutWhatDoITake": {
+      "text": "Ich bin unterwegs, was nehme ich?",
+      "checked": true
+    },
+    "out.swapAFoodOnMyPlate": {
+      "text": "Ein Lebensmittel auf meinem Teller tauschen",
+      "checked": true
+    },
+    "out.makeMyPlateA": {
+      "text": "Mach meinen Teller passend für {meal}",
+      "checked": true
+    },
+    "out.noIdeaInspireMe": {
+      "text": "Keine Idee, inspirier mich",
+      "checked": true
+    },
+    "out.filled": {
+      "text": "{day}, gefüllt: {rows}. Der Tag landet bei {kcal} kcal und {protein} g Protein. Ändere eins oder übernimm sie in den Plan.",
+      "checked": true
+    },
+    "out.filledOf": {
+      "text": "{day}, gefüllt: {rows}. Der Tag landet bei {kcal} kcal und {protein} g Protein von {ofKcal} und {ofProtein}. Ändere eins oder übernimm sie in den Plan.",
+      "checked": true
+    },
+    "out.dishAroundMyPlate": {
+      "text": "Welches Gericht kann ich aus dem machen, was auf meinem Teller ist, damit es für {meal} passt?",
+      "checked": true
+    },
+    "out.changeMyPlateSoItMakes": {
+      "text": "Was soll ich auf meinem Teller ändern, damit es für {meal} passt?",
+      "checked": true
+    },
+    "out.slotIsAsBefore": {
+      "text": "{meal} ist wie vorher.",
+      "checked": true
+    },
+    "out.slotIsNow": {
+      "text": "{meal} ist jetzt {title}.",
+      "checked": true
+    },
+    "out.movedForToday": {
+      "text": "Auf {time} verschoben, für heute.",
+      "checked": true
+    },
+    "out.movedForThatDay": {
+      "text": "Auf {time} verschoben, für diesen Tag.",
+      "checked": true
+    },
+    "out.photoOnly": {
+      "text": "(Foto)",
+      "checked": true
+    },
+    "out.iMovedTheFood": {
+      "text": "Ich habe {food} auf {g} g gesetzt, damit es passt.",
+      "checked": true
+    },
+    "out.evenWithMore": {
+      "text": "Auch mit mehr {food} bleibt das unter deinem Ziel; es ist ein Genuss, keine Anpassung.",
+      "checked": true
+    },
+    "out.didntAnswer": {
+      "text": "Diesmal habe ich nicht geantwortet: {why} Deine Frage bleibt gespeichert.",
+      "checked": true
+    },
+    "out.didntAnswerPlate": {
+      "text": "Diesmal habe ich nicht geantwortet: {why} Deine Frage und der Teller bleiben gespeichert.",
+      "checked": true
+    },
+    "out.gOnThePlate": {
+      "text": "{g} g {food} auf dem Teller.",
+      "checked": true
+    },
+    "out.isOffThePlate": {
+      "text": "{food} ist nicht mehr auf dem Teller.",
+      "checked": true
+    },
+    "out.isBackOnThePlate": {
+      "text": "{food} ist wieder auf dem Teller.",
+      "checked": true
+    },
+    "out.withChefMealan": {
+      "text": "Mit Chef Mealan: {foods}",
+      "checked": true
+    },
+    "out.savedToYourMeals": {
+      "text": "In deinen Mahlzeiten gespeichert.",
+      "checked": true
+    },
+    "out.close": {
+      "text": "Schließen",
+      "checked": true
+    },
+    "out.sayWhatYouWant": {
+      "text": "Sag, was du willst, oder tippe unten auf eine Zeile.",
+      "checked": true
+    },
+    "out.backToTheChat": {
+      "text": "Zurück zum Chat",
+      "checked": true
+    },
+    "out.plateFoods": {
+      "text": "Teller: {foods}",
+      "checked": true
+    },
+    "out.swapped": {
+      "text": "Getauscht",
+      "checked": true
+    },
+    "out.movedTo": {
+      "text": "Auf {time} verschoben",
+      "checked": true
+    },
+    "out.keptAt": {
+      "text": "Bleibt um {time}",
+      "checked": true
+    },
+    "out.keepTime": {
+      "text": "{time} behalten",
+      "checked": true
+    },
+    "out.inThePlan": {
+      "text": "Im Plan",
+      "checked": true
+    },
+    "out.inYourFoods": {
+      "text": "in deinen Lebensmitteln",
+      "checked": true
+    },
+    "out.basicFood": {
+      "text": "Basis-Lebensmittel",
+      "checked": true
+    },
+    "out.thePlateReaches": {
+      "text": "der Teller erreicht {pd}",
+      "checked": true
+    },
+    "out.onThePlateDone": {
+      "text": "Auf dem Teller",
+      "checked": true
+    },
+    "out.plusAdd": {
+      "text": "+ Hinzufügen",
+      "checked": true
+    },
+    "out.onThePlateGrams": {
+      "text": "auf dem Teller · {g} g",
+      "checked": true
+    },
+    "out.outDone": {
+      "text": "Rausgenommen",
+      "checked": true
+    },
+    "out.per100": {
+      "text": "~{kcal} kcal · {protein} g Protein pro 100 g",
+      "checked": true
+    },
+    "out.targetPd": {
+      "text": "Ziel {pd}",
+      "checked": true
+    },
+    "out.workOnItWithChef": {
+      "text": "Mit Chef Mealan daran arbeiten",
+      "checked": true
+    },
+    "out.askedChefMealan": {
+      "text": "Chef Mealan gefragt",
+      "checked": true
+    },
+    "out.listening": {
+      "text": "Ich höre zu",
+      "checked": true
+    },
+    "nutrition.proteinDensity": {
+      "text": "Proteindichte",
+      "checked": true
+    },
+    "nutrition.oneServing": {
+      "text": "1 {one}",
+      "checked": true
+    },
+    "nutrition.allOfIt": {
+      "text": "Alles",
+      "checked": true
+    },
+    "nutrition.pd": {
+      "text": "PD",
+      "checked": true
+    },
+    "nutrition.noTargetSet": {
+      "text": "kein Ziel gesetzt",
+      "checked": true
+    },
+    "nutrition.fitsYourPlan": {
+      "text": "passt zu deinem Plan",
+      "checked": true
+    },
+    "nutrition.underYour": {
+      "text": "{under} unter deinem {target}",
+      "checked": true
+    },
+    "nutrition.kcalProteinGrams": {
+      "text": "{kcal} kcal · {protein} g Protein · {grams} g",
+      "checked": true
+    },
+    "nutrition.nutrition": {
+      "text": "Nährwerte",
+      "checked": true
+    },
+    "nutrition.allN": {
+      "text": "ALLE {n}",
+      "checked": true
+    },
+    "nutrition.all": {
+      "text": "ALLE",
+      "checked": true
+    },
+    "nutrition.per100Head": {
+      "text": "100 G",
+      "checked": true
+    },
+    "nutrition.noValueFor": {
+      "text": "? : kein Wert für {list}. Trag ihn beim Lebensmittel ein, dann zieht die Tabelle nach.",
+      "checked": true
+    },
+    "nutrition.byPartOne": {
+      "text": "Nach Teil, 1 {one}",
+      "checked": true
+    },
+    "nutrition.byPart": {
+      "text": "Nach Teil",
+      "checked": true
+    },
+    "nutrition.kcalHead": {
+      "text": "KCAL",
+      "checked": true
+    },
+    "nutrition.proteinHead": {
+      "text": "PROTEIN",
+      "checked": true
+    },
+    "nutrition.recipeSays": {
+      "text": "Das Rezept sagt, pro {one}: {kcal} kcal{fat}{carbs} · {protein} g Protein{pd}.",
+      "checked": true
+    },
+    "nutrition.saysFat": {
+      "text": " · {g} g Fett",
+      "checked": true
+    },
+    "nutrition.saysCarbs": {
+      "text": " · {g} g Kohlenhydrate",
+      "checked": true
+    },
+    "nutrition.saysPd": {
+      "text": " · PD {pd}",
+      "checked": true
+    },
+    "nutrition.oursIsApart": {
+      "text": "Unser Wert liegt bei der Energie {n}% {way}: Das Rezept nutzt vielleicht andere Produkte.",
+      "checked": true
+    },
+    "nutrition.higher": {
+      "text": "höher",
+      "checked": true
+    },
+    "nutrition.lower": {
+      "text": "niedriger",
+      "checked": true
+    },
+    "nutrition.oursAgrees": {
+      "text": "Unser Wert stimmt überein.",
+      "checked": true
+    },
+    "nutrition.polyols": {
+      "text": "Seine Kohlenhydrate lassen vielleicht die Polyole des Süßstoffs weg.",
+      "checked": true
+    },
+    "nutrition.fromTheFoods": {
+      "text": "Aus den Lebensmitteln und ihren Grammangaben; jeder Wert stammt vom Etikett des Lebensmittels oder ist ein typischer Wert, als Schätzung markiert.",
+      "checked": true
+    },
+    "nutrition.plateRounds": {
+      "text": "Der Teller rundet jedes Lebensmittel auf das Gramm, daher kann eine Portion dort etwas abweichen.",
+      "checked": true
+    },
+    "plan.lengthRange": {
+      "text": "{lo} bis {hi} Min.",
+      "checked": true
+    },
+    "plan.lengthOver": {
+      "text": "{n}+ Min.",
+      "checked": true
+    },
+    "plan.minutesShort": {
+      "text": "{n} Min.",
+      "checked": true
+    },
+    "plan.workHoursHint": {
+      "text": "Deine Arbeitszeit, {from} bis {to}, hält Trainingsvorschläge aus der Arbeit heraus.",
+      "checked": true
+    },
+    "plan.schoolDaysHint": {
+      "text": "Montag bis Freitag sind zu Beginn Schultage. Markiere einen freien Tag als schulfrei.",
+      "checked": true
+    },
+    "plan.workAndStudyHint": {
+      "text": "Aus Alltag: Arbeit und Studium. Wähl für jeden Tag, was er ist.",
+      "checked": true
+    },
+    "plan.gOfProtein": {
+      "text": "{g} g Protein",
+      "checked": true
+    },
+    "plan.underYourRange": {
+      "text": ", unter deinem Bereich von {lo} bis {hi} g. Tausche eine Mahlzeit gegen eine mit mehr Protein.",
+      "checked": true
+    },
+    "plan.aboveYourRange": {
+      "text": "{g} g Protein, über deinem Bereich von {lo} bis {hi} g. Das schadet nicht. Um es zu senken, tausche eine Mahlzeit gegen eine mit weniger Protein.",
+      "checked": true
+    },
+    "plan.whenWord.morning": {
+      "text": "Morgens",
+      "checked": true
+    },
+    "plan.whenWord.day": {
+      "text": "Tagsüber",
+      "checked": true
+    },
+    "plan.whenWord.evening": {
+      "text": "Abends",
+      "checked": true
+    },
+    "plan.whenWord.late": {
+      "text": "Spät nachts",
+      "checked": true
+    },
+    "plan.whenWord.afterschool": {
+      "text": "Nach der Schule",
+      "checked": true
+    },
+    "plan.whenWord.lateafternoon": {
+      "text": "Am späten Nachmittag",
+      "checked": true
+    },
+    "plan.fits": {
+      "text": "passt",
+      "checked": true
+    },
+    "plan.aDayLivedByThePlan": {
+      "text": "✓ Ein Tag nach Plan",
+      "checked": true
+    },
+    "plan.slotPlanned": {
+      "text": "{meal}, {time} · geplant",
+      "checked": true
+    },
+    "plan.batchCook": {
+      "text": "{title}: koche {cook}, für die geplanten {pieces}.",
+      "checked": true
+    },
+    "plan.batchesOf": {
+      "text": "{title}: {n} Durchgang mit {size}, für die geplanten {pieces}.|{title}: {n} Durchgänge mit je {size}, für die geplanten {pieces}.",
+      "checked": true
+    },
+    "plan.leftOver": {
+      "text": "{n} bleiben übrig.",
+      "checked": true
+    },
+    "plan.mealSheetHead": {
+      "text": "{day}, {meal}, {time}",
+      "checked": true
+    },
+    "plan.starterAmount": {
+      "text": "Startgericht von Chef Mealan, {amount}. Das sind die Lebensmittel zum Abwiegen.",
+      "checked": true
+    },
+    "plan.starterOnePortion": {
+      "text": "Startgericht von Chef Mealan, eine Portion. Das sind die Lebensmittel zum Abwiegen.",
+      "checked": true
+    },
+    "plan.chefMealanSEstimate": {
+      "text": "Schätzung von Chef Mealan",
+      "checked": true
+    },
+    "plan.othersReachKcal": {
+      "text": "Die anderen geplanten Mahlzeiten erreichen schon die kcal des Tages.",
+      "checked": true
+    },
+    "plan.proteinCovered": {
+      "text": "Mit den anderen geplanten Mahlzeiten ist das Protein des Tages gedeckt. Es bleiben etwa {kcal} kcal.",
+      "checked": true
+    },
+    "plan.othersLeft": {
+      "text": "Mit den anderen geplanten Mahlzeiten bleiben etwa {kcal} kcal und {g} g Protein, {pd}.",
+      "checked": true
+    },
+    "plan.itNeeds": {
+      "text": "Es braucht etwa {kcal} kcal und {g} g Protein, {pd}.",
+      "checked": true
+    },
+    "plan.myRecipes": {
+      "text": "Meine Rezepte",
+      "checked": true
+    },
+    "plan.coachSRecipes": {
+      "text": "Rezepte vom Coach",
+      "checked": true
+    },
+    "plan.chefMealanSStarters": {
+      "text": "Startgerichte von Chef Mealan",
+      "checked": true
+    },
+    "plan.planATrip": {
+      "text": "✈ Reise planen",
+      "checked": true
+    },
+    "plan.aTripHead": {
+      "text": "✈ Eine Reise",
+      "checked": true
+    },
+    "plan.tripToSaved": {
+      "text": "Reise nach {place}: {from} bis {to}.",
+      "checked": true
+    },
+    "plan.tripHead": {
+      "text": "✈ Reise nach {place} · {from} bis {to}",
+      "checked": true
+    },
+    "plan.theTripIsOff": {
+      "text": "Die Reise ist abgesagt.",
+      "checked": true
+    },
+    "plan.placeFoodsInSearch": {
+      "text": "Lebensmittel aus {place} in meiner Suche",
+      "checked": true
+    },
+    "plan.onByItself": {
+      "text": "Geht am {from} von selbst an, nach {to} aus.",
+      "checked": true
+    },
+    "plan.foodsYouAddTagged": {
+      "text": "Lebensmittel, die du hinzufügst, solange es an ist, bekommen die Markierung {place}.",
+      "checked": true
+    },
+    "plan.placeFoodsOn": {
+      "text": "Lebensmittel aus {place} in meiner Suche: an",
+      "checked": true
+    },
+    "plan.placeFoodsOff": {
+      "text": "Lebensmittel aus {place} in meiner Suche: aus",
+      "checked": true
+    },
+    "plan.on": {
+      "text": "An",
+      "checked": true
+    },
+    "plan.off": {
+      "text": "Aus",
+      "checked": true
+    },
+    "calendar.mealOnAt": {
+      "text": "{meal}, {day} um {time}",
+      "checked": true
+    },
+    "calendar.fromGoogleCalendar": {
+      "text": "Aus Google Kalender: {what}.",
+      "checked": true
+    },
+    "calendar.notUpdated": {
+      "text": "Google Kalender wurde nicht aktualisiert. Versuch es nochmal.",
+      "checked": true
+    },
+    "calendar.notConnected": {
+      "text": "Google Kalender wurde nicht verbunden.",
+      "checked": true
+    },
+    "calendar.yourPlanIsInGoogle": {
+      "text": "Dein Plan ist in Google Kalender, im Kalender Chef Mealan.",
+      "checked": true
+    },
+    "calendar.staysInGoogle": {
+      "text": "Der Kalender bleibt in Google. Versuch es nochmal oder entferne ihn in Google Kalender.",
+      "checked": true
+    },
+    "calendar.googleAnswered": {
+      "text": "Google Kalender hat geantwortet: {answer}. Entferne ihn in Google Kalender.",
+      "checked": true
+    },
+    "calendar.answerNo": {
+      "text": "nein",
+      "checked": true
+    },
+    "calendar.inYourAccount": {
+      "text": "Der Kalender Chef Mealan in deinem Google-Konto.",
+      "checked": true
+    },
+    "calendar.inYourAccountEmail": {
+      "text": "Der Kalender Chef Mealan in deinem Google-Konto, {email}.",
+      "checked": true
+    },
+    "calendar.nextDaysInIt": {
+      "text": "Die nächsten {n} Tage sind darin.",
+      "checked": true
+    },
+    "calendar.updatedAt": {
+      "text": "Aktualisiert {time}.",
+      "checked": true
+    },
+    "calendar.whenYouChange": {
+      "text": "Wenn du hier eine Uhrzeit, einen Termin oder eine Mahlzeit änderst, ändert sich das in Google Kalender innerhalb von Sekunden. Google lässt die App nach einem Tippen etwa eine Stunde lang schreiben; danach bringt ein Tippen auf Google Kalender aktualisieren die nächsten {n} Tage auf den neuesten Stand.",
+      "checked": true
+    },
+    "calendar.writingOf": {
+      "text": "Schreibe {done} von {total}…",
+      "checked": true
+    },
+    "calendar.connecting": {
+      "text": "Verbinde…",
+      "checked": true
+    },
+    "calendar.noBusyTimes": {
+      "text": "Google hat die belegten Zeiten nicht geliefert. Nichts hat sich geändert.",
+      "checked": true
+    },
+    "calendar.planNowShowsBusy": {
+      "text": "Plan zeigt jetzt, wann du beschäftigt bist, und fragt, wo eine belegte Zeit auf eine Mahlzeit oder ein Training trifft.",
+      "checked": true
+    },
+    "calendar.turningItOnAsks": {
+      "text": "Beim Einschalten wird Google noch einmal gefragt, nach einem weiteren Recht: sehen, wann du beschäftigt bist. Belegte Zeiten bleiben auf deinem Handy: nicht auf unserem Server, nicht bei deinem Coach, nicht bei der KI von Chef Mealan.",
+      "checked": true
+    },
+    "calendar.writingToGoogle": {
+      "text": "Schreibe in Google Kalender: {done} von {total}.",
+      "checked": true
+    },
+    "calendar.googleSays": {
+      "text": "Google Kalender: {message}",
+      "checked": true
+    },
+    "calendar.waitingForYourPlan": {
+      "text": "Google Kalender wartet auf deinen Plan. Ein Tippen bringt die nächsten {n} Tage auf den neuesten Stand.",
+      "checked": true
+    },
+    "calendar.alsoInYourGoogle": {
+      "text": "Auch in deinem Google Kalender, {n} Tage im Voraus. Eine Uhrzeit, die du hier änderst, ändert sich auch dort.",
+      "checked": true
+    },
+    "calendar.upToDate": {
+      "text": "Aktuell.",
+      "checked": true
+    },
+    "calendar.upToDateAt": {
+      "text": "Aktuell, {time}.",
+      "checked": true
+    },
+    "calendar.optionalPutsList": {
+      "text": "Optional. Trägt Einkaufsliste {n} in deinen Kalender ein.",
+      "checked": true
+    },
+    "calendar.shopOnList": {
+      "text": "Einkaufstag, Einkaufsliste {n}",
+      "checked": true
+    },
+    "plate.phasePrep": {
+      "text": "Vorbereiten",
+      "checked": true
+    },
+    "plate.phaseMake": {
+      "text": "Zubereiten",
+      "checked": true
+    },
+    "plate.phaseEat": {
+      "text": "Essen",
+      "checked": true
+    },
+    "plate.phaseOf": {
+      "text": "Phase {n} von 3, {phase}",
+      "checked": true
+    },
+    "plate.gSugars": {
+      "text": "{n} g Zucker",
+      "checked": true
+    },
+    "plate.gSaturates": {
+      "text": "{n} g gesättigte Fettsäuren",
+      "checked": true
+    },
+    "plate.gSalt": {
+      "text": "{n} g Salz",
+      "checked": true
+    },
+    "plate.fromFullTable": {
+      "text": "aus Lebensmitteln mit vollständiger Nährwerttabelle",
+      "checked": true
+    },
+    "plate.dishRowLine": {
+      "text": "{pd} · {kcal} kcal · {protein} g Protein · das Rezept bleibt, wie es ist",
+      "checked": true
+    },
+    "plate.ingredientsN": {
+      "text": "Zutaten, {n}",
+      "checked": true
+    },
+    "plate.nOf": {
+      "text": "{n} von {of}",
+      "checked": true
+    },
+    "plate.yourPlateUnder": {
+      "text": "Dein Teller liegt {gap} unter dem Ziel.",
+      "checked": true
+    },
+    "plate.addOneRefits": {
+      "text": "Füge eins davon aus deinen Lebensmitteln hinzu, und Chef Mealan passt neu an:",
+      "checked": true
+    },
+    "plate.addOneToLift": {
+      "text": "Füge eins davon aus deinen Lebensmitteln hinzu, um ihn anzuheben:",
+      "checked": true
+    },
+    "plate.thePlate": {
+      "text": "der Teller",
+      "checked": true
+    },
+    "plate.plusAdd": {
+      "text": "+ Hinzufügen",
+      "checked": true
+    },
+    "plate.noneReaches": {
+      "text": "Keins davon erreicht allein {target}.",
+      "checked": true
+    },
+    "plate.forADishAsk": {
+      "text": "Für ein Gericht rund um diese Lebensmittel frag den Koch.",
+      "checked": true
+    },
+    "plate.askWhatToAdd": {
+      "text": "Frag Chef Mealan, was du hinzufügen sollst",
+      "checked": true
+    },
+    "plate.isInEaten": {
+      "text": "{title} ist als gegessen eingetragen: {slot}.",
+      "checked": true
+    },
+    "plate.recipeUpdated": {
+      "text": "{title} ist aktualisiert. {slot} und die Tage im Plan mit diesem Rezept ziehen mit.",
+      "checked": true
+    },
+    "plate.isSlotStays": {
+      "text": "{name} steht jetzt bei {slot}. {title} bleibt, wie es war.",
+      "checked": true
+    },
+    "plate.changedForDay": {
+      "text": "Für diesen Tag geändert: {diff}.",
+      "checked": true
+    },
+    "plate.slotHasChange": {
+      "text": "{slot} hat deine Änderung. {title} bleibt, wie es war.",
+      "checked": true
+    },
+    "plate.changedFromRecipe": {
+      "text": "Geändert gegenüber deinem Rezept {title}",
+      "checked": true
+    },
+    "plate.pdWas": {
+      "text": "{now}, vorher {was}.",
+      "checked": true
+    },
+    "plate.changesDaysFollow": {
+      "text": "{title} ändert sich; {n} Tag im Plan damit zieht mit.|{title} ändert sich; die {n} Tage im Plan damit ziehen mit.",
+      "checked": true
+    },
+    "plate.changes": {
+      "text": "{title} ändert sich.",
+      "checked": true
+    },
+    "plate.onlyFor": {
+      "text": "Nur für {slot}",
+      "checked": true
+    },
+    "plate.thisDay": {
+      "text": "diesen Tag",
+      "checked": true
+    },
+    "plate.isSlot": {
+      "text": "{title} steht jetzt bei {slot}.",
+      "checked": true
+    },
+    "plate.isSlotSaved": {
+      "text": "{title} steht jetzt bei {slot}. Auch unter Meine Rezepte gespeichert.",
+      "checked": true
+    },
+    "plate.perPiece": {
+      "text": "pro {piece}",
+      "checked": true
+    },
+    "plate.perPortion": {
+      "text": "pro Portion",
+      "checked": true
+    },
+    "plate.kcalLessPer": {
+      "text": "{kcal} kcal weniger {per}",
+      "checked": true
+    },
+    "plate.kcalMorePer": {
+      "text": "{kcal} kcal mehr {per}",
+      "checked": true
+    },
+    "plate.aboutSameEnergy": {
+      "text": "etwa gleich viel Energie",
+      "checked": true
+    },
+    "plate.sameProtein": {
+      "text": "gleich viel Protein",
+      "checked": true
+    },
+    "plate.gMoreProtein": {
+      "text": "{n} g mehr Protein",
+      "checked": true
+    },
+    "plate.gLessProtein": {
+      "text": "{n} g weniger Protein",
+      "checked": true
+    },
+    "plate.sameFoodOtherState": {
+      "text": "dasselbe Lebensmittel ({food}), anderer Zustand · {kcal}, {prot}",
+      "checked": true
+    },
+    "plate.numsOf": {
+      "text": "{kcal} kcal · {protein} g Protein · {pd}",
+      "checked": true
+    },
+    "plate.planLineNums": {
+      "text": "{meal}, {time} · {nums} · Nach Plan",
+      "checked": true
+    },
+    "plate.planLine": {
+      "text": "{meal}, {time} · Nach Plan",
+      "checked": true
+    },
+    "plate.exploringLine": {
+      "text": "Entdecken · nicht für eine Mahlzeit bemessen",
+      "checked": true
+    },
+    "plate.snackLine": {
+      "text": "Snack · außerhalb des Plans",
+      "checked": true
+    },
+    "plate.forHintNums": {
+      "text": "{meal}, {time}: {nums}, aus deinem Plan für heute. Es zählt als {mealLow}.",
+      "checked": true
+    },
+    "plate.forHint": {
+      "text": "{meal}, {time}: Es zählt als {mealLow}.",
+      "checked": true
+    },
+    "plate.forHintClock": {
+      "text": "{meal}, nach der Uhrzeit: eine Schätzung, außerhalb des Plans. Tippe auf {meal}, damit es als {mealLow} zählt: Dann zählt es nach Plan.",
+      "checked": true
+    },
+    "plate.noLonger": {
+      "text": "Nicht mehr {title}: Seine Lebensmittel sind weg. Der Teller gehört dir.",
+      "checked": true
+    },
+    "plate.basicFoodSoldIn": {
+      "text": "Grundlebensmittel, erhältlich in {place}; kommt zu deinen Lebensmitteln",
+      "checked": true
+    },
+    "plate.basicFood": {
+      "text": "Grundlebensmittel; kommt zu deinen Lebensmitteln",
+      "checked": true
+    },
+    "plate.notesJoins": {
+      "text": "{notes}; kommt zu deinen Lebensmitteln",
+      "checked": true
+    },
+    "plate.yours": {
+      "text": "Eigene",
+      "checked": true
+    },
+    "plate.cantReach": {
+      "text": "nicht erreichbar",
+      "checked": true
+    },
+    "plate.swapFor": {
+      "text": "{food} tauschen gegen",
+      "checked": true
+    },
+    "plate.sameKindFirst": {
+      "text": "Zuerst dieselbe Art Lebensmittel, erhältlich dort, wo du einkaufst.",
+      "checked": true
+    },
+    "plate.atYourWithout": {
+      "text": "Der Teller ist auch ohne es bei deinem Ziel von {target}, also behält jedes seine Menge.",
+      "checked": true
+    },
+    "plate.gramsBring": {
+      "text": "Die Gramm bringen den Teller auf dein Ziel von {target}.",
+      "checked": true
+    },
+    "plate.sameKindLike": {
+      "text": "Dieselbe Art Lebensmittel, wie {food}",
+      "checked": true
+    },
+    "plate.otherKindsList": {
+      "text": "Andere Sorten: {list} ›",
+      "checked": true
+    },
+    "plate.otherKindsMore": {
+      "text": "Andere Sorten: {list} und {n} weitere ›",
+      "checked": true
+    },
+    "plate.tasteDaamPd": {
+      "text": "{meal}: eine volle Mahlzeit, die wie ein Dessert schmeckt, mit deiner {pd}. Süße Lebensmittel werden angeboten, herzhafte zurückgehalten; Chef Mealan setzt auf Quark, Skyr und Whey.",
+      "checked": true
+    },
+    "plate.tasteDaam": {
+      "text": "{meal}: eine volle Mahlzeit, die wie ein Dessert schmeckt. Süße Lebensmittel werden angeboten, herzhafte zurückgehalten; Chef Mealan setzt auf Quark, Skyr und Whey.",
+      "checked": true
+    },
+    "plate.tasteSavouryPd": {
+      "text": "{meal}, herzhaft, mit deiner {pd}. Süße Lebensmittel werden zurückgehalten.",
+      "checked": true
+    },
+    "plate.tasteSavoury": {
+      "text": "{meal}, herzhaft. Süße Lebensmittel werden zurückgehalten.",
+      "checked": true
+    },
+    "plate.tasteBoth": {
+      "text": "Herzhaft und süß in einem {meal}, die kcal geteilt: ein Hauptgang und ein süßer Abschluss, zwei Teile auf dem Teller. Nichts wird zurückgehalten.",
+      "checked": true
+    },
+    "plate.pickGoesInto": {
+      "text": "Wähle unten ein Lebensmittel. Es kommt in den Teil {part}.",
+      "checked": true
+    },
+    "plate.part": {
+      "text": "Teil",
+      "checked": true
+    },
+    "plate.noPart": {
+      "text": "Kein Teil",
+      "checked": true
+    },
+    "plate.onPlateSavedMine": {
+      "text": "{title} ist auf deinem Teller und unter Meine gespeichert.",
+      "checked": true
+    },
+    "plate.reachesNoBetter": {
+      "text": "Es erreicht PD {pd1}, nicht besser als {pd0}.",
+      "checked": true
+    },
+    "plate.notRealPortion": {
+      "text": "Eins der Lebensmittel ist in dieser Menge keine echte Portion.",
+      "checked": true
+    },
+    "plate.hasAllergyFood": {
+      "text": "Es enthält ein Lebensmittel mit einer ihrer Allergien.",
+      "checked": true
+    },
+    "plate.partChangeFailed": {
+      "text": "Die Änderung von Chef Mealan am Teil {part} hat die Prüfungen nicht bestanden: {why}",
+      "checked": true
+    },
+    "plate.reachesUnder": {
+      "text": "Es erreicht PD {pd1}, unter dem Ziel {target}.",
+      "checked": true
+    },
+    "plate.changeFailed": {
+      "text": "Die Änderung von Chef Mealan hat die Prüfungen nicht bestanden: {why} Versuch es mit Als Beilage hinzufügen.",
+      "checked": true
+    },
+    "plate.moreProteinTitle": {
+      "text": "{title}, mehr Protein",
+      "checked": true
+    },
+    "plate.tookTooLong": {
+      "text": "Chef Mealan hat zu lange gebraucht, deshalb hat sich nichts geändert. Versuch es nochmal oder mit Als Beilage hinzufügen.",
+      "checked": true
+    },
+    "plate.noSideBrings": {
+      "text": "Keine Beilage von Chef Mealan bringt dieses Gericht in normaler Menge auf dein Ziel. Versuch es mit Rezept ändern.",
+      "checked": true
+    },
+    "plate.ideasNeedAi": {
+      "text": "Die Ideen von Chef Mealan brauchen die KI, und die ist für dein Konto aus. Hier ist die schnelle Anpassung.",
+      "checked": true
+    },
+    "plate.stepRead": {
+      "text": "Deinen Teller gelesen: {foods}, {kcal} kcal",
+      "checked": true
+    },
+    "plate.stepAsk": {
+      "text": "Chef Mealan um drei Mahlzeiten gebeten ({meals})",
+      "checked": true
+    },
+    "plate.stepAskKitchens": {
+      "text": "Chef Mealan um drei Mahlzeiten gebeten ({meals}) aus deinen Küchen, {kitchens}",
+      "checked": true
+    },
+    "plate.stepCheck": {
+      "text": "Seine Ideen werden geprüft: {what}",
+      "checked": true
+    },
+    "plate.stepCheckPd": {
+      "text": "Seine Ideen werden geprüft: {what} und PD {pd}",
+      "checked": true
+    },
+    "plate.kcalRange": {
+      "text": "{low} bis {high} kcal",
+      "checked": true
+    },
+    "plate.theMeal": {
+      "text": "die Mahlzeit",
+      "checked": true
+    },
+    "plate.hereQuickFit": {
+      "text": "Hier ist die schnelle Anpassung.",
+      "checked": true
+    },
+    "plate.gOnThePlate": {
+      "text": "{grams} g {food} auf dem Teller.",
+      "checked": true
+    },
+    "plate.askNoCooking": {
+      "text": "Frag Chef Mealan nach einem Teller ohne Kochen",
+      "checked": true
+    },
+    "plate.makesPortionsTwo": {
+      "text": "{name} ergibt {n} Portionen. Eine ist auf dem Teller; die andere ist im Plan für {meal} morgen.",
+      "checked": true
+    },
+    "plate.makesPortions": {
+      "text": "{name} ergibt {n} Portionen. Eine ist auf dem Teller; die nächste ist im Plan für {meal} morgen.",
+      "checked": true
+    },
+    "plate.shrunk": {
+      "text": "Verkleinert auf eine Mahlzeit ({meal}): {kcal} kcal.",
+      "checked": true
+    },
+    "plate.planningSlot": {
+      "text": "Planung: {slot}",
+      "checked": true
+    },
+    "plate.addingSlot": {
+      "text": "Nachtragen: {slot}",
+      "checked": true
+    },
+    "plate.backToAmounts": {
+      "text": "Zurück zu den Mengen",
+      "checked": true
+    },
+    "plate.backToMaking": {
+      "text": "Zurück zur Zubereitung",
+      "checked": true
+    },
+    "plate.backToLast": {
+      "text": "Zurück zum letzten Schritt",
+      "checked": true
+    },
+    "plate.puttingTogether": {
+      "text": "Chef Mealan stellt es zusammen.",
+      "checked": true
+    },
+    "plate.ideasFailed": {
+      "text": "Die Ideen von Chef Mealan haben die Prüfungen diesmal nicht bestanden. Frag nach anderen Ideen oder lass den Teller, wie er ist.",
+      "checked": true
+    },
+    "plate.ideasHasProtein": {
+      "text": "Dein Teller hat genug Protein: {protein} g, {pd}.",
+      "checked": true
+    },
+    "plate.ideasUnder": {
+      "text": "Dein Teller liegt bei {pd}, unter deinem Ziel von {target}.",
+      "checked": true
+    },
+    "plate.ideasMealRange": {
+      "text": "{meal}: {low} bis {high} kcal.",
+      "checked": true
+    },
+    "plate.ideasMealRangeMore": {
+      "text": "{meal}: {low} bis {high} kcal, etwa {more} mehr als der Teller.",
+      "checked": true
+    },
+    "plate.ideasOne": {
+      "text": "Eine Variante, in diesem Bereich.",
+      "checked": true
+    },
+    "plate.ideasTwo": {
+      "text": "Zwei Varianten, jede in diesem Bereich.",
+      "checked": true
+    },
+    "plate.ideasThree": {
+      "text": "Drei Varianten, jede in diesem Bereich.",
+      "checked": true
+    },
+    "plate.ideasOneKitchens": {
+      "text": "Eine Variante aus deinen Küchen, in diesem Bereich.",
+      "checked": true
+    },
+    "plate.ideasTwoKitchens": {
+      "text": "Zwei Varianten aus deinen Küchen, jede in diesem Bereich.",
+      "checked": true
+    },
+    "plate.ideasThreeKitchens": {
+      "text": "Drei Varianten aus deinen Küchen, jede in diesem Bereich.",
+      "checked": true
+    },
+    "plate.ideasTitle": {
+      "text": "{meal} rund um deine Lebensmittel: {foods}",
+      "checked": true
+    },
+    "plate.onThePlateList": {
+      "text": "Auf dem Teller: {foods}.",
+      "checked": true
+    },
+    "plate.kcalPd": {
+      "text": "{kcal} kcal · {pd}",
+      "checked": true
+    },
+    "plate.forCookingLine": {
+      "text": "{label} {foods}.",
+      "checked": true
+    },
+    "plate.forCooking": {
+      "text": "Zum Kochen, nicht mitgezählt:",
+      "checked": true
+    },
+    "plate.didNotFit": {
+      "text": "Hat nicht gepasst: {why}.",
+      "checked": true
+    },
+    "plate.legendHave": {
+      "text": "+ in deinen Lebensmitteln",
+      "checked": true
+    },
+    "plate.legendNew": {
+      "text": "+ neu",
+      "checked": true
+    },
+    "plate.legendLine": {
+      "text": "neue Lebensmittel sind eine Schätzung von Chef Mealan; die App legt jedes Gramm fest.",
+      "checked": true
+    },
+    "plate.addingSub": {
+      "text": "Nachtragen: {slot}. Füge hinzu, was du gegessen hast, in den Mengen, die du gegessen hast.",
+      "checked": true
+    },
+    "plate.planningSub": {
+      "text": "Planung: {slot}. Füge deine Lebensmittel hinzu, passe sie an dein Ziel an, dann leg sie in den Plan.",
+      "checked": true
+    },
+    "plate.madeBySub": {
+      "text": "{meal} von Chef Mealan, Küche: {kitchen}, rund um deine Lebensmittel: {foods}. Ändere jede Menge, wie du magst.",
+      "checked": true
+    },
+    "plate.changedSub": {
+      "text": "Dein Gericht {title}, geändert. Immer noch für {meal} bemessen.",
+      "checked": true
+    },
+    "plate.sideSub": {
+      "text": "Dein Gericht {title}, wie es ist, {pct}% von 1 {one}, und {side} {where}. Die Einheit ({one}) bleibt unverändert.",
+      "checked": true
+    },
+    "plate.fromSub": {
+      "text": "Aus {source}. {how} Ändere, was du magst.",
+      "checked": true
+    },
+    "plate.theLink": {
+      "text": "dem Link",
+      "checked": true
+    },
+    "plate.yourScreenshot": {
+      "text": "deinem Screenshot",
+      "checked": true
+    },
+    "plate.mixSized": {
+      "text": "Die Mischung des Rezepts, bemessen für {meal}: jedes Lebensmittel gleich skaliert.",
+      "checked": true
+    },
+    "plate.oneAsMakes": {
+      "text": "1 {one}, wie das Rezept es ergibt.",
+      "checked": true
+    },
+    "plate.nameItOrKeep": {
+      "text": "Gib ihm einen Namen oder behalte den Namen der Lebensmittel.",
+      "checked": true
+    },
+    "plate.justScanned": {
+      "text": "gerade gescannt",
+      "checked": true
+    },
+    "plate.useItIn": {
+      "text": "In {dish} verwenden",
+      "checked": true
+    },
+    "plate.useItHelp": {
+      "text": "Verwenden: Chef Mealan fragt, was es ersetzt oder ergänzt, und die Schritte passen sich an. Auf den Teller: Es kommt zu der Mahlzeit, die du gerade zusammenstellst; das Kochen läuft weiter wie bisher. Behalten: Es wartet unter Lebensmittel.",
+      "checked": true
+    },
+    "plate.slotLineEaten": {
+      "text": "{slot}, {time} · Gegessen",
+      "checked": true
+    },
+    "plate.slotLinePlanning": {
+      "text": "{slot}, {time} · In Planung",
+      "checked": true
+    },
+    "plate.slotLineByPlan": {
+      "text": "{slot}, {time} · Nach Plan",
+      "checked": true
+    },
+    "plate.yesterday": {
+      "text": "Gestern",
+      "checked": true
+    },
+    "plate.today": {
+      "text": "Heute",
+      "checked": true
+    },
+    "plate.tomorrow": {
+      "text": "Morgen",
+      "checked": true
+    },
+    "plate.dayAddsPick": {
+      "text": "{day}: trägt nach, was du gegessen hast. Wähle die Mahlzeit.",
+      "checked": true
+    },
+    "plate.dayPlansPick": {
+      "text": "{day}: plant, was du essen wirst. Wähle die Mahlzeit.",
+      "checked": true
+    },
+    "plate.dayWhichMeal": {
+      "text": "{day}, welche Mahlzeit",
+      "checked": true
+    },
+    "plate.mealAtTime": {
+      "text": "{meal}, {time}",
+      "checked": true
+    },
+    "plate.exploringStays": {
+      "text": "Entdecken: {slot} bleibt, wie es war.",
+      "checked": true
+    },
+    "plate.exploring": {
+      "text": "Entdecken",
+      "checked": true
+    },
+    "plate.exploringLeaves": {
+      "text": "Entdecken verlässt {slot}: Es bleibt, wie es war, und nichts wird eingetragen.",
+      "checked": true
+    },
+    "plate.targetForPlate": {
+      "text": "Ziel für diesen Teller: {pd}.",
+      "checked": true
+    },
+    "plate.travelPlans": {
+      "text": "Chef Mealan plant mit dem, was es in {place} zu kaufen gibt. Nutze den Chat, um dort einzukaufen und zu kochen.",
+      "checked": true
+    },
+    "plate.photoLineIdea": {
+      "text": "Ich sehe mir das Foto an. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.|Ich sehe mir das Foto an. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.",
+      "checked": true
+    },
+    "plate.photoLine": {
+      "text": "Dein Foto, {time}. {n} Lebensmittel gelesen, Mengen geschätzt (~). Tippe auf eine Menge, um sie zu korrigieren.|Dein Foto, {time}. {n} Lebensmittel gelesen, Mengen geschätzt (~). Tippe auf eine Menge, um sie zu korrigieren.",
+      "checked": true
+    },
+    "plate.retake": {
+      "text": "📷 Neu aufnehmen",
+      "checked": true
+    },
+    "plate.addPhoto": {
+      "text": "＋ Foto",
+      "checked": true
+    },
+    "plate.photoReadIdea": {
+      "text": "{n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.|{n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.",
+      "checked": true
+    },
+    "plate.yourPhotoAt": {
+      "text": "Dein Foto, {time}.",
+      "checked": true
+    },
+    "plate.photoReadTap": {
+      "text": "{n} Lebensmittel gelesen, Mengen geschätzt (~). Tippe auf das Foto für die große Ansicht; tippe auf eine Menge, um sie zu korrigieren.|{n} Lebensmittel gelesen, Mengen geschätzt (~). Tippe auf das Foto für die große Ansicht; tippe auf eine Menge, um sie zu korrigieren.",
+      "checked": true
+    },
+    "plate.oneThingCannotTell": {
+      "text": "Eine Sache kann ich auf dem Foto nicht erkennen:",
+      "checked": true
+    },
+    "plate.isTheAbout": {
+      "text": "{food}: etwa {a} g oder {b} g?",
+      "checked": true
+    },
+    "plate.searchFindsThere": {
+      "text": "Die Suche findet Produkte, die es dort gibt.",
+      "checked": true
+    },
+    "plate.sizedForYour": {
+      "text": "Bemessen für {meal}",
+      "checked": true
+    },
+    "plate.oneAsMakesBtn": {
+      "text": "1 {one}, wie das Rezept es ergibt",
+      "checked": true
+    },
+    "plate.wholeAsMapped": {
+      "text": "Das ganze Rezept, so wie du es angelegt hast: {count}.",
+      "checked": true
+    },
+    "plate.oneIsKcal": {
+      "text": "1 {one} hat {kcal} kcal.",
+      "checked": true
+    },
+    "plate.sizedForItFits": {
+      "text": "Für {meal} brauchst du etwa {need}. Dafür bemessen: {pct}% von 1 {one}.",
+      "checked": true
+    },
+    "plate.sizedForItNot": {
+      "text": "Für {meal} brauchst du etwa {need}. Dafür bemessen wären es {pct}% von 1 {one}, also ist 1 {one}, wie das Rezept es ergibt, die bessere Wahl.",
+      "checked": true
+    },
+    "plate.pickWhatYouEat": {
+      "text": "Wähle, was du isst.",
+      "checked": true
+    },
+    "plate.yourWay": {
+      "text": "nach deiner Art",
+      "checked": true
+    },
+    "plate.yourWayNote": {
+      "text": "Nach deiner Art: Du hattest es schon zu deinen Mahlzeiten.",
+      "checked": true
+    },
+    "plate.thisMeal": {
+      "text": "Diese Mahlzeit: {meal}",
+      "checked": true
+    },
+    "plate.kcal": {
+      "text": "kcal",
+      "checked": true
+    },
+    "plate.canOilIn": {
+      "text": "{grams} g · {kcal} kcal, in den Zahlen",
+      "checked": true
+    },
+    "plate.canOilUpTo": {
+      "text": "Bis zu {grams} g in der Dose. Nicht in den Zahlen.",
+      "checked": true
+    },
+    "plate.none": {
+      "text": "Nichts",
+      "checked": true
+    },
+    "plate.theCan": {
+      "text": "Die Dose: {can}",
+      "checked": true
+    },
+    "plate.canWord": {
+      "text": "Dose",
+      "checked": true
+    },
+    "plate.cansWord": {
+      "text": "Dosen",
+      "checked": true
+    },
+    "plate.kcalInNumbers": {
+      "text": "{kcal} kcal in den Zahlen",
+      "checked": true
+    },
+    "plate.unlockFood": {
+      "text": "{food} entsperren",
+      "checked": true
+    },
+    "plate.lockFood": {
+      "text": "{food} sperren",
+      "checked": true
+    },
+    "plate.optional": {
+      "text": "Optional",
+      "checked": true
+    },
+    "plate.optionalAdded": {
+      "text": "optional, hinzugefügt ·",
+      "checked": true
+    },
+    "plate.optionalOn": {
+      "text": "✓ Optional",
+      "checked": true
+    },
+    "plate.writtenOnRecipe": {
+      "text": "{written} im Rezept",
+      "checked": true
+    },
+    "plate.optionalLow": {
+      "text": "optional",
+      "checked": true
+    },
+    "plate.addName": {
+      "text": "{name} hinzufügen",
+      "checked": true
+    },
+    "plate.partLeftOut": {
+      "text": "{part}, weggelassen",
+      "checked": true
+    },
+    "plate.foodsKcalLess": {
+      "text": "{n} Lebensmittel · {kcal} kcal weniger|{n} Lebensmittel · {kcal} kcal weniger",
+      "checked": true
+    },
+    "plate.partAria": {
+      "text": "Teil: {part}",
+      "checked": true
+    },
+    "plate.partChanged": {
+      "text": "{part}, geändert",
+      "checked": true
+    },
+    "plate.foodsOptional": {
+      "text": "{n} Lebensmittel, {opt} optional|{n} Lebensmittel, {opt} optional",
+      "checked": true
+    },
+    "plate.foodsN": {
+      "text": "{n} Lebensmittel|{n} Lebensmittel",
+      "checked": true
+    },
+    "plate.kcalN": {
+      "text": "{kcal} kcal",
+      "checked": true
+    },
+    "plate.change": {
+      "text": "Ändern",
+      "checked": true
+    },
+    "plate.partPlaceholder": {
+      "text": "Soße",
+      "checked": true
+    },
+    "plate.addFoodTo": {
+      "text": "+ Lebensmittel zu {part} hinzufügen",
+      "checked": true
+    },
+    "plate.other": {
+      "text": "Sonstiges",
+      "checked": true
+    },
+    "plate.nothingCalled": {
+      "text": "Nichts namens {q} in deinen Lebensmitteln oder den Grundlebensmitteln, die es hier gibt. Scanne es oder füge es oben von Hand hinzu.",
+      "checked": true
+    },
+    "plate.addPutsOne": {
+      "text": "Hinzufügen legt eins auf den Teller, als Lebensmittel wie die anderen.",
+      "checked": true
+    },
+    "plate.takeOut": {
+      "text": "{food} herausnehmen",
+      "checked": true
+    },
+    "plate.stepsStale": {
+      "text": "Die Schritte wurden geschrieben, bevor du die Lebensmittel geändert hast: {diff}.",
+      "checked": true
+    },
+    "plate.theFoodsChanged": {
+      "text": "die Lebensmittel haben sich geändert",
+      "checked": true
+    },
+    "plate.showAllN": {
+      "text": "Alle {n} anzeigen",
+      "checked": true
+    },
+    "plate.chefOnPlate": {
+      "text": "Chef Mealan zu diesem Teller",
+      "checked": true
+    },
+    "plate.ingredientNotFood": {
+      "text": "{food} ist eine Zutat, kein Lebensmittel. Es braucht ein Gericht drumherum: einen Teig, einen Rührteig, einen Topf. Allein ist es kein {meal}.",
+      "checked": true
+    },
+    "plate.takeTheOut": {
+      "text": "{food} herausnehmen",
+      "checked": true
+    },
+    "plate.askDishAround": {
+      "text": "Frag Chef Mealan nach einem Gericht drumherum",
+      "checked": true
+    },
+    "plate.culinaryYes": {
+      "text": "✓ Kulinarisch",
+      "checked": true
+    },
+    "plate.culinaryNo": {
+      "text": "✕ Kulinarisch",
+      "checked": true
+    },
+    "plate.makeItA": {
+      "text": "Zum {meal} machen",
+      "checked": true
+    },
+    "plate.makeItAAround": {
+      "text": "Zum {meal} rund um {food} machen",
+      "checked": true
+    },
+    "plate.topOut": {
+      "text": "Diese Lebensmittel kommen innerhalb ihrer Portionen höchstens auf {pd}. Chef Mealan kann:",
+      "checked": true
+    },
+    "plate.topOutHalf": {
+      "text": "Diese Lebensmittel kommen innerhalb ihrer Portionen höchstens auf {pd}, und {kcal} kcal sind weniger als die Hälfte für {meal}. Chef Mealan kann:",
+      "checked": true
+    },
+    "plate.addFoodsFor": {
+      "text": "Lebensmittel für {meal} hinzufügen",
+      "checked": true
+    },
+    "plate.askChef": {
+      "text": "Frag Chef Mealan",
+      "checked": true
+    },
+    "plate.tomorrowLow": {
+      "text": "morgen",
+      "checked": true
+    },
+    "plate.chefOnIdea": {
+      "text": "Chef Mealan zur Idee",
+      "checked": true
+    },
+    "plate.exploringSo": {
+      "text": "Entdecken, also bleibt {slot}, wie es war.",
+      "checked": true
+    },
+    "plate.fitItToMy": {
+      "text": "Für {meal} anpassen",
+      "checked": true
+    },
+    "plate.putInDays": {
+      "text": "Für {day} als {meal} einplanen",
+      "checked": true
+    },
+    "plate.chefOnMeal": {
+      "text": "Chef Mealan zu deiner Mahlzeit",
+      "checked": true
+    },
+    "plate.underYourWays": {
+      "text": "Unter deinem Ziel von {tag} {pd}. Bereite es zu, wie es ist, oder passe es auf eine von zwei Arten an:",
+      "checked": true
+    },
+    "plate.takesLonger": {
+      "text": "Das dauert länger als meist. Chef Mealan macht weiter: bis zu einer Minute.",
+      "checked": true
+    },
+    "plate.waysWhy": {
+      "text": "Rezept ändern: Chef Mealan tauscht Lebensmittel oder nimmt weniger davon. Als Beilage hinzufügen: eine proteinreiche Beilage, wie Skyr, neben deinem Stück. Beide zielen auf dein Ziel von {pd}.",
+      "checked": true
+    },
+    "plate.putItIn": {
+      "text": "Für {slot} übernehmen",
+      "checked": true
+    },
+    "plate.putItInEaten": {
+      "text": "Für {slot} übernehmen, gegessen",
+      "checked": true
+    },
+    "plate.forWholeRecipe": {
+      "text": "{how}, für das ganze Rezept.",
+      "checked": true
+    },
+    "plate.skippedMoved": {
+      "text": "{name} heute ausgelassen. Sein Anteil ist auf {meal} übergegangen.",
+      "checked": true
+    },
+    "plate.countedOn": {
+      "text": "Gezählt am {day} um {time}. Nichts anzupassen, zuzubereiten oder zu bewerten: Es ist das, was du gegessen hast.",
+      "checked": true
+    },
+    "plate.fitMovesOne": {
+      "text": "Anpassen verschiebt ein Lebensmittel. So lassen übernimmt den Teller unverändert für {slot}.",
+      "checked": true
+    },
+    "plate.fitSetsAmounts": {
+      "text": "Anpassen legt die Mengen fest. So lassen behält deine. Speichern am Ende trägt es als {slot} ein.",
+      "checked": true
+    },
+    "plate.oneProduct": {
+      "text": "Ein Produkt: Chef Mealan sucht in deinen Lebensmitteln einen Partner, der es auf deinen Plan bringt.",
+      "checked": true
+    },
+    "plate.notAPortion": {
+      "text": "{grams} g {food} sind keine Portion. Dieses Lebensmittel bringt dich in normaler Menge nicht dorthin; tausch es oder reduziere die anderen.",
+      "checked": true
+    },
+    "plate.meetingShare": {
+      "text": "Dieser Teller ist {share} % deines Tages. An einem Tag mit Meetings bleib unter einem Drittel, damit du nachmittags konzentriert bleibst.",
+      "checked": true
+    },
+    "plate.dessertShare": {
+      "text": "Dieser Teller ist {share} % deines Tages. Passend für eine Mahlzeit, nicht für ein Dessert.",
+      "checked": true
+    },
+    "plate.chefsRecipe": {
+      "text": "Rezept von Chef Mealan",
+      "checked": true
+    },
+    "plate.unplannedSub": {
+      "text": "{moment}. Genieß es, halte es klein. Deine nächste Mahlzeit setzt auf Protein, und du bist wieder im Plan.",
+      "checked": true
+    },
+    "plate.overSub": {
+      "text": "{food} bräuchte {grams} g, um {target} zu erreichen. Bei {cap} g ist das so nah, wie es geht.",
+      "checked": true
+    },
+    "plate.keptSub": {
+      "text": "Schon über deinem Ziel: {tag} {pd} gegenüber {target}, also hat sich nichts bewegt. Mehr Protein ist in Ordnung. Ändere eine Menge, und Chef Mealan passt neu an.",
+      "checked": true
+    },
+    "plate.moverSub": {
+      "text": "Chef Mealan verschiebt {food}. Ändere eine andere Menge, und er passt neu an.",
+      "checked": true
+    },
+    "plate.nothingMovedSub": {
+      "text": "Nichts hat sich bewegt. Hier landen deine Mengen. Tippe auf einen grauen Punkt, wenn Chef Mealan ein Lebensmittel anpassen soll.",
+      "checked": true
+    },
+    "plate.notRealistic": {
+      "text": "nicht realistisch",
+      "checked": true
+    },
+    "plate.onPlanTarget": {
+      "text": "nach Plan, Ziel {pd}",
+      "checked": true
+    },
+    "plate.target": {
+      "text": "Ziel {pd}",
+      "checked": true
+    },
+    "plate.mixNums": {
+      "text": "{kcal} kcal · {protein} g Protein · {weight} g",
+      "checked": true
+    },
+    "plate.mixNumsShare": {
+      "text": "{kcal} kcal, {share} % deines Tages · {protein} g Protein · {weight} g",
+      "checked": true
+    },
+    "plate.asYouSetIt": {
+      "text": "wie du es eingestellt hast",
+      "checked": true
+    },
+    "plate.whatChefMoves": {
+      "text": "was Chef Mealan verschiebt",
+      "checked": true
+    },
+    "plate.chefMayMove": {
+      "text": "Chef Mealan darf es verschieben",
+      "checked": true
+    },
+    "plate.suggests": {
+      "text": "Chef Mealan schlägt {grams} g vor: Das bringt den Teller von {pd} auf dein Ziel von {target} · übernehmen",
+      "checked": true
+    },
+    "plate.estimated": {
+      "text": "geschätzt",
+      "checked": true
+    },
+    "plate.allowMore": {
+      "text": "Mehr als {cap} g erlauben",
+      "checked": true
+    },
+    "plate.tryAnotherMix": {
+      "text": "Andere Mischung versuchen ({k} von {n})",
+      "checked": true
+    },
+    "plate.portionWord": {
+      "text": "Portion",
+      "checked": true
+    },
+    "plate.portionsWord": {
+      "text": "Portionen",
+      "checked": true
+    },
+    "fit.alreadyAbove": {
+      "text": "Schon über deinem Ziel: {pd} gegenüber {target}, also hat sich nichts bewegt.",
+      "checked": true
+    },
+    "fit.setMostMeal": {
+      "text": "Anpassen hat {grams} g {food} festgelegt, das Maximum für die Portion deiner Mahlzeit (verlangt waren {want} g).",
+      "checked": true
+    },
+    "fit.setMost": {
+      "text": "Anpassen hat {grams} g {food} festgelegt, das Maximum für eine Portion (verlangt waren {want} g).",
+      "checked": true
+    },
+    "fit.setWas": {
+      "text": "Anpassen hat {grams} g {food} festgelegt (vorher {was} g).",
+      "checked": true
+    },
+    "fit.set": {
+      "text": "Anpassen hat {grams} g {food} festgelegt.",
+      "checked": true
+    },
+    "fit.addAFoodFirst": {
+      "text": "Füge zuerst ein Lebensmittel zu deiner Bibliothek hinzu, damit Chef Mealan Partner zur Auswahl hat.",
+      "checked": true
+    },
+    "fit.keptPart": {
+      "text": "Anpassen hat den Teil {part} gelassen, wie er ist: Der Teller ist da, wo er mit diesen Teilen sein kann.",
+      "checked": true
+    },
+    "fit.sizedPart": {
+      "text": "Anpassen hat den Teil {part} als Ganzes bemessen, {factor}: {names} behalten ihr Verhältnis. Unverändert bleibt {others}.|Anpassen hat den Teil {part} als Ganzes bemessen, {factor}: {names} behalten ihr Verhältnis. Unverändert bleiben {others}.",
+      "checked": true
+    },
+    "fit.asFarAsPortions": {
+      "text": "Mehr lassen die Portionen nicht zu.",
+      "checked": true
+    },
+    "fit.roundedTo": {
+      "text": "Gerundet auf {whole}.",
+      "checked": true
+    },
+    "fit.noAmountReaches": {
+      "text": "Chef Mealan hat keine Menge {food} gefunden, die dein Ziel von {target} erreicht.",
+      "checked": true
+    },
+    "cookmode.nSteps": {
+      "text": "{n} Schritt|{n} Schritte",
+      "checked": true
+    },
+    "cookmode.took": {
+      "text": "{steps}.",
+      "checked": true
+    },
+    "cookmode.tookMin": {
+      "text": "{steps}, {n} Minute.|{steps}, {n} Minuten.",
+      "checked": true
+    },
+    "cookmode.startTimerMin": {
+      "text": "⏱ Timer für {n} Min. starten",
+      "checked": true
+    },
+    "cookmode.startTimerSec": {
+      "text": "⏱ Timer für {n} Sekunde starten|⏱ Timer für {n} Sekunden starten",
+      "checked": true
+    },
+    "cookmode.startTimerMinSec": {
+      "text": "⏱ Timer für {m} Min. {s} Sek. starten",
+      "checked": true
+    },
+    "cookmode.micBlocked": {
+      "text": "Das Mikrofon ist für diese Seite blockiert. Erlaube es in den Einstellungen des Browsers oder nutze die Tasten.",
+      "checked": true
+    },
+    "cookmode.backToCooking": {
+      "text": "‹ Zurück zum Kochen",
+      "checked": true
+    },
+    "cookmode.nOf": {
+      "text": "{k} von {n}",
+      "checked": true
+    },
+    "cookmode.cookingTitle": {
+      "text": "Kochen: {title}",
+      "checked": true
+    },
+    "cookmode.close": {
+      "text": "✕ Schließen",
+      "checked": true
+    },
+    "cookmode.doneLow": {
+      "text": "fertig",
+      "checked": true
+    },
+    "cookmode.stepN": {
+      "text": "Schritt {n}",
+      "checked": true
+    },
+    "cookmode.stepNDone": {
+      "text": "Schritt {n}, fertig",
+      "checked": true
+    },
+    "cookmode.timerDoneAria": {
+      "text": "Timer ({name}) ist fertig. Tippe zum Entfernen.",
+      "checked": true
+    },
+    "cookmode.timerLeftAria": {
+      "text": "Timer ({name}), noch {time}. Tippe zum Stoppen.",
+      "checked": true
+    },
+    "cookmode.timerRang": {
+      "text": "0:00 · fertig",
+      "checked": true
+    },
+    "cookmode.nowAPhotoOfYourPlate": {
+      "text": "Jetzt ein Foto von deinem Teller, dann essen.",
+      "checked": true
+    },
+    "cookmode.allStepsTicked": {
+      "text": "Alle {n} Schritte sind abgehakt. Der Bildschirm wird jetzt wieder normal.|Alle {n} Schritte sind abgehakt. Der Bildschirm wird jetzt wieder normal.",
+      "checked": true
+    },
+    "cookmode.yourMeal": {
+      "text": "deine Mahlzeit",
+      "checked": true
+    },
+    "cookmode.lastStepBack": {
+      "text": "‹ Letzter Schritt",
+      "checked": true
+    },
+    "cookmode.stepCaps": {
+      "text": "SCHRITT {n}",
+      "checked": true
+    },
+    "cookmode.addAPhotoOfThisStep": {
+      "text": "📷 Foto von diesem Schritt hinzufügen",
+      "checked": true
+    },
+    "cookmode.moveOf": {
+      "text": "Handgriff {k} von {n}",
+      "checked": true
+    },
+    "cookmode.readAloudOneAtATime": {
+      "text": "LAUT VORGELESEN, EINER NACH DEM ANDEREN · {k} VON {n}",
+      "checked": true
+    },
+    "cookmode.chefLookButton": {
+      "text": "📷 Chef, schau mal",
+      "checked": true
+    },
+    "cookmode.back": {
+      "text": "‹ Zurück",
+      "checked": true
+    },
+    "cookmode.repeat": {
+      "text": "↻ Nochmal",
+      "checked": true
+    },
+    "cookmode.youAsked": {
+      "text": "DU HAST GEFRAGT",
+      "checked": true
+    },
+    "cookmode.youSaid": {
+      "text": "DU HAST GESAGT",
+      "checked": true
+    },
+    "cookmode.chefAboutStep": {
+      "text": "CHEF MEALAN, ZU SCHRITT {n}",
+      "checked": true
+    },
+    "cookmode.chefCaps": {
+      "text": "CHEF MEALAN",
+      "checked": true
+    },
+    "cookmode.orSayChefCanIUse": {
+      "text": "Oder sag: Koch, kann ich tiefgekühlten Spinat nehmen?",
+      "checked": true
+    },
+    "cookmode.canIUseFrozenSpinach": {
+      "text": "Kann ich tiefgekühlten Spinat nehmen?",
+      "checked": true
+    },
+    "cookmode.cmdNext": {
+      "text": "weiter",
+      "checked": true
+    },
+    "cookmode.cmdBack": {
+      "text": "zurück",
+      "checked": true
+    },
+    "cookmode.cmdRepeat": {
+      "text": "nochmal",
+      "checked": true
+    },
+    "cookmode.cmdHowMuch": {
+      "text": "wie viel",
+      "checked": true
+    },
+    "cookmode.cmdTimer": {
+      "text": "Timer",
+      "checked": true
+    },
+    "cookmode.cmdWhatsLeft": {
+      "text": "was noch fehlt",
+      "checked": true
+    },
+    "cookmode.cmdStop": {
+      "text": "stopp",
+      "checked": true
+    },
+    "cookmode.orAskStartWith": {
+      "text": "Oder frag: beginne mit",
+      "checked": true
+    },
+    "cookmode.cmdChef": {
+      "text": "Koch",
+      "checked": true
+    },
+    "cookmode.thisBrowserCanTListen": {
+      "text": "Dieser Browser kann nicht zuhören, also steuern die Tasten.",
+      "checked": true
+    },
+    "cookmode.stopReadingAloud": {
+      "text": "Vorlesen stoppen",
+      "checked": true
+    },
+    "cookmode.readStepsAloud": {
+      "text": "Schritte vorlesen",
+      "checked": true
+    },
+    "cookmode.theScreenStaysOn": {
+      "text": "Der Bildschirm bleibt an, während du kochst.",
+      "checked": true
+    },
+    "cookmode.eachStepIsReadAloud": {
+      "text": "Jeder Schritt wird vorgelesen.",
+      "checked": true
+    },
+    "cookmode.canSayFood": {
+      "text": "Du kannst sagen: weiter, zurück, nochmal, wie viel {food}, Timer 5 Minuten, was noch fehlt, stopp. Beginne mit Koch, um nach dem Gericht zu fragen.",
+      "checked": true
+    },
+    "cookmode.canSayNoFood": {
+      "text": "Du kannst sagen: weiter, zurück, nochmal, wie viel und ein Lebensmittel, Timer 5 Minuten, was noch fehlt, stopp. Beginne mit Koch, um nach dem Gericht zu fragen.",
+      "checked": true
+    },
+    "make.couldNotAnswer": {
+      "text": "Chef Mealan konnte nicht antworten.",
+      "checked": true
+    },
+    "make.draftFailedWrite": {
+      "text": "Der Entwurf von Chef Mealan hat die Prüfungen nicht bestanden ({why}). Versuch es nochmal oder schreib deine eigenen.",
+      "checked": true
+    },
+    "make.couldNotAnswerAgain": {
+      "text": "Chef Mealan konnte nicht antworten. Versuch es nochmal.",
+      "checked": true
+    },
+    "make.changingIt": {
+      "text": "Chef Mealan ändert es…",
+      "checked": true
+    },
+    "make.writingSteps": {
+      "text": "Chef Mealan schreibt die Schritte",
+      "checked": true
+    },
+    "make.writesAtAmounts": {
+      "text": "Chef Mealan schreibt sie für deine Mengen, hier, bevor du das Rezept festlegst.",
+      "checked": true
+    },
+    "make.draftWithChef": {
+      "text": "Schritte mit Chef Mealan entwerfen",
+      "checked": true
+    },
+    "make.looking": {
+      "text": "Chef Mealan schaut nach…",
+      "checked": true
+    },
+    "make.chefsStepsWhole": {
+      "text": "Die Schritte von Chef Mealan, für das ganze Rezept.",
+      "checked": true
+    },
+    "make.adapted": {
+      "text": "Angepasst",
+      "checked": true
+    },
+    "make.added": {
+      "text": "Hinzugefügt",
+      "checked": true
+    },
+    "make.adaptedWhy": {
+      "text": "Angepasst: {why}",
+      "checked": true
+    },
+    "make.addedWhy": {
+      "text": "Hinzugefügt: {why}",
+      "checked": true
+    },
+    "make.draftFailedOriginal": {
+      "text": "Der Entwurf von Chef Mealan hat die Prüfungen nicht bestanden ({why}). Versuch es nochmal oder koch es nach dem Original.",
+      "checked": true
+    },
+    "make.howToMake": {
+      "text": "Zubereitung: {dish}",
+      "checked": true
+    },
+    "make.stepsForMeal": {
+      "text": "Die Schritte von Chef Mealan für {meal}, für deine Mengen. Sie kommen beim Speichern mit dem Rezept mit.",
+      "checked": true
+    },
+    "make.writingForAmounts": {
+      "text": "Chef Mealan schreibt die Schritte für deine Mengen.",
+      "checked": true
+    },
+    "make.stepsChanged": {
+      "text": "Die Schritte von Chef Mealan für dein geändertes Gericht, nach dem Original.",
+      "checked": true
+    },
+    "make.stepsWhatYouMake": {
+      "text": "Die Schritte von Chef Mealan für das, was du zubereitest.",
+      "checked": true
+    },
+    "make.stepsWhatYouMakeParts": {
+      "text": "Die Schritte von Chef Mealan, Teil für Teil, für das, was du zubereitest.",
+      "checked": true
+    },
+    "make.wholeAbout": {
+      "text": "das ganze Rezept, etwa {yours} deiner {many}",
+      "checked": true
+    },
+    "make.wholeRecipeLow": {
+      "text": "das ganze Rezept",
+      "checked": true
+    },
+    "make.oneUnit": {
+      "text": "1 {one}",
+      "checked": true
+    },
+    "make.yourPlate": {
+      "text": "dein Teller",
+      "checked": true
+    },
+    "make.gKcal": {
+      "text": "{g} g · {kcal} kcal",
+      "checked": true
+    },
+    "make.oneMeal": {
+      "text": "eine Mahlzeit ({meal})",
+      "checked": true
+    },
+    "make.yourPlateOne": {
+      "text": "dein Teller, 1 {one}",
+      "checked": true
+    },
+    "make.gKcalPd": {
+      "text": "{g} g · {kcal} kcal · {pd}",
+      "checked": true
+    },
+    "make.stepsWholePlate": {
+      "text": "Die Schritte gelten für das ganze Rezept. {plate}",
+      "checked": true
+    },
+    "make.stepsWholeLeft": {
+      "text": "Die Schritte gelten für das ganze Rezept. {left} bleibt übrig. Um es an anderen Tagen zu essen, leg das Rezept in den Plan.|Die Schritte gelten für das ganze Rezept. {left} bleiben übrig. Um sie an anderen Tagen zu essen, leg das Rezept in den Plan.",
+      "checked": true
+    },
+    "make.recipeMakesN": {
+      "text": "Das Rezept ergibt {n}. Die Schritte gelten für deinen Teller: jede Menge für deine Portion, aufs Gramm genau.",
+      "checked": true
+    },
+    "make.chefs": {
+      "text": "Von Chef Mealan",
+      "checked": true
+    },
+    "make.stepsEarlierFoods": {
+      "text": "Diese Schritte wurden für die vorherigen Lebensmittel geschrieben.",
+      "checked": true
+    },
+    "make.stepsGoWith": {
+      "text": "{title}: Die Schritte kommen beim Speichern mit.",
+      "checked": true
+    },
+    "make.stepsFromOriginal": {
+      "text": "Die Schritte von Chef Mealan, nach dem Original, für deine Mengen und deine Küche.",
+      "checked": true
+    },
+    "make.thePart": {
+      "text": "Teil: {part}",
+      "checked": true
+    },
+    "make.wholeAsOriginal": {
+      "text": "Für das ganze Rezept, so wie es im Original steht.",
+      "checked": true
+    },
+    "make.wholeAsOriginalN": {
+      "text": "Für das ganze Rezept, so wie es im Original steht: {n} {unit}.",
+      "checked": true
+    },
+    "make.chefsWay": {
+      "text": "Nach Art von Chef Mealan",
+      "checked": true
+    },
+    "make.writesFromOriginal": {
+      "text": "Chef Mealan schreibt sie nach dem Original, für deine Mengen und deine Küche, hier, bevor du anfängst.",
+      "checked": true
+    },
+    "make.inABowl": {
+      "text": "in einer Schüssel oder auf einem Teller",
+      "checked": true
+    },
+    "make.writingStepsDot": {
+      "text": "Chef Mealan schreibt die Schritte.",
+      "checked": true
+    },
+    "make.sameAmountsWays": {
+      "text": "Gleiche Mengen, {n} Variante. Wähl die, auf die du Lust hast.|Gleiche Mengen, {n} Varianten. Wähl die, auf die du Lust hast.",
+      "checked": true
+    },
+    "make.makeDish": {
+      "text": "Zubereiten: {dish}",
+      "checked": true
+    },
+    "make.aPhotoOrTwo": {
+      "text": "Ein, zwei Fotos, solange es auf der Arbeitsfläche steht, dann ein Tippen.",
+      "checked": true
+    },
+    "make.useInDish": {
+      "text": "{food} in {dish} verwenden",
+      "checked": true
+    },
+    "make.inPlaceOf": {
+      "text": "Statt {food}",
+      "checked": true
+    },
+    "make.changeStepPhoto": {
+      "text": "Foto von Schritt {n} ändern",
+      "checked": true
+    },
+    "make.addStepPhoto": {
+      "text": "Foto zu Schritt {n} hinzufügen",
+      "checked": true
+    },
+    "make.yourMeal": {
+      "text": "deine Mahlzeit",
+      "checked": true
+    },
+    "make.youAte": {
+      "text": "Gegessen: {what}.",
+      "checked": true
+    },
+    "make.allNLow": {
+      "text": "alle {n}",
+      "checked": true
+    },
+    "make.leftToEat": {
+      "text": "{count} übrig: Um es an anderen Tagen zu essen, leg das Rezept in den Plan.|{count} übrig: Um sie an anderen Tagen zu essen, leg das Rezept in den Plan.",
+      "checked": true
+    },
+    "make.originalStays": {
+      "text": "Das Original, {title}, bleibt, wie es war.",
+      "checked": true
+    },
+    "make.savedInMine": {
+      "text": "✓ Unter Meine gespeichert",
+      "checked": true
+    },
+    "make.madeToday": {
+      "text": "✓ Heute zubereitet",
+      "checked": true
+    },
+    "make.alwaysMakes": {
+      "text": "Es ergibt immer {n}: {n} als Zahl des Rezepts festlegen",
+      "checked": true
+    },
+    "make.allN": {
+      "text": "Alle {n}",
+      "checked": true
+    },
+    "make.kcalInOneMeal": {
+      "text": "{kcal} kcal in einer Mahlzeit?",
+      "checked": true
+    },
+    "make.moreThanDay": {
+      "text": "Das ist mehr als dein ganzer Tag, {kcal} kcal.",
+      "checked": true
+    },
+    "make.ifYouAteN": {
+      "text": "Wenn du {what} gegessen hast, trag es ein; wenn nicht, sag, wie viele.",
+      "checked": true
+    },
+    "make.yesAllN": {
+      "text": "Ja, alle {n}",
+      "checked": true
+    },
+    "make.tasteDaam": {
+      "text": "DaaM good",
+      "checked": true
+    },
+    "make.tasteGood": {
+      "text": "Gut",
+      "checked": true
+    },
+    "make.tasteNo": {
+      "text": "Nicht so",
+      "checked": true
+    },
+    "make.tryWhat": {
+      "text": "{what}. Deine Antwort bleibt beim Rezept, so zeigt es beim nächsten Mal, wie es gelaufen ist.",
+      "checked": true
+    },
+    "make.namedInCraft": {
+      "text": "{title} · benannt in Craft",
+      "checked": true
+    },
+    "make.notePlaceholder": {
+      "text": "Ich hatte so viel Energie",
+      "checked": true
+    },
+    "make.changesDaysFollow": {
+      "text": "{title} ändert sich; die Tage im Plan damit ziehen mit.",
+      "checked": true
+    },
+    "make.staysAsItWas": {
+      "text": "{title} bleibt, wie es war.",
+      "checked": true
+    },
+    "make.staysCardKeeps": {
+      "text": "{title} bleibt, wie es war; diese Karte behält, was du gegessen hast.",
+      "checked": true
+    },
+    "make.inMyRecipesAlready": {
+      "text": "{title} ist schon unter Meine Rezepte. Diese Karte verweist darauf.",
+      "checked": true
+    },
+    "make.changedSave": {
+      "text": "{name}: das ganze Rezept, mit {what}. Angepasst nach {from}.",
+      "checked": true
+    },
+    "make.changedSaveN": {
+      "text": "{name}: das ganze Rezept, {count}, mit {what}. Angepasst nach {from}.",
+      "checked": true
+    },
+    "make.changedSaveOrig": {
+      "text": "{name}: das ganze Rezept, mit {what}. Angepasst nach {from}; die Originalschritte kommen mit, nur für dich.",
+      "checked": true
+    },
+    "make.changedSaveNOrig": {
+      "text": "{name}: das ganze Rezept, {count}, mit {what}. Angepasst nach {from}; die Originalschritte kommen mit, nur für dich.",
+      "checked": true
+    },
+    "make.stepsForChange": {
+      "text": "die Schritte für deine Änderung",
+      "checked": true
+    },
+    "make.itsFoodsGrams": {
+      "text": "seine Lebensmittel und Gramm",
+      "checked": true
+    },
+    "make.isADrink": {
+      "text": "{drink} ist ein Getränk. Es zählt zu der Mahlzeit, die du gegessen hast. Ins Rezept?",
+      "checked": true
+    },
+    "make.atePortion": {
+      "text": "Du hast eine Portion davon gegessen.",
+      "checked": true
+    },
+    "make.atePortionMeals": {
+      "text": "Du hast eine Portion davon gegessen, und es sind etwa {n} deiner Mahlzeiten.",
+      "checked": true
+    },
+    "make.aboutMeals": {
+      "text": "Das sind etwa {n} deiner Mahlzeiten.",
+      "checked": true
+    },
+    "make.howManyMakes": {
+      "text": "Wie viele ergibt es?",
+      "checked": true
+    },
+    "make.saveShare": {
+      "text": "Speichern und teilen: {coach}",
+      "checked": true
+    },
+    "make.save": {
+      "text": "Speichern",
+      "checked": true
+    },
+    "make.shareWith": {
+      "text": "Teilen: {coach}",
+      "checked": true
+    },
+    "make.cookingWhen": {
+      "text": "Kochen, {when}",
+      "checked": true
+    },
+    "make.whenFoods": {
+      "text": "{when} · {n} Lebensmittel|{when} · {n} Lebensmittel",
+      "checked": true
+    },
+    "make.removeTitle": {
+      "text": "{title} entfernen",
+      "checked": true
+    },
+    "make.readAgain": {
+      "text": "Nochmal lesen",
+      "checked": true
+    },
+    "make.readAgainThis": {
+      "text": "Mit diesem Hinweis nochmal lesen",
+      "checked": true
+    },
+    "make.readAgainPhotos": {
+      "text": "Mit {n} Fotos nochmal lesen",
+      "checked": true
+    },
+    "make.readAgainPhotosThis": {
+      "text": "Mit {n} Fotos und diesem Hinweis nochmal lesen",
+      "checked": true
+    },
+    "make.photoOfPlate": {
+      "text": "das Foto des Tellers",
+      "checked": true
+    },
+    "make.removePhotoN": {
+      "text": "Foto {n} entfernen",
+      "checked": true
+    },
+    "make.listening": {
+      "text": "Ich höre zu…",
+      "checked": true
+    },
+    "make.sayIt": {
+      "text": "🎤 Sprechen",
+      "checked": true
+    },
+    "recipe.portion": {
+      "text": "Portion",
+      "checked": true
+    },
+    "recipe.portions": {
+      "text": "Portionen",
+      "checked": true
+    },
+    "recipe.part": {
+      "text": "Teil",
+      "checked": true
+    },
+    "recipe.noPart": {
+      "text": "Kein Teil",
+      "checked": true
+    },
+    "recipe.stepsFollow": {
+      "text": "Die Schritte ziehen mit: {n} Schritt nennt {food}, wo er {old} nannte.|Die Schritte ziehen mit: {n} Schritte nennen {food}, wo sie {old} nannten.",
+      "checked": true
+    },
+    "recipe.draftFailedChecks": {
+      "text": "Der Entwurf von Chef Mealan hat die Prüfungen nicht bestanden ({why}). Versuch es nochmal oder schreib deinen eigenen.",
+      "checked": true
+    },
+    "recipe.recipes": {
+      "text": "Rezepte",
+      "checked": true
+    },
+    "recipe.rename": {
+      "text": "{title} umbenennen",
+      "checked": true
+    },
+    "recipe.byChef": {
+      "text": "{meal} von Chef Mealan ({kitchen}), rund um deine Zutaten: {around}. Gemacht am {date}.",
+      "checked": true
+    },
+    "recipe.wholeMakes": {
+      "text": "Das ganze Rezept ergibt {n} {unit} · 1 {one} {kcal} kcal",
+      "checked": true
+    },
+    "recipe.wholeByWeight": {
+      "text": "Das ganze Rezept: {n} Portionen nach Gewicht. Rezept bearbeiten kann sagen, was es ergibt.",
+      "checked": true
+    },
+    "recipe.pictureOfBy": {
+      "text": "Bild von {title}, gemacht von Chef Mealan",
+      "checked": true
+    },
+    "recipe.drawnByChef": {
+      "text": "Von Chef Mealan gezeichnet",
+      "checked": true
+    },
+    "recipe.coverOf": {
+      "text": "Titelbild von {title}",
+      "checked": true
+    },
+    "recipe.photoOf": {
+      "text": "Foto {n} von {title}",
+      "checked": true
+    },
+    "recipe.chefDrewIt": {
+      "text": "Chef Mealan hat es aus deinen Lebensmitteln und Mengen gezeichnet, als du das Gericht behalten hast, damit du es auf einen Blick findest. Dein eigenes Foto ersetzt es.",
+      "checked": true
+    },
+    "recipe.photoAria": {
+      "text": "Foto {n}{cover}{picked}",
+      "checked": true
+    },
+    "recipe.photoAriaCover": {
+      "text": ", Titelbild",
+      "checked": true
+    },
+    "recipe.photoAriaPicked": {
+      "text": ", ausgewählt",
+      "checked": true
+    },
+    "recipe.deletePhoto": {
+      "text": "Foto {n} löschen",
+      "checked": true
+    },
+    "recipe.chefIsDrawing": {
+      "text": "Chef Mealan zeichnet…",
+      "checked": true
+    },
+    "recipe.letChefDraw": {
+      "text": "Chef Mealan eins zeichnen lassen",
+      "checked": true
+    },
+    "recipe.drawingsToday": {
+      "text": "Zeichnungen von Chef Mealan heute: {used} von {limit}. {rest}",
+      "checked": true
+    },
+    "recipe.removeTheCover": {
+      "text": "Titelbild entfernen",
+      "checked": true
+    },
+    "recipe.aPhotoMakesItEasy": {
+      "text": "Mit einem Foto findest du das Rezept leicht, hier und auf seiner Seite.",
+      "checked": true
+    },
+    "recipe.photoMovesEarlier": {
+      "text": "Foto {n} von {of}. ‹ schiebt es nach vorn: An erster Stelle wird es zum Titelbild.",
+      "checked": true
+    },
+    "recipe.fromTheTimesYouMade": {
+      "text": "Aus den Malen, als du es gemacht hast, fügt ein Tippen das Foto hinzu:",
+      "checked": true
+    },
+    "recipe.addPlatePhoto": {
+      "text": "Tellerfoto {n} zum Rezept hinzufügen",
+      "checked": true
+    },
+    "recipe.watchStepsLength": {
+      "text": "{n} Schritte, etwa {seconds} Sekunden{ai}",
+      "checked": true
+    },
+    "recipe.watchStepsAi": {
+      "text": " · Bilder von KI gezeichnet, Beta",
+      "checked": true
+    },
+    "recipe.oneLess": {
+      "text": "1 {unit} weniger",
+      "checked": true
+    },
+    "recipe.oneMore": {
+      "text": "1 {unit} mehr",
+      "checked": true
+    },
+    "recipe.makesFoodsFor": {
+      "text": "Das Rezept ergibt {n}; die Lebensmittel unten sind für {cook}.",
+      "checked": true
+    },
+    "recipe.planTakes": {
+      "text": "Der Plan braucht {n}: koche {n}",
+      "checked": true
+    },
+    "recipe.backToAsWritten": {
+      "text": "Zurück auf {n}, wie geschrieben",
+      "checked": true
+    },
+    "recipe.forCookingNotCounted": {
+      "text": "Zum Kochen, nicht gezählt:",
+      "checked": true
+    },
+    "recipe.sarmasPlaceholder": {
+      "text": "Sarma",
+      "checked": true
+    },
+    "recipe.deltaOut": {
+      "text": "Raus: {list}.",
+      "checked": true
+    },
+    "recipe.deltaIn": {
+      "text": "Neu: {list}.",
+      "checked": true
+    },
+    "recipe.deltaChanged": {
+      "text": "Geändert: {list}.",
+      "checked": true
+    },
+    "recipe.deltaOne": {
+      "text": "1 {one}: von {kcalFrom} auf {kcalTo} kcal, von {proteinFrom} auf {proteinTo} g Protein{pd}.",
+      "checked": true
+    },
+    "recipe.deltaPd": {
+      "text": ", PD von {from} auf {to}",
+      "checked": true
+    },
+    "recipe.moreThanAFifthApart": {
+      "text": "Mehr als ein Fünftel Unterschied: Prüf, ob das Rezept noch tut, wofür es gedacht war.",
+      "checked": true
+    },
+    "recipe.swapFood": {
+      "text": "{food} tauschen",
+      "checked": true
+    },
+    "recipe.optional": {
+      "text": "Optional",
+      "checked": true
+    },
+    "recipe.writtenForFrying": {
+      "text": "{written}, zum Braten",
+      "checked": true
+    },
+    "recipe.forFrying": {
+      "text": "Zum Braten",
+      "checked": true
+    },
+    "recipe.gramsOf": {
+      "text": "Gramm von {food}",
+      "checked": true
+    },
+    "recipe.removeFood": {
+      "text": "{food} entfernen",
+      "checked": true
+    },
+    "recipe.swapChoice": {
+      "text": "{way}: {grams} g {food}",
+      "checked": true
+    },
+    "recipe.inPlaceOf": {
+      "text": "Anstelle von {food}",
+      "checked": true
+    },
+    "recipe.inPlaceOfGrams": {
+      "text": "Anstelle von {food}, {grams} g:",
+      "checked": true
+    },
+    "recipe.inPlaceOfRemoved": {
+      "text": "Anstelle von {food}, {grams} g, gerade entfernt?",
+      "checked": true
+    },
+    "recipe.aDifferentFood": {
+      "text": "Ein anderes Lebensmittel: Gleiches Gewicht hält das Gericht gleich groß.",
+      "checked": true
+    },
+    "recipe.setTheGramsOf": {
+      "text": "Leg die Gramm für {food} fest oder entferne es.",
+      "checked": true
+    },
+    "recipe.swapFor": {
+      "text": "{food} tauschen gegen:",
+      "checked": true
+    },
+    "recipe.per100g": {
+      "text": "{kcal} kcal · {protein} g Protein pro 100 g",
+      "checked": true
+    },
+    "recipe.per100gNoLabel": {
+      "text": "{kcal} kcal · {protein} g Protein pro 100 g · ein Lebensmittel ohne Etikett",
+      "checked": true
+    },
+    "recipe.countedWholeHere": {
+      "text": "{pieces} und andere Lebensmittel, die nach Stück gezählt werden, sind hier ganz, für das ganze Rezept. 1 {one} enthält seinen Anteil, {share} {piece}: Das ist für die Zahlen, nicht fürs Kochen.",
+      "checked": true
+    },
+    "recipe.writtenOnTheRecipe": {
+      "text": "{written} im Rezept",
+      "checked": true
+    },
+    "recipe.optionalLower": {
+      "text": "optional",
+      "checked": true
+    },
+    "recipe.chefStepsFromOriginal": {
+      "text": "Die Schritte von Chef Mealan, aus dem Original, für deine Mengen und deine Küche. Jeder sagt, wie er zum Original steht.",
+      "checked": true
+    },
+    "recipe.asNameWritesThem": {
+      "text": "Wie {name} sie schreibt, für das ganze Rezept.",
+      "checked": true
+    },
+    "recipe.stepsForEarlierFoods": {
+      "text": "Diese Schritte wurden für die früheren Lebensmittel geschrieben. {diff}",
+      "checked": true
+    },
+    "recipe.photosForTheSteps": {
+      "text": "Fotos für die Schritte kommen vom Kochen: + Foto bei einem Schritt in Zubereiten. Tippe ein Foto an, um es zu ändern oder zu entfernen.",
+      "checked": true
+    },
+    "recipe.chefS": {
+      "text": "Von Chef Mealan",
+      "checked": true
+    },
+    "recipe.yours": {
+      "text": "Deine",
+      "checked": true
+    },
+    "recipe.theOriginalForTheOriginal": {
+      "text": "Das Original, für die ursprünglichen Lebensmittel:",
+      "checked": true
+    },
+    "recipe.chefSWay": {
+      "text": "Auf die Art von Chef Mealan",
+      "checked": true
+    },
+    "recipe.chefWritesTheSteps": {
+      "text": "Chef Mealan schreibt die Schritte für deine Mengen und deine Küche, wenn du sie willst.",
+      "checked": true
+    },
+    "recipe.draftTheStepsWithChef": {
+      "text": "Schritte mit Chef Mealan entwerfen",
+      "checked": true
+    },
+    "recipe.stepsReadAloud": {
+      "text": "{n} Schritt, laut vorgelesen. Sag weiter, zurück oder nochmal. Ein zweites Handy kann ihn zeigen.|{n} Schritte, laut vorgelesen. Sag weiter, zurück oder nochmal. Ein zweites Handy kann sie zeigen.",
+      "checked": true
+    },
+    "recipe.startCookingReadsThe": {
+      "text": "Kochen starten liest die Schritte vor, einen nach dem anderen. Es öffnet sich, sobald die Schritte da sind: von Chef Mealan entworfen oder von dir geschrieben.",
+      "checked": true
+    },
+    "recipe.aRecipeNeedsAtLeast": {
+      "text": "Ein Rezept braucht mindestens ein Lebensmittel.",
+      "checked": true
+    },
+    "recipe.live": {
+      "text": "Live",
+      "checked": true
+    },
+    "recipe.waitingFor": {
+      "text": "Wartet auf {who}",
+      "checked": true
+    },
+    "recipe.draft": {
+      "text": "Entwurf",
+      "checked": true
+    },
+    "recipe.changedTitle": {
+      "text": "Geändert: {list}",
+      "checked": true
+    },
+    "recipe.liveAnyoneWithTheLink": {
+      "text": "chefmealan.com/r/{slug}. Alle mit dem Link sehen die Seite, das Titelbild zuerst.",
+      "checked": true
+    },
+    "recipe.approverSeesThePage": {
+      "text": "{who} sieht die Seite zuerst und stellt sie live oder schickt sie mit einer Notiz zurück.",
+      "checked": true
+    },
+    "recipe.approverSentItBackNote": {
+      "text": "{who} hat es zurückgeschickt: „{note}“",
+      "checked": true
+    },
+    "recipe.approverSentItBack": {
+      "text": "{who} hat es zurückgeschickt.",
+      "checked": true
+    },
+    "recipe.aDraftOnlyHere": {
+      "text": "Ein Entwurf, nur hier. Mach weiter, wo du aufgehört hast.",
+      "checked": true
+    },
+    "recipe.sendToAgain": {
+      "text": "Erneut an {who} senden",
+      "checked": true
+    },
+    "recipe.continuePlain": {
+      "text": "Weiter",
+      "checked": true
+    },
+    "recipe.publish": {
+      "text": "Veröffentlichen",
+      "checked": true
+    },
+    "recipe.forYouOnThePreview": {
+      "text": "Für dich, in der Vorschau. Jedes Tippen zeichnet ein Bild von {title} aus seinen Lebensmitteln und Mengen. Nichts wird gespeichert, außer du tippst auf Als Titelbild verwenden.",
+      "checked": true
+    },
+    "recipe.drawing": {
+      "text": "Zeichnet…",
+      "checked": true
+    },
+    "recipe.realisticTestBy": {
+      "text": "Realistischer Test von {model}",
+      "checked": true
+    },
+    "recipe.accountPlaceholder": {
+      "text": "@konto auf Instagram oder die Website",
+      "checked": true
+    },
+    "recipe.change": {
+      "text": "Ändern",
+      "checked": true
+    },
+    "recipe.addTheLink": {
+      "text": "+ Link hinzufügen",
+      "checked": true
+    },
+    "recipe.makesAsTheRecipeSays": {
+      "text": "Ergibt {n} {unit}, wie im Rezept.",
+      "checked": true
+    },
+    "recipe.screenshotN": {
+      "text": "Screenshot {n}",
+      "checked": true
+    },
+    "recipe.markWhy": {
+      "text": "{mark}: {why}",
+      "checked": true
+    },
+    "recipe.markAdapted": {
+      "text": "Angepasst",
+      "checked": true
+    },
+    "recipe.markAdded": {
+      "text": "Hinzugefügt",
+      "checked": true
+    },
+    "recipe.partHead": {
+      "text": "{part}",
+      "checked": true
+    },
+    "recipe.toppingPlaceholder": {
+      "text": "Topping",
+      "checked": true
+    },
+    "gates.and": {
+      "text": "{a} und {b}",
+      "checked": true
+    },
+    "gates.fatOver": {
+      "text": "Mehr als die Hälfte der Energie dieser Mahlzeit ({meal}) ist Fett: {pct} Prozent, {fat} g.",
+      "checked": true
+    },
+    "gates.fatEdge": {
+      "text": "Fett ist etwa die Hälfte der Energie dieser Mahlzeit ({meal}): {pct} Prozent, und die Grenze liegt bei 50.",
+      "checked": true
+    },
+    "gates.fatHint": {
+      "text": "Um sicher im Rahmen zu bleiben: etwas weniger {food} oder eine Proteinbeilage.",
+      "checked": true
+    },
+    "gates.thePowder": {
+      "text": "dem Pulver",
+      "checked": true
+    },
+    "gates.suppOver": {
+      "text": "Der Großteil des Proteins dieser Mahlzeit ({meal}) kommt aus {from}: {supp} von {protein} g.",
+      "checked": true
+    },
+    "gates.suppEdge": {
+      "text": "Etwa die Hälfte des Proteins dieser Mahlzeit ({meal}) kommt aus einem Supplement: {supp} von {protein} g, und die Grenze liegt bei der Hälfte.",
+      "checked": true
+    },
+    "gates.hintProteinFood": {
+      "text": "Um sicher im Rahmen zu bleiben: ein proteinreiches Lebensmittel dazu.",
+      "checked": true
+    },
+    "gates.carbsOver": {
+      "text": "Vor dem Training braucht der Teller Kohlenhydrate, und dieser hat fast keine: {pct} Prozent seiner Energie.",
+      "checked": true
+    },
+    "gates.carbsEdge": {
+      "text": "Vor dem Training machen Kohlenhydrate {pct} Prozent der Energie dieses Tellers aus, und die Grenze liegt bei 10.",
+      "checked": true
+    },
+    "gates.hintFruit": {
+      "text": "Um sicher im Rahmen zu bleiben: ein Stück Obst oder Brot.",
+      "checked": true
+    },
+    "gates.aMeeting": {
+      "text": "Ein Meeting",
+      "checked": true
+    },
+    "gates.nothingToCook": {
+      "text": "{moment}: nichts zu kochen, und {foods} braucht einen Topf.|{moment}: nichts zu kochen, und {foods} brauchen einen Topf.",
+      "checked": true
+    },
+    "gates.beforeKcalOver": {
+      "text": "Vor dem Training sind {kcal} kcal viel im Magen; ein kleinerer Teller liegt leichter.",
+      "checked": true
+    },
+    "gates.afterProteinUnder": {
+      "text": "Nach dem Training kommt Protein zuerst, und dieser Teller hat {protein} g.",
+      "checked": true
+    },
+    "gates.beforeKcalEdge": {
+      "text": "Vor dem Training {kcal} kcal, und die Grenze liegt bei 600.",
+      "checked": true
+    },
+    "gates.hintSmaller": {
+      "text": "Um sicher im Rahmen zu bleiben: eine kleinere Portion.",
+      "checked": true
+    },
+    "gates.afterProteinEdge": {
+      "text": "Nach dem Training hat dieser Teller {protein} g Protein, und die Grenze liegt bei 15.",
+      "checked": true
+    },
+    "gates.outsideWindow": {
+      "text": "{time}, und dein Essensfenster geht von {from} bis {to}. Ein voller Teller jetzt belastet den morgigen Tag.",
+      "checked": true
+    },
+    "photo.whatIsThe": {
+      "text": "{food}: Was genau ist es?",
+      "checked": true
+    },
+    "photo.aboutKcal": {
+      "text": "etwa {kcal} kcal",
+      "checked": true
+    },
+    "photo.aboutKcalRange": {
+      "text": "etwa {low} bis {high} kcal",
+      "checked": true
+    },
+    "photo.gProtein": {
+      "text": "{n} g Protein",
+      "checked": true
+    },
+    "photo.portions": {
+      "text": "Achtung: Dieser Teller entspricht etwa {big} Portionen für {meal}, {kcal} bei einer Portion von etwa {mealKcal}. Iss eine Portion und heb den Rest auf.",
+      "checked": true
+    },
+    "photo.portionsWhy": {
+      "text": "Achtung: Dieser Teller entspricht etwa {big} Portionen für {meal}, {kcal} bei einer Portion von etwa {mealKcal}. {why} Iss eine Portion und heb den Rest auf.",
+      "checked": true
+    },
+    "photo.snack": {
+      "text": "Das ist ein Snack, nicht dein {meal}: {kcal} und {prot}. Iss ihn, und dein {meal} kommt noch.",
+      "checked": true
+    },
+    "photo.addProtein": {
+      "text": "{why} Nimm eine Proteinbeilage dazu, dann ist es dein {meal}; so wie es ist, sind es {kcal} und {prot}.",
+      "checked": true
+    },
+    "photo.asItStands": {
+      "text": "{why} So wie es ist, sind es {kcal} und {prot}.",
+      "checked": true
+    },
+    "photo.didYouEat": {
+      "text": "Hast du es gegessen? {kcal} und {prot}.",
+      "checked": true
+    },
+    "photo.dayWhy": {
+      "text": "{why} {kcal} und {prot}.",
+      "checked": true
+    },
+    "photo.eatAsIs": {
+      "text": "Iss es, wie es ist. {kcal} und {prot}, ein vollwertiges {meal} für deinen Tag.",
+      "checked": true
+    },
+    "photo.eatAsIsDish": {
+      "text": "Iss es, wie es ist. {kcal} und {prot}, ein vollwertiges {meal} für deinen Tag, und nichts darauf widerspricht dem Gericht.",
+      "checked": true
+    },
+    "photo.ideaPortions": {
+      "text": "So wie auf dem Foto: {kcal} und {prot}, etwa {big} Portionen für {meal}. Pass es an, dann ist es eine Portion.",
+      "checked": true
+    },
+    "photo.ideaWhy": {
+      "text": "{why} So wie auf dem Foto: {kcal} und {prot}. Pass es an, und Chef Mealan bemisst es für {meal}.",
+      "checked": true
+    },
+    "photo.idea": {
+      "text": "{meal}, so wie auf dem Foto: {kcal} und {prot}. Pass es an, dann ist es für deinen Tag bemessen.",
+      "checked": true
     }
   }
 }

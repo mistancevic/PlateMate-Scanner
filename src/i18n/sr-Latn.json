@@ -12360,6 +12360,3666 @@
     "lang.nameDe": {
       "text": "Nemački",
       "checked": false
+    },
+    "busy.busyInYourCalendarAt": {
+      "text": "Zauzeto u tvom kalendaru, {block}",
+      "checked": false
+    },
+    "busy.toTime": {
+      "text": "do {time}",
+      "checked": false
+    },
+    "busy.isAtOn": {
+      "text": "{meal}: {day} u {time}.",
+      "checked": false
+    },
+    "busy.isAtOnBack": {
+      "text": "{meal}: {day} u {time}. Nazad na {usual} je ispod, u Planu.",
+      "checked": false
+    },
+    "busy.keepTime": {
+      "text": "Zadrži {time}",
+      "checked": false
+    },
+    "busy.quickIdeas": {
+      "text": "Brze ideje: {meal}",
+      "checked": false
+    },
+    "busy.quickQuestion": {
+      "text": "Brz obrok ({meal}), {day}: imam obaveze do {until} i jedem u {time}, pa imam oko {free} minuta za kuvanje.",
+      "checked": false
+    },
+    "busy.cookAheadOn": {
+      "text": "Skuvaj unapred: {day}",
+      "checked": false
+    },
+    "busy.isCookedOn": {
+      "text": "{title}: kuva se {ahead}, za dan {day}.",
+      "checked": false
+    },
+    "busy.keepIt": {
+      "text": "Zadrži",
+      "checked": false
+    },
+    "busy.toCarry": {
+      "text": "{meal} za poneti",
+      "checked": false
+    },
+    "busy.carryQuestion": {
+      "text": "Obrok ({meal}) za poneti, {day}: napolju sam od {block}. Nešto što mogu da napravim veče pre i ponesem.",
+      "checked": false
+    },
+    "busy.moveTo": {
+      "text": "Pomeri na {time}",
+      "checked": false
+    },
+    "busy.trainingIsAt": {
+      "text": "Trening je u {time}, {day}, samo tog datuma.",
+      "checked": false
+    },
+    "busy.restDay": {
+      "text": "Dan odmora",
+      "checked": false
+    },
+    "busy.isARestDay": {
+      "text": "{day} je dan odmora, samo tog datuma.",
+      "checked": false
+    },
+    "busy.movedInGoogle": {
+      "text": "Pomereno u Google kalendaru, sa {time}",
+      "checked": false
+    },
+    "busy.atOnThisDate": {
+      "text": "U {time}, samo ovog datuma",
+      "checked": false
+    },
+    "busy.backTo": {
+      "text": "Nazad na {time}",
+      "checked": false
+    },
+    "busy.cookedAheadOn": {
+      "text": "Skuvano unapred: {day}",
+      "checked": false
+    },
+    "recipes.noneLeft": {
+      "text": "ništa nije ostalo",
+      "checked": false
+    },
+    "recipes.nLeft": {
+      "text": "ostalo: {n} {unit}",
+      "checked": false
+    },
+    "recipes.nOnDay": {
+      "text": "{n}: {day}, {slot}",
+      "checked": false
+    },
+    "recipes.batchLine": {
+      "text": "{makes} {unit}: {uses}. {left}.",
+      "checked": false
+    },
+    "recipes.batchCooking": {
+      "text": "{makes} {unit}: {uses}. Kuva se {cook}, {left}.",
+      "checked": false
+    },
+    "recipes.batchBatches": {
+      "text": "{makes} {unit}: {uses}. {n} tura, {left}.|{makes} {unit}: {uses}. {n} ture, {left}.|{makes} {unit}: {uses}. {n} tura, {left}.",
+      "checked": false
+    },
+    "recipes.savedCooking": {
+      "text": "Kuvanje, {when}",
+      "checked": false
+    },
+    "recipes.savedCookingTicked": {
+      "text": "Kuvanje, {when} · štiklirano {ticked} od {n} koraka",
+      "checked": false
+    },
+    "recipes.savedPlate": {
+      "text": "Tanjir, {when}",
+      "checked": false
+    },
+    "recipes.savedInMyRecipes": {
+      "text": "✓ Sačuvano u Mojim receptima",
+      "checked": false
+    },
+    "recipes.yourCoach": {
+      "text": "tvoj trener",
+      "checked": false
+    },
+    "recipes.open": {
+      "text": "Otvori: {title}",
+      "checked": false
+    },
+    "recipes.drawnByChef": {
+      "text": "Nacrtao Chef Mealan",
+      "checked": false
+    },
+    "recipes.tileOne": {
+      "text": "1 {word} · {kcal} kcal · {protein} g proteina · {pd}",
+      "checked": false
+    },
+    "recipes.tileOneMakes": {
+      "text": "1 {word} · {kcal} kcal · {protein} g proteina · {pd} · daje {n}",
+      "checked": false
+    },
+    "recipes.nFoods": {
+      "text": "{n} namirnica|{n} namirnice|{n} namirnica",
+      "checked": false
+    },
+    "recipes.madeTimes": {
+      "text": "napravljeno {n} put|napravljeno {n} puta|napravljeno {n} puta",
+      "checked": false
+    },
+    "recipes.chefSIdea": {
+      "text": "Ideja od Chef Mealana, još nije napravljena",
+      "checked": false
+    },
+    "recipes.sharedWithMembers": {
+      "text": "Podeljeno sa članovima",
+      "checked": false
+    },
+    "recipes.sharedWithMembersNoName": {
+      "text": "Podeljeno sa članovima, bez tvog imena",
+      "checked": false
+    },
+    "recipes.waitingFor": {
+      "text": "Čeka na: {who}",
+      "checked": false
+    },
+    "recipes.sentBackBy": {
+      "text": "Vraćeno od: {who}",
+      "checked": false
+    },
+    "recipes.draft": {
+      "text": "Nacrt",
+      "checked": false
+    },
+    "recipes.couldntTakeBackFromMembers": {
+      "text": "Nije moglo da se povuče iz Članova. Ništa nije obrisano. Pokušaj ponovo.",
+      "checked": false
+    },
+    "recipes.takenBackButPageNotDown": {
+      "text": "Povučeno je iz Članova, ali strana nije mogla da se skine. Ništa drugo nije obrisano. Pokušaj ponovo.",
+      "checked": false
+    },
+    "recipes.pageNotDown": {
+      "text": "Strana nije mogla da se skine. Ništa drugo nije obrisano. Pokušaj ponovo.",
+      "checked": false
+    },
+    "recipes.publishedIsLive": {
+      "text": "✓ Objavljeno. {title} je sada na chefmealan.com.",
+      "checked": false
+    },
+    "recipes.takenDownForEveryMember": {
+      "text": "Skinuto za svakog člana.",
+      "checked": false
+    },
+    "recipes.savedInMine": {
+      "text": "✓ Sačuvano u Mojim",
+      "checked": false
+    },
+    "recipes.today": {
+      "text": "Danas",
+      "checked": false
+    },
+    "recipes.plan": {
+      "text": "Plan",
+      "checked": false
+    },
+    "recipes.sharedWithCoach": {
+      "text": "✓ Podeljeno sa: {coach}",
+      "checked": false
+    },
+    "recipes.shareWithCoach": {
+      "text": "Podeli sa: {coach} ›",
+      "checked": false
+    },
+    "recipes.whatShouldCoachDo": {
+      "text": "Šta {coach} treba da uradi s njim?",
+      "checked": false
+    },
+    "recipes.plannedForHint": {
+      "text": "Isplanirano za: {day}, {meal}. Promeni namirnice ili količine za taj dan; recept ostaje kakav jeste. Napravi ga i Pojeo/Pojela sam dolaze na Danas, {day}.",
+      "checked": false
+    },
+    "recipes.goneByHint": {
+      "text": "{day}, {meal}: obrok je prošao. Promeni ga u ono što je pojedeno, i dodaje se u {time}. Recept ostaje kakav jeste.",
+      "checked": false
+    },
+    "recipes.isDeleted": {
+      "text": "Obrisano: {title}.",
+      "checked": false
+    },
+    "recipes.saveInMyRecipes": {
+      "text": "Sačuvaj u Moje recepte",
+      "checked": false
+    },
+    "recipes.moreOfMine": {
+      "text": "Još {n} mojih ›",
+      "checked": false
+    },
+    "recipes.moreFromCoach": {
+      "text": "Još {n} od: {coach} ›",
+      "checked": false
+    },
+    "recipes.moreFromMembers": {
+      "text": "Još {n} od članova ›",
+      "checked": false
+    },
+    "recipes.loadingWhatMembersShared": {
+      "text": "Učitava se ono što su članovi podelili…",
+      "checked": false
+    },
+    "recipes.slotByThePlanToday": {
+      "text": "{meal}, {time} · po planu · danas",
+      "checked": false
+    },
+    "recipes.slotPlannedNotAdded": {
+      "text": "{day}, {meal}, {time} · isplanirano, nije dodato",
+      "checked": false
+    },
+    "recipes.slotInThePlan": {
+      "text": "{day}, {meal}, {time} · u planu",
+      "checked": false
+    },
+    "publish.partTime": {
+      "text": "Vreme",
+      "checked": false
+    },
+    "publish.partFoodsAndGrams": {
+      "text": "Namirnice i grami",
+      "checked": false
+    },
+    "publish.partFoodsNames": {
+      "text": "Nazivi namirnica",
+      "checked": false
+    },
+    "publish.partAiLabel": {
+      "text": "AI oznaka",
+      "checked": false
+    },
+    "publish.yourCoach": {
+      "text": "tvoj trener",
+      "checked": false
+    },
+    "publish.publishing": {
+      "text": "Objavljuje se…",
+      "checked": false
+    },
+    "publish.takingItDown": {
+      "text": "Skida se…",
+      "checked": false
+    },
+    "publish.itCouldnTBeTakenDown": {
+      "text": "Nije moglo da se skine. Pokušaj ponovo.",
+      "checked": false
+    },
+    "publish.makingTheImages": {
+      "text": "Prave se slike…",
+      "checked": false
+    },
+    "publish.theImagesCouldnTBe": {
+      "text": "Slike nisu mogle da se naprave. Pokušaj ponovo.",
+      "checked": false
+    },
+    "publish.waitingFor": {
+      "text": "Čeka na: {who}",
+      "checked": false
+    },
+    "publish.sendTo": {
+      "text": "Pošalji: {who}",
+      "checked": false
+    },
+    "publish.publish": {
+      "text": "Objavi",
+      "checked": false
+    },
+    "publish.published": {
+      "text": "Objavljeno",
+      "checked": false
+    },
+    "publish.live": {
+      "text": "Uživo",
+      "checked": false
+    },
+    "publish.draft": {
+      "text": "Nacrt",
+      "checked": false
+    },
+    "publish.approverSeesThePage": {
+      "text": "{who} prvo vidi stranu i objavljuje je, ili je vraća s porukom.",
+      "checked": false
+    },
+    "publish.theLivePageStays": {
+      "text": "Objavljena strana do tada ostaje kakva jeste.",
+      "checked": false
+    },
+    "publish.theVersionFrom": {
+      "text": "Objavljena strana pokazuje verziju od {time}.",
+      "checked": false
+    },
+    "publish.changedList": {
+      "text": "Promenjeno: {list}.",
+      "checked": false
+    },
+    "publish.fourImages": {
+      "text": "Četiri slike za karusel, i brojevi kao poslednji kadar rila. Promeni bilo šta ispod, Pogledaj stranu, pa {then}.",
+      "checked": false
+    },
+    "publish.sendTheChangesTo": {
+      "text": "pošalji izmene: {who}",
+      "checked": false
+    },
+    "publish.photoAria": {
+      "text": "Slika {n}{shown}",
+      "checked": false
+    },
+    "publish.photoAriaShown": {
+      "text": ", prikazana",
+      "checked": false
+    },
+    "publish.madeWithAiDrawn": {
+      "text": "Napravljeno uz AI: nacrtao Chef Mealan. Strana i slike kažu Slika napravljena uz AI.",
+      "checked": false
+    },
+    "publish.madeWithAi": {
+      "text": "Napravljeno uz AI. Strana i slike kažu Slika napravljena uz AI.",
+      "checked": false
+    },
+    "publish.crepePlaceholder": {
+      "text": "palačinka",
+      "checked": false
+    },
+    "publish.nameOfFood": {
+      "text": "Naziv namirnice {n}",
+      "checked": false
+    },
+    "publish.highProtein": {
+      "text": "✓ Puno proteina: ",
+      "checked": false
+    },
+    "publish.shareOfEnergy": {
+      "text": "{n} % energije je iz proteina",
+      "checked": false
+    },
+    "publish.oneServing": {
+      "text": "✓ 1 {serving}: {kcal} kcal · {protein} g proteina · PD {pd}",
+      "checked": false
+    },
+    "publish.serving": {
+      "text": "porcija",
+      "checked": false
+    },
+    "publish.ratingDaam": {
+      "text": "✓ Tvoja ocena: DaaM good",
+      "checked": false
+    },
+    "publish.ratingGood": {
+      "text": "✓ Tvoja ocena: Dobro",
+      "checked": false
+    },
+    "publish.previewOnlyYou": {
+      "text": "Pregled: ovo vidiš samo ti.",
+      "checked": false
+    },
+    "publish.approverSeesItBefore": {
+      "text": "{who} to vidi pre objave.",
+      "checked": false
+    },
+    "members.sharedByYou": {
+      "text": "ti ga deliš",
+      "checked": false
+    },
+    "members.sharedByYouWithoutName": {
+      "text": "ti ga deliš, bez svog imena",
+      "checked": false
+    },
+    "members.sharedBy": {
+      "text": "deli: {name}",
+      "checked": false
+    },
+    "members.sharedByAMember": {
+      "text": "deli jedan član",
+      "checked": false
+    },
+    "members.madeTimes": {
+      "text": "napravljeno {n} put|napravljeno {n} puta|napravljeno {n} puta",
+      "checked": false
+    },
+    "members.photoBy": {
+      "text": "Slika: {name}",
+      "checked": false
+    },
+    "members.drawnByChef": {
+      "text": "Nacrtao Chef Mealan",
+      "checked": false
+    },
+    "members.leadForYourDay": {
+      "text": "Recepti članova, izračunati za tvoj dan. {meal}: oko {kcal} kcal{first}.",
+      "checked": false
+    },
+    "members.leadFirst": {
+      "text": " uz {pd} ili više, pa su ovi prvi",
+      "checked": false
+    },
+    "members.open": {
+      "text": "Otvori: {title}",
+      "checked": false
+    },
+    "members.yourMealPortion": {
+      "text": "{meal}, tvoja porcija: {grams} g · {kcal} kcal · {pd}",
+      "checked": false
+    },
+    "members.wholeRecipePortion": {
+      "text": "Ceo recept: {grams} g · {kcal} kcal · {pd}",
+      "checked": false
+    },
+    "members.underYour": {
+      "text": ", ispod tvog {pd}",
+      "checked": false
+    },
+    "members.theCoverOf": {
+      "text": "Naslovna: {title}",
+      "checked": false
+    },
+    "members.byMembers": {
+      "text": "od članova",
+      "checked": false
+    },
+    "members.adaptedFrom": {
+      "text": "Prilagođeno od: {source}",
+      "checked": false
+    },
+    "members.allOfRecipes": {
+      "text": "Svi recepti: {name} ›",
+      "checked": false
+    },
+    "members.yourPortionOfTotal": {
+      "text": "{meal}, tvoja porcija: {grams} g od {total} g koliko recept daje",
+      "checked": false
+    },
+    "members.foods": {
+      "text": "Namirnice",
+      "checked": false
+    },
+    "members.sharedNoSteps": {
+      "text": "{name}: koraci nisu podeljeni.",
+      "checked": false
+    },
+    "members.yourPortionGoesOn": {
+      "text": "Tvoja porcija ide na Tanjir: {grams} g, {kcal} kcal. Uklopi u moj cilj može još da je promeni.",
+      "checked": false
+    },
+    "members.aCopyInMine": {
+      "text": "Kopija u Mojim, da je menjaš kako želiš. {whose} recept ostaje netaknut.",
+      "checked": false
+    },
+    "members.nameS": {
+      "text": "Autorov ({name})",
+      "checked": false
+    },
+    "members.theCoverDidnTChange": {
+      "text": "Naslovna se nije promenila. Pokušaj ponovo.",
+      "checked": false
+    },
+    "members.membersSeeTheNewCover": {
+      "text": "Članovi vide novu naslovnu.",
+      "checked": false
+    },
+    "members.takingItBackDidnT": {
+      "text": "Povlačenje nije uspelo. Pokušaj ponovo.",
+      "checked": false
+    },
+    "members.thePictureByChef": {
+      "text": "slika od Chef Mealana",
+      "checked": false
+    },
+    "members.yourPhotoLower": {
+      "text": "tvoja slika",
+      "checked": false
+    },
+    "members.noCover": {
+      "text": "nema",
+      "checked": false
+    },
+    "members.shared": {
+      "text": "Podeljeno",
+      "checked": false
+    },
+    "members.seeItSince": {
+      "text": "Članovi ga vide od {date}, kao {as}. Naslovna: {cover}.",
+      "checked": false
+    },
+    "members.you": {
+      "text": "ti",
+      "checked": false
+    },
+    "members.aMember": {
+      "text": "jedan član",
+      "checked": false
+    },
+    "members.madeZeroSoFar": {
+      "text": "Do sada napravljeno 0 puta.",
+      "checked": false
+    },
+    "members.madeLine": {
+      "text": "Napravljeno {n} put.|Napravljeno {n} puta.|Napravljeno {n} puta.",
+      "checked": false
+    },
+    "members.aChangeReachesThem": {
+      "text": "Izmena koju ovde napraviš stiže i do njih.",
+      "checked": false
+    },
+    "members.nameIsFree": {
+      "text": "Ime {name} je slobodno. Tvoje je čim podeliš.",
+      "checked": false
+    },
+    "members.switchOn": {
+      "text": "Uključeno: članovi ga vide kao {as}. Isključeno: kao recept jednog člana.",
+      "checked": false
+    },
+    "members.switchOff": {
+      "text": "Isključeno: članovi ga vide kao recept jednog člana. Uključeno: kao {as}.",
+      "checked": false
+    },
+    "members.yoursByYourName": {
+      "text": "tvoj, pod tvojim imenom u Članovima",
+      "checked": false
+    },
+    "steppics.changeOrRemoveThePhoto": {
+      "text": "Promeni ili ukloni sliku koraka {n}",
+      "checked": false
+    },
+    "steppics.aiBeta": {
+      "text": "AI · Beta",
+      "checked": false
+    },
+    "steppics.yours": {
+      "text": "Tvoja",
+      "checked": false
+    },
+    "steppics.changeThePictureOf": {
+      "text": "Promeni sliku koraka {n}",
+      "checked": false
+    },
+    "steppics.addAPictureTo": {
+      "text": "Dodaj sliku koraku {n}",
+      "checked": false
+    },
+    "steppics.addPicture": {
+      "text": "＋ Slika",
+      "checked": false
+    },
+    "steppics.thatPictureDidnTOpen": {
+      "text": "Ta slika se nije otvorila. Probaj drugu.",
+      "checked": false
+    },
+    "steppics.pictureForStep": {
+      "text": "Slika za korak {n}",
+      "checked": false
+    },
+    "steppics.close": {
+      "text": "✕ Zatvori",
+      "checked": false
+    },
+    "steppics.photoFromYourCooks": {
+      "text": "Slika {n} iz tvojih kuvanja",
+      "checked": false
+    },
+    "steppics.thePictureForStep": {
+      "text": "Slika za korak {n}",
+      "checked": false
+    },
+    "steppics.watchTheStepsOf": {
+      "text": "Pogledaj korake: {title}",
+      "checked": false
+    },
+    "steppics.stepN": {
+      "text": "Korak {n}",
+      "checked": false
+    },
+    "steppics.stepOf": {
+      "text": "KORAK {n} OD {of}{timer}",
+      "checked": false
+    },
+    "steppics.timer": {
+      "text": " · TAJMER {time}",
+      "checked": false
+    },
+    "steppics.stepBack": {
+      "text": "‹ Korak {n}",
+      "checked": false
+    },
+    "steppics.stepNext": {
+      "text": "Korak {n} ›",
+      "checked": false
+    },
+    "steppics.pause": {
+      "text": "❚❚ Pauza",
+      "checked": false
+    },
+    "steppics.again": {
+      "text": "↻ Ponovo",
+      "checked": false
+    },
+    "steppics.play": {
+      "text": "▶ Pusti",
+      "checked": false
+    },
+    "delrecipe.deleteTitle": {
+      "text": "Obriši: {title}",
+      "checked": false
+    },
+    "delrecipe.deleteTitleAsk": {
+      "text": "Obrisati: {title}?",
+      "checked": false
+    },
+    "delrecipe.theRecipe": {
+      "text": "Recept: {list}.",
+      "checked": false
+    },
+    "delrecipe.listAnd": {
+      "text": "{list} i {last}",
+      "checked": false
+    },
+    "delrecipe.yourScreenshots": {
+      "text": "Tvoj {n} snimak ekrana|Tvoja {n} snimka ekrana|Tvojih {n} snimaka ekrana",
+      "checked": false
+    },
+    "delrecipe.itsPhotos": {
+      "text": "Njegova {n} slika|Njegove {n} slike|Njegovih {n} slika",
+      "checked": false
+    },
+    "delrecipe.fromThisPhone": {
+      "text": "sa ovog telefona i sa tvog naloga.",
+      "checked": false
+    },
+    "delrecipe.thePictureChefDrew": {
+      "text": "Slika koju je nacrtao Chef Mealan.",
+      "checked": false
+    },
+    "delrecipe.membersWhoKeptACopy": {
+      "text": "Članovi koji su sačuvali kopiju zadržavaju svoju.",
+      "checked": false
+    },
+    "delrecipe.withdrawItFrom": {
+      "text": "Povuci ga od: {who}",
+      "checked": false
+    },
+    "delrecipe.noLongerSeesIt": {
+      "text": "{who} ga više ne vidi na čekanju.",
+      "checked": false
+    },
+    "delrecipe.stopsShowingIt": {
+      "text": "chefmealan.com/r/{slug} ga više ne prikazuje.",
+      "checked": false
+    },
+    "delrecipe.theVersionWaitingFor": {
+      "text": "Verzija koja čeka ({who}) se povlači.",
+      "checked": false
+    },
+    "delrecipe.yourMeals": {
+      "text": "Tvoj {n} obrok|Tvoja {n} obroka|Tvojih {n} obroka",
+      "checked": false
+    },
+    "delrecipe.withItOnToday": {
+      "text": "sa njim, na Danas i u tvojoj istoriji: ono što je pojedeno ostaje pojedeno.",
+      "checked": false
+    },
+    "delrecipe.theFoodsItUses": {
+      "text": "{n} namirnica koju koristi|{n} namirnice koje koristi|{n} namirnica koje koristi",
+      "checked": false
+    },
+    "delrecipe.inYourFoods": {
+      "text": "u tvojim Namirnicama. Namirnica ne sadrži ništa lično.",
+      "checked": false
+    },
+    "delrecipe.deleting": {
+      "text": "Briše se…",
+      "checked": false
+    },
+    "yourcooks.good": {
+      "text": "Dobro",
+      "checked": false
+    },
+    "yourcooks.daamGood": {
+      "text": "DaaM good",
+      "checked": false
+    },
+    "yourcooks.timesTheLastOn": {
+      "text": "{n} put, poslednji put {date}|{n} puta, poslednji put {date}|{n} puta, poslednji put {date}",
+      "checked": false
+    },
+    "yourcooks.asTheStepsSay": {
+      "text": "Kako koraci kažu:",
+      "checked": false
+    },
+    "yourcooks.nOfTotal": {
+      "text": "{n} od {total}",
+      "checked": false
+    },
+    "yourcooks.tasted": {
+      "text": "Ukus:",
+      "checked": false
+    },
+    "yourcooks.carriedYou": {
+      "text": "Kako ti je prijalo:",
+      "checked": false
+    },
+    "yourcooks.today": {
+      "text": "Danas",
+      "checked": false
+    },
+    "yourcooks.yesterday": {
+      "text": "Juče",
+      "checked": false
+    },
+    "yourcooks.cooked": {
+      "text": "skuvano",
+      "checked": false
+    },
+    "yourcooks.theRestOfABatch": {
+      "text": "ostatak veće količine",
+      "checked": false
+    },
+    "yourcooks.logged": {
+      "text": "upisano",
+      "checked": false
+    },
+    "yourcooks.onePortion": {
+      "text": "1 porcija, {g} g",
+      "checked": false
+    },
+    "yourcooks.halfAPortion": {
+      "text": "Pola porcije, {g} g",
+      "checked": false
+    },
+    "yourcooks.twoPortions": {
+      "text": "2 porcije, {g} g",
+      "checked": false
+    },
+    "yourcooks.carriedYouHow": {
+      "text": "kako ti je prijalo: {how}",
+      "checked": false
+    },
+    "yourcooks.fewer": {
+      "text": "Manje",
+      "checked": false
+    },
+    "yourcooks.allN": {
+      "text": "Sve ({n}) ›",
+      "checked": false
+    },
+    "photoask.ateAtTime": {
+      "text": "Pojedeno u {time}",
+      "checked": false
+    },
+    "photoask.eatingNow": {
+      "text": "Jedem sada",
+      "checked": false
+    },
+    "photoask.exploring": {
+      "text": "Istraživanje",
+      "checked": false
+    },
+    "photoask.notYourMeal": {
+      "text": "Nije tvoj obrok, ne upisuje se. Chef Mealan ga čita: skuvaj ga, sačuvaj kao ideju, ili ga isplaniraj.",
+      "checked": false
+    },
+    "photoask.nowAs": {
+      "text": "Kao sa kamere: tanjir ispred tebe, obrok: {meal}.",
+      "checked": false
+    },
+    "photoask.now": {
+      "text": "Kao sa kamere: tanjir ispred tebe.",
+      "checked": false
+    },
+    "photoask.loggedAtAs": {
+      "text": "Upisano u {time}, obrok: {meal}. Dodirni vreme da ga promeniš.",
+      "checked": false
+    },
+    "photoask.loggedAt": {
+      "text": "Upisano u {time}. Dodirni vreme da ga promeniš.",
+      "checked": false
+    },
+    "photoask.notePlaceholder": {
+      "text": "svinjska šnicla, pohovana, Skadarlija",
+      "checked": false
+    },
+    "count.oneLess": {
+      "text": "{piece}: jedan manje",
+      "checked": false
+    },
+    "count.oneMore": {
+      "text": "{piece}: jedan više",
+      "checked": false
+    },
+    "count.sizeOfIs": {
+      "text": "{food}, veličina: {size}",
+      "checked": false
+    },
+    "count.sizeOf": {
+      "text": "{food}, veličina",
+      "checked": false
+    },
+    "count.wholeApple": {
+      "text": "Cela jabuka, sa semenom kućicom. Jabuke se razlikuju, pa je veličina okvirna.",
+      "checked": false
+    },
+    "count.gramsWeighed": {
+      "text": "{piece}, izmereno u gramima",
+      "checked": false
+    },
+    "sayhave.listening": {
+      "text": "Slušam",
+      "checked": false
+    },
+    "sayhave.eggsSpinachFeta": {
+      "text": "jaja, spanać, feta, pola glavice luka",
+      "checked": false
+    },
+    "out.tagPlate": {
+      "text": "SA TVOG TANJIRA",
+      "checked": false
+    },
+    "out.tagDay": {
+      "text": "IZ TVOG DANA",
+      "checked": false
+    },
+    "out.tagPlan": {
+      "text": "TVOJ PLAN",
+      "checked": false
+    },
+    "out.tagChef": {
+      "text": "CHEF MEALAN",
+      "checked": false
+    },
+    "out.aboutDay": {
+      "text": "{day}: {what}.",
+      "checked": false
+    },
+    "out.everySlotSet": {
+      "text": "svi obroci postavljeni",
+      "checked": false
+    },
+    "out.toPlace": {
+      "text": "još {kcal} kcal i {g} g za raspodelu",
+      "checked": false
+    },
+    "out.slotsToCome": {
+      "text": "Preostalo: {open} od {n} obroka.|Preostalo: {open} od {n} obroka.|Preostalo: {open} od {n} obroka.",
+      "checked": false
+    },
+    "out.slotsToComeExtra": {
+      "text": "Preostalo: {open} od {n} obroka, do sada {extra} dodatno.|Preostalo: {open} od {n} obroka, do sada {extra} dodatno.|Preostalo: {open} od {n} obroka, do sada {extra} dodatno.",
+      "checked": false
+    },
+    "out.onThePlate": {
+      "text": "Na tanjiru: {foods}, {pd}.",
+      "checked": false
+    },
+    "out.onThePlateAgainst": {
+      "text": "Na tanjiru: {foods}, {pd} naspram tvog {ref}.",
+      "checked": false
+    },
+    "out.fillDay": {
+      "text": "Popuni: {day}",
+      "checked": false
+    },
+    "out.swapForLighter": {
+      "text": "Zameni obrok ({meal}) nečim lakšim",
+      "checked": false
+    },
+    "out.moveToAfterTraining": {
+      "text": "Pomeri obrok ({meal}) posle treninga",
+      "checked": false
+    },
+    "out.imOutWhatDoITake": {
+      "text": "Napolju sam, šta da uzmem?",
+      "checked": false
+    },
+    "out.swapAFoodOnMyPlate": {
+      "text": "Zameni namirnicu na mom tanjiru",
+      "checked": false
+    },
+    "out.makeMyPlateA": {
+      "text": "Napravi od mog tanjira obrok: {meal}",
+      "checked": false
+    },
+    "out.noIdeaInspireMe": {
+      "text": "Nemam ideju, inspiriši me",
+      "checked": false
+    },
+    "out.filled": {
+      "text": "{day}, popunjeno: {rows}. Dan dolazi do {kcal} kcal i {protein} g proteina. Promeni jedan, ili ih stavi u plan.",
+      "checked": false
+    },
+    "out.filledOf": {
+      "text": "{day}, popunjeno: {rows}. Dan dolazi do {kcal} kcal i {protein} g proteina, od {ofKcal} i {ofProtein}. Promeni jedan, ili ih stavi u plan.",
+      "checked": false
+    },
+    "out.dishAroundMyPlate": {
+      "text": "Koje jelo mogu da napravim od onoga što je na mom tanjiru, da bude obrok: {meal}?",
+      "checked": false
+    },
+    "out.changeMyPlateSoItMakes": {
+      "text": "Šta da promenim na tanjiru da bude obrok: {meal}?",
+      "checked": false
+    },
+    "out.slotIsAsBefore": {
+      "text": "{meal}: kao pre.",
+      "checked": false
+    },
+    "out.slotIsNow": {
+      "text": "{meal}: sada {title}.",
+      "checked": false
+    },
+    "out.movedForToday": {
+      "text": "Pomereno na {time}, za danas.",
+      "checked": false
+    },
+    "out.movedForThatDay": {
+      "text": "Pomereno na {time}, za taj dan.",
+      "checked": false
+    },
+    "out.photoOnly": {
+      "text": "(slika)",
+      "checked": false
+    },
+    "out.iMovedTheFood": {
+      "text": "{food}: pomerio sam na {g} g da se uklopi.",
+      "checked": false
+    },
+    "out.evenWithMore": {
+      "text": "I sa više namirnice {food} ovo ostaje ispod tvog cilja; to je poslastica, ne uklapanje.",
+      "checked": false
+    },
+    "out.didntAnswer": {
+      "text": "Ovaj put nisam odgovorio: {why} Tvoje pitanje je sačuvano.",
+      "checked": false
+    },
+    "out.didntAnswerPlate": {
+      "text": "Ovaj put nisam odgovorio: {why} Tvoje pitanje i tanjir su sačuvani.",
+      "checked": false
+    },
+    "out.gOnThePlate": {
+      "text": "{g} g na tanjiru: {food}.",
+      "checked": false
+    },
+    "out.isOffThePlate": {
+      "text": "{food}: skinuto sa tanjira.",
+      "checked": false
+    },
+    "out.isBackOnThePlate": {
+      "text": "{food}: ponovo na tanjiru.",
+      "checked": false
+    },
+    "out.withChefMealan": {
+      "text": "Sa Chef Mealanom: {foods}",
+      "checked": false
+    },
+    "out.savedToYourMeals": {
+      "text": "Sačuvano u tvoje obroke.",
+      "checked": false
+    },
+    "out.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "out.sayWhatYouWant": {
+      "text": "Reci šta želiš, ili dodirni red ispod.",
+      "checked": false
+    },
+    "out.backToTheChat": {
+      "text": "Nazad na čet",
+      "checked": false
+    },
+    "out.plateFoods": {
+      "text": "Tanjir: {foods}",
+      "checked": false
+    },
+    "out.swapped": {
+      "text": "Zamenjeno",
+      "checked": false
+    },
+    "out.movedTo": {
+      "text": "Pomereno na {time}",
+      "checked": false
+    },
+    "out.keptAt": {
+      "text": "Ostaje u {time}",
+      "checked": false
+    },
+    "out.keepTime": {
+      "text": "Zadrži {time}",
+      "checked": false
+    },
+    "out.inThePlan": {
+      "text": "U planu",
+      "checked": false
+    },
+    "out.inYourFoods": {
+      "text": "u tvojim namirnicama",
+      "checked": false
+    },
+    "out.basicFood": {
+      "text": "osnovna namirnica",
+      "checked": false
+    },
+    "out.thePlateReaches": {
+      "text": "tanjir dostiže {pd}",
+      "checked": false
+    },
+    "out.onThePlateDone": {
+      "text": "Na tanjiru",
+      "checked": false
+    },
+    "out.plusAdd": {
+      "text": "+ Dodaj",
+      "checked": false
+    },
+    "out.onThePlateGrams": {
+      "text": "na tanjiru · {g} g",
+      "checked": false
+    },
+    "out.outDone": {
+      "text": "Izbačeno",
+      "checked": false
+    },
+    "out.per100": {
+      "text": "~{kcal} kcal · {protein} g proteina na 100 g",
+      "checked": false
+    },
+    "out.targetPd": {
+      "text": "cilj {pd}",
+      "checked": false
+    },
+    "out.workOnItWithChef": {
+      "text": "Doradi sa Chef Mealanom",
+      "checked": false
+    },
+    "out.askedChefMealan": {
+      "text": "Pitanje poslato Chef Mealanu",
+      "checked": false
+    },
+    "out.listening": {
+      "text": "Slušam",
+      "checked": false
+    },
+    "nutrition.proteinDensity": {
+      "text": "Gustina proteina",
+      "checked": false
+    },
+    "nutrition.oneServing": {
+      "text": "1 {one}",
+      "checked": false
+    },
+    "nutrition.allOfIt": {
+      "text": "Sve",
+      "checked": false
+    },
+    "nutrition.pd": {
+      "text": "PD",
+      "checked": false
+    },
+    "nutrition.noTargetSet": {
+      "text": "cilj nije postavljen",
+      "checked": false
+    },
+    "nutrition.fitsYourPlan": {
+      "text": "uklapa se u tvoj plan",
+      "checked": false
+    },
+    "nutrition.underYour": {
+      "text": "{under} ispod tvog {target}",
+      "checked": false
+    },
+    "nutrition.kcalProteinGrams": {
+      "text": "{kcal} kcal · {protein} g proteina · {grams} g",
+      "checked": false
+    },
+    "nutrition.nutrition": {
+      "text": "Nutritivne vrednosti",
+      "checked": false
+    },
+    "nutrition.allN": {
+      "text": "SVE {n}",
+      "checked": false
+    },
+    "nutrition.all": {
+      "text": "SVE",
+      "checked": false
+    },
+    "nutrition.per100Head": {
+      "text": "100 G",
+      "checked": false
+    },
+    "nutrition.noValueFor": {
+      "text": "? : nema vrednosti za {list}. Dodaj je na namirnici i tabela se ažurira.",
+      "checked": false
+    },
+    "nutrition.byPartOne": {
+      "text": "Po delu, 1 {one}",
+      "checked": false
+    },
+    "nutrition.byPart": {
+      "text": "Po delu",
+      "checked": false
+    },
+    "nutrition.kcalHead": {
+      "text": "KCAL",
+      "checked": false
+    },
+    "nutrition.proteinHead": {
+      "text": "PROTEINI",
+      "checked": false
+    },
+    "nutrition.recipeSays": {
+      "text": "Recept kaže, za 1 {one}: {kcal} kcal{fat}{carbs} · {protein} g proteina{pd}.",
+      "checked": false
+    },
+    "nutrition.saysFat": {
+      "text": " · {g} g masti",
+      "checked": false
+    },
+    "nutrition.saysCarbs": {
+      "text": " · {g} g ugljenih hidrata",
+      "checked": false
+    },
+    "nutrition.saysPd": {
+      "text": " · PD {pd}",
+      "checked": false
+    },
+    "nutrition.oursIsApart": {
+      "text": "Naša je {n}% {way} po energiji: recept možda koristi druge proizvode.",
+      "checked": false
+    },
+    "nutrition.higher": {
+      "text": "viša",
+      "checked": false
+    },
+    "nutrition.lower": {
+      "text": "niža",
+      "checked": false
+    },
+    "nutrition.oursAgrees": {
+      "text": "Naša se slaže.",
+      "checked": false
+    },
+    "nutrition.polyols": {
+      "text": "Njegovi ugljeni hidrati možda ne uključuju poliole iz zaslađivača.",
+      "checked": false
+    },
+    "nutrition.fromTheFoods": {
+      "text": "Iz namirnica i njihovih grama; svaka vrednost je sa deklaracije namirnice ili tipična vrednost, označena kao procena.",
+      "checked": false
+    },
+    "nutrition.plateRounds": {
+      "text": "Tanjir zaokružuje svaku namirnicu na gram, pa jedna porcija tamo može malo da odstupa.",
+      "checked": false
+    },
+    "plan.lengthRange": {
+      "text": "{lo} do {hi} min",
+      "checked": false
+    },
+    "plan.lengthOver": {
+      "text": "{n}+ min",
+      "checked": false
+    },
+    "plan.minutesShort": {
+      "text": "{n} min",
+      "checked": false
+    },
+    "plan.workHoursHint": {
+      "text": "Tvoje radno vreme, od {from} do {to}, drži predloge za trening van posla.",
+      "checked": false
+    },
+    "plan.schoolDaysHint": {
+      "text": "Ponedeljak do petka su na početku školski dani. Označi praznik kao dan bez škole.",
+      "checked": false
+    },
+    "plan.workAndStudyHint": {
+      "text": "Iz Načina života: posao i studije. Izaberi šta je koji dan.",
+      "checked": false
+    },
+    "plan.gOfProtein": {
+      "text": "{g} g proteina",
+      "checked": false
+    },
+    "plan.underYourRange": {
+      "text": ", ispod tvog opsega od {lo} do {hi} g. Zameni jedan obrok nekim sa više proteina.",
+      "checked": false
+    },
+    "plan.aboveYourRange": {
+      "text": "{g} g proteina, iznad tvog opsega od {lo} do {hi} g. To ne škodi. Da ga spustiš, zameni jedan obrok nekim sa manje proteina.",
+      "checked": false
+    },
+    "plan.whenWord.morning": {
+      "text": "Ujutru",
+      "checked": false
+    },
+    "plan.whenWord.day": {
+      "text": "Tokom dana",
+      "checked": false
+    },
+    "plan.whenWord.evening": {
+      "text": "Uveče",
+      "checked": false
+    },
+    "plan.whenWord.late": {
+      "text": "Kasno noću",
+      "checked": false
+    },
+    "plan.whenWord.afterschool": {
+      "text": "Posle škole",
+      "checked": false
+    },
+    "plan.whenWord.lateafternoon": {
+      "text": "Kasno popodne",
+      "checked": false
+    },
+    "plan.fits": {
+      "text": "uklapa se",
+      "checked": false
+    },
+    "plan.aDayLivedByThePlan": {
+      "text": "✓ Dan proveden po planu",
+      "checked": false
+    },
+    "plan.slotPlanned": {
+      "text": "{meal}, {time} · isplanirano",
+      "checked": false
+    },
+    "plan.batchCook": {
+      "text": "{title}: skuvaj {cook}, za {pieces} u planu.",
+      "checked": false
+    },
+    "plan.batchesOf": {
+      "text": "{title}: {n} tura od {size}, za {pieces} u planu.|{title}: {n} ture od {size}, za {pieces} u planu.|{title}: {n} tura od {size}, za {pieces} u planu.",
+      "checked": false
+    },
+    "plan.leftOver": {
+      "text": "Ostaje: {n}.",
+      "checked": false
+    },
+    "plan.mealSheetHead": {
+      "text": "{day}, {meal}, {time}",
+      "checked": false
+    },
+    "plan.starterAmount": {
+      "text": "Osnovno jelo od Chef Mealana, {amount}. Ovo su namirnice za merenje.",
+      "checked": false
+    },
+    "plan.starterOnePortion": {
+      "text": "Osnovno jelo od Chef Mealana, jedna porcija. Ovo su namirnice za merenje.",
+      "checked": false
+    },
+    "plan.chefMealanSEstimate": {
+      "text": "Procena od Chef Mealana",
+      "checked": false
+    },
+    "plan.othersReachKcal": {
+      "text": "Ostali isplanirani obroci već dostižu dnevne kcal.",
+      "checked": false
+    },
+    "plan.proteinCovered": {
+      "text": "Uz ostale isplanirane obroke, dnevni proteini su pokriveni. Ostaje oko {kcal} kcal.",
+      "checked": false
+    },
+    "plan.othersLeft": {
+      "text": "Uz ostale isplanirane obroke, ostaje oko {kcal} kcal i {g} g proteina, {pd}.",
+      "checked": false
+    },
+    "plan.itNeeds": {
+      "text": "Treba mu oko {kcal} kcal i {g} g proteina, {pd}.",
+      "checked": false
+    },
+    "plan.myRecipes": {
+      "text": "Moji recepti",
+      "checked": false
+    },
+    "plan.coachSRecipes": {
+      "text": "Recepti trenera",
+      "checked": false
+    },
+    "plan.chefMealanSStarters": {
+      "text": "Osnovna jela od Chef Mealana",
+      "checked": false
+    },
+    "plan.planATrip": {
+      "text": "✈ Isplaniraj putovanje",
+      "checked": false
+    },
+    "plan.aTripHead": {
+      "text": "✈ Putovanje",
+      "checked": false
+    },
+    "plan.tripToSaved": {
+      "text": "Putovanje, {place}: od {from} do {to}.",
+      "checked": false
+    },
+    "plan.tripHead": {
+      "text": "✈ Putovanje, {place} · {from} do {to}",
+      "checked": false
+    },
+    "plan.theTripIsOff": {
+      "text": "Putovanje je otkazano.",
+      "checked": false
+    },
+    "plan.placeFoodsInSearch": {
+      "text": "Namirnice za {place} u mojoj pretrazi",
+      "checked": false
+    },
+    "plan.onByItself": {
+      "text": "Samo se uključuje {from}, isključuje se posle {to}.",
+      "checked": false
+    },
+    "plan.foodsYouAddTagged": {
+      "text": "Namirnice koje dodaš dok je uključeno dobijaju oznaku {place}.",
+      "checked": false
+    },
+    "plan.placeFoodsOn": {
+      "text": "Namirnice za {place} u mojoj pretrazi: uključeno",
+      "checked": false
+    },
+    "plan.placeFoodsOff": {
+      "text": "Namirnice za {place} u mojoj pretrazi: isključeno",
+      "checked": false
+    },
+    "plan.on": {
+      "text": "Uključeno",
+      "checked": false
+    },
+    "plan.off": {
+      "text": "Isključeno",
+      "checked": false
+    },
+    "calendar.mealOnAt": {
+      "text": "{meal}, {day} u {time}",
+      "checked": false
+    },
+    "calendar.fromGoogleCalendar": {
+      "text": "Iz Google kalendara: {what}.",
+      "checked": false
+    },
+    "calendar.notUpdated": {
+      "text": "Google kalendar nije ažuriran. Pokušaj ponovo.",
+      "checked": false
+    },
+    "calendar.notConnected": {
+      "text": "Google kalendar nije povezan.",
+      "checked": false
+    },
+    "calendar.yourPlanIsInGoogle": {
+      "text": "Tvoj plan je u Google kalendaru, u kalendaru Chef Mealan.",
+      "checked": false
+    },
+    "calendar.staysInGoogle": {
+      "text": "Kalendar ostaje u Google-u. Pokušaj ponovo, ili ga ukloni u Google kalendaru.",
+      "checked": false
+    },
+    "calendar.googleAnswered": {
+      "text": "Google kalendar je odgovorio: {answer}. Ukloni ga u Google kalendaru.",
+      "checked": false
+    },
+    "calendar.answerNo": {
+      "text": "ne",
+      "checked": false
+    },
+    "calendar.inYourAccount": {
+      "text": "Kalendar Chef Mealan u tvom Google nalogu.",
+      "checked": false
+    },
+    "calendar.inYourAccountEmail": {
+      "text": "Kalendar Chef Mealan u tvom Google nalogu, {email}.",
+      "checked": false
+    },
+    "calendar.nextDaysInIt": {
+      "text": "U njemu je narednih {n} dana.",
+      "checked": false
+    },
+    "calendar.updatedAt": {
+      "text": "Ažurirano {time}.",
+      "checked": false
+    },
+    "calendar.whenYouChange": {
+      "text": "Kad ovde promeniš vreme, termin ili obrok, menja se u Google kalendaru za nekoliko sekundi. Google dozvoljava aplikaciji da upisuje oko sat vremena posle dodira; posle toga, jedan dodir na Ažuriraj Google kalendar ažurira narednih {n} dana.",
+      "checked": false
+    },
+    "calendar.writingOf": {
+      "text": "Upisujem {done} od {total}…",
+      "checked": false
+    },
+    "calendar.connecting": {
+      "text": "Povezivanje…",
+      "checked": false
+    },
+    "calendar.noBusyTimes": {
+      "text": "Google nije dao zauzete termine. Ništa se nije promenilo.",
+      "checked": false
+    },
+    "calendar.planNowShowsBusy": {
+      "text": "Plan sada pokazuje tvoje zauzete termine, i pita gde se zauzeto vreme poklapa sa obrokom ili treningom.",
+      "checked": false
+    },
+    "calendar.turningItOnAsks": {
+      "text": "Uključivanje još jednom pita Google, za još jedno pravo: da vidi tvoje zauzete termine. Zauzeti termini ostaju na tvom telefonu: ne na našem serveru, ne kod tvog trenera, ne kod AI-ja Chef Mealana.",
+      "checked": false
+    },
+    "calendar.writingToGoogle": {
+      "text": "Upisujem u Google kalendar: {done} od {total}.",
+      "checked": false
+    },
+    "calendar.googleSays": {
+      "text": "Google kalendar: {message}",
+      "checked": false
+    },
+    "calendar.waitingForYourPlan": {
+      "text": "Google kalendar čeka tvoj plan. Jedan dodir ažurira narednih {n} dana.",
+      "checked": false
+    },
+    "calendar.alsoInYourGoogle": {
+      "text": "I u tvom Google kalendaru, {n} dana unapred. Vreme koje ovde promeniš menja se i tamo.",
+      "checked": false
+    },
+    "calendar.upToDate": {
+      "text": "Ažurno.",
+      "checked": false
+    },
+    "calendar.upToDateAt": {
+      "text": "Ažurno, {time}.",
+      "checked": false
+    },
+    "calendar.optionalPutsList": {
+      "text": "Opciono. Stavlja Listu za kupovinu {n} u tvoj kalendar.",
+      "checked": false
+    },
+    "calendar.shopOnList": {
+      "text": "Dan za kupovinu, lista za kupovinu {n}",
+      "checked": false
+    },
+    "plate.phasePrep": {
+      "text": "Priprema",
+      "checked": false
+    },
+    "plate.phaseMake": {
+      "text": "Pravljenje",
+      "checked": false
+    },
+    "plate.phaseEat": {
+      "text": "Jelo",
+      "checked": false
+    },
+    "plate.phaseOf": {
+      "text": "Faza {n} od 3, {phase}",
+      "checked": false
+    },
+    "plate.gSugars": {
+      "text": "{n} g šećera",
+      "checked": false
+    },
+    "plate.gSaturates": {
+      "text": "{n} g zasićenih masti",
+      "checked": false
+    },
+    "plate.gSalt": {
+      "text": "{n} g soli",
+      "checked": false
+    },
+    "plate.fromFullTable": {
+      "text": "od namirnica sa punom tabelom",
+      "checked": false
+    },
+    "plate.dishRowLine": {
+      "text": "{pd} · {kcal} kcal · {protein} g proteina · recept ostaje kakav jeste",
+      "checked": false
+    },
+    "plate.ingredientsN": {
+      "text": "Sastojci, {n}",
+      "checked": false
+    },
+    "plate.nOf": {
+      "text": "{n} od {of}",
+      "checked": false
+    },
+    "plate.yourPlateUnder": {
+      "text": "Tvoj tanjir je {gap} ispod cilja.",
+      "checked": false
+    },
+    "plate.addOneRefits": {
+      "text": "Dodaj jednu od ovih iz svojih namirnica i Chef Mealan ponovo uklapa:",
+      "checked": false
+    },
+    "plate.addOneToLift": {
+      "text": "Dodaj jednu od ovih iz svojih namirnica da ga podigneš:",
+      "checked": false
+    },
+    "plate.thePlate": {
+      "text": "tanjir",
+      "checked": false
+    },
+    "plate.plusAdd": {
+      "text": "+ Dodaj",
+      "checked": false
+    },
+    "plate.noneReaches": {
+      "text": "Nijedna sama ne dostiže {target}.",
+      "checked": false
+    },
+    "plate.forADishAsk": {
+      "text": "Za jelo oko ovih namirnica, pitaj kuvara.",
+      "checked": false
+    },
+    "plate.askWhatToAdd": {
+      "text": "Pitaj Chef Mealana šta da dodaš",
+      "checked": false
+    },
+    "plate.isInEaten": {
+      "text": "Upisano kao pojedeno: {title}, {slot}.",
+      "checked": false
+    },
+    "plate.recipeUpdated": {
+      "text": "{title}: ažurirano. {slot} i dani u Planu sa ovim receptom prate izmenu.",
+      "checked": false
+    },
+    "plate.isSlotStays": {
+      "text": "{name} je sada: {slot}. {title} ostaje bez promene.",
+      "checked": false
+    },
+    "plate.changedForDay": {
+      "text": "Promenjeno za ovaj dan: {diff}.",
+      "checked": false
+    },
+    "plate.slotHasChange": {
+      "text": "{slot} ima tvoju izmenu. {title} ostaje bez promene.",
+      "checked": false
+    },
+    "plate.changedFromRecipe": {
+      "text": "Promenjeno u odnosu na tvoj recept: {title}",
+      "checked": false
+    },
+    "plate.pdWas": {
+      "text": "{now}, bilo je {was}.",
+      "checked": false
+    },
+    "plate.changesDaysFollow": {
+      "text": "{title} se menja; {n} dan u Planu sa njim prati izmenu.|{title} se menja; {n} dana u Planu sa njim prate izmenu.|{title} se menja; {n} dana u Planu sa njim prati izmenu.",
+      "checked": false
+    },
+    "plate.changes": {
+      "text": "{title} se menja.",
+      "checked": false
+    },
+    "plate.onlyFor": {
+      "text": "Samo za: {slot}",
+      "checked": false
+    },
+    "plate.thisDay": {
+      "text": "ovaj dan",
+      "checked": false
+    },
+    "plate.isSlot": {
+      "text": "{title} je sada: {slot}.",
+      "checked": false
+    },
+    "plate.isSlotSaved": {
+      "text": "{title} je sada: {slot}. Sačuvano i u Mojim receptima.",
+      "checked": false
+    },
+    "plate.perPiece": {
+      "text": "po komadu ({piece})",
+      "checked": false
+    },
+    "plate.perPortion": {
+      "text": "po porciji",
+      "checked": false
+    },
+    "plate.kcalLessPer": {
+      "text": "{kcal} kcal manje {per}",
+      "checked": false
+    },
+    "plate.kcalMorePer": {
+      "text": "{kcal} kcal više {per}",
+      "checked": false
+    },
+    "plate.aboutSameEnergy": {
+      "text": "otprilike ista energija",
+      "checked": false
+    },
+    "plate.sameProtein": {
+      "text": "isto proteina",
+      "checked": false
+    },
+    "plate.gMoreProtein": {
+      "text": "{n} g proteina više",
+      "checked": false
+    },
+    "plate.gLessProtein": {
+      "text": "{n} g proteina manje",
+      "checked": false
+    },
+    "plate.sameFoodOtherState": {
+      "text": "ista namirnica ({food}), drugo stanje · {kcal}, {prot}",
+      "checked": false
+    },
+    "plate.numsOf": {
+      "text": "{kcal} kcal · {protein} g proteina · {pd}",
+      "checked": false
+    },
+    "plate.planLineNums": {
+      "text": "{meal}, {time} · {nums} · Po planu",
+      "checked": false
+    },
+    "plate.planLine": {
+      "text": "{meal}, {time} · Po planu",
+      "checked": false
+    },
+    "plate.exploringLine": {
+      "text": "Istraživanje · nije odmereno za obrok",
+      "checked": false
+    },
+    "plate.snackLine": {
+      "text": "Užina · van plana",
+      "checked": false
+    },
+    "plate.forHintNums": {
+      "text": "{meal}, {time}: {nums}, iz tvog plana za danas. Računa se kao tvoj obrok ({mealLow}).",
+      "checked": false
+    },
+    "plate.forHint": {
+      "text": "{meal}, {time}: Računa se kao tvoj obrok ({mealLow}).",
+      "checked": false
+    },
+    "plate.forHintClock": {
+      "text": "{meal}, po satu: pretpostavka, van plana. Dodirni {meal} da bude tvoj obrok ({mealLow}): računa se po planu.",
+      "checked": false
+    },
+    "plate.noLonger": {
+      "text": "Više nije {title}: njegove namirnice su uklonjene. Tanjir je tvoj.",
+      "checked": false
+    },
+    "plate.basicFoodSoldIn": {
+      "text": "Osnovna namirnica, prodaje se u: {place}; ulazi u tvoje namirnice",
+      "checked": false
+    },
+    "plate.basicFood": {
+      "text": "Osnovna namirnica; ulazi u tvoje namirnice",
+      "checked": false
+    },
+    "plate.notesJoins": {
+      "text": "{notes}; ulazi u tvoje namirnice",
+      "checked": false
+    },
+    "plate.yours": {
+      "text": "Tvoje",
+      "checked": false
+    },
+    "plate.cantReach": {
+      "text": "ne dostiže",
+      "checked": false
+    },
+    "plate.swapFor": {
+      "text": "Zamena za: {food}",
+      "checked": false
+    },
+    "plate.sameKindFirst": {
+      "text": "Prvo ista vrsta namirnice, koja se prodaje gde kupuješ.",
+      "checked": false
+    },
+    "plate.atYourWithout": {
+      "text": "Tanjir je i bez nje na tvom cilju, {target}, pa svaka zadržava svoju količinu.",
+      "checked": false
+    },
+    "plate.gramsBring": {
+      "text": "Grami dovode tanjir do tvog cilja, {target}.",
+      "checked": false
+    },
+    "plate.sameKindLike": {
+      "text": "Ista vrsta namirnice, kao {food}",
+      "checked": false
+    },
+    "plate.otherKindsList": {
+      "text": "Druge vrste: {list} ›",
+      "checked": false
+    },
+    "plate.otherKindsMore": {
+      "text": "Druge vrste: {list} i još {n} ›",
+      "checked": false
+    },
+    "plate.tasteDaamPd": {
+      "text": "Pun obrok ({meal}) sa ukusom dezerta, sa tvojim {pd}. Slatke namirnice se nude, slane ostaju po strani; Chef Mealan se oslanja na kvark, skyr i protein surutke.",
+      "checked": false
+    },
+    "plate.tasteDaam": {
+      "text": "Pun obrok ({meal}) sa ukusom dezerta. Slatke namirnice se nude, slane ostaju po strani; Chef Mealan se oslanja na kvark, skyr i protein surutke.",
+      "checked": false
+    },
+    "plate.tasteSavouryPd": {
+      "text": "Slan obrok ({meal}) sa tvojim {pd}. Slatke namirnice ostaju po strani.",
+      "checked": false
+    },
+    "plate.tasteSavoury": {
+      "text": "Slan obrok ({meal}). Slatke namirnice ostaju po strani.",
+      "checked": false
+    },
+    "plate.tasteBoth": {
+      "text": "Slano i slatko u jednom obroku ({meal}), kcal podeljene: glavno jelo i sladak kraj, dva dela na tanjiru. Ništa ne ostaje po strani.",
+      "checked": false
+    },
+    "plate.pickGoesInto": {
+      "text": "Izaberi namirnicu ispod. Ide u deo: {part}.",
+      "checked": false
+    },
+    "plate.part": {
+      "text": "Deo",
+      "checked": false
+    },
+    "plate.noPart": {
+      "text": "Bez dela",
+      "checked": false
+    },
+    "plate.onPlateSavedMine": {
+      "text": "{title}: na tvom tanjiru, i sačuvano u Mojim.",
+      "checked": false
+    },
+    "plate.reachesNoBetter": {
+      "text": "Dostiže PD {pd1}, ne bolje od {pd0}.",
+      "checked": false
+    },
+    "plate.notRealPortion": {
+      "text": "Jedna od namirnica u ovoj količini nije prava porcija.",
+      "checked": false
+    },
+    "plate.hasAllergyFood": {
+      "text": "Sadrži namirnicu sa jednom od njihovih alergija.",
+      "checked": false
+    },
+    "plate.partChangeFailed": {
+      "text": "Izmena Chef Mealana za deo {part} nije prošla provere: {why}",
+      "checked": false
+    },
+    "plate.reachesUnder": {
+      "text": "Dostiže PD {pd1}, ispod cilja {target}.",
+      "checked": false
+    },
+    "plate.changeFailed": {
+      "text": "Izmena Chef Mealana nije prošla provere: {why} Probaj Dodaj prilog.",
+      "checked": false
+    },
+    "plate.moreProteinTitle": {
+      "text": "{title}, više proteina",
+      "checked": false
+    },
+    "plate.tookTooLong": {
+      "text": "Chef Mealanu je trebalo predugo, pa se ništa nije promenilo. Pokušaj ponovo, ili Dodaj prilog.",
+      "checked": false
+    },
+    "plate.noSideBrings": {
+      "text": "Nijedan prilog Chef Mealana ne dovodi ovo jelo do tvog cilja u normalnoj količini. Probaj Promeni recept.",
+      "checked": false
+    },
+    "plate.ideasNeedAi": {
+      "text": "Ideje Chef Mealana traže AI, koji je isključen za tvoj nalog. Evo brzog uklapanja.",
+      "checked": false
+    },
+    "plate.stepRead": {
+      "text": "Pročitan tvoj tanjir: {foods}, {kcal} kcal",
+      "checked": false
+    },
+    "plate.stepAsk": {
+      "text": "Traženo od Chef Mealana: tri obroka ({meals})",
+      "checked": false
+    },
+    "plate.stepAskKitchens": {
+      "text": "Traženo od Chef Mealana: tri obroka ({meals}) iz tvojih kuhinja, {kitchens}",
+      "checked": false
+    },
+    "plate.stepCheck": {
+      "text": "Provera njegovih ideja: {what}",
+      "checked": false
+    },
+    "plate.stepCheckPd": {
+      "text": "Provera njegovih ideja: {what} i PD {pd}",
+      "checked": false
+    },
+    "plate.kcalRange": {
+      "text": "{low} do {high} kcal",
+      "checked": false
+    },
+    "plate.theMeal": {
+      "text": "obrok",
+      "checked": false
+    },
+    "plate.hereQuickFit": {
+      "text": "Evo brzog uklapanja.",
+      "checked": false
+    },
+    "plate.gOnThePlate": {
+      "text": "Na tanjiru: {food}, {grams} g.",
+      "checked": false
+    },
+    "plate.askNoCooking": {
+      "text": "Pitaj Chef Mealana za tanjir bez kuvanja",
+      "checked": false
+    },
+    "plate.makesPortionsTwo": {
+      "text": "{name} daje {n} porcije. Jedna je na tanjiru; druga je sutrašnji obrok ({meal}) u Planu.",
+      "checked": false
+    },
+    "plate.makesPortions": {
+      "text": "{name} daje više porcija: {n}. Jedna je na tanjiru; sledeća je sutrašnji obrok ({meal}) u Planu.",
+      "checked": false
+    },
+    "plate.shrunk": {
+      "text": "Smanjeno na jedan obrok ({meal}): {kcal} kcal.",
+      "checked": false
+    },
+    "plate.planningSlot": {
+      "text": "Planiranje: {slot}",
+      "checked": false
+    },
+    "plate.addingSlot": {
+      "text": "Dodavanje: {slot}",
+      "checked": false
+    },
+    "plate.backToAmounts": {
+      "text": "Nazad na količine",
+      "checked": false
+    },
+    "plate.backToMaking": {
+      "text": "Nazad na pravljenje",
+      "checked": false
+    },
+    "plate.backToLast": {
+      "text": "Nazad na poslednji korak",
+      "checked": false
+    },
+    "plate.puttingTogether": {
+      "text": "Chef Mealan ga slaže.",
+      "checked": false
+    },
+    "plate.ideasFailed": {
+      "text": "Ideje Chef Mealana ovaj put nisu prošle provere. Traži druge ideje, ili ostavi tanjir kakav jeste.",
+      "checked": false
+    },
+    "plate.ideasHasProtein": {
+      "text": "Tvoj tanjir ima dovoljno proteina: {protein} g, {pd}.",
+      "checked": false
+    },
+    "plate.ideasUnder": {
+      "text": "Tvoj tanjir je na {pd}, ispod tvog cilja, {target}.",
+      "checked": false
+    },
+    "plate.ideasMealRange": {
+      "text": "{meal}: {low} do {high} kcal.",
+      "checked": false
+    },
+    "plate.ideasMealRangeMore": {
+      "text": "{meal}: {low} do {high} kcal, oko {more} više od tanjira.",
+      "checked": false
+    },
+    "plate.ideasOne": {
+      "text": "Jedan način, u tom opsegu.",
+      "checked": false
+    },
+    "plate.ideasTwo": {
+      "text": "Dva načina, svaki u tom opsegu.",
+      "checked": false
+    },
+    "plate.ideasThree": {
+      "text": "Tri načina, svaki u tom opsegu.",
+      "checked": false
+    },
+    "plate.ideasOneKitchens": {
+      "text": "Jedan način iz tvojih kuhinja, u tom opsegu.",
+      "checked": false
+    },
+    "plate.ideasTwoKitchens": {
+      "text": "Dva načina iz tvojih kuhinja, svaki u tom opsegu.",
+      "checked": false
+    },
+    "plate.ideasThreeKitchens": {
+      "text": "Tri načina iz tvojih kuhinja, svaki u tom opsegu.",
+      "checked": false
+    },
+    "plate.ideasTitle": {
+      "text": "Obrok ({meal}) oko tvojih namirnica: {foods}",
+      "checked": false
+    },
+    "plate.onThePlateList": {
+      "text": "Na tanjiru: {foods}.",
+      "checked": false
+    },
+    "plate.kcalPd": {
+      "text": "{kcal} kcal · {pd}",
+      "checked": false
+    },
+    "plate.forCookingLine": {
+      "text": "{label} {foods}.",
+      "checked": false
+    },
+    "plate.forCooking": {
+      "text": "Za kuvanje, ne računa se:",
+      "checked": false
+    },
+    "plate.didNotFit": {
+      "text": "Nije se uklopilo: {why}.",
+      "checked": false
+    },
+    "plate.legendHave": {
+      "text": "+ u tvojim namirnicama",
+      "checked": false
+    },
+    "plate.legendNew": {
+      "text": "+ novo",
+      "checked": false
+    },
+    "plate.legendLine": {
+      "text": "nove namirnice su procena Chef Mealana; aplikacija određuje svaki gram.",
+      "checked": false
+    },
+    "plate.addingSub": {
+      "text": "Dodavanje: {slot}. Dodaj ono što je pojedeno, u pojedenim količinama.",
+      "checked": false
+    },
+    "plate.planningSub": {
+      "text": "Planiranje: {slot}. Dodaj svoje namirnice, uklopi ih u cilj, pa ih stavi u plan.",
+      "checked": false
+    },
+    "plate.madeBySub": {
+      "text": "Obrok ({meal}) Chef Mealana, kuhinja: {kitchen}, oko tvojih namirnica: {foods}. Promeni koju god količinu želiš.",
+      "checked": false
+    },
+    "plate.changedSub": {
+      "text": "Tvoje jelo {title}, promenjeno. I dalje odmereno za tvoj obrok ({meal}).",
+      "checked": false
+    },
+    "plate.sideSub": {
+      "text": "Tvoje jelo {title} kakvo jeste, {pct}% od jedne mere ({one}), i {side} {where}. Mera ({one}) se ne menja.",
+      "checked": false
+    },
+    "plate.fromSub": {
+      "text": "Izvor: {source}. {how} Promeni šta želiš.",
+      "checked": false
+    },
+    "plate.theLink": {
+      "text": "link",
+      "checked": false
+    },
+    "plate.yourScreenshot": {
+      "text": "tvoj snimak ekrana",
+      "checked": false
+    },
+    "plate.mixSized": {
+      "text": "Mešavina recepta, odmerena za tvoj obrok ({meal}): svaka namirnica skalirana na isti način.",
+      "checked": false
+    },
+    "plate.oneAsMakes": {
+      "text": "1 {one}, kako recept daje.",
+      "checked": false
+    },
+    "plate.nameItOrKeep": {
+      "text": "Daj mu ime, ili zadrži ime namirnica.",
+      "checked": false
+    },
+    "plate.justScanned": {
+      "text": "upravo skenirano",
+      "checked": false
+    },
+    "plate.useItIn": {
+      "text": "Iskoristi u jelu {dish}",
+      "checked": false
+    },
+    "plate.useItHelp": {
+      "text": "Iskoristi: Chef Mealan pita šta menja ili dodaje, a koraci prate. Na Tanjir: ide u obrok koji slažeš; kuvanje ide dalje kao i do sada. Zadrži: čeka u Namirnicama.",
+      "checked": false
+    },
+    "plate.slotLineEaten": {
+      "text": "{slot}, {time} · Pojedeno",
+      "checked": false
+    },
+    "plate.slotLinePlanning": {
+      "text": "{slot}, {time} · U planiranju",
+      "checked": false
+    },
+    "plate.slotLineByPlan": {
+      "text": "{slot}, {time} · Po planu",
+      "checked": false
+    },
+    "plate.yesterday": {
+      "text": "Juče",
+      "checked": false
+    },
+    "plate.today": {
+      "text": "Danas",
+      "checked": false
+    },
+    "plate.tomorrow": {
+      "text": "Sutra",
+      "checked": false
+    },
+    "plate.dayAddsPick": {
+      "text": "{day}: dodaje ono što je pojedeno. Izaberi obrok.",
+      "checked": false
+    },
+    "plate.dayPlansPick": {
+      "text": "{day}: planira šta ćeš jesti. Izaberi obrok.",
+      "checked": false
+    },
+    "plate.dayWhichMeal": {
+      "text": "{day}, koji obrok",
+      "checked": false
+    },
+    "plate.mealAtTime": {
+      "text": "{meal}, {time}",
+      "checked": false
+    },
+    "plate.exploringStays": {
+      "text": "Istraživanje: {slot} ostaje bez promene.",
+      "checked": false
+    },
+    "plate.exploring": {
+      "text": "Istraživanje",
+      "checked": false
+    },
+    "plate.exploringLeaves": {
+      "text": "Istraživanje napušta: {slot}. Ostaje bez promene, i ništa se ne upisuje.",
+      "checked": false
+    },
+    "plate.targetForPlate": {
+      "text": "Cilj za ovaj tanjir: {pd}.",
+      "checked": false
+    },
+    "plate.travelPlans": {
+      "text": "Chef Mealan planira sa onim što se prodaje u: {place}. Koristi čet da tamo kupuješ i kuvaš.",
+      "checked": false
+    },
+    "plate.photoLineIdea": {
+      "text": "Istražujem sliku. {n} namirnica pročitana, količine procenjene (~). Nije upisano: nije tvoj obrok.|Istražujem sliku. {n} namirnice pročitane, količine procenjene (~). Nije upisano: nije tvoj obrok.|Istražujem sliku. {n} namirnica pročitano, količine procenjene (~). Nije upisano: nije tvoj obrok.",
+      "checked": false
+    },
+    "plate.photoLine": {
+      "text": "Tvoja slika, {time}. {n} namirnica pročitana, količine procenjene (~). Dodirni količinu da je ispraviš.|Tvoja slika, {time}. {n} namirnice pročitane, količine procenjene (~). Dodirni količinu da je ispraviš.|Tvoja slika, {time}. {n} namirnica pročitano, količine procenjene (~). Dodirni količinu da je ispraviš.",
+      "checked": false
+    },
+    "plate.retake": {
+      "text": "📷 Slikaj ponovo",
+      "checked": false
+    },
+    "plate.addPhoto": {
+      "text": "＋ Slika",
+      "checked": false
+    },
+    "plate.photoReadIdea": {
+      "text": "{n} namirnica pročitana, količine procenjene (~). Nije upisano: nije tvoj obrok.|{n} namirnice pročitane, količine procenjene (~). Nije upisano: nije tvoj obrok.|{n} namirnica pročitano, količine procenjene (~). Nije upisano: nije tvoj obrok.",
+      "checked": false
+    },
+    "plate.yourPhotoAt": {
+      "text": "Tvoja slika, {time}.",
+      "checked": false
+    },
+    "plate.photoReadTap": {
+      "text": "{n} namirnica pročitana, količine procenjene (~). Dodirni sliku da je vidiš veliku; dodirni količinu da je ispraviš.|{n} namirnice pročitane, količine procenjene (~). Dodirni sliku da je vidiš veliku; dodirni količinu da je ispraviš.|{n} namirnica pročitano, količine procenjene (~). Dodirni sliku da je vidiš veliku; dodirni količinu da je ispraviš.",
+      "checked": false
+    },
+    "plate.oneThingCannotTell": {
+      "text": "Jedno ne mogu da vidim sa slike:",
+      "checked": false
+    },
+    "plate.isTheAbout": {
+      "text": "{food}: oko {a} g ili {b} g?",
+      "checked": false
+    },
+    "plate.searchFindsThere": {
+      "text": "Pretraga nalazi proizvode koji se tamo prodaju.",
+      "checked": false
+    },
+    "plate.sizedForYour": {
+      "text": "Odmereno za tvoj obrok ({meal})",
+      "checked": false
+    },
+    "plate.oneAsMakesBtn": {
+      "text": "1 {one}, kako recept daje",
+      "checked": false
+    },
+    "plate.wholeAsMapped": {
+      "text": "Ceo recept, kako je unet: {count}.",
+      "checked": false
+    },
+    "plate.oneIsKcal": {
+      "text": "1 {one} ima {kcal} kcal.",
+      "checked": false
+    },
+    "plate.sizedForItFits": {
+      "text": "Tvoj obrok ({meal}) je oko {need}. Odmereno za njega: {pct}% od jedne mere ({one}).",
+      "checked": false
+    },
+    "plate.sizedForItNot": {
+      "text": "Tvoj obrok ({meal}) je oko {need}. Odmereno za njega bilo bi {pct}% od jedne mere ({one}), pa je 1 {one}, kako recept daje, bolji izbor.",
+      "checked": false
+    },
+    "plate.pickWhatYouEat": {
+      "text": "Izaberi šta jedeš.",
+      "checked": false
+    },
+    "plate.yourWay": {
+      "text": "po tvom",
+      "checked": false
+    },
+    "plate.yourWayNote": {
+      "text": "Po tvom: već je bilo uz tvoje obroke.",
+      "checked": false
+    },
+    "plate.thisMeal": {
+      "text": "Ovaj obrok: {meal}",
+      "checked": false
+    },
+    "plate.kcal": {
+      "text": "kcal",
+      "checked": false
+    },
+    "plate.canOilIn": {
+      "text": "{grams} g · {kcal} kcal, ulazi u brojeve",
+      "checked": false
+    },
+    "plate.canOilUpTo": {
+      "text": "Do {grams} g u konzervi. Ne ulazi u brojeve.",
+      "checked": false
+    },
+    "plate.none": {
+      "text": "Ništa",
+      "checked": false
+    },
+    "plate.theCan": {
+      "text": "Konzerva: {can}",
+      "checked": false
+    },
+    "plate.canWord": {
+      "text": "konzerva",
+      "checked": false
+    },
+    "plate.cansWord": {
+      "text": "konzerve",
+      "checked": false
+    },
+    "plate.kcalInNumbers": {
+      "text": "{kcal} kcal ulazi u brojeve",
+      "checked": false
+    },
+    "plate.unlockFood": {
+      "text": "Otključaj: {food}",
+      "checked": false
+    },
+    "plate.lockFood": {
+      "text": "Zaključaj: {food}",
+      "checked": false
+    },
+    "plate.optional": {
+      "text": "Po izboru",
+      "checked": false
+    },
+    "plate.optionalAdded": {
+      "text": "po izboru, dodato ·",
+      "checked": false
+    },
+    "plate.optionalOn": {
+      "text": "✓ Po izboru",
+      "checked": false
+    },
+    "plate.writtenOnRecipe": {
+      "text": "{written} u receptu",
+      "checked": false
+    },
+    "plate.optionalLow": {
+      "text": "po izboru",
+      "checked": false
+    },
+    "plate.addName": {
+      "text": "Dodaj: {name}",
+      "checked": false
+    },
+    "plate.partLeftOut": {
+      "text": "{part}, izostavljeno",
+      "checked": false
+    },
+    "plate.foodsKcalLess": {
+      "text": "{n} namirnica · {kcal} kcal manje|{n} namirnice · {kcal} kcal manje|{n} namirnica · {kcal} kcal manje",
+      "checked": false
+    },
+    "plate.partAria": {
+      "text": "Deo: {part}",
+      "checked": false
+    },
+    "plate.partChanged": {
+      "text": "{part}, promenjeno",
+      "checked": false
+    },
+    "plate.foodsOptional": {
+      "text": "{n} namirnica, {opt} po izboru|{n} namirnice, {opt} po izboru|{n} namirnica, {opt} po izboru",
+      "checked": false
+    },
+    "plate.foodsN": {
+      "text": "{n} namirnica|{n} namirnice|{n} namirnica",
+      "checked": false
+    },
+    "plate.kcalN": {
+      "text": "{kcal} kcal",
+      "checked": false
+    },
+    "plate.change": {
+      "text": "Promeni",
+      "checked": false
+    },
+    "plate.partPlaceholder": {
+      "text": "Sos",
+      "checked": false
+    },
+    "plate.addFoodTo": {
+      "text": "+ Dodaj namirnicu u deo: {part}",
+      "checked": false
+    },
+    "plate.other": {
+      "text": "Ostalo",
+      "checked": false
+    },
+    "plate.nothingCalled": {
+      "text": "Ništa pod imenom {q} u tvojim namirnicama ni među osnovnim namirnicama koje se ovde prodaju. Skeniraj, ili dodaj ručno gore.",
+      "checked": false
+    },
+    "plate.addPutsOne": {
+      "text": "Dodaj stavlja jednu na tanjir, kao namirnicu poput ostalih.",
+      "checked": false
+    },
+    "plate.takeOut": {
+      "text": "Izvadi: {food}",
+      "checked": false
+    },
+    "plate.stepsStale": {
+      "text": "Koraci su napisani pre izmene namirnica: {diff}.",
+      "checked": false
+    },
+    "plate.theFoodsChanged": {
+      "text": "namirnice su promenjene",
+      "checked": false
+    },
+    "plate.showAllN": {
+      "text": "Prikaži sve ({n})",
+      "checked": false
+    },
+    "plate.chefOnPlate": {
+      "text": "Chef Mealan o ovom tanjiru",
+      "checked": false
+    },
+    "plate.ingredientNotFood": {
+      "text": "{food} je sastojak, ne namirnica. Treba mu jelo oko njega: testo, smesa, lonac. Samo po sebi nije obrok ({meal}).",
+      "checked": false
+    },
+    "plate.takeTheOut": {
+      "text": "Izvadi: {food}",
+      "checked": false
+    },
+    "plate.askDishAround": {
+      "text": "Pitaj Chef Mealana za jelo oko toga",
+      "checked": false
+    },
+    "plate.culinaryYes": {
+      "text": "✓ Kulinarski",
+      "checked": false
+    },
+    "plate.culinaryNo": {
+      "text": "✕ Kulinarski",
+      "checked": false
+    },
+    "plate.makeItA": {
+      "text": "Neka bude {meal}",
+      "checked": false
+    },
+    "plate.makeItAAround": {
+      "text": "Neka bude {meal}, oko namirnice: {food}",
+      "checked": false
+    },
+    "plate.topOut": {
+      "text": "Ove namirnice u okviru svojih porcija dostižu najviše {pd}. Chef Mealan može:",
+      "checked": false
+    },
+    "plate.topOutHalf": {
+      "text": "Ove namirnice u okviru svojih porcija dostižu najviše {pd}, a {kcal} kcal je manje od pola obroka ({meal}). Chef Mealan može:",
+      "checked": false
+    },
+    "plate.addFoodsFor": {
+      "text": "Dodaj namirnice za obrok: {meal}",
+      "checked": false
+    },
+    "plate.askChef": {
+      "text": "Pitaj Chef Mealana",
+      "checked": false
+    },
+    "plate.tomorrowLow": {
+      "text": "sutra",
+      "checked": false
+    },
+    "plate.chefOnIdea": {
+      "text": "Chef Mealan o ideji",
+      "checked": false
+    },
+    "plate.exploringSo": {
+      "text": "Istraživanje, pa {slot} ostaje bez promene.",
+      "checked": false
+    },
+    "plate.fitItToMy": {
+      "text": "Uklopi u moj obrok ({meal})",
+      "checked": false
+    },
+    "plate.putInDays": {
+      "text": "Stavi u plan za {day}: {meal}",
+      "checked": false
+    },
+    "plate.chefOnMeal": {
+      "text": "Chef Mealan o tvom obroku",
+      "checked": false
+    },
+    "plate.underYourWays": {
+      "text": "Ispod tvog cilja, {tag} {pd}. Napravi ga kakav jeste, ili ga uklopi na jedan od dva načina:",
+      "checked": false
+    },
+    "plate.takesLonger": {
+      "text": "Ovo traje duže nego obično. Chef Mealan nastavlja: najviše jedan minut.",
+      "checked": false
+    },
+    "plate.waysWhy": {
+      "text": "Promeni recept: Chef Mealan menja namirnice ili koristi manje od njih. Dodaj prilog: prilog bogat proteinima, kao skyr, pored tvog komada. Oba ciljaju tvoj cilj, {pd}.",
+      "checked": false
+    },
+    "plate.putItIn": {
+      "text": "Stavi u: {slot}",
+      "checked": false
+    },
+    "plate.putItInEaten": {
+      "text": "Stavi u: {slot}, pojedeno",
+      "checked": false
+    },
+    "plate.forWholeRecipe": {
+      "text": "{how}, za ceo recept.",
+      "checked": false
+    },
+    "plate.skippedMoved": {
+      "text": "{name}: danas preskočeno. Taj deo je prebačen na: {meal}.",
+      "checked": false
+    },
+    "plate.countedOn": {
+      "text": "Upisano: {day}, {time}. Nema šta da se uklapa, pravi ni ocenjuje: to je ono što je pojedeno.",
+      "checked": false
+    },
+    "plate.fitMovesOne": {
+      "text": "Uklopi pomera jednu namirnicu. Ostavi kako jeste stavlja tanjir u {slot} kakav jeste.",
+      "checked": false
+    },
+    "plate.fitSetsAmounts": {
+      "text": "Uklopi određuje količine. Ostavi kako jeste čuva tvoje. Sačuvaj na kraju ga upisuje kao: {slot}.",
+      "checked": false
+    },
+    "plate.oneProduct": {
+      "text": "Jedan proizvod: Chef Mealan traži u tvojim namirnicama partnera koji ga dovodi do tvog plana.",
+      "checked": false
+    },
+    "plate.notAPortion": {
+      "text": "{food}: {grams} g nije porcija. Ova namirnica ne može da te dovede tamo u normalnoj količini; zameni je ili smanji ostale.",
+      "checked": false
+    },
+    "plate.meetingShare": {
+      "text": "Ovaj tanjir je {share} % tvog dana. Na dan sa sastancima drži ga ispod trećine, da glava popodne ostane bistra.",
+      "checked": false
+    },
+    "plate.dessertShare": {
+      "text": "Ovaj tanjir je {share} % tvog dana. To je za obrok, ne za dezert.",
+      "checked": false
+    },
+    "plate.chefsRecipe": {
+      "text": "Recept Chef Mealana",
+      "checked": false
+    },
+    "plate.unplannedSub": {
+      "text": "{moment}. Uživaj, neka bude malo. Tvoj sledeći obrok je bogatiji proteinima i opet si na pravom putu.",
+      "checked": false
+    },
+    "plate.overSub": {
+      "text": "{food}: trebalo bi {grams} g da se dostigne {target}. Sa {cap} g ovo je najbliže što može.",
+      "checked": false
+    },
+    "plate.keptSub": {
+      "text": "Već iznad tvog cilja: {tag} {pd} prema {target}, pa se ništa nije pomerilo. Više proteina je u redu. Promeni količinu i Chef Mealan ponovo uklapa.",
+      "checked": false
+    },
+    "plate.moverSub": {
+      "text": "Chef Mealan pomera: {food}. Promeni bilo koju drugu količinu i ponovo uklapa.",
+      "checked": false
+    },
+    "plate.nothingMovedSub": {
+      "text": "Ništa se nije pomerilo. Ovde završavaju tvoje količine. Dodirni sivu tačku ako želiš da Chef Mealan uklopi jednu namirnicu.",
+      "checked": false
+    },
+    "plate.notRealistic": {
+      "text": "nije realno",
+      "checked": false
+    },
+    "plate.onPlanTarget": {
+      "text": "po planu, cilj {pd}",
+      "checked": false
+    },
+    "plate.target": {
+      "text": "cilj {pd}",
+      "checked": false
+    },
+    "plate.mixNums": {
+      "text": "{kcal} kcal · {protein} g proteina · {weight} g",
+      "checked": false
+    },
+    "plate.mixNumsShare": {
+      "text": "{kcal} kcal, {share} % tvog dana · {protein} g proteina · {weight} g",
+      "checked": false
+    },
+    "plate.asYouSetIt": {
+      "text": "kako je postavljeno",
+      "checked": false
+    },
+    "plate.whatChefMoves": {
+      "text": "ono što Chef Mealan pomera",
+      "checked": false
+    },
+    "plate.chefMayMove": {
+      "text": "Chef Mealan može da pomera",
+      "checked": false
+    },
+    "plate.suggests": {
+      "text": "Chef Mealan predlaže {grams} g: to dovodi tanjir sa {pd} na tvoj cilj, {target} · primeni",
+      "checked": false
+    },
+    "plate.estimated": {
+      "text": "procenjeno",
+      "checked": false
+    },
+    "plate.allowMore": {
+      "text": "Dozvoli više od {cap} g",
+      "checked": false
+    },
+    "plate.tryAnotherMix": {
+      "text": "Probaj drugu mešavinu ({k} od {n})",
+      "checked": false
+    },
+    "plate.portionWord": {
+      "text": "porcija",
+      "checked": false
+    },
+    "plate.portionsWord": {
+      "text": "porcije",
+      "checked": false
+    },
+    "fit.alreadyAbove": {
+      "text": "Već iznad tvog cilja: {pd} prema {target}, pa se ništa nije pomerilo.",
+      "checked": false
+    },
+    "fit.setMostMeal": {
+      "text": "Uklopi je odredilo: {food}, {grams} g, najviše za porciju tvog obroka (tražilo je {want} g).",
+      "checked": false
+    },
+    "fit.setMost": {
+      "text": "Uklopi je odredilo: {food}, {grams} g, najviše za jednu porciju (tražilo je {want} g).",
+      "checked": false
+    },
+    "fit.setWas": {
+      "text": "Uklopi je odredilo: {food}, {grams} g (bilo je {was} g).",
+      "checked": false
+    },
+    "fit.set": {
+      "text": "Uklopi je odredilo: {food}, {grams} g.",
+      "checked": false
+    },
+    "fit.addAFoodFirst": {
+      "text": "Prvo dodaj namirnicu u svoju biblioteku, da Chef Mealan ima partnere za izbor.",
+      "checked": false
+    },
+    "fit.keptPart": {
+      "text": "Uklopi je ostavilo deo {part} kakav jeste: tanjir je gde može da bude sa ovim delovima.",
+      "checked": false
+    },
+    "fit.sizedPart": {
+      "text": "Uklopi je odmerilo deo {part} kao celinu, {factor}: {names} zadržavaju svoj odnos. Ostaje: {others}.|Uklopi je odmerilo deo {part} kao celinu, {factor}: {names} zadržavaju svoj odnos. Ostaju: {others}.|Uklopi je odmerilo deo {part} kao celinu, {factor}: {names} zadržavaju svoj odnos. Ostaju: {others}.",
+      "checked": false
+    },
+    "fit.asFarAsPortions": {
+      "text": "Porcije ne dozvoljavaju više od toga.",
+      "checked": false
+    },
+    "fit.roundedTo": {
+      "text": "Zaokruženo na {whole}.",
+      "checked": false
+    },
+    "fit.noAmountReaches": {
+      "text": "{food}: Chef Mealan nije našao količinu koja dostiže tvoj cilj, {target}.",
+      "checked": false
+    },
+    "cookmode.nSteps": {
+      "text": "{n} korak|{n} koraka|{n} koraka",
+      "checked": false
+    },
+    "cookmode.took": {
+      "text": "{steps}.",
+      "checked": false
+    },
+    "cookmode.tookMin": {
+      "text": "{steps}, {n} minut.|{steps}, {n} minuta.|{steps}, {n} minuta.",
+      "checked": false
+    },
+    "cookmode.startTimerMin": {
+      "text": "⏱ Pokreni tajmer od {n} min",
+      "checked": false
+    },
+    "cookmode.startTimerSec": {
+      "text": "⏱ Pokreni tajmer od {n} sekunde|⏱ Pokreni tajmer od {n} sekunde|⏱ Pokreni tajmer od {n} sekundi",
+      "checked": false
+    },
+    "cookmode.startTimerMinSec": {
+      "text": "⏱ Pokreni tajmer od {m} min {s} sek.",
+      "checked": false
+    },
+    "cookmode.micBlocked": {
+      "text": "Mikrofon je blokiran za ovaj sajt. Dozvoli ga u podešavanjima pregledača, ili koristi dugmad.",
+      "checked": false
+    },
+    "cookmode.backToCooking": {
+      "text": "‹ Nazad na kuvanje",
+      "checked": false
+    },
+    "cookmode.nOf": {
+      "text": "{k} od {n}",
+      "checked": false
+    },
+    "cookmode.cookingTitle": {
+      "text": "Kuvanje: {title}",
+      "checked": false
+    },
+    "cookmode.close": {
+      "text": "✕ Zatvori",
+      "checked": false
+    },
+    "cookmode.doneLow": {
+      "text": "gotovo",
+      "checked": false
+    },
+    "cookmode.stepN": {
+      "text": "Korak {n}",
+      "checked": false
+    },
+    "cookmode.stepNDone": {
+      "text": "Korak {n}, gotovo",
+      "checked": false
+    },
+    "cookmode.timerDoneAria": {
+      "text": "Tajmer ({name}) je gotov. Dodirni da ga skloniš.",
+      "checked": false
+    },
+    "cookmode.timerLeftAria": {
+      "text": "Tajmer ({name}), još {time}. Dodirni da ga zaustaviš.",
+      "checked": false
+    },
+    "cookmode.timerRang": {
+      "text": "0:00 · gotovo",
+      "checked": false
+    },
+    "cookmode.nowAPhotoOfYourPlate": {
+      "text": "Sad slikaj tanjir, pa jedi.",
+      "checked": false
+    },
+    "cookmode.allStepsTicked": {
+      "text": "Svi koraci ({n}) su štiklirani. Ekran se sada vraća u normalu.|Svi koraci ({n}) su štiklirani. Ekran se sada vraća u normalu.|Svi koraci ({n}) su štiklirani. Ekran se sada vraća u normalu.",
+      "checked": false
+    },
+    "cookmode.yourMeal": {
+      "text": "tvoj obrok",
+      "checked": false
+    },
+    "cookmode.lastStepBack": {
+      "text": "‹ Poslednji korak",
+      "checked": false
+    },
+    "cookmode.stepCaps": {
+      "text": "KORAK {n}",
+      "checked": false
+    },
+    "cookmode.addAPhotoOfThisStep": {
+      "text": "📷 Dodaj sliku ovog koraka",
+      "checked": false
+    },
+    "cookmode.moveOf": {
+      "text": "Radnja {k} od {n}",
+      "checked": false
+    },
+    "cookmode.readAloudOneAtATime": {
+      "text": "ČITA SE NAGLAS, JEDAN PO JEDAN · {k} OD {n}",
+      "checked": false
+    },
+    "cookmode.chefLookButton": {
+      "text": "📷 Kuvaru, pogledaj",
+      "checked": false
+    },
+    "cookmode.back": {
+      "text": "‹ Nazad",
+      "checked": false
+    },
+    "cookmode.repeat": {
+      "text": "↻ Ponovi",
+      "checked": false
+    },
+    "cookmode.youAsked": {
+      "text": "TVOJE PITANJE",
+      "checked": false
+    },
+    "cookmode.youSaid": {
+      "text": "TVOJE REČI",
+      "checked": false
+    },
+    "cookmode.chefAboutStep": {
+      "text": "CHEF MEALAN, O KORAKU {n}",
+      "checked": false
+    },
+    "cookmode.chefCaps": {
+      "text": "CHEF MEALAN",
+      "checked": false
+    },
+    "cookmode.orSayChefCanIUse": {
+      "text": "Ili reci: Kuvaru, mogu li da koristim smrznuti spanać?",
+      "checked": false
+    },
+    "cookmode.canIUseFrozenSpinach": {
+      "text": "Mogu li da koristim smrznuti spanać?",
+      "checked": false
+    },
+    "cookmode.cmdNext": {
+      "text": "dalje",
+      "checked": false
+    },
+    "cookmode.cmdBack": {
+      "text": "nazad",
+      "checked": false
+    },
+    "cookmode.cmdRepeat": {
+      "text": "ponovi",
+      "checked": false
+    },
+    "cookmode.cmdHowMuch": {
+      "text": "koliko",
+      "checked": false
+    },
+    "cookmode.cmdTimer": {
+      "text": "tajmer",
+      "checked": false
+    },
+    "cookmode.cmdWhatsLeft": {
+      "text": "šta je ostalo",
+      "checked": false
+    },
+    "cookmode.cmdStop": {
+      "text": "stani",
+      "checked": false
+    },
+    "cookmode.orAskStartWith": {
+      "text": "Ili pitaj: počni sa",
+      "checked": false
+    },
+    "cookmode.cmdChef": {
+      "text": "Kuvaru",
+      "checked": false
+    },
+    "cookmode.thisBrowserCanTListen": {
+      "text": "Ovaj pregledač ne može da sluša, pa upravljaš dugmadima.",
+      "checked": false
+    },
+    "cookmode.stopReadingAloud": {
+      "text": "prestani da čitaš naglas",
+      "checked": false
+    },
+    "cookmode.readStepsAloud": {
+      "text": "čitaj korake naglas",
+      "checked": false
+    },
+    "cookmode.theScreenStaysOn": {
+      "text": "Ekran ostaje uključen dok kuvaš.",
+      "checked": false
+    },
+    "cookmode.eachStepIsReadAloud": {
+      "text": "Svaki korak se čita naglas.",
+      "checked": false
+    },
+    "cookmode.canSayFood": {
+      "text": "Možeš da kažeš: dalje, nazad, ponovi, koliko {food}, tajmer 5 minuta, šta je ostalo, stani. Počni sa Kuvaru da pitaš o jelu.",
+      "checked": false
+    },
+    "cookmode.canSayNoFood": {
+      "text": "Možeš da kažeš: dalje, nazad, ponovi, koliko i namirnicu, tajmer 5 minuta, šta je ostalo, stani. Počni sa Kuvaru da pitaš o jelu.",
+      "checked": false
+    },
+    "make.couldNotAnswer": {
+      "text": "Chef Mealan nije mogao da odgovori.",
+      "checked": false
+    },
+    "make.draftFailedWrite": {
+      "text": "Nacrt Chef Mealana nije prošao provere ({why}). Pokušaj ponovo, ili napiši svoje.",
+      "checked": false
+    },
+    "make.couldNotAnswerAgain": {
+      "text": "Chef Mealan nije mogao da odgovori. Pokušaj ponovo.",
+      "checked": false
+    },
+    "make.changingIt": {
+      "text": "Chef Mealan ga menja…",
+      "checked": false
+    },
+    "make.writingSteps": {
+      "text": "Chef Mealan piše korake",
+      "checked": false
+    },
+    "make.writesAtAmounts": {
+      "text": "Chef Mealan ih piše za tvoje količine, ovde, pre nego što zaključaš recept.",
+      "checked": false
+    },
+    "make.draftWithChef": {
+      "text": "Napiši korake sa Chef Mealanom",
+      "checked": false
+    },
+    "make.looking": {
+      "text": "Chef Mealan gleda…",
+      "checked": false
+    },
+    "make.chefsStepsWhole": {
+      "text": "Koraci Chef Mealana, za ceo recept.",
+      "checked": false
+    },
+    "make.adapted": {
+      "text": "Prilagođeno",
+      "checked": false
+    },
+    "make.added": {
+      "text": "Dodato",
+      "checked": false
+    },
+    "make.adaptedWhy": {
+      "text": "Prilagođeno: {why}",
+      "checked": false
+    },
+    "make.addedWhy": {
+      "text": "Dodato: {why}",
+      "checked": false
+    },
+    "make.draftFailedOriginal": {
+      "text": "Nacrt Chef Mealana nije prošao provere ({why}). Pokušaj ponovo, ili ga napravi po originalu.",
+      "checked": false
+    },
+    "make.howToMake": {
+      "text": "Kako da napraviš: {dish}",
+      "checked": false
+    },
+    "make.stepsForMeal": {
+      "text": "Koraci Chef Mealana za tvoj obrok ({meal}), za tvoje količine. Idu uz recept kad sačuvaš.",
+      "checked": false
+    },
+    "make.writingForAmounts": {
+      "text": "Chef Mealan piše korake za tvoje količine.",
+      "checked": false
+    },
+    "make.stepsChanged": {
+      "text": "Koraci Chef Mealana za tvoje promenjeno jelo, po originalu.",
+      "checked": false
+    },
+    "make.stepsWhatYouMake": {
+      "text": "Koraci Chef Mealana za ono što praviš.",
+      "checked": false
+    },
+    "make.stepsWhatYouMakeParts": {
+      "text": "Koraci Chef Mealana, deo po deo, za ono što praviš.",
+      "checked": false
+    },
+    "make.wholeAbout": {
+      "text": "ceo recept, za tebe oko {yours} ({many})",
+      "checked": false
+    },
+    "make.wholeRecipeLow": {
+      "text": "ceo recept",
+      "checked": false
+    },
+    "make.oneUnit": {
+      "text": "1 {one}",
+      "checked": false
+    },
+    "make.yourPlate": {
+      "text": "tvoj tanjir",
+      "checked": false
+    },
+    "make.gKcal": {
+      "text": "{g} g · {kcal} kcal",
+      "checked": false
+    },
+    "make.oneMeal": {
+      "text": "jedan obrok ({meal})",
+      "checked": false
+    },
+    "make.yourPlateOne": {
+      "text": "tvoj tanjir, 1 {one}",
+      "checked": false
+    },
+    "make.gKcalPd": {
+      "text": "{g} g · {kcal} kcal · {pd}",
+      "checked": false
+    },
+    "make.stepsWholePlate": {
+      "text": "Koraci su za ceo recept. {plate}",
+      "checked": false
+    },
+    "make.stepsWholeLeft": {
+      "text": "Koraci su za ceo recept. Ostaje: {left}. Da ostatak pojedeš drugih dana, stavi recept u Plan.|Koraci su za ceo recept. Ostaju: {left}. Da ostatak pojedeš drugih dana, stavi recept u Plan.|Koraci su za ceo recept. Ostaje: {left}. Da ostatak pojedeš drugih dana, stavi recept u Plan.",
+      "checked": false
+    },
+    "make.recipeMakesN": {
+      "text": "Recept daje {n}. Koraci su za tvoj tanjir: svaka količina za tvoju porciju, do grama.",
+      "checked": false
+    },
+    "make.chefs": {
+      "text": "Od Chef Mealana",
+      "checked": false
+    },
+    "make.stepsEarlierFoods": {
+      "text": "Ovi koraci su napisani za ranije namirnice.",
+      "checked": false
+    },
+    "make.stepsGoWith": {
+      "text": "{title}: koraci idu uz njega kad sačuvaš.",
+      "checked": false
+    },
+    "make.stepsFromOriginal": {
+      "text": "Koraci Chef Mealana, po originalu, za tvoje količine i tvoju kuhinju.",
+      "checked": false
+    },
+    "make.thePart": {
+      "text": "Deo: {part}",
+      "checked": false
+    },
+    "make.wholeAsOriginal": {
+      "text": "Za ceo recept, kako ga original piše.",
+      "checked": false
+    },
+    "make.wholeAsOriginalN": {
+      "text": "Za ceo recept, kako ga original piše: {n} {unit}.",
+      "checked": false
+    },
+    "make.chefsWay": {
+      "text": "Na način Chef Mealana",
+      "checked": false
+    },
+    "make.writesFromOriginal": {
+      "text": "Chef Mealan ih piše po originalu, za tvoje količine i tvoju kuhinju, ovde, pre nego što počneš.",
+      "checked": false
+    },
+    "make.inABowl": {
+      "text": "u činiji ili na tanjiru",
+      "checked": false
+    },
+    "make.writingStepsDot": {
+      "text": "Chef Mealan piše korake.",
+      "checked": false
+    },
+    "make.sameAmountsWays": {
+      "text": "Iste količine, {n} način. Izaberi koji ti prija.|Iste količine, {n} načina. Izaberi koji ti prija.|Iste količine, {n} načina. Izaberi koji ti prija.",
+      "checked": false
+    },
+    "make.makeDish": {
+      "text": "Pravljenje: {dish}",
+      "checked": false
+    },
+    "make.aPhotoOrTwo": {
+      "text": "Slika ili dve dok je na pultu, pa jedan dodir.",
+      "checked": false
+    },
+    "make.useInDish": {
+      "text": "Iskoristi u jelu {dish}: {food}",
+      "checked": false
+    },
+    "make.inPlaceOf": {
+      "text": "Umesto: {food}",
+      "checked": false
+    },
+    "make.changeStepPhoto": {
+      "text": "Promeni sliku koraka {n}",
+      "checked": false
+    },
+    "make.addStepPhoto": {
+      "text": "Dodaj sliku koraku {n}",
+      "checked": false
+    },
+    "make.yourMeal": {
+      "text": "tvoj obrok",
+      "checked": false
+    },
+    "make.youAte": {
+      "text": "Pojedeno: {what}.",
+      "checked": false
+    },
+    "make.allNLow": {
+      "text": "svih {n}",
+      "checked": false
+    },
+    "make.leftToEat": {
+      "text": "Ostaje: {count}; da ostatak pojedeš drugih dana, stavi recept u Plan.|Ostaju: {count}; da ostatak pojedeš drugih dana, stavi recept u Plan.|Ostaje: {count}; da ostatak pojedeš drugih dana, stavi recept u Plan.",
+      "checked": false
+    },
+    "make.originalStays": {
+      "text": "Original, {title}, ostaje bez promene.",
+      "checked": false
+    },
+    "make.savedInMine": {
+      "text": "✓ Sačuvano u Mojim",
+      "checked": false
+    },
+    "make.madeToday": {
+      "text": "✓ Napravljeno danas",
+      "checked": false
+    },
+    "make.alwaysMakes": {
+      "text": "Uvek daje {n}: neka {n} bude broj recepta",
+      "checked": false
+    },
+    "make.allN": {
+      "text": "Svih {n}",
+      "checked": false
+    },
+    "make.kcalInOneMeal": {
+      "text": "{kcal} kcal u jednom obroku?",
+      "checked": false
+    },
+    "make.moreThanDay": {
+      "text": "To je više od celog tvog dana, {kcal} kcal.",
+      "checked": false
+    },
+    "make.ifYouAteN": {
+      "text": "Ako je pojedeno: {what}, upiši; ako nije, reci koliko.",
+      "checked": false
+    },
+    "make.yesAllN": {
+      "text": "Da, svih {n}",
+      "checked": false
+    },
+    "make.tasteDaam": {
+      "text": "DaaM dobro",
+      "checked": false
+    },
+    "make.tasteGood": {
+      "text": "Dobro",
+      "checked": false
+    },
+    "make.tasteNo": {
+      "text": "Baš i ne",
+      "checked": false
+    },
+    "make.tryWhat": {
+      "text": "{what}. Tvoj odgovor ostaje uz recept, pa sledeći put pokazuje kako je prošlo.",
+      "checked": false
+    },
+    "make.namedInCraft": {
+      "text": "{title} · nazvano u Craftu",
+      "checked": false
+    },
+    "make.notePlaceholder": {
+      "text": "Puno energije posle ovoga",
+      "checked": false
+    },
+    "make.changesDaysFollow": {
+      "text": "{title} se menja; dani u Planu sa njim prate izmenu.",
+      "checked": false
+    },
+    "make.staysAsItWas": {
+      "text": "{title} ostaje bez promene.",
+      "checked": false
+    },
+    "make.staysCardKeeps": {
+      "text": "{title} ostaje bez promene; ova kartica čuva ono što je pojedeno.",
+      "checked": false
+    },
+    "make.inMyRecipesAlready": {
+      "text": "{title} je već u Mojim receptima. Ova kartica upućuje na taj recept.",
+      "checked": false
+    },
+    "make.changedSave": {
+      "text": "{name}: ceo recept, uz: {what}. Prilagođeno iz recepta {from}.",
+      "checked": false
+    },
+    "make.changedSaveN": {
+      "text": "{name}: ceo recept, {count}, uz: {what}. Prilagođeno iz recepta {from}.",
+      "checked": false
+    },
+    "make.changedSaveOrig": {
+      "text": "{name}: ceo recept, uz: {what}. Prilagođeno iz recepta {from}; njegovi originalni koraci idu sa njim, samo za tebe.",
+      "checked": false
+    },
+    "make.changedSaveNOrig": {
+      "text": "{name}: ceo recept, {count}, uz: {what}. Prilagođeno iz recepta {from}; njegovi originalni koraci idu sa njim, samo za tebe.",
+      "checked": false
+    },
+    "make.stepsForChange": {
+      "text": "koraci za tvoju izmenu",
+      "checked": false
+    },
+    "make.itsFoodsGrams": {
+      "text": "njegove namirnice i grami",
+      "checked": false
+    },
+    "make.isADrink": {
+      "text": "{drink} je piće. Računa se u obrok koji je pojeden. U receptu?",
+      "checked": false
+    },
+    "make.atePortion": {
+      "text": "Pojedena je jedna porcija od toga.",
+      "checked": false
+    },
+    "make.atePortionMeals": {
+      "text": "Pojedena je jedna porcija od toga, a to je oko {n} tvojih obroka.",
+      "checked": false
+    },
+    "make.aboutMeals": {
+      "text": "Ovo je oko {n} tvojih obroka.",
+      "checked": false
+    },
+    "make.howManyMakes": {
+      "text": "Koliko daje?",
+      "checked": false
+    },
+    "make.saveShare": {
+      "text": "Sačuvaj i podeli sa: {coach}",
+      "checked": false
+    },
+    "make.save": {
+      "text": "Sačuvaj",
+      "checked": false
+    },
+    "make.shareWith": {
+      "text": "Podeli sa: {coach}",
+      "checked": false
+    },
+    "make.cookingWhen": {
+      "text": "kuvanje, {when}",
+      "checked": false
+    },
+    "make.whenFoods": {
+      "text": "{when} · {n} namirnica|{when} · {n} namirnice|{when} · {n} namirnica",
+      "checked": false
+    },
+    "make.removeTitle": {
+      "text": "Ukloni: {title}",
+      "checked": false
+    },
+    "make.readAgain": {
+      "text": "Pročitaj ponovo",
+      "checked": false
+    },
+    "make.readAgainThis": {
+      "text": "Pročitaj ponovo sa ovim",
+      "checked": false
+    },
+    "make.readAgainPhotos": {
+      "text": "Pročitaj ponovo, slike: {n}",
+      "checked": false
+    },
+    "make.readAgainPhotosThis": {
+      "text": "Pročitaj ponovo sa ovim, slike: {n}",
+      "checked": false
+    },
+    "make.photoOfPlate": {
+      "text": "slika tanjira",
+      "checked": false
+    },
+    "make.removePhotoN": {
+      "text": "Ukloni sliku {n}",
+      "checked": false
+    },
+    "make.listening": {
+      "text": "Slušam…",
+      "checked": false
+    },
+    "make.sayIt": {
+      "text": "🎤 Reci",
+      "checked": false
+    },
+    "recipe.portion": {
+      "text": "porcija",
+      "checked": false
+    },
+    "recipe.portions": {
+      "text": "porcije",
+      "checked": false
+    },
+    "recipe.part": {
+      "text": "Deo",
+      "checked": false
+    },
+    "recipe.noPart": {
+      "text": "Bez dela",
+      "checked": false
+    },
+    "recipe.stepsFollow": {
+      "text": "Koraci prate: u {n} koraku sada piše {food}, a pisalo je {old}.|Koraci prate: u {n} koraka sada piše {food}, a pisalo je {old}.|Koraci prate: u {n} koraka sada piše {food}, a pisalo je {old}.",
+      "checked": false
+    },
+    "recipe.draftFailedChecks": {
+      "text": "Nacrt od Chef Mealana nije prošao provere ({why}). Pokušaj ponovo, ili napiši svoj.",
+      "checked": false
+    },
+    "recipe.recipes": {
+      "text": "Recepti",
+      "checked": false
+    },
+    "recipe.rename": {
+      "text": "Preimenuj: {title}",
+      "checked": false
+    },
+    "recipe.byChef": {
+      "text": "{meal} od Chef Mealana ({kitchen}), oko tvojih namirnica: {around}. Napravljeno {date}.",
+      "checked": false
+    },
+    "recipe.wholeMakes": {
+      "text": "Ceo recept daje {n} {unit} · 1 {one} {kcal} kcal",
+      "checked": false
+    },
+    "recipe.wholeByWeight": {
+      "text": "Ceo recept: {n} porcija po težini. Uredi recept može da kaže šta daje.",
+      "checked": false
+    },
+    "recipe.pictureOfBy": {
+      "text": "Slika: {title}, od Chef Mealana",
+      "checked": false
+    },
+    "recipe.drawnByChef": {
+      "text": "Nacrtao Chef Mealan",
+      "checked": false
+    },
+    "recipe.coverOf": {
+      "text": "Naslovna: {title}",
+      "checked": false
+    },
+    "recipe.photoOf": {
+      "text": "Slika {n}: {title}",
+      "checked": false
+    },
+    "recipe.chefDrewIt": {
+      "text": "Chef Mealan ju je nacrtao iz tvojih namirnica i količina kad je jelo sačuvano, da ga nađeš na prvi pogled. Tvoja slika je zamenjuje.",
+      "checked": false
+    },
+    "recipe.photoAria": {
+      "text": "Slika {n}{cover}{picked}",
+      "checked": false
+    },
+    "recipe.photoAriaCover": {
+      "text": ", naslovna",
+      "checked": false
+    },
+    "recipe.photoAriaPicked": {
+      "text": ", izabrana",
+      "checked": false
+    },
+    "recipe.deletePhoto": {
+      "text": "Obriši sliku {n}",
+      "checked": false
+    },
+    "recipe.chefIsDrawing": {
+      "text": "Chef Mealan crta…",
+      "checked": false
+    },
+    "recipe.letChefDraw": {
+      "text": "Neka Chef Mealan nacrta jednu",
+      "checked": false
+    },
+    "recipe.drawingsToday": {
+      "text": "Crteži od Chef Mealana danas: {used} od {limit}. {rest}",
+      "checked": false
+    },
+    "recipe.removeTheCover": {
+      "text": "Ukloni naslovnu",
+      "checked": false
+    },
+    "recipe.aPhotoMakesItEasy": {
+      "text": "Uz sliku se recept lako nalazi, ovde i na njegovoj strani.",
+      "checked": false
+    },
+    "recipe.photoMovesEarlier": {
+      "text": "Slika {n} od {of}. ‹ je pomera napred: na prvom mestu postaje naslovna.",
+      "checked": false
+    },
+    "recipe.fromTheTimesYouMade": {
+      "text": "Sa ranijih kuvanja ovog recepta, dodir dodaje sliku:",
+      "checked": false
+    },
+    "recipe.addPlatePhoto": {
+      "text": "Dodaj sliku tanjira {n} u recept",
+      "checked": false
+    },
+    "recipe.watchStepsLength": {
+      "text": "{n} koraka, oko {seconds} sek.{ai}",
+      "checked": false
+    },
+    "recipe.watchStepsAi": {
+      "text": " · slike nacrtao AI, Beta",
+      "checked": false
+    },
+    "recipe.oneLess": {
+      "text": "1 {unit} manje",
+      "checked": false
+    },
+    "recipe.oneMore": {
+      "text": "1 {unit} više",
+      "checked": false
+    },
+    "recipe.makesFoodsFor": {
+      "text": "Recept daje {n}; namirnice ispod su za {cook}.",
+      "checked": false
+    },
+    "recipe.planTakes": {
+      "text": "Plan traži {n}: skuvaj {n}",
+      "checked": false
+    },
+    "recipe.backToAsWritten": {
+      "text": "Nazad na {n}, kako piše",
+      "checked": false
+    },
+    "recipe.forCookingNotCounted": {
+      "text": "Za kuvanje, ne računa se:",
+      "checked": false
+    },
+    "recipe.sarmasPlaceholder": {
+      "text": "sarme",
+      "checked": false
+    },
+    "recipe.deltaOut": {
+      "text": "Izbačeno: {list}.",
+      "checked": false
+    },
+    "recipe.deltaIn": {
+      "text": "Dodato: {list}.",
+      "checked": false
+    },
+    "recipe.deltaChanged": {
+      "text": "Promenjeno: {list}.",
+      "checked": false
+    },
+    "recipe.deltaOne": {
+      "text": "1 {one}: sa {kcalFrom} na {kcalTo} kcal, sa {proteinFrom} na {proteinTo} g proteina{pd}.",
+      "checked": false
+    },
+    "recipe.deltaPd": {
+      "text": ", PD sa {from} na {to}",
+      "checked": false
+    },
+    "recipe.moreThanAFifthApart": {
+      "text": "Razlika veća od petine: proveri da li recept i dalje služi svojoj svrsi.",
+      "checked": false
+    },
+    "recipe.swapFood": {
+      "text": "Zameni: {food}",
+      "checked": false
+    },
+    "recipe.optional": {
+      "text": "Opciono",
+      "checked": false
+    },
+    "recipe.writtenForFrying": {
+      "text": "{written}, za prženje",
+      "checked": false
+    },
+    "recipe.forFrying": {
+      "text": "Za prženje",
+      "checked": false
+    },
+    "recipe.gramsOf": {
+      "text": "Grami: {food}",
+      "checked": false
+    },
+    "recipe.removeFood": {
+      "text": "Ukloni: {food}",
+      "checked": false
+    },
+    "recipe.swapChoice": {
+      "text": "{way}: {food}, {grams} g",
+      "checked": false
+    },
+    "recipe.inPlaceOf": {
+      "text": "Umesto: {food}",
+      "checked": false
+    },
+    "recipe.inPlaceOfGrams": {
+      "text": "Umesto: {food}, {grams} g:",
+      "checked": false
+    },
+    "recipe.inPlaceOfRemoved": {
+      "text": "Umesto: {food}, {grams} g, upravo uklonjeno?",
+      "checked": false
+    },
+    "recipe.aDifferentFood": {
+      "text": "Druga namirnica: ista težina čuva veličinu jela.",
+      "checked": false
+    },
+    "recipe.setTheGramsOf": {
+      "text": "Podesi grame za namirnicu {food}, ili je ukloni.",
+      "checked": false
+    },
+    "recipe.swapFor": {
+      "text": "Zameni namirnicu {food} za:",
+      "checked": false
+    },
+    "recipe.per100g": {
+      "text": "{kcal} kcal · {protein} g proteina na 100 g",
+      "checked": false
+    },
+    "recipe.per100gNoLabel": {
+      "text": "{kcal} kcal · {protein} g proteina na 100 g · namirnica bez deklaracije",
+      "checked": false
+    },
+    "recipe.countedWholeHere": {
+      "text": "{pieces} i druge namirnice koje se broje na komad ovde su cele, za ceo recept. 1 {one} sadrži svoj deo, {share} {piece}: to je za brojeve, ne za kuvanje.",
+      "checked": false
+    },
+    "recipe.writtenOnTheRecipe": {
+      "text": "{written} u receptu",
+      "checked": false
+    },
+    "recipe.optionalLower": {
+      "text": "opciono",
+      "checked": false
+    },
+    "recipe.chefStepsFromOriginal": {
+      "text": "Koraci od Chef Mealana, iz originala, za tvoje količine i tvoju kuhinju. Svaki kaže kako se odnosi na original.",
+      "checked": false
+    },
+    "recipe.asNameWritesThem": {
+      "text": "Kako ih piše {name}, za ceo recept.",
+      "checked": false
+    },
+    "recipe.stepsForEarlierFoods": {
+      "text": "Ovi koraci su pisani za ranije namirnice. {diff}",
+      "checked": false
+    },
+    "recipe.photosForTheSteps": {
+      "text": "Slike za korake dolaze iz kuvanja: + Slika na koraku u Pravljenju. Dodirni sliku da je promeniš ili ukloniš.",
+      "checked": false
+    },
+    "recipe.chefS": {
+      "text": "Od Chef Mealana",
+      "checked": false
+    },
+    "recipe.yours": {
+      "text": "Tvoji",
+      "checked": false
+    },
+    "recipe.theOriginalForTheOriginal": {
+      "text": "Original, za originalne namirnice:",
+      "checked": false
+    },
+    "recipe.chefSWay": {
+      "text": "Na način Chef Mealana",
+      "checked": false
+    },
+    "recipe.chefWritesTheSteps": {
+      "text": "Chef Mealan piše korake za tvoje količine i tvoju kuhinju, kad ih želiš.",
+      "checked": false
+    },
+    "recipe.draftTheStepsWithChef": {
+      "text": "Napiši korake sa Chef Mealanom",
+      "checked": false
+    },
+    "recipe.stepsReadAloud": {
+      "text": "{n} korak, čita se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ih prikaže.|{n} koraka, čitaju se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ih prikaže.|{n} koraka, čitaju se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ih prikaže.",
+      "checked": false
+    },
+    "recipe.startCookingReadsThe": {
+      "text": "Počni da kuvaš čita korake naglas, jedan po jedan. Otvara se kad koraci postoje: koje je napisao Chef Mealan ili ti.",
+      "checked": false
+    },
+    "recipe.aRecipeNeedsAtLeast": {
+      "text": "Recept mora imati bar jednu namirnicu.",
+      "checked": false
+    },
+    "recipe.live": {
+      "text": "Uživo",
+      "checked": false
+    },
+    "recipe.waitingFor": {
+      "text": "Čeka na: {who}",
+      "checked": false
+    },
+    "recipe.draft": {
+      "text": "Nacrt",
+      "checked": false
+    },
+    "recipe.changedTitle": {
+      "text": "Promenjeno: {list}",
+      "checked": false
+    },
+    "recipe.liveAnyoneWithTheLink": {
+      "text": "chefmealan.com/r/{slug}. Svako s linkom vidi stranu, prvo naslovnu.",
+      "checked": false
+    },
+    "recipe.approverSeesThePage": {
+      "text": "{who} prvo vidi stranu i objavljuje je, ili je vraća s porukom.",
+      "checked": false
+    },
+    "recipe.approverSentItBackNote": {
+      "text": "Vraćeno od: {who}. „{note}“",
+      "checked": false
+    },
+    "recipe.approverSentItBack": {
+      "text": "Vraćeno od: {who}.",
+      "checked": false
+    },
+    "recipe.aDraftOnlyHere": {
+      "text": "Nacrt, samo ovde. Nastavi odakle je ostalo.",
+      "checked": false
+    },
+    "recipe.sendToAgain": {
+      "text": "Pošalji ponovo: {who}",
+      "checked": false
+    },
+    "recipe.continuePlain": {
+      "text": "Nastavi",
+      "checked": false
+    },
+    "recipe.publish": {
+      "text": "Objavi",
+      "checked": false
+    },
+    "recipe.forYouOnThePreview": {
+      "text": "Za tebe, u pregledu. Svaki dodir crta jednu sliku ({title}) iz njegovih namirnica i količina. Ništa se ne čuva osim ako dodirneš Koristi kao naslovnu.",
+      "checked": false
+    },
+    "recipe.drawing": {
+      "text": "Crta se…",
+      "checked": false
+    },
+    "recipe.realisticTestBy": {
+      "text": "Realistični test: {model}",
+      "checked": false
+    },
+    "recipe.accountPlaceholder": {
+      "text": "@nalog na Instagramu, ili sajt",
+      "checked": false
+    },
+    "recipe.change": {
+      "text": "Promeni",
+      "checked": false
+    },
+    "recipe.addTheLink": {
+      "text": "+ Dodaj link",
+      "checked": false
+    },
+    "recipe.makesAsTheRecipeSays": {
+      "text": "Daje {n} {unit}, kako recept kaže.",
+      "checked": false
+    },
+    "recipe.screenshotN": {
+      "text": "Snimak ekrana {n}",
+      "checked": false
+    },
+    "recipe.markWhy": {
+      "text": "{mark}: {why}",
+      "checked": false
+    },
+    "recipe.markAdapted": {
+      "text": "Prilagođeno",
+      "checked": false
+    },
+    "recipe.markAdded": {
+      "text": "Dodato",
+      "checked": false
+    },
+    "recipe.partHead": {
+      "text": "{part}",
+      "checked": false
+    },
+    "recipe.toppingPlaceholder": {
+      "text": "Preliv",
+      "checked": false
+    },
+    "gates.and": {
+      "text": "{a} i {b}",
+      "checked": false
+    },
+    "gates.fatOver": {
+      "text": "Više od pola energije ovog obroka ({meal}) je mast: {pct} posto, {fat} g.",
+      "checked": false
+    },
+    "gates.fatEdge": {
+      "text": "Mast je oko pola energije ovog obroka ({meal}): {pct} posto, a granica je 50.",
+      "checked": false
+    },
+    "gates.fatHint": {
+      "text": "Da se udaljiš od granice: malo manje namirnice {food}, ili prilog sa proteinima.",
+      "checked": false
+    },
+    "gates.thePowder": {
+      "text": "proteinski prah",
+      "checked": false
+    },
+    "gates.suppOver": {
+      "text": "Najveći deo proteina u ovom obroku ({meal}) potiče iz: {from}; {supp} od {protein} g.",
+      "checked": false
+    },
+    "gates.suppEdge": {
+      "text": "Oko pola proteina u ovom obroku ({meal}) potiče iz suplementa: {supp} od {protein} g, a granica je pola.",
+      "checked": false
+    },
+    "gates.hintProteinFood": {
+      "text": "Da se udaljiš od granice: namirnica sa proteinima uz to.",
+      "checked": false
+    },
+    "gates.carbsOver": {
+      "text": "Pre treninga tanjiru trebaju ugljeni hidrati, a ovaj ih skoro nema: {pct} posto njegove energije.",
+      "checked": false
+    },
+    "gates.carbsEdge": {
+      "text": "Pre treninga, ugljeni hidrati su {pct} posto energije ovog tanjira, a granica je 10.",
+      "checked": false
+    },
+    "gates.hintFruit": {
+      "text": "Da se udaljiš od granice: komad voća ili hleba.",
+      "checked": false
+    },
+    "gates.aMeeting": {
+      "text": "Sastanak",
+      "checked": false
+    },
+    "gates.nothingToCook": {
+      "text": "{moment}: bez kuvanja, a {foods} traži lonac.|{moment}: bez kuvanja, a {foods} traže lonac.|{moment}: bez kuvanja, a {foods} traže lonac.",
+      "checked": false
+    },
+    "gates.beforeKcalOver": {
+      "text": "Pre treninga je {kcal} kcal mnogo u stomaku; manji tanjir bolje leži.",
+      "checked": false
+    },
+    "gates.afterProteinUnder": {
+      "text": "Posle treninga proteini su na prvom mestu, a ovaj tanjir ima {protein} g.",
+      "checked": false
+    },
+    "gates.beforeKcalEdge": {
+      "text": "Pre treninga {kcal} kcal, a granica je 600.",
+      "checked": false
+    },
+    "gates.hintSmaller": {
+      "text": "Da se udaljiš od granice: manja porcija.",
+      "checked": false
+    },
+    "gates.afterProteinEdge": {
+      "text": "Posle treninga ovaj tanjir ima {protein} g proteina, a granica je 15.",
+      "checked": false
+    },
+    "gates.outsideWindow": {
+      "text": "{time}, a tvoj prozor za jelo je od {from} do {to}. Pun tanjir sada opterećuje sutrašnji dan.",
+      "checked": false
+    },
+    "photo.whatIsThe": {
+      "text": "{food}: šta je tačno?",
+      "checked": false
+    },
+    "photo.aboutKcal": {
+      "text": "oko {kcal} kcal",
+      "checked": false
+    },
+    "photo.aboutKcalRange": {
+      "text": "oko {low} do {high} kcal",
+      "checked": false
+    },
+    "photo.gProtein": {
+      "text": "{n} g proteina",
+      "checked": false
+    },
+    "photo.portions": {
+      "text": "Obrati pažnju: ovaj tanjir je oko {big} porcije za tvoj obrok ({meal}), {kcal} prema obroku od oko {mealKcal}. Pojedi jednu porciju, a ostatak sačuvaj.",
+      "checked": false
+    },
+    "photo.portionsWhy": {
+      "text": "Obrati pažnju: ovaj tanjir je oko {big} porcije za tvoj obrok ({meal}), {kcal} prema obroku od oko {mealKcal}. {why} Pojedi jednu porciju, a ostatak sačuvaj.",
+      "checked": false
+    },
+    "photo.snack": {
+      "text": "Ovo je užina, ne tvoj obrok ({meal}): {kcal} i {prot}. Pojedi je, a obrok ({meal}) te još čeka.",
+      "checked": false
+    },
+    "photo.addProtein": {
+      "text": "{why} Dodaj prilog sa proteinima i to je tvoj obrok ({meal}); ovako kako stoji, to je {kcal} i {prot}.",
+      "checked": false
+    },
+    "photo.asItStands": {
+      "text": "{why} Ovako kako stoji, to je {kcal} i {prot}.",
+      "checked": false
+    },
+    "photo.didYouEat": {
+      "text": "Da li je pojedeno? {kcal} i {prot}.",
+      "checked": false
+    },
+    "photo.dayWhy": {
+      "text": "{why} {kcal} i {prot}.",
+      "checked": false
+    },
+    "photo.eatAsIs": {
+      "text": "Pojedi ga kakav jeste. {kcal} i {prot}, pun obrok ({meal}) za tvoj dan.",
+      "checked": false
+    },
+    "photo.eatAsIsDish": {
+      "text": "Pojedi ga kakav jeste. {kcal} i {prot}, pun obrok ({meal}) za tvoj dan, i ništa na njemu ne protivreči jelu.",
+      "checked": false
+    },
+    "photo.ideaPortions": {
+      "text": "Kako slika pokazuje: {kcal} i {prot}, oko {big} porcije za tvoj obrok ({meal}). Uklopi ga i biće jedna porcija.",
+      "checked": false
+    },
+    "photo.ideaWhy": {
+      "text": "{why} Kako slika pokazuje: {kcal} i {prot}. Uklopi ga i Chef Mealan ga odmerava za tvoj obrok ({meal}).",
+      "checked": false
+    },
+    "photo.idea": {
+      "text": "Obrok ({meal}) kako ga slika pokazuje: {kcal} i {prot}. Uklopi ga i biće odmeren za tvoj dan.",
+      "checked": false
     }
   }
 }

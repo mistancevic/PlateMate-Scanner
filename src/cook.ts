@@ -22,7 +22,7 @@ export function secondsIn(text: string): number | null {
 export function timerName(step: string, k: number): string {
   const m = new RegExp(TOKEN.source).exec(step);
   const name = m ? m[2].trim() : "";
-  return name ? name.charAt(0).toUpperCase() + name.slice(1) : `Step ${k + 1}`;
+  return name ? name.charAt(0).toUpperCase() + name.slice(1) : w("cookmode.stepN", { n: k + 1 });
 }
 export const clock = (sec: number) => { const s = Math.max(0, Math.round(sec)), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60; return h ? `${h}:${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}` : `${m}:${String(r).padStart(2, "0")}`; };
 export const minutesWords = (sec: number) => (sec % 60 === 0 ? `${sec / 60} ${sec === 60 ? "minute" : "minutes"}` : sec < 60 ? `${sec} seconds` : `${Math.floor(sec / 60)} minutes ${sec % 60} seconds`);
@@ -212,5 +212,5 @@ export function canSayLine(step: string, items: Ingredient[]): string {
   const food = /\[\[i:[^|\]]+\|([^\]]+)\]\]/.exec(step)?.[1]
     ?? items.map(word).find((w) => w.length > 2 && low(step).includes(w))
     ?? (items[0] ? word(items[0]) : "");
-  return `You can say: next, back, repeat, ${food ? `how much ${low(food)}` : "how much and a food"}, timer 5 minutes, what's left, stop. Start with Chef to ask about the dish.`;
+  return food ? w("cookmode.canSayFood", { food: low(food) }) : w("cookmode.canSayNoFood");
 }

@@ -7,6 +7,10 @@ import { aggregate, type Ingredient } from "./pilot";
 import { catOf } from "./mixtip";
 import { toMin } from "./slots";
 import type { MomentId } from "./moments";
+import { w, wn, mealV, wordV } from "./words";
+
+// a list of names in a line: a, b and c (each "and" its own line, so a language can say it its way)
+const andList = (xs: string[]): string => xs.reduce((a, b) => (a ? w("gates.and", { a, b }) : b), "");
 
 export type GateWay = "protein" | "carb" | "snack" | "keep" | "nocook" | "window";
 export type GateLine = { ok: true; edge?: string; hint?: string } | { ok: false; why: string; ways: GateWay[] };
@@ -38,20 +42,20 @@ export function nutritionGate(x: NutritionIn): GateLine {
   const supp = x.items.filter((i) => catOf(i.food) === "supplement").reduce((k, i) => k + ((i.food.protein ?? 0) * i.grams) / 100, 0);
   let edge: GateLine | null = null;
   // N27, fat over half the energy of a meal; the edge names the fattiest food for the hint
-  if (x.kind === "meal" && fatShare > EDGE.fat[1]) return { ok: false, why: `More than half of this ${x.mealWord}'s energy is fat: ${pct(fatShare)} percent, ${Math.round(t.fats ?? 0)} g.`, ways: ["protein", "snack", "keep"] };
+  if (x.kind === "meal" && fatShare > EDGE.fat[1]) return { ok: false, why: w("gates.fatOver", { meal: mealV(x.mealWord, true), pct: pct(fatShare), fat: Math.round(t.fats ?? 0) }), ways: ["protein", "snack", "keep"] };
   if (x.kind === "meal" && within(fatShare, EDGE.fat)) {
     const fattest = [...x.items].sort((a, b) => ((b.food.fats ?? 0) * b.grams) - ((a.food.fats ?? 0) * a.grams))[0];
-    edge = { ok: true, edge: `Fat is about half of this ${x.mealWord}'s energy: ${pct(fatShare)} percent, and the line is 50.`, hint: `To be clear of it: a little less ${fattest.food.name.split(",")[0].toLowerCase()}, or a protein side.` };
+    edge = { ok: true, edge: w("gates.fatEdge", { meal: mealV(x.mealWord, true), pct: pct(fatShare) }), hint: w("gates.fatHint", { food: fattest.food.name.split(",")[0].toLowerCase() }) };
   }
   // N28, more than half the protein from a supplement
   if (protein >= 15 && supp / protein > EDGE.supplement[1]) {
-    const names = x.items.filter((i) => catOf(i.food) === "supplement").map((i) => i.food.name.toLowerCase().includes("powder") || /whey|protein/i.test(i.food.name) ? "the powder" : i.food.name.toLowerCase());
-    return { ok: false, why: `Most of this ${x.mealWord}'s protein comes from ${[...new Set(names)].join(" and ")}: ${Math.round(supp)} of ${Math.round(protein)} g.`, ways: ["protein", "snack", "keep"] };
+    const names = x.items.filter((i) => catOf(i.food) === "supplement").map((i) => i.food.name.toLowerCase().includes("powder") || /whey|protein/i.test(i.food.name) ? w("gates.thePowder") : i.food.name.toLowerCase());
+    return { ok: false, why: w("gates.suppOver", { meal: mealV(x.mealWord, true), from: andList([...new Set(names)]), supp: Math.round(supp), protein: Math.round(protein) }), ways: ["protein", "snack", "keep"] };
   }
-  if (!edge && protein >= 15 && supp > 0 && within(supp / protein, EDGE.supplement)) edge = { ok: true, edge: `About half of this ${x.mealWord}'s protein comes from a supplement: ${Math.round(supp)} of ${Math.round(protein)} g, and the line is half.`, hint: "To be clear of it: a protein food next to it." };
+  if (!edge && protein >= 15 && supp > 0 && within(supp / protein, EDGE.supplement)) edge = { ok: true, edge: w("gates.suppEdge", { meal: mealV(x.mealWord, true), supp: Math.round(supp), protein: Math.round(protein) }), hint: w("gates.hintProteinFood") };
   // N29, carbs before training
-  if (x.beforeTraining && carbShare !== null && carbShare < EDGE.carbsBefore[0]) return { ok: false, why: `Before training the plate wants carbs, and this one has almost none: ${pct(carbShare)} percent of its energy.`, ways: ["carb", "keep"] };
-  if (!edge && x.beforeTraining && carbShare !== null && within(carbShare, EDGE.carbsBefore)) edge = { ok: true, edge: `Before training, carbs are ${pct(carbShare)} percent of this plate's energy, and the line is 10.`, hint: "To be clear of it: a piece of fruit or bread." };
+  if (x.beforeTraining && carbShare !== null && carbShare < EDGE.carbsBefore[0]) return { ok: false, why: w("gates.carbsOver", { pct: pct(carbShare) }), ways: ["carb", "keep"] };
+  if (!edge && x.beforeTraining && carbShare !== null && within(carbShare, EDGE.carbsBefore)) edge = { ok: true, edge: w("gates.carbsEdge", { pct: pct(carbShare) }), hint: w("gates.hintFruit") };
   if (edge) return edge;
   return { ok: true };
 }
@@ -66,16 +70,16 @@ export function dayGate(x: DayIn): GateLine {
   if (!x.items.length || kcal < 100) return { ok: true };
   const cooks = x.items.filter((i) => x.needsCooking(i.food.name)).map((i) => i.food.name.toLowerCase());
   if ((x.moment === "before" || x.moment === "meeting" || x.moment === "travel") && cooks.length)
-    return { ok: false, why: `${x.moment === "before" ? "Before training" : x.moment === "meeting" ? "A meeting" : "Travel"} wants nothing to cook, and ${cooks.join(" and ")} ${cooks.length === 1 ? "needs" : "need"} a pot.`, ways: ["nocook", "keep"] };
-  if (x.moment === "before" && kcal > EDGE.kcalBefore[1]) return { ok: false, why: `Before training ${Math.round(kcal)} kcal is a lot to carry; a smaller plate sits better.`, ways: ["snack", "keep"] };
-  if (x.moment === "after" && (t.protein ?? 0) < EDGE.proteinAfter[0]) return { ok: false, why: `After training protein comes first, and this plate has ${Math.round(t.protein ?? 0)} g.`, ways: ["protein", "keep"] };
+    return { ok: false, why: wn("gates.nothingToCook", cooks.length, { moment: wordV(x.moment === "before" ? "moment.before" : x.moment === "meeting" ? "gates.aMeeting" : "moment.travel"), foods: andList(cooks) }), ways: ["nocook", "keep"] };
+  if (x.moment === "before" && kcal > EDGE.kcalBefore[1]) return { ok: false, why: w("gates.beforeKcalOver", { kcal: Math.round(kcal) }), ways: ["snack", "keep"] };
+  if (x.moment === "after" && (t.protein ?? 0) < EDGE.proteinAfter[0]) return { ok: false, why: w("gates.afterProteinUnder", { protein: Math.round(t.protein ?? 0) }), ways: ["protein", "keep"] };
   let edge: GateLine | null = null;
-  if (x.moment === "before" && within(kcal, EDGE.kcalBefore)) edge = { ok: true, edge: `Before training ${Math.round(kcal)} kcal, and the line is 600.`, hint: "To be clear of it: a smaller portion." };
-  if (x.moment === "after" && within(t.protein ?? 0, EDGE.proteinAfter)) edge = { ok: true, edge: `After training this plate has ${Math.round(t.protein ?? 0)} g protein, and the line is 15.`, hint: "To be clear of it: a protein food next to it." };
+  if (x.moment === "before" && within(kcal, EDGE.kcalBefore)) edge = { ok: true, edge: w("gates.beforeKcalEdge", { kcal: Math.round(kcal) }), hint: w("gates.hintSmaller") };
+  if (x.moment === "after" && within(t.protein ?? 0, EDGE.proteinAfter)) edge = { ok: true, edge: w("gates.afterProteinEdge", { protein: Math.round(t.protein ?? 0) }), hint: w("gates.hintProteinFood") };
   if (x.window?.from && x.window?.to && x.kind !== "dessert") {
     const m = x.now.getHours() * 60 + x.now.getMinutes(), from = toMin(x.window.from), to = toMin(x.window.to);
     const outside = from <= to ? m < from || m > to : m > to && m < from;
-    if (outside && kcal >= 300) return { ok: false, why: `${String(x.now.getHours()).padStart(2, "0")}:${String(x.now.getMinutes()).padStart(2, "0")}, and your eating window is ${x.window.from} to ${x.window.to}. A full plate now sits on tomorrow.`, ways: ["snack", "window", "keep"] };
+    if (outside && kcal >= 300) return { ok: false, why: w("gates.outsideWindow", { time: `${String(x.now.getHours()).padStart(2, "0")}:${String(x.now.getMinutes()).padStart(2, "0")}`, from: x.window.from, to: x.window.to }), ways: ["snack", "window", "keep"] };
   }
   return edge ?? { ok: true };
 }

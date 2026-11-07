@@ -1,7 +1,7 @@
 // DT178 (0.3.21, board Stories126, Coach Milan 31 October 00:08): Chef Mealan's own calendar in Google. Me > Google
 // Calendar: what goes in, what an event says, Connect. On: where and how far ahead, Turn off with remove or keep. Plan says
 // once that the plan is also there; a shopping list can get a day, Shop on. Buttons 44 px or more; labels 12 px or more.
-import { w } from "../words";
+import { w, mealV, dateV } from "../words";
 import { useEffect, useRef, useState } from "react";
 import type { AppApi } from "../screens/api";
 import { calendarEvents, CAL_DAYS, CAL_KINDS, CAL_SCOPE, BUSY_SCOPE, kindOn, dishOn, plusDays, type CalKind, type CalSettings, type CalEvent, type CalMove } from "../gcal";
@@ -32,11 +32,11 @@ export function applyMoves(p: AppApi, moves: CalMove[]) {
     timesOn = withTimeOn(timesOn, m.date, m.slotId, m.to, s.time);
     const k = `${m.date}|${m.slotId}`;
     if (m.to === s.time) delete moved[k]; else moved[k] = moved[k] ?? m.from;
-    words.push(`${s.name} on ${new Date(`${m.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" })} at ${m.to}`);
+    words.push(w("calendar.mealOnAt", { meal: mealV(s.name), day: dateV(new Date(`${m.date}T12:00:00`), { weekday: "long" }, "en-GB"), time: m.to }));
   }
   if (!words.length) return;
   p.setPersonal({ ...now, timesOn, calendar: { ...(now.calendar ?? { on: true }), moved } });
-  p.notify(`From Google Calendar: ${words.join(", ")}.`);
+  p.notify(w("calendar.fromGoogleCalendar", { what: words.join(", ") }));
 }
 const keepId = (p: AppApi, extra: Partial<CalSettings> = {}) => (id: string) => { const now = getPersonal(); p.setPersonal({ ...now, calendar: { ...(now.calendar ?? { on: false }), ...extra, id } }); };
 
@@ -54,7 +54,7 @@ export function eventsFor(p: AppApi, now = new Date()): { events: CalEvent[]; fr
     settings: c,
     weigh: Boolean(p.safety.consentBodyAt) && !weighInsOff(p.safety) && !p.travel?.weighPaused,
     noKitchen: () => p.travel?.kitchen === "hotel",
-    checkIn: ci ? { date: ci, name: p.profile.coachId ? `Check-in with ${p.coachLabel}` : w("calendar.goalCheckIn") } : null,
+    checkIn: ci ? { date: ci, name: p.profile.coachId ? w("calendar.checkInWith", { coach: p.coachLabel }) : w("calendar.goalCheckIn") } : null,
     shopping: getStore().lists.filter((x) => !x.doneAt && x.shopOn).map((x) => ({ n: x.n, at: x.shopOn! })),
     // 0.3.22 (Coach Milan 01:17: the events linked to the preview): the link is always chefmealan.com; only this computer's
     // walkthroughs keep their own address
@@ -115,7 +115,7 @@ export function CalendarSync({ p }: { p: AppApi }) {
 export async function updateNow(p: AppApi): Promise<boolean> {
   let token: string | null = null;
   try { token = await askToken(scopesOf(calOf(p))); } catch { token = null; }
-  if (!token) { p.notify("Google Calendar was not updated. Try again."); return false; }
+  if (!token) { p.notify(w("calendar.notUpdated")); return false; }
   const { events, from, to } = eventsFor(p);
   if (calOf(p).busy) void readBusy(token, from, to, timeZoneHere());
   const id = await runSync(token, calOf(p).id, events, from, to, timeZoneHere(), keepId(p));
@@ -165,13 +165,13 @@ export function CalendarPage({ p }: { p: AppApi }) {
     try {
       let token: string | null = null;
       try { token = await askToken(); } catch { token = null; }
-      if (!token) { p.notify("Google Calendar was not connected."); return; }
+      if (!token) { p.notify(w("calendar.notConnected")); return; }
       const { events, from, to } = eventsFor({ ...p, personal: { ...p.personal, calendar: { ...c, on: true } } });
       const id = await runSync(token, c.id, events, from, to, timeZoneHere(), keepId(p, { on: true, since: new Date().toISOString() }));
       if (!id) return;
       keepId(p, { on: true, since: getPersonal().calendar?.since ?? new Date().toISOString() })(id);
       log("calendar_on", { events: events.length });
-      p.notify("Your plan is in Google Calendar, in the calendar Chef Mealan.");
+      p.notify(w("calendar.yourPlanIsInGoogle"));
     } finally { setBusy(false); }
   };
   const turnOff = async (remove: boolean) => {
@@ -180,8 +180,8 @@ export function CalendarPage({ p }: { p: AppApi }) {
       if (remove && c.id) {
         let token: string | null = null;
         try { token = await askToken(); } catch { token = null; }
-        if (!token) { p.notify("The calendar stays in Google. Try again, or remove it in Google Calendar."); return; }
-        try { await dropCalendar(token, c.id); } catch (e: any) { p.notify(`Google Calendar answered: ${e?.message || "no"}. Remove it in Google Calendar.`); return; }
+        if (!token) { p.notify(w("calendar.staysInGoogle")); return; }
+        try { await dropCalendar(token, c.id); } catch (e: any) { p.notify(w("calendar.googleAnswered", { answer: e?.message || w("calendar.answerNo") })); return; }
         p.setPersonal({ ...p.personal, calendar: { ...c, on: false, id: undefined } });
       } else p.setPersonal({ ...p.personal, calendar: { ...c, on: false } });
       forgetSent(); setCalStatus({ state: "off" }); setEnding(false);
@@ -195,11 +195,11 @@ export function CalendarPage({ p }: { p: AppApi }) {
       {c.on && (
         <section className="card cal-on" aria-label={w("calendar.googleCalendarIsOn")}>
           <span aria-hidden="true">📅</span>
-          <div><b>{w("calendar.on")}</b><small>The Chef Mealan calendar in your Google account{p.user?.email ? `, ${p.user.email}` : ""}. The next {CAL_DAYS} days are in it.{st.state === "done" && st.at ? ` Updated ${st.at}.` : ""}</small></div>
+          <div><b>{w("calendar.on")}</b><small>{p.user?.email ? w("calendar.inYourAccountEmail", { email: p.user.email }) : w("calendar.inYourAccount")} {w("calendar.nextDaysInIt", { n: CAL_DAYS })}{st.state === "done" && st.at ? ` ${w("calendar.updatedAt", { time: st.at })}` : ""}</small></div>
         </section>
       )}
       {c.on && <CalendarState p={p} />}
-      {c.on && <p className="small muted">When you change a time, a slot or a meal here, it changes in Google Calendar within seconds. Google lets the app write for about an hour after a tap; after that, one tap on Update Google Calendar brings the next {CAL_DAYS} days up to date.</p>}
+      {c.on && <p className="small muted">{w("calendar.whenYouChange", { n: CAL_DAYS })}</p>}
       {c.on && <BusyCard p={p} />}
       <section className="card cal-kinds" aria-label={w("calendar.whatGoesIn")}>
         <b>{w("calendar.whatGoesIn")}</b>
@@ -214,7 +214,7 @@ export function CalendarPage({ p }: { p: AppApi }) {
         <small className="cal-say">{w("calendar.theNameTheTimeAnd")}</small>
       </section>
       {!c.on && (<>
-        <button type="button" className="pill pill-wide pill-primary cal-connect" disabled={busy || !canConnect} onClick={connect}>{busy ? (st.state === "busy" && st.total ? `Writing ${st.done ?? 0} of ${st.total}…` : "Connecting…") : w("calendar.connectGoogleCalendar")}</button>
+        <button type="button" className="pill pill-wide pill-primary cal-connect" disabled={busy || !canConnect} onClick={connect}>{busy ? (st.state === "busy" && st.total ? w("calendar.writingOf", { done: st.done ?? 0, total: st.total }) : w("calendar.connecting")) : w("calendar.connectGoogleCalendar")}</button>
         {!canConnect && <small className="muted">{w("calendar.signInWithGoogleFirst")}</small>}
         <small className="muted cal-under">{w("calendar.googleAsksYouOnceFor")}</small>
         {st.state === "error" && <p className="small cal-error" role="alert">{st.message}</p>}
@@ -246,12 +246,12 @@ function BusyCard({ p }: { p: AppApi }) {
     try {
       let token: string | null = null;
       try { token = await askToken([CAL_SCOPE, BUSY_SCOPE]); } catch { token = null; }
-      if (!token) { p.notify("Google did not give the busy times. Nothing changed."); return; }
+      if (!token) { p.notify(w("calendar.noBusyTimes")); return; }
       p.setPersonal({ ...getPersonal(), calendar: { ...(getPersonal().calendar ?? c), busy: true } });
       const from = ymd(new Date()), to = plusDays(from, CAL_DAYS - 1);
       await readBusy(token, from, to, timeZoneHere());
       log("calendar_busy", { on: true });
-      p.notify("Plan now shows when you are busy, and asks where a busy time meets a meal or training.");
+      p.notify(w("calendar.planNowShowsBusy"));
     } finally { setAsking(false); }
   };
   return (
@@ -261,7 +261,7 @@ function BusyCard({ p }: { p: AppApi }) {
         <span><b>{w("calendar.readWhenIMBusy")}</b><small>{w("calendar.busyAndFreeTimesOnly")}</small></span><Switch on={Boolean(c.busy)} />
       </button>
       <small className="cal-say">{w("calendar.withItPlanSuggestsA")}</small>
-      <small className="muted cal-under">{c.busy ? w("calendar.on2") : ""}Turning it on asks Google once more, for one more right: see when you are busy. Busy times stay on your phone: not on our server, not with your coach, not with Chef Mealan's AI.</small>
+      <small className="muted cal-under">{c.busy ? w("calendar.on2") : ""}{w("calendar.turningItOnAsks")}</small>
       {c.busy && b?.error && <p className="small cal-error" role="alert">{b.error}</p>}
       <small className="muted cal-under">{w("calendar.aChefMealanMealYou")}</small>
     </section>
@@ -279,8 +279,8 @@ export function CalendarState({ p, plan }: { p: AppApi; plan?: boolean }) {
   return (
     <div className={`cal-line ${tap ? "cal-line-tap" : ""}`} role="status" aria-label={w("calendar.googleCalendar")}>
       <span aria-hidden="true">📅</span>
-      <small>{st.state === "busy" ? (st.total ? `Writing to Google Calendar: ${st.done ?? 0} of ${st.total}.` : w("calendar.bringingGoogleCalendarUpTo")) : st.state === "error" ? `Google Calendar: ${st.message}` : tap ? `Google Calendar is waiting for your plan. One tap brings the next ${CAL_DAYS} days up to date.`
-        : plan ? `Also in your Google Calendar, ${CAL_DAYS} days ahead. A time you change here changes there.` : `Up to date${st.at ? `, ${st.at}` : ""}.`}</small>
+      <small>{st.state === "busy" ? (st.total ? w("calendar.writingToGoogle", { done: st.done ?? 0, total: st.total }) : w("calendar.bringingGoogleCalendarUpTo")) : st.state === "error" ? w("calendar.googleSays", { message: String(st.message) }) : tap ? w("calendar.waitingForYourPlan", { n: CAL_DAYS })
+        : plan ? w("calendar.alsoInYourGoogle", { n: CAL_DAYS }) : st.at ? w("calendar.upToDateAt", { time: st.at }) : w("calendar.upToDate")}</small>
       {tap && <button type="button" className="pill pill-small" disabled={busy} onClick={async () => { setBusy(true); try { await updateNow(p); } finally { setBusy(false); } }}>{w("calendar.updateGoogleCalendar")}</button>}
     </div>
   );
@@ -292,8 +292,8 @@ export function ShopOn({ p, n, value, onChange }: { p: AppApi; n: number; value?
   if (!c?.on || !kindOn(c, "shopping")) return null;
   return (
     <label className="cal-shop-on">
-      <span><b>{w("calendar.shopOn")}</b><small>Optional. Puts Shopping list {n} in your calendar.</small></span>
-      <input type="datetime-local" aria-label={`Shop on, shopping list ${n}`} value={value ?? ""} onChange={(e) => onChange(e.target.value ? e.target.value.slice(0, 16) : undefined)} />
+      <span><b>{w("calendar.shopOn")}</b><small>{w("calendar.optionalPutsList", { n })}</small></span>
+      <input type="datetime-local" aria-label={w("calendar.shopOnList", { n })} value={value ?? ""} onChange={(e) => onChange(e.target.value ? e.target.value.slice(0, 16) : undefined)} />
     </label>
   );
 }
