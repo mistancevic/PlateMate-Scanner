@@ -44,7 +44,7 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, beforeSteps = null, atStart = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null }: {
   // DT227 (0.3.61, board Stories167): a draft of this recipe saved for later on the Plate
   saved?: { sub: string; go: () => void } | null;
   // DT81: how many of its pieces the plan takes from today, for Cook it's suggestion
@@ -67,6 +67,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   makeAs?: { label: string; hint: string } | null; onPublish: (now?: boolean) => void; onDelete: ReactNode; close: () => void;
   // IM23c (0.2.23): one line for today after How was it; the recipe a changed dish was adapted from
   top?: ReactNode; openOriginal?: (() => void) | null;
+  // DT250 (0.3.99): the recipe's language, over its steps; and Start cooking's question, which takes the button's place
+  beforeSteps?: ReactNode; atStart?: ReactNode;
   // DT84 and DT85: the Made today card, under the photos; and whether the cover is the photo from the meal just made
   landing?: ReactNode; coverToday?: boolean;
   // RP1b (0.2.25): the foods the original steps were written for, so the page can say what differs
@@ -407,6 +409,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <button type="button" className="pill" onClick={saved.go}>{w("recipe.continue")}</button>
         </section>
       )}
+      {!edit && beforeSteps}
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
         <b>{w("recipe.steps")}</b>
         {edit
@@ -466,7 +469,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             with why, while there are no steps */}
         {!edit && !drafted && !makeAs && onCookIt && (() => { const n = meal.steps?.length ?? 0; return (
           <div className="rq-start">
-            <button className={`pill pill-wide${n ? " pill-primary" : ""}`} disabled={!n} onClick={() => onCookIt()}>{w("recipe.startCooking")}</button>
+            {atStart ?? <button className={`pill pill-wide${n ? " pill-primary" : ""}`} disabled={!n} onClick={() => onCookIt()}>{w("recipe.startCooking")}</button>}
             <small className="muted">{n ? `${n} ${n === 1 ? "step" : "steps"}, read aloud. Say next, back or repeat. A second phone can show them.` : `Start cooking reads the steps aloud, one at a time. It opens once the steps are here: drafted by ${CHEF_NAME} or written by you.`}</small>
           </div>); })()}
       </section>

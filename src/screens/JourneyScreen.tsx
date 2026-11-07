@@ -1,5 +1,6 @@
 import { w, wn, wIn, dec, mealV, mealName, wordV, type Val, type WordKey } from "../words";
-import { locOf, getLang, speechLang } from "../lang";
+import { locOf, getLang, speechLang, useLang } from "../lang";
+import { shownMeal } from "../recipeLang";
 import type { PlateIn } from "../chefScript";
 import { plateWhenOf, capFirst, atMeal } from "../plateMode";
 import { say } from "../chefScript";
@@ -671,7 +672,9 @@ export function JourneyScreen(p: AppApi) {
   const [sizeOpen, setSizeOpen] = useState<string | null>(null);
   // RP1c (0.2.25): Chef Mealan's steps or the original on How to make it
   const [mkView, setMkView] = useState<"own" | "orig">("own");
-  const rec = state.fromRecipe ? state.meals.find((m) => m.id === state.fromRecipe) : undefined;
+  // DT250 (0.3.99): a recipe shows, and is cooked, in the language it shows in on its page
+  const recLang = useLang();
+  const rec = (() => { const m = state.fromRecipe ? state.meals.find((x) => x.id === state.fromRecipe) : undefined; return m ? shownMeal(m, recLang) : undefined; })();
   // DT109 (0.2.93, board Stories66; Milan 23:34: chicken and rice locked as the fritters): the link to a recipe lives only
   // while at least half of its foods are on the plate. Under that, the link goes, with its optional and left-out foods, and a
   // toast says so. A plate linked before 0.2.93 has no recipeFoods: the recipe's own foods count.
@@ -1241,7 +1244,7 @@ export function JourneyScreen(p: AppApi) {
   const inCook = !!state.cook?.inView;
   const noMake = !!p.filling && plateWhen !== "now";
   // the recipe being cooked: the one that came in, or the one the plate is (its name)
-  const cookRecipe = rec ?? state.meals.find((m) => (p.filling?.mealId ? m.id === p.filling.mealId : !!state.title && m.title === state.title) && m.items.length > 0);
+  const cookRecipe = rec ?? ((m) => (m ? shownMeal(m, recLang) : m))(state.meals.find((m) => (p.filling?.mealId ? m.id === p.filling.mealId : !!state.title && m.title === state.title) && m.items.length > 0));
   const stepsOfCook = (() => {
     const pr = cookRecipe;
     return (rec?.steps?.length ? rec.steps : pr?.steps?.length ? pr.steps : heldSteps?.steps?.length ? heldSteps.steps : (methodsFor(items).find((w) => w.id === method)?.steps ?? [])).length;
@@ -2167,7 +2170,7 @@ export function JourneyScreen(p: AppApi) {
   }
 
   // the recipe the plate is: one that came in, or one of yours opened on the plate (by its slot or its name)
-  const plateRecipe = rec ?? state.meals.find((m) => (p.filling?.mealId ? m.id === p.filling.mealId : !!state.title && m.title === state.title) && m.items.length > 0);
+  const plateRecipe = rec ?? ((m) => (m ? shownMeal(m, recLang) : m))(state.meals.find((m) => (p.filling?.mealId ? m.id === p.filling.mealId : !!state.title && m.title === state.title) && m.items.length > 0));
   const wholePlate = !!rec?.makes && rec.makes.n >= 2 && pmode === "whole" && !way;
   const madeWhole = !!rec?.makes && rec.makes.n >= 2 && (wholePlate || (makeAll ?? rec.makes.n >= 4));
   // R12 (0.2.38, board RS9): the whole recipe in your portions; a plate sized for your lunch leaves lunches, not the recipe's pieces

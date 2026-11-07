@@ -639,8 +639,8 @@
       "id": "DT250",
       "title": "Offer a recipe in your language",
       "epic": "recipes",
-      "state": "next",
-      "why": "Coach Milan 7 November 06:14, to brainstorm: when a recipe is in another language than the app's (an English recipe, Srpski on), offer to translate it into the selected language. Brainstorm 07:58: c) both. A recipe from a link or a screenshot comes in already in the app's language, the original kept in the background; an older recipe in another language gets one line on its page, Show it in <language>?, Chef Mealan translates it once and it is kept, with a switch <language> / Original. Name, steps and foods not in the food table; amounts, temperatures and times stay; each food in a step stays linked. Cook mode reads the version chosen, in its voice. Chef Mealan's mark on a translation. 08:00 b): Start cooking asks once too (Cook it in <language>, or Cook it as written). Board drawn 7 November, waits for Go.",
+      "state": "done",
+      "why": "Coach Milan 7 November 06:14, to brainstorm: when a recipe is in another language than the app's (an English recipe, Srpski on), offer to translate it into the selected language. Brainstorm 07:58: c) both. A recipe from a link or a screenshot comes in already in the app's language, the original kept in the background; an older recipe in another language gets one line on its page, Show it in <language>?, Chef Mealan translates it once and it is kept, with a switch <language> / Original. Name, steps and foods not in the food table; amounts, temperatures and times stay; each food in a step stays linked. Cook mode reads the version chosen, in its voice. Chef Mealan's mark on a translation. 08:00 b): Start cooking asks once too (Cook it in <language>, or Cook it as written). Board drawn 7 November, waits for Go. Built in 0.3.99 (Go 08:05).",
       "board": 185
     }
   ]

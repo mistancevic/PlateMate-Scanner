@@ -128,6 +128,14 @@
     "secondDish": {
       "text": "{dish}, {minutes} nach {prev}. Dessert zum {meal} oder ein eigener Snack?",
       "checked": true
+    },
+    "recipeOther": {
+      "text": "Dieses Rezept ist {from}. Soll ich es dir {to} zeigen?",
+      "checked": true
+    },
+    "cookOther": {
+      "text": "Dieses Rezept ist {from}. Willst du es {to} kochen?",
+      "checked": true
     }
   },
   "safety": {
@@ -12267,6 +12275,90 @@
     },
     "make.photoN": {
       "text": "Foto {n}",
+      "checked": true
+    },
+    "recipe.trFailed": {
+      "text": "Die Übersetzung hat nicht geklappt. Das Rezept bleibt, wie es geschrieben ist. Versuch es später noch einmal.",
+      "checked": true
+    },
+    "recipe.trShowIt": {
+      "text": "{lang} zeigen",
+      "checked": true
+    },
+    "recipe.trKeepIt": {
+      "text": "{lang} lassen",
+      "checked": true
+    },
+    "recipe.trOfferHelp": {
+      "text": "Chef Mealan übersetzt es einmal und behält die Übersetzung. Das Original bleibt, einen Tipp entfernt.",
+      "checked": true
+    },
+    "recipe.trCookIt": {
+      "text": "{lang} kochen",
+      "checked": true
+    },
+    "recipe.trAsWritten": {
+      "text": "So kochen, wie es geschrieben ist",
+      "checked": true
+    },
+    "recipe.trCookHelp": {
+      "text": "Der Kochmodus liest die Schritte vor, mit einer Stimme der Sprache, die du wählst.",
+      "checked": true
+    },
+    "recipe.trWorking": {
+      "text": "Chef Mealan übersetzt…",
+      "checked": true
+    },
+    "recipe.trBy": {
+      "text": "Übersetzt von Chef Mealan. Mengen, Zeiten und Temperaturen wie im Original.",
+      "checked": true
+    },
+    "recipe.trOriginal": {
+      "text": "Original, {lang}",
+      "checked": true
+    },
+    "recipe.trFromLink": {
+      "text": "Von einem Link, {lang}.",
+      "checked": true
+    },
+    "recipe.trFromShot": {
+      "text": "Von Screenshots, {lang}.",
+      "checked": true
+    },
+    "recipe.trPageWas": {
+      "text": "Die Seite ist {lang}; Chef Mealan hat sie in deiner Sprache gelesen.",
+      "checked": true
+    },
+    "recipe.trSeeOriginal": {
+      "text": "Original ›",
+      "checked": true
+    },
+    "recipe.trWhich": {
+      "text": "In welcher Sprache das Rezept angezeigt wird",
+      "checked": true
+    },
+    "lang.inEn": {
+      "text": "auf Englisch",
+      "checked": true
+    },
+    "lang.inSr": {
+      "text": "auf Serbisch",
+      "checked": true
+    },
+    "lang.inDe": {
+      "text": "auf Deutsch",
+      "checked": true
+    },
+    "lang.nameEn": {
+      "text": "Englisch",
+      "checked": true
+    },
+    "lang.nameSr": {
+      "text": "Serbisch",
+      "checked": true
+    },
+    "lang.nameDe": {
+      "text": "Deutsch",
       "checked": true
     }
   }

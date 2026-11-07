@@ -128,6 +128,14 @@
     "secondDish": {
       "text": "{dish}, {minutes} posle obroka ({prev}). Dezert uz obrok ({meal}) ili posebna užina?",
       "checked": true
+    },
+    "recipeOther": {
+      "text": "Ovaj recept je {from}. Da ga prikažem {to}?",
+      "checked": false
+    },
+    "cookOther": {
+      "text": "Ovaj recept je {from}. Da kuvamo {to}?",
+      "checked": false
     }
   },
   "safety": {
@@ -12267,6 +12275,90 @@
     },
     "make.photoN": {
       "text": "Slika {n}",
+      "checked": false
+    },
+    "recipe.trFailed": {
+      "text": "Prevod nije uspeo. Recept ostaje kako je napisan. Pokušaj ponovo kasnije.",
+      "checked": false
+    },
+    "recipe.trShowIt": {
+      "text": "Prikaži {lang}",
+      "checked": false
+    },
+    "recipe.trKeepIt": {
+      "text": "Zadrži {lang}",
+      "checked": false
+    },
+    "recipe.trOfferHelp": {
+      "text": "Chef Mealan ga prevodi jednom i čuva prevod. Original ostaje, na jedan dodir.",
+      "checked": false
+    },
+    "recipe.trCookIt": {
+      "text": "Kuvaj {lang}",
+      "checked": false
+    },
+    "recipe.trAsWritten": {
+      "text": "Kuvaj kako je napisan",
+      "checked": false
+    },
+    "recipe.trCookHelp": {
+      "text": "Kuvanje naglas čita korake, glasom jezika koji izabereš.",
+      "checked": false
+    },
+    "recipe.trWorking": {
+      "text": "Chef Mealan prevodi…",
+      "checked": false
+    },
+    "recipe.trBy": {
+      "text": "Preveo Chef Mealan. Količine, vremena i temperature kao u originalu.",
+      "checked": false
+    },
+    "recipe.trOriginal": {
+      "text": "Original, {lang}",
+      "checked": false
+    },
+    "recipe.trFromLink": {
+      "text": "Sa linka, {lang}.",
+      "checked": false
+    },
+    "recipe.trFromShot": {
+      "text": "Sa snimaka ekrana, {lang}.",
+      "checked": false
+    },
+    "recipe.trPageWas": {
+      "text": "Stranica je {lang}; Chef Mealan ju je pročitao na tvom jeziku.",
+      "checked": false
+    },
+    "recipe.trSeeOriginal": {
+      "text": "Original ›",
+      "checked": false
+    },
+    "recipe.trWhich": {
+      "text": "Na kom jeziku se recept prikazuje",
+      "checked": false
+    },
+    "lang.inEn": {
+      "text": "na engleskom",
+      "checked": false
+    },
+    "lang.inSr": {
+      "text": "na srpskom",
+      "checked": false
+    },
+    "lang.inDe": {
+      "text": "na nemačkom",
+      "checked": false
+    },
+    "lang.nameEn": {
+      "text": "Engleski",
+      "checked": false
+    },
+    "lang.nameSr": {
+      "text": "Srpski",
+      "checked": false
+    },
+    "lang.nameDe": {
+      "text": "Nemački",
       "checked": false
     }
   }

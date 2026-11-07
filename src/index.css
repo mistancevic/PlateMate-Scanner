@@ -2951,3 +2951,8 @@ html[lang="de"] .topbar .ref { flex: 0 0 auto; min-width: auto; overflow: visibl
 .mm-small { display: block; margin: 0 0 8px; }
 /* 0.3.96 German sweep: a long German food name (Hähnchenbrust,) on a 360 px phone breaks inside the word, never past the row */
 html[lang="de"] .name-link { hyphens: auto; overflow-wrap: anywhere; }
+/* DT250 (0.3.99): a recipe in your language */
+.rq-lang { display: grid; gap: 8px; padding: 12px 14px; }
+.rq-lang-switch .choice { min-height: 44px; height: auto; white-space: normal; }
+.rq-lang-came { margin: 0; line-height: 1.45; } .rq-lang-came .link { min-height: 44px; }
+.rq-lang-offer, .rq-lang-cook { margin: 0 0 12px; }

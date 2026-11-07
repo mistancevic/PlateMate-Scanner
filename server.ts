@@ -1846,6 +1846,24 @@ app.post("/api/recipe/read", requireUser, requireMember, requireAI, async (req, 
     res.json({ recipe: r, ...(link ? { url: link } : {}), ...(photo ? { photo } : {}), ...(allGuessed ? { note: READ_TEXT["no-amounts"] } : {}) });
   } catch (error) { fail(res, error); }
 });
+// DT250 (0.3.99, board Stories185; Coach Milan 7 November, Go 08:05): a recipe in your language. Chef Mealan translates the
+// name, the steps and the names of foods not in the food table into the app's language. Each food's [[i:id|name]] token and
+// every number stay exactly as written; the app checks that and keeps the translation with the recipe.
+const LANG_WORDS: Record<string, string> = { en: "English", "sr-Latn": "Serbian, Latin script (srpski, latinica), ekavian, with the informal ti", de: "German, with the informal du" };
+const trSchema = { type: "object", properties: { title: { type: "string" }, steps: { type: "array", items: { type: "string" } }, foods: { type: "array", items: { type: "object", properties: { id: { type: "string" }, name: { type: "string" } }, required: ["id", "name"] } } }, required: ["title", "steps"] };
+app.post("/api/recipe/translate", requireUser, requireMember, requireAI, async (req, res) => {
+  try {
+    const b = req.body ?? {};
+    const to = typeof b.to === "string" && LANG_WORDS[b.to] ? b.to : null;
+    const steps = (Array.isArray(b.steps) ? b.steps : []).slice(0, 40).map((x: unknown) => String(x ?? "").slice(0, 1200));
+    if (!to || !steps.length) return res.status(400).json({ error: "A recipe with steps and a language are needed." });
+    const foods = (Array.isArray(b.foods) ? b.foods : []).slice(0, 40).map((f: any) => ({ id: String(f?.id ?? "").slice(0, 80), name: String(f?.name ?? "").slice(0, 80) })).filter((f: any) => f.id && f.name);
+    const ctx = JSON.stringify({ title: String(b.title ?? "").slice(0, 120), steps, foods });
+    const prompt = `You are Chef Mealan, a cook. Translate this recipe into ${LANG_WORDS[to]}, the way a cook in that language writes a recipe: plain, short, the same order. "title": the dish's name; keep a dish's own name (Prebranac, Gulasch, Carbonara) and add the plain words only when they help. "steps": the same number of steps, one for one. Keep every token like [[i:abc|onion]] exactly as it is, characters and all, where it fits in the sentence. Keep every number, unit and temperature exactly as written (12 minutes, 200 °C, 2 tbsp). "foods": the same ids, each name in ${LANG_WORDS[to]}. Add nothing, leave nothing out.\n${ctx}`;
+    const d = await generate(prompt, trSchema, []);
+    res.json({ title: String(d?.title ?? "").slice(0, 120), steps: Array.isArray(d?.steps) ? d.steps.map((x: unknown) => String(x ?? "")) : [], foods: Array.isArray(d?.foods) ? d.foods.filter((f: any) => foods.some((x: any) => x.id === f?.id)).map((f: any) => ({ id: String(f.id), name: String(f.name ?? "").slice(0, 80) })) : [] });
+  } catch (error) { fail(res, error); }
+});
 // Change the dish or add on the side (IM5, IM5b): Chef Mealan proposes, code checks and sets every gram
 const changeSchema = {
   type: "object",

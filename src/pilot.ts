@@ -179,6 +179,11 @@ export type Meal = {
   // steps: the original method as read (0.2.18, board IM, IM9b): for the person only, never shared or published
   // photo (0.2.44, R16): the page's own photo of the dish, an https address, for the person only, like the screenshots
   source?: { name: string; url?: string; from: "screenshot" | "link"; at: string; shotSigs?: string[]; steps?: string[]; foods?: string[]; photo?: string };
+  // DT250 (0.3.99): the recipe in another language, Chef Mealan's translation kept with it; which shows; the languages it was
+  // kept as written for (Keep it in Srpski)
+  tr?: import("./recipeLang").RecipeTr;
+  trShow?: "tr" | "orig";
+  trNo?: import("./lang").Lang[];
   // the foods Chef Mealan's steps were written for (0.2.25, RP1c): changed foods since, and a line says so
   stepsFor?: string[];
   // 0.2.96: the bowl way the steps came from (All in one, Topped, Protein first), when they did

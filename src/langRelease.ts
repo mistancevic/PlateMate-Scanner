@@ -29,6 +29,7 @@ const CHEF_WHERE: Record<string, [string, string]> = {
   busyTraining: ["The day", "Training inside a calendar block"],
   cookOpen: ["Cooking", "A new plate while a cook is open"], photoLost: ["The Plate", "A photo whose answer was lost"],
   plateFills: ["The Plate", "Fit to my target on a plate that fills its meal"], secondDish: ["The Plate", "A second photo soon after a meal"],
+  recipeOther: ["Recipes", "A recipe in another language: the offer on its page"], cookOther: ["Cooking", "Start cooking a recipe in another language"],
 };
 const SAFE_WHERE: Record<string, string> = { eating: "Eating disorder", pregnancy: "Pregnancy", diabetes: "Diabetes", allergies: "Allergies", medication: "Medication", off: "Safety notes switched off" };
 
@@ -43,8 +44,9 @@ function chefTemplate(k: string): string {
     plateAddOrNew: [2, "{title}", "{what}", false], scanWhileCooking: ["{dish}", "{food}"], useInCook: ["{food}", "{dish}"], resume: ["{dish}", "{done}"],
     howManyAte: ["{made}"], carryNow: [7], busyMeal: ["{meal}", "{time}", "{block}", "{day}"], busyLate: ["{until}", "{meal}", "{time}", 7, "{quick}", null],
     busyCarry: ["{block}", "{meal}"], busyTraining: ["{time}", "{block}", "{day}"],
-    cookOpen: ["{cook}", "{dish}"], plateFills: ["{meal}", "{kcal}"], secondDish: ["{dish}", 7, "{prev}", "{meal}"],
+    cookOpen: ["{cook}", "{dish}"], plateFills: ["{meal}", "{kcal}"], secondDish: ["{dish}", 7, "{prev}", "{meal}"], recipeOther: ["sr-Latn", "en"], cookOther: ["sr-Latn", "en"],
   };
+  if (k === "recipeOther" || k === "cookOther") return f(...args[k]).replace("in Srpski", "{from}").replace("in English", "{to}");
   return f(...args[k]).replace(whenWords(D), "{when}").replace(agoWords(D), "{ago}").replace("2 foods", "{foods}").replace("7 minutes", "{minutes}").replace("leaves {minutes}", "leaves {free} minutes");
 }
 const slotsIn = (t: string) => [...new Set([...t.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))].sort();
@@ -64,7 +66,7 @@ export function englishRows(): EnRow[] {
 // a new line's area in the tables, by the first part of its key
 const AREA_OF: [RegExp, string, string][] = [
   [/^home\./, "Home page", "The home page"], [/^(plate|make|journey|photo|ideas|fit|dish|out)\./i, "The Plate", "The Plate"],
-  [/^(today|home|carry|busy|measured)\./i, "Today", "Today"], [/^plan\./i, "Plan", "Plan"], [/^(recipe|recipes|publish|members)\./i, "Recipes", "Recipes"],
+  [/^(today|home|carry|busy|measured)\./i, "Today", "Today"], [/^plan\./i, "Plan", "Plan"], [/^(recipe|recipes|publish|members|lang)\./i, "Recipes", "Recipes"],
   [/^(cook|cooking|cookmode)\./i, "Cooking", "Cooking"], [/^(foods|food)\./i, "Foods", "Foods"], [/^(summary|share)\./i, "Your summary and the coach", "Your summary"],
   [/^(coach|client)\./i, "Clients", "Clients"], [/^(menu|settings|langpanel|voice)\./i, "Menu and settings", "Settings"],
 ];

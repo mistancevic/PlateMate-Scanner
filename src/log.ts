@@ -42,6 +42,7 @@ export type LogEvent =
   | "members"        // data.how = open | make | keep | share
   // a recipe from a screenshot or a link (0.2.16, board IM)
   | "recipe_in"      // data.how = shot | link, data.result = read | plate | login | fetch | no-recipe | not-recipe
+  | "recipe_translate" // DT250 (0.3.99): data.auto, data.from, data.to, or data.failed
   | "recipe_fit"     // data.way = change | side, data.result = shown | failed | yes | ok | no
   | "parts"          // data.how = leave | change | set (0.2.19, boards IM15 to IM18)
   | "can_oil"        // the oil of a can on the Plate (DT82): data.how = none | spoon | all
