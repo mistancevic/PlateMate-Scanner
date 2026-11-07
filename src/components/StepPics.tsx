@@ -2,7 +2,7 @@
 // the camera or the gallery (a photo while cooking, or one made in ChatGPT or Gemini with the Step Picture Checks prompts);
 // who made it is asked, and the checks show before it is kept. Watch the steps plays them, made on the phone from the
 // pictures: no video file. Labels sit under a picture, never on it; nothing under 12 px; every button 44 px or more.
-import { w, wIn, type Val, type WordKey } from "../words";
+import { w, wIn, wordV, type Val, type WordKey } from "../words";
 import { ChefLine } from "./ChefLine";
 import { say } from "../chefScript";
 import { useEffect, useRef, useState } from "react";
@@ -148,6 +148,39 @@ export function StepPlayer({ title, steps, items, pics, onClose, onCook }: {
       </div>
       {onCook && <button className="pill pill-wide" style={{ height: 52 }} onClick={onCook}>{w("steppics.startCooking")}</button>}
       <small className="muted cook-under">{w("steppics.madeOnYourPhoneFrom")}</small>
+    </div>
+  );
+}
+
+// DT254 (0.3.105, board Stories187; Coach Milan 7 November 12:16 to 13:24, Go): the cover is the recipe's video. A recipe whose
+// every step has a picture: the page opens and the cover plays the steps once, one picture every 5 seconds, without sound, then
+// rests on the cover with ▶ in the middle; a tap on ▶ plays it again. Under the picture, never on it: the steps as a thin bar
+// and which step. A tap while it plays opens the player with the words. A phone set to reduce motion does not play by itself.
+const calm = () => { try { return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false; } catch { return false; } };
+export function CoverVideo({ title, pics, cover, coverAlt, marks, onWords }: {
+  title: string; pics: StepPic[]; cover: string; coverAlt: string; marks?: React.ReactNode; onWords: () => void;
+}) {
+  const PER = 5;
+  const [k, setK] = useState(0);
+  const [playing, setPlaying] = useState(() => !calm());
+  const [t, setT] = useState(0);
+  useEffect(() => { if (!playing) return; const id = setInterval(() => setT((x) => x + 0.25), 250); return () => clearInterval(id); }, [playing]);
+  useEffect(() => { if (t < PER) return; if (k >= pics.length - 1) { setPlaying(false); setT(0); setK(0); return; } setK(k + 1); setT(0); }, [t]); // eslint-disable-line react-hooks/exhaustive-deps
+  const play = () => { setK(0); setT(0); setPlaying(true); };
+  return (
+    <div className={`rq-video${playing ? " playing" : ""}`}>
+      <figure className="rq-hero rq-hero-video">
+        {playing
+          ? <button type="button" className="rq-video-pic" onClick={() => { setPlaying(false); setT(0); setK(0); onWords(); }} aria-label={w("recipe.videoTapWords", { title })}><img src={pics[k].src} alt={w("steppics.stepN", { n: k + 1 })} /></button>
+          : <button type="button" className="rq-video-pic" onClick={play} aria-label={w("recipe.videoPlay", { title })}><img src={cover} alt={coverAlt} /><span className="watch-play" aria-hidden="true">▶</span></button>}
+        {!playing && marks}
+      </figure>
+      <div className="rq-video-under">
+        <div className="rq-video-bar" aria-hidden="true">{pics.map((_, j) => <span key={j} className={j < k || !playing ? "on" : ""} style={playing && j === k ? { background: `linear-gradient(90deg, var(--brand) ${Math.round((t / PER) * 100)}%, var(--line) ${Math.round((t / PER) * 100)}%)` } : undefined} />)}</div>
+        {playing
+          ? <small className="rq-video-step" aria-live="polite">{w("recipe.videoStepOf", { n: k + 1, of: pics.length })}</small>
+          : <div className="rq-video-rest"><button type="button" className="link" onClick={onWords}>{w("recipe.videoWatchWords")}</button><small className="muted">{w("recipe.watchStepsLength", { n: pics.length, seconds: pics.length * PER, ai: pics.some((p) => p.by === "ai") ? wordV("recipe.watchStepsAi") : "" })}</small></div>}
+      </div>
     </div>
   );
 }

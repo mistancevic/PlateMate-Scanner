@@ -51,7 +51,7 @@ import { resizeImageBase64 } from "../utils/image";
 import { type PubState } from "../components/RecipePage";
 import { LangRecipePage } from "../components/RecipeLang";
 import { fromDraft } from "../steps";
-import { recipePhotosOf, recipeHasPhotos, sig } from "../photos";
+import { recipePhotosOf, recipeHasPhotos, sig, allStepPics, stepPicOf } from "../photos";
 import { coverIsDrawn, isDrawnPhoto } from "../covers";
 import { MemberPage, MemberTile, SharePanel, aheadOf, membersLead, rowOfShared, MEMBERS_CACHE, forgetMembers } from "../components/Members";
 import { sharedOf, contentSig, type SharedRecipe } from "../members";
@@ -206,10 +206,14 @@ export function RecipesScreen(p: AppApi) {
   const mealTile = (m: Meal) => {
     // R7: one tap per recipe: the cover (or the newest plate photo), the name, the foods, where the recipe is
     const own = recipePhotosOf(m), photo = own[0] ?? photoOf(m), n = madeTimes(m), rating = lastRating(m);
+    const vid = (m.steps?.length ?? 0) > 0 && allStepPics(m, m.steps!) ? stepPicOf(m, m.steps![m.steps!.length - 1])!.src : null;
     const st = isCoach ? pubState(m.id, Boolean(m.publish)) : null;
     return (
       <button type="button" className="card recipe-tile" key={m.id} onClick={() => setOpenId(m.id)} aria-label={w("recipes.open", { title: m.title })}>
-        {photo
+        {/* DT254 (0.3.105, board Stories187; Coach Milan 13:06): a recipe with a steps video has ▶ in the middle of its cover */}
+        {vid
+          ? <span className="recipe-tile-cover"><img src={photo ?? vid} alt="" />{coverIsDrawn(m) && own[0] === photo && <span className="tile-drawn">{w("recipes.drawnByChef")}</span>}<span className="tile-play" aria-hidden="true">▶</span></span>
+          : photo
           ? (coverIsDrawn(m) && own[0] === photo ? <span className="recipe-tile-cover"><img src={photo} alt="" /><span className="tile-drawn">{w("recipes.drawnByChef")}</span></span> : <img src={photo} alt="" />)
           : <div className="recipe-tile-blank"><span><Utensils size={28} />{m.cover?.state === "tomorrow" && <small>{w("recipes.pictureTomorrow")}</small>}</span></div>}
         <div className="recipe-tile-body">

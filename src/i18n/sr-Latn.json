@@ -20956,6 +20956,22 @@
     "cookmode.toStep1": {
       "text": "Korak 1 ›",
       "checked": false
+    },
+    "recipe.videoStepOf": {
+      "text": "KORAK {n} OD {of} · BEZ ZVUKA · DODIRNI ZA TEKST",
+      "checked": false
+    },
+    "recipe.videoTapWords": {
+      "text": "Koraci se puštaju: {title}. Dodirni za tekst",
+      "checked": false
+    },
+    "recipe.videoPlay": {
+      "text": "Pusti korake: {title}",
+      "checked": false
+    },
+    "recipe.videoWatchWords": {
+      "text": "Gledaj uz tekst ›",
+      "checked": false
     }
   }
 }

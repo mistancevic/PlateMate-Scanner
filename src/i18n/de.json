@@ -20956,6 +20956,22 @@
     "cookmode.toStep1": {
       "text": "Schritt 1 ›",
       "checked": true
+    },
+    "recipe.videoStepOf": {
+      "text": "SCHRITT {n} VON {of} · OHNE TON · TIPPEN FÜR DEN TEXT",
+      "checked": true
+    },
+    "recipe.videoTapWords": {
+      "text": "Die Schritte von {title} laufen. Tippen für den Text",
+      "checked": true
+    },
+    "recipe.videoPlay": {
+      "text": "Schritte von {title} abspielen",
+      "checked": true
+    },
+    "recipe.videoWatchWords": {
+      "text": "Mit Text ansehen ›",
+      "checked": true
     }
   }
 }

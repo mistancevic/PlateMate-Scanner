@@ -1,6 +1,6 @@
 {
-  "release": "0.3.104",
-  "at": "2026-11-07T11:38:50.689Z",
+  "release": "0.3.105",
+  "at": "2026-11-07T12:43:53.911Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -40619,6 +40619,81 @@
       "release": "0.3.104",
       "order": 900006,
       "at": "2026-11-07T11:38:50.689Z"
+    },
+    {
+      "id": "screen.recipe.videoStepOf",
+      "kind": "screen",
+      "key": "recipe.videoStepOf",
+      "en": "STEP {n} OF {of} · NO SOUND · TAP FOR THE WORDS",
+      "forms": "plain",
+      "slots": [
+        "n",
+        "of"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "KORAK {n} OD {of} · BEZ ZVUKA · DODIRNI ZA TEKST",
+      "de": "SCHRITT {n} VON {of} · OHNE TON · TIPPEN FÜR DEN TEXT",
+      "checked": false,
+      "beta": true,
+      "release": "0.3.105",
+      "order": 900000,
+      "at": "2026-11-07T12:43:53.911Z"
+    },
+    {
+      "id": "screen.recipe.videoTapWords",
+      "kind": "screen",
+      "key": "recipe.videoTapWords",
+      "en": "The steps of {title}, playing. Tap for the words",
+      "forms": "plain",
+      "slots": [
+        "title"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Koraci se puštaju: {title}. Dodirni za tekst",
+      "de": "Die Schritte von {title} laufen. Tippen für den Text",
+      "checked": false,
+      "beta": true,
+      "release": "0.3.105",
+      "order": 900001,
+      "at": "2026-11-07T12:43:53.911Z"
+    },
+    {
+      "id": "screen.recipe.videoPlay",
+      "kind": "screen",
+      "key": "recipe.videoPlay",
+      "en": "Play the steps of {title}",
+      "forms": "plain",
+      "slots": [
+        "title"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Pusti korake: {title}",
+      "de": "Schritte von {title} abspielen",
+      "checked": false,
+      "beta": true,
+      "release": "0.3.105",
+      "order": 900002,
+      "at": "2026-11-07T12:43:53.911Z"
+    },
+    {
+      "id": "screen.recipe.videoWatchWords",
+      "kind": "screen",
+      "key": "recipe.videoWatchWords",
+      "en": "Watch with the words ›",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Gledaj uz tekst ›",
+      "de": "Mit Text ansehen ›",
+      "checked": false,
+      "beta": true,
+      "release": "0.3.105",
+      "order": 900003,
+      "at": "2026-11-07T12:43:53.911Z"
     }
   ]
 }

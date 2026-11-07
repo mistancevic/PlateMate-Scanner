@@ -75,7 +75,10 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     const small = await page.evaluate(() => Math.min(...[...document.querySelectorAll(".rq-step-pic small")].map((x) => parseFloat(getComputedStyle(x).fontSize))));
     ok(small >= 12, "labels 12 px or more: " + small);
     if (process.env.SHOTS) await page.screenshot({ path: process.env.SHOTS + "/sp-recipe.png", fullPage: true });
-    ok(await page.locator(".watch-card").count() === 1 && /6 steps, about 30 seconds · pictures drawn by AI, Beta/.test(await page.locator(".watch-card").textContent()), "Watch the steps appears, on the recipe");
+    // DT254 (0.3.105): the cover is the video: it plays the steps once, then rests on the cover with ▶ in the middle
+    ok(await page.locator(".rq-video.playing").count() === 1 && /STEP 1 OF 6 · NO SOUND/.test(await page.locator(".rq-video").textContent()), "the cover plays the steps, without sound, which step under it");
+    await page.clock.runFor(31000); await page.waitForTimeout(300);
+    ok(await page.locator(".rq-video.playing").count() === 0 && await page.locator(".rq-video .watch-play").count() === 1 && /6 steps, about 30 seconds · pictures drawn by AI, Beta/.test(await page.locator(".rq-video").textContent()), "then it rests on the cover, ▶ in the middle; 6 steps, about 30 seconds, drawn by AI");
     // the pictures are files: a reload brings them back from the photo store, and the saved data holds fingerprints
     await page.waitForTimeout(2500);
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.find((m) => m.id === "m-bowl"));
@@ -83,7 +86,7 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     await toRecipe();
     ok(await page.locator(".rq-step-pic img").count() === 6, "after a reload the six pictures are back");
     // Watch the steps
-    await page.getByRole("button", { name: "Watch the steps" }).first().click(); await page.waitForTimeout(400);
+    await page.getByRole("button", { name: "Watch with the words ›" }).first().click(); await page.waitForTimeout(400);
     const pl = page.locator(".sp-player");
     ok(await pl.count() === 1 && /STEP 1 OF 6 · TIMER 12:00/.test(await pl.textContent()) && /Picture drawn by AI, Beta/.test(await pl.locator(".sp-words").textContent()), "it plays from step 1, the words, the timer and the label under the picture");
     await page.clock.runFor(5300); await page.waitForTimeout(300);
@@ -116,7 +119,7 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     await toRecipe();
     await page.getByRole("button", { name: "Change or remove the photo of step 3" }).click(); await page.waitForTimeout(300);
     await page.locator(".sp-sheet").getByRole("button", { name: "Remove this picture" }).click(); await page.waitForTimeout(400);
-    ok(await page.locator(".rq-step-pic img").count() === 5 && await page.locator(".watch-card").count() === 0, "a picture removed: five left, Watch the steps waits for the sixth");
+    ok(await page.locator(".rq-step-pic img").count() === 5 && await page.locator(".rq-video").count() === 0, "a picture removed: five left, the cover is a photo again until the sixth");
     // a step rewritten loses its picture; the others follow their words
     await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(400);
     const f1 = page.getByRole("textbox", { name: "Step 1", exact: true });
