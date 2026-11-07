@@ -624,7 +624,14 @@
       "title": "Voice in the app's language",
       "epic": "cooking",
       "state": "later",
-      "why": "Coach Milan 7 November 05:54 (test with Darinka, Srpski UI, English recipe, a loud room): voice felt English only. Check: cook mode listens in the app's language (sr-RS) and hears Srpski, English and German commands; Chef Mealan's answers are spoken in the app's language. Still English: every fixed line cook mode says (Step 1., Done. Enjoy your meal., the timer is done, Sorry, say that again?, This recipe has N steps, the how-much answers) and its English voice; the step's own words are read with an English voice whatever language the recipe is in; Say what you have on the Plate listens in English only (en-GB)."
+      "why": "Coach Milan 7 November 05:54 (test with Darinka, Srpski UI, English recipe, a loud room): voice felt English only. Check: cook mode listens in the app's language (sr-RS) and hears Srpski, English and German commands; Chef Mealan's answers are spoken in the app's language. Still English: every fixed line cook mode says (Step 1., Done. Enjoy your meal., the timer is done, Sorry, say that again?, This recipe has N steps, the how-much answers) and its English voice; the step's own words are read with an English voice whatever language the recipe is in; Say what you have on the Plate listens in English only (en-GB). Its own item, with a board (Milan 06:01)."
+    },
+    {
+      "id": "DT249",
+      "title": "The meal's photos on the Plate: the photo as it is, the foods under it, every photo seen",
+      "epic": "plate",
+      "state": "later",
+      "why": "Coach Milan 7 November 06:01, to brainstorm: the foods read are drawn over the photo; show them under it so the photo stays as it is, above all with two photos. Now: the large photo is cut to 9:7 with the foods over its lower part; the other photos of the meal (up to 3, sent with Read it again) show only inside Help Chef Mealan read it, folded under a link."
     }
   ]
 }
