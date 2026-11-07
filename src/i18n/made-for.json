@@ -5242,6 +5242,14 @@
     "screen.recipe.videoStepOf": {"en":"STEP {n} OF {of} · NO SOUND · TAP FOR THE WORDS","area":"Recipes","where":"Recipes","release":"0.3.105"},
     "screen.recipe.videoTapWords": {"en":"The steps of {title}, playing. Tap for the words","area":"Recipes","where":"Recipes","release":"0.3.105"},
     "screen.recipe.videoPlay": {"en":"Play the steps of {title}","area":"Recipes","where":"Recipes","release":"0.3.105"},
-    "screen.recipe.videoWatchWords": {"en":"Watch with the words ›","area":"Recipes","where":"Recipes","release":"0.3.105"}
+    "screen.recipe.videoWatchWords": {"en":"Watch with the words ›","area":"Recipes","where":"Recipes","release":"0.3.105"},
+    "screen.home.langEyebrow": {"en":"In your language","area":"Home page","where":"The home page","release":"0.3.108"},
+    "screen.home.langTitle": {"en":"Chef Mealan is multilingual","area":"Home page","where":"The home page","release":"0.3.108"},
+    "screen.home.lang1": {"en":"The whole app in your language: switch it in Menu, Settings.","area":"Home page","where":"The home page","release":"0.3.108"},
+    "screen.home.lang2": {"en":"A recipe from a link or a screenshot comes in your language; the original stays one tap away.","area":"Home page","where":"The home page","release":"0.3.108"},
+    "screen.home.lang3": {"en":"A recipe in another language: Chef Mealan offers it in yours, once.","area":"Home page","where":"The home page","release":"0.3.108"},
+    "screen.home.lang4": {"en":"Cooking: the steps read aloud in your language, and it listens in it.","area":"Home page","where":"The home page","release":"0.3.108"},
+    "screen.home.langNote": {"en":"Deutsch is in Beta: a German speaker checks it as we go. More languages join this list as they come.","area":"Home page","where":"The home page","release":"0.3.108"},
+    "screen.home.videoLang": {"en":"Chef Mealan in English, Srpski and Deutsch","area":"Home page","where":"The home page","release":"0.3.108"}
   }
 }

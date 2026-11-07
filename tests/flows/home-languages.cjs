@@ -37,6 +37,8 @@ const PORT = "3400", U = `http://127.0.0.1:${PORT}`;
     ok(await headFits(p), "in German the header fits a 390 px phone");
     const clips = await p.locator("video source").evaluateAll((es) => es.map((e) => e.getAttribute("src")));
     ok(clips.length > 0 && clips.every((s) => /^\/landing\/way-/.test(s)), "the clips stay as they are");
+    // DT253: the languages block names each language in its own words, on every page
+    ok((await p.locator(".l-langs li").allTextContents()).join("|") === "English|Srpski|Deutsch · Beta", "in German the languages block still names English, Srpski, Deutsch · Beta");
     await p.context().close();
     // a German phone: the box once, Auf Deutsch
     p = await open("de-DE"); await p.goto(U + "/?home"); await p.waitForTimeout(1500);

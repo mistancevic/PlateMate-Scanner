@@ -60,7 +60,14 @@ const PORT = "3319", U = `http://127.0.0.1:${PORT}`;
     ok(/^Product and recipe builder, and the maker of Chef Mealan\.$/.test((await page.locator(".l-behind .l-role").textContent()).trim()), "Milan's line from the book cover");
     // Coach Milan 14:06: the situations section is Explorer, and says so
     const eyebrows = await page.locator(".l-new .l-eyebrow").allTextContents();
-    ok(eyebrows.join("|") === "Cook|Explorer · Situations|Explorer · The body and nutrients", "the new sections' labels: " + eyebrows.join(", "));
+    ok(eyebrows.join("|") === "Cook|Explorer · Situations|Explorer · The body and nutrients|In your language", "the new sections' labels: " + eyebrows.join(", "));
+    // DT253 (board Stories188): the languages as chips from the switch's list, plain labels at 15 px; four lines, the note, the clip
+    const chips = await page.locator(".l-new .l-langs li").evaluateAll((es) => es.map((e) => ({ t: e.textContent.trim(), fs: getComputedStyle(e).fontSize, button: Boolean(e.closest("button") || e.querySelector("button")) })));
+    ok(chips.map((c) => c.t).join("|") === "English|Srpski|Deutsch · Beta" && chips.every((c) => c.fs === "15px" && !c.button), "the languages as chips, 15 px, not buttons: " + chips.map((c) => c.t).join(", "));
+    ok(h2.includes("Chef Mealan is multilingual") && (await page.locator(".l-new .l-langs + .l-list li").count()) === 4 && /Deutsch is in Beta: a German speaker checks it as we go\./.test(await txt(".l-lang-note")), "In your language: the title, four lines, the Beta note");
+    const lr = await fetch(U + "/landing/way-languages.mp4", { method: "HEAD" });
+    const lp = await fetch(U + "/landing/way-languages.webp", { method: "HEAD" });
+    ok(vids.includes("/landing/way-languages.mp4") && lr.ok && /video\/mp4/.test(lr.headers.get("content-type") || "") && /image\/webp/.test(lp.headers.get("content-type") || ""), "the languages clip and its poster are on the page and served as a video and an image");
     ok(/Papers read again/.test(await txt(".l-built")) && /Nothing kept for nothing/.test(await txt(".l-built")), "two more trust lines");
     // Coaches scrolls to the coach section; Get a coach code opens the beta form as a coach
     await page.getByRole("button", { name: "Coaches", exact: true }).click(); await page.waitForTimeout(2500);

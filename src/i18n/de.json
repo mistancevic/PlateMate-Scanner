@@ -20972,6 +20972,38 @@
     "recipe.videoWatchWords": {
       "text": "Mit Text ansehen ›",
       "checked": true
+    },
+    "home.langEyebrow": {
+      "text": "In deiner Sprache",
+      "checked": true
+    },
+    "home.langTitle": {
+      "text": "Chef Mealan ist mehrsprachig",
+      "checked": true
+    },
+    "home.lang1": {
+      "text": "Die ganze App in deiner Sprache: Stell sie unter Menü, Einstellungen um.",
+      "checked": true
+    },
+    "home.lang2": {
+      "text": "Ein Rezept aus einem Link oder Screenshot kommt in deiner Sprache; das Original ist einen Tipp entfernt.",
+      "checked": true
+    },
+    "home.lang3": {
+      "text": "Ein Rezept in einer anderen Sprache: Chef Mealan bietet es dir einmal in deiner an.",
+      "checked": true
+    },
+    "home.lang4": {
+      "text": "Kochen: Die Schritte werden in deiner Sprache vorgelesen, und die App hört in ihr zu.",
+      "checked": true
+    },
+    "home.langNote": {
+      "text": "Deutsch ist in der Beta: Eine Person mit Deutsch als Muttersprache prüft es laufend. Weitere Sprachen kommen auf diese Liste, sobald es sie gibt.",
+      "checked": true
+    },
+    "home.videoLang": {
+      "text": "Chef Mealan auf Englisch, Serbisch und Deutsch",
+      "checked": true
     }
   }
 }

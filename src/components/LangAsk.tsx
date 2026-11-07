@@ -1,7 +1,7 @@
 // DT236 v3 (0.3.93, boards Stories177 and Stories180): the language switch in the home page's header, and the box once.
 // The switch shows the language that is on (EN, SR, DE); a tap opens all three, the one on ticked. The choice is the app's too.
 import { useEffect, useRef, useState } from "react";
-import { useLang, setLang, LANG_NAMES, type Lang } from "../lang";
+import { useLang, setLang, LANG_NAMES, LANGS, type Lang } from "../lang";
 import { w } from "../words";
 import { ASKS, ASK_NO, ASKED_KEY, askFor } from "../langAsk";
 
@@ -25,7 +25,7 @@ export function LangSwitch() {
       <button type="button" className="lang-switch-btn" aria-haspopup="menu" aria-expanded={open} aria-label={`${w("home.language")}: ${LANG_NAMES[on]}`} onClick={() => setOpen((o) => !o)}>{SHORT[on]}</button>
       {open && (
         <span className="lang-switch-menu" role="menu">
-          {(["en", "sr-Latn", "de"] as Lang[]).map((l) => (
+          {LANGS.map((l) => (
             <button key={l} type="button" role="menuitemradio" aria-checked={l === on} className={l === on ? "on" : ""} onClick={() => { choose(l); setOpen(false); }}>
               <span aria-hidden="true">{l === on ? "✓" : ""}</span>{LANG_NAMES[l]}
             </button>
