@@ -679,8 +679,8 @@
       "id": "DT255",
       "title": "Voice commands in Srpski and German: timers, what is left, steps, foods in any ending",
       "epic": "cooking",
-      "state": "next",
-      "why": "Coach Milan 7 November 22:17 to 22:20, from the DT203 gaps: cook mode in Srpski or German does not set a timer by voice, says nothing for what is left, goes to no step by number, finds a food only as written, and a step's minutes get no timer button. Board 190 drawn 22:22, waits for Go.",
+      "state": "done",
+      "why": "Coach Milan 7 November 22:17 to 22:20, from the DT203 gaps: cook mode in Srpski or German does not set a timer by voice, says nothing for what is left, goes to no step by number, finds a food only as written, and a step's minutes get no timer button. Board 190 drawn 22:22, Go 22:25; built in 0.3.110.",
       "board": 190
     }
   ]

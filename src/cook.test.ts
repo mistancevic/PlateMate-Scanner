@@ -135,3 +135,42 @@ test("DT221: Sorry, say that again?; the words you can say name a food of this s
   assert.match(canSayLine("Cook the basmati 12 minutes.", items), /how much basmati,/);
   assert.match(canSayLine("Serve.", []), /how much and a food,/);
 });
+
+// DT255 (0.3.110, board Stories190; Coach Milan 7 November 22:25 Go): the commands in Srpski and German
+test("DT255: a step's minutes in Srpski and German get their timer", () => {
+  assert.equal(secondsIn("Iseci luk i propržite ga 10 minuta, dok ne omekša."), 600);
+  assert.equal(secondsIn("peci 40 minuta na 200 °C"), 2400);
+  assert.equal(secondsIn("kuvaj pola sata"), 1800);
+  assert.equal(secondsIn("Brate sie 10 Minuten im Öl."), 600);
+  assert.equal(secondsIn("Backe es eine halbe Stunde."), 1800);
+  assert.equal(secondsIn("6 bis 8 Minuten"), 360);
+  assert.equal(secondsIn("kuvaj 1 sat"), 3600);
+  assert.equal(secondsIn("Cook the rice for 12 minutes."), 720, "English as before");
+});
+test("DT255: a timer, what is left and a step, by voice in Srpski and German", () => {
+  assert.deepEqual(parseCommand("tajmer 5 minuta"), { kind: "timer", seconds: 300 });
+  assert.deepEqual(parseCommand("podesi tajmer na 10 minuta"), { kind: "timer", seconds: 600 });
+  assert.deepEqual(parseCommand("tajmer pet minuta"), { kind: "timer", seconds: 300 });
+  assert.deepEqual(parseCommand("Timer 5 Minuten"), { kind: "timer", seconds: 300 });
+  assert.deepEqual(parseCommand("Timer auf zehn Minuten"), { kind: "timer", seconds: 600 });
+  assert.equal(parseCommand("šta je ostalo").kind, "left");
+  assert.equal(parseCommand("šta je još ostalo").kind, "left");
+  assert.equal(parseCommand("koliko je ostalo").kind, "left");
+  assert.equal(parseCommand("was fehlt noch").kind, "left");
+  assert.equal(parseCommand("was kommt noch").kind, "left");
+  assert.deepEqual(parseCommand("korak 2"), { kind: "goto", step: 2 });
+  assert.deepEqual(parseCommand("idi na korak dva"), { kind: "goto", step: 2 });
+  assert.deepEqual(parseCommand("zu Schritt 3"), { kind: "goto", step: 3 });
+  assert.deepEqual(parseCommand("Schritt zwei"), { kind: "goto", step: 2 });
+  assert.equal(parseCommand("dalje").kind, "next", "the rest as before");
+  assert.equal(parseCommand("koliko pasulja").kind, "howMuch");
+});
+test("DT255: a food by voice whatever its ending", () => {
+  const f = (id: string, name: string, grams: number) => ({ id, grams, locked: false, food: { id, name, brand: "", basis: "100g", source: "test", calories: 100, protein: 5 } }) as any;
+  const items = [f("i0", "Pasulj, kuvan", 250), f("i1", "Crni luk", 120), f("i2", "Suncokretovo ulje", 15), f("z", "Zwiebel", 80)];
+  const steps = ["Iseci [[i:i1|crni luk]] na [[i:i2|ulju]].", "Dodaj [[i:i0|pasulj]]."];
+  assert.match(howMuch("pasulja", steps, items), /^250 g pasulj\. .*2/);
+  assert.match(howMuch("luka", steps, items), /^120 g crni luk/);
+  assert.match(howMuch("ulja", steps, items), /^15 g suncokretovo ulje/);
+  assert.match(howMuch("Zwiebeln", steps, items), /^80 g zwiebel/);
+});

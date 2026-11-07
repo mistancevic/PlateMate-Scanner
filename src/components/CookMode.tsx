@@ -11,7 +11,7 @@ import { stepParts, stepText, tokenOf, TOKEN } from "../steps";
 import { tempsIn } from "../units";
 import { utterance, voiceSettings } from "../voiceSettings";
 import { VoiceSettingsPanel } from "./VoiceSettings";
-import { secondsIn, timerName, parseCommand, howMuch, leftSay, spoken, sayAgain, timeSaid, clock, voiceChoice, setVoiceChoice, isEcho, cutsIn, movesFor, SAY_AGAIN, canSayLine, type VoiceChoice } from "../cook";
+import { secondsIn, timerName, parseCommand, howMuch, shownName, leftSay, spoken, sayAgain, timeSaid, clock, voiceChoice, setVoiceChoice, isEcho, cutsIn, movesFor, SAY_AGAIN, canSayLine, type VoiceChoice } from "../cook";
 
 // DT222: how many steps and, when the cook's start is known, how long it took
 export function tookLine(n: number, since?: string, now = Date.now()): string {
@@ -128,7 +128,8 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   // DT251 fix (0.3.106; Coach Milan 13:51 Go): a food is named as the steps on screen name it (a translated recipe: Bohnen, not
   // pasulj); a food no step names keeps its own short name
   const stepName = new Map<string, string>(); for (const s of steps) for (const mt of s.matchAll(TOKEN)) if (!stepName.has(mt[1])) stepName.set(mt[1], mt[2]);
-  const readyToken = (i: Ingredient) => (stepName.has(i.id) ? `[[i:${i.id}|${stepName.get(i.id)}]]` : tokenOf(i));
+  // DT255: a step's word in another case (na ulju) is the same food: its own name is shown (ulje)
+  const readyToken = (i: Ingredient) => (stepName.has(i.id) ? `[[i:${i.id}|${shownName(i, stepName.get(i.id))}]]` : tokenOf(i));
   const sayAllReady = () => say(`${w("cookmode.allReady")} ${w("cookmode.step1Next")}`);
   useEffect(() => { if (prep && pAt >= 0) sayFood(pAt, pAt === 0 && put.size === 0); }, [pAt, prep, voice]); // eslint-disable-line react-hooks/exhaustive-deps
   const nextUnput = (from: number, s: Set<string>) => { for (let j = 0; j < readyFoods.length; j++) { const x = (from + j) % readyFoods.length; if (!s.has(readyFoods[x].id)) return x; } return -1; };
