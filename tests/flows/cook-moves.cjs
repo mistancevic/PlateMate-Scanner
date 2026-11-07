@@ -77,7 +77,7 @@ const PORT = "3345", B = `http://127.0.0.1:${PORT}`;
     // DT222 (0.3.60, board Stories165): done leads to Eat: the meal's photo, big, then Cooked. Next: Eat; Make is a small link
     ok(/Done\. Enjoy your meal\./.test(await cm.locator(".cook-done").textContent()) && /^3 steps(, \d+ minutes?)?\. Now a photo of your plate, then eat\.$/.test(await cm.locator(".cook-done small").textContent()) && !/On Make: add photos/.test(await cm.textContent()), "DT222: done, the steps, and the next step; no paragraph: " + await cm.locator(".cook-done small").textContent());
     ok(await cm.locator(".cook-meal-take").count() === 1 && await cm.getByRole("button", { name: "Cooked. Next: Eat ›" }).count() === 1 && await cm.getByRole("button", { name: "‹ Last step" }).count() === 1 && await cm.getByRole("button", { name: "Make: step photos and notes ›" }).count() === 1, "DT222: Photo of your meal, Cooked. Next: Eat, and two small links");
-    await cm.locator(".cook-meal-take input").setInputFiles(path.resolve(__dirname, "plate.jpg")); await page.waitForTimeout(900);
+    await cm.locator(".cook-meal-take").click(); await cm.locator(".pp-camera input").setInputFiles(path.resolve(__dirname, "plate.jpg")); await page.waitForTimeout(900);
     ok(await cm.locator(".cook-meal-shot img").count() === 1 && await cm.locator(".cook-meal-take").count() === 0 && /Take it again/.test(await cm.locator(".cook-meal-shot").textContent()), "DT222: the photo shows, Take it again under it");
     await cm.getByRole("button", { name: "Cooked. Next: Eat ›" }).click(); await page.waitForTimeout(700);
     ok(await page.locator(".cook-mode").count() === 0 && /Eat: how was it\?/.test(await page.locator("h2").first().textContent()) && await page.locator("main img[src^='data:image']").count() > 0, "DT222: Cooked. Next: Eat opens Eat, with the meal's photo");
@@ -91,7 +91,7 @@ const PORT = "3345", B = `http://127.0.0.1:${PORT}`;
     ok(await c2.locator(".cook-moves").count() === 0 && await c2.getByRole("button", { name: /Start 12 min timer/ }).count() === 1, "step 1, one food: the step itself, with its timer");
     // DT223 (0.3.60, board Stories165): a step without a picture has Add a photo of this step; the photo is kept with the recipe
     ok(await c2.locator(".cook-add-pic").count() === 1 && /📷 Add a photo of this step/.test(await c2.locator(".cook-add-pic").textContent()), "DT223: a step without a picture: Add a photo of this step");
-    await c2.locator(".cook-add-pic input").setInputFiles(path.resolve(__dirname, "plate.jpg")); await page.waitForTimeout(1000);
+    await c2.locator(".cook-add-pic").click(); await c2.locator(".pp-camera input").setInputFiles(path.resolve(__dirname, "plate.jpg")); await page.waitForTimeout(1000);
     const kept = (await store(page)).meals.find((m) => m.id === "m-bowl");
     ok(await c2.locator(".cook-pic").count() === 1 && /Your photo · kept with the recipe/.test(await c2.locator(".cook-pic-label").textContent()) && /Take it again/.test(await c2.locator(".cook-pic-label").textContent()) && await c2.locator(".cook-add-pic").count() === 0 && kept.stepPicMeta?.[0]?.by === "me", "DT223: the photo on top of its step, kept with the recipe; Take it again");
     await c2.getByRole("button", { name: /Next/ }).click(); await c2.getByRole("button", { name: /Next/ }).click(); await page.waitForTimeout(200);

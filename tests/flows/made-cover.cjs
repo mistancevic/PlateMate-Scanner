@@ -28,7 +28,7 @@ seed.meals = [bowl("bowl", "Chicken rice bowl"), bowl("mine", "Rice bowl with a 
     await page.getByRole("button", { name: /^(Make it|Change it first)$/ }).first().click(); await page.waitForTimeout(900);
     await page.getByRole("button", { name: /^(Keep it as it is|Make it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).first().click(); await page.waitForTimeout(800);
     await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(500);
-    await page.locator("label.plate-photo").filter({ hasText: "Add a photo of the meal" }).locator("input").setInputFiles([{ name: "plate.jpg", mimeType: "image/jpeg", buffer: PHOTO }]); await page.waitForTimeout(900);
+    await page.locator(".plate-photo").filter({ hasText: "Add a photo of the meal" }).click(); await page.locator(".pp-camera input").setInputFiles([{ name: "plate.jpg", mimeType: "image/jpeg", buffer: PHOTO }]); await page.waitForTimeout(900);
     await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);

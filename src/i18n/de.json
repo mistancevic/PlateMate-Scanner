@@ -21004,6 +21004,26 @@
     "home.videoLang": {
       "text": "Chef Mealan auf Englisch, Serbisch und Deutsch",
       "checked": true
+    },
+    "photo.camera": {
+      "text": "📷 Kamera",
+      "checked": true
+    },
+    "photo.gallery": {
+      "text": "🖼 Galerie",
+      "checked": true
+    },
+    "photo.cancel": {
+      "text": "Abbrechen",
+      "checked": true
+    },
+    "photo.from": {
+      "text": "Mit der Kamera fotografieren oder ein Bild aus der Galerie wählen",
+      "checked": true
+    },
+    "recipe.stepsReadAloudOrig": {
+      "text": "{n} Schritt, wie ihn das Original schreibt, laut vorgelesen. Sag weiter, zurück oder nochmal. Ein zweites Handy kann ihn zeigen.|{n} Schritte, wie sie das Original schreibt, laut vorgelesen. Sag weiter, zurück oder nochmal. Ein zweites Handy kann sie zeigen.",
+      "checked": true
     }
   }
 }

@@ -21004,6 +21004,26 @@
     "home.videoLang": {
       "text": "Chef Mealan na engleskom, srpskom i nemačkom",
       "checked": true
+    },
+    "photo.camera": {
+      "text": "📷 Kamera",
+      "checked": true
+    },
+    "photo.gallery": {
+      "text": "🖼 Galerija",
+      "checked": true
+    },
+    "photo.cancel": {
+      "text": "Otkaži",
+      "checked": true
+    },
+    "photo.from": {
+      "text": "Fotografiši kamerom ili izaberi sliku iz galerije",
+      "checked": true
+    },
+    "recipe.stepsReadAloudOrig": {
+      "text": "{n} korak, kako ga original piše, čita se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ga prikaže.|{n} koraka, kako ih original piše, čitaju se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ih prikaže.|{n} koraka, kako ih original piše, čitaju se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ih prikaže.",
+      "checked": true
     }
   }
 }

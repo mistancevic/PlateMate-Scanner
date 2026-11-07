@@ -67,7 +67,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     ok(/Tick each step when it is done/.test(await main()), "the steps block says what the ticks are for");
     ok(await page.locator(".mk-photo").count() === 4, "each step has + Photo beside its tick");
     await page.locator(".mk-check").nth(0).click(); await page.locator(".mk-check").nth(1).click();
-    await page.locator(".mk-photo input").nth(1).setInputFiles({ name: "s.png", mimeType: "image/png", buffer: PNG }); await page.waitForTimeout(700);
+    await page.locator(".mk-photo").nth(1).click(); await page.locator(".pp-camera input").setInputFiles({ name: "s.png", mimeType: "image/png", buffer: PNG }); await page.waitForTimeout(700);
     ok(await page.locator(".mk-photo img").count() === 1, "the photo shows on its step");
     ok(/The meal, the final look/.test(await main()) && /How did the cooking go\?/.test(await page.locator(".chef-line").first().textContent()), "the final photo, then Chef Mealan asks how the cooking went");
     ok(await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).count() === 1 && await page.getByRole("button", { name: "Rate it" }).count() === 0, "Make ends on Cooked. Next: Eat");

@@ -2,7 +2,7 @@
 // An older recipe in another language than the app's: Chef Mealan offers once (Show it in English, or Keep it in Srpski).
 // A translated recipe: the translation shows, with a switch to the original. A recipe that came in from a link or screenshots
 // and was read in your language says so, with Original ›. Start cooking asks once, for a recipe not yet in your language.
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { w } from "../words";
 import { useLang, type Lang } from "../lang";
 import { say, inLangWord } from "../chefScript";
@@ -15,10 +15,12 @@ type Done = Promise<boolean>;
 type Translate = (id: string) => Done;
 const nameOf = (l: Lang) => w(l === "sr-Latn" ? "lang.nameSr" : l === "de" ? "lang.nameDe" : "lang.nameEn");
 
-export function useRecipeLang(meal: Meal, x: { aiOn: boolean; translate: Translate; patch: (p: Partial<Meal>) => void; cook: () => void }): { before: ReactNode; atStart: ReactNode; onCook: () => void } {
+export function useRecipeLang(meal: Meal, x: { aiOn: boolean; translate: Translate; patch: (p: Partial<Meal>) => void; cook: (m?: Meal) => void }): { before: ReactNode; atStart: ReactNode; onCook: (m?: Meal) => void } {
   const lang = useLang();
   const [busy, setBusy] = useState(false);
   const [asking, setAsking] = useState(false);
+  // DT256: the recipe to cook, when Start cooking just made the original's steps its own
+  const toCook = useRef<Meal | undefined>(undefined);
   const from = x.aiOn ? offerFrom(meal, lang) : null;
   const run = async (then?: () => void) => { setBusy(true); const ok = await x.translate(meal.id); setBusy(false); if (ok || then) then?.(); };
   const keep = () => x.patch({ trNo: [...(meal.trNo ?? []), lang] });
@@ -54,12 +56,12 @@ export function useRecipeLang(meal: Meal, x: { aiOn: boolean; translate: Transla
   const atStart: ReactNode = asking && from ? (
     <section className="chef-ask rq-lang-cook" aria-label={say("cookOther", from, lang)}>
       <ChefLine text={say("cookOther", from, lang)} />
-      <div className="ca-go"><button type="button" className="pill pill-primary" disabled={busy} onClick={() => void run(() => { setAsking(false); x.cook(); })}>{busy ? w("recipe.trWorking") : w("recipe.trCookIt", { lang: inLangWord(lang, lang) })}</button>
-        <button type="button" className="pill" disabled={busy} onClick={() => { keep(); setAsking(false); x.cook(); }}>{w("recipe.trAsWritten")}</button></div>
+      <div className="ca-go"><button type="button" className="pill pill-primary" disabled={busy} onClick={() => void run(() => { setAsking(false); x.cook(toCook.current); })}>{busy ? w("recipe.trWorking") : w("recipe.trCookIt", { lang: inLangWord(lang, lang) })}</button>
+        <button type="button" className="pill" disabled={busy} onClick={() => { keep(); setAsking(false); x.cook(toCook.current); }}>{w("recipe.trAsWritten")}</button></div>
       <small>{w("recipe.trCookHelp")}</small>
     </section>
   ) : null;
-  return { before, atStart, onCook: () => (from ? setAsking(true) : x.cook()) };
+  return { before, atStart, onCook: (m?: Meal) => { toCook.current = m; if (from) setAsking(true); else x.cook(m); } };
 }
 
 // the recipe's page in the language it shows in: edits made while the translation shows go into the translation
@@ -68,7 +70,7 @@ export function LangRecipePage(props: PageProps & { aiOn: boolean; translate: Tr
   const { aiOn, translate, ...page } = props;
   const lang = useLang();
   const patch = (pt: Partial<Meal>) => page.onPatch(patchShown(page.meal, lang, pt));
-  const l = useRecipeLang(page.meal, { aiOn, translate, patch, cook: () => page.onCookIt?.() });
+  const l = useRecipeLang(page.meal, { aiOn, translate, patch, cook: (m?: Meal) => page.onCookIt?.(m) });
   return <RecipePage {...page} meal={shownMeal(page.meal, lang)} onPatch={patch}
     onRename={(t) => (showsTranslation(page.meal, lang) ? patch({ title: t }) : page.onRename(t))}
     onCookIt={page.onCookIt ? l.onCook : page.onCookIt} beforeSteps={l.before} atStart={l.atStart} />;

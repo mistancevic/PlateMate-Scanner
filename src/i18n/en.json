@@ -568,6 +568,14 @@
   "recipe.yourPhotoFromTodayIs": "Your photo from today is the cover. When you share with members, you choose which photo they see.",
   "recipe.changeTheCover": "Change the cover",
   "recipe.watchTheSteps": "Watch the steps",
+  "photo.camera": "📷 Camera",
+  "photo.gallery": "🖼 Gallery",
+  "photo.cancel": "Cancel",
+  "photo.from": "Take the photo with the camera, or pick one from the gallery",
+  "recipe.stepsReadAloudOrig": {
+    "one": "{n} step, as the original writes it, read aloud. Say next, back or repeat. A second phone can show it.",
+    "other": "{n} steps, as the original writes them, read aloud. Say next, back or repeat. A second phone can show them."
+  },
   "recipe.videoStepOf": "STEP {n} OF {of} · NO SOUND · TAP FOR THE WORDS",
   "recipe.videoTapWords": "The steps of {title}, playing. Tap for the words",
   "recipe.videoPlay": "Play the steps of {title}",

@@ -82,6 +82,7 @@ import { kitchenName } from "../travel";
 import { SayHave } from "../components/SayHave";
 import { type CookUi, type Later, stripWords, resumeLine, cookStarted, plateSince, plateOldOf, whenWords, dayWord, dayIn, foodsLineIn, laterRow } from "../cooking";
 import { ChefLine } from "../components/ChefLine";
+import { PhotoPick } from "../components/PhotoPick";
 import { CookStrip } from "../components/CookStrip";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
@@ -2433,28 +2434,24 @@ export function JourneyScreen(p: AppApi) {
           <section className="card mk-card" aria-label={w("make.theSteps")}>
             <b>{w("make.tickEachStepWhenIt")}</b>
             {madeSteps.map((x, k) => { const on = ticks.has(`s${k}`), ph = stepPhotos[String(k)]; return (
-              <div key={k} className="mk-row">
+              <PhotoPick key={k} onFile={(f) => stepPhotoFile(k, f)}>{({ toggle, open }) => <div className="mk-row">
                 <button type="button" className={`mk-check ${on ? "on" : ""}`} aria-pressed={on} onClick={() => tick(k)}>
                   <span className="mk-box">{on ? "✓" : ""}</span><span>{stepParts(tempsIn(x), stepItems).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</span>
                 </button>
-                <label className={`mk-photo${ph ? "" : " empty"}`} aria-label={ph ? w("make.changeStepPhoto", { n: k + 1 }) : w("make.addStepPhoto", { n: k + 1 })}>
+                <button type="button" className={`mk-photo${ph ? "" : " empty"}`} aria-expanded={open} onClick={toggle} aria-label={ph ? w("make.changeStepPhoto", { n: k + 1 }) : w("make.addStepPhoto", { n: k + 1 })}>
                   {ph ? <img src={ph} alt="" /> : <><b>＋</b><span>{w("make.photo")}</span></>}
-                  <input type="file" accept="image/*" capture="environment" onChange={(e) => { stepPhotoFile(k, e.target.files?.[0]); e.target.value = ""; }} />
-                </label>
-              </div>); })}
+                </button>
+              </div>}</PhotoPick>); })}
           </section>
         )}
         {/* DT211 v8: The meal, the final look: one photo when it is on the plate; Eat shows it */}
         <div className="mk-final">
           <p className="label">{w("make.theMealTheFinalLook")}</p>
           <small className="muted">{w("make.onePhotoWhenItIs")}</small>
-          <label className="plate-photo">
+          <PhotoPick onFile={(file) => { const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then(setPlate).catch(() => {}); r.readAsDataURL(file); }}>{({ toggle, open }) => (
+          <button type="button" className="plate-photo" aria-expanded={open} onClick={toggle}>
             {plate ? <img src={plate} alt={w("make.yourMeal")} /> : <span>{w("make.addAPhotoOfThe")}</span>}
-            <input type="file" accept="image/*" capture="environment" onChange={(e) => {
-              const file = e.target.files?.[0]; e.target.value = ""; if (!file) return;
-              const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then(setPlate).catch(() => {}); r.readAsDataURL(file);
-            }} />
-          </label>
+          </button>)}</PhotoPick>
         </div>
         {/* DT211 v8: How did the cooking go?, Chef Mealan's line */}
         <div className="cook-q">
