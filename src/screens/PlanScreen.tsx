@@ -1,4 +1,4 @@
-import { dec, numLocale, w, wn, wIn, mealV, mealName, dateV, dateText, type Val } from "../words";
+import { dec, numLocale, w, wn, wIn, mealV, mealName, dateV, dateText, type Val, type WordKey } from "../words";
 import { getLang, locOf } from "../lang";
 import { shelfName } from "../reference";
 import { atMeal } from "../plateMode";
@@ -17,7 +17,6 @@ import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
 import { countOf, countLabel } from "../counted";
 import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, proteinOff, bandOf, fitPortions, usualPortions, amountText, isBatch, isFitted, piecesFor, withPieces, oneWord, type PlannedMeal } from "../planned";
-import { CHEF_NAME } from "../components/Mark";
 import { PlanRow } from "../components/PlanRow";
 import { ShortHelp } from "../components/ShortHelp";
 import { pictureOfRecipe } from "../components/MealPicture";
@@ -166,15 +165,15 @@ export function PlanScreen(p: AppApi) {
             <button type="button" className="pill pill-small pill-primary" onClick={fitDay}>{w("plan.fitTo", { day: dayV })}</button>
           </div>
         )}
-        {pOff && !pOff.above && <div className="plan-off" role="status"><p><b>{fmt(sum.protein, 0)} g of protein</b>, under your range of {pr!.min} to {pr!.max} g. Swap one meal for one with more protein.</p></div>}
-        {pOff && pOff.above && <p className="small plan-protein-note" role="status">{fmt(sum.protein, 0)} g of protein, above your range of {pr!.min} to {pr!.max} g. That does no harm. To bring it down, swap one meal for one with less protein.</p>}
+        {pOff && !pOff.above && <div className="plan-off" role="status"><p><b>{w("plan.gOfProtein", { g: fmt(sum.protein, 0) })}</b>{w("plan.underYourRange", { lo: pr!.min, hi: pr!.max })}</p></div>}
+        {pOff && pOff.above && <p className="small plan-protein-note" role="status">{w("plan.aboveYourRange", { g: fmt(sum.protein, 0), lo: pr!.min, hi: pr!.max })}</p>}
         {fitted && <button type="button" className="link plan-usual" onClick={usualDay}>{w("plan.backToTheUsualPortions")}</button>}
       </section>
       <section className="card plan-day">
         {rows.map((r, ri) => <Fragment key={r.kind === "training" ? "training" : r.slot.id}>{busyBefore(rows, dayBusy.blocks, ri)}{((r: DayRow) => {
           if (r.kind === "training") return (
             <button type="button" key="training" className="menu-row plan-training" aria-label={w("plan.trainingAt", { time: r.time, what: planLine(r.day) })} onClick={() => setEditing(r.day)}>
-              <span className={`plan-time${r.exact ? "" : " plan-time-word"}`}>{r.exact ? r.label : r.label === "No time set" ? <>{w("plan.noTime")}<br />{w("plan.set")}</> : r.label}</span>
+              <span className={`plan-time${r.exact ? "" : " plan-time-word"}`}>{r.exact ? r.label : r.label === "No time set" ? <>{w("plan.noTime")}<br />{w("plan.set")}</> : r.day.when ? w(`plan.whenWord.${r.day.when}` as WordKey) : r.label}</span>
               <div className="menu-row-text"><small>{changed ? w("plan.changedForThisDate") : w("plan.fromMyTrainingWeek")}</small><b>{planLine({ ...r.day, when: undefined })}{r.day.minutes ? `, ${minutesWords(r.day.minutes)}` : ""}</b>{!r.exact && r.label === "No time set" && <span className="link plan-set-time">{w("plan.setATime")}</span>}</div>
               <Pencil size={18} />
             </button>
@@ -188,7 +187,7 @@ export function PlanScreen(p: AppApi) {
               {m && !m.skipped
                 ? <PlanRow className="plan-slot plan-slot-set" label={`${mealName(r.slot.name)}, ${r.slot.time}`} title={plannedName(m, p.state.meals)} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
                     ariaLabel={w("plan.slotAt", { meal: mealV(r.slot.name), time: r.slot.time, title: m.title })}
-                    sub={fit ? <>{SOURCE[m.source]}{amountText(m) ? ` · ${amountText(m)}` : ""} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
+                    sub={fit ? <>{SOURCE[m.source]}{amountText(m) ? ` · ${amountText(m)}` : ""} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · {w("plan.fits")}</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
                     onOpen={() => { const rec = m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null; if (rec) p.openMeal(rec.id, { tab: "plan", slot: { date: key, slotId: r.slot.id, name: r.slot.name, time: r.slot.time } }); else if (m.items?.length) setViewing(r.slot); else setOpen(r.slot); }}
                     onSwap={() => setOpen(r.slot)} onRight={() => p.fill(key, r.slot.id, null)} rightLabel={w("plan.empty")} swapName={w("plan.swapMeal", { meal: mealV(r.slot.name, true) })} rightName={w("plan.emptyMeal", { meal: mealV(r.slot.name, true) })} />
                 : <button type="button" className={`menu-row plan-slot ${m ? "plan-slot-set" : ""}`} aria-label={w("plan.slotAt", { meal: mealV(r.slot.name), time: r.slot.time, title: m ? m.title : w("plan.pickAMealLow") })} onClick={() => setOpen(r.slot)}>
@@ -230,7 +229,7 @@ export function PlanScreen(p: AppApi) {
       </>)}
       <button type="button" className="pill pill-wide plan-shop" onClick={() => setShopping(true)}><ShoppingBasket size={18} /> {shopOpen ? w("plan.shopOpen", { n: shopOpen.n }) : shopEarlier ? w("plan.shoppingLists") : w("plan.makeAShoppingList")}</button>
       {shopping && <ShopSheet p={p} close={() => setShopping(false)} showDay={(d) => { setShopping(false); const n = Math.floor((isoWeek(new Date(`${d}T12:00:00`)).monday.getTime() - thisMonday.getTime()) / (7 * 864e5)); setOffsetState(n === 1 ? 0 : n); setPicked(d); }} />}
-      {viewing && held[viewing.id]?.items?.length ? <MealSheet p={p} slot={viewing} m={held[viewing.id]} dayName={dayName} target={target} unit={unit}
+      {viewing && held[viewing.id]?.items?.length ? <MealSheet p={p} slot={viewing} m={held[viewing.id]} day={dayV} target={target} unit={unit}
         close={() => setViewing(null)} swap={() => { setOpen(viewing); setViewing(null); }}
         onPlate={() => { const m = held[viewing.id]; setViewing(null); p.fillOnPlate(fillingOf(viewing), { id: "", title: m.title, items: m.items!, portion: (m.portion ?? 0) * (m.amount ?? 1), savedAt: "" }, m.title); }}
         keep={() => { const m = held[viewing.id]; const meal = { id: uid(), title: m.title, items: m.items!, portion: m.portion ?? m.items!.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
@@ -238,7 +237,7 @@ export function PlanScreen(p: AppApi) {
       {editing && (
         <div className="sheet-backdrop" onClick={() => setEditing(null)}>
           <div className="sheet date-sheet" role="dialog" aria-label={w("plan.dateTraining", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : dateText(date, { weekday: "long", day: "numeric", month: "long" })) })} onClick={(e) => e.stopPropagation()}>
-            <div className="card-top"><span>{WEEKDAY[(date.getDay() + 6) % 7]}, {date.getDate()} {MONTHS[date.getMonth()]}: training</span><button type="button" className="link" onClick={() => setEditing(null)}>{w("plan.close")}</button></div>
+            <div className="card-top"><span>{w("plan.dateTraining", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}</span><button type="button" className="link" onClick={() => setEditing(null)}>{w("plan.close")}</button></div>
             <p className="small date-sheet-why">{w("plan.thisDateOnlyYourTraining")}</p>
             <section className="card seg">
               <DayEditor minor={minor} weekdays={weekdaysOf(lifestyle)} peOn={!!lifestyle.peWeek && lifestyle.peWeek !== "none"} value={editing} onChange={setEditing} workHint={workHintOf(lifestyle, minor)} work={workHoursOf(lifestyle)} />
@@ -287,7 +286,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
               </div>
             );
           })}
-          {lived && <small className="past-lived">✓ A day lived by the plan</small>}
+          {lived && <small className="past-lived">{w("plan.aDayLivedByThePlan")}</small>}
         </>
       ) : !toAdd.length && <small className="setting-hint past-none">{w("plan.nothingWasLoggedOnThis")}</small>}
       {/* DT149 (0.2.130, board Stories101 version 2; Coach Milan 00:14 "the past is recording what I ate"): each meal of a day gone
@@ -299,10 +298,10 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
           {toAdd.map((sl) => {
             const m = p.planned[dayKey]?.[sl.id], f = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time, dayName: WEEKDAY[(date.getDay() + 6) % 7] };
             const slot = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time };
-            if (m?.skipped) return <div className="past-plate" key={sl.id}><span><small>{sl.name}, {sl.time}</small><b>{w("plan.skipped")}</b></span><button type="button" className="link" onClick={() => p.fill(dayKey, sl.id, { ...m, skipped: false })}>{w("plan.undo")}</button></div>;
+            if (m?.skipped) return <div className="past-plate" key={sl.id}><span><small>{mealName(sl.name)}, {sl.time}</small><b>{w("plan.skipped")}</b></span><button type="button" className="link" onClick={() => p.fill(dayKey, sl.id, { ...m, skipped: false })}>{w("plan.undo")}</button></div>;
             if (m) return (
               <div className="past-plate past-planned" key={sl.id}>
-                <span><small>{sl.name}, {sl.time} · planned</small><b>{m.title}</b></span>
+                <span><small>{w("plan.slotPlanned", { meal: mealV(sl.name), time: sl.time })}</small><b>{m.title}</b></span>
                 <div className="button-row">
                   <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, slot, atMeal(dayKey, sl.time)); }}>{w("plan.iAteIt")}</button>
                   <button type="button" className="pill pill-small" onClick={() => p.fillOnPlate(f, null, "")}>{w("plan.iAteSomethingElse")}</button>
@@ -310,7 +309,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
                 </div>
               </div>
             );
-            return <div className="past-plate" key={sl.id}><span><small>{sl.name}, {sl.time}</small><b>{w("plan.nothingAdded")}</b></span><button type="button" className="pill pill-small" onClick={() => p.fillOnPlate(f, null, "")}>{w("plan.addWhatYouAte")}</button></div>;
+            return <div className="past-plate" key={sl.id}><span><small>{mealName(sl.name)}, {sl.time}</small><b>{w("plan.nothingAdded")}</b></span><button type="button" className="pill pill-small" onClick={() => p.fillOnPlate(f, null, "")}>{w("plan.addWhatYouAte")}</button></div>;
           })}
           <small className="muted">{w("plan.aDayBeforeTodayIs")}</small>
         </div>
@@ -462,7 +461,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           <div className="moments" role="group" aria-label={w("plan.days")}>{DAY_CHOICES.map((n) => <button key={n} type="button" className={`choice ${span === n ? "on" : ""}`} onClick={() => setSpan(n)}>{wn("shop.nDays", n)}</button>)}</div>
           <p className="small shop-why">{spanOf(days[0], days[days.length - 1])}: {wn("shop.plannedMeals", preview.meals)}, {wn("shop.nFoods", preview.lines.length)}{store.carry ? w("shop.plusFrom", { n: store.carry.lines.length, list: store.carry.from }) : ""}.</p>
           {/* DT79: a batch recipe is bought whole */}
-          {(preview.batches ?? []).map((b) => <p key={b.title} className="small shop-why shop-batch">{b.cook ? <>{b.title}: cook {b.cook}, for the {b.pieces} planned.{b.cook - b.pieces > 0 ? ` ${b.cook - b.pieces} left over.` : ""}</> : <>{b.title}: {b.batches === 1 ? "one batch" : `${b.batches} batches`} of {b.n}, for the {b.pieces} planned.{b.batches * b.n - b.pieces > 0 ? ` ${b.batches * b.n - b.pieces} left over.` : ""}</>}</p>)}
+          {(preview.batches ?? []).map((b) => <p key={b.title} className="small shop-why shop-batch">{b.cook ? <>{w("plan.batchCook", { title: b.title, cook: b.cook, pieces: b.pieces })}{b.cook - b.pieces > 0 ? ` ${w("plan.leftOver", { n: b.cook - b.pieces })}` : ""}</> : <>{wn("plan.batchesOf", b.batches, { title: b.title, size: b.n, pieces: b.pieces })}{b.batches * b.n - b.pieces > 0 ? ` ${w("plan.leftOver", { n: b.batches * b.n - b.pieces })}` : ""}</>}</p>)}
           <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString(), cookOf))}>{w("shop.makeN", { n: nextN })}</button>
         </>)}
         {reading === null && store.lists.some((l) => l.doneAt) && (<>
@@ -480,25 +479,25 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
 
 // SL6 (0.2.64): a meal in the plan with its foods but no recipe behind it, changed from a shopping list: what it is,
 // why it is there, its foods and numbers; Make it on the Plate, Save in My recipes, or Swap it
-function MealSheet({ p, slot, m, dayName, target, unit, close, swap, onPlate, keep }: { p: AppApi; slot: Slot; m: PlannedMeal; dayName: string; target: number | null; unit: "pd" | "pct"; close: () => void; swap: () => void; onPlate: () => void; keep: () => void }) {
+function MealSheet({ p, slot, m, day, target, unit, close, swap, onPlate, keep }: { p: AppApi; slot: Slot; m: PlannedMeal; day: Val; target: number | null; unit: "pd" | "pct"; close: () => void; swap: () => void; onPlate: () => void; keep: () => void }) {
   const portion = plannedPortion(m, "view", "");
   const fit = fitOf(m, target, unit);
   return (
     <div className="sheet-backdrop" onClick={close}>
-      <div className="sheet date-sheet meal-view" role="dialog" aria-label={`${slot.name}, ${m.title}`} onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>{dayName === "today" ? "Today" : dayName.charAt(0).toUpperCase() + dayName.slice(1)}, {slot.name.toLowerCase()}, {slot.time}</span><button type="button" className="link" onClick={close}>{w("plan.close")}</button></div>
+      <div className="sheet date-sheet meal-view" role="dialog" aria-label={`${mealName(slot.name)}, ${m.title}`} onClick={(e) => e.stopPropagation()}>
+        <div className="card-top"><span>{w("plan.mealSheetHead", { day: (l) => { const t = (day as (x: typeof l) => string | null)(l); return t && t.charAt(0).toUpperCase() + t.slice(1); }, meal: mealV(slot.name, true), time: slot.time })}</span><button type="button" className="link" onClick={close}>{w("plan.close")}</button></div>
         <b className="shop-title">{m.title}</b>
         {/* DT76: a starter says what it is and how much of it, then the foods to weigh, eggs and bananas counted */}
-        <p className="small shop-why">{m.note ?? (m.source === "starter" ? `${CHEF_NAME}'s starter${amountText(m) ? `, ${amountText(m)}` : ", one portion"}. These are the foods to weigh.` : w("plan.thisDayOnlyNoRecipe"))}</p>
+        <p className="small shop-why">{m.note ?? (m.source === "starter" ? (amountText(m) ? w("plan.starterAmount", { amount: amountText(m) }) : w("plan.starterOnePortion")) : w("plan.thisDayOnlyNoRecipe"))}</p>
         <div className="menu-list shop-list">
           {(portion?.items ?? []).map((i) => {
             const c = countOf(i), cl = c ? countLabel(c, i.grams) : null;
             return (
-              <div key={i.id} className="menu-row meal-view-row"><div className="menu-row-text"><b>{i.food.name}</b>{i.food.source === "estimate" && <small>{CHEF_NAME}'s estimate</small>}{cl && <small>{cl.small}</small>}</div><b className="shop-grams">{cl ? cl.main : `${Math.round(i.grams)} g`}</b></div>
+              <div key={i.id} className="menu-row meal-view-row"><div className="menu-row-text"><b>{i.food.name}</b>{i.food.source === "estimate" && <small>{w("plan.chefMealanSEstimate")}</small>}{cl && <small>{cl.small}</small>}</div><b className="shop-grams">{cl ? cl.main : `${Math.round(i.grams)} g`}</b></div>
             );
           })}
         </div>
-        <p className="small meal-view-nums">{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</p>
+        <p className="small meal-view-nums">{w("plan.kcalProteinG", { kcal: fmt(m.kcal, 0), protein: fmt(m.protein, 0) })} · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · {w("plan.fits")}</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</p>
         <div className="button-row"><button type="button" className="pill pill-small" onClick={swap}>{w("plan.swap")}</button><button type="button" className="pill pill-small" onClick={keep}>{w("plan.saveInMyRecipes")}</button></div>
         <button type="button" className="pill pill-wide pill-primary meal-view-make" onClick={onPlate}>{w("plan.makeItOnThePlate")}</button>
       </div>
@@ -524,7 +523,7 @@ function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, pu
     const read = m.mealId ? reads.get(m.mealId)?.read : null;
     return (
       <button key={k} type="button" className="menu-row pick-row" onClick={pick}>
-        <div className="menu-row-text"><b>{plannedName(m, p.state.meals)}</b><small>{isBatch(m) ? `${amountText(m)} · ` : ""}{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein</small>{read && <small className={read === "light" ? "carry-light" : "carry-heavy"}>{read === "light" ? w("plan.lightForYou") : w("plan.heavyForYou")}</small>}</div>
+        <div className="menu-row-text"><b>{plannedName(m, p.state.meals)}</b><small>{isBatch(m) ? `${amountText(m)} · ` : ""}{w("plan.kcalProteinG", { kcal: fmt(m.kcal, 0), protein: fmt(m.protein, 0) })}</small>{read && <small className={read === "light" ? "carry-light" : "carry-heavy"}>{read === "light" ? w("plan.lightForYou") : w("plan.heavyForYou")}</small>}</div>
         <div className={`pick-pd ${fit.state}`}><b>{unit === "pct" ? `${pdVal(fit.pd)} %` : `PD ${pdVal(fit.pd)}`}</b><small>{fit.text}</small></div>
       </button>
     );
@@ -532,12 +531,12 @@ function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, pu
   const group = (title: string, rows: ReactElement[]) => rows.length ? <><small className="pick-group">{title}</small><div className="menu-list pick-list">{rows}</div></> : null;
   return (
     <div className="sheet-backdrop" onClick={close}>
-      <div className="sheet pick-sheet" role="dialog" aria-label={`${slot.name}, ${slot.time}`} onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>{slot.name}, {slot.time}</span><button type="button" className="link" onClick={close}>{w("plan.close")}</button></div>
-        <p className="small pick-why">{held ? w("plan.heldInSlot", { dish: held.title }) : w("plan.tapAMealToPut")}{need ? othersSet ? need.kcal <= 0 ? " The other meals planned already reach the day's kcal." : need.protein <= 0 ? ` With the other meals planned, the day's protein is covered. It has about ${fmt(need.kcal, 0)} kcal left.` : ` With the other meals planned, it has about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein left, ${pdText(leftPd)}.` : ` It needs about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein, ${pdText(leftPd)}.` : ""}</p>
-        {group("My recipes", mine.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
-        {group("Coach's recipes", coach.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
-        {group(`${CHEF_NAME}'s starters`, STARTERS.map((m) => row(m, m.title, () => put(m))))}
+      <div className="sheet pick-sheet" role="dialog" aria-label={`${mealName(slot.name)}, ${slot.time}`} onClick={(e) => e.stopPropagation()}>
+        <div className="card-top"><span>{mealName(slot.name)}, {slot.time}</span><button type="button" className="link" onClick={close}>{w("plan.close")}</button></div>
+        <p className="small pick-why">{held ? w("plan.heldInSlot", { dish: held.title }) : w("plan.tapAMealToPut")}{need ? ` ${othersSet ? need.kcal <= 0 ? w("plan.othersReachKcal") : need.protein <= 0 ? w("plan.proteinCovered", { kcal: fmt(need.kcal, 0) }) : w("plan.othersLeft", { kcal: fmt(need.kcal, 0), g: need.protein, pd: pdText(leftPd) }) : w("plan.itNeeds", { kcal: fmt(need.kcal, 0), g: need.protein, pd: pdText(leftPd) })}` : ""}</p>
+        {group(w("plan.myRecipes"), mine.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
+        {group(w("plan.coachSRecipes"), coach.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
+        {group(w("plan.chefMealanSStarters"), STARTERS.map((m) => row(m, m.title, () => put(m))))}
         <button type="button" className="pill pill-wide pick-plate" onClick={() => onPlate(null)}><ChefHat size={18} /> {w("plan.createANewMealOn")}</button>
         {held && <button type="button" className="pill pill-wide" onClick={clear}>{w("plan.emptyThisSlot")}</button>}
       </div>
@@ -551,27 +550,28 @@ function TripCard({ p }: { p: AppApi }) {
   const t = p.trip, today = ymd(new Date());
   const [edit, setEdit] = useState(false);
   const [draft, setDraft] = useState<Trip>(() => t ?? { place: (REGIONS.find((r) => r.id !== p.region)?.id ?? "belgrade") as Trip["place"], from: today, to: today });
-  const longDay = (k: string) => new Date(`${k}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long" });
-  if (!t && !edit) return <div className="trip-link"><button type="button" className="link" onClick={() => setEdit(true)}>✈ Plan a trip</button></div>;
+  // DT243: the trip's days in the line's own language
+  const longDay = (k: string): Val => dateV(new Date(`${k}T12:00:00`), { weekday: "short", day: "numeric", month: "long" }, "en-GB");
+  if (!t && !edit) return <div className="trip-link"><button type="button" className="link" onClick={() => setEdit(true)}>{w("plan.planATrip")}</button></div>;
   if (edit) return (
     <section className="card trip-card" aria-label={w("plan.aTrip")}>
-      <div className="card-top"><span>✈ A trip</span><button type="button" className="link" onClick={() => setEdit(false)}>{w("plan.cancel")}</button></div>
+      <div className="card-top"><span>{w("plan.aTripHead")}</span><button type="button" className="link" onClick={() => setEdit(false)}>{w("plan.cancel")}</button></div>
       <small>{w("plan.whereTo")}</small>
       <div className="moments">{REGIONS.filter((r) => r.id !== p.region).map((r) => <button type="button" key={r.id} className={`choice ${draft.place === r.id ? "on" : ""}`} aria-pressed={draft.place === r.id} onClick={() => setDraft({ ...draft, place: r.id })}>{r.name}</button>)}</div>
       <div className="field-row" style={{ marginTop: 8 }}>
         <label className="field"><span>{w("plan.from")}</span><input type="date" aria-label={w("plan.tripFrom")} value={draft.from} onChange={(e) => e.target.value && setDraft({ ...draft, from: e.target.value, to: draft.to < e.target.value ? e.target.value : draft.to })} /></label>
         <label className="field"><span>{w("plan.to")}</span><input type="date" aria-label={w("plan.tripTo")} min={draft.from} value={draft.to} onChange={(e) => e.target.value && setDraft({ ...draft, to: e.target.value })} /></label>
       </div>
-      <button type="button" className="pill pill-small pill-primary" onClick={() => { p.setTrip({ place: draft.place, from: draft.from, to: draft.to }); setEdit(false); p.notify(`Trip to ${placeName(draft.place)}: ${longDay(draft.from)} to ${longDay(draft.to)}.`); }}>{w("plan.saveTheTrip")}</button>
+      <button type="button" className="pill pill-small pill-primary" onClick={() => { p.setTrip({ place: draft.place, from: draft.from, to: draft.to }); setEdit(false); p.notify(w("plan.tripToSaved", { place: placeName(draft.place), from: longDay(draft.from), to: longDay(draft.to) })); }}>{w("plan.saveTheTrip")}</button>
     </section>
   );
   const on = tripOn(t, today);
   return (
     <section className="card trip-card" aria-label={w("plan.yourTrip")}>
-      <div className="card-top"><span>✈ Trip to {placeName(t!.place)} · {longDay(t!.from)} to {longDay(t!.to)}</span><span><button type="button" className="link" onClick={() => { setDraft(t!); setEdit(true); }}>{w("plan.change")}</button> · <button type="button" className="link link-danger" onClick={() => { p.setTrip(null); p.notify("The trip is off."); }}>{w("plan.endIt")}</button></span></div>
+      <div className="card-top"><span>{w("plan.tripHead", { place: placeName(t!.place), from: longDay(t!.from), to: longDay(t!.to) })}</span><span><button type="button" className="link" onClick={() => { setDraft(t!); setEdit(true); }}>{w("plan.change")}</button> · <button type="button" className="link link-danger" onClick={() => { p.setTrip(null); p.notify(w("plan.theTripIsOff")); }}>{w("plan.endIt")}</button></span></div>
       <div className="trip-switch">
-        <span><b>{placeName(t!.place)}'s foods in my search</b><small>{t!.on === undefined || t!.on === null ? `On by itself on ${longDay(t!.from)}, off after ${longDay(t!.to)}.` : on ? w("plan.onByYou") : w("plan.offByYou")} Foods you add while it is on are tagged {placeName(t!.place)}.</small></span>
-        <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} aria-label={`${placeName(t!.place)}'s foods in my search: ${on ? "on" : "off"}`} onClick={() => p.setTrip({ ...t!, on: !on })}>{on ? "On" : "Off"}</button>
+        <span><b>{w("plan.placeFoodsInSearch", { place: placeName(t!.place) })}</b><small>{t!.on === undefined || t!.on === null ? w("plan.onByItself", { from: longDay(t!.from), to: longDay(t!.to) }) : on ? w("plan.onByYou") : w("plan.offByYou")} {w("plan.foodsYouAddTagged", { place: placeName(t!.place) })}</small></span>
+        <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} aria-label={w(on ? "plan.placeFoodsOn" : "plan.placeFoodsOff", { place: placeName(t!.place) })} onClick={() => p.setTrip({ ...t!, on: !on })}>{on ? w("plan.on") : w("plan.off")}</button>
       </div>
     </section>
   );

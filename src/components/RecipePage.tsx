@@ -1,5 +1,5 @@
 import { StepPicShown, StepPicSheet, StepPlayer } from "./StepPics";
-import { w } from "../words";
+import { w, wn, wIn, wordV, dateText, type Val, type WordKey } from "../words";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
 import { stepPicOf, setStepPic, alignStepPics, allStepPics } from "../photos";
@@ -43,6 +43,8 @@ import { changeOf, sameKind, swapChoices, type SwapWay } from "../swap";
 export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
+// a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
+const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 
 export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, beforeSteps = null, atStart = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null }: {
   // DT227 (0.3.61, board Stories167): a draft of this recipe saved for later on the Plate
@@ -137,13 +139,14 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const sum = aggregate(items.filter((i) => i.grams > 0));
   // how many servings the numbers are for (IM21): the recipe's own count, or the portions the plate divides it into
   const serves = meal.makes?.n ?? portionsIn(meal);
-  const oneWord = meal.makes ? meal.makes.unit.replace(/s$/, "") : "portion";
+  const oneWord = meal.makes ? meal.makes.unit.replace(/s$/, "") : w("recipe.portion");
+  const allWord = meal.makes?.unit ?? w("recipe.portions");
   const pd = density(sum.protein, sum.calories);
   const resetSwap = () => { setSwapAt(null); setPick(null); setRemoved(null); setUndo([]); setFresh([]); setNeed(null); setFollowed(null); };
   const startEdit = () => { resetSwap(); setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])], optional: [...(meal.optional ?? [])], makesN: meal.makes ? String(meal.makes.n) : "", makesUnit: meal.makes?.unit ?? "" }); setFind(null); setExtraParts([]); };
   // parts in Edit recipe (0.2.19, IM18): each food's part, a new part, optional on and off
   const editParts = edit ? [...new Set([...partsOf(edit.items, edit.optional), ...extraParts])] : [];
-  const PartPick = ({ value, onPick }: { value: string; onPick: (v: string) => void }) => <select className="pt-chip pt-select" aria-label="Part" value={value} onChange={(e) => onPick(e.target.value)}><option value="">No part</option>{[...new Set([...editParts, ...(value ? [value] : [])])].map((x) => <option key={x} value={x}>{x}</option>)}</select>;
+  const PartPick = ({ value, onPick }: { value: string; onPick: (v: string) => void }) => <select className="pt-chip pt-select" aria-label={w("recipe.part")} value={value} onChange={(e) => onPick(e.target.value)}><option value="">{w("recipe.noPart")}</option>{[...new Set([...editParts, ...(value ? [value] : [])])].map((x) => <option key={x} value={x}>{x}</option>)}</select>;
   // DT175a (0.3.18): the step whose picture is being added or changed, and Watch the steps
   const [picAt, setPicAt] = useState<number | null>(null);
   const [watching, setWatching] = useState(false);
@@ -185,7 +188,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       log("swap", { way, kind: sameKind(old.food, food) ? "same" : "other", how: mode });
       const steps = followSteps(edit.steps, old.id, next), n = steps.filter((x, j) => x !== edit.steps[j]).length;
       if (n) setStepsKey((k) => k + 1);
-      setFollowed(n ? `The steps follow: ${n === 1 ? "one step names" : `${n} steps name`} ${pick.food.name} where ${n === 1 ? "it" : "they"} named ${old.food.name}.` : null);
+      setFollowed(n ? wn("recipe.stepsFollow", n, { food: pick.food.name, old: old.food.name }) : null);
       change(mode === "swap" ? edit.items.map((x, j) => (j === at ? next : x)) : [...edit.items.slice(0, at), next, ...edit.items.slice(at)], steps);
     }
     setPick(null); setRemoved(null);
@@ -204,42 +207,42 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const askDraft = async () => {
     if (!draft) return;
     setDrafting("working");
-    try { const d = await draft(); if (d.ok) { setDrafted({ steps: d.steps, marks: d.marks, kitchen: d.kitchen, parts: d.parts, moves: d.moves }); setDrafting(""); } else if ((d as { cannot?: boolean }).cannot) setDrafting((d as { why: string }).why); else setDrafting(`Chef Mealan's draft didn't pass the checks (${(d as { why: string }).why}). Try again, or write your own.`); }
+    try { const d = await draft(); if (d.ok) { setDrafted({ steps: d.steps, marks: d.marks, kitchen: d.kitchen, parts: d.parts, moves: d.moves }); setDrafting(""); } else if ((d as { cannot?: boolean }).cannot) setDrafting((d as { why: string }).why); else setDrafting(w("recipe.draftFailedChecks", { why: (d as { why: string }).why })); }
     catch (e: any) { setDrafting(e?.message || w("recipe.chefMealanCouldNotAnswer")); }
   };
   return (
     <div className="rq">
-      <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> {backLabel ?? "Recipes"}</button>
+      <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> {backLabel ?? w("recipe.recipes")}</button>
       {/* 0.2.56 (board DS4, G, Milan 08:49): the page's title comes first, under Back; then the photo */}
       {edit && <span className="rq-editing">{w("recipe.editingTheRecipe")}</span>}
       {/* the name: tap to rename (the dashed field, as on the Plate) */}
       {naming !== null
         ? <input className="title-input rq-name-input" aria-label={w("recipe.nameOfTheRecipe")} autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
-        : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
+        : <button type="button" className="rq-name" aria-label={w("recipe.rename", { title: meal.title })} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
       {/* DT202 (0.3.75, board Stories174): From the kitchen, or On paper, and what it means */}
       {(() => { const k = kitchenMark(meal, cards); return <div className={`rq-mark ${k.cooked ? "cooked" : "paper"}`}><span className="tile-mark-chip">{markWord(k)}</span><small>{markLine(k)}</small></div>; })()}
       {/* DT90 (0.2.87, board Stories58): Chef Mealan's dinner says who made it, around which food, and when */}
-      {meal.byChef && <small className="rq-label rq-bychef">{CHEF_NAME}'s {meal.byChef.kitchen} {meal.byChef.meal}, around your {meal.byChef.around}. Made on {new Date(meal.byChef.at).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>}
+      {meal.byChef && <small className="rq-label rq-bychef">{w("recipe.byChef", { kitchen: meal.byChef.kitchen, meal: meal.byChef.meal, around: meal.byChef.around, date: dateText(new Date(meal.byChef.at), { day: "numeric", month: "long" }) })}</small>}
       {/* DT81 (Milan 23 October 12:48 to 15:11): what the whole recipe makes is its label, under the name */}
-      {makesN ? <small className="rq-label">The whole recipe makes {makesN} {meal.makes!.unit} · one {meal.makes!.unit.replace(/ies$/, "y").replace(/(?<!s)s$/, "")} {fmt((aggregate(meal.items).calories ?? 0) / makesN, 0)} kcal</small>
-        : serves > 1 ? <small className="rq-label muted">The whole recipe: {serves} portions by weight. Edit recipe can say what it makes.</small> : null}
+      {makesN ? <small className="rq-label">{w("recipe.wholeMakes", { n: makesN, unit: meal.makes!.unit, one: meal.makes!.unit.replace(/ies$/, "y").replace(/(?<!s)s$/, ""), kcal: fmt((aggregate(meal.items).calories ?? 0) / makesN, 0) })}</small>
+        : serves > 1 ? <small className="rq-label muted">{w("recipe.wholeByWeight", { n: serves })}</small> : null}
       {top}
       {/* R8: the photos first */}
       {drawn
-        ? <figure className="rq-hero"><img src={list[0]} alt={`Picture of ${meal.title} by ${CHEF_NAME}`} /><span className="rq-drawn">Drawn by {CHEF_NAME}</span></figure>
+        ? <figure className="rq-hero"><img src={list[0]} alt={w("recipe.pictureOfBy", { title: meal.title })} /><span className="rq-drawn">{w("recipe.drawnByChef")}</span></figure>
         : list.length > 0
-        ? <figure className="rq-hero"><img src={list[sel]} alt={sel === 0 ? `The cover of ${meal.title}` : `Photo ${sel + 1} of ${meal.title}`} />{sel === 0 && <span className="rph-cover">{w("recipe.cover")}</span>}{isDrawnPhoto(meal, list[sel]) && <span className="rq-drawn">Drawn by {CHEF_NAME}</span>}</figure>
+        ? <figure className="rq-hero"><img src={list[sel]} alt={sel === 0 ? w("recipe.coverOf", { title: meal.title }) : w("recipe.photoOf", { n: sel + 1, title: meal.title })} />{sel === 0 && <span className="rph-cover">{w("recipe.cover")}</span>}{isDrawnPhoto(meal, list[sel]) && <span className="rq-drawn">{w("recipe.drawnByChef")}</span>}</figure>
         : <button className="rq-hero rq-hero-empty" onClick={() => fileRef.current?.click()}><Camera size={26} /><span>{w("recipe.addAPhoto")}</span></button>}
       {drawn && (<>
-        <small className="muted rq-hint">{CHEF_NAME} drew it from your foods and amounts when you kept the dish, so you find it at a glance. Your own photo replaces it.</small>
+        <small className="muted rq-hint">{w("recipe.chefDrewIt")}</small>
         <div className="button-row rq-drawn-row"><button className="pill pill-small" disabled={busy} onClick={() => fileRef.current?.click()}>{w("recipe.addMyPhoto")}</button></div>
       </>)}
       <div className="rq-thumbs" hidden={drawn}>
         {list.map((src, i) => (
           <div key={i} className="rq-thumb">
-            <button className={`publish-photo ${sel === i ? "on" : ""}`} onClick={() => setAt(i)} aria-label={`Photo ${i + 1}${i === 0 ? ", the cover" : ""}${sel === i ? ", picked" : ""}`}><img src={src} alt="" /></button>
+            <button className={`publish-photo ${sel === i ? "on" : ""}`} onClick={() => setAt(i)} aria-label={w("recipe.photoAria", { n: i + 1, cover: i === 0 ? wordV("recipe.photoAriaCover") : "", picked: sel === i ? wordV("recipe.photoAriaPicked") : "" })}><img src={src} alt="" /></button>
             {i === 0 && <span className="rq-cover-tag">{w("recipe.cover")}</span>}
-            <ConfirmButton className="rq-del" ariaLabel={`Delete photo ${i + 1}`} label={<X size={13} />} confirmLabel={w("recipe.sure")}
+            <ConfirmButton className="rq-del" ariaLabel={w("recipe.deletePhoto", { n: i + 1 })} label={<X size={13} />} confirmLabel={w("recipe.sure")}
               onConfirm={() => { setPhotos(list.filter((_, k) => k !== i)); setAt(Math.max(0, Math.min(sel, list.length - 2))); }} />
             {sel === i && list.length > 1 && (
               <div className="rq-move">
@@ -258,10 +261,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <section className="card rq-nopic" aria-label={w("recipe.noPhotoYet2")}>
             <b>{w("recipe.noPhotoYet")}</b>
             <div className="button-row">
-              <button className="pill pill-small" disabled={out || picture.drawing} onClick={picture.draw}>{picture.drawing ? `${CHEF_NAME} is drawing…` : `Let ${CHEF_NAME} draw one`}</button>
+              <button className="pill pill-small" disabled={out || picture.drawing} onClick={picture.draw}>{picture.drawing ? w("recipe.chefIsDrawing") : w("recipe.letChefDraw")}</button>
               <button className={`pill pill-small ${out ? "pill-primary" : ""}`} disabled={busy} onClick={() => fileRef.current?.click()}>{w("recipe.addMyPhoto")}</button>
             </div>
-            <small className="muted">{c ? `${CHEF_NAME}'s drawings today: ${c.used} of ${c.limit}. ${out ? w("recipe.drawOneTomorrowOrAdd") : w("recipe.yourOwnPhotoIsAlways")}` : w("recipe.yourOwnPhotoIsAlways")}</small>
+            <small className="muted">{c ? w("recipe.drawingsToday", { used: c.used, limit: c.limit, rest: wordV(out ? "recipe.drawOneTomorrowOrAdd" : "recipe.yourOwnPhotoIsAlways") }) : w("recipe.yourOwnPhotoIsAlways")}</small>
           </section>
         );
       })()}
@@ -269,14 +272,14 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         <small className="muted rq-hint">{w("recipe.yourPhotoFromTodayIs")}</small>
         <div className="button-row rq-drawn-row">
           <button className="pill pill-small" disabled={busy} onClick={() => { coverNext.current = true; fileRef.current?.click(); }}>{w("recipe.changeTheCover")}</button>
-          <ConfirmButton className="link" ariaLabel="Remove the cover" label={w("recipe.removeIt")} confirmLabel={w("recipe.sureRemoveIt")} onConfirm={() => { setPhotos(list.slice(1)); setAt(0); }} />
+          <ConfirmButton className="link" ariaLabel={w("recipe.removeTheCover")} label={w("recipe.removeIt")} confirmLabel={w("recipe.sureRemoveIt")} onConfirm={() => { setPhotos(list.slice(1)); setAt(0); }} />
         </div>
       </>)}
-      {!coverToday && !drawn && !(picture && list.length === 0) && <small className="muted rq-hint">{list.length === 0 ? "A photo makes the recipe easy to find, here and on its page." : list.length === 1 ? w("recipe.thisPhotoIsTheCover") : sel === 0 ? w("recipe.theFirstPhotoIsThe") : `Photo ${sel + 1} of ${list.length}. ‹ moves it earlier: in first place it becomes the cover.`}</small>}
+      {!coverToday && !drawn && !(picture && list.length === 0) && <small className="muted rq-hint">{list.length === 0 ? w("recipe.aPhotoMakesItEasy") : list.length === 1 ? w("recipe.thisPhotoIsTheCover") : sel === 0 ? w("recipe.theFirstPhotoIsThe") : w("recipe.photoMovesEarlier", { n: sel + 1, of: list.length })}</small>}
       {offered.length > 0 && !full && (
         <div className="rq-offer">
-          <small className="muted">From the times you made it, a tap adds the photo:</small>
-          <div className="rq-offer-row">{offered.slice(0, 6).map((src, i) => <button key={i} className="publish-photo rph-offer" onClick={() => add(src)} aria-label={`Add plate photo ${i + 1} to the recipe`}><img src={src} alt="" /><span className="rph-plus"><Plus size={14} /></span></button>)}</div>
+          <small className="muted">{w("recipe.fromTheTimesYouMade")}</small>
+          <div className="rq-offer-row">{offered.slice(0, 6).map((src, i) => <button key={i} className="publish-photo rph-offer" onClick={() => add(src)} aria-label={w("recipe.addPlatePhoto", { n: i + 1 })}><img src={src} alt="" /><span className="rph-plus"><Plus size={14} /></span></button>)}</div>
         </div>
       )}
       {tryPhoto && <TryPhoto meal={meal} tryPhoto={tryPhoto} use={(img) => { const list = recipePhotosOf(meal).filter((x) => x !== img); onPatch({ ...withRecipePhotos([img, ...list].slice(0, MAX_RECIPE_PHOTOS)), coverSig: sig(img) }); }} />}
@@ -287,14 +290,14 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         return (
           <section className="card watch-card" aria-label={w("recipe.watchTheSteps")}>
             <button type="button" className="watch-poster" onClick={() => setWatching(true)} aria-label={w("recipe.watchTheSteps")}><img src={pics[pics.length - 1].src} alt="" /><span className="watch-play" aria-hidden="true">▶</span></button>
-            <div className="watch-text"><b style={{ fontSize: 17 }}>{w("recipe.watchTheSteps")}</b><small className="muted">{meal.steps!.length} steps, about {meal.steps!.length * 5} seconds{ai ? " · pictures drawn by AI, Beta" : ""}</small></div>
+            <div className="watch-text"><b style={{ fontSize: 17 }}>{w("recipe.watchTheSteps")}</b><small className="muted">{w("recipe.watchStepsLength", { n: meal.steps!.length, seconds: meal.steps!.length * 5, ai: ai ? wordV("recipe.watchStepsAi") : "" })}</small></div>
           </section>
         );
       })()}
       {meal.source && <SourceBox meal={meal} onPatch={onPatch} openOriginal={openOriginal ?? null} />}
       {/* R16 (0.2.44, board RS15): PD on top, under Where it came from, as on the Plate; it follows the grams while editing */}
       {plannedLine && <small className="muted rq-planned">{plannedLine}</small>}
-      <NutritionCard readoutOnly rates={rates} items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
+      <NutritionCard readoutOnly rates={rates} items={items} serves={serves} one={oneWord} all={allWord} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
       {/* IM21: one serving first, when the recipe makes more than one */}
       {/* RP2 (0.2.25): the three tiles gave way to the PD readout above the Nutrition table */}
       {/* DT81: Cook it. The recipe stays as written; this batch can be bigger or smaller, and the foods below follow */}
@@ -302,76 +305,76 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         <section className="card rq-cook" aria-label={w("recipe.cookIt")}>
           <b>{w("recipe.cookIt")}</b>
           <div className="rq-cook-row">
-            <button type="button" className="icon" aria-label={`One ${meal.makes!.unit.replace(/(?<!s)s$/, "")} less`} disabled={cookN <= 1} onClick={() => setCook(cookN - 1)}>−</button>
+            <button type="button" className="icon" aria-label={w("recipe.oneLess", { unit: meal.makes!.unit.replace(/(?<!s)s$/, "") })} disabled={cookN <= 1} onClick={() => setCook(cookN - 1)}>−</button>
             <b>{cookN} {meal.makes!.unit}</b>
-            <button type="button" className="icon" aria-label={`One ${meal.makes!.unit.replace(/(?<!s)s$/, "")} more`} onClick={() => setCook(cookN + 1)}>+</button>
+            <button type="button" className="icon" aria-label={w("recipe.oneMore", { unit: meal.makes!.unit.replace(/(?<!s)s$/, "") })} onClick={() => setCook(cookN + 1)}>+</button>
           </div>
-          <small className="muted">{cookN === makesN ? w("recipe.asTheRecipeMakesIt") : `The recipe makes ${makesN}; the foods below are for ${cookN}.`}</small>
-          {!!plannedCount && plannedCount !== cookN && <button type="button" className="link rq-cook-plan" onClick={() => setCook(plannedCount)}>The plan takes {plannedCount}: cook {plannedCount}</button>}
-          {cookN !== makesN && <button type="button" className="link rq-cook-back" onClick={() => setCook(makesN)}>Back to {makesN}, as written</button>}
+          <small className="muted">{cookN === makesN ? w("recipe.asTheRecipeMakesIt") : w("recipe.makesFoodsFor", { n: makesN, cook: cookN })}</small>
+          {!!plannedCount && plannedCount !== cookN && <button type="button" className="link rq-cook-plan" onClick={() => setCook(plannedCount)}>{w("recipe.planTakes", { n: plannedCount })}</button>}
+          {cookN !== makesN && <button type="button" className="link rq-cook-back" onClick={() => setCook(makesN)}>{w("recipe.backToAsWritten", { n: makesN })}</button>}
         </section>
       )}
       <section className={`card rq-foods ${edit ? "editing" : ""}`}>
         <b>{w("recipe.foods")}</b>
         {/* DT91 (0.2.88): what the dish uses for cooking, not counted */}
-        {!edit && meal.cooking?.length ? <small className="muted rq-cook-line"><b>For cooking, not counted:</b> {meal.cooking.join(", ")}.</small> : null}
+        {!edit && meal.cooking?.length ? <small className="muted rq-cook-line"><b>{w("recipe.forCookingNotCounted")}</b> {meal.cooking.join(", ")}.</small> : null}
         {edit && (
           <div className="rq-makes" role="group" aria-label={w("recipe.whatTheRecipeMakes")}>
             <small>{w("recipe.theWholeRecipeMakes")}</small>
             <input inputMode="numeric" aria-label={w("recipe.howManyItMakes")} placeholder="8" value={edit.makesN} onChange={(e) => setEdit({ ...edit, makesN: e.target.value.replace(/[^\d]/g, "").slice(0, 3) })} />
-            <input aria-label={w("recipe.ofWhat")} placeholder="sarmas" value={edit.makesUnit} maxLength={24} onChange={(e) => setEdit({ ...edit, makesUnit: e.target.value })} />
+            <input aria-label={w("recipe.ofWhat")} placeholder={w("recipe.sarmasPlaceholder")} value={edit.makesUnit} maxLength={24} onChange={(e) => setEdit({ ...edit, makesUnit: e.target.value })} />
             <small className="muted">{w("recipe.cookedAsWrittenPlanCounts")}</small>
           </div>
         )}
         {edit && delta && (
           <div className={`rq-change${delta.big ? " rq-change-big" : ""}`} role="status" aria-label={w("recipe.whatChanged")}>
-            <small>{[delta.out.length ? `Out: ${delta.out.join("; ")}.` : "", delta.in.length ? `In: ${delta.in.join("; ")}.` : "", delta.moved.length ? `Changed: ${delta.moved.join("; ")}.` : ""].filter(Boolean).join(" ")}</small>
-            <small><b>One {oneWord}: {whole(delta.kcal[0])} to {whole(delta.kcal[1])} kcal, {whole(delta.protein[0])} to {whole(delta.protein[1])} g protein{delta.pd[0] !== null && delta.pd[1] !== null ? `, PD ${fmt(delta.pd[0], 1)} to ${fmt(delta.pd[1], 1)}` : ""}.</b>{delta.big ? " More than a fifth apart: check that the recipe still does what it was for." : ""}</small>
+            <small>{[delta.out.length ? w("recipe.deltaOut", { list: delta.out.join("; ") }) : "", delta.in.length ? w("recipe.deltaIn", { list: delta.in.join("; ") }) : "", delta.moved.length ? w("recipe.deltaChanged", { list: delta.moved.join("; ") }) : ""].filter(Boolean).join(" ")}</small>
+            <small><b>{w("recipe.deltaOne", { one: oneWord, kcalFrom: whole(delta.kcal[0]), kcalTo: whole(delta.kcal[1]), proteinFrom: whole(delta.protein[0]), proteinTo: whole(delta.protein[1]), pd: delta.pd[0] !== null && delta.pd[1] !== null ? lineV("recipe.deltaPd", { from: fmt(delta.pd[0], 1), to: fmt(delta.pd[1], 1) }) : "" })}</b>{delta.big ? ` ${w("recipe.moreThanAFifthApart")}` : ""}</small>
             {followed && <small>{followed}</small>}
             {undo.length > 0 && <button type="button" className="link" onClick={takeBack}>{w("recipe.undo")}</button>}
           </div>
         )}
         {edit && !partsShown && <button type="button" className="link rq-parts-open" onClick={() => setPartsOpen(true)}>{w("recipe.partsAndOptionalFoods")}</button>}
-        {edit && partsShown && <div className="pt-h pt-mode"><span><small>{w("recipe.partsGiveAFoodIts")}</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>{w("recipe.newPart")}</button> : <input className="pt-new" autoFocus aria-label={w("recipe.nameOfTheNewPart")} placeholder="Topping" value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
+        {edit && partsShown && <div className="pt-h pt-mode"><span><small>{w("recipe.partsGiveAFoodIts")}</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>{w("recipe.newPart")}</button> : <input className="pt-new" autoFocus aria-label={w("recipe.nameOfTheNewPart")} placeholder={w("recipe.toppingPlaceholder")} value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
         {(edit || !cookN || cookN === makesN ? items : sizedFor(meal, cookN)).map((it, k) => {
           const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null;
           return [head, (
           <div className="sheet-row rq-food" key={it.id}>
-            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="link rq-swap-link" aria-label={`Swap ${it.food.name}`} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>{w("recipe.swap")}</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>Optional</button></span>}</span> : <small>{cookName(it.food.name).short}{weighLine(it.food.name) && <span className="rq-weigh"> · {weighLine(it.food.name)}</span>}{it.fry && <span className="rq-fry">{it.fry.written ? `${it.fry.written}, for frying` : "For frying"}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
+            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="link rq-swap-link" aria-label={w("recipe.swapFood", { food: it.food.name })} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>{w("recipe.swap")}</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>{w("recipe.optional")}</button></span>}</span> : <small>{cookName(it.food.name).short}{weighLine(it.food.name) && <span className="rq-weigh"> · {weighLine(it.food.name)}</span>}{it.fry && <span className="rq-fry">{it.fry.written ? w("recipe.writtenForFrying", { written: it.fry.written }) : w("recipe.forFrying")}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
               ? <span className="rq-grams">
-                  <input inputMode="numeric" aria-label={`Grams of ${it.food.name}`} className={fresh.includes(it.id) && !(it.grams > 0) ? "rq-g-need" : undefined} placeholder={fresh.includes(it.id) ? "?" : undefined} autoFocus={fresh.includes(it.id) && !(it.grams > 0)} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setNeed(null); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
-                  <button className="rq-x" aria-label={`Remove ${it.food.name}`} onClick={() => { setRemoved({ item: it, at: k }); setPick(null); setFresh((f) => f.filter((x) => x !== it.id)); change(edit.items.filter((_, j) => j !== k)); }}><X size={14} /></button>
+                  <input inputMode="numeric" aria-label={w("recipe.gramsOf", { food: it.food.name })} className={fresh.includes(it.id) && !(it.grams > 0) ? "rq-g-need" : undefined} placeholder={fresh.includes(it.id) ? "?" : undefined} autoFocus={fresh.includes(it.id) && !(it.grams > 0)} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setNeed(null); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
+                  <button className="rq-x" aria-label={w("recipe.removeFood", { food: it.food.name })} onClick={() => { setRemoved({ item: it, at: k }); setPick(null); setFresh((f) => f.filter((x) => x !== it.id)); change(edit.items.filter((_, j) => j !== k)); }}><X size={14} /></button>
                 </span>
               : isCounted(it) ? <CountAmount item={it} editable={false} whole onGrams={() => {}} /> : <b>{fmt(it.fry ? it.fry.pot : it.grams, 0)} g</b>}
           </div>)];
         })}
         {edit && edit.optional.map((o, k) => (
           <div className="sheet-row rq-food rq-food-opt" key={`o${k}`}>
-            <span className="rq-food-edit"><small>{o.name}</small><span className="pt-chips"><PartPick value={o.part ?? ""} onPick={(v) => setEdit({ ...edit, optional: edit.optional.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip" onClick={() => setEdit({ ...edit, optional: edit.optional.filter((_, j) => j !== k), items: [...edit.items, { id: uid(), food: o.food, grams: o.grams, locked: false, ...(o.part ? { part: o.part } : {}) }] })}>✓ Optional</button></span></span>
+            <span className="rq-food-edit"><small>{o.name}</small><span className="pt-chips"><PartPick value={o.part ?? ""} onPick={(v) => setEdit({ ...edit, optional: edit.optional.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip" onClick={() => setEdit({ ...edit, optional: edit.optional.filter((_, j) => j !== k), items: [...edit.items, { id: uid(), food: o.food, grams: o.grams, locked: false, ...(o.part ? { part: o.part } : {}) }] })}>✓ {w("recipe.optional")}</button></span></span>
             <b>{fmt(o.grams, 0)} g</b>
           </div>
         ))}
         {edit && pick && (() => {
-          const ch = swapChoices(pick.old, pick.food), one = (c: { way: SwapWay; grams: number }) => `${c.way === "energy" ? w("recipe.theSameEnergy") : w("recipe.theSameWeight")}: ${whole(c.grams)} g ${pick.food.name}`;
+          const ch = swapChoices(pick.old, pick.food), one = (c: { way: SwapWay; grams: number }) => w("recipe.swapChoice", { way: wordV(c.way === "energy" ? "recipe.theSameEnergy" : "recipe.theSameWeight"), grams: whole(c.grams), food: pick.food.name });
           return (
-            <div className="rq-swap" role="group" aria-label={`In place of ${pick.old.food.name}`}>
-              <small><b>{pick.mode === "swap" ? `In place of ${pick.old.food.name}, ${whole(pick.old.grams)} g:` : `In place of ${pick.old.food.name}, ${whole(pick.old.grams)} g, removed just now?`}</b></small>
+            <div className="rq-swap" role="group" aria-label={w("recipe.inPlaceOf", { food: pick.old.food.name })}>
+              <small><b>{pick.mode === "swap" ? w("recipe.inPlaceOfGrams", { food: pick.old.food.name, grams: whole(pick.old.grams) }) : w("recipe.inPlaceOfRemoved", { food: pick.old.food.name, grams: whole(pick.old.grams) })}</b></small>
               {ch.map((c) => <button key={c.way} type="button" className="pill pill-small" onClick={() => place(c.way)}>{one(c)}</button>)}
               {pick.mode === "after-remove" && <button type="button" className="pill pill-small" onClick={() => place("new")}>{w("recipe.noAFoodOfIts")}</button>}
-              <small className="muted">{ch.length < 2 ? w("recipe.oneOfTheTwoHas") : sameKind(pick.old.food, pick.food) ? w("recipe.theSameFoodRawOr") : "A different food: the same weight keeps the dish its size."}</small>
+              <small className="muted">{ch.length < 2 ? w("recipe.oneOfTheTwoHas") : sameKind(pick.old.food, pick.food) ? w("recipe.theSameFoodRawOr") : w("recipe.aDifferentFood")}</small>
               <button type="button" className="link" onClick={() => setPick(null)}>{w("recipe.cancel")}</button>
             </div>
           );
         })()}
-        {edit && need && <small className="rq-need" role="alert">Set the grams of {need}, or remove it.</small>}
+        {edit && need && <small className="rq-need" role="alert">{w("recipe.setTheGramsOf", { food: need })}</small>}
         {edit && !pick && (find === null
           ? <button className="pill pill-small rq-addfood" onClick={() => { setSwapAt(null); setFind(""); }}><Plus size={14} /> {w("recipe.addAFood")}</button>
           : (
             <div className="rq-find">
               <input autoFocus placeholder={w("recipe.searchMyFoods")} aria-label={w("recipe.searchMyFoods")} value={find} onChange={(e) => setFind(e.target.value)} />
-              {swapAt && <small className="rq-find-h">Swap {edit.items.find((i) => i.id === swapAt)?.food.name} for:</small>}
-              {matches.map((f) => <button key={f.id} className="rq-find-row" onClick={() => chosen(f)}><span>{f.name}</span><small>{fmt(f.calories, 0)} kcal · {fmt(f.protein, 1)} g protein per 100 g</small></button>)}
-              {refMatches.map((r) => <button key={r.id} className="rq-find-row" onClick={() => chosen(referenceFood(r, null, uid))}><span>{r.en}</span><small>{fmt(r.kcal, 0)} kcal · {r.protein} g protein per 100 g · a food without a label</small></button>)}
+              {swapAt && <small className="rq-find-h">{w("recipe.swapFor", { food: edit.items.find((i) => i.id === swapAt)?.food.name ?? "" })}</small>}
+              {matches.map((f) => <button key={f.id} className="rq-find-row" onClick={() => chosen(f)}><span>{f.name}</span><small>{w("recipe.per100g", { kcal: fmt(f.calories, 0), protein: fmt(f.protein, 1) })}</small></button>)}
+              {refMatches.map((r) => <button key={r.id} className="rq-find-row" onClick={() => chosen(referenceFood(r, null, uid))}><span>{r.en}</span><small>{w("recipe.per100gNoLabel", { kcal: fmt(r.kcal, 0), protein: r.protein })}</small></button>)}
               {matches.length === 0 && refMatches.length === 0 && <small className="muted">{w("recipe.noFoodWithThatName")}</small>}
               <button className="link" onClick={() => { setFind(null); setSwapAt(null); }}>{w("recipe.closeTheSearch")}</button>
             </div>
@@ -382,7 +385,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           const it = items.find((x) => !x.optional && countOf(x));
           if (!it) return null;
           const c = countOf(it)!, k = KINDS[c.kind], share = howMany(c, it.grams) / serves;
-          return <small className="muted rq-count-note">{k.many.charAt(0).toUpperCase() + k.many.slice(1)} and other foods counted by the piece are whole here, for the whole recipe. One {oneWord} holds its share, {countWord(share)} {share > 1 ? k.many : k.one}: that is for the numbers, not for cooking.</small>;
+          return <small className="muted rq-count-note">{w("recipe.countedWholeHere", { pieces: k.many.charAt(0).toUpperCase() + k.many.slice(1), one: oneWord, share: countWord(share), piece: share > 1 ? k.many : k.one })}</small>;
         })()}
       </section>
       {/* IM8, IM14: optional foods stay with the recipe, out of the numbers; the plate adds them */}
@@ -391,14 +394,14 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <b>{w("recipe.optionalNotInTheNumbers")}</b>
           {meal.optional!.map((o, k) => (
             <div className="rq-opt-row" key={k}>
-              <span className="rq-opt-name"><span>{o.name}</span><small>{[o.part, o.note || (o.written ? `${o.written} on the recipe` : "")].filter(Boolean).join(" · ") || "optional"}</small></span>
+              <span className="rq-opt-name"><span>{o.name}</span><small>{[o.part, o.note || (o.written ? w("recipe.writtenOnTheRecipe", { written: o.written }) : "")].filter(Boolean).join(" · ") || w("recipe.optionalLower")}</small></span>
               <b>{fmt(o.grams, 0)} g</b>
             </div>
           ))}
           <small className="muted">{w("recipe.theRecipeSNumbersLeave")}</small>
         </section>
       )}
-      {!edit && <NutritionCard tableOnly items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} />}
+      {!edit && <NutritionCard tableOnly items={items} serves={serves} one={oneWord} all={allWord} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} />}
       {!edit && <CarryBlock meal={meal} cards={cards} />}
       {/* DT214 v2 (0.3.53, board Stories162): a recipe collects its cooks */}
       {!edit && <YourCooks meal={meal} cards={cards} />}
@@ -415,7 +418,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         {edit
           ? <StepsEditor key={stepsKey} steps={edit.steps} items={edit.items} onChange={(steps) => setEdit((e) => (e ? { ...e, steps } : e))} />
           : drafted ? (<>
-              <small className="rq-drafted">{drafted.marks ? (drafted.kitchen || `${CHEF_NAME}'s steps, from the original, for your amounts and your kitchen. Each says how it relates to the original.`) : w("recipe.draftedByChefMealanFrom")}</small>
+              <small className="rq-drafted">{drafted.marks ? (drafted.kitchen || w("recipe.chefStepsFromOriginal")) : w("recipe.draftedByChefMealanFrom")}</small>
               {drafted.marks && drafted.kitchen && <small className="muted">{w("recipe.eachStepSaysHowIt")}</small>}
               <ol className="rp-steps">{drafted.steps.map((x, k) => [partHead(drafted.parts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}<Mark m={drafted.marks?.[k]} /></div></li>])}</ol>
               <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted.steps, stepMarks: drafted.marks, stepsKitchen: drafted.kitchen, stepParts: drafted.parts, moves: drafted.moves, stepsFor: foodNames(meal.items) }); setDrafted(null); }}>{w("recipe.keepTheseSteps")}</button><button className="pill pill-small" onClick={askDraft}>{w("recipe.draftAgain")}</button><button className="link" onClick={() => { setDrafted(null); startEdit(); }}>{w("recipe.writeMyOwn")}</button></div>
@@ -426,19 +429,19 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             const now = foodNames(meal.items);
             const diff = diffFoods(now, originalFoods ?? null), stale = own.length ? diffFoods(now, meal.stepsFor) : null;
             const status = drafting === "working" ? <ThinkingCard className="rq-drafting" title={w("recipe.chefMealanIsWritingThe")} /> : drafting ? <small className="rq-drafting">{drafting}</small> : null;
-            const by = meal.source?.name ? `As ${meal.source.name} writes them, for the whole recipe.` : w("recipe.asTheOriginalWritesThem");
+            const by = meal.source?.name ? w("recipe.asNameWritesThem", { name: meal.source.name }) : w("recipe.asTheOriginalWritesThem");
             const ownList = (<>
-              {stale && <StepsHint tone="warn">These steps were written for the earlier foods. {diffLine(stale)}</StepsHint>}
+              {stale && <StepsHint tone="warn">{w("recipe.stepsForEarlierFoods", { diff: diffLine(stale) })}</StepsHint>}
               {stale && draft && <div className="button-row"><button className="pill pill-small pill-primary" disabled={drafting === "working"} onClick={askDraft}>{w("recipe.writeThemAgain")}</button></div>}
-              {meal.stepMarks && <small className="muted">{meal.stepsKitchen || `${CHEF_NAME}'s steps, from the original, for your amounts and your kitchen. Each says how it relates to the original.`}</small>}
+              {meal.stepMarks && <small className="muted">{meal.stepsKitchen || w("recipe.chefStepsFromOriginal")}</small>}
               <ol className="rp-steps">{own.map((x, k) => [partHead(meal.stepParts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div>
                 {/* DT211 v8 (0.3.53): the step's photo comes from cooking; no + slot here, a tap changes or removes it */}
                 <StepPicShown pic={stepPicOf(meal, x)} k={k} onOpen={() => setPicAt(k)} /></li>])}</ol>
-              <small className="muted">Photos for the steps come from cooking: + Photo on a step in Make. Tap a photo to change or remove it.</small>
+              <small className="muted">{w("recipe.photosForTheSteps")}</small>
             </>);
             if (own.length && orig.length) return (<>
               <div className="segments rq-steps-seg" role="tablist" aria-label={w("recipe.whichSteps")}>
-                <button role="tab" aria-selected={stepView === "own"} className={`seg ${stepView === "own" ? "on" : ""}`} onClick={() => setStepView("own")}>{meal.stepMarks ? `${CHEF_NAME}'s` : "Yours"}</button>
+                <button role="tab" aria-selected={stepView === "own"} className={`seg ${stepView === "own" ? "on" : ""}`} onClick={() => setStepView("own")}>{meal.stepMarks ? w("recipe.chefS") : w("recipe.yours")}</button>
                 <button role="tab" aria-selected={stepView === "orig"} className={`seg ${stepView === "orig" ? "on" : ""}`} onClick={() => setStepView("orig")}>{w("recipe.original")}</button>
               </div>
               {status}
@@ -449,20 +452,20 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               <StepsHint tone="warn">{diffLine(diff)}</StepsHint>
               {status}
               {draft && <div className="button-row"><button className="pill pill-small pill-primary" disabled={drafting === "working"} onClick={askDraft}>{w("recipe.writeTheStepsForMy")}</button></div>}
-              <small className="muted">The original, for the original foods:</small>
+              <small className="muted">{w("recipe.theOriginalForTheOriginal")}</small>
               <OriginalSteps steps={orig} />
             </>) : (<>
               <small className="muted">{by}</small>
               <OriginalSteps steps={orig} />
               <StepsHint tone="ok">{w("recipe.theOriginalWorksWithYour")}</StepsHint>
               {status}
-              {draft && <><div className="button-row"><button className="pill pill-small" disabled={drafting === "working"} onClick={askDraft}>{CHEF_NAME}'s way</button></div>
-                <small className="muted">{CHEF_NAME} writes the steps for your amounts and your kitchen, when you want them.</small></>}
+              {draft && <><div className="button-row"><button className="pill pill-small" disabled={drafting === "working"} onClick={askDraft}>{w("recipe.chefSWay")}</button></div>
+                <small className="muted">{w("recipe.chefWritesTheSteps")}</small></>}
             </>);
             return draft ? (<>
               <small className="muted">{w("recipe.noStepsYet")}</small>
               {status}
-              <div className="button-row"><button className="pill pill-small" disabled={drafting === "working"} onClick={askDraft}>Draft the steps with {CHEF_NAME}</button><button className="pill pill-small" onClick={startEdit}>{w("recipe.writeMyOwn")}</button></div>
+              <div className="button-row"><button className="pill pill-small" disabled={drafting === "working"} onClick={askDraft}>{w("recipe.draftTheStepsWithChef")}</button><button className="pill pill-small" onClick={startEdit}>{w("recipe.writeMyOwn")}</button></div>
             </>) : <small className="muted">{w("recipe.noStepsYetEditRecipe")}</small>;
           })()}
         {/* DT211 v8 (0.3.53, board Stories158): one Start cooking, at the end of the Steps block, after you have read them; grey,
@@ -470,13 +473,13 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         {!edit && !drafted && !makeAs && onCookIt && (() => { const n = meal.steps?.length ?? 0; return (
           <div className="rq-start">
             {atStart ?? <button className={`pill pill-wide${n ? " pill-primary" : ""}`} disabled={!n} onClick={() => onCookIt()}>{w("recipe.startCooking")}</button>}
-            <small className="muted">{n ? `${n} ${n === 1 ? "step" : "steps"}, read aloud. Say next, back or repeat. A second phone can show them.` : `Start cooking reads the steps aloud, one at a time. It opens once the steps are here: drafted by ${CHEF_NAME} or written by you.`}</small>
+            <small className="muted">{n ? wn("recipe.stepsReadAloud", n) : w("recipe.startCookingReadsThe")}</small>
           </div>); })()}
       </section>
       {edit ? (
         <>
           <button className="pill pill-wide pill-primary" disabled={!edit.items.some((i) => i.grams > 0)} onClick={save}>{w("recipe.saveChanges")}</button>
-          <small className="muted rq-under">{edit.items.some((i) => i.grams > 0) ? w("recipe.theNumbersAboveFollowAs") : "A recipe needs at least one food."}</small>
+          <small className="muted rq-under">{edit.items.some((i) => i.grams > 0) ? w("recipe.theNumbersAboveFollowAs") : w("recipe.aRecipeNeedsAtLeast")}</small>
           <button className="pill pill-wide" onClick={() => { setEdit(null); setFind(null); resetSwap(); }}>{w("recipe.cancel")}</button>
           {live && <small className="muted rq-under">{w("recipe.liveOnChefmealanComThe")}</small>}
         </>
@@ -499,19 +502,19 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           {!edit && <EatLog meal={meal} cards={cards} />}
           {cook && (
             <section className="card rq-pub">
-              <div className="card-top"><b>{w("recipe.onChefmealanCom")}</b>{state && <small className={`pub-state ${state}`}>{state === "live" ? "Live" : state === "down" ? w("recipe.takenDown") : state === "waiting" ? `Waiting for ${approver}` : state === "back" ? w("recipe.sentBack") : "Draft"}</small>}</div>
-              {live && unpublished.length > 0 && <small className="pub-pending" title={`Changed: ${unpublished.join(", ")}`}>{w("recipe.changesNotPublishedYet")}</small>}
+              <div className="card-top"><b>{w("recipe.onChefmealanCom")}</b>{state && <small className={`pub-state ${state}`}>{state === "live" ? w("recipe.live") : state === "down" ? w("recipe.takenDown") : state === "waiting" ? w("recipe.waitingFor", { who: approver }) : state === "back" ? w("recipe.sentBack") : w("recipe.draft")}</small>}</div>
+              {live && unpublished.length > 0 && <small className="pub-pending" title={w("recipe.changedTitle", { list: unpublished.join(", ") })}>{w("recipe.changesNotPublishedYet")}</small>}
               <small className="muted">{
-                live ? `chefmealan.com/r/${pub!.slug}. Anyone with the link sees the page, with the cover first.`
-                : state === "waiting" ? `${approver.charAt(0).toUpperCase() + approver.slice(1)} sees the page first and makes it live, or sends it back with a note.`
-                : state === "back" ? `${approver.charAt(0).toUpperCase() + approver.slice(1)} sent it back${pub?.note ? `: “${pub.note}”` : "."}`
+                live ? w("recipe.liveAnyoneWithTheLink", { slug: pub!.slug })
+                : state === "waiting" ? w("recipe.approverSeesThePage", { who: approver.charAt(0).toUpperCase() + approver.slice(1) })
+                : state === "back" ? (pub?.note ? w("recipe.approverSentItBackNote", { who: approver.charAt(0).toUpperCase() + approver.slice(1), note: pub.note }) : w("recipe.approverSentItBack", { who: approver.charAt(0).toUpperCase() + approver.slice(1) }))
                 : state === "down" ? w("recipe.theLinkSaysThisRecipe")
-                : state === "draft" ? "A draft, only here. Continue where you left off."
+                : state === "draft" ? w("recipe.aDraftOnlyHere")
                 : w("recipe.notOnTheSiteYet")}</small>
               <div className="button-row">
                 {live && <a className="pill pill-small" href={`/r/${pub!.slug}`} target="_blank" rel="noreferrer">{w("recipe.seeLivePage")}</a>}
                 <button className={`pill pill-small${live && unpublished.length && direct ? " pill-primary" : ""}`} onClick={() => onPublish(Boolean(live && unpublished.length && direct))}>{
-                  live ? (unpublished.length && direct ? w("recipe.publishTheChanges") : w("recipe.changeLivePage")) : state === "waiting" ? w("recipe.seeWhatYouSent") : state === "down" ? (direct ? w("recipe.publishAgain") : `Send to ${approver} again`) : state === "draft" || state === "back" ? "Continue" : "Publish"}</button>
+                  live ? (unpublished.length && direct ? w("recipe.publishTheChanges") : w("recipe.changeLivePage")) : state === "waiting" ? w("recipe.seeWhatYouSent") : state === "down" ? (direct ? w("recipe.publishAgain") : w("recipe.sendToAgain", { who: approver })) : state === "draft" || state === "back" ? w("recipe.continuePlain") : w("recipe.publish")}</button>
               </div>
             </section>
           )}
@@ -538,11 +541,11 @@ function TryPhoto({ meal, tryPhoto, use }: { meal: Meal; tryPhoto: (model: strin
   return (
     <section className="card try-photo">
       <b>{w("recipe.tryARealisticPhoto")}</b>
-      <small className="muted">For you, on the preview. Each tap draws one picture of {meal.title} from its foods and amounts. Nothing is kept unless you tap Use as cover.</small>
-      <div className="button-row">{TEST_MODELS.map((m) => <button key={m.id} className="pill pill-small" disabled={Boolean(busy)} onClick={() => go(m.id)}>{busy === m.id ? "Drawing…" : `${m.name}, $${m.usd}`}</button>)}</div>
+      <small className="muted">{w("recipe.forYouOnThePreview", { title: meal.title })}</small>
+      <div className="button-row">{TEST_MODELS.map((m) => <button key={m.id} className="pill pill-small" disabled={Boolean(busy)} onClick={() => go(m.id)}>{busy === m.id ? w("recipe.drawing") : `${m.name}, $${m.usd}`}</button>)}</div>
       {err && <small className="muted" style={{ color: "var(--low)" }}>{err}</small>}
       {shots.map((s, k) => (
-        <figure key={k} className="try-shot"><img src={s.img} alt={`Realistic test by ${s.model}`} /><figcaption><small>{TEST_MODELS.find((m) => m.id === s.model)?.name}</small>
+        <figure key={k} className="try-shot"><img src={s.img} alt={w("recipe.realisticTestBy", { model: s.model })} /><figcaption><small>{TEST_MODELS.find((m) => m.id === s.model)?.name}</small>
           <span className="button-row"><button className="pill pill-small pill-primary" onClick={() => { use(s.img); setShots((x) => x.filter((_, j) => j !== k)); }}>{w("recipe.useAsCover")}</button><button className="link" onClick={() => setShots((x) => x.filter((_, j) => j !== k))}>{w("recipe.discard")}</button></span></figcaption></figure>
       ))}
     </section>
@@ -565,16 +568,16 @@ function SourceBox({ meal, onPatch, openOriginal }: { meal: Meal; onPatch: (patc
       {meal.basedOn && name === null
         ? <small>{w("recipe.adaptedFrom")} <b>{meal.basedOn.title}</b>{src.name ? `, ${src.name}` : ""}{openOriginal && <> · <button className="link in-inline" onClick={openOriginal}>{w("recipe.openTheOriginal")}</button></>}</small>
         : name !== null
-        ? <input className="search" aria-label={w("recipe.whereItCameFrom")} autoFocus value={name} placeholder="@account on Instagram, or the site" onChange={(e) => setName(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") saveName(); }} />
-        : <small>{src.name ? <>{w("recipe.adaptedFrom")} <b>{src.name}</b></> : w("recipe.whereItCameFromIsn")} · <button className="link in-inline" onClick={() => setName(src.name)}>{src.name ? "Change" : w("recipe.addIt")}</button></small>}
+        ? <input className="search" aria-label={w("recipe.whereItCameFrom")} autoFocus value={name} placeholder={w("recipe.accountPlaceholder")} onChange={(e) => setName(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") saveName(); }} />
+        : <small>{src.name ? <>{w("recipe.adaptedFrom")} <b>{src.name}</b></> : w("recipe.whereItCameFromIsn")} · <button className="link in-inline" onClick={() => setName(src.name)}>{src.name ? w("recipe.change") : w("recipe.addIt")}</button></small>}
       {src.url
         ? <small><a href={src.url} target="_blank" rel="noopener noreferrer nofollow">{src.url.replace(/^https:\/\/(www\.)?/, "").slice(0, 60)}</a></small>
         : link !== null
           ? <input className="search" type="url" aria-label={w("recipe.linkToTheOriginal")} autoFocus value={link} placeholder="https://…" onChange={(e) => setLink(e.target.value)} onBlur={saveLink} onKeyDown={(e) => { if (e.key === "Enter") saveLink(); }} />
-          : <button className="link in-inline" style={{ alignSelf: "flex-start" }} onClick={() => setLink("")}>+ Add the link</button>}
-      {meal.makes && <small className="muted">Makes {meal.makes.n} {meal.makes.n === 1 ? meal.makes.unit.replace(/s$/, "") : meal.makes.unit}, as the recipe says.</small>}
+          : <button className="link in-inline" style={{ alignSelf: "flex-start" }} onClick={() => setLink("")}>{w("recipe.addTheLink")}</button>}
+      {meal.makes && <small className="muted">{w("recipe.makesAsTheRecipeSays", { n: meal.makes.n, unit: meal.makes.n === 1 ? meal.makes.unit.replace(/s$/, "") : meal.makes.unit })}</small>}
       {shots.length > 0 && (<>
-        <div className="in-thumbs">{shots.map((x, n) => <button key={n} className={`in-thumb ${big === n ? "big" : ""}`} onClick={() => setBig(big === n ? null : n)} aria-label={`Screenshot ${n + 1}`}><img src={x} alt="" /></button>)}</div>
+        <div className="in-thumbs">{shots.map((x, n) => <button key={n} className={`in-thumb ${big === n ? "big" : ""}`} onClick={() => setBig(big === n ? null : n)} aria-label={w("recipe.screenshotN", { n: n + 1 })}><img src={x} alt="" /></button>)}</div>
         <small className="muted">{w("recipe.yourScreenshotsForYouOnly")}</small>
       </>)}
       {!shots.length && Array.isArray(src.shotSigs) && src.shotSigs.length > 0 && <small className="muted">{w("recipe.yourScreenshotsAreLoading")}</small>}
@@ -586,13 +589,13 @@ function SourceBox({ meal, onPatch, openOriginal }: { meal: Meal; onPatch: (patc
 // IM9: how a step relates to the original
 function Mark({ m }: { m?: StepMark }) {
   if (!m) return null;
-  return <small className={`st-mark ${m.kind}`}>{m.kind === "same" ? w("recipe.asTheOriginal") : `${m.kind === "adapted" ? "Adapted" : "Added"}${m.why ? `: ${m.why}` : ""}`}</small>;
+  return <small className={`st-mark ${m.kind}`}>{m.kind === "same" ? w("recipe.asTheOriginal") : m.why ? w("recipe.markWhy", { mark: wordV(m.kind === "adapted" ? "recipe.markAdapted" : "recipe.markAdded"), why: m.why }) : w(m.kind === "adapted" ? "recipe.markAdapted" : "recipe.markAdded")}</small>;
 }
 
 // IM17: a heading where the steps move to another part: The base, The filling
 function partHead(parts: string[] | undefined, k: number) {
   const pt = parts?.[k];
   if (!pt || (k > 0 && parts![k - 1] === pt)) return null;
-  return <li key={`p${k}`} className="rp-step-part">The {pt.toLowerCase()}</li>;
+  return <li key={`p${k}`} className="rp-step-part">{w("recipe.partHead", { part: pt.toLowerCase() })}</li>;
 }
 

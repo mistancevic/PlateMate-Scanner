@@ -34,11 +34,11 @@ export function SayHave({ onDone, onCancel, busy }: { onDone: (text: string) => 
   const text = [said, typed].filter((x) => x.trim()).join(", ");
   return (
     <section className="card say-have" aria-label={w("sayhave.sayWhatYouHave")}>
-      <div className="say-head"><span className={`cook-dot ${listening ? "on" : ""}`} aria-hidden="true" /><b>{listening ? "Listening" : hasEars ? w("sayhave.notListening") : w("sayhave.typeWhatYouHave")}</b></div>
+      <div className="say-head"><span className={`cook-dot ${listening ? "on" : ""}`} aria-hidden="true" /><b>{listening ? w("sayhave.listening") : hasEars ? w("sayhave.notListening") : w("sayhave.typeWhatYouHave")}</b></div>
       {said && <b className="say-words" aria-live="polite">{said}</b>}
       {note && <small className="muted">{note}</small>}
       <small className="muted">{hasEars ? w("sayhave.sayTheFoodsYouHave") : w("sayhave.theFoodsYouHaveIn")}</small>
-      <input id="say-have-typed" className="search" value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={hasEars ? w("sayhave.orTypeHere") : "eggs, spinach, feta, half an onion"} maxLength={400} />
+      <input id="say-have-typed" className="search" value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={hasEars ? w("sayhave.orTypeHere") : w("sayhave.eggsSpinachFeta")} maxLength={400} />
       <div className="button-row say-buttons">
         <button type="button" className="pill pill-primary" disabled={busy || text.trim().length < 3} onClick={() => { try { rec.current?.stop(); } catch { /* fine */ } onDone(text); }}>{w("sayhave.done")}</button>
         <button type="button" className="pill" disabled={busy} onClick={onCancel}>{w("sayhave.cancel")}</button>

@@ -275,8 +275,8 @@ export const SLOTS: { id: Slot; name: string }[] = [{ id: "9-5", get name() { re
 export function workHintOf(l: Lifestyle, minor: boolean): string | undefined {
   const wkd = weekdaysOf(l);
   // DT147 (0.2.128): the work hours, and what they do for training
-  const wh = workHoursOf(l), hrs = wh ? ` Your work hours, ${wh.from} to ${wh.to}, keep training suggestions out of work.` : "";
-  return minor ? "Monday to Friday start as school days. Mark a holiday as no school." : wkd === "both" ? `From Lifestyle: work and study. Pick which one each day is.${hrs}` : hrs.trim() || undefined;
+  const wh = workHoursOf(l), hrs = wh ? w("plan.workHoursHint", { from: wh.from, to: wh.to }) : "";
+  return minor ? w("plan.schoolDaysHint") : wkd === "both" ? (hrs ? `${w("plan.workAndStudyHint")} ${hrs}` : w("plan.workAndStudyHint")) : hrs || undefined;
 }
 export const WHERE = ["Cook at home", "Meal prep for days", "Canteen at work", "Restaurants", "Takeaway", "Family dinners"];
 export const WHERE_KID = ["At home", "School lunch", "Lunch packed from home", "Bakery or shop near school", "Takeaway", "Family dinners"];
@@ -355,7 +355,8 @@ export function moveDay(plan: Plan, from: number, to: number): Plan {
   next[from] = isTraining(plan[to]) ? ({ ...restOf(plan[from]), ...b } as PlanDay) : restOf(plan[from]);
   return next;
 }
-export const lengthName = (minutes: number | undefined) => lengthOf(minutes ?? 60).name.replace("–", " to ");
+// DT243: said in words, in the app's language: 15 to 30 min, 90+ min
+export const lengthName = (minutes: number | undefined) => { const [lo, hi] = lengthOf(minutes ?? 60).id.split("-"); return hi ? w("plan.lengthRange", { lo, hi }) : w("plan.lengthOver", { n: parseInt(lo, 10) }); };
 // DT146 (0.3.38, board Stories146; Anna): a length picked as a range is said as that range (55 is the middle of 45 to 60);
 // a length typed as minutes stays as typed
-export const minutesWords = (minutes: number) => (LENGTHS.some((r) => r.mid === minutes) ? lengthName(minutes) : `${minutes} min`);
+export const minutesWords = (minutes: number) => (LENGTHS.some((r) => r.mid === minutes) ? lengthName(minutes) : w("plan.minutesShort", { n: minutes }));

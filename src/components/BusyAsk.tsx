@@ -2,7 +2,8 @@
 // more. Where it meets the plan, Plan asks once, under the meal or the training: one tap changes this date only; Keep it
 // leaves it and the question goes. A meal at its own time for a date says so, with Back to the usual time; one moved in
 // Google Calendar says that too. Buttons 44 px or more; labels 12 px or more.
-import { w } from "../words";
+import { w, mealV, dateV, type Val } from "../words";
+import type { Lang } from "../lang";
 import { ChefLine } from "./ChefLine";
 import { say } from "../chefScript";
 import type { ReactNode } from "react";
@@ -17,6 +18,9 @@ import { calendarNudge } from "./Calendar";
 
 const WD = (date: string) => new Date(`${date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" });
 const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+// DT243: the weekday in a line's own language (WD stays for Chef Mealan's lines); Cap starts a sentence with it
+const WDV = (date: string): Val => dateV(new Date(`${date}T12:00:00`), { weekday: "long" }, "en-GB");
+const Cap = (v: Val): Val => (l) => { const t = (v as (x: Lang) => string | null)(l); return t && t.charAt(0).toUpperCase() + t.slice(1); };
 const rowMin = (r: DayRow) => toMin(r.kind === "slot" ? r.slot.time : r.time);
 
 export function useDayBusy(p: AppApi, date: string, slots: Slot[], training: PlanDay | null, past: boolean) {
@@ -30,8 +34,8 @@ export function useDayBusy(p: AppApi, date: string, slots: Slot[], training: Pla
 
 export function BusyRow({ b }: { b: Block }) {
   return (
-    <div className="busy-row" role="note" aria-label={`Busy in your calendar, ${blockWords(b)}`}>
-      <small className="busy-time">{clock(b.from)}<br />to {clock(b.to)}</small><small>{w("busy.busyInYourCalendar")}</small>
+    <div className="busy-row" role="note" aria-label={w("busy.busyInYourCalendarAt", { block: blockWords(b) })}>
+      <small className="busy-time">{clock(b.from)}<br />{w("busy.toTime", { time: clock(b.to) })}</small><small>{w("busy.busyInYourCalendar")}</small>
     </div>
   );
 }
@@ -52,31 +56,31 @@ export function AskCard({ p, date, a, training, cooked, title }: { p: AppApi; da
   const moveTo = (slotId: string, to: string, name: string) => {
     const now = getPersonal(), usual = slotsOf(lifestyleOf(now)).find((s) => s.id === slotId)?.time ?? to;
     p.setPersonal({ ...now, timesOn: withTimeOn(now.timesOn, date, slotId, to, usual) });
-    p.notify(`${name} is at ${to} on ${WD(date)}. ${to === usual ? "" : `Back to ${usual} is under it on Plan.`}`.trim());
+    p.notify(w(to === usual ? "busy.isAtOn" : "busy.isAtOnBack", { meal: mealV(name), time: to, day: WDV(date), usual }));
   };
   const btn = (label: string, run: () => void, primary = false) => <button key={label} type="button" className={`pill pill-small ${primary ? "pill-primary" : ""}`} onClick={run}>{label}</button>;
   let text = "", buttons: ReactNode[] = [];
   if (a.kind === "meal") {
     text = say("busyMeal", a.name, a.time, blockWords(a.block), WD(date));
-    buttons = [a.before && btn(a.before, () => moveTo(a.slotId, a.before!, a.name), true), a.after && btn(a.after, () => moveTo(a.slotId, a.after!, a.name), !a.before), btn(`Keep ${a.time}`, keep)].filter(Boolean) as ReactNode[];
+    buttons = [a.before && btn(a.before, () => moveTo(a.slotId, a.before!, a.name), true), a.after && btn(a.after, () => moveTo(a.slotId, a.after!, a.name), !a.before), btn(w("busy.keepTime", { time: a.time }), keep)].filter(Boolean) as ReactNode[];
   } else if (a.kind === "late") {
     const prev = dayBefore(date);
     text = say("busyLate", clock(a.block.to), a.name, a.time, a.free ?? 0, lower(a.name), cooked ? WD(prev) : null);
     buttons = [
-      btn(`Quick ${lower(a.name)} ideas`, () => p.openOut({ q: `A quick ${lower(a.name)} for ${WD(date)}: I am busy until ${clock(a.block.to)} and eat at ${a.time}, so I have about ${a.free} minutes to cook.` }), true),
-      cooked && btn(`Cook ahead on ${WD(prev)}`, () => { const now = getPersonal(); p.setPersonal({ ...now, calendar: { ...(now.calendar ?? c), ahead: { ...(now.calendar?.ahead ?? {}), [`${date}|${a.slotId}`]: prev }, kept: [...(now.calendar?.kept ?? []), askKey(date, a)] } }); calendarNudge(); p.notify(`${title ?? a.name} is cooked on ${WD(prev)}, for ${WD(date)}.`); }),
-      btn("Keep it", keep),
+      btn(w("busy.quickIdeas", { meal: mealV(a.name, true) }), () => p.openOut({ q: w("busy.quickQuestion", { meal: mealV(a.name, true), day: WDV(date), until: clock(a.block.to), time: a.time, free: String(a.free) }) }), true),
+      cooked && btn(w("busy.cookAheadOn", { day: WDV(prev) }), () => { const now = getPersonal(); p.setPersonal({ ...now, calendar: { ...(now.calendar ?? c), ahead: { ...(now.calendar?.ahead ?? {}), [`${date}|${a.slotId}`]: prev }, kept: [...(now.calendar?.kept ?? []), askKey(date, a)] } }); calendarNudge(); p.notify(w("busy.isCookedOn", { title: title ?? a.name, ahead: WDV(prev), day: WDV(date) })); }),
+      btn(w("busy.keepIt"), keep),
     ].filter(Boolean) as ReactNode[];
   } else if (a.kind === "carry") {
     text = say("busyCarry", blockWords(a.block), lower(a.name));
-    buttons = [btn(`${a.name} to carry`, () => p.openOut({ q: `A ${lower(a.name)} to take along on ${WD(date)}: I am out from ${blockWords(a.block)}. Something I can make the evening before and carry.` }), true), btn("Keep it", keep)];
+    buttons = [btn(w("busy.toCarry", { meal: mealV(a.name) }), () => p.openOut({ q: w("busy.carryQuestion", { meal: mealV(a.name, true), day: WDV(date), block: blockWords(a.block) }) }), true), btn(w("busy.keepIt"), keep)];
   } else {
     text = say("busyTraining", a.time, blockWords(a.block), WD(date));
     const d = new Date(`${date}T12:00:00`);
     buttons = [
-      a.move && btn(`Move to ${a.move}`, () => { if (training) { p.setDated(d, { ...training, at: a.move! }); p.notify(`Training is at ${a.move} on ${WD(date)}, this date only.`); } }, true),
-      btn("Rest day", () => { if (training) { p.setDated(d, { work: training.work, study: training.study, kind: "rest" }); p.notify(`${WD(date)} is a rest day, this date only.`); } }, !a.move),
-      btn("Keep it", keep),
+      a.move && btn(w("busy.moveTo", { time: a.move }), () => { if (training) { p.setDated(d, { ...training, at: a.move! }); p.notify(w("busy.trainingIsAt", { time: a.move!, day: WDV(date) })); } }, true),
+      btn(w("busy.restDay"), () => { if (training) { p.setDated(d, { work: training.work, study: training.study, kind: "rest" }); p.notify(w("busy.isARestDay", { day: Cap(WDV(date)) })); } }, !a.move),
+      btn(w("busy.keepIt"), keep),
     ].filter(Boolean) as ReactNode[];
   }
   return (
@@ -101,8 +105,8 @@ export function SlotNotes({ p, date, slot }: { p: AppApi; date: string; slot: Sl
   const notAhead = () => { const now = getPersonal(); const ah = { ...(now.calendar?.ahead ?? {}) }; delete ah[`${date}|${slot.id}`]; p.setPersonal({ ...now, calendar: { ...(now.calendar ?? { on: true }), ahead: ah } }); calendarNudge(); };
   return (
     <div className="slot-notes">
-      {own && usual && own !== usual && <div><small>{from ? `Moved in Google Calendar, from ${from}` : `At ${own} on this date only`}</small><button type="button" className="link" onClick={back}>Back to {usual}</button></div>}
-      {ahead && <div><small>Cooked ahead on {WD(ahead)}</small><button type="button" className="link" onClick={notAhead}>{w("busy.cookItOnTheDay")}</button></div>}
+      {own && usual && own !== usual && <div><small>{from ? w("busy.movedInGoogle", { time: from }) : w("busy.atOnThisDate", { time: own })}</small><button type="button" className="link" onClick={back}>{w("busy.backTo", { time: usual })}</button></div>}
+      {ahead && <div><small>{w("busy.cookedAheadOn", { day: WDV(ahead) })}</small><button type="button" className="link" onClick={notAhead}>{w("busy.cookItOnTheDay")}</button></div>}
     </div>
   );
 }

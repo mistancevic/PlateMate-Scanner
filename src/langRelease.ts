@@ -65,8 +65,8 @@ export function englishRows(): EnRow[] {
 
 // a new line's area in the tables, by the first part of its key
 const AREA_OF: [RegExp, string, string][] = [
-  [/^home\./, "Home page", "The home page"], [/^(plate|make|journey|photo|ideas|fit|dish|out)\./i, "The Plate", "The Plate"],
-  [/^(today|home|carry|busy|measured)\./i, "Today", "Today"], [/^plan\./i, "Plan", "Plan"], [/^(recipe|recipes|publish|members|lang)\./i, "Recipes", "Recipes"],
+  [/^home\./, "Home page", "The home page"], [/^(plate|make|journey|photo|photoask|count|gates|sayhave|ideas|fit|dish|out)\./i, "The Plate", "The Plate"],
+  [/^(today|home|carry|busy|measured)\./i, "Today", "Today"], [/^(plan|calendar)\./i, "Plan", "Plan"], [/^(recipe|recipes|publish|members|lang|steppics|yourcooks|delrecipe|nutrition)\./i, "Recipes", "Recipes"],
   [/^(cook|cooking|cookmode)\./i, "Cooking", "Cooking"], [/^(foods|food)\./i, "Foods", "Foods"], [/^(summary|share)\./i, "Your summary and the coach", "Your summary"],
   [/^(coach|client)\./i, "Clients", "Clients"], [/^(menu|settings|langpanel|voice)\./i, "Menu and settings", "Settings"],
 ];

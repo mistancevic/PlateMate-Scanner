@@ -3,6 +3,7 @@
 // 12:40 (the photo's time; Ate it logs it then, in the meal that time belongs to), Eating now (as from the camera), An idea
 // (a friend's dinner, a plate online: the same read, nothing logged). This file holds the rules, by code: the photo's time
 // from the file, which chip starts on, and the line under the chips.
+import { w, mealV } from "./words";
 
 export type Who = "ate" | "now" | "idea";
 export const WHO_ORDER: Who[] = ["ate", "now", "idea"];
@@ -67,13 +68,13 @@ export function photoFrom(at: Date, now: Date): string {
 
 // the chip's words: short (Milan 15:45)
 // 0.3.62 (Coach Milan 20:55): the third chip is Exploring, the pencil block's word: no meal of yours, nothing logged
-export function chipWord(who: Who, time: string): string { return who === "ate" ? `Ate at ${time}` : who === "now" ? "Eating now" : "Exploring"; }
+export function chipWord(who: Who, time: string): string { return who === "ate" ? w("photoask.ateAtTime", { time }) : who === "now" ? w("photoask.eatingNow") : w("photoask.exploring"); }
 
 // the line under the chips: what the one that is on does
 export function whoLine(who: Who, time: string, meal: string | null): string {
-  if (who === "idea") return "Not your meal, not logged. Chef Mealan reads it: cook it, keep it as an idea, or plan it.";
-  if (who === "now") return `As from the camera: the plate in front of you${meal ? `, as ${meal}` : ""}.`;
-  return `Logged at ${time}${meal ? `, as ${meal}` : ""}. Tap the time to change it.`;
+  if (who === "idea") return w("photoask.notYourMeal");
+  if (who === "now") return meal ? w("photoask.nowAs", { meal: mealV(meal, true) }) : w("photoask.now");
+  return meal ? w("photoask.loggedAtAs", { time, meal: mealV(meal, true) }) : w("photoask.loggedAt", { time });
 }
 
 // the photo's date with the time picked on the chip

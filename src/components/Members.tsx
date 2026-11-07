@@ -1,5 +1,7 @@
 // Members on the Recipes tab (0.2.11, canvas board CO, CO2 to CO4b; Milan 16 October 2026, 15:37 to 16:24).
-import { w } from "../words";
+import { w, wn, wIn, wordV, mealV, dateText, type Val, type WordKey } from "../words";
+// a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
+const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 import { tempsIn } from "../units";
 // CO2: the recipes members shared, each at your portion for the meal ahead; at or above your PD target first, then your
 // kitchens; your kitchens filter the list. CO3: a member's recipe at your portion, with Make it and Keep in mine.
@@ -10,7 +12,6 @@ import { log } from "../log";
 import { ChevronLeft, Utensils } from "lucide-react";
 import type { Meal } from "../pilot";
 import { fmt, pdText, pdVal } from "../ui";
-import { CHEF_NAME } from "./Mark";
 import { useBack } from "../back";
 import { stepParts } from "../steps";
 import { recipePhotosOf, sig } from "../photos";
@@ -43,8 +44,8 @@ export function aheadOf(p: AppApi): Ahead | null {
   return share ? { name: slot.name.toLowerCase(), kcal: share.kcal, target: p.dayPd ?? p.pdRef, ...(share.kcal < 50 ? { full: true } : {}) } : null;
 }
 export const cooksOf = (list: SharedRecipe[]) => { const n = new Map<string, number>(); for (const r of list) if (r.name && !r.mine) n.set(r.name, (n.get(r.name) ?? 0) + 1); return [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map((x) => x[0]); };
-const byLine = (r: SharedRecipe) => [r.kitchen, r.mine ? (r.name ? "shared by you" : "shared by you, without your name") : r.name ? `shared by ${r.name}` : "shared by a member", r.made ? `made ${r.made === 1 ? "once" : `${r.made} times`}` : ""].filter(Boolean).join(" · ");
-const tag = (r: SharedRecipe) => (r.coverKind === "photo" ? (r.name ? `Photo by ${r.name}` : r.mine ? w("members.yourPhoto") : w("members.photoByAMember")) : `Drawn by ${CHEF_NAME}`);
+const byLine = (r: SharedRecipe) => [r.kitchen, r.mine ? (r.name ? w("members.sharedByYou") : w("members.sharedByYouWithoutName")) : r.name ? w("members.sharedBy", { name: r.name }) : w("members.sharedByAMember"), r.made ? wn("members.madeTimes", r.made) : ""].filter(Boolean).join(" · ");
+const tag = (r: SharedRecipe) => (r.coverKind === "photo" ? (r.name ? w("members.photoBy", { name: r.name }) : r.mine ? w("members.yourPhoto") : w("members.photoByAMember")) : w("members.drawnByChef"));
 
 // the members' list is kept for a minute in the tab (RecipesScreen.loadMembers); a change of yours forgets it
 export const MEMBERS_CACHE = "chefmealan-members-list";
@@ -55,19 +56,19 @@ export const rowOfShared = (r: SharedRecipe): RecipeRow => { const w = portionOf
 export const membersLead = (ahead: Ahead | null) => ahead?.full
   ? w("members.membersRecipesEachAsThe")
   : ahead
-  ? `Members' recipes, calculated for your day. ${ahead.name.charAt(0).toUpperCase() + ahead.name.slice(1)} is about ${fmt(ahead.kcal, 0)} kcal${ahead.target !== null ? ` at ${pdText(ahead.target)} or more, so these come first` : ""}.`
+  ? w("members.leadForYourDay", { meal: mealV(ahead.name), kcal: fmt(ahead.kcal, 0), first: ahead.target !== null ? lineV("members.leadFirst", { pd: pdText(ahead.target) }) : "" })
   : w("members.membersRecipesSetYourGoal");
 // CO2: one tile. DT126c (0.2.106): the Members tab is gone; the tiles sit in the one list under Made by members
 export function MemberTile({ r, ahead, open }: { r: SharedRecipe; ahead: Ahead | null; open: (id: string) => void }) {
   const x = portionOf(r, ahead && !ahead.full ? ahead.kcal : null);
   const ok = ahead?.target == null || (x.pd !== null && x.pd >= ahead.target - 0.05);
   return (
-    <button type="button" className="card recipe-tile" onClick={() => open(r.id)} aria-label={`Open ${r.title}`}>
+    <button type="button" className="card recipe-tile" onClick={() => open(r.id)} aria-label={w("members.open", { title: r.title })}>
       {r.cover ? <span className="recipe-tile-cover"><img src={r.cover} alt="" /><span className="tile-drawn">{tag(r)}</span></span> : <div className="recipe-tile-blank"><Utensils size={28} /></div>}
       <div className="recipe-tile-body">
         <div className="card-top"><b className="tile-name">{r.title}</b></div>
         <small>{byLine(r)}</small>
-        <small className={`tile-state ${ok ? "live" : "under"}`}>{ahead && !ahead.full ? `Your ${ahead.name}: ${fmt(x.grams, 0)} g · ${fmt(x.kcal, 0)} kcal · ${pdText(x.pd)}` : ahead?.full ? `The whole recipe: ${fmt(x.grams, 0)} g · ${fmt(x.kcal, 0)} kcal · ${pdText(x.pd)}` : `${fmt(x.grams, 0)} g · ${fmt(x.kcal, 0)} kcal · ${pdText(x.pd)}`}{ok ? "" : `, under your ${pdVal(ahead!.target)}`}</small>
+        <small className={`tile-state ${ok ? "live" : "under"}`}>{ahead && !ahead.full ? w("members.yourMealPortion", { meal: mealV(ahead.name, true), grams: fmt(x.grams, 0), kcal: fmt(x.kcal, 0), pd: pdText(x.pd) }) : ahead?.full ? w("members.wholeRecipePortion", { grams: fmt(x.grams, 0), kcal: fmt(x.kcal, 0), pd: pdText(x.pd) }) : `${fmt(x.grams, 0)} g · ${fmt(x.kcal, 0)} kcal · ${pdText(x.pd)}`}{ok ? "" : w("members.underYour", { pd: pdVal(ahead!.target) })}</small>
       </div>
     </button>
   );
@@ -82,31 +83,31 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown, toCook }: { r:
   return (
     <div className="rq">
       <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> {w("members.members")}</button>
-      {r.cover ? <figure className="rq-hero"><img src={r.cover} alt={`The cover of ${r.title}`} /><span className="rq-drawn">{tag(r)}</span></figure> : null}
+      {r.cover ? <figure className="rq-hero"><img src={r.cover} alt={w("members.theCoverOf", { title: r.title })} /><span className="rq-drawn">{tag(r)}</span></figure> : null}
       <h2 className="rq-name rq-name-fixed">{r.title}</h2>
-      <small className="muted mb-by">{byLine(r)}{r.made ? " by members" : ""}</small>
-      {r.source && <small className="muted mb-by">Adapted from {r.source}</small>}
-      {r.name && !r.mine && toCook && <button className="link mb-cook-link" onClick={() => toCook(r.name)}>All of {r.name}'s recipes ›</button>}
-      {ahead && !ahead.full && <small className="mb-yours">Your {ahead.name}: {fmt(x.grams, 0)} g of the {fmt(x.total, 0)} g it makes</small>}
+      <small className="muted mb-by">{byLine(r)}{r.made ? ` ${w("members.byMembers")}` : ""}</small>
+      {r.source && <small className="muted mb-by">{w("members.adaptedFrom", { source: r.source })}</small>}
+      {r.name && !r.mine && toCook && <button className="link mb-cook-link" onClick={() => toCook(r.name)}>{w("members.allOfRecipes", { name: r.name })}</button>}
+      {ahead && !ahead.full && <small className="mb-yours">{w("members.yourPortionOfTotal", { meal: mealV(ahead.name, true), grams: fmt(x.grams, 0), total: fmt(x.total, 0) })}</small>}
       <div className="rp-stats">
         <span><b>{fmt(x.kcal, 0)}</b><small>{w("members.kcal")}</small></span>
         <span><b>{fmt(x.protein, 0)}</b><small>{w("members.gProtein")}</small></span>
         <span className="wide"><b>{pdText(x.pd)}</b><small>{w("members.proteinDensity")}</small></span>
       </div>
       <section className="card rq-foods">
-        <b>{ahead && !ahead.full ? w("members.foodsForYourPortion") : "Foods"}</b>
+        <b>{ahead && !ahead.full ? w("members.foodsForYourPortion") : w("members.foods")}</b>
         {x.items.map((it, k) => [it.part && (k === 0 || x.items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null, <div className="sheet-row rq-food" key={it.id}><small>{it.food.name}</small><b>{fmt(it.grams, 0)} g</b></div>])}
       </section>
       <section className="card rq-steps">
         <b>{w("members.steps")}</b>
         {steps.length
           ? <ol className="rp-steps">{steps.map((s, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(s), x.items).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</div></li>)}</ol>
-          : <small className="muted">{r.name || w("members.theMember")} shared no steps.</small>}
+          : <small className="muted">{w("members.sharedNoSteps", { name: r.name || wordV("members.theMember") })}</small>}
       </section>
       <button className="pill pill-wide pill-primary" onClick={() => { close(); p.takeMember(r, "make", x.items); }}>{w("members.makeIt")}</button>
-      <small className="muted rq-under">Your portion goes on the Plate: {fmt(x.grams, 0)} g, {fmt(x.kcal, 0)} kcal. Fit to my target can still move it.</small>
+      <small className="muted rq-under">{w("members.yourPortionGoesOn", { grams: fmt(x.grams, 0), kcal: fmt(x.kcal, 0) })}</small>
       {!r.mine && <><button className="pill pill-wide" onClick={() => { close(); p.takeMember(r, "keep"); }}>{w("members.keepInMine")}</button>
-        <small className="muted rq-under">A copy in Mine, to change as you like. {r.name ? `${r.name}'s` : w("members.theMemberS")} recipe stays theirs.</small></>}
+        <small className="muted rq-under">{w("members.aCopyInMine", { whose: r.name ? lineV("members.nameS", { name: r.name }) : wordV("members.theMemberS") })}</small></>}
       {owner && !r.mine && <ConfirmButton className="link link-danger rq-delete" label={w("members.takeItDownOwner")} confirmLabel={w("members.sureItGoesForEvery")} onConfirm={takeDown} />}
     </div>
   );
@@ -160,37 +161,37 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
       const cover = chosen ? await resizeImageBase64(chosen, 640, 480).catch(() => null) : null;
       const recipe = sharedOf(meal, shared.kitchen);
       const r = await fetch("/api/members", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: shared.id, recipe, cover, coverKind: chosen && isDrawnPhoto(meal, chosen) ? "drawn" : "photo", named: shared.named, name: p.user?.name ?? "" }) });
-      if (!r.ok) throw new Error("The cover didn't change. Try again.");
+      if (!r.ok) throw new Error(w("members.theCoverDidnTChange"));
       forgetMembers();
       onPatch({ members: { ...shared, coverSig: pick, sent: contentSig(recipe) } });
-      p.notify("Members see the new cover.");
+      p.notify(w("members.membersSeeTheNewCover"));
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   };
   const takeBack = async () => {
     setBusy(true); setErr("");
     try {
       const r = await fetch(`/api/members/${encodeURIComponent(shared!.id)}`, { method: "DELETE" });
-      if (!r.ok) throw new Error("Taking it back didn't work. Try again.");
+      if (!r.ok) throw new Error(w("members.takingItBackDidnT"));
       forgetMembers();
       onPatch({ members: undefined });
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   };
-  const since = shared ? new Date(shared.at).toLocaleDateString("en-GB", { day: "numeric", month: "long" }) : "";
-  const coverWord = shared?.coverSig && photos.some((x) => sig(x) === shared.coverSig && isDrawnPhoto(meal, x)) ? `the picture by ${CHEF_NAME}` : shared?.coverSig ? "your photo" : "no cover";
+  const since = shared ? dateText(new Date(shared.at), { day: "numeric", month: "long" }) : "";
+  const coverWord = shared?.coverSig && photos.some((x) => sig(x) === shared.coverSig && isDrawnPhoto(meal, x)) ? w("members.thePictureByChef") : shared?.coverSig ? w("members.yourPhotoLower") : w("members.noCover");
   return (
     <section className="card mb-share">
-      <div className="card-top"><b>{w("members.forMembers")}</b><small className={`mb-state ${shared ? "live" : "none"}`}>{shared ? "Shared" : w("members.notShared")}</small></div>
+      <div className="card-top"><b>{w("members.forMembers")}</b><small className={`mb-state ${shared ? "live" : "none"}`}>{shared ? w("members.shared") : w("members.notShared")}</small></div>
       {shared ? (<>
         {/* MB4 (0.2.66, Milan 21:14): the cover members see can change; your own photos only when you pick one */}
         {photos.length > 0 && (<>
           <small className="mb-sub">{w("members.theCoverMembersSee")}</small>
           <div className="mb-covers">{photos.map((x) => {
             const d = isDrawnPhoto(meal, x), on = sig(x) === pick;
-            return <button key={sig(x)} className={`mb-cover ${on ? "on" : ""}`} onClick={() => setPick(sig(x))} aria-pressed={on}><img src={x} alt="" /><small>{on ? "✓ " : ""}{d ? `Drawn by ${CHEF_NAME}` : w("members.yourPhoto")}</small></button>;
+            return <button key={sig(x)} className={`mb-cover ${on ? "on" : ""}`} onClick={() => setPick(sig(x))} aria-pressed={on}><img src={x} alt="" /><small>{on ? "✓ " : ""}{d ? w("members.drawnByChef") : w("members.yourPhoto")}</small></button>;
           })}</div>
           {pick !== (shared.coverSig ?? null) && <div className="button-row"><button className="pill pill-small" disabled={busy} onClick={changeCover}>{w("members.changeTheCover")}</button></div>}
         </>)}
-        <small className="muted">Members see it since {since}, as {shared.named ? name : "a member"}, with {coverWord}.{made !== null ? ` Made ${made === 0 ? "0 times so far" : made === 1 ? "once" : `${made} times`}.` : ""} A change you make here reaches them too.</small>
+        <small className="muted">{w("members.seeItSince", { date: since, as: shared.named ? (name === "you" ? wordV("members.you") : name) : wordV("members.aMember"), cover: coverWord })}{made !== null ? ` ${made === 0 ? w("members.madeZeroSoFar") : wn("members.madeLine", made)}` : ""} {w("members.aChangeReachesThem")}</small>
         <div className="button-row"><button className="pill pill-small" disabled={busy} onClick={takeBack}>{w("members.takeItBack")}</button></div>
         <small className="muted">{w("members.takeItBackRemovesIt")}</small>
       </>) : (<>
@@ -199,7 +200,7 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
           <small className="mb-sub">{w("members.theCoverMembersSee")}</small>
           <div className="mb-covers">{photos.map((x) => {
             const d = isDrawnPhoto(meal, x), on = sig(x) === pick;
-            return <button key={sig(x)} className={`mb-cover ${on ? "on" : ""}`} onClick={() => setPick(sig(x))} aria-pressed={on}><img src={x} alt="" /><small>{on ? "✓ " : ""}{d ? `Drawn by ${CHEF_NAME}` : w("members.yourPhoto")}</small></button>;
+            return <button key={sig(x)} className={`mb-cover ${on ? "on" : ""}`} onClick={() => setPick(sig(x))} aria-pressed={on}><img src={x} alt="" /><small>{on ? "✓ " : ""}{d ? w("members.drawnByChef") : w("members.yourPhoto")}</small></button>;
           })}</div>
           <small className="muted">{w("members.yourPlatePhotosStayYours")}</small>
         </>)}
@@ -211,9 +212,9 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
         {named && memberName === null && (<>
           <small className="mb-sub">{w("members.yourNameInMembers")}</small>
           <input className="mb-name" aria-label={w("members.yourNameInMembers")} value={typed} maxLength={20} onChange={(e) => setTyped(e.target.value)} />
-          <small className={check?.ok ? "mb-name-ok" : "muted"}>{check ? (check.ok ? `${typed.trim()} is free. It is yours once you share.` : check.why) : w("members.oneNamePerMemberSo")}</small>
+          <small className={check?.ok ? "mb-name-ok" : "muted"}>{check ? (check.ok ? w("members.nameIsFree", { name: typed.trim() }) : check.why) : w("members.oneNamePerMemberSo")}</small>
         </>)}
-        <small className="muted">{named ? `On: members see it as ${name === "you" ? "yours, by your name in Members" : `${name}'s`}. Off: as a member's.` : `Off: members see it as a member's. On: as ${name === "you" ? "yours, by your name in Members" : `${name}'s`}.`}</small>
+        <small className="muted">{w(named ? "members.switchOn" : "members.switchOff", { as: name === "you" ? wordV("members.yoursByYourName") : lineV("members.nameS", { name }) })}</small>
         <div className="button-row"><button className="pill pill-small" disabled={busy || (named && memberName === null && !check?.ok)} onClick={share}>{w("members.shareWithMembers")}</button></div>
       </>)}
       {err && <small className="muted" style={{ color: "var(--low)" }}>{err}</small>}
