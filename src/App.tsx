@@ -11,7 +11,7 @@ import { idleOut, lastOpen, markOpen, setIdleOut } from "./idle";
 import { servingsOf } from "./pilot";
 import * as cooking from "./cooking";
 import { recordOf, followed, secondDish } from "./dishes";
-import { recipeLangOf, trProblems, offerFrom } from "./recipeLang";
+import { recipeLangOf, trProblems, offerFrom, TR_V } from "./recipeLang";
 // DT242 (0.3.96): an answer lost on the way, not one the server gave: no signal, or the browser stopped it while away
 const connectionLost = (e: unknown) => { const m = String((e as any)?.message ?? ""), n = String((e as any)?.name ?? ""); return e instanceof TypeError || n === "AbortError" || n === "TimeoutError" || /failed to fetch|load failed|networkerror|network request failed|the internet connection/i.test(m); };
 // wait until the app is in front and online again, at most two minutes
@@ -2179,7 +2179,7 @@ export default function App() {
       const d = await api("/api/recipe/translate", { to: lang, title: m.title, steps: m.steps, foods: m.items.filter((i) => !i.food.refId).map((i) => ({ id: i.id, name: i.food.name })) });
       const steps: string[] = Array.isArray(d?.steps) ? d.steps : [];
       if (trProblems(m.steps, steps).length) throw new Error("check");
-      const tr = { lang, from: recipeLangOf(m), title: String(d.title || m.title), steps, foods: Object.fromEntries((d.foods ?? []).map((f: { id: string; name: string }) => [f.id, f.name])), at: new Date().toISOString(), ...(auto ? { auto: true } : {}) };
+      const tr = { lang, from: recipeLangOf(m), title: String(d.title || m.title), steps, foods: Object.fromEntries((d.foods ?? []).map((f: { id: string; name: string }) => [f.id, f.name])), at: new Date().toISOString(), v: TR_V, ...(auto ? { auto: true } : {}) };
       setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === id ? { ...x, tr, trShow: "tr" as const } : x)) }));
       log("recipe_translate", { auto, from: tr.from, to: lang });
       return true;

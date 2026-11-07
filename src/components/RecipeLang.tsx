@@ -6,7 +6,7 @@ import { useState, type ReactNode } from "react";
 import { w } from "../words";
 import { useLang, type Lang } from "../lang";
 import { say, inLangWord } from "../chefScript";
-import { offerFrom, showsTranslation, shownMeal, patchShown } from "../recipeLang";
+import { offerFrom, showsTranslation, shownMeal, patchShown, TR_V } from "../recipeLang";
 import { RecipePage } from "./RecipePage";
 import type { Meal } from "../pilot";
 import { ChefLine } from "./ChefLine";
@@ -22,7 +22,7 @@ export function useRecipeLang(meal: Meal, x: { aiOn: boolean; translate: Transla
   const from = x.aiOn ? offerFrom(meal, lang) : null;
   const run = async (then?: () => void) => { setBusy(true); const ok = await x.translate(meal.id); setBusy(false); if (ok || then) then?.(); };
   const keep = () => x.patch({ trNo: [...(meal.trNo ?? []), lang] });
-  const tr = meal.tr && meal.tr.lang === lang ? meal.tr : null;
+  const tr = meal.tr && meal.tr.lang === lang && (meal.tr.v ?? 1) >= TR_V ? meal.tr : null;
   let before: ReactNode = null;
   if (busy) before = <section className="card rq-lang" role="status"><small className="rq-drafting">{w("recipe.trWorking")}</small></section>;
   else if (tr) {

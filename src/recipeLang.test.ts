@@ -2,12 +2,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Meal } from "./pilot";
-import { recipeLangOf, shownMeal, offerFrom, trProblems, patchShown, showsTranslation } from "./recipeLang";
+import { TR_V, recipeLangOf, shownMeal, offerFrom, trProblems, patchShown, showsTranslation } from "./recipeLang";
 
 const food = (id: string, name: string, refId?: string) => ({ id, name, brand: "", basis: "100g", source: "test", calories: 100, protein: 5, ...(refId ? { refId } : {}) }) as any;
 const meal = (x: Partial<Meal> = {}): Meal => ({ id: "m", title: "Prebranac", savedAt: "2026-11-07T08:00:00Z", portion: 370, items: [{ id: "a", food: food("f1", "Pasulj"), grams: 250, locked: false }, { id: "b", food: food("f2", "Onion", "onion"), grams: 120, locked: false }],
   steps: ["Iseci [[i:b|luk]] i propržite ga 10 minuta.", "Dodaj [[i:a|pasulj]] i peci 40 minuta na 200 °C."], ...x } as Meal);
-const tr = { lang: "en" as const, from: "sr-Latn" as const, title: "Prebranac (baked beans)", steps: ["Slice the [[i:b|onion]] and fry it for 10 minutes.", "Add the [[i:a|beans]] and bake for 40 minutes at 200 °C."], foods: { a: "Beans", b: "Onion, raw" }, at: "2026-11-07T08:10:00Z" };
+const tr = { lang: "en" as const, from: "sr-Latn" as const, title: "Prebranac (baked beans)", steps: ["Slice the [[i:b|onion]] and fry it for 10 minutes.", "Add the [[i:a|beans]] and bake for 40 minutes at 200 °C."], foods: { a: "Beans", b: "Onion, raw" }, at: "2026-11-07T08:10:00Z", v: 2 };
 
 test("the recipe's language, from its words", () => {
   assert.equal(recipeLangOf(meal()), "sr-Latn");
@@ -45,4 +45,12 @@ test("a change while the translation shows goes into the translation; the origin
   const p = patchShown(m, "en", { steps: ["One.", "Two."], title: "Beans" });
   assert.equal((p as any).steps, undefined); assert.deepEqual(p.tr!.steps, ["One.", "Two."]); assert.equal(p.tr!.title, "Beans");
   assert.deepEqual(patchShown({ ...m, trShow: "orig" }, "en", { steps: ["x"] }), { steps: ["x"] });
+});
+
+test("0.3.100: a translation made before version 2 is offered again; renamed foods are no changed foods; token names may change", () => {
+  const old = { ...tr, v: undefined };
+  assert.equal(offerFrom(meal({ tr: old }), "en"), "sr-Latn"); assert.equal(shownMeal(meal({ tr: old }), "en").steps![0], meal().steps![0]); assert.equal(TR_V, 2);
+  const s = shownMeal(meal({ tr, stepsFor: ["Pasulj", "Onion"] }), "en");
+  assert.deepEqual(s.stepsFor, ["Beans", "Onion"], "the foods the steps were written for, by the shown names");
+  assert.deepEqual(trProblems(["Iseci [[i:b|luk]] 10 minuta."], ["Slice the [[i:b|onion]] for 10 minutes."]), [], "the name in a token is the new language's");
 });

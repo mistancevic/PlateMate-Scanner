@@ -12,7 +12,7 @@ const F = (id, name, calories, protein, fats, carbs) => ({ ...seed.foods[0], id,
 const items = [[250, F("be", "Pasulj, kuvan", 127, 8.7, 0.5, 23)], [120, F("on", "Crni luk", 40, 1.1, 0.1, 9)]].map(([g, f], k) => ({ id: "i" + k, grams: g, food: f, locked: false }));
 const SR = ["Iseci luk na tanke polukrugove i propržite ga na ulju 10 minuta, dok ne omekša.", "Dodaj pasulj, sve stavi u vatrostalnu posudu i peci 40 minuta na 200 °C."];
 const EN = ["Slice the onion into thin half rings and fry it in the oil for 10 minutes, until soft.", "Add the beans, put it all in a baking dish and bake for 40 minutes at 200 °C."];
-const recipe = (x = {}) => ({ id: "m-pr", title: "Prebranac", items, portion: 370, steps: SR, savedAt: "2026-11-03T18:00:00Z", ...x });
+const recipe = (x = {}) => ({ id: "m-pr", title: "Prebranac", items, portion: 370, steps: SR, stepsFor: ["Pasulj, kuvan", "Crni luk"], savedAt: "2026-11-03T18:00:00Z", ...x });
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(B + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
@@ -49,6 +49,7 @@ const recipe = (x = {}) => ({ id: "m-pr", title: "Prebranac", items, portion: 37
     ok(page.asked.length === 1 && page.asked[0].to === "en" && page.asked[0].steps.length === 2 && page.asked[0].foods.length === 2, "Chef Mealan gets the steps and the foods, to English");
     ok(/Slice the onion/.test(await steps(page)) && /Prebranac \(baked beans\)/.test(await page.locator("main").innerText()), "the recipe shows in English");
     ok(/Translated by Chef Mealan/.test(await page.locator(".rq-lang").innerText()), "Translated by Chef Mealan");
+    ok(!/written for the earlier foods/.test(await page.locator(".rq-steps").innerText()), "0.3.100: the foods' new names are no changed foods");
     const m1 = await saved(page);
     ok(m1.steps[0] === SR[0] && m1.tr && m1.tr.steps[0] === EN[0], "the original is kept, the translation with it");
     await page.locator(".rq-lang-switch button").filter({ hasText: "Original, Srpski" }).click(); await page.waitForTimeout(400);
