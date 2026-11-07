@@ -66,8 +66,8 @@ export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
   plateSaveOrClear: (foods: number, since: Date | null, dish: string) => ({ foods: wnIn(local(), "plate.foodsCount", foods), ago: since ? agoIn(local(), since) : wIn(local(), "ago.now"), dish }),
   // DT240 to DT247 (0.3.96): the meal's name and the minutes in the language on this phone
   cookOpen: (cook: string, dish: string) => ({ cook, dish }),
-  plateFills: (meal: string, kcal: string) => ({ meal: mealV(meal, true)(local()), kcal }),
-  secondDish: (dish: string, minutes: number, prev: string, meal: string) => ({ dish, minutes: getLang() === "de" ? `${minutes} ${minutes === 1 ? "Minute" : "Minuten"}` : srCount(minutes, "minut", "minuta", "minuta"), prev, meal: mealV(meal, true)(local()) }),
+  plateFills: (meal: string, kcal: string) => ({ meal: (mealV(meal, true) as (l: Lang) => string | null)(local()) ?? meal, kcal }),
+  secondDish: (dish: string, minutes: number, prev: string, meal: string) => ({ dish, minutes: getLang() === "de" ? `${minutes} ${minutes === 1 ? "Minute" : "Minuten"}` : srCount(minutes, "minut", "minuta", "minuta"), prev, meal: (mealV(meal, true) as (l: Lang) => string | null)(local()) ?? meal }),
 };
 // the slots each line takes, by name: the Serbian line names each of them once or more, and no other (the release check, the table)
 export const SR_ALLOWED: Partial<Record<ChefLineName, string[]>> = {

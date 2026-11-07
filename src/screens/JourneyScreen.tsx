@@ -1,5 +1,5 @@
 import { w, wn, wIn, dec, mealV, mealName, wordV, type Val, type WordKey } from "../words";
-import { locOf } from "../lang";
+import { locOf, getLang, speechLang } from "../lang";
 import type { PlateIn } from "../chefScript";
 import { plateWhenOf, capFirst, atMeal } from "../plateMode";
 import { say } from "../chefScript";
@@ -1133,6 +1133,9 @@ export function JourneyScreen(p: AppApi) {
   // DT127: the meal photo, small in the line or large with the foods over it
   // DT230 (0.3.70): a photo plate opens with the photo large, its own buttons under it
   const [photoBig, setPhotoBig] = useState(true);
+  // DT249 (0.3.98, board Stories184; Coach Milan 7 November 06:01 to 06:14, Go): which photo of the meal is the big one
+  const [shotAt, setShotAt] = useState(0);
+  useEffect(() => { setShotAt(0); }, [state.photo?.at, state.photo?.image]);
   const [morePhoto, setMorePhoto] = useState<{ file: File; at: number } | null>(null);
   // DT130: Put it in my plan, for an idea: the day and the meal picked in two rows of chips
   const [ideaPlan, setIdeaPlan] = useState<{ date: string; slotId: string } | null>(null);
@@ -1550,8 +1553,14 @@ export function JourneyScreen(p: AppApi) {
         {/* DT127 (0.2.108, board Stories75): the photo the plate was read from stays on it; a tap opens it large with the foods over it */}
         {state.photo && (photoBig ? (
           <div className="mp-big">
-            <div className="mp-big-img"><img src={state.photo.image} alt="your meal" />
-              <div className="mp-tags">{items.map((i) => <span key={i.id}>{foodName(i.food).split(",")[0]} {i.est ? "~" : ""}{Math.round(i.grams)} g</span>)}</div></div>
+            {/* DT249: the photo as it is, nothing over it; every photo of the meal in a row under it (a tap swaps it with the big
+                one); the foods under the photos, each with its amount */}
+            {(() => { const shots = [state.photo.image, ...(state.photo.more ?? [])], at = Math.min(shotAt, shots.length - 1); return (<>
+              <div className="mp-big-img"><img src={shots[at]} alt={w("make.photoOfTheMeal")} /></div>
+              {shots.length > 1 && <div className="mp-shots" role="group" aria-label={w("make.photosOfTheMeal")}>{shots.map((src, k) => (
+                <button key={k} type="button" className={`mp-shot${k === at ? " on" : ""}`} aria-pressed={k === at} aria-label={w("make.photoN", { n: k + 1 })} onClick={() => setShotAt(k)}><img src={src} alt="" /></button>))}</div>}
+            </>); })()}
+            <div className="mp-tags">{items.map((i) => <span key={i.id}>{foodName(i.food).split(",")[0]} {i.est ? "~" : ""}{Math.round(i.grams)} g</span>)}</div>
             <div className="mp-big-row"><small className="muted mp-big-say">{state.photo.who === "idea"
                 ? `Exploring a photo. ${items.length} ${items.length === 1 ? "food" : "foods"} read, amounts estimated (~). Not logged: it is not your meal.`
                 : `Your photo, ${photoTime(state.photo.at)}. ${items.length} ${items.length === 1 ? "food" : "foods"} read, amounts estimated (~). Tap an amount to correct it.`}</small>
@@ -2722,7 +2731,7 @@ function HelpRead({ photo, read, incoming }: { photo: NonNullable<import("../pil
   const [hearing, setHearing] = useState(false);
   const S = typeof window !== "undefined" ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
   const add = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 640).then((d) => setMore((m) => (m.length < 3 ? [...m, d] : m))).catch(() => {}); r.readAsDataURL(file); };
-  const listen = () => { if (!S || hearing) return; try { const r = new S(); r.lang = "en-GB"; r.interimResults = false; r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript ?? "").trim(); if (t) setNote((n) => (n ? `${n} ${t}` : t).slice(0, 200)); }; r.onend = () => setHearing(false); r.onerror = () => setHearing(false); setHearing(true); r.start(); } catch { setHearing(false); } };
+  const listen = () => { if (!S || hearing) return; try { const r = new S(); r.lang = speechLang(getLang()); r.interimResults = false; r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript ?? "").trim(); if (t) setNote((n) => (n ? `${n} ${t}` : t).slice(0, 200)); }; r.onend = () => setHearing(false); r.onerror = () => setHearing(false); setHearing(true); r.start(); } catch { setHearing(false); } };
   // DT230: ＋ Photo under the large photo opens this with that photo in it
   useEffect(() => { if (incoming) { setOpen(true); add(incoming.file); } }, [incoming?.at]); // eslint-disable-line react-hooks/exhaustive-deps
   const n = 1 + more.length, words = note.trim();

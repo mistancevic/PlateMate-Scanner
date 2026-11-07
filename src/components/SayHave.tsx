@@ -1,6 +1,7 @@
 // DT175 (0.3.17, board Stories122): Say what you have. On an empty Plate, the person says the foods they have, in any order,
 // with amounts if they know them; the browser's own speech recognition shows the words as they come. Done sends the words
 // to Chef Mealan (plateFromWords), which lands them on the Plate as estimates. Typing works the same where there are no ears.
+import { getLang, speechLang } from "../lang";
 import { w } from "../words";
 import { useEffect, useRef, useState } from "react";
 
@@ -19,7 +20,8 @@ export function SayHave({ onDone, onCancel, busy }: { onDone: (text: string) => 
     const start = () => {
       if (stopped) return;
       try {
-        const r = new S(); rec.current = r; r.lang = "en-GB"; r.continuous = true; r.interimResults = false;
+        const r = new S(); rec.current = r; r.lang = speechLang(getLang()); // DT248 (0.3.98): in the app's language
+        r.continuous = true; r.interimResults = false;
         r.onresult = (e: any) => { const parts: string[] = []; for (let i = 0; i < e.results.length; i++) { const x = e.results[i]; if (x.isFinal !== false) parts.push(String(x[0].transcript || "").trim()); } if (parts.length) setSaid((s) => [s, ...parts.filter((p) => p && !s.includes(p))].filter(Boolean).join(", ")); };
         r.onerror = (e: any) => { if (e?.error === "not-allowed" || e?.error === "service-not-allowed") { stopped = true; setListening(false); setNote(w("sayhave.micBlocked")); } };
         r.onend = () => { if (!stopped) setTimeout(start, 300); };

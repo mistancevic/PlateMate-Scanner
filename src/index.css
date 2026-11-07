@@ -2222,9 +2222,14 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .mp-line { display: flex; gap: 10px; align-items: center; width: 100%; border: 0; background: var(--tint); border-radius: var(--r-control); padding: 8px 10px; margin: 0 0 10px; font: inherit; font-size: var(--fs-small); color: var(--ink); text-align: left; line-height: 1.4; cursor: pointer; }
 .mp-line img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; flex: none; border: 2px solid var(--brand); }
 .mp-big { border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line); margin: 0 0 10px; background: var(--surface); }
-.mp-big-img { position: relative; } .mp-big-img img { width: 100%; display: block; aspect-ratio: 9 / 7; object-fit: cover; }
-.mp-tags { position: absolute; left: 10px; bottom: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
-.mp-tags span { background: rgba(23,39,66,.82); color: #fff; border-radius: 999px; padding: 4px 10px; font-size: var(--fs-small); font-weight: 900; }
+/* DT249 (0.3.98): the photo as it is, nothing over it; the other photos of the meal under it; then the foods */
+.mp-big-img { position: relative; background: var(--tint); } .mp-big-img img { width: 100%; display: block; height: auto; max-height: 70vh; object-fit: contain; }
+.mp-shots { display: flex; gap: 8px; padding: 10px 12px 0; flex-wrap: wrap; }
+.mp-shot { width: 64px; height: 64px; padding: 0; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--line); background: var(--surface); cursor: pointer; }
+.mp-shot.on { border: 3px solid var(--brand); }
+.mp-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mp-tags { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 12px 2px; }
+.mp-tags span { background: var(--tint); color: var(--navy); border-radius: 999px; padding: 4px 9px; font-size: var(--fs-small); font-weight: 800; }
 .mp-big-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; } .mp-retake { cursor: pointer; }
 /* DT230 (0.3.70): the large photo's own buttons, under it */
 .mp-big-row { flex-wrap: wrap; }

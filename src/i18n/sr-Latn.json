@@ -12204,6 +12204,70 @@
     "dish.savedForLater": {
       "text": "Tvoj tanjir je sačuvan za kasnije, na vrhu Tanjira.",
       "checked": true
+    },
+    "cookmode.sayStep": {
+      "text": "Korak {n}.",
+      "checked": false
+    },
+    "cookmode.sayTimerDone": {
+      "text": "Tajmer ({name}) je gotov.",
+      "checked": false
+    },
+    "cookmode.sayAgain": {
+      "text": "Izvini, ponovi?",
+      "checked": false
+    },
+    "cookmode.recipeSteps": {
+      "text": "Ovaj recept ima {n} korak.|Ovaj recept ima {n} koraka.|Ovaj recept ima {n} koraka.",
+      "checked": false
+    },
+    "cookmode.chefCantAnswer": {
+      "text": "Chef Mealan sada ne može da odgovori. Koraci, komande i tajmeri i dalje rade.",
+      "checked": false
+    },
+    "cookmode.sayTheFood": {
+      "text": "Reci i namirnicu: koliko pirinča, na primer.",
+      "checked": false
+    },
+    "cookmode.notInRecipe": {
+      "text": "Ovog nema u receptu: {food}.",
+      "checked": false
+    },
+    "cookmode.amountInStep": {
+      "text": "{amount}. U koraku {n}.",
+      "checked": false
+    },
+    "cookmode.lastStep": {
+      "text": "Ovo je poslednji korak.",
+      "checked": false
+    },
+    "cookmode.stepsAfter": {
+      "text": "Posle ovog još {n} korak. Sledeći:|Posle ovog još {n} koraka. Sledeći:|Posle ovog još {n} koraka. Sledeći:",
+      "checked": false
+    },
+    "cookmode.timerSet": {
+      "text": "Tajmer ({name}): {time}.",
+      "checked": false
+    },
+    "cookmode.minutes": {
+      "text": "{n} minut|{n} minuta|{n} minuta",
+      "checked": false
+    },
+    "cookmode.seconds": {
+      "text": "{n} sekunda|{n} sekunde|{n} sekundi",
+      "checked": false
+    },
+    "make.photoOfTheMeal": {
+      "text": "Tvoja slika obroka",
+      "checked": false
+    },
+    "make.photosOfTheMeal": {
+      "text": "Slike obroka",
+      "checked": false
+    },
+    "make.photoN": {
+      "text": "Slika {n}",
+      "checked": false
     }
   }
 }

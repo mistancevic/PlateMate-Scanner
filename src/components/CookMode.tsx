@@ -1,8 +1,8 @@
 // DT174 (0.3.16, board Stories121): cook mode, full screen over Make. One big step at a time, read aloud by the phone's own
 // voice, steered by Back, Repeat, Next or by voice (the browser's own speech recognition). The screen stays on. Each step you
 // finish is ticked on Make; closing keeps the ticks. No AI, nothing sent by us: free to run.
-import { w } from "../words";
-import { getLang, speechLang } from "../lang";
+import { w, wn, wIn } from "../words";
+import { getLang, speechLang, textLang, langScore } from "../lang";
 import { ChefLine } from "./ChefLine";
 import { say as chefSay } from "../chefScript";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -11,7 +11,7 @@ import { stepParts, stepText } from "../steps";
 import { tempsIn } from "../units";
 import { utterance, voiceSettings } from "../voiceSettings";
 import { VoiceSettingsPanel } from "./VoiceSettings";
-import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, cutsIn, movesFor, SAY_AGAIN, canSayLine, type VoiceChoice } from "../cook";
+import { secondsIn, timerName, parseCommand, howMuch, leftSay, spoken, sayAgain, timeSaid, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, cutsIn, movesFor, SAY_AGAIN, canSayLine, type VoiceChoice } from "../cook";
 
 // DT222: how many steps and, when the cook's start is known, how long it took
 export function tookLine(n: number, since?: string, now = Date.now()): string {
@@ -69,19 +69,30 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     v.speaking = false; v.tail = true;
     v.timers.forEach((t) => clearTimeout(t)); v.timers = [window.setTimeout(() => { v.tail = false; }, 2500)];
   };
-  const say = (text: string, lang?: string) => {
-    if (!live.current.on || !canSpeak()) return;
+  // DT248 (0.3.98, board Stories184; Coach Milan 7 November, Go 06:14): everything said aloud is in the app's language, in a
+  // voice of that language; the recipe's own words (a step, the next step) in the recipe's language. Parts are spoken in turn.
+  const appVoice = () => speechLang(getLang());
+  const recipeVoice = () => speechLang(textLang(steps.join(" ")));
+  const sayParts = (parts: { text: string; lang: string }[]) => {
+    // parts in the same language go as one, so the voice reads them in one breath
+    type Part = { text: string; lang: string };
+    const ps = parts.filter((x) => !!x.text.trim()).reduce((out: Part[], x) => { const l = out[out.length - 1]; if (l && l.lang === x.lang) l.text = `${l.text} ${x.text}`; else out.push({ ...x }); return out; }, []);
+    if (!live.current.on || !canSpeak() || !ps.length) return;
     try {
-      // DT215 v3 (0.3.66): the voice and the speed from Settings, Voice while cooking; DT203: Chef Mealan's answers in his language
-      const u = utterance(text, undefined, lang);
-      const v = voiceOut.current; v.speaking = true; v.tail = false; v.text = text; (voiceOut as any).lastU = u;
+      // DT215 v3 (0.3.66): the voice and the speed from Settings, Voice while cooking
+      const us = ps.map((x) => utterance(x.text, undefined, x.lang)), last = us[us.length - 1], text = ps.map((x) => x.text).join(" ");
+      const v = voiceOut.current; v.speaking = true; v.tail = false; v.text = text; (voiceOut as any).lastU = last;
       v.timers.forEach((t) => clearTimeout(t));
       // a phone that never says it finished: the words' own length, then the tail
-      v.timers = [window.setTimeout(() => endSpeak(u), 1500 + text.split(/\s+/).length * 450)];
-      u.onend = () => endSpeak(u); u.onerror = () => endSpeak(u);
-      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+      v.timers = [window.setTimeout(() => endSpeak(last), 1500 + text.split(/\s+/).length * 450)];
+      for (const u of us) { u.onerror = () => endSpeak(u); }
+      last.onend = () => endSpeak(last);
+      window.speechSynthesis.cancel(); for (const u of us) window.speechSynthesis.speak(u);
     } catch { /* the phone has no voice: the screen says it */ }
   };
+  // a line in the app's language takes its voice; a line still in English (its translation not confirmed yet) an English one
+  const voiceFor = (text: string) => { if (getLang() === "en") return appVoice(); const en = langScore(text, "en"); return en > 0 && en > langScore(text, getLang()) ? speechLang("en") : appVoice(); };
+  const say = (text: string, lang?: string) => sayParts([{ text, lang: lang ?? voiceFor(text) }]);
   // the screen stays on while cooking; asked again when the page comes back
   useEffect(() => {
     let lock: any = null, gone = false;
@@ -97,7 +108,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   // ticks from the other screen join this one's
   useEffect(() => { setDoneSet((d) => { let ch = false; const n = new Set(d); ticks.forEach((t) => { if (!n.has(t)) { n.add(t); ch = true; } }); return ch ? n : d; }); }, [ticks]);
   // a step is read aloud when it shows; with moves, one move at a time, the first with the step's number (DT217)
-  const sayMove = (j: number, mi: number) => { const mv = movesOf(j); say(`${mi === 0 ? `Step ${j + 1}. ` : ""}${spoken(mv[Math.min(mi, mv.length - 1)], items)}`); };
+  const sayMove = (j: number, mi: number) => { const mv = movesOf(j); const head = mi === 0 ? w("cookmode.sayStep", { n: j + 1 }) : ""; sayParts([{ text: head, lang: head === wIn("en", "cookmode.sayStep", { n: j + 1 }) ? speechLang("en") : appVoice() }, { text: spoken(mv[Math.min(mi, mv.length - 1)], items), lang: recipeVoice() }]); };
   useEffect(() => { if (!done) sayMove(k, m); }, [k, m, done, voice]); // eslint-disable-line react-hooks/exhaustive-deps
   // the timers count down; one that ends rings, buzzes and says which
   useEffect(() => { if (!timers.length) return; const t = setInterval(() => setNow(Date.now()), 500); return () => clearInterval(t); }, [timers.length]);
@@ -105,7 +116,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     const due = timers.filter((t) => !t.rang && t.ends <= now);
     if (!due.length) return;
     setTimers((ts) => ts.map((t) => (due.some((d) => d.id === t.id) ? { ...t, rang: true } : t)));
-    for (const t of due) { ring(); say(`The ${t.name.toLowerCase()} timer is done.`); }
+    for (const t of due) { ring(); say(w("cookmode.sayTimerDone", { name: t.name.toLowerCase() })); }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const go = (to: number, mi = 0) => { setHeard(null); const j = Math.max(0, Math.min(steps.length - 1, to)); setK(j); setM(Math.max(0, Math.min(movesOf(j).length - 1, mi))); };
@@ -113,26 +124,26 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const next = () => {
     const { k: at, m: mi } = live.current;
     if (mi < movesOf(at).length - 1) { setHeard(null); setM(mi + 1); return; }
-    onTick(at); setDoneSet((d) => new Set(d).add(at)); if (at >= steps.length - 1) { setDone(true); say("Done. Enjoy your meal."); } else go(at + 1);
+    onTick(at); setDoneSet((d) => new Set(d).add(at)); if (at >= steps.length - 1) { setDone(true); say(w("cookmode.doneEnjoyYourMeal")); } else go(at + 1);
   };
   const back = () => { const { k: at, m: mi } = live.current; if (live.current.done) { setDone(false); return; } if (mi > 0) { setHeard(null); setM(mi - 1); return; } if (at > 0) go(at - 1, movesOf(at - 1).length - 1); };
   const repeat = () => { setHeard(null); sayMove(live.current.k, live.current.m); };
   const startTimer = (seconds: number, name: string) => {
     setTimers((ts) => [...ts, { id: Date.now() + Math.random(), name, ends: Date.now() + seconds * 1000, total: seconds, rang: false }]);
     setNow(Date.now());
-    return `${name} timer, ${minutesWords(seconds)}.`;
+    return w("cookmode.timerSet", { name, time: timeSaid(seconds) });
   };
   // DT175: a question to Chef Mealan, with the recipe, this step and the amounts cooked; advice only, read aloud
   const askChef = async (question: string) => {
     const at = live.current.k;
     // DT177: Chef, look, on the kitchen screen: one photo of the pan with this step
     if (link.look && /^(?:have a |take a )?look(?: at (?:this|it|the pan|the pot|that))?(?: please)?$/.test(question.trim().toLowerCase())) return lookNow();
-    if (!ask) { const a = "Chef Mealan can't answer right now. The steps, the commands and the timers still work."; setHeard({ said: question, answer: a, chef: true, step: at }); say(a); return; }
+    if (!ask) { const a = w("cookmode.chefCantAnswer"); setHeard({ said: question, answer: a, chef: true, step: at }); say(a); return; }
     setHeard({ said: question, answer: "", chef: true, step: at, working: true });
     try {
       const a = await ask(question, at, asked.current.slice(-4));
       asked.current = [...asked.current, { role: "cook" as const, text: question }, { role: "chef" as const, text: a }].slice(-8);
-      setHeard({ said: question, answer: a, chef: true, step: at }); say(a, speechLang(getLang()));
+      setHeard({ said: question, answer: a, chef: true, step: at }); say(a);
     } catch (e: any) {
       const a = e?.message || w("cookmode.chefMealanCouldNotAnswer");
       setHeard({ said: question, answer: a, chef: true, step: at }); say(a);
@@ -153,13 +164,14 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     if (c.kind === "repeat") return repeat();
     if (c.kind === "stop") return close();
     if (c.kind === "ask") return void askChef(c.question);
-    if (c.kind === "goto") { if (c.step > steps.length) { const a = `This recipe has ${steps.length} steps.`; setHeard({ said, answer: a }); say(a); return; } setDone(false); return go(c.step - 1); }
-    const answer = c.kind === "left" ? leftLine(at, steps, items)
-      : c.kind === "howMuch" ? howMuch(c.food, steps, items)
+    if (c.kind === "goto") { if (c.step > steps.length) { const a = wn("cookmode.recipeSteps", steps.length); setHeard({ said, answer: a }); say(a); return; } setDone(false); return go(c.step - 1); }
+    // the next step in the recipe's own language
+    if (c.kind === "left") { const l = leftSay(at, steps, items); setHeard({ said, answer: l.next ? `${l.head} ${l.next}` : l.head }); sayParts([{ text: l.head, lang: voiceFor(l.head) }, { text: l.next ? spoken(l.next, items) : "", lang: recipeVoice() }]); return; }
+    const answer = c.kind === "howMuch" ? howMuch(c.food, steps, items)
       : c.kind === "timer" ? startTimer(c.seconds, timerName(steps[at], at))
       : null;
     // DT221 (0.3.58): not caught: the phone says one short line; what can be said stays on the screen, not read aloud
-    if (answer === null) { setHeard({ said, answer: SAY_AGAIN, hint: canSayLine(steps[at] ?? "", items) }); say(SAY_AGAIN); return; }
+    if (answer === null) { setHeard({ said, answer: sayAgain(), hint: canSayLine(steps[at] ?? "", items) }); say(sayAgain()); return; }
     setHeard({ said, answer }); say(answer);
   };
   const hearRef = useRef(hear); hearRef.current = hear;
