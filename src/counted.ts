@@ -7,6 +7,7 @@
 // S 43, M 52, L 61, XL 68 g. Bananas, peeled (USDA SR28): XS 81, S 101, M 118, L 136, XL 152 g.
 // Egg whites, yolks and bottled liquid egg stay in grams.
 // DT77 (Milan 23 October 09:52): apples too. USDA SR Legacy household measures, whole apple: S 149, M 182, L 223 g.
+import { w, wn, type WordKey } from "./words";
 export type CountKind = "egg" | "banana" | "apple";
 export type Size = "XS" | "S" | "M" | "L" | "XL";
 export type Count = { kind: CountKind; size: Size; weighed?: boolean };
@@ -79,8 +80,12 @@ export function countLabel(c: Count, grams: number, whole = false): { main: stri
   const n = c.weighed || whole ? Math.max(1, Math.round(howMany(c, grams))) : howMany(c, grams);
   const word = countWord(n);
   const many = word !== "1" && !(n < 1);
-  return { main: `${word} ${many ? k.many : k.one}`, small: `${c.size} · ${Math.round(grams)} g${k.note ? ` ${k.note}` : ""}${c.weighed ? ", weighed" : ""}` };
+  // DT243: the words in the language chosen (KINDS keeps the English, the name a pack's piece is saved with); a share or one
+  // takes the one form, more takes the other
+  return { main: countName(c.kind, many ? Math.max(2, Math.round(n)) : 1, word), small: `${c.size} · ${Math.round(grams)} g${k.note ? ` ${w("count.peeled")}` : ""}${c.weighed ? `, ${w("count.weighed")}` : ""}` };
 }
+// "2 eggs", "½ egg": form picks the line's form, shown is the number as written
+export const countName = (k: CountKind, form: number, shown?: string) => wn(`count.${k}` as WordKey, form, shown === undefined ? {} : { n: shown });
 // one more or one less: whole ones; a share (¼ egg) goes to the whole one above or below
 export const stepCount = (c: Count, grams: number, by: 1 | -1) => {
   const n = howMany(c, grams);

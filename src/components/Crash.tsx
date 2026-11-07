@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from "react";
+import { w } from "../words";
 
 // Never a white screen again: if the app fails to draw, say so, show what failed, and offer the ways out.
 // The phone's copy is never deleted here; "Open from the account" moves it aside under a backup key first.
@@ -21,15 +22,15 @@ export class Crash extends Component<{ children: ReactNode }, { error: Error | n
     };
     return (
       <div style={{ padding: 24, fontFamily: "Nunito, system-ui, sans-serif", color: "var(--ink)", background: "var(--base)", minHeight: "100vh", boxSizing: "border-box" }}>
-        <h2 style={{ margin: "8px 0" }}>Chef Mealan could not open</h2>
-        <p>Your data is still on this phone and in your account. Send Milan a screenshot of this screen.</p>
+        <h2 style={{ margin: "8px 0" }}>{w("app.crashTitle")}</h2>
+        <p>{w("app.crashDataSafe")}</p>
         <pre style={{ whiteSpace: "pre-wrap", fontSize: 12.5, background: "var(--surface)", padding: 12, borderRadius: 12, border: "1.5px solid var(--line)" }}>{version}{"\n"}{e.message}{"\n"}{(e.stack ?? "").split("\n").slice(1, 5).join("\n")}</pre>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 12 }}>
-          <button onClick={() => location.reload()} style={btn}>Try again</button>
-          <button onClick={exportCopy} style={btn}>Save this phone's copy as a file</button>
-          <button onClick={fromAccount} style={{ ...btn, background: "var(--brand)", color: "var(--surface)", borderColor: "var(--brand)" }}>Open from the account copy</button>
+          <button onClick={() => location.reload()} style={btn}>{w("app.crashTryAgain")}</button>
+          <button onClick={exportCopy} style={btn}>{w("app.crashSaveCopy")}</button>
+          <button onClick={fromAccount} style={{ ...btn, background: "var(--brand)", color: "var(--surface)", borderColor: "var(--brand)" }}>{w("app.crashFromAccount")}</button>
         </div>
-        <p style={{ fontSize: 13, color: "var(--muted)" }}>Open from the account copy sets this phone's copy aside, not deleted, and loads the one in your account.</p>
+        <p style={{ fontSize: 13, color: "var(--muted)" }}>{w("app.crashFromAccountWhy")}</p>
       </div>
     );
   }

@@ -1,5 +1,5 @@
 // A cook's words for a food (DT88, board Stories58; Milan 24 October 12:12). The food's name keeps its state after a comma,
-import { w } from "./words";
+import { w, wIn, type Val, type WordKey } from "./words";
 // as the database writes it: "Penne, dry", "Chicken breast, cooked". A cook says "135 g dry penne" and weighs it dry, so the
 // screens show the short name and how to weigh it. The food and its numbers do not change; only the words on the screen.
 // DT91 (0.2.88): what a cook does with it: a food that goes in the pot raw or dry is cooked by the steps; a food sold cooked is
@@ -17,25 +17,29 @@ export function cookName(name: string): { short: string; state: CookState | null
 export function weighLine(name: string): string | null {
   const { state } = cookName(name);
   if (!state) return null;
-  return state === "uncooked" || state === "raw" ? w("cook.weighRaw") : state === "drained" ? w("cook.weighDrained") : state === "dry" ? w("cook.weighDry") : state === "cooked" ? w("cook.weighCooked") : `weigh it ${state}`;
+  return state === "uncooked" || state === "raw" ? w("cook.weighRaw") : state === "drained" ? w("cook.weighDrained") : state === "dry" ? w("cook.weighDry") : state === "cooked" ? w("cook.weighCooked") : w("cook.weighBoiled");
 }
 // the food as a cook says it, with its amount: 135 g dry penne, 150 g cooked chicken breast, 80 g chickpeas, drained
+const PHRASE: Record<CookState, WordKey> = { dry: "cook.phraseDry", raw: "cook.phraseRaw", uncooked: "cook.phraseRaw", cooked: "cook.phraseCooked", boiled: "cook.phraseBoiled", drained: "cook.phraseDrained" };
 export function cookPhrase(name: string, grams: number): string {
   const { short, state } = cookName(name);
-  const g = `${Math.round(grams)} g`, low = lowerName(short);
-  if (!state) return `${g} ${low}`;
-  if (state === "drained") return `${g} ${low}, drained`;
-  return `${g} ${state === "uncooked" ? "raw" : state} ${low}`;
+  return w(state ? PHRASE[state] : "cook.phrase", { grams: Math.round(grams), food: lowerName(short) });
 }
 // lower case for the running text, as the chips always were, except names of places and words in capitals (Greek, PD)
 function lowerName(s: string): string {
   return s.split(/\s+/).map((w) => (/^(Greek|Icelandic|Dijon|Parma|Mozzarella di)$/.test(w) || /^[A-Z0-9%]{2,}$/.test(w) ? w : w.toLowerCase())).join(" ");
 }
 // the food the plate is built around, for the head and the lines: "chicken breast"; more than one food: "foods"
+// DT243 part two: in the app's language, as it fills a slot of another line
 export function aroundWord(names: string[]): string {
-  if (names.length !== 1) return "foods";
+  if (names.length !== 1) return w("cook.aroundFoods");
   return lowerName(cookName(names[0]).short);
 }
+// as a recipe saves it (Chef Mealan's dinner, byChef.around): "foods" stays the saved word; aroundV puts it in a line
+export function aroundSaved(names: string[]): string {
+  return names.length !== 1 ? "foods" : aroundWord(names);
+}
+export const aroundV = (saved: string): Val => (l) => (saved === "foods" ? wIn(l, "cook.aroundFoods") : saved);
 
 const MEAT = /\b(chicken|turkey|beef|pork|lamb|veal|steak|mince|minced|salmon|tuna|cod|fish|trout|duck|breast|thigh)\b/i;
 const PASTA = /\b(pasta|penne|spaghetti|fusilli|macaroni|noodles?|tagliatelle|linguine|rigatoni)\b/i;
@@ -68,9 +72,9 @@ export function rawHint(name: string, grams: number): string | null {
   const { short, state } = cookName(name);
   if (state !== "cooked" && state !== "boiled" || !(grams > 0)) return null;
   const r5 = (g: number) => Math.round(g / 5) * 5;
-  if (MEAT.test(short)) return `about ${r5(grams / 0.75)} g raw`;
-  if (PASTA.test(short)) return `about ${r5(grams / 2.4)} g dry`;
-  if (GRAIN.test(short)) return `about ${r5(grams / 2.5)} g dry`;
+  if (MEAT.test(short)) return w("cook.aboutRaw", { grams: r5(grams / 0.75) });
+  if (PASTA.test(short)) return w("cook.aboutDry", { grams: r5(grams / 2.4) });
+  if (GRAIN.test(short)) return w("cook.aboutDry", { grams: r5(grams / 2.5) });
   return null;
 }
 

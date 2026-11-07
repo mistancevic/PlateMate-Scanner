@@ -5,6 +5,7 @@
 import type { Slot } from "./slots";
 import { toMin, toTime } from "./slots";
 import type { PlanDay } from "./plan";
+import { w } from "./words";
 
 export type Block = { from: number; to: number }; // minutes past the date's midnight
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -22,7 +23,7 @@ export function blocksOn(date: string, busy: { s: number; e: number }[]): Block[
   for (const b of raw) { const last = out[out.length - 1]; if (last && b.from <= last.to) last.to = Math.max(last.to, b.to); else out.push({ ...b }); }
   return out;
 }
-export const blockWords = (b: Block) => `${clock(b.from)} to ${clock(b.to)}`;
+export const blockWords = (b: Block) => w("busy.fromTo", { from: clock(b.from), to: clock(b.to) });
 
 export type Ask =
   | { kind: "meal"; slotId: string; name: string; time: string; block: Block; before: string | null; after: string | null }

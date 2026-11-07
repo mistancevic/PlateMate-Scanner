@@ -21,7 +21,7 @@ const t0 = Date.now();
 const run = (file, port) => new Promise((resolve) => {
   // the same walkthrough with its own port, next to the original so its requires still resolve
   const src = fs.readFileSync(path.join(DIR, file), "utf8");
-  const ports = [...new Set([...src.matchAll(/PORT: "(\d{4})"/g)].map((m) => m[1]))];
+  const ports = [...new Set([...src.matchAll(/PORT: "(\d{4})"/g), ...src.matchAll(/PORT = "(\d{4})"/g)].map((m) => m[1]))];
   let body = src; for (const p of ports) body = body.split(p).join(String(port));
   const tmp = path.join(DIR, `_lane-${port}-${file}`); fs.writeFileSync(tmp, body);
   const t = Date.now(); let out = "";

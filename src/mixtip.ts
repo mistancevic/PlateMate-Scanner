@@ -1,7 +1,7 @@
 // The mix tip: a scanned food that doesn't fit the plate on its own, and what to mix it with.
 // Pure code. The case comes from the number, the partners from the moment and the roles, the amounts from the solver.
 // The model never picks a partner; it may only word the Pro tip below.
-import { dec } from "./words";
+import { dec, w, wn, type WordKey } from "./words";
 import { aggregate, density, solveIngredient, snapToServing, uid, type Food, type Ingredient } from "./pilot";
 import { jobOf, PORTION, minPortionOf, isVegPepper, type Job } from "./foodjob";
 import { roleOf } from "./swaps";
@@ -14,6 +14,9 @@ import { englishName } from "./foodId";
 
 export type MixCase = "fits" | "under" | "over" | "unknown";
 export type MixKind = "DaaM dessert" | "meal" | "snack";
+// DT243: a mix's kind on the screen, in the language chosen; the kind itself stays as it is logged
+const KIND_WORD: Record<MixKind, WordKey> = { "DaaM dessert": "foods.mixDessert", meal: "foods.mixMeal", snack: "foods.mixSnack" };
+export const mixKindName = (k: MixKind) => w(KIND_WORD[k]);
 export type Mix = { id: string; partners: Food[]; items: Ingredient[]; pd: number; kcal: number; protein: number; kind: MixKind; cooking: boolean; fromStarter: string[] };
 export type MixTip = { case: MixCase; mixes: Mix[]; why: string };
 
@@ -209,8 +212,8 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
     if (pre.fits) return { case: "fits", mixes: [], why: pre.reason };
   }
   const c = mixCase(food, target);
-  if (c === "fits") return { case: c, mixes: [], why: "fits this plate as it stands" };
-  if (c === "unknown" || target === null) return { case: c, mixes: [], why: "no target or no protein value" };
+  if (c === "fits") return { case: c, mixes: [], why: w("foods.mixFits") };
+  if (c === "unknown" || target === null) return { case: c, mixes: [], why: w("foods.mixUnknown") };
   const ask = ASKS[moment] ?? ASKS.regular;
   const roles = c === "under" ? ask.under : ask.over;
   const cap = ask.snack ? Math.min(SNACK_KCAL, kcalCap ?? SNACK_KCAL) : kcalCap;
@@ -249,11 +252,11 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
   }
   // fill the remaining slots with other single partners, so the person sees an alternative
   for (const f of firsts.slice(1)) { if (mixes.length >= ask.partners) break; push([f]); }
-  const why = c === "under" ? `PD ${dec(density(food.protein, food.calories)!, 1)} is under your ${dec(target, 1)}: it needs a protein base` : `PD ${density(food.protein, food.calories)!.toFixed(1)} is far over your ${target.toFixed(1)}: alone it is not a meal`;
+  const why = w(c === "under" ? "foods.mixUnder" : "foods.mixOver", { pd: dec(density(food.protein, food.calories)!, 1), target: dec(target, 1) });
   return { case: c, mixes, why };
 }
 
-export const mixLabel = (m: Mix) => { const first = m.items[0]; const n = first?.food.serving ? `${Math.round(first.grams / first.food.serving.grams)} ${first.food.serving.name}${Math.round(first.grams / first.food.serving.grams) === 1 ? "" : "s"} ` : ""; return `${n}with ${m.partners.map((p) => p.name).join(" + ")}`; };
+export const mixLabel = (m: Mix) => { const first = m.items[0]; const partners = m.partners.map((p) => p.name).join(" + "); return first?.food.serving ? wn("foods.mixLabelServings", Math.round(first.grams / first.food.serving.grams), { serving: first.food.serving.name, partners }) : w("foods.mixLabel", { partners }); };
 
 // DT206 (0.3.48; Coach Milan 1 November 19:42, a lunch built around an alcohol-free beer): a drink goes with a meal. It counts
 // in the meal; Chef Mealan never builds the meal around it, and a recipe keeps it out unless you say so.

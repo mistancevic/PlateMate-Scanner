@@ -5,6 +5,7 @@
 //   2. photo files, 3. the record with cards and recipes, 4. access requests and invites.
 //      If one of these fails, the sign-in is unlocked again, so the person can sign in and finish.
 //   5. the sign-in itself. If only this fails, the data is gone and the sign-in stays switched off; the team removes it.
+import { w } from "./words";
 export type DeleteStep = "lock" | "files" | "record" | "requests" | "signin";
 export type DeleteDeps = {
   lock: () => Promise<void>;
@@ -17,14 +18,10 @@ export type DeleteDeps = {
 };
 export type DeleteResult = { ok: boolean; done: DeleteStep[]; failed?: DeleteStep; dataGone: boolean; message: string; error?: string };
 
-const NAME: Record<DeleteStep, string> = {
-  lock: "locking your sign-in",
-  files: "your photo files",
-  record: "your record, with cards and recipes",
-  requests: "your access requests and invites",
-  signin: "your sign-in",
-};
-const list = (xs: DeleteStep[]) => xs.filter((x) => x !== "lock").map((x) => NAME[x]).join(", ");
+// DT243: the words are lines of the app. The server builds the message, so it reads English there until the phone's language is passed
+const NAME_KEY = { lock: "account.stepLock", files: "account.stepFiles", record: "account.stepRecord", requests: "account.stepRequests", signin: "account.stepSignin" } as const;
+const NAME = (s: DeleteStep) => w(NAME_KEY[s]);
+const list = (xs: DeleteStep[]) => xs.filter((x) => x !== "lock").map((x) => NAME(x)).join(", ");
 
 export async function deleteAccount(deps: DeleteDeps): Promise<DeleteResult> {
   const done: DeleteStep[] = [];
@@ -37,10 +34,10 @@ export async function deleteAccount(deps: DeleteDeps): Promise<DeleteResult> {
       const error = (e as Error)?.message ?? String(e);
       deps.log(`account delete stopped at ${step}: ${error}`);
       if (step === "lock") {
-        return { ok: false, done, failed: step, dataGone: false, error, message: "Nothing was deleted: the delete couldn't start. Your data is as it was. Try again later." };
+        return { ok: false, done, failed: step, dataGone: false, error, message: w("account.deleteNotStarted") };
       }
       if (step === "signin") {
-        return { ok: false, done, failed: step, dataGone: true, error, message: "Your data is deleted. Your sign-in is switched off, but removing it didn't work. Chef Mealan removes it for you." };
+        return { ok: false, done, failed: step, dataGone: true, error, message: w("account.deleteSigninLeft") };
       }
       let unlocked = true;
       try { await deps.unlock(); } catch (u) { unlocked = false; deps.log(`account delete could not unlock: ${(u as Error)?.message ?? u}`); }
@@ -48,9 +45,9 @@ export async function deleteAccount(deps: DeleteDeps): Promise<DeleteResult> {
       const removed = list(done);
       return {
         ok: false, done, failed: step, dataGone, error,
-        message: `The delete stopped at ${NAME[step]}.${removed ? ` Removed so far: ${removed}.` : " Nothing was removed."}${unlocked ? " Your sign-in still works: sign in and tap Delete my account again to finish." : " Your sign-in is switched off; Chef Mealan finishes the delete for you."}`,
+        message: `${w("account.deleteStoppedAt", { step: NAME(step) })} ${removed ? w("account.deleteRemovedSoFar", { removed }) : w("account.deleteNothingRemoved")} ${unlocked ? w("account.deleteSigninWorks") : w("account.deleteSigninOff")}`,
       };
     }
   }
-  return { ok: true, done, dataGone: true, message: `Deleted: ${list(done)}.` };
+  return { ok: true, done, dataGone: true, message: w("account.deleted", { list: list(done) }) };
 }

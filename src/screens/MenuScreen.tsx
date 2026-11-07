@@ -1,4 +1,5 @@
-import { numLocale, w, wIn as wordIn, dec, dateText, phoneLoc, mealName, mealV, type WordKey } from "../words";
+import { numLocale, w, wn, wIn as wordIn, dec, dateText, phoneLoc, mealName, mealV, type WordKey } from "../words";
+import { weekdayName } from "../weekdayWords";
 import { optWord } from "../optWords";
 import { getLang } from "../lang";
 import { SafetyQuestion } from "../components/SafetyQuestion";
@@ -72,14 +73,14 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "metrics", get name() { return w("menu.metrics"); }, icon: <LineChart size={20} /> },
   { id: "costs", get name() { return w("menu.runningCosts"); }, icon: <Receipt size={20} /> },
   { id: "share", get name() { return w("menu.shareChefMealan"); }, icon: <QrCode size={20} /> },
-  { id: "explorer", name: "Explorer", icon: <Microscope size={20} /> },
+  { id: "explorer", get name() { return w("tab.explorer"); }, icon: <Microscope size={20} /> },
   { id: "admin", get name() { return w("menu.admin"); }, icon: <ShieldCheck size={20} /> },
   // DT215 v3 (0.3.66, board Stories162b): Settings, how the app works for you; Voice while cooking its first page
   { id: "settings", get name() { return w("menu.settings"); }, icon: <Settings size={20} /> },
   { id: "voice", get name() { return w("menu.voiceWhileCooking"); }, icon: <Settings size={20} /> },
   { id: "dev", get name() { return w("menu.devData"); }, icon: <Settings size={20} /> },
   // DT203 (0.3.76, board Stories175 v2): the language Chef Mealan speaks
-  { id: "language", name: "Language", icon: <Settings size={20} /> },
+  { id: "language", get name() { return w("voice.language"); }, icon: <Settings size={20} /> },
 ];
 // Metrics in the menu only for the account the server names (0.2.5+r17, board M, M1); kept so the row shows at once
 const OWNER = "chefmealan-metrics-owner";
@@ -137,7 +138,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
           {p.profile.admin && <button className="menu-row" onClick={() => setSection("admin")}><span className="menu-icon"><ShieldCheck size={20} /></span><span className="menu-row-text"><b>{w("menu.admin")}</b><small>{w("menu.superadminOnly")}</small></span><ChevronRight size={18} /></button>}
           {/* SH73 (Milan 21 October 21:10): a QR code to share chefmealan.com or the book, and for a coach a code to join, shown as a QR code */}
           <ShareRow open={() => setSection("share")} />
-          {[{ id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
+          {[{ id: "support" as MenuSection, name: w("menu.support"), icon: <LifeBuoy size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
             <button key={it.id} className="menu-row" onClick={() => setSection(it.id)}>
               <span className="menu-icon">{it.icon}</span><b>{it.name}</b><ChevronRight size={18} />
             </button>
@@ -219,10 +220,10 @@ function ProfilePanel(p: AppApi) {
           <b>{w("menu.beforeYourNumbers")}</b>
           <p className="small">{w("menu.toCalculateYourDayChef")}</p>
           <ul className="small">
-            <li><b>Kept:</b> {w("menu.onlyThoseValuesAndThe")}</li>
-            <li><b>Where:</b> {w("menu.onThisPhoneAndIn")}</li>
-            <li><b>How long:</b> {w("menu.whileTheAccountExists")}</li>
-            <li><b>Yours:</b> {w("menu.exportItOrDeleteIt")}</li>
+            <li><b>{w("menu.consentKept")}</b> {w("menu.onlyThoseValuesAndThe")}</li>
+            <li><b>{w("menu.consentWhere")}</b> {w("menu.onThisPhoneAndIn")}</li>
+            <li><b>{w("menu.consentHowLong")}</b> {w("menu.whileTheAccountExists")}</li>
+            <li><b>{w("menu.consentYours")}</b> {w("menu.exportItOrDeleteIt")}</li>
           </ul>
           <p className="small">{w("menu.nothingAboutYourBodyIs")} <a href="/privacy">{w("menu.privacyNotice2")}</a>.</p>
           <div className="button-row">
@@ -234,16 +235,16 @@ function ProfilePanel(p: AppApi) {
         <label className="field"><span>{w("menu.name")}</span><input value={name} placeholder={w("menu.yourName")} onChange={(e) => setName(e.target.value)} /></label>
         <div className="field" id="pf-sex"><span>{w("menu.yourBody")}</span>
           <div className="moments">
-            {(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setD({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}
+            {(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setD({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? w("goal.female") : w("goal.male")}</button>)}
           </div>
         </div>
         <div className="field-row" onBlur={() => setLeft(true)}>
-          <label className="field" id="pf-birthYear"><span>{w("menu.birthYear")}</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="enter year" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} /></label>
+          <label className="field" id="pf-birthYear"><span>{w("menu.birthYear")}</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder={w("goal.enterYear")} onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} /></label>
           <HeightField id="pf-height" cm={d.heightCm} unit={cleanUnits(d.units).height} onCm={(v) => setD((x) => ({ ...x, heightCm: v }))} />
           <WeightField id="pf-weight" kg={d.weightKg} unit={cleanUnits(d.units).weight} onKg={(v) => setD((x) => ({ ...x, weightKg: v }))} />
         </div>
         {/* DT208 (0.3.49): a field the numbers need says so when you leave it empty */}
-        {left && needNow.filter((x) => ["birthYear", "height", "weight"].includes(x.field ?? "")).map((x) => <small key={x.label} className="field-need">{x.label.replace(/^./, (c) => c.toUpperCase())}: needed for your numbers.</small>)}
+        {left && needNow.filter((x) => ["birthYear", "height", "weight"].includes(x.field ?? "")).map((x) => <small key={x.label} className="field-need">{w("menu.neededForNumbers", { field: x.label.replace(/^./, (c) => c.toUpperCase()) })}</small>)}
         <label className="field"><span>{w("profile.bodyFatIf")}</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder={w("profile.fromScale")} onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} /></label>
         <div className="field"><span>{w("menu.yourWork")}</span>
           <div className="activity-list">
@@ -270,7 +271,7 @@ function ProfilePanel(p: AppApi) {
               <small className="muted">{u.weight === "kg" ? w("menu.weighInsYourGoalAnd") : d.weightKg ? w("profile.kgIsLb", { kg: Math.round(d.weightKg * 10) / 10, lb: (Math.round(kgToLb(d.weightKg) * 10) / 10).toFixed(1) }) : w("menu.weighInsYourGoalAnd2")}</small>
               <b>{w("menu.height")}</b>
               <div className="moments">{chip("height", "cm", "cm")}{chip("height", "ftin", w("profile.ftIn"))}</div>
-              {u.height === "ftin" && h && <small className="muted">{Math.round(d.heightCm!)} cm is {h.ft} ft {h.inch} in.</small>}
+              {u.height === "ftin" && h && <small className="muted">{w("menu.cmIsFtIn", { cm: Math.round(d.heightCm!), ft: h.ft, inch: h.inch })}</small>}
               <small className="muted">{w("menu.foodAmountsStayInGrams")}</small>
             </div>
           );
@@ -286,12 +287,12 @@ function ProfilePanel(p: AppApi) {
             return <small className="pd-unit-day">{w("profile.pdYourDay", { g: Math.round(pro), kcal: Math.round(kcal).toLocaleString(numLocale()), pd: getLang() !== "en" ? dec(pd, 1) : pd.toFixed(1), pct: Math.round(pd * 4), part: Math.round(pro * 4).toLocaleString(numLocale()) })}</small>;
           })()}
         </div>
-        <small className={`muted saved-line ${odd ? "odd" : ""}`} role="status">{!consented ? "" : odd ? `Not kept yet: ${odd}.` : w("menu.keptAsYouGoNothing")}</small>
+        <small className={`muted saved-line ${odd ? "odd" : ""}`} role="status">{!consented ? "" : odd ? w("menu.notKeptYet", { what: odd }) : w("menu.keptAsYouGoNothing")}</small>
       </section>
       <div id="pf-health"><SafetyQuestion p={p} /></div>
       <NextLink p={p} to="goal" from="profile" text={w("me2.goal")} hint={canCalculate(d) ? w("menu.calculateYourDailyNumbersFrom") : w("menu.yourGoalAndDailyNumbers")} before={keep} />
       {/* DT208: Next goes on; under it, what is still missing, the whole line a link to that field */}
-      {needNow.length > 0 && <button type="button" className="setup-line" onClick={() => focusField(needNow[0].field)}><span>Still needed for your numbers: {needNow.map((x) => x.label).join(", ")}</span><ChevronRight size={18} aria-hidden="true" /></button>}
+      {needNow.length > 0 && <button type="button" className="setup-line" onClick={() => focusField(needNow[0].field)}><span>{w("menu.stillNeeded", { list: needNow.map((x) => x.label).join(", ") })}</span><ChevronRight size={18} aria-hidden="true" /></button>}
     </>
   );
 }
@@ -321,7 +322,7 @@ function NextLink({ p, to, from, text, hint, before }: { p: AppApi; to: MenuSect
 function GoalPanel(p: AppApi) {
   const { state, goal, openGoal, resetGoal } = p;
   const band = goal?.band ? bandOf(goal.band) : null;
-  const setBy = goal?.setBy === "coach" ? `Coach ${(goal.coachName || p.profile.coachName || COACH_NAME).split(" ")[0]}` : "you";
+  const setBy = goal?.setBy === "coach" ? w("sheet.coachName", { name: (goal.coachName || p.profile.coachName || COACH_NAME).split(" ")[0] }) : w("coach.youLower");
   const mode = dayModeOf(p.personal);
   const ownWay = goal?.source === "exact" || goal?.source === "coach";
   const c = calculate(p.personal, band?.id ?? "maintain", p.formula);
@@ -338,17 +339,17 @@ function GoalPanel(p: AppApi) {
         {band && <span className="goal-who">{wordIn(getLang(), `goal.who.${band.id}` as WordKey) ?? band.who}</span>}
         {p.review && p.review.status !== "closed" && ownWay && (
           <span className={`review-state ${p.review.status}`}>
-            {p.review.status === "waiting" ? `Waiting for ${p.coachLabel}: ${p.review.kept?.length ?? 0} kept on purpose` : p.review.status === "approved" ? `Approved by ${p.review.by || p.coachLabel}, ${new Date(p.review.at).toLocaleDateString("en", { day: "numeric", month: "long" })}` : `${p.review.by || p.coachLabel} asks you to change ${p.review.kept?.length === 1 ? "one number" : "your numbers"}`}
+            {p.review.status === "waiting" ? w("menu.reviewWaiting", { coach: p.coachLabel, n: p.review.kept?.length ?? 0 }) : p.review.status === "approved" ? w("menu.reviewApproved", { coach: p.review.by || p.coachLabel, date: dateText(new Date(p.review.at), { day: "numeric", month: "long" }, "en") }) : w(p.review.kept?.length === 1 ? "menu.reviewChangeOne" : "menu.reviewChangeAll", { coach: p.review.by || p.coachLabel })}
           </span>
         )}
         {mode === "same" || (!c && !o) ? (
           <>
             <div className="plan-row">
-              <div><b>{pdVal(p.dayPd)}</b><small>{pdTag()} target</small></div>
+              <div><b>{pdVal(p.dayPd)}</b><small>{w("menu.tagTarget", { tag: pdTag() })}</small></div>
               <div><b>{fmt(state.goals.calories, 0)}</b><small>{w("menu.kcalADay")}</small></div>
               <div><b>{fmt(state.goals.protein, 0)}</b><small>{w("menu.gProtein")}</small></div>
             </div>
-            {state.goals.fats != null && state.goals.carbs != null && <p className="macro-line">{fmt(state.goals.fats, 0)} g fat · {fmt(state.goals.carbs, 0)} g carbs · every day the same</p>}
+            {state.goals.fats != null && state.goals.carbs != null && <p className="macro-line">{w("menu.macroSame", { fat: fmt(state.goals.fats, 0), carbs: fmt(state.goals.carbs, 0) })}</p>}
           </>
         ) : null}
       </section>
@@ -357,20 +358,20 @@ function GoalPanel(p: AppApi) {
         const ng = p.personal.nextGoal, day = new Date(`${ng.from}T12:00:00`);
         return (
           <section className="card next-goal" aria-label={w("menu.nextGoal")}>
-            <small className="next-goal-when">NEXT, FROM {day.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).toUpperCase().replace(",", "")}</small>
+            <small className="next-goal-when">{w("menu.nextFrom", { date: dateText(day, { weekday: "long", day: "numeric", month: "long" }, "en-GB").toUpperCase().replace(",", "") })}</small>
             <b>{goalName(ng.band)}</b>
-            <small>{ng.setBy === "coach" ? `Set by ${p.coachLabel}. ` : ""}{ng.kcal.toLocaleString(numLocale())} kcal and {ng.protein} g protein a day on average. Plan already uses it from {day.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>
+            <small>{ng.setBy === "coach" ? `${w("menu.setByCoach", { coach: p.coachLabel })} ` : ""}{w("menu.nextGoalNumbers", { kcal: ng.kcal.toLocaleString(numLocale()), protein: ng.protein, date: dateText(day, { day: "numeric", month: "long" }, "en-GB") })}</small>
             {/* a goal from the coach (canvas board CW, CW9): Reply instead of Change the date and Cancel */}
             {ng.setBy === "coach"
-              ? <div className="button-row"><button className="pill pill-small" onClick={() => { const r = window.prompt(`Reply to ${p.coachLabel}`); if (r && r.trim()) { p.replyToCoach(r.trim()); p.notify(`Sent to ${p.coachLabel}.`); } }}>Reply to {p.coachLabel}</button></div>
-              : <div className="button-row"><button className="pill pill-small" onClick={openGoal}>{w("menu.changeTheDate")}</button><button className="link link-danger" onClick={() => { p.cancelNextGoal(); p.notify("The next goal is cancelled."); }}>{w("menu.cancel")}</button></div>}
+              ? <div className="button-row"><button className="pill pill-small" onClick={() => { const r = window.prompt(w("menu.replyTo", { coach: p.coachLabel })); if (r && r.trim()) { p.replyToCoach(r.trim()); p.notify(w("menu.sentTo", { coach: p.coachLabel })); } }}>{w("menu.replyTo", { coach: p.coachLabel })}</button></div>
+              : <div className="button-row"><button className="pill pill-small" onClick={openGoal}>{w("menu.changeTheDate")}</button><button className="link link-danger" onClick={() => { p.cancelNextGoal(); p.notify(w("menu.nextGoalCancelled")); }}>{w("menu.cancel")}</button></div>}
           </section>
         );
       })()}
       {sheet && <GoalSheet sheet={sheet} />}
       {band && p.safety.consentBodyAt && !weighInsOff(p.safety) && (
         <WeightTrend list={p.personal.weighIns} band={band.id} weightKg={p.personal.weightKg} trainingAge={p.personal.trainingAge}
-          onUpdateWeight={(kg) => { p.setPersonal({ ...p.personal, weightKg: kg }); p.notify(`Your numbers now use ${wText(kg, 0)}.`); }}
+          onUpdateWeight={(kg) => { p.setPersonal({ ...p.personal, weightKg: kg }); p.notify(w("menu.numbersNowUse", { kg: wText(kg, 0) })); }}
           onRemove={(date) => p.setPersonal({ ...p.personal, weighIns: withoutWeighIn(p.personal.weighIns, date) })} />
       )}
       {band && guideOf(band.id) && (
@@ -382,12 +383,12 @@ function GoalPanel(p: AppApi) {
       {!ownWay && c && <ProteinCard c={c} />}
       {p.review?.status === "change" && ownWay && (
         <section className="coach-note">
-          <small>{p.review.by || p.coachLabel}, {new Date(p.review.at).toLocaleDateString("en", { day: "numeric", month: "long" })}</small>
+          <small>{p.review.by || p.coachLabel}, {dateText(new Date(p.review.at), { day: "numeric", month: "long" }, "en")}</small>
           <b>{p.review.note || w("menu.pleaseLookAtYourNumbers")}</b>
-          {p.review.kept?.length ? <small>About: {p.review.kept.map((k) => k.title.toLowerCase()).join("; ")}</small> : null}
+          {p.review.kept?.length ? <small>{w("menu.reviewAbout", { list: p.review.kept.map((k) => k.title.toLowerCase()).join("; ") })}</small> : null}
           <div className="button-row">
             <button className="pill pill-small pill-primary" onClick={openGoal}>{w("menu.changeMyNumbers")}</button>
-            <button className="pill pill-small" onClick={() => { const r = window.prompt(`Reply to ${p.review?.by || p.coachLabel}`); if (r && r.trim()) void p.sendReview(p.review?.kept ?? [], p.review?.summary ?? "", r.trim()); }}>Reply to {p.review.by || p.coachLabel}</button>
+            <button className="pill pill-small" onClick={() => { const r = window.prompt(w("menu.replyTo", { coach: p.review?.by || p.coachLabel })); if (r && r.trim()) void p.sendReview(p.review?.kept ?? [], p.review?.summary ?? "", r.trim()); }}>{w("menu.replyTo", { coach: p.review.by || p.coachLabel })}</button>
           </div>
         </section>
       )}
@@ -405,7 +406,7 @@ function GoalPanel(p: AppApi) {
         const kept = a.findings.filter((f) => !openAt(f, p.personal)).length, open = a.findings.length - kept;
         return (
           <button className="menu-row analysis-row" onClick={openGoal}>
-            <span className="menu-row-text"><b>{w("menu.targetAnalysis")}</b><small>{a.findings.length ? `${a.findings.length} finding${a.findings.length === 1 ? "" : "s"}${kept ? `, ${kept} kept on purpose` : ""}${open ? `, ${open} open` : ""}` : w("menu.everythingInRange")}</small></span><ChevronRight size={18} />
+            <span className="menu-row-text"><b>{w("menu.targetAnalysis")}</b><small>{a.findings.length ? `${wn("menu.findingsN", a.findings.length)}${kept ? `, ${w("menu.nKeptOnPurpose", { n: kept })}` : ""}${open ? `, ${w("menu.nOpen", { n: open })}` : ""}` : w("menu.everythingInRange")}</small></span><ChevronRight size={18} />
           </button>
         );
       })()}
@@ -417,7 +418,7 @@ function GoalPanel(p: AppApi) {
       {/* the formula is picked in the calculator (canvas board FX, G1a); here one line says which one is in use */}
       {canCalculate(p.personal) && !isMinor(p.personal) && (
         <section className="card you-card formula-line">
-          <span><b>{w("menu.formula")}</b><small>{p.formula ? `${FORMULA_NAME[p.formula]}, set by ${p.coachLabel}` : p.personal.formula ? FORMULA_NAME[p.personal.formula] : `Automatic: ${p.personal.bodyFatPct ? w("menu.katchMcardle") : w("menu.mifflinStJeor")} now`}{(p.formula ?? p.personal.formula) === "data" && p.personal.measuredUse ? ` · ${p.personal.measuredUse.kcal.toLocaleString(numLocale())} kcal a day to stay the same` : p.formulaKcal ? ` · ${p.formulaKcal.toLocaleString(numLocale())} kcal a day to stay the same` : ""}</small></span>
+          <span><b>{w("menu.formula")}</b><small>{p.formula ? w("menu.formulaSetBy", { formula: FORMULA_NAME[p.formula], coach: p.coachLabel }) : p.personal.formula ? FORMULA_NAME[p.personal.formula] : w("menu.formulaAutoNow", { formula: p.personal.bodyFatPct ? w("menu.katchMcardle") : w("menu.mifflinStJeor") })}{(p.formula ?? p.personal.formula) === "data" && p.personal.measuredUse ? ` · ${w("menu.kcalToStay", { kcal: p.personal.measuredUse.kcal.toLocaleString(numLocale()) })}` : p.formulaKcal ? ` · ${w("menu.kcalToStay", { kcal: p.formulaKcal.toLocaleString(numLocale()) })}` : ""}</small></span>
           <button className="link" onClick={() => openGoal("formula")}>{w("menu.change")}</button>
         </section>
       )}
@@ -431,7 +432,7 @@ function GoalPanel(p: AppApi) {
         <p><b>{w("menu.yourTraining")}</b> {w("menu.eachTrainingDayAddsWhat")}</p>
         <p><b>{w("menu.yourGoal2")}</b> {w("goalp.howGoal")}</p>
         <p><b>{w("menu.protein")}</b> {w("goalp.howProtein")}</p>
-        <small>Sources: Mifflin et al. 1990; Katch and McArdle; Schofield 1985 (FAO/WHO/UNU); FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
+        <small>{w("menu.numbersSources")}</small>
       </section>
       <GoalHistory log={p.goalLog} />
       <NextLink p={p} to="life" from="goal" text={w("me2.lifestyle")} hint={w("me.lifeHint")} />
@@ -449,8 +450,8 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
       <section className="card history">
         {periods.slice(0, 20).map(({ entry: e, ...pr }) => (
           <div className="history-row" key={e.at}>
-            <div><b>{e.band ? goalName(e.band) : "Custom"}{pr.now && <span className="now-tag">NOW</span>}</b><small>{periodLine({ entry: e, ...pr })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? `, at ${wText(e.weightKg, Number.isInteger(wIn(e.weightKg)) ? 0 : 1)}` : ""}</small></div>
-            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString(numLocale()) : "?"}</b><small>kcal, {e.protein ?? "?"} g protein</small></div>
+            <div><b>{e.band ? goalName(e.band) : w("menu.custom")}{pr.now && <span className="now-tag">{w("menu.nowTag")}</span>}</b><small>{periodLine({ entry: e, ...pr })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? `, ${w("menu.atWeight", { kg: wText(e.weightKg, Number.isInteger(wIn(e.weightKg)) ? 0 : 1) })}` : ""}</small></div>
+            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString(numLocale()) : "?"}</b><small>{w("menu.kcalProtein", { protein: e.protein ?? "?" })}</small></div>
           </div>
         ))}
       </section>
@@ -517,12 +518,12 @@ function LifestylePanel(p: AppApi) {
                   <div className="time-rows my-hours">
                     <label className="time-row"><span>{w("menu.from")}</span><input type="time" value={l.workFrom ?? "09:00"} aria-label={w("menu.workFrom")} onChange={(e) => e.target.value && save({ workFrom: e.target.value })} /></label>
                     <label className="time-row"><span>{w("menu.to")}</span><input type="time" value={l.workTo ?? "17:00"} aria-label={w("menu.workTo")} onChange={(e) => e.target.value && save({ workTo: e.target.value })} /></label>
-                    <small className="setting-hint">{l.workFrom ?? "09:00"} to {l.workTo ?? "17:00"}{toMin(l.workTo ?? "17:00") <= toMin(l.workFrom ?? "09:00") ? " the next day" : ""}, your time. Meals and training fit around it.</small>
+                    <small className="setting-hint">{w(toMin(l.workTo ?? "17:00") <= toMin(l.workFrom ?? "09:00") ? "menu.myHoursNextDay" : "menu.myHours", { from: l.workFrom ?? "09:00", to: l.workTo ?? "17:00" })}</small>
                   </div>
                 )}
               </Setting>
               <Setting name={w("life.atWork")}><Options items={MOVES} on={l.move ?? "sitting"} pick={(v) => save({ move: v })} /></Setting>
-              <Setting name={w("life.workTravel")}><Chips items={[{ id: "none", name: "None" }, { id: "sometimes", name: "Occasionally" }, { id: "often", name: "A lot" }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
+              <Setting name={w("life.workTravel")}><Chips items={[{ id: "none", name: optWord("None") }, { id: "sometimes", name: optWord("Occasionally") }, { id: "often", name: optWord("A lot") }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
             </>
           )}
           {(wk === "study" || wk === "both") && (
@@ -553,13 +554,13 @@ function LifestylePanel(p: AppApi) {
             {/* DT166: a time you set yourself stays; when work, wake-up or bedtime would give another, one tap takes it back */}
             {(() => { const auto = slotsOf({ ...l, slotTimes: undefined }); return slotsOf(l).filter((s) => l.slotTimes?.[s.id] && auto.find((a) => a.id === s.id)!.time !== s.time).map((s) => { const a = auto.find((x) => x.id === s.id)!.time;
               const { [s.id]: _drop, ...rest } = l.slotTimes ?? {};
-              return <small key={s.id} className="setting-hint own-time">{l.meals === 1 ? "Your meal" : s.name} at {s.time} is your own time. <button type="button" className="link" onClick={() => save({ slotTimes: rest })}>Back to {a}</button></small>; }); })()}
+              return <small key={s.id} className="setting-hint own-time">{w("menu.ownTime", { meal: l.meals === 1 ? w("menu.yourMeal") : mealName(s.name), time: s.time })} <button type="button" className="link" onClick={() => save({ slotTimes: rest })}>{w("menu.backTo", { time: a })}</button></small>; }); })()}
           </div>
           {(() => { const wq = workHoursOf(l); if (!wq || !timesFromWork(l)) return null; const late = toMin(wq.from) >= 11 * 60;
-            return <small className="setting-hint from-work">From your work hours, {wq.from} to {wq.to}: {late ? "breakfast late morning, the main meal an hour before work, a small one at the break" : "breakfast before work, lunch at the halfway break, dinner after"}. Change any time and yours stays.</small>; })()}
+            return <small className="setting-hint from-work">{w(late ? "menu.fromWorkLate" : "menu.fromWork", { from: wq.from, to: wq.to })}</small>; })()}
           {/* DT166 (0.3.8, board Stories118): wake-up and bedtime set the first and last meal, the rest evenly between */}
           {!minor && timesFromSleep(l) && (() => { const sw = sleepWindow(l)!;
-            return <small className="setting-hint from-sleep">From your wake-up and bedtime, above: the first meal at {sw.from}, an hour and a half after you wake; the last at {sw.to}, two hours before bed; the rest evenly between. Change any time and yours stays.</small>; })()}
+            return <small className="setting-hint from-sleep">{w("menu.fromSleep", { from: sw.from, to: sw.to })}</small>; })()}
         </Setting>
         {/* DT134 (0.2.113, board Stories89): one meal a day eats within an hour from the meal, and the meal carries the day */}
         {!minor && l.meals === 1 && (() => { const wq = windowOf(l)!; return <p className="window-line">{w("life.windowOne", { from: wq.from, to: wq.to, kcal: fmt(p.state.goals.calories, 0), protein: fmt(p.state.goals.protein, 0) })}</p>; })()}
@@ -570,9 +571,9 @@ function LifestylePanel(p: AppApi) {
         <Setting name={w("life.whatEat")}>
           <Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} />
           {/* DT161 (0.3.3, board Stories113): what each diet means, Meat only's effect on the numbers, Other in your words */}
-          {l.diet === "Meat only" && <small className="setting-hint diet-hint">{optWord(DIET_MEANS["Meat only"])} They bring almost no carbs, so your carbs come close to zero. Very low carb fits your numbers: <button type="button" className="link" onClick={() => p.openGoal()}>{w("menu.setItUnderGoal")}</button></small>}
+          {l.diet === "Meat only" && <small className="setting-hint diet-hint">{optWord(DIET_MEANS["Meat only"])} {w("menu.meatOnlyCarbs")} <button type="button" className="link" onClick={() => p.openGoal()}>{w("menu.setItUnderGoal")}</button></small>}
           {l.diet && l.diet !== "Meat only" && DIET_MEANS[l.diet] && <small className="setting-hint diet-hint">{optWord(DIET_MEANS[l.diet])}</small>}
-          {l.diet === "Other" && <label className="field diet-other"><span>{w("menu.howYouEatInYour")}</span><input value={l.dietOther ?? ""} maxLength={120} placeholder="for example Mediterranean, no gluten" onChange={(e) => save({ dietOther: e.target.value })} /></label>}
+          {l.diet === "Other" && <label className="field diet-other"><span>{w("menu.howYouEatInYour")}</span><input value={l.dietOther ?? ""} maxLength={120} placeholder={w("menu.dietOtherExample")} onChange={(e) => save({ dietOther: e.target.value })} /></label>}
           {!minor && <small className="setting-hint">{w("life.readsThis")}</small>}
         </Setting>
         {/* DT167 (0.3.9): Taste, moved here from the bottom of Me */}
@@ -607,7 +608,7 @@ function PlanPanel(p: AppApi) {
   const c = p.goal ? calculate(p.personal, p.goal.band ?? "maintain", p.formula) : null;
   // Release B: the word on the right says Work, Study, or nothing on a day off; the bar keeps its colors
   const wkd = weekdaysOf(l), peOn = !!l.peWeek && l.peWeek !== "none";
-  const dayWord = (d: PlanDay) => { if (minor) return d.work ? w("menu.school") : w("menu.noSchool"); const k = dayKindOf(d, l); return k === "work" ? "Work" : k === "study" ? "Study" : wkd === "home" ? "" : w("menu.dayOff"); };
+  const dayWord = (d: PlanDay) => { if (minor) return d.work ? w("menu.school") : w("menu.noSchool"); const k = dayKindOf(d, l); return k === "work" ? w("menu.work") : k === "study" ? w("menu.study") : wkd === "home" ? "" : w("menu.dayOff"); };
   const wh = workHoursOf(l);
   const workHint = workHintOf(l, minor);
   const counts = countsOf(plan);
@@ -616,7 +617,7 @@ function PlanPanel(p: AppApi) {
     <>
       <p className="small muted page-why">{w("menu.yourUsualWeekOfTraining")}</p>
       <section className="week-card" aria-label={w("menu.yourTrainingWeek")}>
-        <div className="week-card-head"><b>{w("menu.yourUsualTrainingWeek")}</b>{avg !== null && <small>average {avg.toLocaleString(numLocale())} kcal</small>}</div>
+        <div className="week-card-head"><b>{w("menu.yourUsualTrainingWeek")}</b>{avg !== null && <small>{w("menu.averageKcal", { kcal: avg.toLocaleString(numLocale()) })}</small>}</div>
         {plan.map((d, i) => (
           <Fragment key={i}>
           <button type="button" className={`agenda-row ${open.includes(i) ? "on open" : ""}`} aria-expanded={open.includes(i)} onClick={() => toggle(i)}>
@@ -626,22 +627,22 @@ function PlanPanel(p: AppApi) {
             <small className={dayWord(d) ? "work" : ""}>{dayWord(d)}</small>
           </button>
           {open.includes(i) && (
-            <div className="agenda-open" role="group" aria-label={`${WEEKDAY_NAMES[i]}, every week`}>
-              <small className="muted agenda-open-why">Every {WEEKDAY_NAMES[i]}. To change one date, open that day on Plan. Tap {WEEKDAY_NAMES[i]} again to close.</small>
+            <div className="agenda-open" role="group" aria-label={w("menu.dayEveryWeek", { day: weekdayName(i) })}>
+              <small className="muted agenda-open-why">{w("menu.everyDayWhy", { day: weekdayName(i) })}</small>
               <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={d} onChange={(x) => setDay(i, x)} workHint={workHint} work={wh} />
               {/* DT140 (0.2.125) Move to and Copy, since DT147 one line at the end: each opens its day chips right there */}
               {act?.day === i ? (
-                <div className="setting day-act" role="group" aria-label={`${act.kind === "move" ? "Move" : "Copy"} ${WEEKDAY_NAMES[i]} to`}>
-                  <small className="setting-name">{act.kind === "move" ? `Move ${WEEKDAY_NAMES[i]} to` : `Copy ${WEEKDAY_NAMES[i]} to`}</small>
+                <div className="setting day-act" role="group" aria-label={w(act.kind === "move" ? "menu.moveDayTo" : "menu.copyDayTo", { day: weekdayName(i) })}>
+                  <small className="setting-name">{w(act.kind === "move" ? "menu.moveDayTo" : "menu.copyDayTo", { day: weekdayName(i) })}</small>
                   <div className="chip-row">{WEEKDAYS.map((wq, n) => n === i ? null : <button type="button" key={wq} className={`choice ${act.days.includes(n) ? "on" : ""}`} aria-pressed={act.days.includes(n)} onClick={() => {
-                    if (act.kind === "move") { save(moveDay(plan, i, n)); setOpen((o) => [...o.filter((x) => x !== i), n]); setAct(null); p.notify(`${WEEKDAY_NAMES[i]}'s training is on ${WEEKDAY_NAMES[n]} now${isTraining(plan[n]) ? `, and ${WEEKDAY_NAMES[n]}'s on ${WEEKDAY_NAMES[i]}` : ""}.`); }
+                    if (act.kind === "move") { save(moveDay(plan, i, n)); setOpen((o) => [...o.filter((x) => x !== i), n]); setAct(null); p.notify(w(isTraining(plan[n]) ? "menu.movedSwap" : "menu.moved", { from: weekdayName(i), to: weekdayName(n) })); }
                     else setAct({ ...act, days: act.days.includes(n) ? act.days.filter((x) => x !== n) : [...act.days, n] });
                   }}>{wq}</button>)}</div>
                   <div className="actions">
-                    {act.kind === "copy" && <button type="button" className="pill pill-primary action-main" disabled={!act.days.length} onClick={() => { save(plan.map((x, n) => (act.days.includes(n) ? { ...d, work: x.work, study: x.study, pe: x.work && x.study === d.study ? d.pe : false } : x))); setAct(null); }}>Copy to {act.days.length} {act.days.length === 1 ? "day" : "days"}</button>}
+                    {act.kind === "copy" && <button type="button" className="pill pill-primary action-main" disabled={!act.days.length} onClick={() => { save(plan.map((x, n) => (act.days.includes(n) ? { ...d, work: x.work, study: x.study, pe: x.work && x.study === d.study ? d.pe : false } : x))); setAct(null); }}>{wn("menu.copyToN", act.days.length)}</button>}
                     <button type="button" className="link action-cancel" onClick={() => setAct(null)}>{w("menu.cancel")}</button>
                   </div>
-                  <small className="setting-hint">{act.kind === "move" ? w("menu.theTrainingGoesAsIt") : `Copies the activity; each day keeps its ${minor ? "school day or no school" : "work day, study day or day off"}.`}</small>
+                  <small className="setting-hint">{act.kind === "move" ? w("menu.theTrainingGoesAsIt") : w(minor ? "menu.copiesSchool" : "menu.copiesWork")}</small>
                 </div>
               ) : (
                 <div className="day-act-line">
@@ -677,11 +678,11 @@ function ShopPanel(p: AppApi) {
       <div className="place-row" key={r.id}>
         <span>
           <b>{r.name}</b>
-          <small>{n ? `${n} ${n === 1 ? "food" : "foods"}${on ? "" : ", kept"}` : w("menu.aboutTwentyStarterFoods")}{p.trip?.place === r.id ? " · your trip" : ""}</small>
-          {!on && n > 0 && <small className="place-kept">Your logs and recipes stay. {unused > 0 && <><button type="button" className="link" onClick={() => p.deleteUnused(r.id)}>Delete {unused} unused</button> · </>}<button type="button" className="link" onClick={() => p.makeHome(r.id)}>{w("menu.makeItHome")}</button></small>}
+          <small>{n ? (on ? wn("menu.nFoods", n) : wn("menu.nFoodsKept", n)) : w("menu.aboutTwentyStarterFoods")}{p.trip?.place === r.id ? ` · ${w("menu.yourTrip")}` : ""}</small>
+          {!on && n > 0 && <small className="place-kept">{w("menu.logsStay")} {unused > 0 && <><button type="button" className="link" onClick={() => p.deleteUnused(r.id)}>{w("menu.deleteUnused", { n: unused })}</button> · </>}<button type="button" className="link" onClick={() => p.makeHome(r.id)}>{w("menu.makeItHome")}</button></small>}
           {(on || n === 0) && <small><button type="button" className="link" onClick={() => p.makeHome(r.id)}>{w("menu.makeItHome")}</button></small>}
         </span>
-        <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} aria-label={`${r.name}: ${on ? "on" : "off"}`} onClick={() => p.setPlaceOn(r.id, !on)}>{on ? "On" : "Off"}</button>
+        <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} aria-label={w(on ? "menu.placeOn" : "menu.placeOff", { place: r.name })} onClick={() => p.setPlaceOn(r.id, !on)}>{on ? w("voice.on") : w("voice.off")}</button>
       </div>
     );
   };
@@ -715,7 +716,7 @@ export function KitchensAndTools(p: AppApi) {
     <section className="card kitchens" style={{ gap: 8 }}>
       <small>{w("shopp.cooksFirst")}</small>
       <div className="moments" role="group" aria-label={w("menu.theKitchensYouCook")}>
-        {KITCHENS.map((k) => { const on = (p.personal.kitchens ?? []).includes(k); return <button key={k} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, kitchens: on ? (p.personal.kitchens ?? []).filter((x) => x !== k) : [...(p.personal.kitchens ?? []), k] })}>{k}</button>; })}
+        {KITCHENS.map((k) => { const on = (p.personal.kitchens ?? []).includes(k); return <button key={k} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, kitchens: on ? (p.personal.kitchens ?? []).filter((x) => x !== k) : [...(p.personal.kitchens ?? []), k] })}>{optWord(k)}</button>; })}
       </div>
       {/* What a kitchen means (0.2.10, board CH, CH7): a line, three dishes Chef Mealan would cook you, Another and Undo */}
       {(p.personal.kitchens ?? []).filter((k) => KITCHEN[k]).map((k) => {
@@ -724,14 +725,14 @@ export function KitchensAndTools(p: AppApi) {
         const last = t.out[t.out.length - 1], more = anotherLeft(t, k, diet);
         return (
           <div className="kt" key={k}>
-            <small className="kt-name">{k.toUpperCase()}</small>
+            <small className="kt-name">{optWord(k).toUpperCase()}</small>
             <small className="kt-what">{KITCHEN[k].what}</small>
-            <small className="kt-lead">{t.shown.length === 0 ? `No ${k} dish we list fits ${fits}. ${CHEF_NAME} cooks the kitchen your way: tell it in the chat what you cook.` : `${t.shown.length === 3 ? w("menu.threeDishes") : t.shown.length === 2 ? w("menu.twoDishes") : w("menu.oneDish")} ${CHEF_NAME} would cook you${fits ? `, all ${fits}` : ""}:`}</small>
+            <small className="kt-lead">{t.shown.length === 0 ? w("menu.noDishFits", { kitchen: optWord(k), diet: fits ? optWord(fits) : "null" }) : `${t.shown.length === 3 ? w("menu.threeDishes") : t.shown.length === 2 ? w("menu.twoDishes") : w("menu.oneDish")} ${fits ? w("menu.wouldCookAll", { diet: optWord(fits) }) : w("menu.wouldCook")}`}</small>
             {t.shown.map((d, i) => (
               <div className={`kt-dish ${last?.with === d ? "kt-new" : ""}`} key={d}><b>{d}</b>{more && <button className="link" aria-label={w("shopp.anotherInstead", { dish: d })} onClick={() => set(another(t, k, i, diet))}>{w("menu.another")}</button>}</div>
             ))}
-            {t.out.length > 0 && <small className="kt-out">Not for you: {t.out.map((o) => o.dish.toLowerCase()).join(", ")}. <button className="link" onClick={() => set(undo(t))}>{w("menu.undo")}</button></small>}
-            {!more && t.shown.length > 0 && <small className="kt-out">{fits ? `That's every ${k} dish we have that fits ${fits}. ${CHEF_NAME} cooks the kitchen your way: tell it in the chat what you cook.` : `That's every dish we have for this kitchen. Tell ${CHEF_NAME} in the chat what you cook.`}</small>}
+            {t.out.length > 0 && <small className="kt-out">{w("menu.notForYou", { list: t.out.map((o) => o.dish.toLowerCase()).join(", ") })} <button className="link" onClick={() => set(undo(t))}>{w("menu.undo")}</button></small>}
+            {!more && t.shown.length > 0 && <small className="kt-out">{fits ? w("menu.everyDishFits", { kitchen: optWord(k), diet: optWord(fits) }) : w("menu.everyDish")}</small>}
           </div>
         );
       })}
@@ -742,7 +743,7 @@ export function KitchensAndTools(p: AppApi) {
     <section className="card cook-with" style={{ gap: 8 }}>
       <small>{w("shopp.stepsForWhatYouHave")}</small>
       <div className="moments" role="group" aria-label={w("menu.whatYouCookWith")}>
-        {EQUIPMENT.map(([id, name]) => { const has = equipmentOf(p.personal), on = has.includes(id); return <button key={id} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, equipment: on ? has.filter((x) => x !== id) : [...has, id] })}>{name}</button>; })}
+        {EQUIPMENT.map(([id, name]) => { const has = equipmentOf(p.personal), on = has.includes(id); return <button key={id} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, equipment: on ? has.filter((x) => x !== id) : [...has, id] })}>{optWord(name)}</button>; })}
       </div>
     </section>
     </>
@@ -765,11 +766,11 @@ function CoachPanel(p: AppApi) {
         <div>
           <b>{coachName}</b>
           {profile.coachEmail && <small><a href={`mailto:${profile.coachEmail}`}>{profile.coachEmail}</a></small>}
-          <small>Your coach{profile.joinedAt ? ` since ${fmtDay(profile.joinedAt)}` : ""}.</small>
+          <small>{profile.joinedAt ? w("menu.yourCoachSince", { date: fmtDay(profile.joinedAt) }) : w("menu.yourCoachDot")}</small>
         </div>
       </section>
       {/* 0.2.6 (canvas board CW, CW6): the check-in day, what the coach sees with the week first, and the notes */}
-      <section className="card coach-checkin"><span><b>Check-in: {DAY_NAMES[p.checkinDay]}</b><small>{p.coachLabel} looks at your week and sends a note.</small></span></section>
+      <section className="card coach-checkin"><span><b>{w("clientweek.checkinDayIs", { day: weekdayName(p.checkinDay) })}</b><small>{w("menu.coachLooks", { coach: p.coachLabel })}</small></span></section>
       <section className="card">
         <b>{w("menu.whatYourCoachSees")}</b>
         <ul className="small">
@@ -789,9 +790,9 @@ function CoachPanel(p: AppApi) {
       </section>
       {p.coachNotes.length > 0 && (
         <>
-          <p className="label">Notes from {p.coachLabel}</p>
+          <p className="label">{w("menu.notesFrom", { coach: p.coachLabel })}</p>
           <section className="card days">{[...p.coachNotes].reverse().slice(0, 20).map((n) => (
-            <div className="history-row" key={n.at}><div><b>{new Date(n.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}</b><small>{n.by === "client" ? w("menu.yourReply") : n.suggest?.kind === "answer" ? `On your ${n.suggest.card?.title ?? "meal"}` : n.suggest?.kind === "reaction" ? `On your ${n.suggest.card?.title ?? "meal"}` : n.suggest ? "A suggestion" : n.verdict === "change" ? w("menu.askedYouToChangeYour") : w("menu.approvedYourWeek")}</small></div><div className="history-num"><small>“{n.text}”</small></div></div>
+            <div className="history-row" key={n.at}><div><b>{dateText(new Date(n.at), { weekday: "long", day: "numeric", month: "long" }, "en-GB").replace(",", "")}</b><small>{n.by === "client" ? w("menu.yourReply") : n.suggest?.kind === "answer" || n.suggest?.kind === "reaction" ? w("menu.onYour", { title: n.suggest.card?.title ?? w("menu.mealLow") }) : n.suggest ? w("menu.aSuggestion") : n.verdict === "change" ? w("menu.askedYouToChangeYour") : w("menu.approvedYourWeek")}</small></div><div className="history-num"><small>“{n.suggest?.kind === "reaction" ? (n.suggest.reaction === "good" ? w("cardanswer.good") : n.suggest.reaction === "seen" ? w("cardanswer.seen") : n.text) : n.text}”</small></div></div>
           ))}</section>
         </>
       )}
@@ -826,7 +827,7 @@ function AccountPanel(p: AppApi) {
     <>
       <section className="card person">
         {user?.photo ? <img className="avatar avatar-img" src={user.photo} alt="" /> : <span className="avatar">{(user?.name || "?").slice(0, 1)}</span>}
-        <div><b>{user ? user.name || user.email : w("menu.thisPhoneOnly")}</b><small>{user ? user.email : "no account, data stays here"}</small></div>
+        <div><b>{user ? user.name || user.email : w("menu.thisPhoneOnly")}</b><small>{user ? user.email : w("menu.noAccount")}</small></div>
       </section>
       {user && cloudStatus.text && <p className={`small sync ${cloudStatus.ok ? "" : "sync-bad"}`}>{cloudStatus.text}{cloudStatus.at ? `, ${new Date(cloudStatus.at).toLocaleTimeString(phoneLoc(), { hour: "2-digit", minute: "2-digit" })}` : ""}.</p>}
       <section className="card">
@@ -835,7 +836,7 @@ function AccountPanel(p: AppApi) {
         <div className="button-row">
           <button className="pill pill-small" onClick={p.exportMyData}><Download size={14} /> {w("menu.exportMyData")}</button>
         </div>
-        {user && <p className="small">Delete removes all of it, photos, cards and recipes included, and the sign-in. Not undoable.{p.deleteSteps ? ` ${p.deleteSteps}…` : ""}</p>}
+        {user && <p className="small">{w("menu.deleteRemoves")}{p.deleteSteps ? ` ${p.deleteSteps}…` : ""}</p>}
       </section>
       <div className="button-row">
         {user && <SignOut p={p} inline />}
@@ -863,7 +864,7 @@ function SupportPanel(p: AppApi) {
             {!cloudEnabled && <label className="check"><input type="checkbox" checked={coach} onChange={(e) => setCoach(e.target.checked)} /> {w("menu.iAmTheCoach")}</label>}
             {(coach || isCoach) && (
               <div className="coach-tools">
-                <small>Pilot log: {n} {n === 1 ? "event" : "events"} on this device.</small>
+                <small>{wn("menu.pilotLog", n)}</small>
                 <div className="button-row">
                   <button className="pill pill-small" onClick={exportLog}><Download size={14} /> {w("menu.exportLog")}</button>
                   <ConfirmButton className="pill pill-small" label={w("menu.clearLog")} confirmLabel={w("menu.tapAgainToClear")} onConfirm={clearLog} />
@@ -876,7 +877,7 @@ function SupportPanel(p: AppApi) {
                   <button className="pill pill-small" onClick={() => importRef.current?.click()}><Upload size={14} /> {w("menu.restore")}</button>
                   <button className="pill pill-small" onClick={() => setTab("recipes")}>{w("menu.recipes")}</button>
                 </div>
-                <small>AI label reading: {services?.ai ? "on" : "off"}</small>
+                <small>{w(services?.ai ? "menu.aiLabelOn" : "menu.aiLabelOff")}</small>
               </div>
             )}
           </section>

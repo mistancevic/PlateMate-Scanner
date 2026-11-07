@@ -1,5 +1,5 @@
 // What a food is, by its job on a plate. A property of the food, never a verdict: that depends on the day (see todayLine).
-import { w, type WordKey } from "./words";
+import { w, wn, numText, type WordKey } from "./words";
 import type { Lang } from "./lang";
 import { foodNameIn } from "./reference";
 import { dec } from "./words";
@@ -49,11 +49,11 @@ export function plainLine(f: Food, target: number | null): string {
   const g = PORTION[job];
   const kcal = f.calories == null ? null : Math.round((f.calories * g) / 100);
   const prot = f.protein == null ? null : Math.round((f.protein * g) / 10) / 10;
-  const portion = kcal == null ? "" : ` ${g} g is ${kcal} kcal${prot != null ? ` and ${prot} g protein` : ""}.`;
+  const portion = kcal == null ? "" : ` ${prot != null ? w("foods.portionKcalProt", { g, kcal, prot: dec(prot, 1).replace(/[.,]0$/, "") }) : w("foods.portionKcal", { g, kcal })}`;
   if (pd == null || target == null) return portion.trim();
   const fits = pd >= target;
-  const what = job === "Flavour food" ? "It brings the taste; let a protein base carry the plate." : job === "Protein base" ? "It can carry a plate on its own." : fits ? "It fits on its own." : "Pair it with a protein base to reach your target.";
-  return `PD ${dec(pd, 1)}, ${fits ? "on" : "below"} your ${dec(target, 1)}. ${what}${portion}`;
+  const what = w(job === "Flavour food" ? "foods.whatFlavour" : job === "Protein base" ? "foods.whatProtein" : fits ? "foods.whatFits" : "foods.whatPair");
+  return `${w(fits ? "foods.pdOn" : "foods.pdBelow", { pd: dec(pd, 1), target: dec(target, 1) })} ${what}${portion}`;
 }
 // Today, for this person: computed fresh every time, never stored.
 export function todayLine(f: Food, dayKcal: number | null, eatenKcal: number, dayName: string): string | null {
@@ -61,13 +61,13 @@ export function todayLine(f: Food, dayKcal: number | null, eatenKcal: number, da
   const { job } = jobOf(f);
   // a counted food's portion is one serving; the line says so in the pack's own word
   const grams = f.serving ? f.serving.grams : PORTION[job];
-  const portion = f.serving ? `1 ${f.serving.name} (${f.serving.grams} g)` : `A ${PORTION[job]} g portion`;
+  const portion = f.serving ? w("foods.oneServing", { serving: f.serving.name, grams: f.serving.grams }) : w("foods.aPortion", { grams: PORTION[job] });
   const portionKcal = Math.round((f.calories * grams) / 100);
   const left = Math.round(dayKcal - eatenKcal);
-  const so = eatenKcal > 0 ? `${Math.round(eatenKcal).toLocaleString("en")} of ${Math.round(dayKcal).toLocaleString("en")} kcal so far today` : `${Math.round(dayKcal).toLocaleString("en")} kcal planned, nothing logged yet`;
-  if (left <= 0) return `${dayName}: ${so}. Not today.`;
-  if (portionKcal > left) return `${dayName}: ${so}. ${portion} is more than the ${left} kcal left.`;
-  return `${dayName}: ${so}. ${portion} fits.`;
+  const so = eatenKcal > 0 ? w("foods.soFarToday", { eaten: numText(Math.round(eatenKcal)), day: numText(Math.round(dayKcal)) }) : w("foods.plannedNothingLogged", { day: numText(Math.round(dayKcal)) });
+  if (left <= 0) return w("foods.todayNotToday", { day: dayName, so });
+  if (portionKcal > left) return w("foods.todayMoreThanLeft", { day: dayName, so, portion, left });
+  return w("foods.todayFits", { day: dayName, so, portion });
 }
 
 // 0.2.118 (Milan 27 October 18:23, "Fix Paprika"): a sweet pepper is a vegetable, not the spice. Bell pepper, red, raw and
@@ -86,18 +86,18 @@ export function isVegPepper(name: string): boolean {
 // DT93 (0.2.88, board Stories60; Milan 24 October 13:58): a normal portion of a food, by its name first, else by its job.
 // Code holds these, not the AI. Fit never moves a food past its range, and a food outside it gets a line under it.
 // A counted food (a bar, an egg) goes by its piece: one to three pieces.
-const NAMED: [RegExp, [number, number], string][] = [
+const NAMED: [RegExp, [number, number], WordKey | ""][] = [
   // 0.2.115: a salad is a salad by its name, dressed or not; its oil made it read as a fat source (5 to 40 g)
   [/\b(salad|salat|salata)\b/i, [50, 300], ""],
-  [/\byeast\b|hefe/i, [3, 10], "A dough uses 5 to 10 g."],
+  [/\byeast\b|hefe/i, [3, 10], "plate.noteDough"],
   [/\b(baking powder|baking soda|backpulver|natron)\b/i, [2, 10], ""],
   [/\b(salt|salz|pepper|pfeffer)\b/i, [1, 5], ""],
   [SPICE_PAPRIKA, [1, 5], ""],
-  [/\b(protein|whey|casein) ?(powder|pulver)\b|\bwhey\b|\bcasein\b/i, [20, 40], "One scoop is about 30 g."],
+  [/\b(protein|whey|casein) ?(powder|pulver)\b|\bwhey\b|\bcasein\b/i, [20, 40], "plate.noteScoop"],
   [/peanut ?butter|erdnussmus|nussmus|almond butter|tahini|nutella|spread|aufstrich/i, [15, 40], ""],
   [/\b(honey|honig|jam|marmelade|maple|sirup|syrup|sugar|zucker)\b/i, [5, 30], ""],
   [/\b(oil|öl|butter|ghee|lard|schmalz)\b/i, [5, 25], ""],
-  [/\b(nuts?|almonds?|walnuts?|cashews?|hazelnuts?|pistachios?|seeds?|nüsse|mandeln)\b/i, [15, 50], "A handful is about 30 g."],
+  [/\b(nuts?|almonds?|walnuts?|cashews?|hazelnuts?|pistachios?|seeds?|nüsse|mandeln)\b/i, [15, 50], "plate.noteHandful"],
   [/\b(parmesan|feta|cheddar|gouda|mozzarella|cheese|käse)\b/i, [20, 80], ""],
   [/\b(chocolate|schokolade)\b/i, [10, 40], ""],
   [/\b(cookie|keks|biscuit|cracker)\b/i, [15, 60], ""],
@@ -129,10 +129,10 @@ export function portionOf(f: Food, scale = 1): Portion {
   return { ...p, max: p.piece ? Math.round(p.max * scale) : up(p.max, scale), scaled: true };
 }
 function portionOfMeal(f: Food): Portion {
-  if (f.serving && f.serving.grams > 0) return { min: f.serving.grams, max: f.serving.grams * 3, note: `One ${f.serving.name} is ${Math.round(f.serving.grams)} g.`, piece: f.serving };
-  if (/\bbar\b|riegel/i.test(f.name)) return { min: 35, max: 100, note: "One bar is about 50 g.", piece: { grams: 50, name: "bar" } };
+  if (f.serving && f.serving.grams > 0) return { min: f.serving.grams, max: f.serving.grams * 3, note: w("plate.noteOneServing", { serving: f.serving.name, grams: Math.round(f.serving.grams) }), piece: f.serving };
+  if (/\bbar\b|riegel/i.test(f.name)) return { min: 35, max: 100, note: w("plate.noteOneBar"), piece: { grams: 50, name: "bar" } };
   if (isVegPepper(f.name)) return { min: 50, max: 300, note: "" };
-  for (const [re, [min, max], note] of NAMED) if (re.test(f.name)) return { min, max, note };
+  for (const [re, [min, max], note] of NAMED) if (re.test(f.name)) return { min, max, note: note ? w(note) : "" };
   const [min, max] = JOB_RANGE[jobOf(f).job];
   return { min, max, note: "" };
 }
@@ -141,7 +141,7 @@ export function portionLine(f: Food, grams: number, scale = 1): string | null {
   const p = portionOf(f, scale);
   if (grams <= p.max && grams >= p.min) return null;
   const short = f.name.split(",")[0].trim().toLowerCase();
-  if (grams > p.max && p.piece) { const n = Math.round(grams / p.piece.grams); return `${Math.round(grams)} g is ${n} ${p.piece.name}${n === 1 ? "" : "s"}. ${p.note}`.trim(); }
+  if (grams > p.max && p.piece) { const n = Math.round(grams / p.piece.grams); return `${f.serving && f.serving.grams > 0 ? wn("plate.gIsServings", n, { grams: Math.round(grams), serving: p.piece.name }) : wn("plate.gIsBars", n, { grams: Math.round(grams) })} ${p.note}`.trim(); }
   const food = (l: Lang) => (l === "en" ? short : foodNameIn(l, f).split(",")[0].trim());
   if (grams > p.max) return w(p.scaled ? "plate.overMealPortion" : "plate.overPortion", { grams: Math.round(grams), food, min: p.min, max: p.max }) + (p.note && !p.scaled ? ` ${p.note}` : "");
   // DT203 release 2 (0.3.77): in Srpski the food stands after a colon, so no word changes its ending
@@ -166,7 +166,7 @@ export function startGrams(f: Food, scale = 1): number {
 // it by the same factor, so a filling keeps its quark to egg; the other parts stay. The factor stays between half and twice,
 // and no food goes past its portion (C12, C49): then the part is as big as it can be, and the line says so.
 type Item = { id: string; food: Food; grams: number; locked?: boolean; part?: string };
-const KIND_WORD: Record<string, string> = { egg: "whole eggs", banana: "whole bananas", apple: "whole apples" };
+const KIND_WORD: Record<string, WordKey> = { egg: "fit.wholeEggs", banana: "fit.wholeBananas", apple: "fit.wholeApples" };
 const roundG = (g: number) => (g < 20 ? Math.round(g) : Math.round(g / 5) * 5);
 export function fitPart<T extends Item>(items: T[], target: number, scale = 1): { items: T[]; part: string; factor: number; reached: boolean; whole?: string } | null {
   const parts = [...new Set(items.map((i) => i.part).filter((x): x is string => !!x))];
@@ -195,7 +195,7 @@ export function fitPart<T extends Item>(items: T[], target: number, scale = 1): 
     let n = Math.max(1, Math.round((counted.grams * f) / one));
     if ((n * one) / counted.grams > hi + 0.01 && n > 1) n -= 1;
     const f2 = (n * one) / counted.grams;
-    if (Math.abs(f2 - f) >= 0.01) whole = KIND_WORD[k] ?? "pieces";
+    if (Math.abs(f2 - f) >= 0.01) whole = w(KIND_WORD[k] ?? "fit.wholePieces");
     f = f2;
   }
   const next = items.map((i) => (c.free.some((x) => x.id === i.id) ? { ...i, grams: i === counted ? Math.round(i.grams * f) : roundG(i.grams * f) } : i));
@@ -204,7 +204,7 @@ export function fitPart<T extends Item>(items: T[], target: number, scale = 1): 
 // the factor in words: a third more, half as much again, 20 % less
 export function factorWords(f: number): string {
   const d = Math.round((f - 1) * 100);
-  if (d === 0) return "as it was";
-  const w: Record<number, string> = { 25: "a quarter more", 33: "a third more", 50: "half as much again", 100: "twice as much", [-25]: "a quarter less", [-33]: "a third less", [-50]: "half as much" };
-  return w[d] ?? (d > 0 ? `${d} % more` : `${-d} % less`);
+  if (d === 0) return w("fit.asItWas");
+  const k: Record<number, WordKey> = { 25: "fit.quarterMore", 33: "fit.thirdMore", 50: "fit.halfAgain", 100: "fit.twiceAsMuch", [-25]: "fit.quarterLess", [-33]: "fit.thirdLess", [-50]: "fit.halfAsMuch" };
+  return k[d] ? w(k[d]) : d > 0 ? w("fit.pctMore", { d }) : w("fit.pctLess", { d: -d });
 }

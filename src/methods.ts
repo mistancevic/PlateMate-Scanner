@@ -1,6 +1,7 @@
 // Ways to eat the same amounts. Rule-based from the roles on the plate; a person's confirmed recipes will replace these.
 import { density, type Ingredient } from "./pilot";
 import { fmt } from "./ui";
+import { w } from "./words";
 export type Method = { id: string; name: string; why: string; steps: string[] };
 const CRUNCH = /keks|biscuit|cookie|cracker|knäcke|müsli|muesli|granola|oat|hafer|nuss|nut|mandel|almond|cornflake|brot|bread|toast/i;
 export function methodsFor(items: Ingredient[]): Method[] {
@@ -10,36 +11,37 @@ export function methodsFor(items: Ingredient[]): Method[] {
   const rest = items.filter((i) => i.id !== base.id);
   const crunch = rest.find((i) => CRUNCH.test(i.food.name)) ?? null;
   const flavours = rest.filter((i) => i.id !== crunch?.id);
+  // DT243 part two: the words in src/i18n/en.json (make.method.*), in the app's language when the ways are made
   const g = (i: Ingredient) => `${fmt(i.grams, 0)} g ${i.food.name}`;
-  const list = (xs: Ingredient[]) => xs.map(g).join(" and ");
+  const list = (xs: Ingredient[]) => xs.map(g).reduce((a, b) => w("make.method.and", { a, b }));
   const out: Method[] = [];
   out.push({
-    id: "mixed", name: "All in one", why: "One bowl, one spoon. The taste is even from the first bite to the last.",
+    id: "mixed", name: w("make.method.mixed"), why: w("make.method.mixedWhy"),
     steps: [
-      `Put ${g(base)} in a bowl.`,
-      ...(flavours.length ? [`Add ${list(flavours)} and stir until it's one colour.`] : []),
-      ...(crunch ? [`Crumble ${g(crunch)} over the top, or fold it in if you like it soft.`] : []),
+      w("make.method.putInBowl", { food: g(base) }),
+      ...(flavours.length ? [w("make.method.addAndStir", { foods: list(flavours) })] : []),
+      ...(crunch ? [w("make.method.crumble", { food: g(crunch) })] : []),
     ],
   });
   if (crunch && flavours.length)
     out.push({
-      id: "topped", name: "Topped", why: "The crunch stays crunchy and the flavour sits where you taste it most.",
+      id: "topped", name: w("make.method.topped"), why: w("make.method.toppedCrunchWhy"),
       steps: [
-        `Spread ${list(flavours)} on ${g(crunch)}.`,
-        `Put ${g(base)} in a small bowl next to it.`,
-        `Eat them together, a bite of each.`,
+        w("make.method.spreadOn", { foods: list(flavours), food: g(crunch) }),
+        w("make.method.putInSmallBowl", { food: g(base) }),
+        w("make.method.eatTogether"),
       ],
     });
   else if (flavours.length)
     out.push({
-      id: "topped", name: "Topped", why: "The flavour stays on top, so every spoon starts with it.",
-      steps: [`Put ${g(base)} in a bowl.`, `Drop ${list(flavours)} on top. Don't stir.`],
+      id: "topped", name: w("make.method.topped"), why: w("make.method.toppedWhy"),
+      steps: [w("make.method.putInBowl", { food: g(base) }), w("make.method.dropOnTop", { foods: list(flavours) })],
     });
   out.push({
-    id: "base-first", name: "Protein first", why: "The base fills you up before the treat, so the treat stays the size it is.",
+    id: "base-first", name: w("make.method.baseFirst"), why: w("make.method.baseFirstWhy"),
     steps: [
-      `Eat ${g(base)} first, plain or with a pinch of cinnamon.`,
-      `Then ${list(rest)}, slowly.`,
+      w("make.method.eatFirst", { food: g(base) }),
+      w("make.method.thenSlowly", { foods: list(rest) }),
     ],
   });
   return out;

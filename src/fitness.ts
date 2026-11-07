@@ -3,6 +3,7 @@
 import { density, type Food } from "./pilot";
 import { playbookFor, type Playbook } from "./playbook";
 import type { DayType } from "./personal";
+import { w } from "./words";
 
 export const SOURCES = {
   proteinDose: "ISSN position stand on nutrient timing, 2017: 20 to 40 g protein per dose, 0.25 to 0.40 g per kg body mass, every 3 to 4 hours",
@@ -31,9 +32,9 @@ export type PreFit = { fits: boolean; grams: number | null; carbs: number; reaso
 export function preTraining(f: Food, pb: Playbook, weightKg: number | null | undefined, dayType: DayType): PreFit {
   const carbs = preCarbGrams(weightKg, dayType);
   if (!pb.beforeTraining.ok) return { fits: false, grams: null, carbs, reason: pb.beforeTraining.reason };
-  if (!isCarbFood(f)) return { fits: false, grams: null, carbs, reason: `${pb.beforeTraining.reason}; the energy before training comes from a carb food` };
+  if (!isCarbFood(f)) return { fits: false, grams: null, carbs, reason: w("fitness.preNeedsCarbFood", { reason: pb.beforeTraining.reason }) };
   const grams = Math.min(300, Math.round((carbs / (f.carbs as number)) * 100 / 5) * 5);
-  return { fits: true, grams, carbs, reason: `fast energy, nothing to add: about ${grams} g gives ${carbs} g carbs for a ${dayName(dayType)}` };
+  return { fits: true, grams, carbs, reason: w("fitness.preFits", { grams, carbs, day: dayName(dayType) }) };
 }
 
 // After training: a protein base that reaches the floor. The grams that get there, within a real portion.
@@ -44,12 +45,12 @@ export function afterTraining(f: Food, pb: Playbook, weightKg: number | null | u
   const pd = density(f.protein, f.calories) ?? 0;
   if (pd >= 8 && f.protein && f.protein > 0) {
     const grams = Math.min(400, Math.round((floor / f.protein) * 100 / 5) * 5);
-    return { fits: true, grams, floor, reason: `suits after training: about ${grams} g gives ${floor} g protein` };
+    return { fits: true, grams, floor, reason: w("fitness.postFits", { grams, floor }) };
   }
-  return { fits: true, grams: null, floor, reason: `${pb.afterTraining.reason}; the plate wants ${floor} g protein` };
+  return { fits: true, grams: null, floor, reason: w("fitness.postWants", { reason: pb.afterTraining.reason, floor }) };
 }
 
-export const dayName = (d: DayType) => ({ passive: "rest day", active: "active rest day", easy: "training day", hard: "hard training day" } as Record<DayType, string>)[d];
+export const dayName = (d: DayType) => w(({ passive: "fitness.restDay", active: "fitness.activeRestDay", easy: "fitness.trainingDay", hard: "fitness.hardTrainingDay" } as const)[d]);
 
 export function fitnessFor(f: Food, weightKg: number | null | undefined, dayType: DayType) {
   const pb = playbookFor(f);

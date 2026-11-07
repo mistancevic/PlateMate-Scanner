@@ -1,11 +1,11 @@
 import { StepPicShown, StepPicSheet, StepPlayer } from "./StepPics";
-import { w, wn, wIn, wordV, dateText, type Val, type WordKey } from "../words";
+import { w, wn, wIn, wordV, dateText, mealV, type Val, type WordKey } from "../words";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
 import { stepPicOf, setStepPic, alignStepPics, allStepPics } from "../photos";
 import { ThinkingCard } from "./ThinkingCard";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { cookName, weighLine } from "../cookWords";
+import { cookName, weighLine, aroundV } from "../cookWords";
 import { tempsIn } from "../units";
 import { Camera, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import type { Feedback, Food, Ingredient, Meal, StepMark } from "../pilot";
@@ -34,6 +34,7 @@ import { NutritionCard } from "./NutritionCard";
 import { CarryBlock } from "./CarryBlock";
 import { portionsIn } from "../pilot";
 import { changeOf, sameKind, swapChoices, type SwapWay } from "../swap";
+import { unitWord, unitV, partName, partLowV, ONE } from "../recipeWords";
 
 // The recipe's own page in the app (0.2.5+r11, canvas board S3, R8 to R11, approved 12 October 2026). Photos first: the
 // cover large, every photo with × to delete, ‹ › to move the picked one (first place is the cover), Add. Then the name
@@ -139,14 +140,15 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const sum = aggregate(items.filter((i) => i.grams > 0));
   // how many servings the numbers are for (IM21): the recipe's own count, or the portions the plate divides it into
   const serves = meal.makes?.n ?? portionsIn(meal);
-  const oneWord = meal.makes ? meal.makes.unit.replace(/s$/, "") : w("recipe.portion");
-  const allWord = meal.makes?.unit ?? w("recipe.portions");
+  // DT243 part two: a unit the app saved (portions) shows through its count line; the cook's own unit as before
+  const oneWord = meal.makes ? unitWord(meal.makes.unit, 1, ONE.s) : w("recipe.portion");
+  const allWord = meal.makes ? unitWord(meal.makes.unit, 2) : w("recipe.portions");
   const pd = density(sum.protein, sum.calories);
   const resetSwap = () => { setSwapAt(null); setPick(null); setRemoved(null); setUndo([]); setFresh([]); setNeed(null); setFollowed(null); };
   const startEdit = () => { resetSwap(); setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])], optional: [...(meal.optional ?? [])], makesN: meal.makes ? String(meal.makes.n) : "", makesUnit: meal.makes?.unit ?? "" }); setFind(null); setExtraParts([]); };
   // parts in Edit recipe (0.2.19, IM18): each food's part, a new part, optional on and off
   const editParts = edit ? [...new Set([...partsOf(edit.items, edit.optional), ...extraParts])] : [];
-  const PartPick = ({ value, onPick }: { value: string; onPick: (v: string) => void }) => <select className="pt-chip pt-select" aria-label={w("recipe.part")} value={value} onChange={(e) => onPick(e.target.value)}><option value="">{w("recipe.noPart")}</option>{[...new Set([...editParts, ...(value ? [value] : [])])].map((x) => <option key={x} value={x}>{x}</option>)}</select>;
+  const PartPick = ({ value, onPick }: { value: string; onPick: (v: string) => void }) => <select className="pt-chip pt-select" aria-label={w("recipe.part")} value={value} onChange={(e) => onPick(e.target.value)}><option value="">{w("recipe.noPart")}</option>{[...new Set([...editParts, ...(value ? [value] : [])])].map((x) => <option key={x} value={x}>{partName(x)}</option>)}</select>;
   // DT175a (0.3.18): the step whose picture is being added or changed, and Watch the steps
   const [picAt, setPicAt] = useState<number | null>(null);
   const [watching, setWatching] = useState(false);
@@ -222,9 +224,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {/* DT202 (0.3.75, board Stories174): From the kitchen, or On paper, and what it means */}
       {(() => { const k = kitchenMark(meal, cards); return <div className={`rq-mark ${k.cooked ? "cooked" : "paper"}`}><span className="tile-mark-chip">{markWord(k)}</span><small>{markLine(k)}</small></div>; })()}
       {/* DT90 (0.2.87, board Stories58): Chef Mealan's dinner says who made it, around which food, and when */}
-      {meal.byChef && <small className="rq-label rq-bychef">{w("recipe.byChef", { kitchen: meal.byChef.kitchen, meal: meal.byChef.meal, around: meal.byChef.around, date: dateText(new Date(meal.byChef.at), { day: "numeric", month: "long" }) })}</small>}
+      {meal.byChef && <small className="rq-label rq-bychef">{w("recipe.byChef", { kitchen: meal.byChef.kitchen, meal: mealV(meal.byChef.meal, true), around: aroundV(meal.byChef.around), date: dateText(new Date(meal.byChef.at), { day: "numeric", month: "long" }) })}</small>}
       {/* DT81 (Milan 23 October 12:48 to 15:11): what the whole recipe makes is its label, under the name */}
-      {makesN ? <small className="rq-label">{w("recipe.wholeMakes", { n: makesN, unit: meal.makes!.unit, one: meal.makes!.unit.replace(/ies$/, "y").replace(/(?<!s)s$/, ""), kcal: fmt((aggregate(meal.items).calories ?? 0) / makesN, 0) })}</small>
+      {makesN ? <small className="rq-label">{w("recipe.wholeMakes", { n: makesN, unit: unitV(meal.makes!.unit, makesN), one: unitV(meal.makes!.unit, 1, ONE.ies), kcal: fmt((aggregate(meal.items).calories ?? 0) / makesN, 0) })}</small>
         : serves > 1 ? <small className="rq-label muted">{w("recipe.wholeByWeight", { n: serves })}</small> : null}
       {top}
       {/* R8: the photos first */}
@@ -305,9 +307,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         <section className="card rq-cook" aria-label={w("recipe.cookIt")}>
           <b>{w("recipe.cookIt")}</b>
           <div className="rq-cook-row">
-            <button type="button" className="icon" aria-label={w("recipe.oneLess", { unit: meal.makes!.unit.replace(/(?<!s)s$/, "") })} disabled={cookN <= 1} onClick={() => setCook(cookN - 1)}>−</button>
-            <b>{cookN} {meal.makes!.unit}</b>
-            <button type="button" className="icon" aria-label={w("recipe.oneMore", { unit: meal.makes!.unit.replace(/(?<!s)s$/, "") })} onClick={() => setCook(cookN + 1)}>+</button>
+            <button type="button" className="icon" aria-label={w("recipe.oneLess", { unit: unitV(meal.makes!.unit, 1, ONE.notSs) })} disabled={cookN <= 1} onClick={() => setCook(cookN - 1)}>−</button>
+            <b>{cookN} {unitWord(meal.makes!.unit, 2)}</b>
+            <button type="button" className="icon" aria-label={w("recipe.oneMore", { unit: unitV(meal.makes!.unit, 1, ONE.notSs) })} onClick={() => setCook(cookN + 1)}>+</button>
           </div>
           <small className="muted">{cookN === makesN ? w("recipe.asTheRecipeMakesIt") : w("recipe.makesFoodsFor", { n: makesN, cook: cookN })}</small>
           {!!plannedCount && plannedCount !== cookN && <button type="button" className="link rq-cook-plan" onClick={() => setCook(plannedCount)}>{w("recipe.planTakes", { n: plannedCount })}</button>}
@@ -337,7 +339,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         {edit && !partsShown && <button type="button" className="link rq-parts-open" onClick={() => setPartsOpen(true)}>{w("recipe.partsAndOptionalFoods")}</button>}
         {edit && partsShown && <div className="pt-h pt-mode"><span><small>{w("recipe.partsGiveAFoodIts")}</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>{w("recipe.newPart")}</button> : <input className="pt-new" autoFocus aria-label={w("recipe.nameOfTheNewPart")} placeholder={w("recipe.toppingPlaceholder")} value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
         {(edit || !cookN || cookN === makesN ? items : sizedFor(meal, cookN)).map((it, k) => {
-          const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null;
+          const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{partName(it.part)}</div> : null;
           return [head, (
           <div className="sheet-row rq-food" key={it.id}>
             {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="link rq-swap-link" aria-label={w("recipe.swapFood", { food: it.food.name })} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>{w("recipe.swap")}</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>{w("recipe.optional")}</button></span>}</span> : <small>{cookName(it.food.name).short}{weighLine(it.food.name) && <span className="rq-weigh"> · {weighLine(it.food.name)}</span>}{it.fry && <span className="rq-fry">{it.fry.written ? w("recipe.writtenForFrying", { written: it.fry.written }) : w("recipe.forFrying")}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
@@ -394,7 +396,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <b>{w("recipe.optionalNotInTheNumbers")}</b>
           {meal.optional!.map((o, k) => (
             <div className="rq-opt-row" key={k}>
-              <span className="rq-opt-name"><span>{o.name}</span><small>{[o.part, o.note || (o.written ? w("recipe.writtenOnTheRecipe", { written: o.written }) : "")].filter(Boolean).join(" · ") || w("recipe.optionalLower")}</small></span>
+              <span className="rq-opt-name"><span>{o.name}</span><small>{[o.part ? partName(o.part) : o.part, o.note || (o.written ? w("recipe.writtenOnTheRecipe", { written: o.written }) : "")].filter(Boolean).join(" · ") || w("recipe.optionalLower")}</small></span>
               <b>{fmt(o.grams, 0)} g</b>
             </div>
           ))}
@@ -575,7 +577,7 @@ function SourceBox({ meal, onPatch, openOriginal }: { meal: Meal; onPatch: (patc
         : link !== null
           ? <input className="search" type="url" aria-label={w("recipe.linkToTheOriginal")} autoFocus value={link} placeholder="https://…" onChange={(e) => setLink(e.target.value)} onBlur={saveLink} onKeyDown={(e) => { if (e.key === "Enter") saveLink(); }} />
           : <button className="link in-inline" style={{ alignSelf: "flex-start" }} onClick={() => setLink("")}>{w("recipe.addTheLink")}</button>}
-      {meal.makes && <small className="muted">{w("recipe.makesAsTheRecipeSays", { n: meal.makes.n, unit: meal.makes.n === 1 ? meal.makes.unit.replace(/s$/, "") : meal.makes.unit })}</small>}
+      {meal.makes && <small className="muted">{w("recipe.makesAsTheRecipeSays", { n: meal.makes.n, unit: unitV(meal.makes.unit, meal.makes.n, ONE.s) })}</small>}
       {shots.length > 0 && (<>
         <div className="in-thumbs">{shots.map((x, n) => <button key={n} className={`in-thumb ${big === n ? "big" : ""}`} onClick={() => setBig(big === n ? null : n)} aria-label={w("recipe.screenshotN", { n: n + 1 })}><img src={x} alt="" /></button>)}</div>
         <small className="muted">{w("recipe.yourScreenshotsForYouOnly")}</small>
@@ -596,6 +598,6 @@ function Mark({ m }: { m?: StepMark }) {
 function partHead(parts: string[] | undefined, k: number) {
   const pt = parts?.[k];
   if (!pt || (k > 0 && parts![k - 1] === pt)) return null;
-  return <li key={`p${k}`} className="rp-step-part">{w("recipe.partHead", { part: pt.toLowerCase() })}</li>;
+  return <li key={`p${k}`} className="rp-step-part">{w("recipe.partHead", { part: partLowV(pt) })}</li>;
 }
 

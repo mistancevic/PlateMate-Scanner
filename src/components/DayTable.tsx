@@ -1,4 +1,4 @@
-import { numLocale, w } from "../words";
+import { numLocale, w, wn, dec } from "../words";
 import { useRef, useState } from "react";
 import { DAY_TYPES, type DayNumbers, type DayType, type OwnDay, type Week } from "../personal";
 import { density } from "../pilot";
@@ -13,8 +13,8 @@ type Field = "kcal" | "protein" | "fats" | "carbs";
 // the resting burn's source, from the formula the calculation names (canvas board TW, F1)
 const restSource = (line = "") => (/Schofield/.test(line) ? w("daytable.schofieldFaoWhoUnu") : /Katch/.test(line) ? w("daytable.katchAndMcardle") : w("daytable.mifflinEtAl"));
 // From your data (0.2.7, board FT, FT5): the days' line about the measured burn names the 14 days as the source
-const dataSource = (how: string[] = []) => { const m = how.join(" ").match(/measured burn, [\d,]+ kcal a day \((\d+ \w+) to (\d+ \w+)\)/); return m ? `your own 14 days, ${m[1]} to ${m[2]}` : null; };
-const LABEL: Record<Field, string> = { get kcal() { return w("daytable.kcal"); }, protein: "protein g", fats: "fat g", carbs: "carbs g" };
+const dataSource = (how: string[] = []) => { const m = how.join(" ").match(/measured burn, [\d,]+ kcal a day \((\d+ \w+) to (\d+ \w+)\)/); return m ? w("daytable.ownDays", { from: m[1], to: m[2] }) : null; };
+const LABEL: Record<Field, string> = { get kcal() { return w("daytable.kcal"); }, get protein() { return w("daytable.proteinG"); }, get fats() { return w("daytable.fatG"); }, get carbs() { return w("daytable.carbsG"); } };
 
 export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, weekdays, note }: {
   note?: string;
@@ -35,9 +35,10 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
   const mix = DAY_TYPES.filter((d) => week[d.id]).map((d) => `${week[d.id]} ${d.name.toLowerCase().replace("training, ", "").replace("rest, ", "")}`).join(", ");
   // plain English (7 October 2026): "Your week averages 2,950 kcal at PD 6.1, with 4 training days and 3 without."
   const trainingDays = 7 - (week.passive || 0);
-  const avgLine = <p className="dt-avg">Your week averages {avg.kcal.toLocaleString(numLocale())} kcal at PD {(density(avg.protein, avg.kcal) ?? 0).toFixed(1)}{mix ? `, with ${trainingDays} training ${trainingDays === 1 ? "day" : "days"} and ${7 - trainingDays} without` : ""}.{note ? ` ${note}` : ""}</p>;
+  const avgV = { kcal: avg.kcal.toLocaleString(numLocale()), pd: dec(density(avg.protein, avg.kcal) ?? 0, 1) };
+  const avgLine = <p className="dt-avg">{mix ? wn("daytable.avgWith", trainingDays, { ...avgV, rest: 7 - trainingDays }) : w("daytable.avg", avgV)}{note ? ` ${note}` : ""}</p>;
   const howBlock = (d: string, r: Row) => how === d && <div className="dt-how">{r.how.map((l, i) => <p key={i} className={i === r.how.length - 1 ? "dt-sum" : ""}>{l}</p>)}</div>;
-  const howLink = (d: string) => <button type="button" className="link" aria-expanded={how === d} onClick={() => setHow(how === d ? null : d)}>{how === d ? "Hide" : w("daytable.how")}</button>;
+  const howLink = (d: string) => <button type="button" className="link" aria-expanded={how === d} onClick={() => setHow(how === d ? null : d)}>{how === d ? w("daytable.hide") : w("daytable.how")}</button>;
 
   if (!setOwn && weekdays) {
     return (
@@ -47,7 +48,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
           <div className="dt-row" key={wd.name}>
             <div className="dt-cells">
               {/* DT144 (0.3.38, board Stories146): each day's PD, the number Today shows on that day */}
-              <span className="dt-day"><b><i className={`load-dot load-${loadOf(wd.day)}`} />{wd.name}</b><small>{planShort(wd.day)}</small><b className="dt-pd">PD {(density(wd.protein, wd.kcal) ?? 0).toFixed(1)}</b></span>
+              <span className="dt-day"><b><i className={`load-dot load-${loadOf(wd.day)}`} />{wd.name}</b><small>{planShort(wd.day)}</small><b className="dt-pd">{w("daytable.pd", { pd: dec(density(wd.protein, wd.kcal) ?? 0, 1) })}</b></span>
               <b className="dt-num">{wd.kcal.toLocaleString(numLocale())}</b>
               <span className="dt-num">{wd.protein}</span>
               <span className="dt-num muted">{wd.fats}</span>
@@ -58,7 +59,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
           </div>
         ))}
         {avgLine}
-        <small className="muted">Protein and fat stay the same every day. Carbs go up and down with your training. The days come from your Training week. Sources: {dataSource(weekdays[0]?.how) ?? restSource(weekdays[0]?.how[0])}; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.</small>
+        <small className="muted">{w("daytable.sourcesWeek", { source: dataSource(weekdays[0]?.how) ?? restSource(weekdays[0]?.how[0]) })}</small>
       </div>
     );
   }
@@ -83,7 +84,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
           );
         })}
         {avgLine}
-        <small className="muted">Protein and fat stay the same every day. Carbs go up and down with your training. Sources: Mifflin et al. 1990; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.</small>
+        <small className="muted">{w("daytable.sourcesDays")}</small>
       </div>
     );
   }
@@ -101,14 +102,14 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
         <button type="button" className="pill pill-small pill-primary" onClick={() => focus(f)}>{w("daytable.changeIt")}</button>
       </div>
     </div>
-  ) : <p className="finding-kept" key={f.id}>Kept on purpose: {f.title.toLowerCase()}</p>;
+  ) : <p className="finding-kept" key={f.id}>{w("daytable.keptOnPurpose", { title: f.title.toLowerCase() })}</p>;
   const input = (d: DayType, field: Field, shown: number, warn: boolean) => {
     const key = `${d}-${field}`, typed = own?.[d]?.[field];
     return (
       <label className="dt-field" key={field}>
         <input ref={(el) => { refs.current[key] = el; }} className={`dt-input ${typed ? "typed" : ""} ${warn ? "warn" : ""}`} inputMode="numeric"
-          aria-label={`${DAY_TYPES.find((x) => x.id === d)!.name}, ${field === "kcal" ? w("daytable.kcal") : `${field === "fats" ? w("daytable.fat") : field} in grams`}`}
-          placeholder={shown ? `≈${shown}` : "enter"} value={draft[key] ?? (typed ? String(typed) : "")}
+          aria-label={`${DAY_TYPES.find((x) => x.id === d)!.name}, ${field === "kcal" ? w("daytable.kcal") : w("daytable.inGrams", { field: w(field === "fats" ? "daytable.fat" : field === "protein" ? "daytable.protein" : "daytable.carbs") })}`}
+          placeholder={shown ? `≈${shown}` : w("daytable.enter")} value={draft[key] ?? (typed ? String(typed) : "")}
           onChange={(e) => setDraft((x) => ({ ...x, [key]: e.target.value }))}
           onBlur={(e) => { const n = Number(e.target.value); setOwn(d, { [field]: e.target.value.trim() === "" || !Number.isFinite(n) || n <= 0 ? undefined : Math.round(n) }); setDraft((x) => { const y = { ...x }; delete y[key]; return y; }); }}
           onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} />
@@ -122,8 +123,8 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
         const r = rows[d.id], o = own?.[d.id] ?? {};
         const typedAll = (["kcal", "protein", "fats", "carbs"] as Field[]).every((f) => (o[f] ?? 0) > 0);
         const sum = typedAll ? addsUp(r) : null;
-        const fills = [!o.protein && "protein from your other days", !o.fats && "fat 30 % of the average day", !o.carbs && "carbs the rest"].filter(Boolean) as string[];
-        const filled = o.kcal && fills.length ? (fills.length === 2 && !o.fats && !o.carbs ? w("daytable.fatAndCarbsFilledFat") : `Filled: ${fills.join(", ")}`) : null;
+        const fills = [!o.protein && w("daytable.fillProtein"), !o.fats && w("daytable.fillFat"), !o.carbs && w("daytable.fillCarbs")].filter(Boolean) as string[];
+        const filled = o.kcal && fills.length ? (fills.length === 2 && !o.fats && !o.carbs ? w("daytable.fatAndCarbsFilledFat") : w("daytable.filled", { list: fills.join(", ") })) : null;
         const dayFindings = findings.filter((f) => f.day === d.id);
         const edge = dayFindings.some(isOpen) || sum !== null;
         return (
@@ -131,7 +132,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
             <div className="dt-block-head"><b>{d.name}</b><small>{d.hint}</small></div>
             <div className="dt-fields">{(["kcal", "protein", "fats", "carbs"] as Field[]).map((f) => input(d.id, f, r[f], sum !== null))}</div>
             <div className="dt-src">
-              {sum !== null ? <small className="warn">These come to {sum.toLocaleString(numLocale())}, not {r.kcal.toLocaleString(numLocale())}: {Math.abs(sum - r.kcal)} kcal apart</small>
+              {sum !== null ? <small className="warn">{w("daytable.comesTo", { sum: sum.toLocaleString(numLocale()), kcal: r.kcal.toLocaleString(numLocale()), apart: Math.abs(sum - r.kcal) })}</small>
                 : o.kcal ? <small>{filled ?? w("daytable.setByYou")}</small>
                 : <><small>{r.source === "calculated" ? w("daytable.calculatedNothingTyped") : w("daytable.nothingTypedTheAverageOf")}</small>{howLink(d.id)}</>}
             </div>
@@ -143,7 +144,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
       <div className="dt-week">
         {avgLine}
         {findings.filter((f) => f.day === null).map(card)}
-        {analysis && analysis.inRange.length > 0 && <p className="in-range">In range: {analysis.inRange.join(" · ")}</p>}
+        {analysis && analysis.inRange.length > 0 && <p className="in-range">{w("daytable.inRange", { list: analysis.inRange.join(" · ") })}</p>}
       </div>
     </div>
   );
@@ -161,8 +162,8 @@ export function FindingList({ analysis, open, keep }: { analysis: Analysis; open
             <button type="button" className="pill pill-small pill-primary" onClick={() => { const el = document.getElementById(`own-${f.field}`) as HTMLInputElement | null; el?.focus(); el?.select(); }}>{w("daytable.changeIt")}</button>
           </div>
         </div>
-      ) : <p className="finding-kept" key={f.id}>Kept on purpose: {f.title.toLowerCase()}</p>)}
-      {analysis.inRange.length > 0 && <p className="in-range">In range: {analysis.inRange.join(" · ")}</p>}
+      ) : <p className="finding-kept" key={f.id}>{w("daytable.keptOnPurpose", { title: f.title.toLowerCase() })}</p>)}
+      {analysis.inRange.length > 0 && <p className="in-range">{w("daytable.inRange", { list: analysis.inRange.join(" · ") })}</p>}
     </div>
   );
 }

@@ -1,6 +1,9 @@
 // Who the person is, for calculating their numbers. Every field optional; stored on the phone and in their account only.
-import { w } from "./words";
-import { BANDS, ALL_BANDS, goalLabel, type Band, type TrainingAge } from "./goal";
+import { w, numText, numLocale, dateText, type WordKey } from "./words";
+import { getLang } from "./lang";
+import { BANDS, ALL_BANDS, goalLabel, goalName as goalNameOf, type Band, type TrainingAge } from "./goal";
+// DT243: calculate() names its weight w, so the app's lines go through tr inside it
+const tr = w;
 import { ymd, isPlanDay, PE, COMMUTE, isPlan, planFromCounts, lengthOf, levelMinutes, START_MIN, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, MOVES, weekdaysOf, dayKindOf, WEEKDAY_NAMES, planLine, planShort, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
 export type Sex = "female" | "male";
 export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete"; // before 6 October 2026; read only to move old profiles over
@@ -15,8 +18,8 @@ export type DayType = "passive" | "active" | "easy" | "hard";
 // feet, 12,000 in physical work. 1,000 steps is about 10 minutes of walking, at 3.5 METs (Compendium 2024).
 export type StepsBand = "u5" | "5to8" | "8to12" | "12p";
 export const STEPS: { id: StepsBand; name: string; mid: number }[] = [
-  { id: "u5", name: "Under 5,000", mid: 4000 }, { id: "5to8", name: "5,000–8,000", mid: 6500 },
-  { id: "8to12", name: "8,000–12,000", mid: 10000 }, { id: "12p", name: "12,000+", mid: 14000 },
+  { id: "u5", get name() { return w("opt.w.under5000"); }, mid: 4000 }, { id: "5to8", get name() { return w("opt.w.n50008000"); }, mid: 6500 },
+  { id: "8to12", get name() { return w("opt.w.n800012000"); }, mid: 10000 }, { id: "12p", get name() { return w("opt.w.n12000"); }, mid: 14000 },
 ];
 const stepsCovered = (factor: number) => (factor >= 1.75 ? 12000 : factor >= 1.55 ? 10000 : factor >= 1.4 ? 7000 : 5000);
 // minutes of walking above what the day already covers
@@ -106,10 +109,10 @@ export const LIFE: { id: Life; name: string; hint: string; factor: number }[] = 
 // The four loads a day can have. The Training week says what each day holds; its load decides which row of own numbers applies.
 // The METs and minutes here are only for someone with no Training week yet: a walk about 3.5, most training about 5, hard about 8.
 export const DAY_TYPES: { id: DayType; name: string; hint: string; met: number; minutes: (p: Personal) => number }[] = [
-  { id: "passive", name: "Rest",     hint: "no training",                     met: 1,   minutes: () => 0 },
-  { id: "active",  name: "Light",    hint: "Zone 1 · yoga, mobility",         met: 3.5, minutes: (p) => lenOf(p, "easy") ?? START_MIN.easy },
-  { id: "easy",    name: "Moderate", hint: "Zone 2–3 · most training",        met: 5,   minutes: (p) => lenOf(p, "moderate") ?? lengthOf(p.easyMin ?? START_MIN.moderate).mid },
-  { id: "hard",    name: "Hard",     hint: "Zone 4–5 · you couldn't talk",    met: 8,   minutes: (p) => lenOf(p, "hard") ?? lengthOf(p.hardMin ?? START_MIN.hard).mid },
+  { id: "passive", get name() { return w("me.load.passive"); }, get hint() { return w("me.load.passiveHint"); }, met: 1,   minutes: () => 0 },
+  { id: "active",  get name() { return w("me.load.active"); },  get hint() { return w("me.load.activeHint"); },  met: 3.5, minutes: (p) => lenOf(p, "easy") ?? START_MIN.easy },
+  { id: "easy",    get name() { return w("me.load.easy"); },    get hint() { return w("me.load.easyHint"); },    met: 5,   minutes: (p) => lenOf(p, "moderate") ?? lengthOf(p.easyMin ?? START_MIN.moderate).mid },
+  { id: "hard",    get name() { return w("me.load.hard"); },    get hint() { return w("me.load.hardHint"); },    met: 8,   minutes: (p) => lenOf(p, "hard") ?? lengthOf(p.hardMin ?? START_MIN.hard).mid },
 ];
 // the usual length of a kind of training, from the Training week
 const lenOf = (p: Personal, level: "easy" | "moderate" | "hard") => { const pl = planOf(p); return pl ? levelMinutes(pl, level) : null; };
@@ -180,11 +183,11 @@ export function getDay(p: Personal = getPersonal(), date = new Date()): Day {
 export const getDayType = (): DayType | null => getDay().type;
 // a load picked on Today by someone with no Training week: kept for this date only
 export const setDayType = (d: DayType | null) => setTodayChange(d ? dayOfLoad(d) : null);
-export const dayName = (t: DayType | null) => (t ? DAY_TYPES.find((x) => x.id === t)!.name : "Average day");
+export const dayName = (t: DayType | null) => (t ? DAY_TYPES.find((x) => x.id === t)!.name : w("me.averageDay"));
 // a day stored before 6 October 2026 keeps a readable name in the last days
-const OLD_DAY_NAME: Record<string, string> = { rest: "Rest", normal: "Average day", training: "Moderate", very: "Hard" };
-export const dayNameAny = (x: string | null | undefined) => (!x ? "" : DAY_TYPES.find((d) => d.id === x)?.name ?? OLD_DAY_NAME[x] ?? x);
-export const dayLine = (d: Day): string => d.source === "plan" ? `${dayName(d.type)}, as planned` : d.source === "today" || d.source === "you" ? `${dayName(d.type)}, changed for today` : "Your week's average, until you pick the day";
+const OLD_DAY_NAME: Record<string, WordKey> = { rest: "me.load.passive", normal: "me.averageDay", training: "me.load.easy", very: "me.load.hard" };
+export const dayNameAny = (x: string | null | undefined) => (!x ? "" : DAY_TYPES.find((d) => d.id === x)?.name ?? (OLD_DAY_NAME[x] ? w(OLD_DAY_NAME[x]) : x));
+export const dayLine = (d: Day): string => d.source === "plan" ? w("me.dayAsPlanned", { day: dayName(d.type) }) : d.source === "today" || d.source === "you" ? w("me.dayChangedToday", { day: dayName(d.type) }) : w("me.dayWeekAverage");
 const KEY = "chefmealan-personal";
 export const getPersonal = (): Personal => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } };
 export const setPersonal = (p: Personal) => { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch {} };
@@ -201,10 +204,10 @@ export const ADJ: Record<string, number> = { fatloss: -0.2, recomp: -0.1, mainta
 export type Split = "balanced" | "carbs" | "fat" | "low";
 export type CarbsFat = { split: Split; carbs?: number };
 export const SPLITS: { id: Split; name: string; hint: string; share: number | null }[] = [
-  { id: "balanced", name: "Balanced", hint: "Fat 30 % of your energy, carbs the rest. Chef Mealan's default.", share: 0.30 },
-  { id: "carbs", name: "More carbs", hint: "Fat 25 %, more room for carbs: hard training and endurance.", share: 0.25 },
-  { id: "fat", name: "More fat", hint: "Fat 35 %, the top of the range, fewer carbs.", share: 0.35 },
-  { id: "low", name: "Very low carb", hint: "You set your carbs; fat takes the rest. Outside the usual ranges.", share: null },
+  { id: "balanced", name: "Balanced", get hint() { return w("me.split.balancedHint"); }, share: 0.30 },
+  { id: "carbs", name: "More carbs", get hint() { return w("me.split.carbsHint"); }, share: 0.25 },
+  { id: "fat", name: "More fat", get hint() { return w("me.split.fatHint"); }, share: 0.35 },
+  { id: "low", name: "Very low carb", get hint() { return w("me.split.lowHint"); }, share: null },
 ];
 export const FAT_RANGE = { lo: 0.20, hi: 0.35 }, CARB_RANGE = { lo: 0.45, hi: 0.60 };
 // the pick, else where the goal starts: Performance on More carbs, every other goal Balanced
@@ -223,7 +226,7 @@ export function suggestBand(p: Personal, current?: string): Band {
 export function formulaFor(p: Personal, pinned?: Formula | null): Formula { return pinned ?? p.formula ?? (p.bodyFatPct ? "katch" : "mifflin"); }
 // Schofield (FAO/WHO/UNU 1985), the adult bands: 18 to 30, 30 to 60, over 60. Sex and weight; height doesn't enter.
 const SCHOFIELD: Record<Sex, [number, number][]> = { male: [[15.057, 692.2], [11.472, 873.1], [11.711, 587.7]], female: [[14.818, 486.6], [8.126, 845.6], [9.082, 658.5]] };
-export const schofieldBand = (age: number) => (age < 30 ? "18 to 30" : age < 60 ? "30 to 60" : "over 60");
+export const schofieldBand = (age: number) => w(age < 30 ? "me.calc.age18to30" : age < 60 ? "me.calc.age30to60" : "me.calc.over60");
 export function schofieldAdult(sex: Sex | undefined, age: number, w: number): number {
   const i = age < 30 ? 0 : age < 60 ? 1 : 2;
   const of = (s: Sex) => SCHOFIELD[s][i][0] * w + SCHOFIELD[s][i][1];
@@ -249,10 +252,14 @@ export function macroSplit(kcal: number, protein: number, fatsFixed?: number | n
   return { fats, carbs };
 }
 export type DayNumbers = { kcal: number; protein: number; fats: number; carbs: number; how: string[] };
-export type Calc = { maintainRaw: number; shift: number; kcal: number; protein: number; fats: number; carbs: number; proteinMin: number; proteinMax: number; proteinLo: number; proteinHi: number; proteinPerKg: number; proteinWhy: string[]; perMeal: number; trains: boolean; note: string; method: string; math: string; bmr: number; tdee: number; days: Record<DayType, DayNumbers>; week: Week; weekdays: ({ name: string; day: PlanDay } & DayNumbers)[] | null; numbersOf: (d: PlanDay) => DayNumbers };
+export type Calc = { maintainRaw: number; shift: number; kcal: number; protein: number; fats: number; carbs: number; proteinMin: number; proteinMax: number; proteinLo: number; proteinHi: number; proteinPerKg: number; proteinWhy: string[]; perMeal: number; trains: boolean; note: string; method: string; methodText: string; math: string; bmr: number; tdee: number; days: Record<DayType, DayNumbers>; week: Week; weekdays: ({ name: string; day: PlanDay } & DayNumbers)[] | null; numbersOf: (d: PlanDay) => DayNumbers };
 const r50 = (x: number) => Math.round(x / 50) * 50;
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const stepsLine = (kcal: number, min: number) => `+ ${Math.round(kcal)} for your steps, about ${Math.round(min)} min of walking above what your day covers (3.5 METs)`;
+const stepsLine = (kcal: number, min: number) => w("me.calc.steps", { n: Math.round(kcal), min: Math.round(min) });
+// a number in a line of the calculation: 1.55, 96.5 · 1,55
+const nf = (x: number) => x.toLocaleString(numLocale(), { maximumFractionDigits: 3, useGrouping: false });
+// a measured span's day: 3 Oct (English as before), the phone's calendar in another language
+const shortDay = (ymd: string) => (getLang() === "en" ? `${ymd.slice(8, 10).replace(/^0/, "")} ${MONTH_SHORT[Number(ymd.slice(5, 7)) - 1]}` : dateText(new Date(`${ymd}T12:00:00`), { day: "numeric", month: "short" }));
 export function calculate(p: Personal, bandId: string, pinned?: Formula | null): Calc | null {
   if (!canCalculate(p)) return null;
   const age = ageOf(p)!;
@@ -266,30 +273,32 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const pick = pick0 === "data" ? shapeF : pick0;
   let shift = 0;
   if (useData) { const sh = calculate({ ...p, formula: shapeF }, "maintain", shapeF); if (sh) shift = p.measuredUse!.kcal - sh.maintainRaw; }
-  const shiftLine = useData ? `${shift >= 0 ? "+" : "−"} ${Math.abs(Math.round(shift))} to match your measured burn, ${p.measuredUse!.kcal.toLocaleString("en")} kcal a day (${p.measuredUse!.from.slice(8, 10).replace(/^0/, "")} ${MONTH_SHORT[Number(p.measuredUse!.from.slice(5, 7)) - 1]} to ${p.measuredUse!.to.slice(8, 10).replace(/^0/, "")} ${MONTH_SHORT[Number(p.measuredUse!.to.slice(5, 7)) - 1]})` : "";
+  const shiftLine = useData ? tr("me.calc.shift", { shift: `${shift >= 0 ? "+" : "−"} ${Math.abs(Math.round(shift))}`, kcal: numText(p.measuredUse!.kcal), from: shortDay(p.measuredUse!.from), to: shortDay(p.measuredUse!.to) }) : "";
   const f: Formula = pick === "katch" && p.bodyFatPct ? "katch" : pick === "schofield" ? "schofield" : "mifflin";
   const lean = p.bodyFatPct ? w * (1 - p.bodyFatPct / 100) : null;
   // Under 18: the Schofield equations for 10 to 18 years (FAO/WHO/UNU), made for children and teenagers; the adult formulas are not.
   const minor = age < 18;
   const schofield = p.sex === "male" ? 17.686 * w + 658.2 : p.sex === "female" ? 13.384 * w + 692.6 : (17.686 * w + 658.2 + 13.384 * w + 692.6) / 2;
   const bmr = minor ? schofield : f === "katch" && lean ? 370 + 21.6 * lean : f === "schofield" ? schofieldAdult(p.sex, age, w) : 10 * w + 6.25 * h - 5 * age + sexTerm;
-  const restName = f === "katch" ? "Katch–McArdle, from lean mass" : f === "schofield" ? `Schofield, ${schofieldBand(age)}: sex and weight` : "Mifflin–St Jeor: sex, age, height, weight";
+  const restName = f === "katch" ? tr("me.calc.restKatch") : f === "schofield" ? tr("me.calc.restSchofield", { band: schofieldBand(age) }) : tr("me.calc.restMifflin");
   const ls = lifestyleOf(p), move = moveOf(ls);
   // what fills the weekdays (Release B): work counts how you move at work; study and at home count as mostly sitting
   const wk = weekdaysOf(ls);
   const life = minor ? { factor: 1.3, name: "a school day, mostly sitting" } : wk === "study" ? { factor: 1.3, name: "a study day, mostly sitting" } : wk === "home" ? { factor: 1.3, name: "a day at home" } : { factor: move.factor, name: `${move.name.toLowerCase()} at work` };
+  // the same, in the app's language, for the lines on the screen (life.name stays the English of the method kept with a goal)
+  const lifeText = minor ? tr("me.calc.schoolDay") : wk === "study" ? tr("me.calc.studyDay") : wk === "home" ? tr("me.calc.dayAtHome") : tr("me.calc.atWork", { move: move.name.toLowerCase() });
   let adj = ADJ[bandId] ?? 0;
   const notes: string[] = [];
-  if (age < 18 && adj < 0) { adj = 0; notes.push("Under 18: no deficit, energy stays at maintenance."); }
+  if (age < 18 && adj < 0) { adj = 0; notes.push(tr("me.calc.under18")); }
   const base = bmr * life.factor;
   const pct = Math.round(adj * 100);
-  const goalName = goalLabel(bandId) || "your goal";
+  const goalName = goalNameOf(bandId) || tr("me.calc.yourGoal");
   // protein reference: real weight, or lean-based when body fat is known and high
   let ref = w;
   if (lean && p.bodyFatPct) {
     const healthy = p.sex === "female" ? 0.25 : 0.15;
     const target = lean / (1 - healthy);
-    if (target < w) { ref = target; notes.push("Protein counted on your lean mass, from your body fat."); }
+    if (target < w) { ref = target; notes.push(tr("me.calc.leanMass")); }
   }
   const trains = trainsOf(p);
   const [lo, hi] = trains ? [1.6, 2.2] : [1.2, 1.6];
@@ -298,15 +307,17 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   // eating mostly plant protein (used a little less well), or being over 60 (PROT-AGE 2013) moves it to the top.
   const diet = (lifestyleOf(p).diet ?? "").toLowerCase();
   const proteinWhy: string[] = [];
-  if (bandId === "fatloss" && !minor) proteinWhy.push("You're losing fat: eating less than you burn, more protein helps you keep your muscle.");
-  if (diet === "vegan" || diet === "vegetarian") proteinWhy.push("You eat mostly plant protein, which the body uses a little less well.");
-  if (age >= 60) proteinWhy.push("You're over 60: muscles respond less to protein with age.");
+  if (bandId === "fatloss" && !minor) proteinWhy.push(tr("me.calc.whyLosing"));
+  if (diet === "vegan" || diet === "vegetarian") proteinWhy.push(tr("me.calc.whyPlant"));
+  if (age >= 60) proteinWhy.push(tr("me.calc.whyOver60"));
   const perKg = proteinWhy.length ? hi : (lo + hi) / 2;
   const protein = Math.round((perKg * ref) / 5) * 5;
   const perMeal = Math.round((0.4 * ref) / 5) * 5;
   const week = weekOf(p);
   const kcalOf = {} as Record<DayType, number>;
   const how = {} as Record<DayType, string[]>;
+  const pctLine = pct === 0 ? tr("me.calc.pctZero", { goal: goalName }) : pct > 0 ? tr("me.calc.pctUp", { pct, goal: goalName }) : tr("me.calc.pctDown", { pct: Math.abs(pct), goal: goalName });
+  const restLine = tr("me.calc.atRest", { n: numText(Math.round(bmr)), how: minor ? tr("me.calc.restMinor") : restName });
   const rawOf = {} as Record<DayType, number>;
   for (const d of DAY_TYPES) {
     const min = d.minutes(p);
@@ -315,19 +326,17 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
     rawOf[d.id] = base + walk + extra;
     kcalOf[d.id] = r50((base + walk + extra + shift) * (1 + adj));
     how[d.id] = [
-      `${Math.round(bmr).toLocaleString("en")} at rest (${minor ? "Schofield, for 10 to 18 years: sex and weight" : restName})`,
-      `× ${life.factor} for ${life.name} = ${Math.round(base).toLocaleString("en")}`,
+      restLine,
+      tr("me.calc.timesFor", { f: nf(life.factor), what: lifeText, n: numText(Math.round(base)) }),
       ...(walk ? [stepsLine(walk, walkMin)] : []),
-      extra ? `+ ${Math.round(extra)} for ${min} min ${d.id === "active" ? "light training" : d.id === "easy" ? "moderate training" : "hard training"} (${d.met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest)` : "+ 0, no training",
+      extra ? tr("me.calc.training", { n: Math.round(extra), min, what: tr(d.id === "active" ? "me.calc.lightTraining" : d.id === "easy" ? "me.calc.moderateTraining" : "me.calc.hardTraining"), met: nf(d.met), kg: nf(w), h: nf(Math.round((min / 60) * 100) / 100) }) : tr("me.calc.noTraining"),
       ...(shiftLine ? [shiftLine] : []),
-      `${pct === 0 ? "± 0" : pct > 0 ? `+ ${pct}` : `− ${Math.abs(pct)}`} % for ${goalName}`,
-      `= ${kcalOf[d.id].toLocaleString("en")} kcal`,
+      pctLine,
+      tr("me.calc.total", { n: numText(kcalOf[d.id]) }),
     ];
   }
   // a planned day: resting burn × the day's baseline (work day or off), plus its activity, then the goal
   const plan = planOf(p);
-  const pctLine = `${pct === 0 ? "± 0" : pct > 0 ? `+ ${pct}` : `− ${Math.abs(pct)}`} % for ${goalName}`;
-  const restLine = `${Math.round(bmr).toLocaleString("en")} at rest (${minor ? "Schofield, for 10 to 18 years: sex and weight" : restName})`;
   const part = (met: number, min: number) => (met - 1) * w * (min / 60);
   const dayKcalHow = (d: PlanDay): { kcal: number; how: string[]; raw: number } => {
     const kind = dayKindOf(d, ls, minor);
@@ -345,14 +354,14 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
     const what = d.kind === "club" || d.kind === "match" ? planShort({ ...d, pe: false, when: undefined }).toLowerCase() : planLine({ ...d, pe: false }).toLowerCase().replace(/, (in|during|late|right).*$/, "");
     return { kcal, how: [
       restLine,
-      `× ${fac} for ${minor ? (d.work ? "a school day, mostly sitting" : "a day without school") : kind === "work" ? `${move.name.toLowerCase()} at work` : kind === "study" ? "a study day, mostly sitting" : wk === "home" ? "a day at home" : "a day off"} = ${Math.round(b).toLocaleString("en")}`,
+      tr("me.calc.timesFor", { f: nf(fac), what: minor ? tr(d.work ? "me.calc.schoolDay" : "me.calc.noSchoolDay") : kind === "work" ? tr("me.calc.atWork", { move: move.name.toLowerCase() }) : kind === "study" ? tr("me.calc.studyDay") : wk === "home" ? tr("me.calc.dayAtHome") : tr("me.calc.dayOff"), n: numText(Math.round(b)) }),
       ...(walk ? [stepsLine(walk, walkMin)] : []),
-      ...(commute ? [`+ ${Math.round(commute)} for ${way!.name} (${way!.met} METs, ${way!.minutes} min)`] : []),
-      ...(pe ? [`+ ${Math.round(pe)} for ${minor ? "sport at school" : "sport in class"} (${PE.met} METs, ${PE.minutes} min)`] : []),
-      extra ? `+ ${Math.round(extra)} for ${min} min ${what} (${met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest; Compendium 2024)` : pe || commute ? (minor ? "+ 0 after school" : "+ 0 after classes") : "+ 0, no training",
+      ...(commute ? [tr("me.calc.commute", { n: Math.round(commute), way: way!.name, met: nf(way!.met), min: way!.minutes })] : []),
+      ...(pe ? [tr("me.calc.pe", { n: Math.round(pe), what: tr(minor ? "me.calc.sportAtSchool" : "me.calc.sportInClass"), met: nf(PE.met), min: PE.minutes })] : []),
+      extra ? tr("me.calc.trainingPlan", { n: Math.round(extra), min, what, met: nf(met), kg: nf(w), h: nf(Math.round((min / 60) * 100) / 100) }) : pe || commute ? tr(minor ? "me.calc.zeroAfterSchool" : "me.calc.zeroAfterClasses") : tr("me.calc.noTraining"),
       ...(shiftLine ? [shiftLine] : []),
       pctLine,
-      `= ${kcal.toLocaleString("en")} kcal`,
+      tr("me.calc.total", { n: numText(kcal) }),
     ], raw };
   };
   const weekdayKcal = plan ? plan.map(dayKcalHow) : null;
@@ -369,9 +378,12 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const numbersOf = (d: PlanDay): DayNumbers => { const x = dayKcalHow(d); return { kcal: x.kcal, protein, fats: fatsOf(x.kcal), carbs: carbsOf(x.kcal), how: x.how }; };
   const weekdays = plan ? plan.map((d, i) => ({ name: WEEKDAY_NAMES[i], day: d, ...numbersOf(d) })) : null;
   const method = `${useData ? `From your data, ${p.measuredUse!.kcal.toLocaleString("en")} kcal a day to stay the same, with the days shaped by ` : ""}${minor ? "Schofield (10 to 18 years)" : f === "katch" ? "Katch–McArdle" : f === "schofield" ? `Schofield (${schofieldBand(age)})` : "Mifflin–St Jeor"}, ${life.name} ×${life.factor}, activity per day from the Compendium of Physical Activities${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
-  const math = `Average over your week: ${avg.toLocaleString("en")} kcal. Protein ${lo}–${hi} g per kg${trains ? ", because you train" : ""} × ${Math.round(ref)} kg = ${proteinMin}–${proteinMax} g, target ${protein} g.`;
+  // methodText: the method as the screen shows it; method stays the English kept with a goal
+  const methodOwn = `${minor ? tr("me.calc.mSchofieldMinor") : f === "katch" ? "Katch–McArdle" : f === "schofield" ? tr("me.calc.mSchofield", { band: schofieldBand(age) }) : "Mifflin–St Jeor"}, ${tr("me.calc.mRest", { life: lifeText, f: nf(life.factor) })}${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
+  const methodText = useData ? tr("me.calc.fromData", { kcal: numText(p.measuredUse!.kcal), method: methodOwn }) : methodOwn;
+  const math = tr(trains ? "me.calc.mathTrains" : "me.calc.math", { avg: numText(avg), lo: nf(lo), hi: nf(hi), ref: Math.round(ref), min: proteinMin, max: proteinMax, protein });
   const maintainRaw = weekdayKcal ? weekdayKcal.reduce((a, x) => a + x.raw, 0) / 7 : DAY_TYPES.reduce((a, d) => a + rawOf[d.id] * (week[d.id] || 0), 0) / nDays;
-  return { maintainRaw, shift, kcal: avg, protein, fats, carbs: carbsOf(avg), proteinMin, proteinMax, proteinLo: lo, proteinHi: hi, proteinPerKg: perKg, proteinWhy, perMeal, trains, note: notes.join(" "), method, math, bmr: Math.round(bmr), tdee: Math.round(base), days, week, weekdays, numbersOf };
+  return { maintainRaw, shift, kcal: avg, protein, fats, carbs: carbsOf(avg), proteinMin, proteinMax, proteinLo: lo, proteinHi: hi, proteinPerKg: perKg, proteinWhy, perMeal, trains, note: notes.join(" "), method, methodText, math, bmr: Math.round(bmr), tdee: Math.round(base), days, week, weekdays, numbersOf };
 }
 // Own numbers, day by day: a typed row wins; an empty row is calculated when the profile allows, else it takes the average
 // of the typed ones. Fat stays one number for every day unless typed; carbs carry the difference.
@@ -393,7 +405,7 @@ export function ownDayNumbers(p: Personal, bandId: string, pinned?: Formula | nu
     const kcal = kcalOf(d.id), protein = o.protein && o.protein > 0 ? o.protein : Math.round(meanP), fats = o.fats && o.fats > 0 ? o.fats : fatsAll;
     const carbs = o.carbs && o.carbs > 0 ? o.carbs : Math.max(0, Math.round((kcal - protein * 4 - fats * 9) / 4));
     const source = o.kcal && o.kcal > 0 ? "you" : c ? "calculated" : "average";
-    days[d.id] = { kcal, protein, fats, carbs, source, how: source === "you" ? ["Set by you."] : source === "calculated" ? c!.days[d.id].how : ["Nothing typed and no profile to calculate from: the average of the days you typed."] };
+    days[d.id] = { kcal, protein, fats, carbs, source, how: source === "you" ? [w("me.calc.setByYou")] : source === "calculated" ? c!.days[d.id].how : [w("me.calc.averageOfTyped")] };
   }
   const avgP = Math.round(DAY_TYPES.reduce((a, d) => a + days[d.id].protein * (week[d.id] || 0), 0) / nDays);
   return { days, avg: { kcal: avgK, protein: avgP, fats: fatsAll, carbs: Math.max(0, Math.round((avgK - avgP * 4 - fatsAll * 9) / 4)) } };

@@ -1,5 +1,5 @@
 import { ClearField } from "../components/ClearField";
-import { w } from "../words";
+import { w, wn, type WordKey } from "../words";
 import { alsoSeen, seenLine, asMine, type MemberFood } from "../memberFoods";
 import type { Food } from "../pilot";
 import { oneList, rowLine } from "../oneList";
@@ -9,7 +9,9 @@ import { Camera, X, Pencil, Plus } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
 import { findReference, referenceFood, localName, otherNames as refOtherNames, synonymsOf, shelfName } from "../reference";
 import { inPlaces, placeName } from "../places";
-import { BAND_LABEL, bandLineIdle, bandHint } from "../goal";
+import { bandLineIdle, bandHint, type PdBand } from "../goal";
+// DT243: a band's chip in the language chosen (goal.ts BAND_LABEL keeps the English)
+const bandWord = (b: PdBand) => w(`foods.band.${b}` as WordKey);
 
 import { duplicatePairs } from "../dedupe";
 import { jobOf, jobName, brandName } from "../foodjob";
@@ -100,7 +102,7 @@ export function FoodsScreen(p: AppApi) {
             <span className="thumb">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
             <div className="row-text">
               <span className="name-line"><button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>{isToday((f as any).addedAt) && <span className="new-mark">{w("foods.new")}</span>}</span>
-              {(() => { const sh = shelfName(f, p.region); return sh ? <small className="shelf-name">In shops in {sh.country}: {sh.name}</small> : null; })()}
+              {(() => { const sh = shelfName(f, p.region); return sh ? <small className="shelf-name">{w("foods.inShopsIn", { country: sh.country, name: sh.name })}</small> : null; })()}
               <small>{f.brand ? w("foods.jobBy", { job: jobName(jobOf(f).job), brand: brandName(f.brand) }) : jobName(jobOf(f).job)}. {w("foods.per100", { kcal: fmt(f.calories, 0), protein: fmt(f.protein) })}{names.length > 1 ? w("foods.also", { names: names.slice(1).join(", ") }) : ""}</small>
               <span className="row-links">
                 <button className="link" onClick={() => add(f)}>{w("foods.addToMeal")}</button>
@@ -131,9 +133,9 @@ export function FoodsScreen(p: AppApi) {
   const take = (r: { kind: string; food: Food; member?: MemberFood }) => {
     if (r.kind === "member" && r.member) { p.addMemberFood(r.member); return; }
     const have = state.foods.find((f) => identityOf(f) === identityOf(r.food));
-    if (have) { notify(`${have.name} is in your foods already.`); return; }
+    if (have) { notify(w("foods.alreadyInYourFoods", { name: have.name })); return; }
     setState((st) => ({ ...st, foods: [{ ...r.food, id: uid(), reviewedAt: new Date().toISOString() }, ...st.foods] }));
-    notify(`${r.food.name} is in your foods.`);
+    notify(w("foods.isInYourFoods", { name: r.food.name }));
   };
   const nothing = q.length >= 1 && list.rows.length === 0 && list.db.length === 0 && !db.busy;
   return (
@@ -162,9 +164,9 @@ export function FoodsScreen(p: AppApi) {
           <button type="button" className={`choice ${allPlaces ? "on" : ""}`} aria-pressed={allPlaces} onClick={() => setAllPlaces(!allPlaces)}>{w("foods.allPlaces")}</button>
         </div>
       )}
-      {q && away.size > 0 && <small className="place-away">{[...away].map(([x, n]) => `${n} more in ${placeName(x)}`).join(", ")}. Tap {[...away.keys()].map(placeName).join(" or ")} to see them.</small>}
+      {q && away.size > 0 && <small className="place-away">{[...away].map(([x, n]) => w("foods.moreIn", { n, place: placeName(x) })).join(", ")}. {w("foods.tapToSee", { places: [...away.keys()].map(placeName).reduce((a, b) => (a ? w("foods.or", { a, b }) : b), "") })}</small>}
       {pairs.length > 0 && (
-        <button className="strip strip-button" onClick={() => setDupOpen(true)}>{pairs.length} possible {pairs.length === 1 ? "duplicate" : "duplicates"} in your foods. Check and merge.</button>
+        <button className="strip strip-button" onClick={() => setDupOpen(true)}>{wn("foods.possibleDupsN", pairs.length)}</button>
       )}
       {dupOpen && <DuplicatesSheet pairs={pairs} close={() => setDupOpen(false)} merge={p.mergeInLibrary} notSame={(a, b) => { const k = [...notSame, pairKey(a, b)]; setNotSame(k); try { localStorage.setItem("chefmealan-not-same", JSON.stringify(k)); } catch {} }} />}
       {pending.length > 0 && (
@@ -172,7 +174,7 @@ export function FoodsScreen(p: AppApi) {
           <p className="label">{w("foods.productsSeenReviewOrEnter")}</p>
           {pending.map((q, i) => (
             <div className="row" key={i}>
-              <div className="row-text"><b>{q.name}</b><small>{q.brand}{q.values ? " · values read from the label" : ""}</small></div>
+              <div className="row-text"><b>{q.name}</b><small>{q.brand}{q.values ? ` · ${w("foods.valuesReadFromLabel")}` : ""}</small></div>
               {q.values
                 ? <button className="pill pill-small pill-primary" onClick={() => { setEdit(candidateFood(q.values, "Photos · review required")); setPending((v: any[]) => v.filter((_, j) => j !== i)); }}>{w("foods.review")}</button>
                 : <button className="pill pill-small" onClick={() => blank(q.name, q.brand)}>{w("foods.enterLabel")}</button>}
@@ -183,14 +185,14 @@ export function FoodsScreen(p: AppApi) {
       )}
       <div className={`chips ${filter !== "all" ? "filtering" : ""}`}>
         {(["below", "close", "plan", "high", "top"] as const).map((k) => (
-          <button key={k} className={`chip chip-${k} ${filter === k ? "on" : ""}`} aria-pressed={filter === k} onClick={() => setFilter(filter === k ? "all" : k)}>{BAND_LABEL[k]}</button>
+          <button key={k} className={`chip chip-${k} ${filter === k ? "on" : ""}`} aria-pressed={filter === k} onClick={() => setFilter(filter === k ? "all" : k)}>{bandWord(k)}</button>
         ))}
       </div>
       <p className="band-line" aria-live="polite">{filter === "all" ? bandLineIdle() : bandHint(filter, p.dayPd)}</p>
-      {hiddenByChip.length > 0 && <p className="small hidden-by-chip">{hiddenByChip.length} more in your foods under {[...new Set(hiddenByChip.map((x) => BAND_LABEL[x.b]))].join(", ")}. <button className="link" onClick={() => setFilter("all")}>{w("foods.showAll")}</button></p>}
+      {hiddenByChip.length > 0 && <p className="small hidden-by-chip">{w("foods.moreUnder", { n: hiddenByChip.length, bands: [...new Set(hiddenByChip.map((x) => bandWord(x.b)))].join(", ") })} <button className="link" onClick={() => setFilter("all")}>{w("foods.showAll")}</button></p>}
       {/* DT125 (0.2.104): one list for one word. Your foods first, then members', then the basic foods; the product database
           behind a line. One row per food, whatever anyone called it. With nothing typed, your foods as before. */}
-      {q.length >= 1 && (list.rows.length > 0 || list.db.length > 0) && <p className="label group-label">{q.length >= 1 ? `${q} · ${list.rows.length} ${list.rows.length === 1 ? "food" : "foods"}` : w("foods.yourFoods")}{db.busy && q.length >= 3 ? <small> · looking in the product database…</small> : null}</p>}
+      {q.length >= 1 && (list.rows.length > 0 || list.db.length > 0) && <p className="label group-label">{q.length >= 1 ? wn("foods.qFoodsN", list.rows.length, { q }) : w("foods.yourFoods")}{db.busy && q.length >= 3 ? <small> · {w("foods.lookingInDb")}</small> : null}</p>}
       <div className="rows">
         {list.rows.map((r) => r.kind === "mine" ? mineRow(r.food, r.names) : (
           <div className={`row outside-row row-${r.kind}`} key={r.key}>
@@ -220,7 +222,7 @@ export function FoodsScreen(p: AppApi) {
       {q.length >= 2 && !db.busy && (
         <section className="end-add" aria-label={w("foods.addItYourself")}>
           <b>{nothing ? w("foods.nothingFoundFor", { q }) : w("foods.canTFindWhatYou")}</b>
-          <span>Add it yourself{isDigits ? ", the number comes with you." : `, "${q}" comes with you.`}</span>
+          <span>{isDigits ? w("foods.addItYourselfNumber") : w("foods.addItYourselfName", { q })}</span>
           <div className="ways">
             <button className="pill pill-small" onClick={() => blank(isDigits ? "" : q, "", q, isDigits ? q : "")}><Pencil size={15} /> {w("foods.type")}</button>
             <button className="pill pill-small pill-primary" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> {w("foods.scan")}</button>
@@ -254,7 +256,7 @@ function DuplicatesSheet({ pairs, close, merge, notSame }: { pairs: [any, any][]
               {pair.map((x, k) => (
                 <button key={x.id} className={`dup-row ${keep === k ? "on" : ""}`} onClick={() => setNames({ ...names, [i]: k as 0 | 1 })}>
                   <span className="thumb thumb-sm">{x.photo ? <img src={x.photo} alt="" /> : "🍽️"}</span>
-                  <span className="dup-text"><b>{x.name}</b><small>{x.brand || "no brand"}{x.barcode ? ` · ${x.barcode}` : ""} · {Math.round(x.calories ?? 0)} kcal · {x.protein ?? "?"} g protein</small></span>
+                  <span className="dup-text"><b>{x.name}</b><small>{x.brand || w("foods.noBrand")}{x.barcode ? ` · ${x.barcode}` : ""} · {w("foods.kcalN", { kcal: Math.round(x.calories ?? 0) })} · {w("foods.gProtein", { protein: fmt(x.protein ?? null, 3) })}</small></span>
                   <span className="dup-pick">{keep === k ? w("foods.keepThisName") : ""}</span>
                 </button>
               ))}

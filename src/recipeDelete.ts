@@ -8,6 +8,8 @@
 //   a food holds nothing personal (Milan 14:34). The day's count of drawn pictures stays as it is.
 import type { Feedback, Meal, PilotState } from "./pilot";
 import { recipePhotosOf, sig } from "./photos";
+import { w } from "./words";
+import { unitWord, ONE } from "./recipeWords";
 
 export type PageState = "live" | "waiting" | "live+waiting" | "down" | "back" | null;
 export type DeletePlan = {
@@ -27,16 +29,16 @@ export type DeletePlan = {
 // the cards that belong to the recipe: made from it, or with its name
 export const cardsOf = (m: Pick<Meal, "id" | "title">, cards: Feedback[]) => cards.filter((f) => f.recipeId === m.id || f.meal?.id === m.id || f.meal?.title === m.title);
 
-const one = (n: number, unit: string) => (n === 1 ? unit.replace(/(?<=[^s])s$/, "") : unit);
-export const countOf = (n: number, unit: string) => `${n} ${one(n, unit)}`;
+// DT243 part two: a unit the app saved (portions) through its count line; the recipe's own unit as before
+export const countOf = (n: number, unit: string) => `${n} ${unitWord(unit, n, ONE.afterNotS)}`;
 
 export function deletePlan(m: Meal, s: Pick<PilotState, "feedback" | "foods">, pub: { status?: string; waiting?: boolean } | null): DeletePlan {
-  const recipe = ["its foods and grams"];
-  if (m.steps?.length) recipe.push("steps");
-  if (m.items.some((i) => i.part)) recipe.push("parts");
-  if (m.optional?.length) recipe.push("optional foods");
-  if (m.source?.steps?.length) recipe.push("the original steps");
-  if (m.stated) recipe.push("the recipe's own numbers");
+  const recipe = [w("delrecipe.itsFoodsAndGrams")];
+  if (m.steps?.length) recipe.push(w("delrecipe.partSteps"));
+  if (m.items.some((i) => i.part)) recipe.push(w("delrecipe.partParts"));
+  if (m.optional?.length) recipe.push(w("delrecipe.partOptional"));
+  if (m.source?.steps?.length) recipe.push(w("delrecipe.partOriginalSteps"));
+  if (m.stated) recipe.push(w("delrecipe.partOwnNumbers"));
   const shots = Array.isArray(m.shots) ? m.shots.length : m.source?.shotSigs?.length ?? 0;
   const sigs = Array.isArray(m.photoSigs) ? m.photoSigs : recipePhotosOf(m).map(sig);
   const drawn = Boolean(m.coverSig && sigs.includes(m.coverSig));
@@ -73,11 +75,11 @@ export function forgetRecipe<S extends PilotState>(s: S, m: Pick<Meal, "id" | "t
 
 // IM22c: the line on Recipes after, saying what was done
 export function deletedLine(p: DeletePlan, did: { members: boolean; page: boolean }, approver: string): string {
-  const done: string[] = [];
-  if (did.members) done.push("Taken back from Members");
-  if (did.page && (p.page === "live" || p.page === "live+waiting")) done.push(done.length ? "down on chefmealan.com" : "Taken down on chefmealan.com");
-  if (did.page && p.page === "waiting") done.push(done.length ? `withdrawn from ${approver}` : `Withdrawn from ${approver}`);
+  // DT243 part two: each whole sentence a line of its own (delrecipe.done*, delrecipe.leaves*)
+  const down = did.page && (p.page === "live" || p.page === "live+waiting"), off = did.page && p.page === "waiting";
+  const done = did.members ? (down ? w("delrecipe.doneMembersDown") : off ? w("delrecipe.doneMembersWithdrawn", { who: approver }) : w("delrecipe.doneMembers"))
+    : down ? w("delrecipe.doneDown") : off ? w("delrecipe.doneWithdrawn", { who: approver }) : "";
   const pics = p.photos + (p.drawn ? 1 : 0);
-  const files = p.shots ? (p.shots === 1 ? "Its screenshot leaves" : "Its screenshots leave") : pics ? (pics === 1 ? "Its picture leaves" : "Its pictures leave") : "";
-  return [done.length ? `${done.join(" and ")}.` : "", files ? `${files} your account with the next save.` : ""].filter(Boolean).join(" ");
+  const files = p.shots ? (p.shots === 1 ? w("delrecipe.leavesShot") : w("delrecipe.leavesShots")) : pics ? (pics === 1 ? w("delrecipe.leavesPicture") : w("delrecipe.leavesPictures")) : "";
+  return [done, files].filter(Boolean).join(" ");
 }

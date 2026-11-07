@@ -65,10 +65,12 @@ export function englishRows(): EnRow[] {
 
 // a new line's area in the tables, by the first part of its key
 const AREA_OF: [RegExp, string, string][] = [
-  [/^home\./, "Home page", "The home page"], [/^(plate|make|journey|photo|photoask|count|gates|sayhave|ideas|fit|dish|out)\./i, "The Plate", "The Plate"],
-  [/^(today|home|carry|busy|measured)\./i, "Today", "Today"], [/^(plan|calendar)\./i, "Plan", "Plan"], [/^(recipe|recipes|publish|members|lang|steppics|yourcooks|delrecipe|nutrition)\./i, "Recipes", "Recipes"],
-  [/^(cook|cooking|cookmode)\./i, "Cooking", "Cooking"], [/^(foods|food)\./i, "Foods", "Foods"], [/^(summary|share)\./i, "Your summary and the coach", "Your summary"],
-  [/^(coach|client)\./i, "Clients", "Clients"], [/^(menu|settings|langpanel|voice)\./i, "Menu and settings", "Settings"],
+  [/^home\./, "Home page", "The home page"], [/^(plate|make|journey|photo|photoask|count|gates|sayhave|ideas|fit|dish|out|craving|moment)\./i, "The Plate", "The Plate"],
+  [/^(today|home|carry|busy|measured|travel)\./i, "Today", "Today"], [/^(plan|calendar|shop|slot|daytable)\./i, "Plan", "Plan"], [/^(recipe|recipes|publish|members|lang|steppics|yourcooks|delrecipe|nutrition|recipein|letters|steps|rf)\./i, "Recipes", "Recipes"],
+  [/^(cook|cooking|cookmode|cookpair|strip)\./i, "Cooking", "Cooking"], [/^(foods|food|place|fitness)\./i, "Foods", "Foods"], [/^(summary|share)\./i, "Your summary and the coach", "Your summary"],
+  [/^(coach|client|clientweek|cardanswer)\./i, "Clients", "Clients"], [/^(menu|settings|langpanel|voice|cloud|account|shorthelp)\./i, "Menu and settings", "Settings"],
+  // DT243 part two: Me and setup, the goal and its page, the numbers, weigh-ins and the kitchen screen
+  [/^(me|goal|guide|analysis|weight|profile|sheet|formula|carbsfat|kitchen)\./i, "Me and setup", "Me"],
 ];
 export function areaOf(r: EnRow, made: MadeFor): { area: string; where: string } {
   const m = made[r.id]; if (m) return { area: m.area, where: m.where };

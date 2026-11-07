@@ -91,12 +91,13 @@ export function kitchenLines(rows: RecipeRow[]): Line[] {
 export function madeByLines(rows: RecipeRow[], coachLabel: string): Line[] {
   const out: Line[] = [];
   const me = rows.filter((r) => r.source === "me"), unnamed = me.filter((r) => r.unnamed).length;
-  if (me.length) out.push({ key: ME, label: "Me", count: unnamed ? `${me.length}, ${unnamed === 1 ? "one" : unnamed} shared without your name` : String(me.length) });
+  // DT243 part two: the words in src/i18n/en.json (rf.line*, rf.meUnnamed)
+  if (me.length) out.push({ key: ME, label: w("rf.lineMe"), count: unnamed ? wn("rf.meUnnamed", unnamed, { me: me.length }) : String(me.length) });
   const coach = rows.filter((r) => r.source === "coach").length; if (coach) out.push({ key: COACH, label: coachLabel, count: String(coach) });
-  const members = rows.filter((r) => r.source === "member").length; if (members) out.push({ key: MEMBERS, label: "All members", count: String(members) });
+  const members = rows.filter((r) => r.source === "member").length; if (members) out.push({ key: MEMBERS, label: w("rf.lineAllMembers"), count: String(members) });
   const n = new Map<string, number>(); for (const r of rows) if (r.source === "member" && r.cook) n.set(r.cook, (n.get(r.cook) ?? 0) + 1);
   for (const [k, c] of [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))) out.push({ key: k, label: k, count: String(c) });
-  const none = rows.filter((r) => r.source === "member" && !r.cook).length; if (none) out.push({ key: NONE, label: "A member without a name", count: String(none) });
+  const none = rows.filter((r) => r.source === "member" && !r.cook).length; if (none) out.push({ key: NONE, label: w("rf.lineNoName"), count: String(none) });
   return out;
 }
 // "Your coach" inside a sentence reads "your coach"

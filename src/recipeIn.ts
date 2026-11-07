@@ -8,6 +8,8 @@ import type { Food, Ingredient } from "./pilot";
 import { gramsFromMeasure } from "./units";
 import { cleanPart } from "./parts";
 import { countRead, type Count } from "./counted";
+import { w } from "./words";
+import { OTHER_PART } from "./recipeWords";
 
 export const MAX_SHOTS = 4;
 export const ROLES = ["base", "protein", "melting cheese", "cheese", "dairy", "sauce", "fat", "vegetable", "fruit", "herb or spice", "sweet", "other"] as const;
@@ -162,7 +164,7 @@ export function cleanRead(d: any): ReadRecipe | null {
   if (!items.length) return null;
   // parts only when the recipe groups its foods into two or more (0.2.19, IM15); a single group is one list
   if (new Set(items.map((i) => i.part).filter(Boolean)).size < 2) for (const i of items) delete i.part;
-  else for (const i of items) if (!i.part) i.part = "Other";
+  else for (const i of items) if (!i.part) i.part = OTHER_PART;
   // R3 (0.2.38): the oil a recipe fries in counts what the food takes up, an estimate; the whole pot stays as written
   const steps = cleanSteps(d.method);
   const capped = capOil(items, steps);
@@ -253,7 +255,8 @@ export const isYours = (name: string, habits: string[]) => { const n = name.toLo
 // What a line says about its amount (IM3)
 export const howWord = (h: How) => (h === "recipe" ? "" : h);
 export type SideKind = "side" | "top" | "after";
-export const sideWord = (k: SideKind) => (k === "top" ? "on top" : k === "after" ? "after" : "on the side");
+// DT243 part two: in the app's language (it fills a slot of the Plate's lines)
+export const sideWord = (k: SideKind) => w(k === "top" ? "recipein.sideOnTop" : k === "after" ? "recipein.sideAfter" : "recipein.sideOnTheSide");
 // The plate's foods as ingredients
 export const asItems = (l: { grams: number; food: Food }[], id: () => string): Ingredient[] => l.map((i) => ({ id: id(), grams: i.grams, locked: true, food: i.food }));
 

@@ -6,7 +6,7 @@
 // Sources: EFSA, dietary reference values, press release of 26 March 2010 (fat 20 to 35 %, carbohydrate 45 to 60 %, fibre 25 g)
 // and the 2017 summary report; fat 20 to 35 % also AND, DC and ACSM 2016; WHO 2023 (saturated fat); WHO 2015 (free sugars).
 import { FAT_RANGE, CARB_RANGE } from "./personal";
-import { WEEKDAY_NAMES } from "./plan";
+import { WEEKDAY_NAMES_EN as WEEKDAY_NAMES } from "./plan";
 
 export type DayN = { kcal: number; protein: number; fats: number; carbs: number };
 export type WeekDay = { name: string; date: Date; n: DayN };

@@ -3,6 +3,7 @@
 // Every number comes from the recipe and the labels of its foods, weighed; never guessed from a photo.
 import type { Meal } from "./pilot";
 import { BANDS } from "./goal";
+import { w } from "./words";
 
 export type PublicItem = { name: string; grams: number; amount: string; part?: string; per100?: { kcal: number | null; protein: number | null; fat: number | null; carbs: number | null; fibre: number | null } };
 export type PublicNutrition = { kcal: number; protein: number; carbs: number; fat: number; fibre: number | null };
@@ -61,7 +62,7 @@ export function fitsOf(pd: number): PublicRecipe["fits"] {
 export const saysHighProtein = (s: string) => /high[- ]?protein|protein[- ]?rich|viel protein|eiwei(ß|ss)reich|proteinreich/i.test(s);
 export function claimProblem(title: string, lines: string, share: number): string | null {
   return (saysHighProtein(title) || saysHighProtein(lines)) && share < 20
-    ? `The words high protein need at least 20 % of the calories from protein; this recipe has ${share} %. Change the name or the two lines.`
+    ? w("publish.claimProblem", { share })
     : null;
 }
 
@@ -76,7 +77,7 @@ export function forVisitor(r: PublicRecipe): PublicRecipe & { locked?: boolean }
 // Who it's from (RF4 Q9, RG0): From Milan's kitchen, the cook's first name. Older pages said Coach Milan or Your coach.
 export function bylineOf(author: string | null | undefined): string {
   const name = String(author ?? "").replace(/^coach\s+/i, "").trim();
-  return !name || /^your coach$/i.test(String(author ?? "").trim()) ? "From our kitchen" : `From ${name}${/s$/i.test(name) ? "'" : "'s"} kitchen`;
+  return !name || /^your coach$/i.test(String(author ?? "").trim()) ? w("publish.bylineOurs") : w(/s$/i.test(name) ? "publish.bylineNameS" : "publish.bylineName", { name });
 }
 // Only the goals the recipe truly fits get a tick (RF4 Q11); just above or below stays on the scale
 export const fitsTicked = (r: Pick<PublicRecipe, "fits">) => (r.fits ?? []).filter((f) => f.how === "fits");

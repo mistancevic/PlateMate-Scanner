@@ -41,9 +41,9 @@ export function KnowCard({ m, openGoal }: { m: Measured; openGoal: () => void })
 export function ReadyCard({ m, formulaKcal, seeGoal, gotIt }: { m: Measured; formulaKcal: number | null; seeGoal: () => void; gotIt: () => void }) {
   return (
     <section className="card ft-card ft-ready">
-      <small className="ft-caps ft-ok">✓ YOUR BURN IS MEASURED</small>
+      <small className="ft-caps ft-ok">✓ {w("measured.burnIsMeasured")}</small>
       <div className="ft-big"><b>{n(m.kcal!)}</b><b>{w("measured.kcalADay")}</b></div>
-      <small className="ft-text">Give or take {n(m.hi! - m.kcal!)}. From your 14 days: {m.fullDays} full days and {m.weighIns} weigh-ins.{formulaKcal ? ` The formula said ${n(formulaKcal)}.` : ""} Your numbers stay as they are until you choose.</small>
+      <small className="ft-text">{w("measured.readyGive", { range: n(m.hi! - m.kcal!), full: m.fullDays, weighed: m.weighIns })}{formulaKcal ? ` ${w("measured.formulaSaid", { kcal: n(formulaKcal) })}` : ""} {w("measured.readyStay")}</small>
       <div className="button-row" style={{ marginTop: 4 }}><button className="pill pill-small pill-primary" onClick={seeGoal}>{w("measured.seeItOnGoal")}</button><button className="pill pill-small" onClick={gotIt}>{w("measured.gotIt")}</button></div>
     </section>
   );
@@ -91,29 +91,29 @@ export function BurnCard({ m, formulaKcal, name, inUse, onUse }: { m: Measured; 
   }
   const change = m.changeKg ?? 0, perDay = Math.round(Math.abs(change) * KCAL_PER_KG / WINDOW / 10) * 10;
   const gap = gapOf(m, formulaKcal);
-  const weight = change === 0 ? "the same over 14 days" : `${change < 0 ? "down" : "up"} ${kgText(change)} in 14 days`;
+  const weight = change === 0 ? w("measured.weightSame") : w(change < 0 ? "measured.weightDown" : "measured.weightUp", { kg: kgText(change) });
   return (
     <section className="card ft-card ft-burn">
       <small className="ft-caps">{coach ? w("measured.burnOf", { who: whose }) : w("measured.burnYour")} · {coach ? w("measured.last14Caps") : spanOf(m.from, m.to).toUpperCase()}</small>
       <div className="ft-big"><b>{n(m.kcal!)}</b><b>{w("measured.kcalADay")}</b></div>
-      <small className="ft-text">Somewhere between {n(m.lo!)} and {n(m.hi!)}.{formulaKcal ? ` The formula says ${n(formulaKcal)}.` : ""}</small>
+      <small className="ft-text">{w("measured.between", { lo: n(m.lo!), hi: n(m.hi!) })}{formulaKcal ? ` ${w("measured.formulaSays", { kcal: n(formulaKcal) })}` : ""}</small>
       {!coach && <Scale lo={m.lo!} kcal={m.kcal!} hi={m.hi!} formula={formulaKcal} />}
-      <div className="ft-row"><small>{coach ? `${name} ate` : w("measured.youAte")}</small><b>{n(m.ate!)} kcal a day on average, on {m.fullDays} full days</b></div>
-      <div className="ft-row"><small>{coach ? w("measured.theWeight") : w("measured.yourWeight")}</small><b>{coach ? `${weight}, ${m.weighIns} weigh-ins` : `${weight}, from the line through ${m.weighIns} weigh-ins`}</b></div>
-      <div className="ft-row"><small>{coach ? w("measured.soTheBurn") : w("measured.soYouBurned")}</small><b>{change === 0 ? `about what ${coach ? "was" : "you"} ate` : `${coach ? "" : `${kgText(change)} × 7,700 kcal ÷ 14 days = `}about ${perDay} kcal a day ${change < 0 ? "more" : "less"} than ${coach ? "eaten" : "you ate"}`}</b></div>
-      {gap?.line && <small className="ft-gap">{n(Math.abs(gap.kcal))} kcal {gap.kcal > 0 ? "more" : "less"} than the formula, {Math.abs(gap.pct)} %. {gap.line}</small>}
-      {coach ? <small className="ft-text">To use it, pick From {name}'s data under Formula, or set a new goal from a date.</small> : (
+      <div className="ft-row"><small>{coach ? w("measured.nameAte", { name: name! }) : w("measured.youAte")}</small><b>{w("measured.ateAvg", { ate: n(m.ate!), full: m.fullDays })}</b></div>
+      <div className="ft-row"><small>{coach ? w("measured.theWeight") : w("measured.yourWeight")}</small><b>{w(coach ? "measured.weightCoach" : "measured.weightYou", { weight, n: m.weighIns })}</b></div>
+      <div className="ft-row"><small>{coach ? w("measured.soTheBurn") : w("measured.soYouBurned")}</small><b>{change === 0 ? w(coach ? "measured.aboutSameCoach" : "measured.aboutSameYou") : w(coach ? (change < 0 ? "measured.burnMoreCoach" : "measured.burnLessCoach") : change < 0 ? "measured.burnMoreYou" : "measured.burnLessYou", { kg: kgText(change), perDay })}</b></div>
+      {gap?.line && <small className="ft-gap">{w(gap.kcal > 0 ? "measured.gapMore" : "measured.gapLess", { kcal: n(Math.abs(gap.kcal)), pct: Math.abs(gap.pct) })} {gap.line}</small>}
+      {coach ? <small className="ft-text">{w("measured.toUseIt", { name: name! })}</small> : (
         <>
           <div className="button-row" style={{ marginTop: 6 }}>{onUse && <button className="pill pill-small pill-primary" onClick={onUse}>{w("measured.useMyData")}</button>}<button className="link" aria-expanded={how} onClick={() => setHow((v) => !v)}>{how ? w("measured.closeHowItSCalculated") : w("measured.howItSCalculated")}</button></div>
           {how && (
             <div className="ft-how">
               <p><b>{w("measured.whatYouAte")}</b> {w("measured.theAverageOfYourFull")}</p>
-              <p><b>{w("measured.whatYourWeightDid")}</b> A straight line through your weigh-ins, not the first and the last morning. In your first two weeks, weigh-ins count from day {SKIP_DAYS + 1}: early changes are mostly water.</p>
+              <p><b>{w("measured.whatYourWeightDid")}</b> {w("measured.lineHow", { day: SKIP_DAYS + 1 })}</p>
               <p><b>{w("measured.theBurn")}</b> {w("measured.whatYouAtePlusKcal")}</p>
-              <p><b>{w("measured.theRange")}</b> The more your weigh-ins sit off the line, the wider it is. It needs {NEED_FULL} full days and {NEED_WEIGH} weigh-ins in 14 days.</p>
+              <p><b>{w("measured.theRange")}</b> {w("measured.rangeHow", { full: NEED_FULL, weighed: NEED_WEIGH })}</p>
             </div>
           )}
-          <small className="ft-text">{inUse ? `In use since ${longDate(inUse.at.slice(0, 10))}: ${n(inUse.kcal)} kcal a day, from ${spanOf(inUse.from, inUse.to)}. A newer number is used only when you apply it again.` : w("measured.yourNumbersStayAsThey")}</small>
+          <small className="ft-text">{inUse ? w("measured.inUseSince", { date: longDate(inUse.at.slice(0, 10)), kcal: n(inUse.kcal), span: spanOf(inUse.from, inUse.to) }) : w("measured.yourNumbersStayAsThey")}</small>
         </>
       )}
     </section>

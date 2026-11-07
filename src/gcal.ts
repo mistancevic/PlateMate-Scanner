@@ -7,6 +7,8 @@ import type { Slot } from "./slots";
 import { toMin, trainingWhen } from "./slots";
 import { activityName, type PlanDay } from "./plan";
 import type { Planned } from "./planned";
+import { w as words, mealName, dateText } from "./words";
+import { getLang } from "./lang";
 
 export const CAL_SCOPE = "https://www.googleapis.com/auth/calendar.app.created";
 // DT179 (0.3.23, board Stories127): busy and free times only, asked for when Read when I'm busy is turned on
@@ -62,10 +64,13 @@ export function eventId(key: string): string {
 }
 const hashOf = (s: string) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); };
 export const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+// DT243: a slot's name in an event, in the language chosen: Breakfast, Lunch, Snack, Dinner, Meal have their words; a name of
+// your own stays as it is. Lower for "Cook breakfast" (German keeps its capital)
+const slotName = (n: string, low = false) => { const t = /^(breakfast|lunch|snack|dinner|meal)$/i.test(n) ? mealName(n) : n; return low && getLang() !== "de" ? lower(t) : t; };
 
 export function calendarEvents(x: CalInput): CalEvent[] {
   const c = x.settings, out: CalEvent[] = [];
-  const link = (date: string) => `Open in Chef Mealan: ${x.origin}/plan?day=${date}`;
+  const link = (date: string) => words("calendar.ev.open", { link: `${x.origin}/plan?day=${date}` });
   const add = (key: string, summary: string, date: string, start: CalTime, end: CalTime) => {
     const description = link(date);
     // v2 (0.3.23): every event carries its key and the start it was written with, so a move in Google can be read back
@@ -78,17 +83,17 @@ export function calendarEvents(x: CalInput): CalEvent[] {
       const m = held[s.id];
       if (m?.skipped) continue;
       const t = toMin(s.time), dish = m && dishOn(c) ? ` · ${m.title}` : "";
-      if (kindOn(c, "meals") && (m || c.meals !== "planned")) add(`${date}|meal|${s.id}`, `${s.name}${dish}`, date, ...timed(date, t, t + 30));
+      if (kindOn(c, "meals") && (m || c.meals !== "planned")) add(`${date}|meal|${s.id}`, `${slotName(s.name)}${dish}`, date, ...timed(date, t, t + 30));
       const ahead = c.ahead?.[`${date}|${s.id}`];
-      if (kindOn(c, "cooking") && m?.mealId && x.cooked(m.mealId) && !x.noKitchen?.(date) && !ahead) add(`${date}|cook|${s.id}`, `Cook ${lower(s.name)}${dish}`, date, ...timed(date, t - 30, t));
+      if (kindOn(c, "cooking") && m?.mealId && x.cooked(m.mealId) && !x.noKitchen?.(date) && !ahead) add(`${date}|cook|${s.id}`, `${words("calendar.ev.cook", { meal: slotName(s.name, true) })}${dish}`, date, ...timed(date, t - 30, t));
     }
     // DT179: a meal cooked the day before: its cooking sits on this day, at this day's time for the same meal
     if (kindOn(c, "cooking")) for (const [k, day] of Object.entries(c.ahead ?? {})) {
       if (day !== date) continue;
       const [for_, slotId] = k.split("|"), m = x.planned[for_]?.[slotId], s = slots.find((z) => z.id === slotId);
       if (!m || m.skipped || !s) continue;
-      const t = toMin(s.time), wd = new Date(`${for_}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" });
-      add(`${date}|ahead|${slotId}`, `Cook ahead for ${wd}${dishOn(c) ? ` · ${m.title}` : ""}`, date, ...timed(date, t - 30, t));
+      const t = toMin(s.time), wd = dateText(new Date(`${for_}T12:00:00`), { weekday: "long" });
+      add(`${date}|ahead|${slotId}`, `${words("calendar.ev.cookAhead", { day: wd })}${dishOn(c) ? ` · ${m.title}` : ""}`, date, ...timed(date, t - 30, t));
     }
     const tr = x.trainingOf(date), w = trainingWhen(tr);
     if (kindOn(c, "training") && tr && w) {
@@ -96,9 +101,9 @@ export function calendarEvents(x: CalInput): CalEvent[] {
       if (w.label === "No time set") add(`${date}|training`, name, date, { date }, { date: plusDays(date, 1) });
       else { const t = toMin(w.sort); add(`${date}|training`, name, date, ...timed(date, t, t + (tr.minutes || 60))); }
     }
-    if (kindOn(c, "weigh") && x.weigh && slots.length) { const t = toMin(slots[0].time); add(`${date}|weigh`, "Weigh in", date, ...timed(date, t - 15, t - 10)); }
+    if (kindOn(c, "weigh") && x.weigh && slots.length) { const t = toMin(slots[0].time); add(`${date}|weigh`, words("calendar.ev.weighIn"), date, ...timed(date, t - 15, t - 10)); }
     if (kindOn(c, "checkin") && x.checkIn?.date === date) add(`${date}|checkin`, x.checkIn.name, date, { date }, { date: plusDays(date, 1) });
-    if (kindOn(c, "shopping")) for (const l of x.shopping) if (l.at.slice(0, 10) === date) { const t = toMin(l.at.slice(11, 16)); add(`${date}|shop|${l.n}`, `Shopping list ${l.n}`, date, ...timed(date, t, t + 60)); }
+    if (kindOn(c, "shopping")) for (const l of x.shopping) if (l.at.slice(0, 10) === date) { const t = toMin(l.at.slice(11, 16)); add(`${date}|shop|${l.n}`, words("calendar.ev.shopping", { n: l.n }), date, ...timed(date, t, t + 60)); }
   }
   return out;
 }
@@ -123,7 +128,7 @@ async function call(f: Fetch, token: string, method: string, path: string, body?
     const j = await r.json().catch(() => null);
     const slow = r.status === 429 || r.status >= 500 || (r.status === 403 && /rate|quota/i.test(JSON.stringify(j?.error ?? "")));
     if (slow && n < 3) { await retryWait(n); continue; }
-    if (!r.ok) throw new CalError(r.status, j?.error?.message || `Google Calendar answered ${r.status}`);
+    if (!r.ok) throw new CalError(r.status, j?.error?.message || words("calendar.err.answered", { status: r.status }));
     return j;
   }
 }
@@ -133,7 +138,7 @@ async function pool<T>(items: T[], n: number, run: (x: T) => Promise<void>) {
   let i = 0;
   await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const x = items[i++]; await run(x); } }));
 }
-export const makeCalendar = async (f: Fetch, token: string, timeZone: string): Promise<string> => (await call(f, token, "POST", "/calendars", { summary: CAL_NAME, description: "Your meals, cooking and training from Chef Mealan. Names and times only.", timeZone })).id;
+export const makeCalendar = async (f: Fetch, token: string, timeZone: string): Promise<string> => (await call(f, token, "POST", "/calendars", { summary: CAL_NAME, description: words("calendar.ev.calDescription"), timeZone })).id;
 export const removeCalendar = (f: Fetch, token: string, id: string) => call(f, token, "DELETE", `/calendars/${encodeURIComponent(id)}`).catch((e) => { if (!(e instanceof CalError && (e.status === 404 || e.status === 410))) throw e; });
 const body = (e: CalEvent) => ({ id: e.id, summary: e.summary, description: e.description, start: e.start, end: e.end, status: "confirmed", transparency: "opaque",
   reminders: { useDefault: true }, extendedProperties: { private: { cm: "1", h: e.h, k: e.key, s: e.s } } });
@@ -160,7 +165,7 @@ export function moveOf(item: any): CalMove | null {
 export async function freeBusy(f: Fetch, token: string, from: string, to: string, timeZone: string): Promise<{ s: number; e: number }[]> {
   const r = await call(f, token, "POST", "/freeBusy", { timeMin: new Date(`${from}T00:00:00`).toISOString(), timeMax: new Date(`${to}T23:59:59`).toISOString(), timeZone, items: [{ id: "primary" }] });
   const cal = r?.calendars?.primary;
-  if (cal?.errors?.length) throw new CalError(403, "Google Calendar did not share your busy times.");
+  if (cal?.errors?.length) throw new CalError(403, words("calendar.err.noBusy"));
   return (cal?.busy ?? []).map((b: any) => ({ s: Date.parse(b.start), e: Date.parse(b.end) })).filter((b: any) => b.e > b.s);
 }
 

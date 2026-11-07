@@ -23,9 +23,11 @@ export type Pace = "steady" | "faster";
 export const STEADY: Band = { id: "gainsteady", name: "Build muscle", range: "PD 4 to 5", kcal: [2300, 2900], protein: [110, 150], who: "steady progress in strength; your weight goes up slowly",
   points: ["More food than you burn, about 5 % more.", "Your lifts go up first; your weight follows slowly."] };
 export const ALL_BANDS: Band[] = [...BANDS, STEADY];
+// DT243: what a goal card says, in the app's language (goal.point.<band>.<n>); the band's own points stay the English the prompts read
+export const pointsOf = (b: Band): string[] => b.points.map((x, i) => w(`goal.point.${b.id}.${i + 1}` as WordKey));
 export const PACES: { id: Pace; band: string; name: string; hint: string }[] = [
-  { id: "steady", band: "gainsteady", name: "Steady", hint: "about 5 % more food · weight up about 0.05 to 0.25 % a week, by how long you've trained · for someone who has trained a while and wants to get stronger" },
-  { id: "faster", band: "gain", name: "Faster", hint: "about 10 % more food · weight up 0.25 to 0.5 % a week · for someone with muscle to catch up on" },
+  { id: "steady", band: "gainsteady", get name() { return w("goal.pace.steady"); }, get hint() { return w("goal.paceHint.steady"); } },
+  { id: "faster", band: "gain", get name() { return w("goal.pace.faster"); }, get hint() { return w("goal.paceHint.faster"); } },
 ];
 export const isBuild = (id?: string) => id === "gain" || id === "gainsteady";
 export const paceOf = (id?: string): Pace | null => (id === "gainsteady" ? "steady" : id === "gain" ? "faster" : null);
@@ -34,8 +36,10 @@ export const goalLabel = (id?: string) => { const b = bandOf(id); if (!b) return
 // DT203 phase 9 (0.3.86): the goal's name on the screens, in the language chosen; goalLabel stays English for Chef Mealan's prompts
 const BAND_WORD: Record<string, WordKey> = { recomp: "goal.band.recomp", fatloss: "goal.band.fatloss", maintain: "goal.band.maintain", gain: "goal.band.gain", gainsteady: "goal.band.gain", performance: "goal.band.performance" };
 export const goalName = (id?: string) => { const b = bandOf(id); if (!b) return ""; const pc = paceOf(b.id), n = BAND_WORD[b.id] ? w(BAND_WORD[b.id]) : b.name; return pc ? `${n} · ${pc === "steady" ? w("goal.pace.steady") : w("goal.pace.faster")}` : n; };
+// a goal card's own name, without its pace: Build muscle
+export const bandName = (id: string) => (BAND_WORD[id] ? w(BAND_WORD[id]) : bandOf(id)?.name ?? "");
 export type TrainingAge = "u1" | "1to3" | "3p";
-export const TRAINING_AGES: { id: TrainingAge; name: string }[] = [{ id: "u1", name: "Under 1 year" }, { id: "1to3", name: "1–3 years" }, { id: "3p", name: "Over 3 years" }];
+export const TRAINING_AGES: { id: TrainingAge; name: string }[] = [{ id: "u1", get name() { return w("opt.w.under1Year"); } }, { id: "1to3", get name() { return w("goal.age.1to3"); } }, { id: "3p", get name() { return w("opt.w.over3Years"); } }];
 // the starting pace: the longer you've trained, the slower muscle comes
 export const paceForAge = (a: TrainingAge): Pace => (a === "u1" ? "faster" : "steady");
 
@@ -51,7 +55,7 @@ const LKEY = "chefmealan-goal-log";
 export const getGoalLog = (): GoalEntry[] => { try { return JSON.parse(localStorage.getItem(LKEY) || "[]"); } catch { return []; } };
 // kept collapsed (board FX, G3): one goal per day, the same goal one period; see goalHistory.ts
 export const setGoalLog = (l: GoalEntry[]) => { try { localStorage.setItem(LKEY, JSON.stringify(collapseLog(l).slice(-60))); } catch {} };
-export const SOURCE_LABEL: Record<GoalSource, string> = { quick: "A rough goal, the band's middle", profile: "Calculated from your profile", exact: "Your own numbers", coach: "Set by your coach" };
+export const SOURCE_LABEL: Record<GoalSource, string> = { get quick() { return w("goal.source.quick"); }, get profile() { return w("goal.source.profile"); }, get exact() { return w("goal.source.exact"); }, get coach() { return w("goal.source.coach"); } };
 export const getGoal = (): Goal | null => {
   try {
     const r = localStorage.getItem(KEY); if (!r) return null;
@@ -69,7 +73,7 @@ export const goalsForBand = (b: Band) => { const calories = mid(b.kcal), protein
 // below under 0.6 T, close 0.6 to 0.9 T, on plan 0.9 to 1.5 T, high 1.5 to 2.5 T, high+ from 2.5 T. A bit under counts as on plan.
 export type PdBand = "below" | "close" | "plan" | "high" | "top";
 export const BAND_EDGES = { close: 0.6, plan: 0.9, high: 1.5, top: 2.5 } as const;
-export const BAND_LABEL: Record<PdBand, string> = { below: "Low−", close: "Low", plan: "On plan", high: "High", top: "High+" };
+export const BAND_LABEL: Record<PdBand, string> = { get below() { return w("goal.pd.below"); }, get close() { return w("goal.pd.close"); }, get plan() { return w("goal.pd.plan"); }, get high() { return w("goal.pd.high"); }, get top() { return w("goal.pd.top"); } };
 export const fit = (pd: number | null, target: number | null): PdBand => {
   if (pd === null || target === null || target <= 0) return "plan";
   const r = pd / target;
@@ -78,12 +82,12 @@ export const fit = (pd: number | null, target: number | null): PdBand => {
 // the range a band covers for a target, for the chip's title
 export const bandRange = (b: PdBand, t: number) => {
   const f = (x: number) => dec(Math.round(x * 10) / 10, 1);
-  return b === "below" ? `under ${f(t * 0.6)}` : b === "close" ? `${f(t * 0.6)} to ${f(t * 0.9)}` : b === "plan" ? `${f(t * 0.9)} to ${f(t * 1.5)}` : b === "high" ? `${f(t * 1.5)} to ${f(t * 2.5)}` : `${f(t * 2.5)} and up`;
+  return b === "below" ? w("goal.rangeUnder", { n: f(t * 0.6) }) : b === "close" ? w("goal.rangeTo", { a: f(t * 0.6), b: f(t * 0.9) }) : b === "plan" ? w("goal.rangeTo", { a: f(t * 0.9), b: f(t * 1.5) }) : b === "high" ? w("goal.rangeTo", { a: f(t * 1.5), b: f(t * 2.5) }) : w("goal.rangeAndUp", { n: f(t * 2.5) });
 };
 
 // The line under the chips: one line, the band's range for this target. Pairing is Mix it's job, not the chip's.
 export const bandLineIdle = () => w("goal.bandIdle");
 export function bandHint(b: PdBand, t: number | null): string {
   if (!t) return bandLineIdle();
-  return `${BAND_LABEL[b]}: PD ${bandRange(b, t)} · your target ${dec(t, 1)}`;
+  return w("goal.bandHint", { band: BAND_LABEL[b], range: bandRange(b, t), target: dec(t, 1) });
 }

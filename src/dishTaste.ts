@@ -7,6 +7,7 @@ export type Taste = "sweet" | "fruit" | "savoury" | "veg" | "basic" | "unknown";
 export type DishTaste = "sweet" | "savoury" | null;
 
 import { isVegPepper } from "./foodjob";
+import { w, wn, wIn, type Val } from "./words";
 const SWEET = /nutella|chocolate|schoko|kakao|cocoa|cacao|\bjam\b|marmelade|konfit|honey|honig|syrup|sirup|sugar|zucker|icing|frosting|glaze|glasur|caramel|karamell|candy|cookie|keks|biscuit|whey|protein ?powder|proteinpulver|casein|sprinkles|marzipan|nougat|ice ?cream|\beis\b|dattel|\bdates?\b/i;
 const SAVOURY = /chicken|hähnchen|huhn|beef|\brind|pork|schwein|\bham\b|schinken|bacon|speck|sausage|wurst|salami|turkey|\bpute|lamb|lamm|steak|fish|fisch|tuna|thunfisch|salmon|lachs|shrimp|garnel|prawn|anchov|sardin|onion|zwiebel|shallot|schalotte|garlic|knoblauch|\bleek|lauch|ketchup|mustard|senf|mayo|soy ?sauce|sojasauce|\bstock\b|brühe|broth|bouillon|parmesan|cheddar|gouda|emmental|mozzarella|feta|halloumi|pasta|nudel|noodle|spaghetti|penne|\brice\b|\breis\b|potato|kartoffel|tortilla|tofu|tempeh|seitan/i;
 const FRUIT = /banana|banane|apple|apfel|berr|beere|fruit|frucht|mango|orange|pear|birne|grape|traube|peach|pfirsich|cherr|kirsch|plum|pflaume|apricot|aprikose|raisin|rosine|lemon|zitrone|lime/i;
@@ -36,17 +37,18 @@ export function goesInDish(dish: DishTaste, name: string): boolean {
 }
 // The line under the search when a food you have is held back: "Chicken breast, cooked is in your foods, but it doesn't go
 // with this dessert." Two or more are named together.
+// DT243 part two: the words in src/i18n/en.json (dish.heldBack*, dish.taste*)
 export function heldBackLine(dish: Exclude<DishTaste, null>, names: string[]): string {
-  const list = names.length <= 1 ? names.join("") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
-  return `${list} ${names.length === 1 ? "is" : "are"} in your foods, but ${names.length === 1 ? "it doesn't" : "they don't"} go with this ${dish === "sweet" ? "dessert" : "dish"}.`;
+  const foods: Val = (l) => (names.length <= 1 ? names.join("") : wIn(l, "list.and", { rest: names.slice(0, -1).join(", "), last: names[names.length - 1] }));
+  return wn(dish === "sweet" ? "dish.heldBackDessert" : "dish.heldBackDish", names.length, { foods });
 }
 
 // R22 (0.2.50, Milan 22:27 to 23:15, board RS21): What is it? One question in place of Meal or Dessert. Each is a full meal at
 // the PD: Savoury holds sweet foods back, Sweet, a DaaM (Dessert as a Meal) holds savoury ones back, Both holds nothing back
 // and puts a savoury main and a sweet finish on the plate as two parts. A small thing is a Snack, in What is it for.
 export type PlateTaste = "savoury" | "daam" | "both";
-export const PLATE_TASTE_WORD: Record<PlateTaste, string> = { savoury: "Savoury", daam: "Sweet, a DaaM", both: "Both" };
-export const PLATE_TASTE_LINE: Record<PlateTaste, string> = { savoury: "Savoury", daam: "Sweet, a DaaM", both: "Savoury and sweet" };
+export const PLATE_TASTE_WORD: Record<PlateTaste, string> = { get savoury() { return w("dish.tasteSavoury"); }, get daam() { return w("dish.tasteDaam"); }, get both() { return w("dish.tasteBoth"); } };
+export const PLATE_TASTE_LINE: Record<PlateTaste, string> = { get savoury() { return w("dish.tasteSavoury"); }, get daam() { return w("dish.tasteDaam"); }, get both() { return w("dish.tasteSavouryAndSweet"); } };
 // what is offered: the taste picked, else the recipe's own, else nothing held back
 export const offerTaste = (picked: PlateTaste | null, recipe: DishTaste): DishTaste => (picked === "savoury" ? "savoury" : picked === "daam" ? "sweet" : picked === "both" ? null : recipe);
 // the taste a recipe presets, shown as picked until you pick

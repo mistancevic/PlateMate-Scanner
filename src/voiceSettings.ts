@@ -1,6 +1,7 @@
 // DT215 v3 (0.3.66, board Stories162b; Coach Milan 2 November 23:37, Go): how Chef Mealan reads to you while you cook, on this
 // phone. Read aloud on or off is the cook's own voice choice (chefmealan-cook-voice, cook.ts); the voice, the speed and cut in
 // live here. The phone's own voices: free, nothing leaves the phone.
+import { w } from "./words";
 export type Speed = "slower" | "normal" | "faster";
 export type VoiceSettings = { voice: string | null; speed: Speed; cutIn: boolean };
 export const VOICE_SETTINGS_KEY = "chefmealan-voice-settings";
@@ -22,11 +23,13 @@ export function langWords(lang: string): string {
   const [l, r] = lang.split(/[-_]/);
   try { const name = new Intl.DisplayNames(["en"], { type: "language" }).of(l) ?? l; const reg = r ? ({ GB: "UK", US: "US", AU: "Australia", IE: "Ireland", IN: "India", ZA: "South Africa", CA: "Canada" } as Record<string, string>)[r.toUpperCase()] ?? new Intl.DisplayNames(["en"], { type: "region" }).of(r.toUpperCase()) : null; return reg ? `${name} (${reg})` : name; } catch { return lang; }
 }
+const SPEED_KEY = { slower: "voice.speedSlower", normal: "voice.speedNormal", faster: "voice.speedFaster" } as const;
 // the line on the Settings row: Read aloud · Daniel, English (UK) · normal speed · cut in on
 export function voiceLine(on: boolean, s: VoiceSettings, voices: PhoneVoice[]): string {
-  if (!on) return "Read aloud off · the buttons steer";
+  if (!on) return w("voice.lineOff");
   const v = voices.find((x) => x.uri === s.voice);
-  return `Read aloud · ${v ? `${v.name.replace(/^Google /, "Google ")}, ${langWords(v.lang)}` : "the phone's voice"} · ${s.speed} speed · cut in ${s.cutIn ? "on" : "off"}`;
+  const voice = v ? w("voice.lineVoice", { name: v.name.replace(/^Google /, "Google "), lang: langWords(v.lang) }) : w("voice.linePhoneVoice");
+  return w(s.cutIn ? "voice.lineOnCutIn" : "voice.lineOnNoCutIn", { voice, speed: w(SPEED_KEY[s.speed]) });
 }
 // the phone's voices; they can arrive a moment after the page opens
 export function phoneVoices(): PhoneVoice[] {

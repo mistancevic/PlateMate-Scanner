@@ -8,6 +8,8 @@ import type { Slot } from "./slots";
 import { dayRecord } from "./record";
 import { livedByPlan } from "./metricsCalc";
 import { fullOf } from "./measured";
+import { w, wn, mealName, numText } from "./words";
+import { getLang } from "./lang";
 
 export type SlotMark = "plan" | "swapped" | "skipped" | "missed" | "open";
 export type SlotLine = { name: string; time: string; planned: string | null; eaten: string | null; mark: SlotMark; kcal: number; protein: number };
@@ -48,21 +50,23 @@ export function dayLineOf(o: { date: string; today: string; slots: Slot[]; held:
 // the line's words, the same on the coach's page: status, colour and the detail under it
 export type LineWords = { status: string; tone: "lived" | "plan" | "changed" | "today" | "none"; detail: string };
 const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+// DT243: a slot's name in the line's language: the meals have their words, a name of your own stays as written (German keeps its capital)
+const slotLow = (n: string) => { const t = /^(breakfast|lunch|snack|dinner|meal)$/i.test(n) ? mealName(n) : n; return getLang() === "de" && t !== n ? t : lower(t); };
 export function wordsOf(l: DayLine): LineWords {
-  const of = `${l.byPlan + l.swapped} of ${l.planned}`;
-  const extra = l.extras.length ? `${l.extras.length} extra: ${l.extras.map((x) => `${lower(x.title)}, ${x.kcal.toLocaleString("en")} kcal`).join("; ")}` : "";
-  const skip = l.skipped ? `${l.skipped} skipped on purpose` : "";
-  if (l.when === "future") return { status: l.planned ? `${l.planned} planned` : "Nothing planned yet", tone: "none", detail: "" };
+  const of = w("clientweek.nOf", { n: l.byPlan + l.swapped, of: l.planned });
+  const extra = l.extras.length ? w("clientweek.extra", { n: l.extras.length, list: l.extras.map((x) => w("clientweek.extraItem", { title: lower(x.title), kcal: numText(x.kcal) })).join("; ") }) : "";
+  const skip = l.skipped ? w("clientweek.skippedOnPurpose", { n: l.skipped }) : "";
+  if (l.when === "future") return { status: l.planned ? w("clientweek.nPlanned", { n: l.planned }) : w("clientweek.nothingPlannedYet"), tone: "none", detail: "" };
   if (l.when === "today") {
     const next = l.slots.find((s) => s.mark === "open");
-    return { status: "Today so far", tone: "today", detail: [of, next ? `${lower(next.name)} at ${next.time}` : "", skip, extra].filter(Boolean).join(" · ") };
+    return { status: w("clientweek.todaySoFar"), tone: "today", detail: [of, next ? w("clientweek.mealAt", { meal: slotLow(next.name), time: next.time }) : "", skip, extra].filter(Boolean).join(" · ") };
   }
-  if (!l.planned && !l.extras.length) return { status: "Nothing planned or eaten", tone: "none", detail: "" };
-  if (!l.planned) return { status: "Not planned", tone: "none", detail: extra };
+  if (!l.planned && !l.extras.length) return { status: w("clientweek.nothingPlannedOrEaten"), tone: "none", detail: "" };
+  if (!l.planned) return { status: w("clientweek.notPlanned"), tone: "none", detail: extra };
   const changes = l.slots.filter((s) => s.mark === "swapped" || s.mark === "missed");
   if (changes.length) {
-    const what = changes.map((s) => `${lower(s.name)} ${s.mark === "swapped" ? "swapped" : "not eaten"}`).join(", ");
-    return { status: `${changes.length} ${changes.length === 1 ? "change" : "changes"}`, tone: "changed", detail: [what, skip, extra].filter(Boolean).join(" · ") };
+    const what = changes.map((s) => w(s.mark === "swapped" ? "clientweek.mealSwapped" : "clientweek.mealNotEaten", { meal: slotLow(s.name) })).join(", ");
+    return { status: wn("clientweek.nChanges", changes.length), tone: "changed", detail: [what, skip, extra].filter(Boolean).join(" · ") };
   }
-  return { status: "By the plan", tone: l.lived ? "lived" : "plan", detail: [of, skip, l.training, extra].filter(Boolean).join(" · ") };
+  return { status: w("clientweek.byThePlan"), tone: l.lived ? "lived" : "plan", detail: [of, skip, l.training, extra].filter(Boolean).join(" · ") };
 }

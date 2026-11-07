@@ -15,14 +15,14 @@ export function FormulaCard({ personal: d, pinned, coachLabel, value, onPick, me
   if (!canCalculate(d) || isMinor(d)) return null;
   const on: Formula | "auto" = pinned ?? value;
   const n = (f: Formula) => restingBurn(d, f);
-  const kcal = (x: number | null) => (x === null ? null : `${x.toLocaleString(numLocale())} kcal at rest`);
+  const kcal = (x: number | null) => (x === null ? null : w("formula.kcalAtRest", { kcal: x.toLocaleString(numLocale()) }));
   const age = ageOf(d)!;
   const pick = (f: Formula | "auto") => { if (!pinned) onPick(f); };
   const opts: { id: Formula | "auto"; name: string; num: string; hint: string; off?: boolean }[] = [
-    { id: "auto", name: "Automatic", num: d.bodyFatPct ? w("formula.katchMcardleNow") : w("formula.mifflinStJeorNow"), hint: d.bodyFatPct ? w("formula.fromYourBodyFat") : w("formula.katchMcardleOnceYouAdd") },
+    { id: "auto", name: w("formula.automatic"), num: d.bodyFatPct ? w("formula.katchMcardleNow") : w("formula.mifflinStJeorNow"), hint: d.bodyFatPct ? w("formula.fromYourBodyFat") : w("formula.katchMcardleOnceYouAdd") },
     { id: "mifflin", name: w("formula.mifflinStJeor2"), num: kcal(n("mifflin"))!, hint: w("formula.sexAgeHeightWeight") },
     n("katch") === null ? { id: "katch", name: w("formula.katchMcardle2"), num: w("formula.needsBodyFat"), hint: w("formula.addYourBodyFatUnder"), off: true } : { id: "katch", name: w("formula.katchMcardle2"), num: kcal(n("katch"))!, hint: w("formula.leanMassFromYourBody") },
-    { id: "schofield", name: "Schofield", num: kcal(n("schofield"))!, hint: `Sex, weight, age band ${schofieldBand(age)}.` },
+    { id: "schofield", name: "Schofield", num: kcal(n("schofield"))!, hint: w("formula.schofieldHint", { band: schofieldBand(age) }) },
   ];
   // the difference in plain numbers: at rest, then times the everyday (the same factor every formula gets)
   const s = n("schofield")!, m = n("mifflin")!;
@@ -31,8 +31,8 @@ export function FormulaCard({ personal: d, pinned, coachLabel, value, onPick, me
   const fixed = d.measuredUse && on === "data" ? d.measuredUse : fixedOf(measured);
   const shapeName = d.bodyFatPct ? w("formula.katchMcardle2") : w("formula.mifflinStJeor2");
   const dataGap = fixed ? fixed.kcal - (calculate({ ...d, formula: d.bodyFatPct ? "katch" : "mifflin" }, "maintain", null)?.kcal ?? fixed.kcal) : 0;
-  const dataDiff = `Your data gives ${Math.abs(dataGap)} kcal a day ${dataGap < 0 ? "less" : "more"} than ${shapeName} with your everyday and training. Your days keep their shape: training days stay higher than rest days.`;
-  const diff = on === "data" && fixed ? dataDiff : rest === 0 ? w("formula.schofieldAndMifflinStJeor") : `Schofield gives ${Math.abs(rest)} kcal ${rest > 0 ? "more" : "less"} at rest than Mifflin St Jeor. With your everyday that is about ${Math.abs(day)} kcal ${rest > 0 ? "more" : "less"} a day, before training.`;
+  const dataDiff = w(dataGap < 0 ? "formula.dataLess" : "formula.dataMore", { kcal: Math.abs(dataGap), formula: shapeName });
+  const diff = on === "data" && fixed ? dataDiff : rest === 0 ? w("formula.schofieldAndMifflinStJeor") : w(rest > 0 ? "formula.schofieldMore" : "formula.schofieldLess", { rest: Math.abs(rest), day: Math.abs(day) });
   return (
     <>
       {measured ? <div className="seg-head"><b>{w("formula.yourBurnAFormulaOr")}</b><small>{w("formula.threePublishedFormulasOrYour")}</small></div>
@@ -48,11 +48,11 @@ export function FormulaCard({ personal: d, pinned, coachLabel, value, onPick, me
         {measured && (
           <button type="button" className={`opt opt-wide ${on === "data" ? "on" : ""}`} aria-pressed={on === "data"} disabled={!fixed || !!pinned} onClick={() => pick("data")}>
             <b>{w("formula.fromYourData")}</b>
-            {fixed ? <><small className="opt-num">{fixed.kcal.toLocaleString(numLocale())} kcal a day, all in</small><small>What you ate and how your weight moved, {spanOf(fixed.from, fixed.to)}.</small></>
-              : <><small className="opt-num">{w("formula.notEnoughDataYet")}</small><small>{measured.readyOn ? `Ready on ${longDate(measured.readyOn)} at the earliest.` : w("formula.needsFullDaysAndWeigh")}</small></>}
+            {fixed ? <><small className="opt-num">{w("formula.kcalAllIn", { kcal: fixed.kcal.toLocaleString(numLocale()) })}</small><small>{w("formula.whatYouAte", { span: spanOf(fixed.from, fixed.to) })}</small></>
+              : <><small className="opt-num">{w("formula.notEnoughDataYet")}</small><small>{measured.readyOn ? w("formula.readyOn", { date: longDate(measured.readyOn) }) : w("formula.needsFullDaysAndWeigh")}</small></>}
           </button>
         )}
-        {pinned && <small className="setting-hint">Set by {coachLabel}. Ask {coachLabel} to change it.</small>}
+        {pinned && <small className="setting-hint">{w("formula.setByCoach", { coach: coachLabel })}</small>}
         <small className="setting-hint">{diff}</small>
         <button type="button" className="link formula-about" aria-expanded={about} onClick={() => setAbout((v) => !v)}>{about ? w("formula.closeAboutTheThreeFormulas") : w("formula.aboutTheThreeFormulas")}</button>
         {about && (
