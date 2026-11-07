@@ -167,7 +167,8 @@
       "id": "EV1",
       "title": "Photo evals: about 20 weighed plates from Milan and Tester 3",
       "epic": "ops",
-      "state": "later"
+      "state": "now",
+      "why": "7 November 20:59: Coach Milan and Marko collect about 20 weighed plates on the page Weighed plates (artifact 7f329dcc-3307-4df2-90ba-a798e2334749: db plates, photos as assets). Then Claude runs the photo reading on each and compares food by food."
     },
     {
       "id": "OP1",
@@ -616,8 +617,8 @@
       "id": "DT235",
       "title": "Accessibility: WCAG 2.2 AA, checked area by area",
       "epic": "trust",
-      "state": "next",
-      "why": "Coach Milan 4 November 06:01 to 06:09. Not checked yet: contrast, colour alone (PD verdict, letters), screen readers in practice, large text, photo descriptions, the page's language (lang sr for Srpski, English parts marked). Plan: axe in the walkthroughs on every release, a manual pass with VoiceOver and TalkBack on the Plate, Today and cooking, fixes area by area. Whether the European Accessibility Act applies is a question for a lawyer."
+      "state": "parked",
+      "why": "7 November 21:03: not a legal duty for now (BFSG: microenterprises exempt for services; a free beta is no consumer contract). Done in 0.3.109: text contrast 4.5:1 and axe in every release (accessibility.cjs). Parked: the manual pass (screen readers, large text) until a paying customer, an institution or growth past the exemption. Earlier: Coach Milan 4 November 06:01 to 06:09. Not checked yet: contrast, colour alone (PD verdict, letters), screen readers in practice, large text, photo descriptions, the page's language (lang sr for Srpski, English parts marked). Plan: axe in the walkthroughs on every release, a manual pass with VoiceOver and TalkBack on the Plate, Today and cooking, fixes area by area. Whether the European Accessibility Act applies is a question for a lawyer."
     },
     {
       "id": "DT248",
