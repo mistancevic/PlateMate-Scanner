@@ -27,7 +27,8 @@ HC7. The loop is clean. Each clip ends on a settled screen held for at least 1.5
 background, so the jump back to the first frame reads as a new start, not a glitch. Check: at least 1.5 seconds after the last
 action; the fades are in the encode.
 
-HC8. Short. Each clip runs 6 to 12 seconds. Check: the length.
+HC8. Short. Each clip runs 6 to 12 seconds. The language clip runs up to 20 seconds (Coach Milan, 7 November 14:06: nine
+frames, about 2 seconds each, so a visitor can read each change). Check: the length, 6 to 12 s; 6 to 20 s for the language clip.
 
 HC9. Honest. The section says the clips are the app on test data with made-up packs. Check: the note is in LandingScreen.tsx.
 
@@ -47,8 +48,9 @@ the run.
 
 HC12. The poster says what the clip is about (Coach Milan, 1 November 11:57: the shopping list's picture showed Plan). The still
 shown before a clip plays is what the clip is about: for the four ways in, the camera with the pack or the plate in it; for
-Explorer, The body's families; for the coach, Waiting for you; for the others, the last settled screen before the fade. Never the first frame. Check: the poster is taken at a set second for the
-four ways in, and 1.1 seconds before the end for the others.
+Explorer, The body's families; for the coach, Waiting for you; for the languages, the recipe in German (DT253); for the others,
+the last settled screen before the fade. Never the first frame. Check: the poster is taken at a set second for the four ways in,
+at the moment the German recipe has settled for the languages, and 1.1 seconds before the end for the others.
 
 HC13. Hands free looks hands free (Coach Milan, 1 November 14:06: the cook clip moved on taps). A voice command shows as a
 bubble at the bottom with the words said, and the app moves because it heard them, through the browser's speech recognition

@@ -12,7 +12,7 @@ import { pendingCode } from "../pendingCode";
 import { hit } from "../metrics";
 import { VERSION_LINE } from "../version";
 import { w, wn, type WordKey, dec } from "../words";
-import { useLang, getLang, setLang, type Lang } from "../lang";
+import { useLang, getLang, setLang, LANGS, langChip, type Lang } from "../lang";
 import { LangSwitch, LangAsk, pageLang, langPath } from "../components/LangAsk";
 import { IDLE_DAYS } from "../idle";
 
@@ -212,6 +212,22 @@ export function LandingScreen() {
             <p>{w("home.body2")}</p>
           </div>
           <DayVideo src="/landing/way-explorer.mp4" poster="/landing/way-explorer.webp" label={w("home.videoBody")} />
+        </div>
+        {/* DT253 (board Stories188; Coach Milan 7 November 13:45, the title evergreen): the app's languages, as chips from the list
+            the header's switch reads (LANGS), so a new language shows here by itself; the clip runs up to 20 s (HC8) */}
+        <div className="l-one">
+          <div className="l-one-text">
+            <span className="l-eyebrow">{w("home.langEyebrow")}</span>
+            <h2>{w("home.langTitle")}</h2>
+            <ul className="l-langs" aria-label={w("home.language")}>
+              {LANGS.map((l) => { const c = langChip(l); return <li key={l} lang={l}>{c.name}{c.beta && <span className="l-lang-beta"> · Beta</span>}</li>; })}
+            </ul>
+            <ul className="l-list">
+              {(["home.lang1", "home.lang2", "home.lang3", "home.lang4"] as WordKey[]).map((k) => <li key={k}>{w(k)}</li>)}
+            </ul>
+            <small className="l-lang-note">{w("home.langNote")}</small>
+          </div>
+          <DayVideo src="/landing/way-languages.mp4" poster="/landing/way-languages.webp" label={w("home.videoLang")} />
         </div>
         <small className="l-ways-note">{w("home.clipsNames")}</small>
       </section>

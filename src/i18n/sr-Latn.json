@@ -20972,6 +20972,38 @@
     "recipe.videoWatchWords": {
       "text": "Gledaj uz tekst ›",
       "checked": true
+    },
+    "home.langEyebrow": {
+      "text": "Na tvom jeziku",
+      "checked": true
+    },
+    "home.langTitle": {
+      "text": "Chef Mealan govori više jezika",
+      "checked": true
+    },
+    "home.lang1": {
+      "text": "Cela aplikacija na tvom jeziku: promeni ga u Meni, Podešavanja.",
+      "checked": true
+    },
+    "home.lang2": {
+      "text": "Recept sa linka ili snimka ekrana stiže na tvom jeziku; original je na jedan dodir.",
+      "checked": true
+    },
+    "home.lang3": {
+      "text": "Recept na drugom jeziku: Chef Mealan ti ga jednom ponudi na tvom.",
+      "checked": true
+    },
+    "home.lang4": {
+      "text": "Kuvanje: koraci se čitaju naglas na tvom jeziku, i aplikacija te sluša na njemu.",
+      "checked": true
+    },
+    "home.langNote": {
+      "text": "Deutsch je u beta verziji: usput ga proverava neko kome je nemački maternji. Novi jezici stižu na ovaj spisak kako dolaze.",
+      "checked": true
+    },
+    "home.videoLang": {
+      "text": "Chef Mealan na engleskom, srpskom i nemačkom",
+      "checked": true
     }
   }
 }

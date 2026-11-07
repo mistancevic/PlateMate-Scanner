@@ -3,6 +3,7 @@
 // your day; the shopping list. The AI's answers are stand-ins (page.route) and the pack is invented (Fjell Skyr): no real brand.
 // Run after npm run build: node scripts/record-home-clips.cjs. Writes public/landing/way-*.mp4, .webm and .webp, only when every
 // rule in docs/rules/home-clips.md passes (HC1 to HC13); a failed rule stops the run and lists what failed.
+// One clip alone: CLIPS=languages checks its rules and writes nothing; CLIPS=languages CLIPS_OUT=public/landing records it there.
 const { chromium } = require("playwright");
 const { spawn, execFileSync } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path"), os = require("node:os");
@@ -40,7 +41,12 @@ const LABEL = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="9
 const cup = (x, top, name, line, color) => `<rect x="${x}" y="${top}" width="136" height="250" rx="16" fill="#f7f5ef" stroke="#d8d2c4" stroke-width="3"/><rect x="${x}" y="${top + 26}" width="136" height="58" fill="${color}"/><text x="${x + 68}" y="${top + 66}" font-family="Georgia" font-size="${name.length > 6 ? 22 : 28}" fill="#fff" text-anchor="middle">${name}</text><text x="${x + 68}" y="${top + 126}" font-family="Arial" font-weight="700" font-size="18" fill="${color}" text-anchor="middle">${line}</text>`;
 const GROUP = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960"><rect width="720" height="960" fill="#cdbb9f"/>${cup(146, 360, "Fjell", "SKYR", "#2e5d8f")}${cup(292, 340, "Kornfeld", "OATS", "#8a5a1f")}${cup(438, 360, "Nusshof", "PEANUT", "#b3261e")}</svg>`);
 const MEAL = photo("meal.jpg");
-const RECIPE_PHOTOS = { m1: photo("recipe-crepes.jpg"), m2: photo("recipe-pudding.jpg"), m3: photo("recipe-sarma.jpg") };
+const RECIPE_PHOTOS = { m1: photo("recipe-crepes.jpg"), m2: photo("recipe-pudding.jpg"), m3: photo("recipe-sarma.jpg"), "m-pr": photo("recipe-prebranac.jpg") };
+// HC11 in every language: the bar's Explorer and Clients as the app's three word files name them (Entdecken, Istraživač)
+const tabWords = (k) => { const out = [JSON.parse(fs.readFileSync(path.join(ROOT, "src/i18n/en.json"), "utf8"))[k]];
+  for (const f of ["sr-Latn", "de"]) { const l = JSON.parse(fs.readFileSync(path.join(ROOT, `src/i18n/${f}.json`), "utf8")).screens?.[k]; if (l?.checked) out.push(l.text); }
+  return new RegExp(out.join("|")); };
+const EXPLORER_TAB = tabWords("tab.explorer"), CLIENTS_TAB = tabWords("tab.clients");
 const SKYR = { success: true, product_name: "Fjell Skyr natural", brand: "Fjell", basis: "100g", calories: 66, protein: 11.6, fats: 0.3, carbs: 3.8, fiber: 0, notes: "", error_reason: "", table: [], source: "Product database · review required" };
 const LABEL_READ = { ...SKYR, source: "Label photo · review required", table: LABEL_ROWS.map(([name, v]) => ({ name, amount: Number(String(v).match(/([\d.]+) ?k?c?a?l?$/)?.[1] ?? 0), unit: /kcal/.test(v) ? "kcal" : "g" })) };
 const GROUP_READ = { entities: [
@@ -59,9 +65,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // HC5 before anything: the photos must be there
   rule(Boolean(MEAL), "HC5", `the meal photo: ${path.relative(ROOT, path.join(ASSETS, "meal.jpg"))}`);
   rule(Boolean(BARCODE), "HC5", "the pack photo: design/home-clips/pack-barcode.jpg");
-  for (const [id, f] of [["m1", "recipe-crepes.jpg"], ["m2", "recipe-pudding.jpg"], ["m3", "recipe-sarma.jpg"]]) rule(Boolean(RECIPE_PHOTOS[id]), "HC5", `a recipe photo: design/home-clips/${f}`);
+  for (const [id, f] of [["m1", "recipe-crepes.jpg"], ["m2", "recipe-pudding.jpg"], ["m3", "recipe-sarma.jpg"], ["m-pr", "recipe-prebranac.jpg"]]) rule(Boolean(RECIPE_PHOTOS[id]), "HC5", `a recipe photo: design/home-clips/${f}`);
   // HC9: the page says what the clips are
-  rule(/Clips of the app on test data/.test(fs.readFileSync(path.join(ROOT, "src/screens/LandingScreen.tsx"), "utf8")), "HC9", "the section says the clips are the app on test data");
+  // since DT203 the note's words live in src/i18n/en.json; LandingScreen.tsx shows them by their keys
+  { const en = JSON.parse(fs.readFileSync(path.join(ROOT, "src/i18n/en.json"), "utf8")), ls = fs.readFileSync(path.join(ROOT, "src/screens/LandingScreen.tsx"), "utf8");
+    const notes = Object.keys(en).filter((k) => /^home\./.test(k) && /Clips of the app on test data/.test(en[k]));
+    rule(notes.length > 0 && notes.every((k) => ls.includes(`w("${k}")`)), "HC9", `the section says the clips are the app on test data (${notes.join(", ") || "no line"})`); }
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await sleep(500); } }
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "clips-"));
@@ -143,16 +152,18 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.route("**/api/product/**", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(SKYR) }));
     await page.route("**/api/scan", (r) => { const group = r.request().postDataJSON()?.mode === "group"; r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(group ? GROUP_READ : LABEL_READ) }); });
     await page.route("**/api/plate-photo", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(READ) }));
+    if (x.routes) await x.routes(page);
     const t0 = Date.now();
     await page.goto(U + (x.path || "/plate")); await sleep(1600);
     // HP3: steps to reach the clip's first screen, before it starts; clicked without a pointer, so no finger is drawn
     if (x.setup) { const click = async (loc, wait = 600) => { await loc.waitFor({ timeout: 6000 }); await loc.evaluate((el) => el.click()); await sleep(wait); }; await x.setup(page, click); await sleep(500); }
-    let from = (Date.now() - t0) / 1000, lastAct = from, taps = 0, swipes = 0, says = 0;
+    let from = (Date.now() - t0) / 1000, lastAct = from, taps = 0, swipes = 0, says = 0, posterAt = null;
     // HC10: this clip's hand. A seeded random per clip: where the thumb comes from, which side it scrolls on, how fast it moves
-    const rnd = seeded(name), hand = { side: 210 + rnd() * 110, pace: 0.85 + rnd() * 0.4, entry: [250 + rnd() * 120, 880] };
+    // DT253: a clip with many taps can have a quicker hand (x.quick, under 1): travel and the moment before a press are shorter
+    const rnd = seeded(name), hand = { side: 210 + rnd() * 110, pace: 0.85 + rnd() * 0.4, entry: [250 + rnd() * 120, 880] }, quick = x.quick || 1;
     let first = true, last = hand.entry;
     const travel = async (x, y) => { const d = Math.hypot(x - last[0], y - last[1]);
-      const ms = Math.round((first ? 480 : 220) + Math.min(320, d * 0.6) * hand.pace), bend = (rnd() - 0.5) * Math.min(80, d * 0.25);
+      const ms = Math.round(((first ? 480 : 220) + Math.min(320, d * 0.6) * hand.pace) * quick), bend = (rnd() - 0.5) * Math.min(80, d * 0.25);
       await page.evaluate(([x, y, ms, bend, from]) => window.__finger.move(x, y, ms, bend, from), [x, y, ms, bend, first ? hand.entry : null]); first = false; last = [x, y]; };
     const act = {
       // a tap: the finger travels there, presses a little off the centre as a thumb does, a real click, lifts
@@ -160,13 +171,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         const x = bb.x + bb.width * (0.5 + (rnd() - 0.5) * Math.min(0.4, 24 / bb.width)), y = bb.y + bb.height * (0.5 + (rnd() - 0.5) * Math.min(0.35, 14 / bb.height));
         const hit = await loc.evaluate((el, [x, y]) => { const h = document.elementFromPoint(x, y); return Boolean(h && (el === h || el.contains(h))); }, [x, y]);
         if (!hit) { const info = await page.evaluate(([x, y]) => { const h = document.elementFromPoint(x, y); const sc = document.scrollingElement; return `${h ? h.tagName + "." + h.className + " " + (h.textContent || "").slice(0, 30) : "nothing"}; scrollTop ${sc.scrollTop} of ${sc.scrollHeight}`; }, [x, y]); throw new Error(`tap at ${Math.round(x)},${Math.round(y)} on ${(await loc.textContent().catch(() => "")).slice(0, 30)} lands on ${info}; scroll first`); }
-        await travel(x, y); await sleep(90 + rnd() * 120);
+        await travel(x, y); await sleep((90 + rnd() * 120) * quick);
         await page.evaluate(() => window.__finger.down()); await page.mouse.move(x, y); await page.mouse.down(); await sleep(70 + rnd() * 60); await page.mouse.up(); await page.evaluate(() => window.__finger.up());
         taps++; lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
       // a scroll: the finger goes to the scroll side, drags up part of the way with the page under it, and the page glides on
       swipe: async (dy, wait = 1200) => { const x = hand.side + (rnd() - 0.5) * 30, y = 560 + rnd() * 140;
-        await travel(x, y); await sleep(120 + rnd() * 100);
-        const d = Math.round(Math.min(dy * (0.5 + rnd() * 0.15), 300)), ms = Math.round((340 + rnd() * 160) * hand.pace), gms = Math.round(360 + Math.min(520, (dy - d) * 0.45) + rnd() * 120);
+        await travel(x, y); await sleep((120 + rnd() * 100) * quick);
+        const d = Math.round(Math.min(dy * (0.5 + rnd() * 0.15), 300)), ms = Math.round((340 + rnd() * 160) * hand.pace * quick), gms = Math.round((360 + Math.min(520, (dy - d) * 0.45) + rnd() * 120) * Math.max(quick, 0.7));
         await page.evaluate(([d, ms, g, gms]) => window.__finger.drag(d, ms, g, gms), [d, ms, dy - d, gms]); last = [x, y - d];
         strokes.push(`${Math.round(x)}/${d}/${ms}`); swipes++; lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
       // a voice command: the bubble shows the words, then the app hears them through the browser's recognition
@@ -174,6 +185,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         const heard = await page.evaluate((t) => window.__hear(t.toLowerCase()), text); if (!heard) rule(false, "HC13", `${name}: the app was not listening for "${text}"`);
         lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
       mark: () => { from = (Date.now() - t0) / 1000; },
+      at: () => (Date.now() - t0) / 1000 - from,
+      // HC12 (DT253): the poster is this moment of the clip, what the clip is about, in place of the last screen
+      poster: () => { posterAt = (Date.now() - t0) / 1000; },
+      // DT253: an end frame on the app's blue, the words given; the loop's fade follows it (HC7). Not an action: nothing tapped
+      card: async (text) => { await page.evaluate((t) => { const c = document.createElement("div"); c.className = "hc-card";
+        c.style.cssText = "position:fixed;inset:0;z-index:2147483645;display:grid;place-items:center;background:#2e7be8;color:#fff;font:800 25px Nunito,system-ui,sans-serif;text-align:center;padding:0 24px;opacity:0;transition:opacity .35s";
+        c.textContent = t; document.body.appendChild(c); requestAnimationFrame(() => (c.style.opacity = "1")); }, text); },
     };
     let checks = {};
     try { checks = (await run(page, act)) || {}; } catch (e) { rule(false, "run", `${name}: ${e.message.split("\n")[0]}`); }
@@ -181,7 +199,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     // HC11 (Coach Milan, 1 November 11:40): the app's bar, where the clip shows it, has all five tabs with Explorer; a coach's
     // bar has six, Clients the sixth (DT210, 0.3.50)
     const bar = await page.evaluate(() => { const n = document.querySelector(".bottom-nav"); if (!n || getComputedStyle(n).display === "none") return null; return [...n.querySelectorAll("button")].map((x) => x.textContent.trim()); }).catch(() => null);
-    rule(bar === null || ((bar.length === 5 || (bar.length === 6 && bar.some((t) => /Clients/.test(t)))) && bar.some((t) => /Explorer/.test(t))), "HC11", `${name}: the bar ${bar ? bar.join(", ") : "is not on screen"}`);
+    rule(bar === null || ((bar.length === 5 || (bar.length === 6 && bar.some((t) => CLIENTS_TAB.test(t)))) && bar.some((t) => EXPLORER_TAB.test(t))), "HC11", `${name}: the bar ${bar ? bar.join(", ") : "is not on screen"}`);
     const saidDrawn = await page.evaluate(() => window.__said || 0).catch(() => -1);
     if (says) rule(saidDrawn === says, "HC13", `${name}: ${says} voice commands, ${saidDrawn} bubbles`);
     const drawn = await page.evaluate(() => ({ rings: window.__rings, ripples: window.__ripples, swipes: window.__swipes, travels: window.__travels, synced: window.__synced })).catch(() => ({ rings: -1, ripples: -1, swipes: -1, travels: -1, synced: [] }));
@@ -193,13 +211,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const slip = drawn.synced.filter((v) => !v.end && Math.abs(v.page - v.finger) > 4);
     rule(slip.length === 0, "HC10", `${name}: the page moved with the finger on every scroll${slip.length ? ": " + slip.map((v) => `${v.finger} px finger, ${v.page} px page`).join(", ") : ""}`);
     rule(end - lastAct >= 1.5, "HC7", `${name}: the last screen held ${(end - lastAct).toFixed(1)} s`);
-    rule(len >= 6 && len <= 12, "HC8", `${name}: ${len.toFixed(1)} s`);
+    // HC8: 6 to 12 s; the language clip up to 20 s (Coach Milan, 7 November 14:06: nine frames, about 2 s each)
+    const most = x.most || 12;
+    rule(len >= 6 && len <= most, "HC8", `${name}: ${len.toFixed(1)} s (6 to ${most})`);
+    const poster = posterAt === null ? null : posterAt - from;
+    if (x.poster) rule(poster !== null && poster > 1 && poster < len - 1.5, "HC12", `${name}: the poster is ${x.poster}, at ${poster === null ? "no moment" : poster.toFixed(1) + " s"}`);
     for (const [k, v] of Object.entries(checks)) rule(Boolean(v.ok), k, `${name}: ${v.what}`);
-    made.push({ name, raw, from, len });
+    made.push({ name, raw, from, len, most, poster });
   };
   // HC7: fade in and out to the page's background, so the loop reads as a new start
-  const encode = ({ name, raw, from, len }) => {
-    const base = path.join(OUT, `way-${name}`), t = Math.min(len, 12.5);
+  const encode = ({ name, raw, from, len, most, poster }) => {
+    const base = path.join(OUT, `way-${name}`), t = Math.min(len, most + 0.5);
     const vf = `fade=t=in:st=0:d=0.3:color=0xEEF3FC,fade=t=out:st=${(t - 0.4).toFixed(2)}:d=0.4:color=0xEEF3FC`;
     const cut = ["-y", "-ss", from.toFixed(2), "-i", raw, "-t", t.toFixed(2), "-an", "-vf", vf];
     execFileSync("ffmpeg", [...cut, "-c:v", "libx264", "-preset", "veryfast", "-crf", "28", "-pix_fmt", "yuv420p", "-movflags", "+faststart", `${base}.mp4`], { stdio: "ignore" });
@@ -207,7 +229,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     // HC12 (Coach Milan, 1 November 11:57): the poster is the clip's last settled screen, what the clip is about, before
     // the fade; the first frame was Plan for both the recipes and the shopping list
     // for the four ways in, what the clip is about is the camera with the pack or the plate in it, not the Plate after
-    const at = { barcode: 0.8, label: 1.6, group: 1.6, meal: 0.9, coach: 0.8, explorer: 2.0 }[name];
+    // DT253: the languages clip's poster is the moment it marked, the recipe in German
+    const at = poster !== null ? poster.toFixed(2) : { barcode: 0.8, label: 1.6, group: 1.6, meal: 0.9, coach: 0.8, explorer: 2.0 }[name];
     execFileSync("ffmpeg", ["-y", ...(at ? ["-ss", String(at)] : ["-sseof", "-1.1"]), "-i", `${base}.mp4`, "-frames:v", "1", "-c:v", "libwebp", "-quality", "70", `${base}.webp`], { stdio: "ignore" });
     console.log("clip", name, `${len.toFixed(1)} s`);
   };
@@ -320,6 +343,70 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await a.swipe(380, 1300); await a.swipe(360, 600);
       return { HP3: { ok: !/Davorka/.test(await page.locator("main").textContent()), what: "made-up names only" } };
     }, { path: "/today?coachdemo", setup: async (page, click) => { await click(page.locator(".bottom-nav button").filter({ hasText: "Clients" }), 900); } });
+    // DT253 (board Stories188; Coach Milan 7 November 13:45 to 14:06): Chef Mealan in three languages, nine beats of about 2 s.
+    // Today in English; Settings, Language, Srpski; Danas; a recipe saved from a Serbian link, as written; Deutsch (Beta); the
+    // recipe offered in German and translated (a stand-in for Chef Mealan's translation); cook mode on Get it ready, one "weiter"
+    // heard; an end frame. The poster is the recipe in German (HC12).
+    const Fl = (id, name, calories, protein, fats, carbs) => ({ ...seed.foods[0], id, name, brand: "", source: "label", calories, protein, fats, carbs, fiber: 0, photo: undefined, photos: undefined, icon: undefined, barcode: undefined });
+    const prItems = [[250, Fl("be", "Pasulj, kuvan", 127, 8.7, 0.5, 23)], [120, Fl("on", "Crni luk", 40, 1.1, 0.1, 9)], [15, Fl("oi", "Suncokretovo ulje", 884, 0, 100, 0)]].map(([g, f], k) => ({ id: "i" + k, grams: g, food: f, locked: false }));
+    const prebranac = { id: "m-pr", title: "Prebranac", items: prItems, portion: 385, savedAt: "2026-11-03T18:00:00Z", stepsFor: prItems.map((i) => i.food.name), photo: RECIPE_PHOTOS["m-pr"],
+      source: { name: "recepti.rs", url: "https://recepti.rs/prebranac", from: "link" },
+      steps: ["Iseci [[i:i1|crni luk]] na tanke polukrugove i propržite ga na [[i:i2|ulju]] 10 minuta, dok ne omekša.", "Dodaj [[i:i0|pasulj]], sve stavi u vatrostalnu posudu i peci 40 minuta na 200 °C."] };
+    const GERMAN = { title: "Prebranac (gebackene Bohnen)", steps: ["Schneide die [[i:i1|Zwiebel]] in dünne Halbringe und brate sie 10 Minuten im [[i:i2|Öl]], bis sie weich ist.", "Gib die [[i:i0|Bohnen]] dazu, gib alles in eine Auflaufform und backe es 40 Minuten bei 200 °C."],
+      foods: [{ id: "i0", name: "Bohnen, gekocht" }, { id: "i1", name: "Zwiebel" }, { id: "i2", name: "Sonnenblumenöl" }] };
+    await clip("languages", async (page, a) => {
+      const text = async (sel = "main") => ((await page.locator(sel).first().innerText().catch(() => "")) || "").replace(/\s+/g, " ");
+      const menu = async (row, lang) => {
+        await a.tap(page.locator("header .menu-button"), 120);
+        await a.tap(page.locator(".menu-row").filter({ hasText: row[0] }).first(), 120);
+        await a.tap(page.locator("button.menu-row").filter({ hasText: row[1] }).first(), 150);
+        await a.tap(page.locator(".lang-row").filter({ hasText: lang }), 600);
+      };
+      const c = {}, beat = (n) => console.log(`     beat ${n} at ${a.at().toFixed(1)} s`);
+      let tiles = [];
+      const recipe = async () => {
+        await a.tap(page.locator(".bottom-nav button").nth(3), 250);
+        tiles = await page.evaluate(() => [...document.querySelectorAll("main .recipe-tile")].map((t) => Boolean(t.querySelector("img"))));
+        await a.tap(page.locator(".recipe-tile").filter({ hasText: "Prebranac" }), 250);
+      };
+      // 1. Today in English
+      beat(1); await sleep(700); c.en = /Today/.test(await text("header h1"));
+      // 2. Menu, Settings, Language: Srpski (latinica)
+      beat(2); await menu([/Settings/, /Language/], "Srpski");
+      // 3. Today again: Danas
+      beat(3); await a.tap(page.locator(".menu-head button.link").last(), 750); c.sr = /Danas/.test(await text("header h1"));
+      // 4. Recipes: Prebranac, from a Serbian link, as written: its page in Srpski, the source recepti.rs
+      beat(4); await recipe(); await sleep(650); c.asWritten = /Prebranac/.test(await text("main")) && /recepti\.rs/.test(await text(".rq-source"));
+      // 5. Meni, Podešavanja, Jezik: Deutsch (Beta)
+      beat(5); await menu([/Podešavanja|Settings/, /Jezik|Language/], "Deutsch");
+      // 6. back on the recipe: Chef Mealan offers it in German, auf Deutsch zeigen
+      beat(6); await recipe();
+      const offer = page.locator(".rq-lang-offer");
+      await offer.waitFor({ timeout: 6000 });
+      await a.swipe(Math.round(await offer.evaluate((e) => e.getBoundingClientRect().top + document.scrollingElement.scrollTop)) - 120, 250);
+      c.offer = /auf Deutsch zeigen/i.test(await text(".rq-lang-offer"));
+      await a.tap(offer.locator(".pill-primary"), 400);
+      // 7. the recipe in German, Übersetzt von Chef Mealan, the Original switch: the poster
+      await page.locator(".rq-lang-switch").waitFor({ timeout: 6000 }); beat(7); await sleep(250); a.poster(); await sleep(950);
+      c.german = /Schneide die .*Zwiebel/.test(await text(".rq-steps")) && /Übersetzt von Chef Mealan/.test(await text(".rq-lang")) && await page.locator(".rq-lang-switch").isVisible();
+      // 8. Kochen starten: Get it ready, the foods as the German steps name them; "weiter" heard ticks the first
+      beat(8); await a.tap(page.locator(".rq-start button").first(), 650);
+      const ready = await text(".cook-mode .cook-ready-list");
+      await a.say("weiter", 350);
+      const put = await page.locator(".cook-mode .cook-ready-food.put").count();
+      // 9. the end frame, on the app's blue
+      beat(9); await a.card("English · Srpski · Deutsch (Beta)"); await sleep(300);
+      return {
+        HC5: { ok: tiles.length >= 1 && tiles.every(Boolean), what: `the recipe tile shows its photo (${tiles.filter(Boolean).length} of ${tiles.length})` },
+        DT253: { ok: c.en && c.sr && c.asWritten && c.offer && c.german, what: `Today, then Danas; the recipe as written; auf Deutsch zeigen; in German with its switch (${JSON.stringify(c)})` },
+        HC13: { ok: /Bohnen/.test(ready) && /Zwiebel/.test(ready) && put === 1, what: `Get it ready names ${ready.slice(0, 80)}; "weiter" ticked ${put}` },
+      };
+    }, { meals: [prebranac], path: "/today", time: "2026-11-07T12:20:00", most: 20, poster: "the recipe in German", quick: 0.5,
+      // the voice stood in for, as in the cook clip; voice on was chosen before, so cook mode listens from the start
+      init: `(${voice})(); try { localStorage.setItem("chefmealan-cook-voice", "on"); } catch { /* none kept */ }`,
+      routes: async (page) => {
+        await page.route("**/api/status", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ai: true, airtable: false, accessRequired: false }) }));
+        await page.route("**/api/recipe/translate", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(GERMAN) })); } });
   } catch (e) { rule(false, "run", (e.stack || e.message).split("\n").slice(0, 3).join(" | ")); }
   rule(new Set(strokes).size === strokes.length, "HC10", `no two scrolls in the set are the same (${strokes.length} scrolls)`);
   server.kill();
