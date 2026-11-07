@@ -4,6 +4,7 @@
 import { w, wn, wIn, wnIn } from "../words";
 import { getLang, speechLang, textLang, langScore, type Lang } from "../lang";
 import { ChefLine } from "./ChefLine";
+import { PhotoPick } from "./PhotoPick";
 import { say as chefSay } from "../chefScript";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
@@ -289,9 +290,8 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
             {/* DT222 (0.3.60, board Stories165): the next step is the meal's photo, then Eat; Make is a small link */}
             {link.mealPhoto && (link.mealPhoto.src
               ? <div className="cook-meal-shot"><img src={link.mealPhoto.src} alt={w("cookmode.yourMeal")} />
-                  <label className="link cook-meal-again">{w("cookmode.takeItAgain")}<input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) link.mealPhoto!.take(f); }} /></label></div>
-              : <label className="pill pill-wide cook-meal-take"><span aria-hidden="true">📷</span>{w("cookmode.photoOfYourMeal")}<small>{w("cookmode.itGoesOnTheMeal")}</small>
-                  <input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) link.mealPhoto!.take(f); }} /></label>)}
+                  <PhotoPick onFile={(f) => link.mealPhoto!.take(f)}>{({ toggle, open }) => <button type="button" className="link cook-meal-again" aria-expanded={open} onClick={toggle}>{w("cookmode.takeItAgain")}</button>}</PhotoPick></div>
+              : <PhotoPick onFile={(f) => link.mealPhoto!.take(f)}>{({ toggle, open }) => <button type="button" className="pill pill-wide cook-meal-take" aria-expanded={open} onClick={toggle}><span aria-hidden="true">📷</span>{w("cookmode.photoOfYourMeal")}<small>{w("cookmode.itGoesOnTheMeal")}</small></button>}</PhotoPick>)}
             <button className="pill pill-wide pill-primary cook-to-eat" onClick={() => link.eat!()}>{w("cookmode.cookedNextEat")}</button>
             <div className="cook-done-links"><button className="link" onClick={back}>{w("cookmode.lastStepBack")}</button><button className="link" onClick={close}>{w("cookmode.makeStepPhotosAndNotes")}</button></div>
           </>) : (<>
@@ -321,11 +321,11 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
           <section className={`cook-card cook-step${pics[k] ? " has-pic" : ""}`} aria-live="polite">
             {pics[k] && <><img className="cook-pic" src={pics[k]!.src} alt={w("cookmode.stepN", { n: k + 1 })} /><small className="cook-pic-label">{pics[k]!.by === "ai" ? w("cookmode.pictureDrawnByAiBeta") : link.stepPhoto?.kept ? w("cookmode.yourPhotoKeptWithThe") : w("cookmode.yourPhoto")}
               {/* DT223 (0.3.60): your photo of the step can be taken again */}
-              {pics[k]!.by === "me" && link.stepPhoto && <label className="link cook-pic-again">{w("cookmode.takeItAgain")}<input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) link.stepPhoto!.take(k, f); }} /></label>}</small></>}
+              {pics[k]!.by === "me" && link.stepPhoto && <PhotoPick key={`again-${k}`} onFile={(f) => link.stepPhoto!.take(k, f)}>{({ toggle, open }) => <button type="button" className="link cook-pic-again" aria-expanded={open} onClick={toggle}>{w("cookmode.takeItAgain")}</button>}</PhotoPick>}</small></>}
             <small>{w("cookmode.stepCaps", { n: k + 1 })}</small>
             <div className={`cook-text${mvs.length > 1 ? " cook-text-whole" : ""}`}>{stepParts(tempsIn(steps[k]), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}</div>
             {/* DT223 (0.3.60, board Stories165): a step without a picture: a small button to add your photo of it */}
-            {!pics[k] && link.stepPhoto && <label className="pill pill-small cook-add-pic">{w("cookmode.addAPhotoOfThisStep")}<input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) link.stepPhoto!.take(k, f); }} /></label>}
+            {!pics[k] && link.stepPhoto && <PhotoPick key={`add-${k}`} onFile={(f) => link.stepPhoto!.take(k, f)}>{({ toggle, open }) => <button type="button" className="pill pill-small cook-add-pic" aria-expanded={open} onClick={toggle}>{w("cookmode.addAPhotoOfThisStep")}</button>}</PhotoPick>}
             {/* DT217 v2: under the whole step, its moves, read aloud one at a time: done ones ticked, this one large */}
             {mvs.length > 1 && (
               <div className="cook-moves" aria-label={w("cookmode.moveOf", { k: m + 1, n: mvs.length })}>

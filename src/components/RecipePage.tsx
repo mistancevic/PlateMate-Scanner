@@ -25,6 +25,8 @@ import { CountAmount, isCounted } from "./CountAmount";
 import { countOf, countWord, howMany, KINDS } from "../counted";
 import { OriginalSteps, StepsHint } from "./StepsView";
 import { foodNames, diffFoods, diffLine } from "../stepsState";
+// DT256: the recipe's own steps are the original's, word for word
+const sameSteps = (a: string[], b: string[]) => a.length === b.length && a.every((x, k) => x === b[k]);
 import { stepParts, tokenOf } from "../steps";
 import { coverIsDrawn, isDrawnPhoto, TEST_MODELS } from "../covers";
 import { sig } from "../photos";
@@ -65,7 +67,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // 0.2.10 (canvas board CH, CH5): Chef Mealan drafts the steps; none without the AI
   draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: import("../pilot").StepMoves } | { ok: false; why: string; cannot?: boolean }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
-  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onCookIt?: (() => void) | null;
+  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onCookIt?: ((m?: Meal) => void) | null;
   // DT149 (0.2.130): opened from a meal of another day on Plan, Make it is Change it on the Plate, with its own line
   makeAs?: { label: string; hint: string } | null; onPublish: (now?: boolean) => void; onDelete: ReactNode; close: () => void;
   // IM23c (0.2.23): one line for today after How was it; the recipe a changed dish was adapted from
@@ -448,6 +450,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
                 <StepPicShown pic={stepPicOf(meal, x)} k={k} onOpen={() => setPicAt(k)} /></li>])}</ol>
               <small className="muted">{w("recipe.photosForTheSteps")}</small>
             </>);
+            // DT256: steps made the recipe's own from the original, word for word: one list, with the original's line
+            if (own.length && orig.length && sameSteps(own, orig)) return <><small className="muted">{by}</small>{status}{ownList}</>;
             if (own.length && orig.length) return (<>
               <div className="segments rq-steps-seg" role="tablist" aria-label={w("recipe.whichSteps")}>
                 <button role="tab" aria-selected={stepView === "own"} className={`seg ${stepView === "own" ? "on" : ""}`} onClick={() => setStepView("own")}>{meal.stepMarks ? w("recipe.chefS") : w("recipe.yours")}</button>
@@ -479,10 +483,16 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           })()}
         {/* DT211 v8 (0.3.53, board Stories158): one Start cooking, at the end of the Steps block, after you have read them; grey,
             with why, while there are no steps */}
-        {!edit && !drafted && !makeAs && onCookIt && (() => { const n = meal.steps?.length ?? 0; return (
+        {/* DT256 (0.3.111, board Stories191; Coach Milan 8 November 00:06, Go): the original's steps work with your foods as they
+            are: Start cooking cooks them as written, and the first cook makes them the recipe's own (pictures and the cover video) */}
+        {!edit && !drafted && !makeAs && onCookIt && (() => {
+          const orig = meal.source?.steps ?? [], useOrig = !(meal.steps?.length) && orig.length > 0 && !diffFoods(foodNames(meal.items), originalFoods ?? null);
+          const n = meal.steps?.length || (useOrig ? orig.length : 0);
+          const go = () => { if (!useOrig) return onCookIt(); const pt = { steps: orig, stepsFor: foodNames(meal.items) }; onPatch(pt); onCookIt({ ...meal, ...pt }); };
+          return (
           <div className="rq-start">
-            {atStart ?? <button className={`pill pill-wide${n ? " pill-primary" : ""}`} disabled={!n} onClick={() => onCookIt()}>{w("recipe.startCooking")}</button>}
-            <small className="muted">{n ? wn("recipe.stepsReadAloud", n) : w("recipe.startCookingReadsThe")}</small>
+            {atStart ?? <button className={`pill pill-wide${n ? " pill-primary" : ""}`} disabled={!n} onClick={go}>{w("recipe.startCooking")}</button>}
+            <small className="muted">{n ? (useOrig ? wn("recipe.stepsReadAloudOrig", n) : wn("recipe.stepsReadAloud", n)) : w("recipe.startCookingReadsThe")}</small>
           </div>); })()}
       </section>
       {edit ? (

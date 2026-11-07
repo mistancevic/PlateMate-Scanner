@@ -1,6 +1,6 @@
 {
-  "release": "0.3.108",
-  "at": "2026-11-07T19:19:41.220Z",
+  "release": "0.3.111",
+  "at": "2026-11-07T23:14:36.835Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -40830,6 +40830,93 @@
       "release": "0.3.108",
       "order": 900007,
       "at": "2026-11-07T19:19:41.220Z"
+    },
+    {
+      "id": "screen.photo.camera",
+      "kind": "screen",
+      "key": "photo.camera",
+      "en": "📷 Camera",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "📷 Kamera",
+      "de": "📷 Kamera",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.111",
+      "order": 900000,
+      "at": "2026-11-07T23:14:36.835Z"
+    },
+    {
+      "id": "screen.photo.gallery",
+      "kind": "screen",
+      "key": "photo.gallery",
+      "en": "🖼 Gallery",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "🖼 Galerija",
+      "de": "🖼 Galerie",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.111",
+      "order": 900001,
+      "at": "2026-11-07T23:14:36.835Z"
+    },
+    {
+      "id": "screen.photo.cancel",
+      "kind": "screen",
+      "key": "photo.cancel",
+      "en": "Cancel",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Otkaži",
+      "de": "Abbrechen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.111",
+      "order": 900002,
+      "at": "2026-11-07T23:14:36.835Z"
+    },
+    {
+      "id": "screen.photo.from",
+      "kind": "screen",
+      "key": "photo.from",
+      "en": "Take the photo with the camera, or pick one from the gallery",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Fotografiši kamerom ili izaberi sliku iz galerije",
+      "de": "Mit der Kamera fotografieren oder ein Bild aus der Galerie wählen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.111",
+      "order": 900003,
+      "at": "2026-11-07T23:14:36.835Z"
+    },
+    {
+      "id": "screen.recipe.stepsReadAloudOrig",
+      "kind": "screen",
+      "key": "recipe.stepsReadAloudOrig",
+      "en": "{n} step, as the original writes it, read aloud. Say next, back or repeat. A second phone can show it.|{n} steps, as the original writes them, read aloud. Say next, back or repeat. A second phone can show them.",
+      "forms": "count",
+      "slots": [
+        "n"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "{n} korak, kako ga original piše, čita se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ga prikaže.|{n} koraka, kako ih original piše, čitaju se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ih prikaže.|{n} koraka, kako ih original piše, čitaju se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ih prikaže.",
+      "de": "{n} Schritt, wie ihn das Original schreibt, laut vorgelesen. Sag weiter, zurück oder nochmal. Ein zweites Handy kann ihn zeigen.|{n} Schritte, wie sie das Original schreibt, laut vorgelesen. Sag weiter, zurück oder nochmal. Ein zweites Handy kann sie zeigen.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.111",
+      "order": 900004,
+      "at": "2026-11-07T23:14:36.835Z"
     }
   ]
 }

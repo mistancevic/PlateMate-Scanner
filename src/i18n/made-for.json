@@ -5250,6 +5250,11 @@
     "screen.home.lang3": {"en":"A recipe in another language: Chef Mealan offers it in yours, once.","area":"Home page","where":"The home page","release":"0.3.108"},
     "screen.home.lang4": {"en":"Cooking: the steps read aloud in your language, and it listens in it.","area":"Home page","where":"The home page","release":"0.3.108"},
     "screen.home.langNote": {"en":"Deutsch is in Beta: a German speaker checks it as we go. More languages join this list as they come.","area":"Home page","where":"The home page","release":"0.3.108"},
-    "screen.home.videoLang": {"en":"Chef Mealan in English, Srpski and Deutsch","area":"Home page","where":"The home page","release":"0.3.108"}
+    "screen.home.videoLang": {"en":"Chef Mealan in English, Srpski and Deutsch","area":"Home page","where":"The home page","release":"0.3.108"},
+    "screen.photo.camera": {"en":"📷 Camera","area":"The Plate","where":"The Plate","release":"0.3.111"},
+    "screen.photo.gallery": {"en":"🖼 Gallery","area":"The Plate","where":"The Plate","release":"0.3.111"},
+    "screen.photo.cancel": {"en":"Cancel","area":"The Plate","where":"The Plate","release":"0.3.111"},
+    "screen.photo.from": {"en":"Take the photo with the camera, or pick one from the gallery","area":"The Plate","where":"The Plate","release":"0.3.111"},
+    "screen.recipe.stepsReadAloudOrig": {"en":"{n} step, as the original writes it, read aloud. Say next, back or repeat. A second phone can show it.|{n} steps, as the original writes them, read aloud. Say next, back or repeat. A second phone can show them.","area":"Recipes","where":"Recipes","release":"0.3.111"}
   }
 }

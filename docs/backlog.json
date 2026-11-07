@@ -687,9 +687,17 @@
       "id": "DT256",
       "title": "Cook the original's steps when they work with your foods",
       "epic": "recipes",
-      "state": "next",
-      "why": "Coach Milan 7 November 23:59 to 8 November 00:01: his Chicken rice bowl from a screenshot had the six steps and the green line, and Start cooking was grey. Start cooking cooks the original's steps as written when they fit; the first cook makes them the recipe's own, so step pictures and the cover video work. Board 191 drawn 00:03, waits for Go.",
+      "state": "done",
+      "why": "Coach Milan 7 November 23:59 to 8 November 00:01: his Chicken rice bowl from a screenshot had the six steps and the green line, and Start cooking was grey. Start cooking cooks the original's steps as written when they fit; the first cook makes them the recipe's own, so step pictures and the cover video work. Board 191 drawn 00:03, Go 00:06; built in 0.3.111.",
       "board": 191
+    },
+    {
+      "id": "DT257",
+      "title": "Camera or Gallery for a step's photo and the meal's photo",
+      "epic": "cooking",
+      "state": "done",
+      "why": "Coach Milan 8 November 00:04: Add a photo in step one has no upload. On Android the camera-only input opened the camera alone. Board 192 (00:08), Go 00:09; built in 0.3.111: a tap asks Camera or Gallery, in cook mode and on Make.",
+      "board": 192
     }
   ]
 }

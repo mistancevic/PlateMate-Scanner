@@ -2999,3 +2999,12 @@ html[lang="sr-Latn"] .topbar .ref { flex: 0 0 auto; min-width: auto; overflow: v
 /* 0.3.109 (Coach Milan 7 November 21:03): text 4.5:1 on its colour (WCAG 2.2 AA 1.4.3). The PD band chips Low− and Low are
    coral and amber: their words are ink, not white. Checked by axe in tests/flows/accessibility.cjs at every release. */
 .chip-below, .chip-close, .chip-high, .pdpill-below, .pdpill-close, .pdpill-high, .pdpill-mid, .pdpill-low { color: var(--ink); }
+/* DT257 (0.3.111, board Stories192): Camera or Gallery, under the button that asked. The old labels are buttons now. */
+.pp-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0 4px; }
+.pp-opt { position: relative; min-height: 44px; display: inline-flex; align-items: center; cursor: pointer; }
+.pp-opt input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.pp-cancel { min-height: 44px; }
+button.cook-meal-take { width: 100%; }
+button.mk-photo { padding: 0; font: inherit; }
+button.mk-photo:not(.empty) { border: 0; background: none; }
+button.plate-photo { width: 100%; padding: 0; font: inherit; text-align: center; cursor: pointer; }

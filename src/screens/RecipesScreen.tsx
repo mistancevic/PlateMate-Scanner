@@ -333,7 +333,7 @@ export function RecipesScreen(p: AppApi) {
           // DT149 (0.2.130): a meal of another day opens on the Plate as that meal: planning, or adding what you ate
           if (w && w !== "now" && sl) { setOpenId(null); p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }), mealId: m?.mealId ?? opened.id }, m?.items ? { id: m.mealId ?? opened.id, title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : opened, m?.title ?? opened.title); return; }
           setOpenId(null); p.openOnPlate(opened); }}
-        onCookIt={() => { setOpenId(null); setLanded(null); p.openOnPlate(opened, { cook: true }); }}
+        onCookIt={(m?: Meal) => { setOpenId(null); setLanded(null); p.openOnPlate(m ?? opened, { cook: true }); }}
         makeAs={(() => { const sw = slotWhen(), sl = cameFrom?.from.slot; if (!sw || sw === "now" || !sl) return null; const d = dateV(new Date(`${sl.date}T12:00:00`), { weekday: "long" });
           return sw === "plan" ? { label: w("recipes.changeItOnThePlate"), hint: w("recipes.plannedForHint", { day: d, meal: mealV(sl.name, true) }) }
             : { label: w("recipes.changeItOnThePlate"), hint: w("recipes.goneByHint", { day: d, meal: mealV(sl.name, true), time: sl.time }) }; })()} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
