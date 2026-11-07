@@ -3,7 +3,7 @@
 // (eggs, oats, the basic foods). Home is always on; any other place is on when you switch it on, or while a trip there is on.
 // A food shows in your search when it is sold everywhere or in a place that is on. Nothing here deletes a food.
 import type { Food } from "./pilot";
-import { REGIONS, type RegionId } from "./moments";
+import { REGIONS, regionShort, type RegionId } from "./moments";
 import { REFERENCE, localName, namesOf, marketFoods, type RefFood } from "./reference";
 
 export type Trip = { place: RegionId; from: string; to: string; on?: boolean | null };
@@ -27,7 +27,10 @@ export const samePlace = (a: string, b: string): boolean => a === b || marketTag
 export const inPlaces = (places: string[] | undefined, active: Set<string>): boolean => !places || places.length === 0 || places.some((p) => [...active].some((a) => samePlace(p, a)));
 export const inPlace = (f: Pick<Food, "places">, active: Set<string>): boolean => inPlaces(f.places, active);
 
-export const placeName = (id: string): string => (REGIONS.find((r) => r.id === id)?.name ?? id).replace(/, elsewhere$/, "");
+// DT243: in the language chosen; byName below matches the English names
+export const placeName = (id: string): string => regionShort(id);
+// the English name, for what Chef Mealan is told
+export const placeNameEn = (id: string): string => (REGIONS.find((r) => r.id === id)?.name ?? id).replace(/, elsewhere$/, "");
 const byName = (n: string): RegionId | null => (REGIONS.find((r) => r.name.replace(/, elsewhere$/, "").toLowerCase() === n.trim().toLowerCase())?.id as RegionId) ?? null;
 
 // a food already in a library, before foods had places: read from its name. A basic food named in Serbian came from Belgrade,

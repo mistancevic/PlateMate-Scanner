@@ -1,4 +1,4 @@
-import { dec, w } from "../words";
+import { dec, w, wn, dateText } from "../words";
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { avg7, isWeight, trendOf, verdictNote, withWeighIn, withoutWeighIn, VERDICT_WORDS, fmtKg, type WeighIn , fmtPct } from "../weight";
@@ -6,7 +6,7 @@ import { goalName } from "../goal";
 import { ConfirmButton } from "./Confirm";
 import { wText, wIn, wFrom, wUnit } from "../units";
 
-const dayName = (ymd: string) => new Date(`${ymd}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" });
+const dayName = (ymd: string) => dateText(new Date(`${ymd}T12:00:00`), { weekday: "long" });
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 
 // Today: a quiet line under the plan (canvas board W1). Tap, type the weight, save. Never a judgement on one morning.
@@ -24,15 +24,15 @@ export function WeighInLine({ list, onSave, notify }: { list: WeighIn[] | undefi
   };
   if (!open) return (
     <button className="weigh-line" onClick={() => { setV(last ? wIn(last.kg).toFixed(1) : ""); setOpen(true); }}>
-      <span><b>{w("weight.weighIn")}</b><small>{last ? `last: ${wText(last.kg)}, ${last.date === today() ? w("weight.today") : dayName(last.date)}${avg ? ` · 7-day average ${wText(avg)}` : ""}` : w("weight.anyMorningBeforeBreakfast")}</small></span>
+      <span><b>{w("weight.weighIn")}</b><small>{last ? `${w("weight.last", { kg: wText(last.kg), day: last.date === today() ? w("weight.today") : dayName(last.date) })}${avg ? ` · ${w("weight.avg7Value", { kg: wText(avg) })}` : ""}` : w("weight.anyMorningBeforeBreakfast")}</small></span>
       <Plus size={20} />
     </button>
   );
   return (
     <div className="weigh-entry" role="group" aria-label={w("weight.weighIn")}>
       <div className="weigh-entry-top"><b>{w("weight.weighIn")}</b><button className="link" onClick={() => setOpen(false)}>{w("weight.cancel")}</button></div>
-      <label className="weigh-input"><input inputMode="decimal" autoFocus aria-label={`Your weight, ${wUnit()}`} value={v} placeholder={wUnit() === "lb" ? "165.0" : "75.0"} onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === "Enter" && save()} /><span>{wUnit()}</span></label>
-      <small>Today, {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</small>
+      <label className="weigh-input"><input inputMode="decimal" autoFocus aria-label={w("weight.yourWeightUnit", { unit: wUnit() })} value={v} placeholder={wUnit() === "lb" ? "165.0" : "75.0"} onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === "Enter" && save()} /><span>{wUnit()}</span></label>
+      <small>{w("weight.todayDate", { date: dateText(new Date(), { weekday: "long", day: "numeric", month: "long" }) })}</small>
       <button className="pill pill-primary pill-wide" disabled={!isWeight(wFrom(Number(v.replace(",", "."))))} onClick={save}>{w("weight.save")}</button>
     </div>
   );
@@ -55,7 +55,7 @@ function Chart({ t, unit = "" }: { t: ReturnType<typeof trendOf>; unit?: string 
       {t.averages.length > 0 && <polygon points={`${x(6)},${y(a0)} ${x(27)},${y(band[1])} ${x(27)},${y(band[0])}`} fill="var(--brand)" opacity={0.16} />}
       {t.points.map((p) => <circle key={p.day} cx={x(p.day)} cy={y(p.kg)} r={2.6} fill="var(--muted)" />)}
       {t.averages.length > 1 && <polyline fill="none" stroke="var(--brand)" strokeWidth={2.5} points={t.averages.map((a) => `${x(a.day)},${y(a.kg)}`).join(" ")} />}
-      <text x={pad} y={H - 6} fontSize={10} fill="var(--muted)">4 weeks ago</text>
+      <text x={pad} y={H - 6} fontSize={10} fill="var(--muted)">{w("weight.weeksAgo4")}</text>
       <text x={W - 8} y={H - 6} fontSize={10} fill="var(--muted)" textAnchor="end">{w("weight.today")}</text>
     </svg>
   );
@@ -73,20 +73,20 @@ export function WeightTrend({ list, band, weightKg, trainingAge, onUpdateWeight,
     <section className="card weight-trend" aria-label={w("weight.theLastWeeks")}>
       <b>{w("weight.theLastWeeks")}</b>
       <Chart t={t} />
-      <div className="trend-legend"><span><i className="sw-dot" />{coach ? w("weight.weighIns") : "your weigh-ins"}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalName(band)}</span></div>
-      {t.first !== null && t.last !== null && <div className="sheet-row"><small>7-day average</small><b>{dec(wIn(t.first), 1)} → {wText(t.last)}</b></div>}
-      {t.change !== null && <div className="sheet-row"><small>{w("weight.change")}</small><b>{fmtKg(t.change)} in 3 weeks</b></div>}
-      <div className="sheet-row"><small>{w("weight.expected")}</small><b>{fmtKg(t.expected[0]).replace(` ${wUnit()}`, "")} to {fmtKg(t.expected[1])}</b></div>
+      <div className="trend-legend"><span><i className="sw-dot" />{coach ? w("weight.weighIns") : w("weight.yourWeighInsLow")}</span><span><i className="sw-line" />{w("weight.avg7")}</span><span><i className="sw-band" />{w("weight.expectedFor", { goal: goalName(band) })}</span></div>
+      {t.first !== null && t.last !== null && <div className="sheet-row"><small>{w("weight.avg7")}</small><b>{dec(wIn(t.first), 1)} → {wText(t.last)}</b></div>}
+      {t.change !== null && <div className="sheet-row"><small>{w("weight.change")}</small><b>{w("weight.in3Weeks", { change: fmtKg(t.change) })}</b></div>}
+      <div className="sheet-row"><small>{w("weight.expected")}</small><b>{w("weight.rangeTo", { a: fmtKg(t.expected[0]).replace(` ${wUnit()}`, ""), b: fmtKg(t.expected[1]) })}</b></div>
       <span className={`trend-chip ${tone}`}>{VERDICT_WORDS[t.verdict]}</span>
-      <small className="muted">{t.count} weigh-in{t.count === 1 ? "" : "s"} in 4 weeks.</small>
-      {note && <p className="trend-note">{note}{coach ? "" : " Your coach sees the same."}</p>}
+      <small className="muted">{wn("weight.countIn4Weeks", t.count)}</small>
+      {note && <p className="trend-note">{note}{coach ? "" : ` ${w("weight.coachSeesSame")}`}</p>}
       {!coach && onUpdateWeight && avg !== null && weightKg && Math.abs(avg - weightKg) >= 2 && (
-        <button className="pill pill-small" onClick={() => onUpdateWeight(wFrom(Math.round(wIn(avg))))}>Update my numbers to {Math.round(wIn(avg))} {wUnit()}</button>
+        <button className="pill pill-small" onClick={() => onUpdateWeight(wFrom(Math.round(wIn(avg))))}>{w("weight.updateTo", { n: Math.round(wIn(avg)), unit: wUnit() })}</button>
       )}
       {!coach && onRemove && (
         <>
           <button className="link" aria-expanded={showAll} onClick={() => setShowAll((s) => !s)}>{showAll ? w("weight.hideWeighIns") : w("weight.yourWeighIns")}</button>
-          {showAll && <ul className="weigh-list">{[...list].reverse().slice(0, 28).map((wi) => <li key={wi.date}><span>{new Date(`${wi.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}</span><b>{wText(wi.kg)}</b><ConfirmButton className="link" label={<X size={14} />} ariaLabel={`Remove the weigh-in of ${wi.date}`} confirmLabel={w("weight.remove")} onConfirm={() => onRemove(wi.date)} /></li>)}</ul>}
+          {showAll && <ul className="weigh-list">{[...list].reverse().slice(0, 28).map((wi) => <li key={wi.date}><span>{dateText(new Date(`${wi.date}T12:00:00`), { weekday: "short", day: "numeric", month: "short" })}</span><b>{wText(wi.kg)}</b><ConfirmButton className="link" label={<X size={14} />} ariaLabel={w("weight.removeOf", { date: wi.date })} confirmLabel={w("weight.remove")} onConfirm={() => onRemove(wi.date)} /></li>)}</ul>}
         </>
       )}
     </section>
@@ -101,11 +101,11 @@ export function WeightTrendPct({ t, band, at }: { t: ReturnType<typeof trendOf>;
     <section className="card weight-trend" aria-label={w("weight.theLastWeeks")}>
       <b>{w("weight.theLastWeeks")}</b>
       <Chart t={t} unit=" %" />
-      <div className="trend-legend"><span><i className="sw-dot" />{w("weight.weighIns")}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalName(band)}</span></div>
-      {t.change !== null && <div className="sheet-row"><small>{w("weight.change")}</small><b>{fmtPct(t.change)} in 3 weeks</b></div>}
-      <div className="sheet-row"><small>{w("weight.expected")}</small><b>{fmtPct(t.expected[0]).replace(" %", "")} to {fmtPct(t.expected[1])}</b></div>
+      <div className="trend-legend"><span><i className="sw-dot" />{w("weight.weighIns")}</span><span><i className="sw-line" />{w("weight.avg7")}</span><span><i className="sw-band" />{w("weight.expectedFor", { goal: goalName(band) })}</span></div>
+      {t.change !== null && <div className="sheet-row"><small>{w("weight.change")}</small><b>{w("weight.in3Weeks", { change: fmtPct(t.change) })}</b></div>}
+      <div className="sheet-row"><small>{w("weight.expected")}</small><b>{w("weight.rangeTo", { a: fmtPct(t.expected[0]).replace(" %", ""), b: fmtPct(t.expected[1]) })}</b></div>
       <span className={`trend-chip ${tone}`}>{VERDICT_WORDS[t.verdict]}</span>
-      <small className="muted">{t.count} weigh-in{t.count === 1 ? "" : "s"} in 4 weeks{at ? `, as of ${new Date(`${at}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}` : ""}. In percent of their weight: they share no body data.</small>
+      <small className="muted">{at ? wn("weight.countPctAsOf", t.count, { date: dateText(new Date(`${at}T12:00:00`), { day: "numeric", month: "short" }) }) : wn("weight.countPct", t.count)}</small>
       {note && <p className="trend-note">{note}</p>}
     </section>
   );

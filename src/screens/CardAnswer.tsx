@@ -19,18 +19,22 @@ export function CardAnswer({ row, card, coachName, send, notify, setError, onDon
     catch (e: any) { setError(e.message || w("cardanswer.thatDidnTSendTry")); }
     finally { setBusy(false); }
   };
+  // the card's title is kept with the note as it is (a meal with no title is kept as "a meal")
   const cardRef = { id: card.id, title: card.meal?.title ?? "a meal", at: card.createdAt };
-  const answer = () => write({ at: new Date().toISOString(), by: "coach", name: coachName, text: text.trim(), suggest: { kind: "answer", card: cardRef } }, `Sent. ${name} sees it on Today, with the meal.`);
-  const react = (r: "good" | "seen") => { const at = new Date().toISOString(); return write({ at, by: "coach", name: coachName, text: REACTION_WORDS[r], readAt: at, suggest: { kind: "reaction", card: cardRef, reaction: r } }, r === "good" ? `Good, on ${name}'s card.` : `Seen, on ${name}'s card.`); };
+  const shownTitle = card.meal?.title ?? w("coach.aMeal");
+  // a reaction is kept as English words (Good 👍, Seen); the screen shows its own
+  const reactWord = (n: CoachNote) => (n.suggest?.reaction === "good" ? w("cardanswer.good") : n.suggest?.reaction === "seen" ? w("cardanswer.seen") : n.text);
+  const answer = () => write({ at: new Date().toISOString(), by: "coach", name: coachName, text: text.trim(), suggest: { kind: "answer", card: cardRef } }, w("cardanswer.sent", { name }));
+  const react = (r: "good" | "seen") => { const at = new Date().toISOString(); return write({ at, by: "coach", name: coachName, text: REACTION_WORDS[r], readAt: at, suggest: { kind: "reaction", card: cardRef, reaction: r } }, w(r === "good" ? "cardanswer.goodOn" : "cardanswer.seenOn", { name })); };
   const form = (
     <div className="ca-form">
-      <textarea className="search" rows={2} aria-label={`Answer on ${cardRef.title}`} placeholder={w("cardanswer.oneLineAboutThisMeal")} value={text} onChange={(e) => setText(e.target.value)} />
+      <textarea className="search" rows={2} aria-label={w("cardanswer.answerOn", { title: shownTitle })} placeholder={w("cardanswer.oneLineAboutThisMeal")} value={text} onChange={(e) => setText(e.target.value)} />
       <div className="ca-row">
         <button type="button" className="pill pill-small pill-primary" disabled={busy || !text.trim()} onClick={answer}>{w("cardanswer.sendTheAnswer")}</button>
         {given.length > 0 && <button type="button" className="pill pill-small" disabled={busy} onClick={() => { setAgain(false); setText(""); }}>{w("cardanswer.cancel")}</button>}
-        {!given.length && <><button type="button" className="pill pill-small" disabled={busy} onClick={() => react("good")}>Good 👍</button><button type="button" className="pill pill-small" disabled={busy} onClick={() => react("seen")}>{w("cardanswer.seen")}</button></>}
+        {!given.length && <><button type="button" className="pill pill-small" disabled={busy} onClick={() => react("good")}>{w("cardanswer.good")}</button><button type="button" className="pill pill-small" disabled={busy} onClick={() => react("seen")}>{w("cardanswer.seen")}</button></>}
       </div>
-      <small className="muted">An answer lands on {name}'s Today with the meal quoted, with Got it. Good or Seen lands on the card only.</small>
+      <small className="muted">{w("cardanswer.howItLands", { name })}</small>
     </div>
   );
   return (
@@ -39,9 +43,9 @@ export function CardAnswer({ row, card, coachName, send, notify, setError, onDon
         const replies = repliesAfter(row.notes, n.at).slice(0, 2);
         return (
           <div key={n.at} className="ca-given">
-            <small className="muted">{n.suggest?.kind === "reaction" ? `${n.text}, ${cardWhen(n.at)}` : `You answered, ${cardWhen(n.at)}${n.readAt ? " · read" : ""}`}</small>
+            <small className="muted">{n.suggest?.kind === "reaction" ? w("cardanswer.reactedAt", { word: reactWord(n), when: cardWhen(n.at) }) : w(n.readAt ? "cardanswer.youAnsweredRead" : "cardanswer.youAnswered", { when: cardWhen(n.at) })}</small>
             {n.suggest?.kind === "answer" && <span className="coach-note-text">{n.text}</span>}
-            {replies.map((r) => <small key={r.at} className="muted">{name} replied, {cardWhen(r.at)}: “{r.text}”</small>)}
+            {replies.map((r) => <small key={r.at} className="muted">{w("cardanswer.replied", { name, when: cardWhen(r.at), text: r.text })}</small>)}
           </div>
         );
       })}

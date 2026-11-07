@@ -1,4 +1,6 @@
-import { numLocale, w } from "../words";
+import { numLocale, w, wn, dateText } from "../words";
+import { weekdayName } from "../weekdayWords";
+import { optWord } from "../optWords";
 import { CarbsFatStep } from "../components/CarbsFatStep";
 import { KitchensAndTools } from "./MenuScreen";
 import { REGIONS } from "../moments";
@@ -8,7 +10,7 @@ import { underAge, ADULT_ONLY } from "../safety";
 import { WeightField, HeightField } from "../components/UnitFields";
 import { units, hText, wText, wIn } from "../units";
 import { useState } from "react";
-import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalName } from "../goal";
+import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalName, pointsOf, bandName } from "../goal";
 import { density } from "../pilot";
 import { pdText, pdVal, pdTag } from "../ui";
 import { Mark, APP_NAME, CHEF_NAME } from "../components/Mark";
@@ -31,7 +33,7 @@ type Way = "calc" | "own";
 const num = (v: string) => (v.trim() === "" ? undefined : Number(v));
 
 // what Calculate for me still needs, in plain words
-const missingOf = (d: Personal): string[] => [!d.birthYear && "your birth year", !d.heightCm && "your height", !d.weightKg && "your weight"].filter(Boolean) as string[];
+const missingOf = (d: Personal): string[] => [!d.birthYear && w("goal.missBirthYear"), !d.heightCm && w("goal.missHeight"), !d.weightKg && w("goal.missWeight")].filter(Boolean) as string[];
 export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void; fromMe?: boolean }) {
   const { state, setState, onDone, onLater, fromMe, coach } = p;
   const consented = Boolean(p.safety.consentBodyAt);
@@ -69,7 +71,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
     const { formula: _f, measuredUse: _m, ...r } = d; void _f; void _m;
     const base = calculate(r, band, null); if (!base) return undefined;
     const k = c.kcal - base.kcal;
-    return k === 0 ? w("goal.fromYourDataTheSame") : `From your data: ${Math.abs(k).toLocaleString(numLocale())} kcal ${k < 0 ? "less" : "more"} than with the formula.`;
+    return k === 0 ? w("goal.fromYourDataTheSame") : w(k < 0 ? "goal.dataLess" : "goal.dataMore", { kcal: Math.abs(k).toLocaleString(numLocale()) });
   })();
   const by = coach ? "coach" : "you";
   const done = () => { p.notify(w("goal.daySet")); onDone(); };
@@ -106,14 +108,14 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const nextMonday = (() => { const n = (8 - new Date().getDay()) % 7 || 7; const k = dayFrom(n); return k === tomorrow ? dayFrom(n + 7) : k; })();
   const [from, setFrom] = useState(todayKey);
   const [picking, setPicking] = useState(false);
-  const longDay = (k: string) => new Date(`${k}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "");
-  const fromName = from === todayKey ? "today" : from === tomorrow ? "tomorrow" : longDay(from);
-  const saveLabel = (a: ReturnType<typeof analyse> | null) => { const n = a ? a.findings.filter(isOpen).length : 0; return `Apply from ${fromName}${n ? `, ${n} kept as ${n === 1 ? "it is" : "they are"}` : ""}`; };
+  const longDay = (k: string) => dateText(new Date(`${k}T12:00:00`), { weekday: "long", day: "numeric", month: "long" }, "en-GB").replace(",", "");
+  const fromName = from === todayKey ? w("goal.fromToday") : from === tomorrow ? w("goal.fromTomorrow") : longDay(from);
+  const saveLabel = (a: ReturnType<typeof analyse> | null) => { const n = a ? a.findings.filter(isOpen).length : 0; return n ? wn("goal.applyFromKept", n, { from: fromName }) : w("goal.applyFromDay", { from: fromName }); };
   const ApplyFrom = () => (
     <div className="apply-from" role="group" aria-label={w("goal.applyFrom")}>
       <small className="setting-name">{w("goal.applyFrom")}</small>
       <div className="chip-row">
-        {[[todayKey, "Today"], [tomorrow, "Tomorrow"], [nextMonday, longDay(nextMonday)]].map(([k, l]) => <button type="button" key={k} className={`choice ${from === k && !picking ? "on" : ""}`} aria-pressed={from === k && !picking} onClick={() => { setPicking(false); setFrom(k); }}>{l}</button>)}
+        {[[todayKey, w("goal.chipToday")], [tomorrow, w("goal.chipTomorrow")], [nextMonday, longDay(nextMonday)]].map(([k, l]) => <button type="button" key={k} className={`choice ${from === k && !picking ? "on" : ""}`} aria-pressed={from === k && !picking} onClick={() => { setPicking(false); setFrom(k); }}>{l}</button>)}
         <button type="button" className={`choice ${picking ? "on" : ""}`} aria-pressed={picking} onClick={() => setPicking(true)}>{w("goal.pickADate")}</button>
       </div>
       {picking && <input type="date" aria-label={w("goal.startDate")} min={tomorrow} value={from > todayKey ? from : ""} onChange={(e) => e.target.value && e.target.value > todayKey && setFrom(e.target.value)} />}
@@ -127,7 +129,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
     if (firstRun) { setShopStep(true); window.scrollTo(0, 0); return; }
     finish();
   };
-  const finish = () => { if (from <= todayKey) done(); else { p.notify(`${goalName(band)} starts on ${longDay(from)}.`); onLater(); } };
+  const finish = () => { if (from <= todayKey) done(); else { p.notify(w("goal.startsOn", { goal: goalName(band), date: longDay(from) })); onLater(); } };
   // on save: open findings count as kept on purpose; what is kept goes to the coach; nothing kept closes a request
   const settle = (a: ReturnType<typeof analyse> | null, summary: string) => {
     const now = new Date().toISOString();
@@ -147,7 +149,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
       <div><b>{carbs}</b><small>{w("goal.gCarbs")}</small></div>
     </div>
   );
-  const Days = ({ title = "Your days" }: { title?: string }) => (
+  const Days = ({ title = w("goal.yourDays") }: { title?: string }) => (
     <div className="days-choice">
       <b className="section-title">{title}</b>
       <div className="two-way">
@@ -178,21 +180,21 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           const on = isTraining(x), lvl = (x.intensity ?? "easy") as Intensity;
           return (
             <div key={i} className={`wk-day ${on ? "on" : ""}`}>
-              <button type="button" className="wk-head" aria-expanded={openDays.includes(i)} aria-label={`${WEEKDAY_NAMES[i]}: ${on ? `${INTENSITIES.find((y) => y.id === lvl)!.name}, ${lengthName(x.minutes)}, ${whenName(x.when)}` : "no training"}`} onClick={() => toggleDay(i)}>
+              <button type="button" className="wk-head" aria-expanded={openDays.includes(i)} aria-label={w("goal.dayAria", { day: weekdayName(i), what: on ? `${INTENSITIES.find((y) => y.id === lvl)!.name}, ${lengthName(x.minutes)}, ${whenName(x.when)}` : w("goal.noTrainingLow") })} onClick={() => toggleDay(i)}>
                 <b>{WEEKDAYS[i]}</b><span>{on ? `${INTENSITIES.find((y) => y.id === lvl)!.name} · ${lengthName(x.minutes)} · ${whenName(x.when)}` : w("goal.noTraining")}</span>
               </button>
               {openDays.includes(i) && (
                 <div className="wk-edit">
                   <small className="setting-name">{w("goal.howHard")}</small>
-                  <div className="chip-row" role="group" aria-label={`${WEEKDAY_NAMES[i]}, how hard`}>
+                  <div className="chip-row" role="group" aria-label={w("goal.dayHowHard", { day: weekdayName(i) })}>
                     <button type="button" className={`choice ${!on ? "on" : ""}`} aria-pressed={!on} onClick={() => setPlan(withDay(planNow, i, { level: null }))}>{w("goal.noTraining")}</button>
                     {INTENSITIES.map((y) => <button type="button" key={y.id} className={`choice ${on && lvl === y.id ? "on" : ""}`} aria-pressed={on && lvl === y.id} onClick={() => setPlan(withDay(planNow, i, { level: y.id }, wh))}>{y.name}</button>)}
                   </div>
                   {on && <>
                     <small className="setting-name">{w("goal.howLong")}</small>
-                    <div className="chip-row" role="group" aria-label={`${WEEKDAY_NAMES[i]}, how long`}>{LENGTHS.map((r) => { const sel = lengthOf(x.minutes ?? 60).id === r.id; return <button type="button" key={r.id} className={`choice ${sel ? "on" : ""}`} aria-pressed={sel} onClick={() => setPlan(withDay(planNow, i, { level: lvl, minutes: r.mid }))}>{r.name.replace("–", " to ")}</button>; })}</div>
+                    <div className="chip-row" role="group" aria-label={w("goal.dayHowLong", { day: weekdayName(i) })}>{LENGTHS.map((r) => { const sel = lengthOf(x.minutes ?? 60).id === r.id; return <button type="button" key={r.id} className={`choice ${sel ? "on" : ""}`} aria-pressed={sel} onClick={() => setPlan(withDay(planNow, i, { level: lvl, minutes: r.mid }))}>{r.name.replace("–", ` ${w("goal.to")} `)}</button>; })}</div>
                     <small className="setting-name">{w("goal.when")}</small>
-                    <div className="chip-row" role="group" aria-label={`${WEEKDAY_NAMES[i]}, when`}>{WHENS.filter((wo) => ["morning", "day", "evening"].includes(wo.id)).map((wo) => <button type="button" key={wo.id} className={`choice ${x.when === wo.id ? "on" : ""}`} aria-pressed={x.when === wo.id} onClick={() => setPlan(withDay(planNow, i, { level: lvl, when: wo.id }))}>{wo.name}{whenAtWork(wo.id, wh) && <small className="at-work"> · in work hours</small>}</button>)}</div>
+                    <div className="chip-row" role="group" aria-label={w("goal.dayWhen", { day: weekdayName(i) })}>{WHENS.filter((wo) => ["morning", "day", "evening"].includes(wo.id)).map((wo) => <button type="button" key={wo.id} className={`choice ${x.when === wo.id ? "on" : ""}`} aria-pressed={x.when === wo.id} onClick={() => setPlan(withDay(planNow, i, { level: lvl, when: wo.id }))}>{wo.name}{whenAtWork(wo.id, wh) && <small className="at-work"> · {w("goal.inWorkHours")}</small>}</button>)}</div>
                     {wh && <small className="setting-hint">{WORK_WHEN(wh)}</small>}
                   </>}
                 </div>
@@ -200,7 +202,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
             </div>
           );
         })}
-        <div className="train-tally"><b>{n} training {n === 1 ? "day" : "days"}</b><small>{names.length ? `${names.join(", ")} · ` : ""}{7 - n} without</small></div>
+        <div className="train-tally"><b>{wn("goal.trainingDays", n)}</b><small>{names.length ? `${names.join(", ")} · ` : ""}{w("goal.without", { n: 7 - n })}</small></div>
         <button type="button" className="link" aria-expanded={zonesOpen} onClick={() => setZonesOpen(!zonesOpen)}>{w("goal.whatLightModerateAndHard")}</button>
         {zonesOpen && INTENSITIES.map((y) => <div key={y.id} className="train-name"><b>{y.name}</b><Zones level={y.id} walkNote={y.id === "easy"} /></div>)}
       </div>
@@ -213,14 +215,14 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
     const homeN = p.state.foods.filter(p.inPlace).length;
     return (
       <div className="goal-screen shop-step">
-        <p className="label calc-step">{nGoal + 3}. Where you shop and cook</p>
-        <p className="small muted">Home brings its starter foods. The kitchens and what you cook with tell {CHEF_NAME} what to suggest. You can change all of it in Me later.</p>
+        <p className="label calc-step">{w("goal.stepShop", { n: nGoal + 3 })}</p>
+        <p className="small muted">{w("goal.shopWhy")}</p>
         <section className="card place-pick">
           <b>{w("goal.whereDoYouLiveAnd")}</b>
           <div className="moments" role="group" aria-label={w("goal.whereDoYouLiveAnd")}>
             {REGIONS.map((r) => <button type="button" key={r.id} className={`choice ${p.region === r.id ? "on" : ""}`} aria-pressed={p.region === r.id} onClick={() => p.makeHome(r.id)}>{r.name}</button>)}
           </div>
-          {home && <div className="starter-line"><b>{homeN} foods for {home.name.replace(/, elsewhere$/, "")}</b><small>{w("goal.withItsStarterFoodsReady")} <button type="button" className="link" onClick={() => { finish(); p.setTab("foods"); }}>{w("goal.seeThemInFoods")}</button></small></div>}
+          {home && <div className="starter-line"><b>{w("goal.foodsFor", { n: homeN, place: home.name.replace(/, elsewhere$/, "") })}</b><small>{w("goal.withItsStarterFoodsReady")} <button type="button" className="link" onClick={() => { finish(); p.setTab("foods"); }}>{w("goal.seeThemInFoods")}</button></small></div>}
         </section>
         <KitchensAndTools {...p} />
         <button type="button" className="pill pill-primary pill-wide shop-done" disabled={!p.region} onClick={finish}>{p.region ? w("goal.doneToToday") : w("goal.pickHomeFirst")}</button>
@@ -230,8 +232,8 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   return (
     <div className="goal-screen">
       <div className="goal-top">
-        {fromMe ? <button className="link" onClick={onLater}>← Me</button> : <span />}
-        <button className="link" onClick={onLater}>{fromMe ? "Close" : w("goal.notNow")}</button>
+        {fromMe ? <button className="link" onClick={onLater}>{w("goal.backToMe")}</button> : <span />}
+        <button className="link" onClick={onLater}>{fromMe ? w("goal.close") : w("goal.notNow")}</button>
       </div>
       <div className="hero"><Mark size={52} color="var(--brand)" /><h2>{APP_NAME}</h2><p>{w("goal.yourDayInFiveNumbers")}</p></div>
       <div className="ways">
@@ -252,32 +254,32 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           )}
           {/* DT141 (0.2.126, board Stories97; Anna's DT119; Milan 28 October 18:33 Go): right after I agree, the safety question;
               the step ends on Next: 1. You, and the rest of setup follows */}
-          {consented && askDoor && <SafetyQuestion p={p} doneLabel={`Next: ${nYou}. You`} onDone={() => { setAskDoor(false); window.setTimeout(() => document.querySelector(".calc-step")?.scrollIntoView({ block: "start" }), 50); }} />}
+          {consented && askDoor && <SafetyQuestion p={p} doneLabel={w("goal.nextYou", { n: nYou })} onDone={() => { setAskDoor(false); window.setTimeout(() => document.querySelector(".calc-step")?.scrollIntoView({ block: "start" }), 50); }} />}
           {!(consented && askDoor) && <>
-          {consented && <p className="label calc-step">{nYou}. You</p>}
+          {consented && <p className="label calc-step">{w("goal.stepYou", { n: nYou })}</p>}
           {consented && !editing && canCalculate(d) ? (
             <section className="card you-card">
-              <span><b>{w("goal.you")}</b><small>{[d.sex === "male" ? "Male" : d.sex === "female" ? "Female" : null, d.birthYear, d.heightCm ? hText(d.heightCm) : null, d.weightKg ? wText(d.weightKg, Number.isInteger(wIn(d.weightKg)) ? 0 : 1) : null, LIFE.find((l) => l.id === workOf(d))!.name, STEPS.find((x) => x.id === d.steps)?.name.concat(" steps")].filter(Boolean).join(" · ")}<br />Body fat: {d.bodyFatPct ? `${d.bodyFatPct} %` : "not given"}</small></span>
+              <span><b>{w("goal.you")}</b><small>{[d.sex === "male" ? w("goal.male") : d.sex === "female" ? w("goal.female") : null, d.birthYear, d.heightCm ? hText(d.heightCm) : null, d.weightKg ? wText(d.weightKg, Number.isInteger(wIn(d.weightKg)) ? 0 : 1) : null, LIFE.find((l) => l.id === workOf(d))!.name, (() => { const s = STEPS.find((x) => x.id === d.steps); return s ? w("goal.stepsValue", { steps: s.name }) : null; })()].filter(Boolean).join(" · ")}<br />{w("goal.bodyFatValue", { value: d.bodyFatPct ? `${d.bodyFatPct} %` : w("goal.notGiven") })}</small></span>
               <button className="link" onClick={() => setEditing(true)}>{w("goal.edit")}</button>
             </section>
           ) : (
             <section className={`card form ${consented ? "" : "shut"}`} aria-disabled={!consented}>
               <div className="field"><span>{w("goal.yourBody")}</span>
-                <div className="moments">{(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setPersonalNow({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}</div>
+                <div className="moments">{(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setPersonalNow({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? w("goal.female") : w("goal.male")}</button>)}</div>
               </div>
               <div className="field-row">
-                <label className="field"><span>{w("goal.birthYear")}</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="enter year" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} onBlur={() => save(d)} /></label>
+                <label className="field"><span>{w("goal.birthYear")}</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder={w("goal.enterYear")} onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} onBlur={() => save(d)} /></label>
                 <HeightField cm={d.heightCm} unit={units().height} onCm={(v) => setD({ ...d, heightCm: v })} onDone={() => save(d)} />
                 <WeightField kg={d.weightKg} unit={units().weight} onKg={(v) => setD({ ...d, weightKg: v })} onDone={() => save(d)} />
               </div>
-              {under && <p className="small adult-line" role="alert"><b>{w("goal.chefMealanIsForAdults")}</b> {ADULT_ONLY} This birth year means you're under 18, so you can't use Chef Mealan yet. If you typed it wrong, correct it here.</p>}
+              {under && <p className="small adult-line" role="alert"><b>{w("goal.chefMealanIsForAdults")}</b> {ADULT_ONLY} {w("goal.under18Here")}</p>}
               <div className="calc-part"><b>{w("goal.lifestyle")}</b><small>{w("goal.everyDayWithOrWithout")}</small></div>
               {wk === "work" || wk === "both" ? (
                 <div className="field"><span>{w("goal.yourWork")}</span>
                   <div className="activity-list">{LIFE.map((l) => <button key={l.id} className={`activity ${workOf(d) === l.id ? "on" : ""}`} onClick={() => setPersonalNow(withWork(d, l.id))}><b>{l.name}</b><small>{l.hint}</small></button>)}</div>
                 </div>
               ) : (
-                <p className="small muted">Your weekdays: {WEEKDAY_CHOICES.find((x) => x.id === wk)!.name}, counted as mostly sitting. You can change it in Lifestyle.</p>
+                <p className="small muted">{w("goal.yourWeekdays", { what: WEEKDAY_CHOICES.find((x) => x.id === wk)!.name })}</p>
               )}
               <div className="field"><span>{w("goal.stepsOnAUsualDay")}</span>
                 <div className="chip-row" role="group" aria-label={w("goal.stepsOnAUsualDay")}>{STEPS.map((x) => <button type="button" key={x.id} className={`choice ${d.steps === x.id ? "on" : ""}`} aria-pressed={d.steps === x.id} onClick={() => setPersonalNow({ ...d, steps: d.steps === x.id ? undefined : x.id })}>{x.name}</button>)}</div>
@@ -297,7 +299,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               {howOpen && <FormulaCard personal={formula === "data" && dataFixed ? { ...d, measuredUse: dataFixed } : d} pinned={p.formula ?? null} coachLabel={p.coachLabel} value={formula} onPick={setFormula} measured={p.measured} />}
             </>
           )}
-          <b className="section-title">{nGoal}. What are you after?</b>
+          <b className="section-title">{w("goal.stepAfter", { n: nGoal })}</b>
           <p className="small muted">{w("goal.eachGoalSaysWhatHappens")}</p>
           <div className="goal-cards">{BANDS.map((b) => {
             // Build muscle has a pace (canvas board K1): Steady or Faster, started by how long the person has trained
@@ -306,8 +308,8 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
             return (
               <div key={b.id} className={`goal-pick-wrap ${on ? "on" : ""}`}>
                 <button type="button" className={`goal-pick ${on ? "on" : ""}`} aria-pressed={on} onClick={pick}>
-                  <span className="goal-pick-head"><b>{b.name}</b>{b.popular && <small>{w("goal.mostPeoplePickThis")}</small>}</span>
-                  <ul>{b.points.map((x) => <li key={x}>{x}</li>)}</ul>
+                  <span className="goal-pick-head"><b>{bandName(b.id)}</b>{b.popular && <small>{w("goal.mostPeoplePickThis")}</small>}</span>
+                  <ul>{pointsOf(b).map((x) => <li key={x}>{x}</li>)}</ul>
                 </button>
                 {on && b.id === "gain" && (
                   <div className="pace">
@@ -330,9 +332,9 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {c && <CarbsFatStep c={c} d={d} band={band} n={nGoal + 1} set={(cf) => setPersonalNow({ ...d, carbsFat: cf })} />}
           {c ? (
             <>
-              <Days title={`${nGoal + 2}. Your days`} />
+              <Days title={w("goal.stepDays", { n: nGoal + 2 })} />
               {mode === "same" ? (
-                <section className="card proposal"><Four kcal={c.kcal} protein={c.protein} fats={c.fats} carbs={c.carbs} /><p className="math">{c.math}</p><small>{c.method}.</small></section>
+                <section className="card proposal"><Four kcal={c.kcal} protein={c.protein} fats={c.fats} carbs={c.carbs} /><p className="math">{c.math}</p><small>{c.methodText}.</small></section>
               ) : (
                 <DayTable rows={c.days} avg={{ kcal: c.kcal, protein: c.protein }} week={c.week} weekdays={c.weekdays} note={dataNote} />
               )}
@@ -344,7 +346,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
             </>
           ) : (
             // 0.2.119 (Tester 2, Milan 28 October 14:59): no Apply and no word why read as a dead end; say what is missing
-            <p className="small goal-missing" role="status">{consented && canCalculate(d) && !under && !picked ? w("goal.pickWhatYouAreAfter") : !consented ? w("goal.toCalculateYourNumbersTap") : under ? w("goal.chefMealanIsForAdults2") : `To calculate your numbers, fill in ${missingOf(d).join(", ")} above. Or use My own numbers.`}</p>
+            <p className="small goal-missing" role="status">{consented && canCalculate(d) && !under && !picked ? w("goal.pickWhatYouAreAfter") : !consented ? w("goal.toCalculateYourNumbersTap") : under ? w("goal.chefMealanIsForAdults2") : w("goal.fillIn", { missing: missingOf(d).join(", ") })}</p>
           )}
           </>}
         </div>
@@ -357,14 +359,14 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {mode === "same" ? (
             <>
               <div className="field-row">
-                <label className="field"><span>{w("goal.kcalADay")}</span><input id="own-kcal" inputMode="numeric" value={own.kcal} onChange={(e) => setOwn({ ...own, kcal: e.target.value })} placeholder="enter kcal" /></label>
-                <label className="field"><span>{w("goal.proteinG")}</span><input id="own-protein" inputMode="numeric" value={own.protein} onChange={(e) => setOwn({ ...own, protein: e.target.value })} placeholder="enter protein" /></label>
+                <label className="field"><span>{w("goal.kcalADay")}</span><input id="own-kcal" inputMode="numeric" value={own.kcal} onChange={(e) => setOwn({ ...own, kcal: e.target.value })} placeholder={w("goal.enterKcal")} /></label>
+                <label className="field"><span>{w("goal.proteinG")}</span><input id="own-protein" inputMode="numeric" value={own.protein} onChange={(e) => setOwn({ ...own, protein: e.target.value })} placeholder={w("goal.enterProtein")} /></label>
               </div>
               <div className="field-row">
-                <label className="field"><span>{w("goal.fatG")}</span><input id="own-fats" inputMode="numeric" value={own.fats} onChange={(e) => setOwn({ ...own, fats: e.target.value })} placeholder={ownFats !== null ? `fills in: ${ownFats}` : "fills in"} /></label>
-                <label className="field"><span>{w("goal.carbsG")}</span><input id="own-carbs" inputMode="numeric" value={own.carbs} onChange={(e) => setOwn({ ...own, carbs: e.target.value })} placeholder={ownCarbs !== null ? `the rest: ${ownCarbs}` : "the rest"} /></label>
+                <label className="field"><span>{w("goal.fatG")}</span><input id="own-fats" inputMode="numeric" value={own.fats} onChange={(e) => setOwn({ ...own, fats: e.target.value })} placeholder={ownFats !== null ? w("goal.fillsInN", { n: ownFats }) : w("goal.fillsIn")} /></label>
+                <label className="field"><span>{w("goal.carbsG")}</span><input id="own-carbs" inputMode="numeric" value={own.carbs} onChange={(e) => setOwn({ ...own, carbs: e.target.value })} placeholder={ownCarbs !== null ? w("goal.theRestN", { n: ownCarbs }) : w("goal.theRest")} /></label>
               </div>
-              <p className="small">One number for every day. That is {pdText(density(ownProtein, ownKcal))}{ownFats !== null && ownCarbs !== null ? `, ${ownFats} g fat and ${ownCarbs} g carbs` : ""}.</p>
+              <p className="small">{ownFats !== null && ownCarbs !== null ? w("goal.oneNumberFull", { pd: pdText(density(ownProtein, ownKcal)), fat: ownFats, carbs: ownCarbs }) : w("goal.oneNumber", { pd: pdText(density(ownProtein, ownKcal)) })}</p>
               {analysisSame && <FindingList analysis={analysisSame} open={isOpen} keep={keep} />}
               <ApplyFrom />
               <button className="pill pill-primary pill-wide" disabled={!density(ownProtein, ownKcal)} onClick={() => {
@@ -372,7 +374,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
                 apply({ source: "exact", kcal: ownKcal!, protein: ownProtein!, fats: ownFats ?? 0, carbs: ownCarbs ?? 0 });
               }}>{saveLabel(analysisSame)}</button>
               {!density(ownProtein, ownKcal) && <p className="small goal-missing" role="status">{w("goal.typeKcalAndProteinAbove")}</p>}
-              {p.profile.coachId && !coach && <p className="small muted">Anything kept on purpose goes to {p.coachLabel} to approve.</p>}
+              {p.profile.coachId && !coach && <p className="small muted">{w("goal.keptGoesTo", { coach: p.coachLabel })}</p>}
             </>
           ) : (
             <>
@@ -393,7 +395,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
                 apply({ source: "exact", kcal: a.kcal, protein: a.protein, fats: a.fats, carbs: a.carbs });
               }}>{saveLabel(analysisEach)}</button>
               {!o && !c && <p className="small goal-missing" role="status">{w("goal.typeTheKcalForAt")}</p>}
-              {p.profile.coachId && !coach && <p className="small muted">Anything kept on purpose goes to {p.coachLabel} to approve.</p>}
+              {p.profile.coachId && !coach && <p className="small muted">{w("goal.keptGoesTo", { coach: p.coachLabel })}</p>}
             </>
           )}
         </div>

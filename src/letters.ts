@@ -12,6 +12,7 @@
 // energy, carbs the rest); fibre 14 g per 1,000 kcal (Dietary Guidelines for Americans, 2020) until the plan has its own.
 // A letter says the level, never good or bad: F+ on a nut is the nut.
 import { BAND_EDGES, fit, type PdBand } from "./goal";
+import { w, wordV, dec, type WordKey } from "./words";
 
 export type Rates = { fats: number; carbs: number; fiber: number; protein: number }; // grams per 100 kcal
 export const FIBRE_PER_1000_KCAL = 14;
@@ -45,29 +46,31 @@ export function lettersOf(n: Numbers, rates: Rates): string[] {
 export const lettersText = (n: Numbers, rates: Rates | null): string | null => (rates ? lettersOf(n, rates).join(" ") : null);
 
 // one sentence per letter, for the tap: F+ fat, 12.5 g per 100 kcal, more than your day's 3.3
-const WORD: Record<Macro, string> = { fats: "fat", carbs: "carbs", fiber: "fibre", protein: "protein" };
+// DT243 part two: the words in src/i18n/en.json (letters.*); the numbers with the language's decimal mark, written as before
+const WORD: Record<Macro, WordKey> = { fats: "letters.word.fat", carbs: "letters.word.carbs", fiber: "letters.word.fibre", protein: "letters.word.protein" };
+const plain = (x: number) => dec(x, (String(x).split(".")[1] ?? "").length);
 export function letterLine(macro: Macro, value: number | null, rate: number): string {
-  const l = letterOf(macro, value, rate), w = WORD[macro];
-  if (value === null) return `${l} ${w}: no value on the label.`;
-  const v = Math.round(value * 10) / 10, r = Math.round(rate * 10) / 10;
-  const how = l.endsWith("+") ? "more than" : l === CAP[macro] ? "as" : l.endsWith("-") ? "close to none against" : "under";
-  return `${l} ${w}: ${v} g per 100 kcal, ${how} your day's ${r}.`;
+  const l = letterOf(macro, value, rate), m = wordV(WORD[macro]);
+  if (value === null) return w("letters.lineNoValue", { letter: l, macro: m });
+  const v = plain(Math.round(value * 10) / 10), r = plain(Math.round(rate * 10) / 10);
+  const k: WordKey = l.endsWith("+") ? "letters.lineMore" : l === CAP[macro] ? "letters.lineAs" : l.endsWith("-") ? "letters.lineCloseToNone" : "letters.lineUnder";
+  return w(k, { letter: l, macro: m, v, rate: r });
 }
 // the word under a letter's grams in the readout cells (DT128, 0.2.107): fat, high · carbs, under · fibre, no value
 export function letterWord(macro: Macro, value: number | null, rate: number): string {
-  const l = letterOf(macro, value, rate), w = WORD[macro];
-  if (value === null) return `${w}, no value`;
-  return `${w}, ${l.endsWith("+") ? "high" : l === CAP[macro] ? "as your day" : l.endsWith("-") ? "close to none" : "under"}`;
+  const l = letterOf(macro, value, rate), m = wordV(WORD[macro]);
+  if (value === null) return w("letters.wordNoValue", { macro: m });
+  return w(l.endsWith("+") ? "letters.wordHigh" : l === CAP[macro] ? "letters.wordAs" : l.endsWith("-") ? "letters.wordCloseToNone" : "letters.wordUnder", { macro: m });
 }
 // DT132 (0.2.113, board Stories88; Milan 14:21: not sure how to solve that; the suggestion taken): the quick line of four
 // letters stays clean. Where the numbers are read (Per 100 kcal), a letter within 5 percent of a band edge says so; the letter
 // itself never changes.
-const EDGE_NAME: Record<string, string> = { close: "close to none", plan: "as your day", high: "high" };
+const EDGE_LINE: Record<"close" | "plan" | "high", WordKey> = { close: "letters.edgeClose", plan: "letters.edgePlan", high: "letters.edgeHigh" };
 export function letterEdge(value: number | null, rate: number): string | null {
   if (value === null || !(rate > 0)) return null;
   const ratio = value / rate;
   for (const [k, e] of [["close", BAND_EDGES.close], ["plan", BAND_EDGES.plan], ["high", BAND_EDGES.high]] as const)
-    if (Math.abs(ratio - e) / e < 0.05) return `On the edge of ${EDGE_NAME[k]}: ${ratio.toFixed(2)} times your day, the edge is ${e}.`;
+    if (Math.abs(ratio - e) / e < 0.05) return w(EDGE_LINE[k], { ratio: dec(ratio, 2), edge: plain(e) });
   return null;
 }
-export const BANDS_NOTE = `Capital with a plus: more than your day (from ${BAND_EDGES.high} times its rate). Capital: as your day needs (${BAND_EDGES.plan} to ${BAND_EDGES.high} times). Small: under. Small with a minus: close to none (under ${BAND_EDGES.close} times).`;
+export const bandsNote = () => w("letters.bandsNote", { high: plain(BAND_EDGES.high), plan: plain(BAND_EDGES.plan), close: plain(BAND_EDGES.close) });

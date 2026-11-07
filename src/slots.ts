@@ -150,7 +150,7 @@ export function suggestWhen(usual: When, wh: WorkHours | null): When {
   if (!whenAtWork(usual, wh)) return usual;
   return (["evening", "morning", "day", "late"] as When[]).find((x) => !whenAtWork(x, wh)) ?? usual;
 }
-export const WORK_WHEN = (wh: WorkHours) => `Chef Mealan suggests training outside your work hours, ${wh.from} to ${wh.to}. Every time stays open: a break at work can be gym time.`;
+export const WORK_WHEN = (wh: WorkHours) => w("slot.workWhen", { from: wh.from, to: wh.to });
 // where the row goes and what its time column says
 // DT203 phase 9 (0.3.90): the phrase stays English for Chef Mealan and Explorer; shown() is the same in the language of the screen
 export const trainingShown = (d: PlanDay | null | undefined): string | null => (!d || d.kind === "rest" ? null : isClock(d.at) ? w("slot.trainingAt", { time: d.at! }) : d.when ? w(`slot.trainingWhen.${d.when}` as WordKey) : w("slot.trainingNoTime"));

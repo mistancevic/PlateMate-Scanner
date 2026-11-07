@@ -2,6 +2,7 @@
 // The read brings the original's steps with the foods, in one call. When your foods are the recipe's, the original is the
 // steps; Chef Mealan writes his only when you ask, and a line says which case it is: your foods as they are, or the foods
 // that differ. Once written, his steps stay with the recipe beside the original; foods changed after: write them again.
+import { w, wIn, type Val } from "./words";
 const norm = (s: string) => s.trim().toLowerCase();
 export const foodNames = (items: { grams: number; food: { name: string } }[]) => items.filter((i) => i.grams > 0).map((i) => i.food.name);
 export type FoodDiff = { added: string[]; gone: string[] };
@@ -13,12 +14,13 @@ export function diffFoods(now: string[], then: string[] | null | undefined): Foo
   const gone = then.filter((x, k) => !a.has(norm(x)) && then.findIndex((y) => norm(y) === norm(x)) === k);
   return added.length || gone.length ? { added, gone } : null;
 }
-const list = (xs: string[]) => { const l = xs.map((x) => x.toLowerCase()); return l.length <= 1 ? l.join("") : `${l.slice(0, -1).join(", ")} and ${l[l.length - 1]}`; };
+// DT243 part two: the words in src/i18n/en.json (recipe.stepsDiff*, list.and)
+const list = (xs: string[]): Val => (lang) => { const l = xs.map((x) => x.toLowerCase()); return l.length <= 1 ? l.join("") : wIn(lang, "list.and", { rest: l.slice(0, -1).join(", "), last: l[l.length - 1] }); };
 // the line over the original when your dish differs (RP1b)
 export function diffLine(d: FoodDiff): string {
-  if (d.added.length && d.gone.length) return `Your dish has ${list(d.added)}. The original has ${list(d.gone)}.`;
-  if (d.added.length) return `Your dish adds ${list(d.added)}.`;
-  return `Your dish leaves out ${list(d.gone)}.`;
+  if (d.added.length && d.gone.length) return w("recipe.stepsDiffBoth", { added: list(d.added), gone: list(d.gone) });
+  if (d.added.length) return w("recipe.stepsDiffAdds", { added: list(d.added) });
+  return w("recipe.stepsDiffLeavesOut", { gone: list(d.gone) });
 }
 // the foods the original steps were written for: kept at the read; for a changed dish, its original's
 export function originalFoodsOf(m: { source?: { foods?: string[] }; basedOn?: { id: string } }, meals: { id: string; items: { grams: number; food: { name: string } }[]; source?: { foods?: string[] } }[] = []): string[] | null {

@@ -31,7 +31,7 @@ export function PairedCookMode(x: Parameters<typeof CookMode>[0] & { notify: (m:
     try { const d = await post("/api/cook/session", { title: cook.title, steps: cook.steps, items: slimItems(cook.items), step: at, ticks: [...cook.ticks] }); setCode(d.code); setJoined(false); seen.current = d.session.rev; }
     catch (e: any) { setErr(e?.message || w("cookpair.thatDidnTWorkTry")); } finally { setOpening(false); }
   };
-  const end = (say = true) => { const c = codeRef.current; if (c) void post("/api/cook/update", { code: c, end: true }).catch(() => {}); setCode(null); setJoined(false); if (say) notify("The kitchen screen is closed."); };
+  const end = (say = true) => { const c = codeRef.current; if (c) void post("/api/cook/update", { code: c, end: true }).catch(() => {}); setCode(null); setJoined(false); if (say) notify(w("cookpair.kitchenClosed")); };
   useEffect(() => {
     if (!code) return;
     let stop = false;
@@ -39,9 +39,9 @@ export function PairedCookMode(x: Parameters<typeof CookMode>[0] & { notify: (m:
       try {
         const r = await fetch(`/api/cook/state?code=${encodeURIComponent(code)}`); const d = await r.json().catch(() => ({}));
         if (stop) return;
-        if (!r.ok || d.session?.ended) { setCode(null); setJoined(false); if (joined) notify("The kitchen screen left."); return; }
+        if (!r.ok || d.session?.ended) { setCode(null); setJoined(false); if (joined) notify(w("cookpair.kitchenLeft")); return; }
         const s: Pub = d.session;
-        if (s.joined && !joined) { setJoined(true); notify("The kitchen screen is on."); }
+        if (s.joined && !joined) { setJoined(true); notify(w("cookpair.kitchenOn")); }
         if (s.rev > seen.current) { seen.current = s.rev; if (s.by === "kitchen") setRemote({ k: s.step, rev: s.rev }); setRemoteTicks(s.ticks); }
       } catch { /* offline for a moment: the next read catches up */ }
     };
@@ -54,18 +54,18 @@ export function PairedCookMode(x: Parameters<typeof CookMode>[0] & { notify: (m:
     ...cook.link,
     remoteStep: remote,
     onStep: (k) => { setAt(k); const c = codeRef.current; if (c && joined) void post("/api/cook/update", { code: c, step: k }).then((d) => { seen.current = Math.max(seen.current, d.session.rev); }).catch(() => {}); },
-    top: code && joined ? <div className="cook-link" role="status"><small>Also on the kitchen screen · step {at + 1} of {cook.steps.length}</small><button className="pill pill-small" onClick={() => end()}>{w("cookpair.end")}</button></div> : null,
+    top: code && joined ? <div className="cook-link" role="status"><small>{w("cookpair.alsoOnKitchen", { k: at + 1, n: cook.steps.length })}</small><button className="pill pill-small" onClick={() => end()}>{w("cookpair.end")}</button></div> : null,
     pair: code && !joined ? (
       <section className="cook-card cook-pair" aria-label={w("cookpair.useAnotherScreen")}>
         <b style={{ fontSize: 17 }}>{w("cookpair.useAnotherScreen")}</b>
         <small>{w("cookpair.onTheOtherPhoneOr")} <b>chefmealan.com/cook</b> {w("cookpair.andTypeTheCodeOr")}</small>
-        <span className="pair-code" aria-label={`Code ${code.split("").join(" ")}`}>{code}</span>
-        <QrCode text={`${location.origin}/cook?c=${code}`} size={168} label={`QR code for the kitchen screen, code ${code}`} />
+        <span className="pair-code" aria-label={w("cookpair.codeAria", { code: code.split("").join(" ") })}>{code}</span>
+        <QrCode text={`${location.origin}/cook?c=${code}`} size={168} label={w("cookpair.qrLabel", { code })} />
         <small className="muted">{w("cookpair.theCodeWorksOnceAnd")}</small>
         <button className="pill" onClick={() => end(false)}>{w("cookpair.cancel")}</button>
       </section>
     ) : !code ? <>
-      <button className="pill pill-wide cook-pair-open" disabled={opening} onClick={() => void open()}>📱 Use another screen</button>
+      <button className="pill pill-wide cook-pair-open" disabled={opening} onClick={() => void open()}>📱 {w("cookpair.useAnotherScreen")}</button>
       {err ? <small className="error">{err}</small> : <small className="muted cook-under">{w("cookpair.aSecondPhoneOrTablet")}</small>}
     </> : null,
   };

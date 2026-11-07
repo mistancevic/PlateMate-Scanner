@@ -1,5 +1,6 @@
 // Sign in with Google and keep each person's data under their own account. Off entirely when not configured.
 import { fixMoves } from "./pilot";
+import { w } from "./words";
 import { notesOf, checkinOf } from "./coachNotes";
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
@@ -92,7 +93,7 @@ export async function loadMain(uid: string): Promise<CloudDoc | null> {
 // otherwise put its old copy back after the record is gone (7 October 2026). A paused write fails, so nothing counts as saved.
 let paused = false;
 export const pauseAccountWrites = (on: boolean) => { paused = on; };
-const notPaused = () => { if (paused) throw new Error("Saving is paused while your account is deleted."); };
+const notPaused = () => { if (paused) throw new Error(w("cloud.savingPaused")); };
 export async function saveCloud(uid: string, data: CloudDoc, opts?: { onlyChanged?: boolean }) {
   notPaused();
   // merge, so fields the coach or the console own (role, coach link, coachSetAt) are never wiped by the client's save
@@ -149,7 +150,7 @@ export async function joinCoach(_uid: string, code: string) {
   // the server checks the invite: right code, right email, not used, not expired
   const r = await fetch("/api/join", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(d.error || "Couldn't join with that code.");
+  if (!r.ok) throw new Error(d.error || w("cloud.joinFailed"));
   return { coachId: d.coachId as string, coachName: (d.coachName as string) || "your coach", coachEmail: (d.coachEmail as string | null) ?? undefined, coachPhoto: (d.coachPhoto as string | null) ?? undefined, joinedAt: (d.joinedAt as string) ?? undefined };
 }
 export async function leaveCoach(uid: string) {
@@ -223,10 +224,10 @@ export async function setClientGoal(clientUid: string, goal: any, goals: { calor
 // Plain words for the two failures people will actually hit.
 export function explainCloudError(e: any): string {
   const code = String(e?.code ?? ""), msg = String(e?.message ?? "");
-  if (code.includes("permission-denied")) return "your account isn't allowed to save yet (the database rules)";
-  if (/exceeds the maximum size|too large|1048487|INVALID_ARGUMENT/i.test(msg)) return "too much to save in one go";
-  if (code.includes("unavailable") || /network|offline/i.test(msg)) return "no connection";
-  return msg || "unknown error";
+  if (code.includes("permission-denied")) return w("cloud.notAllowed");
+  if (/exceeds the maximum size|too large|1048487|INVALID_ARGUMENT/i.test(msg)) return w("cloud.tooMuch");
+  if (code.includes("unavailable") || /network|offline/i.test(msg)) return w("cloud.noConnection");
+  return msg || w("cloud.unknownError");
 }
 // Photos stay on the phone for now; everything else goes to the account. Keeps the document small.
 export function stripPhotos<T>(state: T, fileUp?: (key: string) => boolean): T {

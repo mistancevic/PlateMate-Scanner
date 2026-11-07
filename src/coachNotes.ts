@@ -1,3 +1,4 @@
+import { w, wn, wordV, dateText, type Val } from "./words";
 // The coach's note and the check-in day (0.2.6, canvas board CW, CW4 to CW6). One thread per client in the client's own
 // account: the coach's weekly note (Approve the week or Change the numbers, one line), and the client's replies.
 // The client sees a new note on Today once; Got it keeps it in My coach.
@@ -11,11 +12,15 @@ export type CoachNote = { at: string; by: "coach" | "client"; name?: string; wee
 export type Suggest = { kind: "snack" | "page" | "answer" | "reaction"; time?: string; page?: { part: "nutrients" | "body" | "situations"; id: string; member?: string; name: string }; card?: { id: string; title: string; at: string }; reaction?: "good" | "seen" };
 export type Answer = { at: string; choice: "accept" | "later"; reason?: string };
 export const REASONS = ["Not this week", "Don't like it", "Too much for me", "Ask me at the check-in"];
-export const answerWords = (n: CoachNote) => !n.answer ? "waiting" : n.answer.choice === "accept" ? "accepted" : `not now${n.answer.reason ? `: ${n.answer.reason.charAt(0).toLowerCase()}${n.answer.reason.slice(1)}` : ""}`;
-export const suggestTitle = (s: Suggest, text: string) => s.kind === "snack" ? `A planned snack${s.time ? ` at ${s.time}` : ""}: ${text}` : s.kind === "page" ? `A page: ${s.page?.name ?? text}` : s.kind === "answer" ? `On ${s.card?.title ?? "a meal"}: ${text}` : `${s.reaction === "good" ? "Good" : "Seen"} on ${s.card?.title ?? "a meal"}`;
+// DT243: the reasons stay saved in English; the screen shows each in the app's language. A reason typed by hand shows as typed
+const REASON_KEYS: Record<string, "coach.reasonNotThisWeek" | "coach.reasonDontLike" | "coach.reasonTooMuch" | "coach.reasonAskCheckin"> = { "Not this week": "coach.reasonNotThisWeek", "Don't like it": "coach.reasonDontLike", "Too much for me": "coach.reasonTooMuch", "Ask me at the check-in": "coach.reasonAskCheckin" };
+export const reasonWord = (r: string) => (REASON_KEYS[r] ? w(REASON_KEYS[r]) : r);
+const aMeal = (t?: string): Val => t ?? wordV("coach.aMeal");
+export const answerWords = (n: CoachNote) => { if (!n.answer) return w("coach.answerWaiting"); if (n.answer.choice === "accept") return w("coach.answerAccepted"); const r = n.answer.reason ? reasonWord(n.answer.reason) : ""; return r ? w("coach.answerNotNowWhy", { reason: `${r.charAt(0).toLowerCase()}${r.slice(1)}` }) : w("coach.answerNotNow"); };
+export const suggestTitle = (s: Suggest, text: string) => s.kind === "snack" ? (s.time ? w("coach.sugSnackAt", { time: s.time, text }) : w("coach.sugSnack", { text })) : s.kind === "page" ? w("coach.sugPage", { name: s.page?.name ?? text }) : s.kind === "answer" ? w("coach.sugAnswer", { title: aMeal(s.card?.title), text }) : w(s.reaction === "good" ? "coach.sugGood" : "coach.sugSeen", { title: aMeal(s.card?.title) });
 export const REACTION_WORDS: Record<"good" | "seen", string> = { good: "Good 👍", seen: "Seen" };
 // the card's time, for the answer's title: "On your Sarma with skyr, Tuesday 13:00"
-export const cardWhen = (at: string) => new Date(at).toLocaleDateString("en-GB", { weekday: "long", hour: "2-digit", minute: "2-digit" }).replace(",", "");
+export const cardWhen = (at: string) => dateText(new Date(at), { weekday: "long", hour: "2-digit", minute: "2-digit" }, "en-GB").replace(",", "");
 // the coach's answers and reactions on one card, newest first
 export const onCard = (notes: CoachNote[], cardId: string) => notes.filter((n) => n.by === "coach" && n.suggest?.card?.id === cardId && (n.suggest.kind === "answer" || n.suggest.kind === "reaction")).sort((a, b) => (a.at < b.at ? 1 : -1));
 // the client's replies after a given note
@@ -51,7 +56,7 @@ export type WaitingRow = { uid: string; name: string; notes: CoachNote[]; feedba
 const SEEN = (uid: string) => `chefmealan-waiting-seen-${uid}`;
 export const seenWaiting = (coachUid: string): Set<string> => { try { return new Set(JSON.parse(localStorage.getItem(SEEN(coachUid)) || "[]")); } catch { return new Set(); } };
 export const markWaitingSeen = (coachUid: string, key: string) => { try { const s = seenWaiting(coachUid); s.add(key); localStorage.setItem(SEEN(coachUid), JSON.stringify([...s].slice(-400))); } catch {} };
-const REASON_WORDS: Record<string, string> = { look: "look at this", ok: "was this OK?", help: "help me next time" };
+const REASON_WORDS: Record<string, "coach.askLook" | "coach.askOk" | "coach.askHelp"> = { look: "coach.askLook", ok: "coach.askOk", help: "coach.askHelp" };
 export function waitingFor(rows: WaitingRow[], seen: Set<string>, todayIndex: number, weekKey: string): Waiting[] {
   const out: Waiting[] = [];
   for (const r of rows) {
@@ -59,14 +64,15 @@ export function waitingFor(rows: WaitingRow[], seen: Set<string>, todayIndex: nu
     for (const f of r.feedback) {
       const key = `card|${r.uid}|${f.id}`;
       if (seen.has(key) || onCard(r.notes, f.id).length) continue;
-      const q = f.shared?.reason ? REASON_WORDS[f.shared.reason] ?? "" : "";
-      out.push({ key, uid: r.uid, name: first, kind: "card", what: `${q ? q + " " : ""}${f.meal?.title ?? "a meal"}`, when: `${cardWhen(f.createdAt)} · shared with you`, at: f.shared?.at || f.createdAt, cardId: f.id });
+      const q = f.shared?.reason && REASON_WORDS[f.shared.reason] ? w(REASON_WORDS[f.shared.reason]) : "";
+      const title = aMeal(f.meal?.title);
+      out.push({ key, uid: r.uid, name: first, kind: "card", what: q ? w("coach.waitAskTitle", { ask: q, title }) : (f.meal?.title ?? w("coach.aMeal")), when: w("coach.waitShared", { when: cardWhen(f.createdAt) }), at: f.shared?.at || f.createdAt, cardId: f.id });
     }
     // a reply: the client's newest note after the coach's last one
     const lastCoach = [...r.notes].reverse().find((n) => n.by === "coach");
-    for (const n of r.notes) if (n.by === "client" && (!lastCoach || n.at > lastCoach.at)) { const key = `reply|${r.uid}|${n.at}`; if (!seen.has(key)) out.push({ key, uid: r.uid, name: first, kind: "reply", what: `replied: “${n.text}”`, when: `${cardWhen(n.at)} · to your note`, at: n.at }); }
-    if (r.review?.status === "waiting") { const key = `review|${r.uid}|${r.review.at ?? ""}`; if (!seen.has(key)) out.push({ key, uid: r.uid, name: first, kind: "review", what: "numbers to approve", when: "the goal sheet", at: r.review.at ?? "" }); }
-    if (r.checkinDay === todayIndex && !r.notes.some((n) => n.by === "coach" && n.week === weekKey)) out.push({ key: `checkin|${r.uid}|${weekKey}`, uid: r.uid, name: first, kind: "checkin", what: "check-in today", when: "the note is not sent yet", at: `${weekKey}T00:00:00` });
+    for (const n of r.notes) if (n.by === "client" && (!lastCoach || n.at > lastCoach.at)) { const key = `reply|${r.uid}|${n.at}`; if (!seen.has(key)) out.push({ key, uid: r.uid, name: first, kind: "reply", what: w("coach.waitReplied", { text: n.text }), when: w("coach.waitToNote", { when: cardWhen(n.at) }), at: n.at }); }
+    if (r.review?.status === "waiting") { const key = `review|${r.uid}|${r.review.at ?? ""}`; if (!seen.has(key)) out.push({ key, uid: r.uid, name: first, kind: "review", what: w("coach.waitNumbers"), when: w("coach.waitGoalSheet"), at: r.review.at ?? "" }); }
+    if (r.checkinDay === todayIndex && !r.notes.some((n) => n.by === "coach" && n.week === weekKey)) out.push({ key: `checkin|${r.uid}|${weekKey}`, uid: r.uid, name: first, kind: "checkin", what: w("coach.waitCheckin"), when: w("coach.waitNoteNotSent"), at: `${weekKey}T00:00:00` });
   }
   return out.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
 }
@@ -74,6 +80,6 @@ export function waitingFor(rows: WaitingRow[], seen: Set<string>, todayIndex: nu
 export function waitingWords(list: Waiting[]): string {
   if (!list.length) return "";
   const n = (k: Waiting["kind"]) => list.filter((x) => x.kind === k).length;
-  const parts = [n("card") ? `${n("card") === 1 ? "a card" : `${n("card")} cards`} shared` : "", n("reply") ? `${n("reply") === 1 ? "a reply" : `${n("reply")} replies`}` : "", n("review") ? "numbers to approve" : "", n("checkin") ? `${n("checkin") === 1 ? "a check-in" : `${n("checkin")} check-ins`} today` : ""].filter(Boolean);
-  return `${list.length === 1 ? "1 thing waits" : `${list.length} things wait`} on Clients: ${parts.join(", ")}. Open Clients ›`;
+  const parts = [n("card") ? wn("coach.waitCards", n("card")) : "", n("reply") ? wn("coach.waitReplies", n("reply")) : "", n("review") ? w("coach.waitNumbers") : "", n("checkin") ? wn("coach.waitCheckins", n("checkin")) : ""].filter(Boolean);
+  return wn("coach.waitStrip", list.length, { parts: parts.join(", ") });
 }

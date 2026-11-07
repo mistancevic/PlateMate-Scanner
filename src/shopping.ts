@@ -3,14 +3,15 @@
 // foods saved (a starter) can't be counted, so the list names it instead of leaving it out quietly.
 import { plannedPortion, isBatch, type Planned, type PlannedMeal } from "./planned";
 import { rawOf } from "./reference";
-import { kindOf, KINDS } from "./counted";
+import { kindOf, KINDS, countName } from "./counted";
+import { w, numText } from "./words";
 // DT76: eggs and bananas are bought by the piece: 210 g of eggs is 4 eggs (size M), at least one. DT77: apples too, and
 // a part of one is bought whole (1.7 eggs is 2); a list sums shares of many portions, so it rounds up, a little slack kept
 export function shopAmount(name: string, grams: number): string {
   const k = kindOf(name);
-  if (!k) return `${grams.toLocaleString("en")} g`;
+  if (!k) return w("shop.grams", { g: numText(grams) });
   const n = Math.max(1, Math.ceil(grams / KINDS[k].sizes.M! - 0.15));
-  return `${n} ${n === 1 ? KINDS[k].one : KINDS[k].many}`;
+  return countName(k, n);
 }
 
 // SL4 (0.2.62): each food knows the meals it is for, so the list can say what it is for and show itself meal by meal
@@ -84,7 +85,7 @@ export function shoppingList(planned: Planned, days: string[], cookOf?: (mealId:
 // the list as text, to paste in a message or a note
 export function shoppingText(list: ShopList, span: string, ticked: Set<string>): string {
   const left = list.lines.filter((l) => !ticked.has(l.key));
-  return [`Shopping list, ${span}`, "", ...left.map((l) => `${l.name}${l.brand && !/typical values|generic|check your/i.test(l.brand) ? ` (${l.brand})` : ""}: ${shopAmount(l.name, l.grams)}`)].join("\n");
+  return [w("shop.textHead", { span }), "", ...left.map((l) => `${l.name}${l.brand && !/typical values|generic|check your/i.test(l.brand) ? ` (${l.brand})` : ""}: ${shopAmount(l.name, l.grams)}`)].join("\n");
 }
 
 // SL3 (0.2.61, Milan 16:46 to 16:50): a list is saved, named and dated: Shopping list 1, made on a day, for the days picked.
@@ -151,8 +152,8 @@ export function finishList(s: ShopStore, n: number, carry: boolean, at: string):
   return { lists: s.lists.map((x) => (x.n === n ? { ...x, doneAt: at } : x)), carry: carry && left.length ? { from: n, lines: left } : s.carry };
 }
 export function listText(l: SavedList, span: string): string {
-  const shown = (x: ShopLine) => `${x.name}${x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? ` (${x.brand})` : ""}: ${shopAmount(x.name, x.grams)}${x.cooked ? ` (${x.cooked.toLocaleString("en")} g cooked)` : ""}`;
-  return [`Shopping list ${l.n}, ${span}`, "", ...notTicked(l).map((x) => shown(x) + ((l.missing ?? []).includes(x.key) ? " (not bought last time)" : ""))].join("\n");
+  const shown = (x: ShopLine) => `${x.name}${x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? ` (${x.brand})` : ""}: ${shopAmount(x.name, x.grams)}${x.cooked ? ` ${w("shop.textCooked", { g: numText(x.cooked) })}` : ""}`;
+  return [w("shop.textHeadN", { n: l.n, span }), "", ...notTicked(l).map((x) => shown(x) + ((l.missing ?? []).includes(x.key) ? ` ${w("shop.textNotBought")}` : ""))].join("\n");
 }
 
 // SL5 (0.2.63): a short meal changed with Chef Mealan's help. The plan's meal for that slot is new, and the open list

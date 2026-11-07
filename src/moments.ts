@@ -1,14 +1,12 @@
 // What a meal is for. The day's band stays; the moment moves the plate's target.
+import { w, wIn, type Val, type WordKey } from "./words";
 export type MomentId = "regular" | "before" | "after" | "meeting" | "travel" | "celebration" | "afterwork";
 export type Moment = { id: MomentId; name: string; planned: boolean; hint: string };
+// DT243: a moment's name and hint on the screen, in the language chosen; the id is what is kept
+const moment = (id: MomentId, planned: boolean): Moment => ({ id, planned, get name() { return w(`moment.${id}` as WordKey); }, get hint() { return w(`moment.hint.${id}` as WordKey); } });
 export const MOMENTS: Moment[] = [
-  { id: "regular",     name: "Regular meal",        planned: true,  hint: "Aims at your day's target." },
-  { id: "before",      name: "Before training",     planned: true,  hint: "Energy that's easy to take in. Keep fat and fibre low." },
-  { id: "after",       name: "After training",      planned: true,  hint: "Protein first." },
-  { id: "meeting",     name: "Meeting day",         planned: true,  hint: "Steady energy, no dip. Keep the plate small." },
-  { id: "travel",      name: "Travel",              planned: true,  hint: "Take what's there. Protein where you can, and don't chase the number." },
-  { id: "celebration", name: "Celebration at work", planned: false, hint: "Just happened. Enjoy it, keep it small; the next meal leans protein." },
-  { id: "afterwork",   name: "Afterwork event",     planned: false, hint: "Just happened. Enjoy it, keep it small; the next meal leans protein." },
+  moment("regular", true), moment("before", true), moment("after", true), moment("meeting", true), moment("travel", true),
+  moment("celebration", false), moment("afterwork", false),
 ];
 export const momentOf = (id?: MomentId | null) => MOMENTS.find((m) => m.id === id) ?? MOMENTS[0];
 // The plate's target for a moment, from the day's target. dayKcal for the meeting cap.
@@ -62,6 +60,13 @@ export const REGIONS: { id: RegionId; name: string; tags: string[] }[] = [
   { id: "cyprus",      name: "Cyprus, elsewhere",  tags: ["*", "cy"] },
   { id: "elsewhere",   name: "Elsewhere",          tags: ["*"] },
 ];
+// DT243: a place's name on the screen, in the language chosen (the English name above stays for matching): "Germany, elsewhere"
+const REGION_WORD: Record<RegionId, WordKey> = { munich: "opt.w.munich", germany: "opt.w.germanyElsewhere", austria: "opt.w.austria", switzerland: "opt.w.switzerland", belgrade: "opt.w.belgrade", serbia: "opt.w.serbiaElsewhere", madrid: "opt.w.madrid", spain: "opt.w.spainElsewhere", limassol: "opt.w.limassol", cyprus: "opt.w.cyprusElsewhere", elsewhere: "opt.w.elsewhere" };
+// and short, without ", elsewhere": "Germany"
+const REGION_SHORT: Partial<Record<RegionId, WordKey>> = { germany: "place.germany", serbia: "place.serbia", spain: "place.spain", cyprus: "place.cyprus" };
+export const regionV = (id: string, short = false): Val => (l) => { const k = (short && REGION_SHORT[id as RegionId]) || REGION_WORD[id as RegionId]; return k ? wIn(l, k) : id; };
+export const regionName = (id: string): string => { const k = REGION_WORD[id as RegionId]; return k ? w(k) : id; };
+export const regionShort = (id: string): string => { const k = REGION_SHORT[id as RegionId] ?? REGION_WORD[id as RegionId]; return k ? w(k) : id; };
 // Where a trip goes. Chosen on the craving screen when the moment is Travel; Mealan plans with that place's shelves.
 const TKEY = "chefmealan-travel-to";
 export const getTravelTo = (): RegionId | null => { try { return (localStorage.getItem(TKEY) as RegionId) || null; } catch { return null; } };

@@ -1,5 +1,7 @@
 import { numLocale } from "./words";
-import { w } from "./words";
+import { w, wn, dateText, type WordKey } from "./words";
+import { wx } from "./wx";
+import { weekdayName } from "./weekdayWords";
 import { eatsForReq, installEats, type Eats } from "./eats";
 import { useLang, getLang } from "./lang";
 import { TravelBanner } from "./components/Travel";
@@ -175,7 +177,7 @@ const fillingName = (f: { dayName: string; name: string }) => `${f.dayName === "
 const withTimeout = <T,>(p: Promise<T>, ms: number) => new Promise<T>((res, rej) => { const t = setTimeout(() => rej(new Error("timeout")), ms); p.then((v) => { clearTimeout(t); res(v); }, (e) => { clearTimeout(t); rej(e); }); });
 // names say who is who: Coach Milan, Chef Mealan, Client Tester 1
 const firstName = (n?: string | null) => (n ?? "").trim().split(/\s+/)[0] || "";
-const coachLabel = (n?: string | null) => (firstName(n) ? `Coach ${firstName(n)}` : w("app.yourCoach"));
+const coachLabel = (n?: string | null) => (firstName(n) ? w("sheet.coachName", { name: firstName(n) }) : w("app.yourCoach"));
 // when the phone's copy last changed by a person's hand, and which foods left the library (merged away, removed)
 const STATE_AT = "chefmealan-state-at", GONE = "chefmealan-gone-foods";
 // Storage release 2: what this phone last sent or took, per record (see records.ts)
@@ -201,6 +203,9 @@ const load = () => {
 // the main screen showed: how long the app took to open, from the page starting to load (storage release 1)
 function Opened() { useEffect(() => { if (openStats.ms === null) openStats.ms = Math.round(performance.now()); }, []); return null; }
 // a value in a field as a label prints it: 313 kcal, 8.9 g, not 313.3333 or 8.888889 (Milan, 8 October 2026)
+// DT243: a food's source is kept as English words; the label check shows the ones it knows in the app's language
+const SOURCE_WORDS: Record<string, WordKey> = { "Reference table": "app.referenceTable", "Manual entry": "app.srcManual", "Photos · review required": "app.srcPhotos", "Barcode and photos · review required": "app.srcBarcodePhotos", "Label photo · review required": "app.srcLabelPhoto", "Product database · review required": "app.srcDatabase", "Product database and photos · review required": "app.srcDatabasePhotos" };
+const sourceWord = (s: string) => (SOURCE_WORDS[s] ? w(SOURCE_WORDS[s]) : s);
 const inputValue = (x: number | null, key?: string) => (x === null ? "" : String(tidy(x, key === "calories" ? "kcal" : "g") ?? x));
 function Modal({
   eyebrow,
@@ -233,6 +238,7 @@ function Modal({
     </div>
   );
 }
+const NUTRIENT_WORD: Record<string, WordKey> = { calories: "app.nEnergy", protein: "app.nProtein", fats: "app.nFat", carbs: "app.nCarbohydrate", fiber: "app.nFibre" };
 function Mealan({
   items,
   portion,
@@ -250,7 +256,7 @@ function Mealan({
     valid = data.weight > 0;
   return (
     <section className="mealan-card">
-      <div className="eyebrow">MEALAN · SELECTED PORTION</div>
+      <div className="eyebrow">{w("app.mealanSelected")}</div>
       <h2>{title || w("app.myMeal")}</h2>
       <div className="headline-metrics">
         <span>
@@ -260,8 +266,7 @@ function Mealan({
         <span>{fmt(data.calories, 0)} kcal</span>
       </div>
       <p className="calorie-share">
-        CAL <strong>{fmt(contribution(data.calories, goals.calories))}%</strong>{" "}
-        of daily reference
+        {wx("app.calShare", { pct: <strong>{fmt(contribution(data.calories, goals.calories))}%</strong> })}
       </p>
       <div className="macro-grid">
         {MACROS.map((k) => (
@@ -269,7 +274,7 @@ function Mealan({
             <strong>{symbol(k, data, goals)}</strong>
             <span>{fmt(contribution(data[k], goals[k]))}%</span>
             <small>
-              {fmt(data[k])} g {LABELS[k].toLowerCase()}
+              {w("app.gNutrient", { g: fmt(data[k]), what: w(NUTRIENT_WORD[k]).toLowerCase() })}
             </small>
           </div>
         ))}
@@ -282,17 +287,13 @@ function Mealan({
       <p className="small">
         {portion === null
           ? w("app.wholeRecipeSelected")
-          : `Whole recipe: ${fmt(total.weight)} g. Portion assumes ingredients are evenly mixed.`}{" "}
-        Missing data is shown as ?.
+          : w("app.wholeRecipeG", { g: fmt(total.weight) })}{" "}
+        {w("app.missingShownAs")}
       </p>
       <details>
         <summary>{w("app.howToReadThis")}</summary>
         <p>
-          PD is grams of protein per 100 kcal. PD {fmt(pd, 2)} describes
-          concentration, not the total amount you eat. Percentages show this
-          portion's share of your daily targets. Letters compare nutrient
-          density with your plan: + above, capital near, lowercase below. The
-          pilot uses a ±10% band; it does not label a meal healthy or unhealthy.
+          {w("app.pdExplain", { pd: fmt(pd, 2) })}
         </p>
         <div className="density-list">
           {MACROS.map((k) => (
@@ -302,9 +303,7 @@ function Mealan({
           ))}
         </div>
         <p className="small">
-          DS names the density family. Combined MD remains experimental and is
-          not used to rate meals. A ? may mean the nutrient or its daily target
-          is missing.
+          {w("app.dsExplain")}
         </p>
       </details>
     </section>
@@ -392,10 +391,10 @@ function LabelCheck({
   const kind = (() => {
     const src = food.source || "";
     const where = addTo === "plate" ? w("app.addToPlate") : w("app.addAFood");
-    if (titleAs) return { eyebrow: w("app.findAFood"), title: titleAs, line: w("app.checkWhatTheDatabaseSays") };
-    if (/barcode|product database|open food facts/i.test(src)) return { eyebrow: where, title: "Barcode", line: w("app.checkWhatTheDatabaseSays") };
-    if (/photo|label/i.test(src)) return { eyebrow: where, title: "Scan", line: w("app.checkWhatWasReadAgainst") };
-    return { eyebrow: where, title: "Manual", line: w("app.nameTheFoodFillThe") };
+    if (titleAs) return { id: "as", eyebrow: w("app.findAFood"), title: titleAs, line: w("app.checkWhatTheDatabaseSays") };
+    if (/barcode|product database|open food facts/i.test(src)) return { id: "barcode", eyebrow: where, title: w("app.kindBarcode"), line: w("app.checkWhatTheDatabaseSays") };
+    if (/photo|label/i.test(src)) return { id: "scan", eyebrow: where, title: w("plate.scan"), line: w("app.checkWhatWasReadAgainst") };
+    return { id: "manual", eyebrow: where, title: w("plate.manual"), line: w("app.nameTheFoodFillThe") };
   })();
   const [refOpen, setRefOpen] = useState(() => Boolean(food.name) && /manual/i.test(food.source || ""));
   const [code, setCode] = useState(food.barcode ?? "");
@@ -419,7 +418,7 @@ function LabelCheck({
   function submit() {
     const f = {
       ...food,
-      ...(refPicked ? { source: w("app.referenceTable") } : {}),
+      ...(refPicked ? { source: "Reference table" } : {}),
       ...(/^\d{8,14}$/.test(code.trim()) ? { barcode: code.trim() } : {}),
       name: name.trim(),
       brand: brand.trim(),
@@ -437,10 +436,10 @@ function LabelCheck({
       )
     )
       e.push(
-        "Use a non-negative decimal number, or leave unknown values blank. Record trace or < values in the notes.",
+        w("app.useNonNegative"),
       );
     if (!reviewed)
-      e.push("Confirm the label and per-100-g basis before saving.");
+      e.push(w("app.confirmLabelBasis"));
     setErrors(e);
     if (e.length) return;
     f.icon = f.icon || iconFor(f.name);
@@ -469,12 +468,12 @@ function LabelCheck({
   }
   return (
     <Modal title={kind.title} close={close} eyebrow={kind.eyebrow}>
-      <p className="small muted sheet-line">{kind.line}{fromSearch ? <> From your search: <b>{fromSearch}</b>.</> : null}</p>
+      <p className="small muted sheet-line">{kind.line}{fromSearch ? <> {wx("app.fromYourSearch", { q: <b>{fromSearch}</b> })}</> : null}</p>
       {dbPhotos && dbPhotos.length > 0 && (
         <div className="db-photos">
           <div className="db-strip" aria-label={w("app.photosFromOpenFoodFacts")}>
             {dbPhotos.map((src, i) => (
-              <button key={i} className={`db-photo ${keepDb[i] ? "on" : ""}`} aria-pressed={keepDb[i]} aria-label={`${keepDb[i] ? "Leave out" : "Keep"} database photo ${i + 1}`} onClick={() => setKeepDb((k) => k.map((x, j) => (j === i ? !x : x)))}>
+              <button key={i} className={`db-photo ${keepDb[i] ? "on" : ""}`} aria-pressed={keepDb[i]} aria-label={w(keepDb[i] ? "app.leaveOutDbPhoto" : "app.keepDbPhoto", { n: i + 1 })} onClick={() => setKeepDb((k) => k.map((x, j) => (j === i ? !x : x)))}>
                 <img src={src} alt="" />
                 <span className="db-tick" aria-hidden="true">{keepDb[i] ? "✓" : ""}</span>
                 <span className="db-globe" aria-hidden="true"><Globe size={12} /></span>
@@ -489,19 +488,19 @@ function LabelCheck({
         <div className="label-previews" aria-label={w("app.yourPhotosOfThisProduct")}>
           {images.map((src, i) => (
             <div className="preview-wrap" key={i}>
-              <img className="label-preview" src={src} alt={`Photo ${i + 1} of ${images.length}`} />
-              <button className={`star ${mainIdx === i ? "on" : ""}`} aria-label={mainIdx === i ? w("app.mainPhoto") : w("app.makeThisTheMainPhoto")} onClick={() => setMainIdx(i)}>{mainIdx === i ? "★ Main photo" : "☆ Make main"}</button>
+              <img className="label-preview" src={src} alt={w("app.photoNOf", { n: i + 1, of: images.length })} />
+              <button className={`star ${mainIdx === i ? "on" : ""}`} aria-label={mainIdx === i ? w("app.mainPhoto") : w("app.makeThisTheMainPhoto")} onClick={() => setMainIdx(i)}>{mainIdx === i ? w("app.starMain") : w("app.starMakeMain")}</button>
             </div>
           ))}
         </div>
       ) : image ? (
-        <img className="label-preview" src={image} alt="Captured nutrition label" />
+        <img className="label-preview" src={image} alt={w("app.capturedLabel")} />
       ) : null}
-      {images && images.length > 1 && <p className="small center">{images.length} photos · swipe to see each</p>}
+      {images && images.length > 1 && <p className="small center">{w("app.photosSwipe", { n: images.length })}</p>}
       {liveMatch && (
         <section className="match">
           <b>{w("app.looksLikeAFoodYou")}</b>
-          <small>{liveMatch.food.name}{liveMatch.food.brand ? `, ${liveMatch.food.brand}` : ""} · {liveMatch.reason === "barcode" ? "same barcode" : "same values per 100 g"}</small>
+          <small>{liveMatch.food.name}{liveMatch.food.brand ? `, ${liveMatch.food.brand}` : ""} · {liveMatch.reason === "barcode" ? w("app.sameBarcode") : w("app.sameValues")}</small>
           <div className="moments" style={{ marginTop: 8 }}>
             <button className={`choice ${choice === "update" ? "on" : ""}`} onClick={() => setChoice("update")}>{w("app.updateThatOne")}</button>
             <button className={`choice ${choice === "both" ? "on" : ""}`} onClick={() => setChoice("both")}>{w("app.keepBoth")}</button>
@@ -511,8 +510,7 @@ function LabelCheck({
         </section>
       )}
       <p className="small">
-        Source: {food.source}. Check the actual package. All values below must
-        be <strong>{w("app.perG")}</strong>, with carbohydrate excluding fibre.
+        {wx("app.sourceCheck", { source: sourceWord(food.source), basis: <strong>{w("app.perG")}</strong> })}
       </p>
       <label>
         {w("app.productName")}
@@ -520,7 +518,7 @@ function LabelCheck({
       </label>
       {refOpen && food.source !== "Reference table" && !food.barcode && findReference(name).length > 0 && (
         <div className="ref-suggest" role="listbox" aria-label={w("app.fromTheReferenceTable")}>
-          <small className="muted">No label needed. From the reference table, per 100 g:</small>
+          <small className="muted">{w("app.noLabelNeeded")}</small>
           {findReference(name).map((r) => (
             <button key={r.id} type="button" role="option" className="ref-row" onClick={() => {
               const rf = referenceFood(r, region, () => food.id);
@@ -528,7 +526,7 @@ function LabelCheck({
               setValues(Object.fromEntries(KEYS.map((k) => [k, inputValue((rf as any)[k], k)])) as Record<string, string>);
               setRows(displayRows(rf)); setRefPicked(r.id); setRefOpen(false);
             }}>
-              <b>{localName(r, region)}</b><small>{otherNames(r, region).join(" · ")} · {r.kcal} kcal · {r.protein} g protein</small>
+              <b>{localName(r, region)}</b><small>{w("app.refRowLine", { names: otherNames(r, region).join(" · "), kcal: r.kcal, protein: r.protein })}</small>
             </button>
           ))}
         </div>
@@ -538,11 +536,11 @@ function LabelCheck({
         {w("app.brand")}
         <input value={brand} onChange={(e) => setBrand(e.target.value)} />
       </label>
-      {kind.title === "Manual" && onLookup && (
+      {kind.id === "manual" && onLookup && (
         <label className="barcode-field">
           {w("app.barcodeNumberIfThePack")}
           <div className="barcode-row">
-            <input inputMode="numeric" placeholder="8 to 14 digits, under the bars" value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && /^\d{8,14}$/.test(code.trim())) onLookup(code.trim()); }} />
+            <input inputMode="numeric" placeholder={w("app.barcodeDigits")} value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && /^\d{8,14}$/.test(code.trim())) onLookup(code.trim()); }} />
             <button type="button" className="pill pill-small" disabled={!/^\d{8,14}$/.test(code.trim())} onClick={() => onLookup(code.trim())}>{w("app.lookUp")}</button>
           </div>
           <small className="muted">{w("app.lookUpFillsTheTable")}</small>
@@ -552,7 +550,7 @@ function LabelCheck({
         <span className="label">{w("app.servingIfThePackPrints")}</span>
         <div className="serving-row">
           <span>1</span>
-          <input aria-label={w("app.servingName")} placeholder="bar, piece, pot" value={servingName} onChange={(e) => setServingName(e.target.value)} />
+          <input aria-label={w("app.servingName")} placeholder={w("app.servingExample")} value={servingName} onChange={(e) => setServingName(e.target.value)} />
           <input aria-label={w("app.servingGrams")} type="number" inputMode="decimal" min="0" placeholder="45" value={servingGrams} onChange={(e) => setServingGrams(e.target.value)} />
           <span>g</span>
         </div>
@@ -565,14 +563,14 @@ function LabelCheck({
           const core = knownOf(r.key)?.core;
           return (
             <div className={`lt-row ${r.sub ? "sub" : ""}`} key={r.key + i}>
-              <span className="lt-name">{r.name}{r.source === "you" && <em> · added by you</em>}{r.source === "database" && <em> · database</em>}{r.source === "photo" && <em className="from-photo"> · read from the photo</em>}</span>
+              <span className="lt-name">{r.name}{r.source === "you" && <em> · {w("app.rowByYou")}</em>}{r.source === "database" && <em> · {w("app.rowDatabase")}</em>}{r.source === "photo" && <em className="from-photo"> · {w("app.rowFromPhoto")}</em>}</span>
               {/* 0.2.121 (Tester 2, Milan 28 October 15:26): a row like salt kept only the number, so "0." became 0 and a decimal
                   could not be typed. What you type stays as typed and counts when you leave the field */}
               <input inputMode="decimal" aria-label={r.name} value={core ? values[core] : rowDraft[i] ?? (r.amount ?? "")} placeholder="–"
                 onChange={(e) => core ? setValues((v) => ({ ...v, [core]: e.target.value })) : setRowDraft((d) => ({ ...d, [i]: e.target.value }))}
                 onBlur={(e) => { if (core) return; const t = e.target.value; setRows((rs) => rs.map((x, j) => j === i ? { ...x, amount: numberInput(t) } : x)); setRowDraft((d) => { const n = { ...d }; delete n[i]; return n; }); }} />
               <span className="lt-unit">{r.unit}</span>
-              {!core ? <button className="lt-x" aria-label={`Remove ${r.name}`} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}>×</button> : <span className="lt-x" />}
+              {!core ? <button className="lt-x" aria-label={w("app.removeRow", { name: r.name })} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}>×</button> : <span className="lt-x" />}
             </div>
           );
         })}
@@ -585,22 +583,22 @@ function LabelCheck({
         const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
         // on its own: the playbook's word, and the number against this plate's target; under the target is never green
         const under = target != null && pd !== null && pd < target;
-        const ownText = !pb.alone.ok ? cap(pb.alone.reason) : under ? `Under your ${fixed(target!)}: pair it with a protein base to get there` : target != null ? `On your ${fixed(target)}. ${cap(pb.alone.reason)}` : cap(pb.alone.reason);
+        const ownText = !pb.alone.ok ? cap(pb.alone.reason) : under ? w("app.underYourTarget", { target: fixed(target!) }) : target != null ? w("app.onYourTarget", { target: fixed(target), reason: cap(pb.alone.reason) }) : cap(pb.alone.reason);
         const ownClass = !pb.alone.ok ? "no" : under ? "mid" : "ok";
         const t = day ? todayLine(d, day.kcal, day.eaten, day.name) : null;
         const sv = d.serving;
-        const count = (grams: number) => (sv ? `${servingsFor(d, grams)} ${sv.name}${servingsFor(d, grams) === 1 ? "" : "s"}, ${snapToServing(d, grams)} g` : `about ${grams} g`);
-        const beforeText = fit.before.fits && fit.before.grams !== null ? `fast energy, nothing to add: ${count(fit.before.grams)} gives about ${Math.round((snapToServing(d, fit.before.grams) * (d.carbs ?? 0)) / 100)} g carbs for a ${dayName(day?.type ?? "passive")}` : fit.before.reason;
-        const afterText = fit.after.fits && fit.after.grams !== null ? `suits after training: ${count(fit.after.grams)} gives about ${Math.round((snapToServing(d, fit.after.grams) * (d.protein ?? 0)) / 100)} g protein, your ${fit.after.floor} g` : fit.after.reason;
+        const count = (grams: number) => (sv ? `${servingsFor(d, grams)} ${sv.name}${servingsFor(d, grams) === 1 ? "" : "s"}, ${snapToServing(d, grams)} g` : w("app.aboutG", { g: grams }));
+        const beforeText = fit.before.fits && fit.before.grams !== null ? w("app.beforeFits", { amount: count(fit.before.grams), carbs: Math.round((snapToServing(d, fit.before.grams) * (d.carbs ?? 0)) / 100), day: dayName(day?.type ?? "passive") }) : fit.before.reason;
+        const afterText = fit.after.fits && fit.after.grams !== null ? w("app.afterFits", { amount: count(fit.after.grams), protein: Math.round((snapToServing(d, fit.after.grams) * (d.protein ?? 0)) / 100), floor: fit.after.floor }) : fit.after.reason;
         return (
           <section className="fit-lines" aria-label={w("app.howItFits")}>
             <p className="label">{w("app.howItFits")}</p>
-            <p className="fit-pd"><b>{pdText(pd)}</b><small>{fmt(d.protein)} g protein per {fmt(d.calories, 0)} kcal{sv ? ` · 1 ${sv.name} is ${sv.grams} g, ${Math.round((sv.grams * (d.calories ?? 0)) / 100)} kcal and ${Math.round((sv.grams * (d.protein ?? 0)) / 100 * 10) / 10} g protein` : ""}</small></p>
-            <p className={`fit-line ${ownClass}`}><b>On its own:</b> {ownText}.</p>
-            <p className={`fit-line ${fit.before.fits ? "ok" : pb.beforeTraining.ok ? "mid" : "no"}`} title={SOURCES.preCarb}><b>Before training:</b> {cap(beforeText)}.</p>
-            <p className={`fit-line ${fit.after.fits ? "ok" : "no"}`} title={SOURCES.proteinDose}><b>After training:</b> {cap(afterText)}.</p>
-            {pb.caveats.length > 0 && <p className="fit-line no"><b>Label:</b> {cap(pb.caveats.join(", "))}.</p>}
-            {allergies && allergyHits(d, allergies).length > 0 && <p className="fit-line no"><b>Contains what you avoid:</b> {allergyHits(d, allergies).join(", ")}. Never suggested; shown so you can see it.</p>}
+            <p className="fit-pd"><b>{pdText(pd)}</b><small>{w("app.gProteinPer", { protein: fmt(d.protein), kcal: fmt(d.calories, 0) })}{sv ? ` · ${w("app.servingIs", { name: sv.name, g: sv.grams, kcal: Math.round((sv.grams * (d.calories ?? 0)) / 100), protein: fmt(Math.round((sv.grams * (d.protein ?? 0)) / 100 * 10) / 10) })}` : ""}</small></p>
+            <p className={`fit-line ${ownClass}`}><b>{w("app.onItsOwn")}</b> {ownText}.</p>
+            <p className={`fit-line ${fit.before.fits ? "ok" : pb.beforeTraining.ok ? "mid" : "no"}`} title={SOURCES.preCarb}><b>{w("app.beforeTrainingLabel")}</b> {cap(beforeText)}.</p>
+            <p className={`fit-line ${fit.after.fits ? "ok" : "no"}`} title={SOURCES.proteinDose}><b>{w("app.afterTrainingLabel")}</b> {cap(afterText)}.</p>
+            {pb.caveats.length > 0 && <p className="fit-line no"><b>{w("app.labelLabel")}</b> {cap(pb.caveats.join(", "))}.</p>}
+            {allergies && allergyHits(d, allergies).length > 0 && <p className="fit-line no"><b>{w("app.containsAvoid")}</b> {w("app.neverSuggested", { list: allergyHits(d, allergies).join(", ") })}</p>}
             {t && <p className="fit-line today">{t}</p>}
           </section>
         );
@@ -609,7 +607,7 @@ function LabelCheck({
         <div className="lt-add">
           <select value={addKey} onChange={(e) => setAddKey(e.target.value)} aria-label={w("app.whichLine")}>
             {KNOWN.filter((k) => !k.core && !rows.some((r) => r.key === k.key)).map((k) => <option key={k.key} value={k.key}>{k.name}</option>)}
-            <option value="other">Other…</option>
+            <option value="other">{w("app.otherLine")}</option>
           </select>
           {addKey === "other" && <input placeholder={w("app.nameAsPrinted")} value={addName} onChange={(e) => setAddName(e.target.value)} />}
           <div className="lt-add-row">
@@ -625,10 +623,10 @@ function LabelCheck({
           </div>
         </div>
       ) : (
-        <button className="link" onClick={() => { const first = KNOWN.find((k) => !k.core && !rows.some((r) => r.key === k.key)); setAddKey(first?.key ?? "other"); setAddUnit(first?.unit ?? "g"); setAdding(true); }}>+ Add a line, from the pack or the maker's website</button>
+        <button className="link" onClick={() => { const first = KNOWN.find((k) => !k.core && !rows.some((r) => r.key === k.key)); setAddKey(first?.key ?? "other"); setAddUnit(first?.unit ?? "g"); setAdding(true); }}>{w("app.addLine")}</button>
       )}
       <label>
-        Label notes / preparation state
+        {w("app.labelNotes")}
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -641,7 +639,7 @@ function LabelCheck({
           checked={ready}
           onChange={(e) => setReady(e.target.checked)}
         />{" "}
-        Ready to eat and suitable for cold mixing
+        {w("app.readyCold")}
       </label>
       <label className="check">
         <input
@@ -649,11 +647,10 @@ function LabelCheck({
           checked={reviewed}
           onChange={(e) => setReviewed(e.target.checked)}
         />{" "}
-        I checked the values, per-100-g basis and carbohydrate/fibre convention.
+        {w("app.iChecked")}
       </label>
       <p className="small">
-        For a per-100-ml or per-serving label, convert from a known mass before
-        saving. Do not assume ml equals g. Leave undeclared nutrients blank.
+        {w("app.perMlNote")}
       </p>
       {errors.map((e) => (
         <p className="notice" key={e}>
@@ -677,7 +674,7 @@ function LabelCheck({
             {tip.mixes.map((m) => (
               <button key={m.id} className="mix-chip" onClick={() => { pendingMix.current = m; submit(); }}>
                 <b>{mixLabel(m)}</b>
-                <small>{pdText(m.pd)} · {m.kcal} kcal · {m.kind}{m.cooking ? " · cooking" : ""}{m.fromStarter.length ? " · from the starter set" : ""}</small>
+                <small>{pdText(m.pd)} · {m.kcal} kcal · {m.kind}{m.cooking ? ` · ${w("app.mixCooking")}` : ""}{m.fromStarter.length ? ` · ${w("app.mixFromStarter")}` : ""}</small>
               </button>
             ))}
             <p className="small">{w("app.aTapSavesTheFood")}</p>
@@ -708,13 +705,12 @@ function GoalsEditor({
   return (
     <Modal title={w("app.yourDailyReference")} close={close}>
       <p>
-        Enter your existing plan or targets agreed with your coach. Blank fields
-        stay unknown. These are daily amounts, not one meal's targets.
+        {w("app.goalsEditorWhy")}
       </p>
       <div className="form-grid">
         {KEYS.map((k) => (
           <label key={k}>
-            {LABELS[k]} ({k === "calories" ? "kcal" : "g"})
+            {w(NUTRIENT_WORD[k])} ({k === "calories" ? "kcal" : "g"})
             <input
               inputMode="decimal"
               value={values[k]}
@@ -725,13 +721,7 @@ function GoalsEditor({
         ))}
       </div>
       <p className="small">
-        Reference PD:{" "}
-        {fmt(
-          density(numberInput(values.protein), numberInput(values.calories)),
-          2,
-        )}{" "}
-        g protein per 100 kcal. Changing the reference does not change a food's
-        density.
+        {w("app.referencePd", { pd: fmt(density(numberInput(values.protein), numberInput(values.calories)), 2) })}
       </p>
       {error && <p className="notice">{error}</p>}
       <button
@@ -745,7 +735,7 @@ function GoalsEditor({
                   numberInput(values[k]) === 0),
             )
           ) {
-            setError("Enter positive targets, or leave a field blank.");
+            setError(w("app.positiveTargets"));
             return;
           }
           save(
@@ -986,7 +976,7 @@ export default function App() {
       r.known = c.next; saveKnown(uid, r.known);
       if (r.pulled && !remoteMeta.current.recordsMovedAt) { await markRecordsMoved(uid); remoteMeta.current = { ...remoteMeta.current, recordsMovedAt: new Date().toISOString() }; }
     } catch (e) {
-      setCloudStatus({ ok: true, text: `Saved. Records: ${explainCloudError(e)}`, at: new Date().toISOString() });
+      setCloudStatus({ ok: true, text: w("app.savedRecords", { why: explainCloudError(e) }), at: new Date().toISOString() });
     } finally {
       r.running = false;
       if (r.again) { const p = r.againPull; r.again = false; r.againPull = false; void syncRecords(p); }
@@ -1023,11 +1013,11 @@ export default function App() {
           await deletePhotoFile(fr.uid, fileOf(k)); fr.up.delete(k); saveUp();
         }
       } while (fr.again);
-      if (sent) setCloudStatus({ ok: true, text: `Saved to your account, with ${sent} photo${sent === 1 ? "" : "s"}`, at: new Date().toISOString() });
+      if (sent) setCloudStatus({ ok: true, text: wn("app.savedWithPhotos", sent), at: new Date().toISOString() });
       // 0.3.71: a loose photo's file is up: the next save names it in the account's copy in place of the photo
       if (looseSent) setFilesTick((t) => t + 1);
     } catch (e) {
-      setCloudStatus({ ok: true, text: `Saved to your account. Photos: ${explainCloudError(e)}`, at: new Date().toISOString() });
+      setCloudStatus({ ok: true, text: w("app.savedPhotosWhy", { why: explainCloudError(e) }), at: new Date().toISOString() });
     } finally { fr.running = false; }
   };
   const syncPhotoStore = () => {
@@ -1128,7 +1118,7 @@ export default function App() {
       }
       return { ...s, foods, items };
     });
-    notify(`${twins.length === 1 ? w("app.twoEntriesOfTheSame") : `${twins.length + 1} entries of the same foods`} folded into one.`);
+    notify(twins.length === 1 ? `${w("app.twoEntriesOfTheSame")} ${w("app.foldedIntoOne")}` : w("app.entriesFolded", { n: twins.length + 1 }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.foods.length]);
   // DT115 (0.2.97): every reviewed food of yours goes to the members' catalogue once (no photo, no name); a food changed after
@@ -1161,7 +1151,7 @@ export default function App() {
     try {
       if (unreadableBackup !== null) {
         setError(
-          "Stored pilot data could not be read. It has been preserved. Export the recovery backup before importing a valid backup or clearing this site's data.",
+          w("app.storedUnreadable"),
         );
         return;
       }
@@ -1180,7 +1170,7 @@ export default function App() {
       prevFoodIds.current = state.foods.map((f) => f.id);
     } catch {
       setError(
-        "This browser could not save your changes. Export a backup before leaving.",
+        w("app.browserCouldNotSave"),
       );
     }
   }, [state]);
@@ -1252,7 +1242,7 @@ export default function App() {
           setCloudStatus({ ok: true, text: w("app.thisPhoneHasNewerChanges"), at: new Date().toISOString() });
           void up().then(() => setCloudStatus({ ok: true, text: w("app.thisPhoneHadNewerChanges"), at: new Date().toISOString() }))
             .catch(() => window.setTimeout(() => void up().then(() => setCloudStatus({ ok: true, text: w("app.thisPhoneHadNewerChanges"), at: new Date().toISOString() }))
-              .catch((e) => setCloudStatus({ ok: false, text: `Not saved yet: ${explainCloudError(e)}` })), 30000));
+              .catch((e) => setCloudStatus({ ok: false, text: w("app.notSavedYetWhy", { why: explainCloudError(e) }) })), 30000));
         } else if (remote && !(isEmptyState(remote.state) && !remote.recordsOnly && !isEmptyState(state))) {
           // (0.3.68) a block that holds only the plate and settings (recordsOnly) is a real account copy, never an empty one
           // a real account copy replaces the phone; photos are merged back from the phone by id
@@ -1297,16 +1287,16 @@ export default function App() {
           setCloudStatus({ ok: true, text: w("app.savingToYourAccount"), at: new Date().toISOString() });
           void saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() })
             .then(() => setCloudStatus({ ok: true, text: w("app.savedToYourAccount"), at: new Date().toISOString() }))
-            .catch((e) => setCloudStatus({ ok: false, text: `Not saved yet: ${explainCloudError(e)}` }));
+            .catch((e) => setCloudStatus({ ok: false, text: w("app.notSavedYetWhy", { why: explainCloudError(e) }) }));
         }
       } catch (e: any) {
         if (stale) return;
-        const why = e?.message === "timeout" ? "the connection is too slow right now" : explainCloudError(e);
-        setCloudStatus({ ok: false, text: `Not connected: ${why}` });
+        const why = e?.message === "timeout" ? w("app.tooSlow") : explainCloudError(e);
+        setCloudStatus({ ok: false, text: w("app.notConnected", { why }) });
         // never send this phone's copy over the account before the account was read: open on the phone's copy,
         // keep what is changed here, and try the account again in half a minute
         localMode.current = true;
-        setError(`Could not reach your account: ${why}. Working on this phone for now; Chef Mealan keeps trying.`);
+        setError(w("app.couldNotReach", { why }));
         setProfileReady(true);
         setTimeout(() => setLoadTry((n) => n + 1), 30000);
         return;
@@ -1357,7 +1347,7 @@ export default function App() {
           if (!meta.photosOldGoneAt && Date.now() - Date.parse(meta.photosMovedAt) > 30 * 86_400_000) await dropOldPhotoCopies(filesFor).catch(() => {});
           await pullFiles(true);
         }
-      } catch (e) { setCloudStatus({ ok: true, text: `Loaded. Photos: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
+      } catch (e) { setCloudStatus({ ok: true, text: w("app.loadedPhotos", { why: explainCloudError(e) }), at: new Date().toISOString() }); }
       if (stale) return;
       fr.ready = true;
       void syncFiles();
@@ -1396,7 +1386,7 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid, profile.role, profile.coachId]);
   const fromCoach = unseenFromCoach(coachThread.notes) + inbox.length;
-  useEffect(() => { if (coachSeen.current >= 0 && fromCoach > coachSeen.current) notify(`${profile.coachName ? profile.coachName.split(" ")[0] : w("app.yourCoach")} sent you something. It is on Today.`); coachSeen.current = fromCoach; /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [fromCoach]);
+  useEffect(() => { if (coachSeen.current >= 0 && fromCoach > coachSeen.current) notify(w("app.coachSentSomething", { coach: profile.coachName ? profile.coachName.split(" ")[0] : w("app.yourCoach") })); coachSeen.current = fromCoach; /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [fromCoach]);
   // coach: how many cards were shared since I last looked
   // DT189 (0.3.31, board Stories138, Milan 17:42): the badge used to clear the moment Clients opened, so the count vanished
   // before anything was reached. Now the badge is the Waiting for you list's count, and a row leaves it only when handled.
@@ -1443,7 +1433,7 @@ export default function App() {
           setGoalState(getGoal());
           const g = (remote.state as any)?.goals;
           if (g) setState((s) => ({ ...s, goals: { ...s.goals, calories: g.calories ?? s.goals.calories, protein: g.protein ?? s.goals.protein } }));
-          notify(`${remote.coachName || w("app.yourCoach")} set your goal.`);
+          notify(w("app.coachSetGoal", { coach: remote.coachName || w("app.yourCoach") }));
         }
       } catch { /* offline, ignore */ }
     };
@@ -1494,13 +1484,13 @@ export default function App() {
     try { localStorage.setItem("chefmealan-coachgoal-at", cg.at); } catch {}
     const m = macroSplit(cg.kcal, cg.protein);
     const x = { band: cg.band, source: "coach" as const, setBy: "coach" as const, kcal: cg.kcal, protein: cg.protein, fats: m.fats, carbs: m.carbs };
-    if (cg.from > ymd(new Date())) { const next: Personal = { ...getPersonal(), nextGoal: { ...x, from: cg.from, at: cg.at } }; storePersonal(next); setPersonalState(next); notify(`${remote.coachName || w("app.yourCoach")} set your next goal, from ${new Date(`${cg.from}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}.`); }
-    else { applyGoalNow(x); notify(`${remote.coachName || w("app.yourCoach")} set your goal.`); }
+    if (cg.from > ymd(new Date())) { const next: Personal = { ...getPersonal(), nextGoal: { ...x, from: cg.from, at: cg.at } }; storePersonal(next); setPersonalState(next); notify(w("app.coachSetNextGoal", { coach: remote.coachName || w("app.yourCoach"), date: dateText(new Date(`${cg.from}T12:00:00`), { weekday: "long", day: "numeric", month: "long" }, "en-GB").replace(",", "") })); }
+    else { applyGoalNow(x); notify(w("app.coachSetGoal", { coach: remote.coachName || w("app.yourCoach") })); }
   }
   // Got it and Reply on the coach's note (CW5): on this phone at once, then in the account
   function saveNotes(notes: CoachNote[]) {
     const c = { ...coachThread, notes }; setCoachLocal(c); setCoachThread(c);
-    if (user && cloudEnabled) void saveOwnNotes(user.uid, notes).catch(() => notify("Not saved to your account yet. It stays on this phone."));
+    if (user && cloudEnabled) void saveOwnNotes(user.uid, notes).catch(() => notify(w("app.notSavedStays")));
   }
   // the goal and profile as they are now, for numbersOfDay when it is given another goal (board FX)
   const goalNow = goal, personalNow = personal;
@@ -1613,7 +1603,7 @@ export default function App() {
           // photos go up as files, by the photo sync: see syncFiles
           void syncFiles();
         })
-        .catch((e) => setCloudStatus({ ok: false, text: `Not saved: ${explainCloudError(e)}` }));
+        .catch((e) => setCloudStatus({ ok: false, text: w("app.notSavedWhy", { why: explainCloudError(e) }) }));
     };
     const t = window.setTimeout(run, 3000);
     pendingSave.current = run;
@@ -1684,15 +1674,15 @@ export default function App() {
     if (scanFrom === "today") { setScanFrom(null); setCamera(false); setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); setWhere(f); return; }
     // DT82 (Tester 3, 23 October 2026): Scan or Manual on the Plate puts the food on the plate and keeps it in My foods, as
     // decided in 0.2.25 (RP5); a food already on the plate is only updated there
-    if (opts?.plate) { setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); if (!state.items.some((i) => libraryId(i.food.id) === f.id)) add(f); else notify(`Updated ${f.name}.`); return; }
-    if (existed && f.reviewedAt) { setEdit(null); setImageSet([]); notify(`Updated ${f.name}.`); return; }
+    if (opts?.plate) { setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); if (!state.items.some((i) => libraryId(i.food.id) === f.id)) add(f); else notify(w("app.updatedFood", { name: f.name })); return; }
+    if (existed && f.reviewedAt) { setEdit(null); setImageSet([]); notify(w("app.updatedFood", { name: f.name })); return; }
     setEdit(null);
     setPending((p) =>
       p.filter((x) => x.name !== f.name || x.brand !== f.brand),
     );
     // journey invariant (Milan, 7 October 2026): a new food added on Foods opens its card, so you see what was saved
-    if (opts?.open) { setOpenFoodId(f.id); setTab("foods"); notify(`${f.name} is in your foods.`); return; }
-    notify(`${f.name} is in your foods.`);
+    if (opts?.open) { setOpenFoodId(f.id); setTab("foods"); notify(w("app.inYourFoods", { name: f.name })); return; }
+    notify(w("app.inYourFoods", { name: f.name }));
   }
   // 0.2.121 (Tester 2, Milan 28 October 15:28): a number field kept the focus, and few keyboards have an Enter key. Every field
   // shows a Done key (enterkeyhint), Enter finishes it, and a tap outside any field finishes it too; the value counts then.
@@ -1730,7 +1720,7 @@ export default function App() {
         .filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), reviewedAt: now, places: STARTER_REGION[f.id] ? [place] : [] }));
       const named = new Set(s.foods.flatMap((f) => [f.name, ...(f.aliases ?? [])]).map((n) => n.toLowerCase()));
       const local = marketFoods(tags).filter((r) => ![r.en, r.de, r.sr, r.cyr, r.el ?? ""].some((n) => n && named.has(n.toLowerCase()))).map((r) => ({ ...referenceFood(r, place, uid), places: [place] }));
-      notify(add.length + local.length ? `${add.length + local.length} starter foods added${local.length ? `, ${local.length} of them local` : ""}.` : w("app.starterFoodsAreAlreadyIn"));
+      notify(add.length + local.length ? (local.length ? w("app.starterAddedLocal", { n: add.length + local.length, local: local.length }) : w("app.starterAdded", { n: add.length + local.length })) : w("app.starterFoodsAreAlreadyIn"));
       return { ...s, foods: [...s.foods, ...add, ...local] };
     });
     const st = getStarted(); if (!st.includes(place)) setStarted([...st, place]);
@@ -1763,7 +1753,7 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.items.length]);
   // a trip is over the day after its last day: its place goes off, its foods wait with it
-  useEffect(() => { if (tripOver(trip, todayKeyP)) { setTrip(null); setTripState(null); notify(`Back from ${REGIONS.find((r) => r.id === trip!.place)?.name ?? "your trip"}: its foods are put away. Switch it on in Where I shop to bring them back.`); } }, [trip, todayKeyP]);
+  useEffect(() => { if (tripOver(trip, todayKeyP)) { setTrip(null); setTripState(null); notify(w("app.backFromTrip", { place: REGIONS.find((r) => r.id === trip!.place)?.name ?? w("app.yourTrip") })); } }, [trip, todayKeyP]);
   // DT135 (0.2.116): set by the Plate from the open meal; Add puts a food on at that meal's normal portion
   const mealScaleRef = useRef(1);
   // DT206 (0.3.48; Coach Milan 1 November 19:42: a photo's plate from 13:11 still waited at 19:40, and a scanned beer joined
@@ -1779,8 +1769,8 @@ export default function App() {
     }
     if (!asked && plateOld()) {
       const at = plateSince()!, hm = `${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}`;
-      const when = ymd(at) === ymd(new Date()) ? hm : `${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][at.getDay()]} ${hm}`;
-      askPlate({ kind: "food", what: `${food0.name} would join a plate from ${when}.`, apply: (how) => {
+      const when = ymd(at) === ymd(new Date()) ? hm : w("app.dayAndTime", { day: weekdayName((at.getDay() + 6) % 7), time: hm });
+      askPlate({ kind: "food", what: w("app.wouldJoinPlate", { name: food0.name, when }), apply: (how) => {
         if (how === "new") setState((s) => ({ ...s, items: [], portion: null, title: "", fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined, plateAt: undefined }));
         add(food0, true);
       } });
@@ -1807,7 +1797,7 @@ export default function App() {
     }));
     setStep("in");
     setTab("journey");
-    notify(food.serving ? `Added: 1 ${food.serving.name}, ${fmt(food.serving.grams, 0)} g. Set the amount you actually have.` : w("app.addedSetTheAmountYou"));
+    notify(food.serving ? w("app.addedServing", { name: food.serving.name, g: fmt(food.serving.grams, 0) }) : w("app.addedSetTheAmountYou"));
   }
   // the photo that shows the front goes first: it becomes the main photo and the card's picture
   const frontFirst = (images: string[], front: number) => { const i = Number(front) - 1; return i > 0 && i < images.length ? [images[i], ...images.filter((_, j) => j !== i)] : images; };
@@ -1846,7 +1836,7 @@ export default function App() {
           setImageSet(ordered);
           setEdit(candidateFood(one, "Photos · review required"));
         } else {
-          setPending(entities.map((x: any) => ({ name: x.product_name || "Unknown item", brand: x.brand || "", values: read(x) ? x : undefined })));
+          setPending(entities.map((x: any) => ({ name: x.product_name || w("app.unknownItem"), brand: x.brand || "", values: read(x) ? x : undefined })));
           setTab("foods");
           notify(entities.some(read) ? w("app.productsFoundReviewTheOnes") : w("app.productsFoundEnterEachLabel"));
         }
@@ -1854,7 +1844,7 @@ export default function App() {
         if (!data.success)
           throw new Error(
             data.error_reason ||
-              "Label could not be read. Try another photo or enter it manually.",
+              w("app.labelUnreadable"),
           );
         const ordered = frontFirst(images, data.front_image);
         setImage(ordered[0]);
@@ -1890,11 +1880,11 @@ export default function App() {
   }
   async function lookup(code = barcode) {
     if (!/^\d{8,14}$/.test(code.trim())) {
-      setError("Enter a numeric barcode with 8–14 digits.");
+      setError(w("app.barcodeNumeric"));
       return;
     }
     const run = ++runRef.current;
-    setBusy("Looking up product…");
+    setBusy(w("app.lookingUp"));
     setCamera(false);
     setError("");
     setImage("");
@@ -1907,13 +1897,13 @@ export default function App() {
       else if (local) {
         setOpenFoodId(local.id);
         setTab("foods");
-        notify("Already in your foods.");
+        notify(w("app.alreadyInFoods"));
       } else {
         const d0 = await api(`/api/product/${code.trim()}`);
         if (run !== runRef.current) return;
         const ph = await dbPhotosOf(d0);
         if (run !== runRef.current) return;
-        if (ph.nutrition) setBusy("Reading the nutrition photo…");
+        if (ph.nutrition) setBusy(w("app.readingNutrition"));
         const d = await withPhotoLines(d0, ph.nutrition, code.trim());
         if (run !== runRef.current) return;
         setDbPhotos([ph.front, ph.nutrition].filter(Boolean) as string[]);
@@ -1933,9 +1923,9 @@ export default function App() {
     const c = code.trim();
     const local = state.foods.find((f) => f.barcode === c);
     if (local && tab === "journey") { setCamera(false); add(local); return; }
-    if (local) { setCamera(false); setOpenFoodId(local.id); setTab("foods"); notify("Already in your foods."); return; }
+    if (local) { setCamera(false); setOpenFoodId(local.id); setTab("foods"); notify(w("app.alreadyInFoods")); return; }
     const run = ++runRef.current;
-    setBusy("Looking up product…"); setError(""); setCamera(false);
+    setBusy(w("app.lookingUp")); setError(""); setCamera(false);
     let db: any = null;
     try { db = await api(`/api/product/${c}`); } catch { db = null; }
     if (run !== runRef.current) return;
@@ -1976,7 +1966,7 @@ export default function App() {
     const t = aggregate(state.items),
       p = state.portion ?? t.weight;
     if (!p || p > t.weight) {
-      setError("Set a valid portion before saving.");
+      setError(w("app.validPortion"));
       return;
     }
     const meal: Meal = {
@@ -1987,7 +1977,7 @@ export default function App() {
       savedAt: new Date().toISOString(),
     };
     setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
-    notify("Recipe saved. It has not been recorded as eaten.");
+    notify(w("app.recipeSavedNotEaten"));
   }
   // Today's four numbers: the week's average, unless each day has its own and today's day is picked; then that day's row,
   // calculated from the profile, or the coach's or the person's own numbers for that day.
@@ -2045,19 +2035,19 @@ export default function App() {
     // its own number, the time of day and the average protein, so a slot's plate fell short of the slot's target)
     const target = pdRef;
     if (target === null || target <= 0) {
-      setError("Set daily energy and protein targets first.");
+      setError(w("app.setTargetsFirst"));
       return false;
     }
     const selected = itemsIn.find((x) => x.id === id);
     if (!selected || selected.locked) {
-      setError("Let Chef Mealan move one product. Everything else stays as you set it.");
+      setError(w("app.moveOneProduct"));
       return false;
     }
     if (
       !selected.food.readyToEat ||
       itemsIn.some((x) => !x.food.readyToEat)
     ) {
-      setError("Chef Mealan mixes foods you can eat as they are.");
+      setError(w("app.mixesReadyFoods"));
       return false;
     }
     if (
@@ -2065,7 +2055,7 @@ export default function App() {
         (x) => x.trim() !== "" && numberInput(x) === null,
       )
     ) {
-      setError("Meal limits must be non-negative numbers, or blank.");
+      setError(w("app.mealLimits"));
       return false;
     }
     const max = numberInput(limits.maxWeight),
@@ -2073,7 +2063,7 @@ export default function App() {
       maxE = numberInput(limits.maxKcal);
     // a dessert (Y1, 10 October 2026) takes about a tenth of the day, from what is left of it; never under 100 kcal so a real portion fits
     const dessertCap = kind === "dessert" ? dessertKcal() : null;
-    let reason = "No candidate meets the selected constraints.";
+    let reason = w("app.noCandidate");
     // the person's food first and always; a swap is only offered when it goes with the rest of the plate, and a drink never is
     const others = itemsIn.filter((x) => x.id !== id).map((x) => x.food);
     const foods = [
@@ -2115,11 +2105,11 @@ export default function App() {
     }
     setOptions(results.slice(0, 8));
     if (!results.length)
-      setError(reason + " You can change a limit or choose another food.");
+      setError(`${reason} ${w("app.changeALimit")}`);
     return results.length > 0;
   }
   async function personalize() {
-    setBusy("Considering your taste preferences…");
+    setBusy(w("app.consideringTaste"));
     try {
       const data = await api("/api/chef", {
         preferences: state.preferences,
@@ -2147,7 +2137,7 @@ export default function App() {
           .filter(Boolean),
       );
       notify(
-        "Suggestions ranked from the calculated options. Check ingredients and taste before choosing.",
+        w("app.suggestionsRanked"),
       );
     } catch (e: any) {
       setError(e.message);
@@ -2301,10 +2291,10 @@ export default function App() {
       // photos taken on another phone that haven't arrived yet: adding now would take the place of one of them
       const f0 = stateRef.current.foods.find((f) => f.id === foodId) as any;
       if (f0 && !f0.photos?.length && !f0.photo && ((f0.photoSigs ?? []).some(Boolean) || (f0.photoCount ?? 0) > 0)) {
-        void pullFiles(); setError("This food's photos are still coming from your account. Try again in a moment."); return;
+        void pullFiles(); setError(w("app.photosStillComing")); return;
       }
       const [thumb, big] = await Promise.all([thumbnailBase64(dataUrl).catch(() => ""), resizeImageBase64(dataUrl, 900, 900).catch(() => "")]);
-      if (!big) { setError("This photo could not be read. Try another one."); return; }
+      if (!big) { setError(w("app.photoUnreadable")); return; }
       // a food's picture stays its first photo (journey invariant, 5 October 2026: the picture plus the added photos); a
       // drawn picture is not a photo, so the first real photo added becomes the main one and the picture (board C9)
       setState((s) => ({ ...s, foods: s.foods.map((f) => {
@@ -2312,21 +2302,21 @@ export default function App() {
         const had = realPhotosOf(f);
         return { ...f, photo: (had.length && f.photo && !isDrawn(f.photo) ? f.photo : thumb) || undefined, photos: [...had, big].slice(0, 6) };
       }) }));
-      notify("Photo added.");
+      notify(w("app.photoAdded"));
     },
     openFoodId, clearOpenFood: () => setOpenFoodId(null),
     // 0.2.56 (board DS4, F): open one food in Foods, from the note under Today's numbers
     openFood: (id: string) => { setMenuSection(null); setOpenFoodId(id); setTab("foods"); },
     setFoodJob: (foodId: string, job: string | null) => {
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, job: job || undefined } : x)) }));
-      notify(job ? `Labelled ${job.toLowerCase()}.` : w("app.backToChefMealanS"));
+      notify(job ? w("app.labelled", { job: job.toLowerCase() }) : w("app.backToChefMealanS"));
     },
     eatenTodayKcal: (() => {
       const today = new Date().toDateString();
       return state.feedback.filter((f) => f.status !== "not-used" && new Date(f.createdAt).toDateString() === today)
         .reduce((s, f) => s + f.meal.items.reduce((t, i) => t + ((i.food.calories ?? 0) * i.grams) / 100, 0), 0);
     })(),
-    dayName: dayModeOf(personal) === "each" && day.type ? dayNameOf(day.type) : "Today",
+    dayName: dayModeOf(personal) === "each" && day.type ? dayNameOf(day.type) : w("tab.today"),
     tipGoalKey: `${goal?.band ?? "none"}|${pdRef ?? "none"}|pb1`,
     requestTip: async (foodId: string) => {
       if (!ai.on) { notify(ai.why || FIXED.off); return; }
@@ -2353,7 +2343,7 @@ export default function App() {
       const now = at ?? new Date().toISOString(), meal = plannedPortion(m, m.mealId ?? uid(), now);
       if (!meal) return;
       setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten", slot, ...(m.mealId ? { recipeId: m.mealId } : {}), taste: "", notes: "", createdAt: now, dayType: !at && dayModeOf(personal) === "each" && day.type ? day.type : undefined } as Feedback, ...s.feedback] }));
-      notify("Logged, as planned.");
+      notify(w("app.loggedAsPlanned"));
     },
     // DT149 (0.2.130): what you ate at a meal of a day gone by, from the Plate: counted at that meal's time, nothing to rate
     logEaten: (items: Ingredient[], title: string, slot: NonNullable<Feedback["slot"]>, at: string, recipeId?: string) => {
@@ -2368,7 +2358,7 @@ export default function App() {
       if (card && how === "eaten" && (card.left ?? 0) > 1) {
         const now = new Date().toISOString();
         setState((s) => ({ ...s, feedback: [{ ...structuredClone(card), id: uid(), status: "eaten", left: undefined, createdAt: now, taste: card.taste || "Good", ...asMeal }, ...s.feedback.map((f) => (f.id === id ? { ...f, left: (f.left ?? 1) - 1 } : f))] }));
-        notify(`Logged. ${(card.left ?? 1) - 1} left.`); return;
+        notify(w("app.loggedLeft", { n: (card.left ?? 1) - 1 })); return;
       }
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, status: how, left: undefined, createdAt: how === "eaten" ? new Date().toISOString() : f.createdAt, taste: how === "eaten" ? f.taste || "Good" : f.taste, ...asMeal } : f)) }));
       notify(how === "eaten" ? w("app.logged") : w("app.droppedForToday"));
@@ -2389,7 +2379,7 @@ export default function App() {
         const first = rest[0];
         thumbnailBase64(first).then((t) => { if (t) setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id === foodId && f.photos?.[0] === first ? { ...f, photo: t } : f)) })); }).catch(() => {});
       }
-      notify("Photo removed.");
+      notify(w("app.photoRemoved"));
     },
     // Make it the main photo (board C9): it moves to the front, and becomes the food's picture everywhere
     setMainPhoto: (foodId: string, index: number) => {
@@ -2398,7 +2388,7 @@ export default function App() {
       if (!chosen || index === 0) return;
       setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id !== foodId ? f : { ...f, photos: [chosen, ...list.filter((_, i) => i !== index)] })) }));
       thumbnailBase64(chosen).then((t) => { if (t) setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id === foodId && f.photos?.[0] === chosen ? { ...f, photo: t } : f)) })); }).catch(() => {});
-      notify("That's the main photo now.");
+      notify(w("app.mainPhotoNow"));
     },
     mergeInLibrary: (keepId: string, otherId: string, name: string) => {
       setState((s) => {
@@ -2407,7 +2397,7 @@ export default function App() {
         const merged = mergeFoods(keep, other, name);
         return { ...s, foods: s.foods.filter((x) => x.id !== otherId).map((x) => (x.id === keepId ? merged : x)), items: repoint(repoint(s.items, otherId, merged), keepId, merged) };
       });
-      notify("Merged into one food.");
+      notify(w("app.mergedOne"));
     },
     goalLog, formula: profile.formula ?? null, todayKcal, dayType: day.type, day, setDayType: (d: DayType | null) => { const next = withDated(personal, new Date(), d ? dayOfLoad(d) : null); storePersonal(next); setPersonalState(next); setDayState(getDay(next)); },
     // today's plan, for this date only; the Training week stays
@@ -2436,7 +2426,7 @@ export default function App() {
       if (!getStarted().includes(place)) addStarterFor(place);
     },
     unusedOf: (place: string) => { const used = usedIds(state, getPlanned()); return state.foods.filter((f) => (f.places ?? []).includes(place) && !used.has(f.id)); },
-    deleteUnused: (place: string) => { const used = usedIds(state, getPlanned()); let n = 0; setState((s) => ({ ...s, foods: s.foods.filter((f) => { const out = (f.places ?? []).includes(place) && (f.places ?? []).length === 1 && !used.has(f.id); if (out) n++; return !out; }) })); notify(`${n} unused ${n === 1 ? "food" : "foods"} deleted.`); },
+    deleteUnused: (place: string) => { const used = usedIds(state, getPlanned()); let n = 0; setState((s) => ({ ...s, foods: s.foods.filter((f) => { const out = (f.places ?? []).includes(place) && (f.places ?? []).length === 1 && !used.has(f.id); if (out) n++; return !out; }) })); notify(wn("app.unusedDeleted", n)); },
     setTrip: (t: Trip | null) => { setTrip(t); setTripState(t); },
     setFoodPlaces: (id: string, places: string[]) => setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id === id ? { ...f, places } : f)) })),
     numbersFor: (date: Date) => numbersOfDate(date),
@@ -2463,12 +2453,12 @@ export default function App() {
     openMenu: (s?: MenuSection, from?: MenuSection) => { if (s === "explorer") { setMenuSection(null); setTalkOpen(false); setTab("explorer"); return; } setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
     foodsView, setFoodsView, saveFood, setEditFrom,
     // a product picked from the search opens the sheet titled by the button that picked it
-    addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
+    addFromDatabase: (code: string) => { setEditTitle(w("app.addToMyFoods")); lookup(code); },
     searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (shopRegion ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
     // DT127 (0.2.108, board Stories75): a photo of the meal in front of you, read onto the Plate as estimates
     readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string }) => {
       const more0 = (x?.more ?? []).slice(0, 3), note = (x?.note ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
-      setBusy(more0.length ? `Reading your ${more0.length + 1} photos…` : w("app.readingYourPlate"));
+      setBusy(more0.length ? w("app.readingPhotos", { n: more0.length + 1 }) : w("app.readingYourPlate"));
       try {
         // DT228 v2 (0.3.63, board Stories168): the other photos of the meal and the person's words go with the photo, in one read
         const [sent, thumb, moreSent, moreThumbs] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640),
@@ -2517,7 +2507,7 @@ export default function App() {
         };
         setPhotoAsk(null);
         if (x?.replace) { land("new"); setTab("journey"); log("meal_photo", { foods: items.length, again: true }); return true; }
-        askPlate({ kind: "photo", what: `The photo read ${items.length} ${items.length === 1 ? "food" : "foods"}: ${items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ")}.`, image: thumb, apply: land });
+        askPlate({ kind: "photo", what: wn("app.photoRead", items.length, { list: items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ") }), image: thumb, apply: land });
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
         log("meal_photo", { foods: items.length, unsure: Boolean(read.unsure), who: x?.who ?? "camera" });
         return true;
@@ -2527,20 +2517,20 @@ export default function App() {
     retryPhoto: () => { const l = photoLost; if (!l) return; setPhotoLost(null); void screenProps.readMealPhoto(l.image, l.x); },
     // DT175 (0.3.17, board Stories122): Say what you have: the foods named, by voice or typed, land on the Plate as estimates
     plateFromWords: async (text: string) => {
-      setBusy("Chef Mealan is listing your foods…");
+      setBusy(w("app.listingFoods"));
       try {
         const d = await api("/api/plate-said", { text, region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name), meal: moment });
         const read = cleanRead(d);
-        if (!read) { setError("I didn't catch a food in that. Say the foods you have, for example: eggs, spinach, feta."); return false; }
+        if (!read) { setError(w("app.noFoodCaught")); return false; }
         const { items, fresh } = itemsOfRead(read, state.foods, shopRegion, uid);
         const land = (how: "add" | "new") => {
           if (state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat")) setCookOpenAsk(true);
           if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null }));
           else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined }));
           setKind("meal"); setStep("in");
-          notify(`From what you said: ${items.map((i) => i.food.name.split(",")[0].toLowerCase()).join(", ")}. Fit to my target sets the amounts.`);
+          notify(w("app.fromWhatYouSaid", { list: items.map((i) => i.food.name.split(",")[0].toLowerCase()).join(", ") }));
         };
-        if (state.items.length) askPlate({ kind: "photo", what: `You said ${items.length} ${items.length === 1 ? "food" : "foods"}: ${items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ")}.`, apply: land });
+        if (state.items.length) askPlate({ kind: "photo", what: wn("app.youSaid", items.length, { list: items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ") }), apply: land });
         else land("new");
         log("plate_said", { foods: items.length });
         return true;
@@ -2555,12 +2545,12 @@ export default function App() {
       const eaten = n > 1 ? part(meal, 1) : { ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })) };
       setState((s) => ({ ...s,
         feedback: [{ id: uid(), meal: structuredClone(eaten), status: "eaten" as const, taste: "", notes: "", createdAt: now, ...(slot ? { slot } : {}), ...(s.course ? { course: s.course } : {}), ...(x.photo ? { photo: x.photo, photos: [x.photo] } : {}), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined, moment } as Feedback,
-          ...(n > 1 ? [{ id: uid(), meal: structuredClone({ ...part(meal, n - 1), title: x.portions ? `${meal.title}, the other ${n - 1 === 1 ? "portion" : `${n - 1} portions`}` : `${meal.title}, the other half` }), status: "prepared" as const, taste: "", notes: "", createdAt: now, ...(x.photo ? { photo: x.photo } : {}) } as Feedback] : []),
+          ...(n > 1 ? [{ id: uid(), meal: structuredClone({ ...part(meal, n - 1), title: x.portions ? (n - 1 === 1 ? w("app.otherPortion", { title: meal.title }) : w("app.otherPortions", { title: meal.title, n: n - 1 })) : w("app.otherHalf", { title: meal.title }) }), status: "prepared" as const, taste: "", notes: "", createdAt: now, ...(x.photo ? { photo: x.photo } : {}) } as Feedback] : []),
           ...s.feedback],
         items: [], portion: null, title: "", photo: undefined, course: undefined }));
-      if (x.stay) { notify(`Logged at ${new Date(now).toTimeString().slice(0, 5)}. It's on Today.`); return; }
+      if (x.stay) { notify(w("app.loggedAt", { time: new Date(now).toTimeString().slice(0, 5) })); return; }
       setStep("in"); setTab("home");
-      notify(x.portions ? `One portion logged. The other ${n - 1 === 1 ? "portion is" : `${n - 1} portions are`} on Today.` : x.half ? w("app.halfLoggedTheOtherHalf") : x.at ? `Logged at ${new Date(x.at).toTimeString().slice(0, 5)}. It's on Today.` : w("app.loggedItSOnToday"));
+      notify(x.portions ? (n - 1 === 1 ? w("app.onePortionLogged") : w("app.onePortionLoggedN", { n: n - 1 })) : x.half ? w("app.halfLoggedTheOtherHalf") : x.at ? w("app.loggedAt", { time: new Date(x.at).toTimeString().slice(0, 5) }) : w("app.loggedItSOnToday"));
     },
     // DT130 (0.2.110, board Stories78, A): Photo of my meal opens the same camera as Scan, in Meal mode
     mealCamera: () => { setTalkOpen(false); setMode("meal"); setCamera(true); },
@@ -2603,7 +2593,7 @@ export default function App() {
       const have = state.foods.find((f) => (m.barcode && f.barcode === m.barcode) || (f.name.toLowerCase() === m.name.toLowerCase() && (f.brand ?? "").toLowerCase() === m.brand.toLowerCase()));
       const food = have ?? asMine(m, uid);
       if (!have) setState((s) => ({ ...s, foods: [food, ...s.foods] }));
-      if (to === "plate") add(food); else notify(`${food.name} is in your foods.`);
+      if (to === "plate") add(food); else notify(w("app.inYourFoods", { name: food.name }));
     },
     peekBarcode: async (code: string) => { try { const d = await api(`/api/product/${code}`); return d?.product_name ? { code, name: d.product_name, brand: d.brand || "", quantity: "", kcal: d.calories, protein: d.protein } : null; } catch { return null; } },
     // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
@@ -2624,7 +2614,7 @@ export default function App() {
       }
       if (state.items.length && state.fromRecipe !== meal.id && plateRecipeId !== meal.id) {
         const add = asDish(meal);
-        askPlate({ kind: "recipe", what: `${meal.title} from your recipes has ${add.length}.`, apply: (how) => (how === "new" ? openOnPlateNow(meal, cook) : setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null }))) });
+        askPlate({ kind: "recipe", what: w("app.fromRecipesHas", { title: meal.title, n: add.length }), apply: (how) => (how === "new" ? openOnPlateNow(meal, cook) : setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null }))) });
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey"); return;
       }
       openOnPlateNow(meal, cook);
@@ -2634,7 +2624,7 @@ export default function App() {
     startCook: (x) => {
       const old = state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat") ? state.cook.title : null;
       setState((s) => cooking.startCook(s, x));
-      if (old) notify(`${old} is saved for later, at the top of the Plate.`);
+      if (old) notify(w("app.oldSavedForLater", { name: old }));
     },
     goOnCook: () => {
       const c = state.cook; if (!c) return;
@@ -2645,7 +2635,7 @@ export default function App() {
       setState((s) => cooking.swapIn(s)); setPlateKey((k) => k + 1);
       setStep(c.ui.step ?? (c.stage === "eat" ? "after" : "made")); setTab("journey");
     },
-    saveCookForLater: () => { setState((s) => cooking.saveCookForLater(s)); setPlateKey((k) => k + 1); setStep("in"); notify("Saved for later, at the top of the Plate."); },
+    saveCookForLater: () => { setState((s) => cooking.saveCookForLater(s)); setPlateKey((k) => k + 1); setStep("in"); notify(w("app.savedForLaterTop")); },
     cookEaten: (cardId: string) => {
       const now = new Date().toISOString();
       setState((s) => { const c = s.cook; if (!c) return s; const base = c.inView ? cooking.withSnap(s, c.free) : s; return { ...base, cook: { ...c, stage: "carry", cardId, eatenAt: now, inView: false, plate: {}, free: undefined } }; });
@@ -2658,7 +2648,7 @@ export default function App() {
     endCook: () => { setState((s) => cooking.closeCook(s)); setPlateKey((k) => k + 1); setCarryNow(null); },
     setCookSteps: (n: number) => setState((s) => (s.cook && s.cook.steps !== n ? { ...s, cook: { ...s.cook, steps: n } } : s)),
     // DT212 v4: Save for later, Continue, swipe to remove; Keep working on it
-    savePlate: () => { setPlateAsk(null); setState((s) => cooking.savePlate(s)); setPlateKey((k) => k + 1); notify("Saved for later, at the top of the Plate."); },
+    savePlate: () => { setPlateAsk(null); setState((s) => cooking.savePlate(s)); setPlateKey((k) => k + 1); notify(w("app.savedForLaterTop")); },
     continueLater: (id: string) => {
       const it = (state.later ?? []).find((x) => x.id === id); if (!it) return;
       // a plate on the Plate already waits in its place, so nothing is lost
@@ -2666,7 +2656,7 @@ export default function App() {
       setState((s) => cooking.continueLater(swap ? cooking.savePlate(s) : s, id));
       setPlateKey((k) => k + 1);
       if (it.kind === "cook") setStep(it.cook!.ui.step ?? (it.cook!.stage === "eat" ? "after" : "made")); else setStep("in");
-      if (swap) notify("Your plate is saved for later, at the top of the Plate.");
+      if (swap) notify(w("app.plateSavedForLater"));
     },
     removeLater: (id: string) => setState((s) => cooking.removeLater(s, id)),
     keepWorking: () => setState((s) => { const at = cooking.plateSince(s); return at ? { ...s, plateAsked: at.toISOString() } : s; }),
@@ -2684,7 +2674,7 @@ export default function App() {
       const f = pendingFood; setPendingFood(null);
       if (!f) return;
       if (!state.foods.some((x) => x.id === f.id)) setState((s) => ({ ...s, foods: [f, ...s.foods] }));
-      if (how === "keep") { notify(`${f.name} is in your foods.`); return; }
+      if (how === "keep") { notify(w("app.inYourFoods", { name: f.name })); return; }
       // 0.3.69 (Coach Milan 3 November 13:31, Go 13:34): the Plate is free while a cook runs; the food joins it, asked about an old plate as ever
       if (how === "plate") { add(f, false, true); return; }
       setUseInCook(f); screenProps.goOnCook(); setStep("made");
@@ -2714,7 +2704,7 @@ export default function App() {
       const same = (plateRecipeId && plateRecipeId === meal?.id) || (filling && filling.date === f.date && filling.slotId === f.slotId);
       if (state.items.length && meal && !same) {
         const add = asDish(meal);
-        askPlate({ kind: "slot", what: `${meal.title} from your plan has ${add.length} ${add.length === 1 ? "food" : "foods"}.`, apply: (how) => { if (how === "new") fillOnPlateNow(f, meal, title); else { setFilling(f); setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null })); } } });
+        askPlate({ kind: "slot", what: wn("app.fromPlanHas", add.length, { title: meal.title }), apply: (how) => { if (how === "new") fillOnPlateNow(f, meal, title); else { setFilling(f); setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null })); } } });
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey"); return;
       }
       fillOnPlateNow(f, meal, title);
@@ -2779,7 +2769,7 @@ export default function App() {
         return { ...s, foods, items, portion: null };
       });
       setStep("in"); setTab("journey");
-      notify(`${mixLabel(mix)}: ${mix.kind}, ${mix.kcal} kcal. Amounts set by the solver.`);
+      notify(w("app.mixSet", { mix: mixLabel(mix), kind: mix.kind, kcal: mix.kcal }));
     },
     askAboutMix: (food: Food, tip: MixTip) => {
       log("mix_ask", { food: food.name, moment, case: tip.case, offered: tip.mixes.map(mixLabel) });
@@ -2806,7 +2796,7 @@ export default function App() {
           meals: s.meals.map((m) => { if (m.id !== recipeId) return m; const list = recipePhotosOf(m).filter((x) => x !== photo); return { ...m, ...withRecipePhotos([photo, ...list].slice(0, 6)) }; }) };
       });
       log("cover", { how: "real" });
-      notify("Your photo is the cover now.");
+      notify(w("app.photoIsCover"));
     },
     takeMember: (r: SharedRecipe, how: "make" | "keep", portion?: Ingredient[]) => {
       // foods she doesn't have come along with their values, as from a coach's recipe
@@ -2826,8 +2816,8 @@ export default function App() {
         return { ...s, foods, meals: [meal, ...s.meals] };
       });
       log("members", { how });
-      if (how === "make") { void fetch(`/api/members/${encodeURIComponent(r.id)}/made`, { method: "POST" }).catch(() => {}); setStep("recipe"); setTab("journey"); notify("On your plate, at your portion."); }
-      else notify(`${r.title} is in Mine. It's yours to change.`);
+      if (how === "make") { void fetch(`/api/members/${encodeURIComponent(r.id)}/made`, { method: "POST" }).catch(() => {}); setStep("recipe"); setTab("journey"); notify(w("app.onPlateYourPortion")); }
+      else notify(w("app.inMine", { title: r.title }));
     },
     saveCardAsRecipe: (id: string) => {
       setState((s) => {
@@ -2835,7 +2825,7 @@ export default function App() {
         const meal: Meal = { ...structuredClone(f.meal), id: uid(), savedAt: new Date().toISOString(), from: undefined };
         return { ...s, meals: [meal, ...s.meals], feedback: s.feedback.map((x) => (x.id === id ? { ...x, recipeId: meal.id } : x)) };
       });
-      notify("Saved in My recipes.");
+      notify(w("app.savedInMyRecipes"));
     },
     // R20 (0.2.48): the answer keeps its moment and the recipe's foods as they were; a change of answer (Change) is not counted again
     setCarry: (id: string, how: "light" | "fine" | "heavy", moment?: import("./carry").CarryMoment) => {
@@ -2848,10 +2838,10 @@ export default function App() {
     },
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
-      notify(`Shared with ${coachLabel(profile.coachName)}.`);
+      notify(w("app.sharedWith", { coach: coachLabel(profile.coachName) }));
     },
     user, cloudEnabled, cloudStatus, profile: shownProf,
-    joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },
+    joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(w("app.youreWith", { coach: r.coachName })); } catch (e: any) { setError(e.message); } },
     leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined, coachEmail: undefined, coachPhoto: undefined, joinedAt: undefined })); } catch (e: any) { setError(e.message); } },
     // DT168 (0.3.10): sign-out clears the phone, so nothing of this person stays for the next one to sign in. First everything
     // is saved: the record, the foods, recipes and cards, the photos. If anything isn't, the phone is not cleared unless the
@@ -2926,7 +2916,7 @@ export default function App() {
       const cal = personal.calendar;
       if (cal?.id) { try { const t = await askToken(); if (t) await dropCalendar(t, cal.id); } catch { /* the account still goes; the calendar stays in Google */ } }
       pauseAccountWrites(true);
-      setDeleteSteps("Removing the photo files, the record, cards, recipes and the sign-in");
+      setDeleteSteps(w("app.removingAll"));
       let r: { ok?: boolean; dataGone?: boolean; message?: string; error?: string } | null = null;
       try {
         const res = await fetch("/api/account/delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}", signal: AbortSignal.timeout(65000) });
@@ -2937,7 +2927,7 @@ export default function App() {
         // no answer: the delete may or may not have run; the phone's copy goes, so it can't come back, and the account decides
         log("account_delete", { result: "unknown" });
         await clearPhone();
-        setError(r?.error ? `${r.error} Nothing on this phone is kept; sign in again to check.` : w("app.theDeleteDidnTAnswer"));
+        setError(r?.error ? `${r.error} ${w("app.nothingKeptSignIn")}` : w("app.theDeleteDidnTAnswer"));
         setTimeout(() => location.reload(), 5000);
         return;
       }
@@ -2992,12 +2982,12 @@ export default function App() {
     recipes: w("tab.recipes"),
     me: w("menu.me"),
     clients: w("tab.clients"),
-    meal: "Meal",
-    chef: "Chef",
+    meal: w("meal.meal"),
+    chef: w("cookmode.cmdChef"),
     foods: w("menu.foods"),
     notes: w("tab.recipes"),
-    more: "More",
-    explorer: "Explorer",
+    more: w("app.more"),
+    explorer: w("tab.explorer"),
   };
   if (!authReady) return <Starting onLocal={null} />;
   // the legal pages are public: /impressum, /privacy, /disclaimer, /about, signed in or not
@@ -3007,8 +2997,8 @@ export default function App() {
     const tools: MemberTools | null = isMember ? {
       mixFor: screenProps.mixFor,
       takeMix: (f, m) => { screenProps.takeMix(f, m); goApp("journey"); },
-      putAlone: (f, g) => { setState((s) => ({ ...s, items: [...s.items, { id: uid(), food: f, grams: g, locked: false }], portion: null })); setStep("in"); goApp("journey"); notify(`${f.name} is on your plate.`); },
-      addRecipe: (m) => { setState((s) => ({ ...s, meals: [m, ...s.meals] })); goApp("recipes"); notify(`${m.title} is in your recipes.`); },
+      putAlone: (f, g) => { setState((s) => ({ ...s, items: [...s.items, { id: uid(), food: f, grams: g, locked: false }], portion: null })); setStep("in"); goApp("journey"); notify(w("app.onYourPlate", { name: f.name })); },
+      addRecipe: (m) => { setState((s) => ({ ...s, meals: [m, ...s.meals] })); goApp("recipes"); notify(w("app.inYourRecipes", { title: m.title })); },
       momentName: momentOf(moment).name, goalName: goal ? goalName(goal.band) : w("app.yourGoal"),
       mealKcal: todayKcal === null ? null : Math.round(todayKcal * momentKcalShare(moment)),
     } : null;
@@ -3060,7 +3050,7 @@ export default function App() {
         </button>
         <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? w("menu.me") : w("app.menu")) : TITLES[tab]}</h1>
         {/* DT232 (0.3.72): while the app is viewed as Coach or User, the header says so and leads back, on every page */}
-        {view !== "me" ? <button className="ref view-as" onClick={() => setViewAs("me")}>As {viewWord(view)} · Back to me</button>
+        {view !== "me" ? <button className="ref view-as" onClick={() => setViewAs("me")}>{w("app.viewAsBack", { who: viewWord(view) })}</button>
         : tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label={w("app.editDailyReference")}>
           {menuSection === "goal" ? w("app.pdToday", { pd: pdText(dayPd) }) : <>{goal?.band ? goalName(goal.band).split(" · ")[0] : w("app.kcalG", { kcal: fmt(state.goals.calories, 0), g: fmt(state.goals.protein) })} · {w("app.pdToday", { pd: pdText(dayPd) })}</>}
         </button>}
@@ -3124,11 +3114,11 @@ export default function App() {
             const f = e.target.files?.[0];
             if (!f) return;
             try {
-              if (f.size > 5_000_000) throw new Error("Backup is too large.");
+              if (f.size > 5_000_000) throw new Error(w("app.backupTooLarge"));
               const data = parseState(await f.text());
               unreadableBackup = null;
               setState(data);
-              notify("Backup imported. It replaced what was on this device.");
+              notify(w("app.backupImported"));
             } catch (err: any) {
               setError(err.message);
             }
@@ -3211,15 +3201,14 @@ export default function App() {
             { const cur = getGoal(); if (cur) { saveGoal({ ...cur, source: "exact", method: undefined, setAt: new Date().toISOString() }); setGoalState(getGoal()); } }
             setState((s) => ({ ...s, goals: g }));
             setGoalsOpen(false);
-            notify("Daily reference saved. Food composition stays unchanged.");
+            notify(w("app.referenceSaved"));
           }}
         />
       )}
       {accessOpen && (
         <Modal title={w("app.pilotServerAccess")} close={() => setAccessOpen(false)}>
           <p>
-            Use the access key provided by the person hosting this pilot. It is
-            kept for this browser session.
+            {w("app.accessKeyWhy")}
           </p>
           <label>
             {w("app.accessKey")}
@@ -3234,7 +3223,7 @@ export default function App() {
             onClick={() => {
               sessionStorage.setItem("platemate-access", access);
               setAccessOpen(false);
-              notify("Access key saved for this session. Retry your request.");
+              notify(w("app.accessKeySaved"));
             }}
           >
             {w("app.saveAccessKey")}
@@ -3243,7 +3232,7 @@ export default function App() {
       )}
       {reviewMeal && (
         <Modal
-          title={`Feedback: ${reviewMeal.title}`}
+          title={w("app.feedbackTitle", { title: reviewMeal.title })}
           close={() => setReviewMeal(null)}
         >
           <label>
@@ -3298,7 +3287,7 @@ export default function App() {
               }));
               log("feedback", { status: feedback.status });
               setReviewMeal(null);
-              notify("Feedback saved with this recipe snapshot.");
+              notify(w("app.feedbackSaved"));
             }}
           >
             {w("app.saveFeedback")}

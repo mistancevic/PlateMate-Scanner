@@ -3,10 +3,12 @@
 // food takes up: an estimate, 15% of the food's weight. The source: a glazed yeast doughnut holds 22.7 g fat per 100 g
 // (USDA SR Legacy, FDC 172758), its dough, filling and glaze about 5 g; so frying adds 15 to 18 g per 100 g. The recipe
 // still lists the whole pot, as it needs it; the app says the amount counted is an estimate wherever it shows.
+import { w } from "./words";
 export const TAKEN_UP = 0.15;
-export const TAKEN_UP_LINE = "taken up in frying, an estimate: 15% of the food";
+// DT243 part two: the words in src/i18n/en.json (cook.takenUp*, cook.potPlate, cook.countedFrying)
+export const takenUpLine = () => w("cook.takenUpLine");
 // the plate row has one short line; the word that matters goes first
-export const TAKEN_UP_SHORT = "An estimate: taken up in frying";
+export const takenUpShort = () => w("cook.takenUpShort");
 // the oil a dish cooks in; butter is never one (it goes into doughs and sauces, not under a fryer)
 const OIL = /(\boil\b|öl\b|shortening|\blard\b|schmalz|frying fat|frittierfett|\bghee\b|\btallow\b|rindertalg)/i;
 const NOT_OIL = /\bspray\b/i;
@@ -30,6 +32,8 @@ export function capOil<T extends { name: string; written: string; grams: number;
 }
 
 // the oil as you cook with it: the recipe's own words for the pot, or its grams; just your plate still needs the whole pot
-export const potLine = (f: Fry, name: string, fmtGrams: (g: number) => string) =>
-  `${f.plate ? "enough to fry: " : ""}${f.written ? `${f.written} ${name}` : `${fmtGrams(f.pot)} ${name}`}${f.plate ? ", as the recipe says" : ""}`;
-export const countedLine = (grams: string) => `Counted: ${grams}, taken up in frying, an estimate`;
+export const potLine = (f: Fry, name: string, fmtGrams: (g: number) => string) => {
+  const amount = f.written ? `${f.written} ${name}` : `${fmtGrams(f.pot)} ${name}`;
+  return f.plate ? w("cook.potPlate", { amount }) : amount;
+};
+export const countedLine = (grams: string) => w("cook.countedFrying", { grams });

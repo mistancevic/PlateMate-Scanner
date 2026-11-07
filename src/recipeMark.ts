@@ -3,15 +3,16 @@
 // On paper: calculated from labels and food tables, not cooked yet.
 import type { Feedback, Meal } from "./pilot";
 import { cardsOfRecipe } from "./carry";
+import { w, dateV } from "./words";
 export type KitchenMark = { cooked: boolean; at: string | null };
 export function kitchenMark(m: Pick<Meal, "id" | "title" | "cookedAt">, cards: Feedback[]): KitchenMark {
   const first = cardsOfRecipe(m, cards).map((f) => f.createdAt).sort()[0] ?? null;
   const at = [m.cookedAt, first].filter(Boolean).sort()[0] ?? null;
   return { cooked: Boolean(at), at };
 }
-export const MARK_WORDS = { cooked: "From the kitchen", paper: "On paper" } as const;
+// DT243 part two: the words live in src/i18n/en.json (recipe.mark*)
+export const MARK_WORDS = { get cooked() { return w("recipe.markCooked"); }, get paper() { return w("recipe.markPaper"); } };
 export const markWord = (k: { cooked: boolean }) => (k.cooked ? MARK_WORDS.cooked : MARK_WORDS.paper);
-const day = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
 export const markLine = (k: KitchenMark) =>
-  k.cooked ? `Cooked${k.at ? ` first on ${day(k.at)}` : ""}, and weighed. The numbers come from labels and food tables.`
-  : "Calculated from labels and food tables, not cooked yet. Cook it once, to the end of Eat, and it says From the kitchen.";
+  k.cooked ? (k.at ? w("recipe.markLineCookedOn", { date: dateV(new Date(k.at), { day: "numeric", month: "long" }) }) : w("recipe.markLineCooked"))
+  : w("recipe.markLinePaper");

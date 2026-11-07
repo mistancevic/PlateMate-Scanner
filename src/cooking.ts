@@ -5,7 +5,7 @@
 // Pure functions here, so the walkthroughs and the unit tests read the same rules.
 import { wIn, wnIn, w, wn } from "./words";
 import { foodNameIn } from "./reference";
-import { locOf, type Lang } from "./lang";
+import { locOf, getLang, type Lang } from "./lang";
 import { say } from "./chefScript";
 import type { PilotState } from "./pilot";
 
@@ -191,9 +191,10 @@ export const cookStarted = (c: Cook | undefined) => !!c && ((c.ui.ticks?.length 
 // the row in Saved for later: its name, when, how many foods
 export function laterRow(x: Later): { title: string; photo?: string; foods: number } {
   const p = x.kind === "cook" ? x.cook!.plate : x.plate!;
-  const title = x.kind === "cook" ? x.cook!.title : p.title && p.title !== "DaaM" ? p.title : foodsLine(p.items ?? []);
+  // DT243 part two: the foods line and A plate in the app's language
+  const title = x.kind === "cook" ? x.cook!.title : p.title && p.title !== "DaaM" ? p.title : foodsLineIn(getLang(), p.items ?? []) ?? foodsLine(p.items ?? []);
   const photo = x.kind === "cook" ? x.cook!.ui.final ?? Object.values(x.cook!.ui.stepPhotos ?? {})[0] ?? p.photo?.image : p.photo?.image;
-  return { title: title || "A plate", photo, foods: (p.items ?? []).length };
+  return { title: title || w("cook.aPlate"), photo, foods: (p.items ?? []).length };
 }
 
 // DT206 and DT212: when the plate started (its first food, or its photo); over 3 hours, or another day, is a plate from an earlier

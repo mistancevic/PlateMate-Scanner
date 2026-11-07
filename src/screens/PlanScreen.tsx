@@ -1,4 +1,4 @@
-import { dec, numLocale, w, wn, wIn, mealV, mealName, dateV, dateText, type Val, type WordKey } from "../words";
+import { dec, numLocale, w, wn, wIn, mealV, mealName, dateV, dateText, dateIn, type Val, type WordKey } from "../words";
 import { getLang, locOf } from "../lang";
 import { shelfName } from "../reference";
 import { atMeal } from "../plateMode";
@@ -34,9 +34,9 @@ import { useDayBusy, busyBefore, busyAfter, AskCard, SlotNotes } from "../compon
 // 0.2.5+r19 (canvas board TW, TW3 to TW5, Milan 13 October 2026): Plan is the one calendar with dates. The training row opens
 // that date's training (this date only; the Training week stays), and the arrows go back a week at a time: a past date
 // shows what was eaten, with Cook again, and whether the day was lived by the plan.
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const WEEKDAY = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+// DT243: the English names from the phone's calendar (en-GB), in the English forms Plan keeps; other languages write their own below
+const enDate = (o: Intl.DateTimeFormatOptions) => (d: Date) => dateIn("en", d, o);
+const MONTH = enDate({ month: "long" }), DAY = enDate({ weekday: "short" }), WEEKDAY_OF = enDate({ weekday: "long" });
 const addDays = (d: Date, n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); x.setHours(12, 0, 0, 0); return x; };
 const SOURCE: Record<PlannedMeal["source"], string> = { get mine() { return w("today.srcMine"); }, get coach() { return w("today.srcCoach"); }, get starter() { return w("today.srcStarter"); }, get plate() { return w("today.srcPlate"); } };
 
@@ -94,10 +94,10 @@ export function PlanScreen(p: AppApi) {
   const minor = isMinor(p.personal);
   const changed = !!dayFor(p.personal, date)?.changed;
   const wk = isoWeek(monday), sunday = addDays(monday, 6);
-  const weekSpan = w("plan.weekSpan", { n: wk.week, span: (l) => l === "en" ? `${monday.getDate()}${monday.getMonth() === sunday.getMonth() ? "" : ` ${MONTHS[monday.getMonth()]}`} to ${sunday.getDate()} ${MONTHS[sunday.getMonth()]}` : monday.getMonth() === sunday.getMonth() ? `${monday.getDate()}–${sunday.getDate()}. ${sunday.toLocaleDateString(locOf(l), { month: "long" })}` : `${monday.getDate()}. ${monday.toLocaleDateString(locOf(l), { month: "long" })} – ${sunday.getDate()}. ${sunday.toLocaleDateString(locOf(l), { month: "long" })}` });
+  const weekSpan = w("plan.weekSpan", { n: wk.week, span: (l) => l === "en" ? `${monday.getDate()}${monday.getMonth() === sunday.getMonth() ? "" : ` ${MONTH(monday)}`} to ${sunday.getDate()} ${MONTH(sunday)}` : monday.getMonth() === sunday.getMonth() ? `${monday.getDate()}–${sunday.getDate()}. ${sunday.toLocaleDateString(locOf(l), { month: "long" })}` : `${monday.getDate()}. ${monday.toLocaleDateString(locOf(l), { month: "long" })} – ${sunday.getDate()}. ${sunday.toLocaleDateString(locOf(l), { month: "long" })}` });
   // DT203 phase 9: the day in a line's own language: today · danas · Thursday · četvrtak
   const dayV: Val = isToday ? (l) => wIn(l, "plan.todayLow") : dateV(date, { weekday: "long" });
-  const dayName = isToday ? "today" : WEEKDAY[(date.getDay() + 6) % 7];
+  const dayName = isToday ? "today" : WEEKDAY_OF(date);
   const line = [
     numbers ? w("plan.kcalProtein", { kcal: fmt(numbers.kcal, 0), protein: numbers.protein }) : w("plan.noNumbersYet"),
     tWhen ? trainingShown(training) ?? tWhen.phrase : training ? w("plan.restDay") : null,
@@ -108,7 +108,7 @@ export function PlanScreen(p: AppApi) {
   const sum = sumOf(held);
   const openCount = slots.filter((s) => !held[s.id]).length;
   // DT74 (board DT74, Anna's first run): every target names its day; a full day well off its kcal says so, and can fit
-  const dayPoss = isToday ? "today's" : `${WEEKDAY[(date.getDay() + 6) % 7]}'s`;
+  const dayPoss = isToday ? "today's" : `${WEEKDAY_OF(date)}'s`;
   const off = dayOff(sum, numbers, openCount);
   // DT75: the day's kcal as a range, a tenth either side; protein in the person's range (g per kg), the target inside it
   const band = numbers ? bandOf(numbers.kcal) : null;
@@ -138,7 +138,7 @@ export function PlanScreen(p: AppApi) {
           const n = Object.keys(p.planned[ymd(d)] ?? {}).length;
           // SL7 (Milan 21:20): today's day is always marked, picked or not
           const isT = ymd(d) === ymd(today);
-          return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""} ${isT ? "is-today" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{isT ? w("tab.today") : getLang() !== "en" ? d.toLocaleDateString(locOf(getLang()), { weekday: "short" }) : DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
+          return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""} ${isT ? "is-today" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{isT ? w("tab.today") : getLang() !== "en" ? d.toLocaleDateString(locOf(getLang()), { weekday: "short" }) : DAY(d)} {d.getDate()}</button>;
         })}
       </div>
       {/* 0.3.59 (Coach Milan 2 November 19:00): no cook strip on Plan; it stays on Today and the Plate */}
@@ -148,7 +148,7 @@ export function PlanScreen(p: AppApi) {
           open slots, then the plan against the target. The target is said once, in the numbers. */}
       <section className="plan plan-head">
         <div className="plan-day-head">
-          <b>{w(isToday ? "plan.todayDate" : "plan.date", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}
+          <b>{w(isToday ? "plan.todayDate" : "plan.date", { date: (l) => (l === "en" ? `${WEEKDAY_OF(date)}, ${date.getDate()} ${MONTH(date)}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}
             {!rows.some((r) => r.kind === "training") && <button type="button" className="icon today-pencil plan-pencil" aria-label={w("plan.changeTheTrainingForThis")} onClick={() => setEditing(training ?? { work: true, kind: "rest" })}><Pencil size={15} /></button>}
           </b>
           <small>{[tWhen ? trainingShown(training) ?? tWhen.phrase : training ? w("plan.restDay") : null, openCount ? wn("plan.slotsOpen", openCount) : w("plan.allSet")].filter(Boolean).join(" · ")}</small>
@@ -187,7 +187,7 @@ export function PlanScreen(p: AppApi) {
               {m && !m.skipped
                 ? <PlanRow className="plan-slot plan-slot-set" label={`${mealName(r.slot.name)}, ${r.slot.time}`} title={plannedName(m, p.state.meals)} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
                     ariaLabel={w("plan.slotAt", { meal: mealV(r.slot.name), time: r.slot.time, title: m.title })}
-                    sub={fit ? <>{SOURCE[m.source]}{amountText(m) ? ` · ${amountText(m)}` : ""} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · {w("plan.fits")}</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
+                    sub={fit ? <>{SOURCE[m.source]}{amountText(m) ? ` · ${amountText(m)}` : ""} · {w("plan.kcalG", { kcal: fmt(m.kcal, 0), protein: fmt(m.protein, 0) })} · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · {w("plan.fits")}</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
                     onOpen={() => { const rec = m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null; if (rec) p.openMeal(rec.id, { tab: "plan", slot: { date: key, slotId: r.slot.id, name: r.slot.name, time: r.slot.time } }); else if (m.items?.length) setViewing(r.slot); else setOpen(r.slot); }}
                     onSwap={() => setOpen(r.slot)} onRight={() => p.fill(key, r.slot.id, null)} rightLabel={w("plan.empty")} swapName={w("plan.swapMeal", { meal: mealV(r.slot.name, true) })} rightName={w("plan.emptyMeal", { meal: mealV(r.slot.name, true) })} />
                 : <button type="button" className={`menu-row plan-slot ${m ? "plan-slot-set" : ""}`} aria-label={w("plan.slotAt", { meal: mealV(r.slot.name), time: r.slot.time, title: m ? m.title : w("plan.pickAMealLow") })} onClick={() => setOpen(r.slot)}>
@@ -236,14 +236,14 @@ export function PlanScreen(p: AppApi) {
           p.setState((st) => ({ ...st, meals: [...st.meals, meal] })); p.fill(key, viewing.id, { ...m, mealId: meal.id, source: "mine", note: undefined }); setViewing(null); p.notify(w("plan.inMyRecipes", { title: m.title })); }} /> : null}
       {editing && (
         <div className="sheet-backdrop" onClick={() => setEditing(null)}>
-          <div className="sheet date-sheet" role="dialog" aria-label={w("plan.dateTraining", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : dateText(date, { weekday: "long", day: "numeric", month: "long" })) })} onClick={(e) => e.stopPropagation()}>
-            <div className="card-top"><span>{w("plan.dateTraining", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}</span><button type="button" className="link" onClick={() => setEditing(null)}>{w("plan.close")}</button></div>
+          <div className="sheet date-sheet" role="dialog" aria-label={w("plan.dateTraining", { date: (l) => (l === "en" ? `${WEEKDAY_OF(date)}, ${date.getDate()} ${MONTH(date)}` : dateText(date, { weekday: "long", day: "numeric", month: "long" })) })} onClick={(e) => e.stopPropagation()}>
+            <div className="card-top"><span>{w("plan.dateTraining", { date: (l) => (l === "en" ? `${WEEKDAY_OF(date)}, ${date.getDate()} ${MONTH(date)}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}</span><button type="button" className="link" onClick={() => setEditing(null)}>{w("plan.close")}</button></div>
             <p className="small date-sheet-why">{w("plan.thisDateOnlyYourTraining")}</p>
             <section className="card seg">
               <DayEditor minor={minor} weekdays={weekdaysOf(lifestyle)} peOn={!!lifestyle.peWeek && lifestyle.peWeek !== "none"} value={editing} onChange={setEditing} workHint={workHintOf(lifestyle, minor)} work={workHoursOf(lifestyle)} />
             </section>
             <div className="actions date-sheet-actions">
-              <button type="button" className="pill pill-primary action-main" onClick={() => { p.setDated(date, editing); setEditing(null); p.notify(isToday ? w("plan.changedToday") : w("plan.changedFor", { date: (l) => (l === "en" ? `${dayName}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : dateText(date, { weekday: "long", day: "numeric", month: "long" })) })); }}>{w("plan.saveForThisDate")}</button>
+              <button type="button" className="pill pill-primary action-main" onClick={() => { p.setDated(date, editing); setEditing(null); p.notify(isToday ? w("plan.changedToday") : w("plan.changedFor", { date: (l) => (l === "en" ? `${dayName}, ${date.getDate()} ${MONTH(date)}` : dateText(date, { weekday: "long", day: "numeric", month: "long" })) })); }}>{w("plan.saveForThisDate")}</button>
               {changed && <button type="button" className="link action-cancel" onClick={() => { p.setDated(date, null); setEditing(null); }}>{w("plan.backUsualDay", { day: dateV(date, { weekday: "long" }) })}</button>}
             </div>
           </div>
@@ -265,7 +265,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
   return (
     <section className="card plan-day plan-past">
       <div className="plan-day-head">
-        <b>{w("plan.date", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}</b>
+        <b>{w("plan.date", { date: (l) => (l === "en" ? `${WEEKDAY_OF(date)}, ${date.getDate()} ${MONTH(date)}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}</b>
         <small>{line}</small>
       </div>
       {log.logged.length ? (
@@ -296,7 +296,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
         <div className="past-add" aria-label={w("plan.whatYouAte")}>
           <small className="setting-name past-label">{log.logged.length ? w("plan.notAddedYet") : w("plan.whatYouAte")}</small>
           {toAdd.map((sl) => {
-            const m = p.planned[dayKey]?.[sl.id], f = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time, dayName: WEEKDAY[(date.getDay() + 6) % 7] };
+            const m = p.planned[dayKey]?.[sl.id], f = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time, dayName: WEEKDAY_OF(date) };
             const slot = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time };
             if (m?.skipped) return <div className="past-plate" key={sl.id}><span><small>{mealName(sl.name)}, {sl.time}</small><b>{w("plan.skipped")}</b></span><button type="button" className="link" onClick={() => p.fill(dayKey, sl.id, { ...m, skipped: false })}>{w("plan.undo")}</button></div>;
             if (m) return (
@@ -333,11 +333,11 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const dt = (d: string) => new Date(`${d}T12:00:00`);
   // DT203 phase 9: the shopping list's days in the language chosen (the phone's calendar writes the Serbian names)
   const sr = getLang() !== "en", srD = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString(locOf(getLang()), o);
-  const WD = (d: Date) => (sr ? srD(d, { weekday: "long" }) : WEEKDAY[(d.getDay() + 6) % 7]), MO = (d: Date) => (sr ? srD(d, { month: "long" }) : MONTHS[d.getMonth()]);
+  const WD = (d: Date) => (sr ? srD(d, { weekday: "long" }) : WEEKDAY_OF(d)), MO = (d: Date) => (sr ? srD(d, { month: "long" }) : MONTH(d));
   const dayWord = (d: string) => (sr ? `${WD(dt(d))} ${dt(d).getDate()}.` : `${WD(dt(d))} ${dt(d).getDate()}`);
   const spanOf = (from: string, to: string) => sr ? (from === to ? srD(dt(from), { weekday: "long", day: "numeric", month: "long" }) : `${dayWord(from)}${dt(from).getMonth() === dt(to).getMonth() ? "" : ` ${MO(dt(from))}`} – ${dayWord(to)} ${MO(dt(to))}`)
-    : from === to ? `${dayWord(from)} ${MONTHS[dt(from).getMonth()]}` : `${dayWord(from)}${dt(from).getMonth() === dt(to).getMonth() ? "" : ` ${MONTHS[dt(from).getMonth()]}`} to ${dayWord(to)} ${MONTHS[dt(to).getMonth()]}`;
-  const madeOn = (iso: string) => { const d = new Date(iso); return sr ? srD(d, { weekday: "long", day: "numeric", month: "long" }) : `${WEEKDAY[(d.getDay() + 6) % 7]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; };
+    : from === to ? `${dayWord(from)} ${MONTH(dt(from))}` : `${dayWord(from)}${dt(from).getMonth() === dt(to).getMonth() ? "" : ` ${MONTH(dt(from))}`} to ${dayWord(to)} ${MONTH(dt(to))}`;
+  const madeOn = (iso: string) => { const d = new Date(iso); return sr ? srD(d, { weekday: "long", day: "numeric", month: "long" }) : `${WEEKDAY_OF(d)} ${d.getDate()} ${MONTH(d)}`; };
   const start = nextStart(store, today, p.planned);
   const days = daysFrom(start, span);
   const cookOf = (id: string) => p.state.meals.find((x) => x.id === id)?.cook?.n;
@@ -348,7 +348,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   // SL4: what each food is for, and the list meal by meal; a tap goes to buy, in the basket, not this time
   const [by, setBy] = useState<"food" | "meal">("food");
   const slotName = (date: string, slot: string) => mealName(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, date).find((x) => x.id === slot)?.name ?? slot.charAt(0).toUpperCase() + slot.slice(1));
-  const short = (d: string) => (sr ? srD(dt(d), { weekday: "short" }) : DAYS[(dt(d).getDay() + 6) % 7]);
+  const short = (d: string) => (sr ? srD(dt(d), { weekday: "short" }) : DAY(dt(d)));
   const forWhat = (x: ShopLine) => {
     if (!x.uses?.length) return wn("shop.nMeals", x.meals);
     // one part per meal and slot: Sarma: Wed, Fri lunch
@@ -524,7 +524,7 @@ function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, pu
     return (
       <button key={k} type="button" className="menu-row pick-row" onClick={pick}>
         <div className="menu-row-text"><b>{plannedName(m, p.state.meals)}</b><small>{isBatch(m) ? `${amountText(m)} · ` : ""}{w("plan.kcalProteinG", { kcal: fmt(m.kcal, 0), protein: fmt(m.protein, 0) })}</small>{read && <small className={read === "light" ? "carry-light" : "carry-heavy"}>{read === "light" ? w("plan.lightForYou") : w("plan.heavyForYou")}</small>}</div>
-        <div className={`pick-pd ${fit.state}`}><b>{unit === "pct" ? `${pdVal(fit.pd)} %` : `PD ${pdVal(fit.pd)}`}</b><small>{fit.text}</small></div>
+        <div className={`pick-pd ${fit.state}`}><b>{unit === "pct" ? `${pdVal(fit.pd)} %` : w("plan.pdN", { pd: pdVal(fit.pd) })}</b><small>{fit.text}</small></div>
       </button>
     );
   };

@@ -4,6 +4,7 @@
 // member, and the rest wait for the next day ("Picture tomorrow"). The server keeps both counts.
 import { sig, recipePhotosOf, recipeHasPhotos } from "./photos";
 import type { Feedback, Meal } from "./pilot";
+import { w } from "./words";
 
 export const COVER_DAILY = 10;
 // Google's cheapest image model, checked on Google's price page on 16 October 2026: $0.0336 a picture at 1K, about €0.03
@@ -31,8 +32,9 @@ export function coverPrompt(title: string, items: { name: string; grams: number 
 
 // A realistic photo, to try against the drawing (0.2.13, Milan 16 October 2026, 18:43: "give it a try"). Only the owner, only on
 // the preview; the models to compare, with Google's price for a 1K picture on 16 October 2026.
-export const TEST_MODELS = [
-  { id: "gemini-3.1-flash-lite-image", name: "Cheapest", usd: 0.0336 },
+// DT243 part two: Cheapest is a word on the screen (recipe.testModelCheapest); the other two are the models' own names
+export const TEST_MODELS: { id: string; name: string; usd: number }[] = [
+  { id: "gemini-3.1-flash-lite-image", get name() { return w("recipe.testModelCheapest"); }, usd: 0.0336 },
   { id: "gemini-nano-banana-2.1", name: "Nano Banana 2.1", usd: 0.0336 },
   { id: "gemini-3.1-flash-image", name: "Flash Image", usd: 0.067 },
 ];

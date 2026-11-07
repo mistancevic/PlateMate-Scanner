@@ -48,9 +48,9 @@ export function KitchenScreen() {
   const leave = () => { if (s && token) void post("/api/cook/update", { code: s.code, token, end: true }).catch(() => {}); setEnded(true); setToken(null); setS(null); };
   // one photo: from the phone's camera app (the file input opens it), resized, sent with the step
   const look = async (k: number) => {
-    if (!s || !token) throw new Error("The session ended.");
+    if (!s || !token) throw new Error(w("kitchen.sessionEnded"));
     const f = await new Promise<File | null>((res) => { pending.current = res; fileRef.current?.click(); });
-    if (!f) throw new Error("No photo taken. Tap Chef, look again.");
+    if (!f) throw new Error(w("kitchen.noPhoto"));
     const raw = await readFile(f), img = await resizeImageBase64(raw, 1024, 1024).catch(() => raw);
     const d = await post("/api/cook/look", { code: s.code, token, image: img, step: k });
     return String(d.reply || "");
@@ -62,12 +62,12 @@ export function KitchenScreen() {
       onTick={(k) => { setS((o) => (o && !o.ticks.includes(k) ? { ...o, ticks: [...o.ticks, k] } : o)); void post("/api/cook/update", { code: s.code, token, tick: k }).catch(() => {}); }}
       onClose={leave}
       link={{ remoteStep: remote, onStep: (k) => { void post("/api/cook/update", { code: s.code, token, step: k }).then((d) => { seen.current = Math.max(seen.current, d.session.rev); }).catch(() => {}); },
-        top: <div className="cook-link" role="status"><small>Kitchen screen · joined to the cooking phone</small></div>,
-        look, closeLabel: "Leave", doneLabel: "Finish" }} />
+        top: <div className="cook-link" role="status"><small>{w("kitchen.joinedLine")}</small></div>,
+        look, closeLabel: w("kitchen.leave"), doneLabel: w("kitchen.finish") }} />
   </>);
   return (
     <div className="kitchen-join">
-      <b style={{ fontSize: 22 }}>Chef Mealan · Kitchen screen</b>
+      <b style={{ fontSize: 22 }}>{w("kitchen.title")}</b>
       {ended ? <>
         <p>{w("kitchen.theSessionEndedThisScreen")}</p>
         <small className="muted">{w("kitchen.toCookWithItAgain")}</small>

@@ -1,6 +1,6 @@
 // What is in the slots (0.2.2, canvas S "Plan purpose one" and H7): a meal per slot per date, with its numbers, so the day
 // adds up before anything is cooked. A meal comes from My recipes, Coach's recipes, Chef Mealan's starters, or the Plate.
-import { dec } from "./words";
+import { dec, w, wn, wIn, wordV, mealV } from "./words";
 import { aggregate, density, servingsOf, sizedFor, type Ingredient, type Meal } from "./pilot";
 import type { Slot } from "./slots";
 import { REFERENCE, referenceFood } from "./reference";
@@ -302,11 +302,12 @@ export function usualPortions(held: Record<string, PlannedMeal>): Record<string,
 const FRACTION: Record<number, string> = { 0: "", 0.25: "¼", 0.5: "½", 0.75: "¾" };
 export const amountText = (m: PlannedMeal) => {
   // DT79: a batch recipe always says its pieces, 1 sarma, 3 sarmas
-  if (isBatch(m)) { const c = m.amount ?? 1, u = m.unit ?? "portions"; return `${c} ${c === 1 ? oneWord(u) : u}`; }
+  // DT243: portions are the app's word, in count lines; a recipe's own unit (sarmas) stays as written
+  if (isBatch(m)) { const c = m.amount ?? 1, u = m.unit; return u && u !== "portions" ? `${c} ${c === 1 ? oneWord(u) : u}` : wn("plan.portionsN", c); }
   if (!m.amount || m.amount === 1) return null;
   const whole = Math.floor(m.amount), part = FRACTION[Math.round((m.amount - whole) * 4) / 4];
-  if (part === undefined) return `${dec(m.amount, 2).replace(/0$/, "")} portions`;
-  return `${whole || ""}${part} ${m.amount <= 1 ? "portion" : "portions"}`;
+  if (part === undefined) return wn("plan.portionsN", Math.max(2, Math.round(m.amount)), { n: dec(m.amount, 2).replace(/0$/, "") });
+  return wn("plan.portionsN", m.amount <= 1 ? 1 : Math.max(2, Math.round(m.amount)), { n: `${whole || ""}${part}` });
 };
 
 // the day as planned: what the slots hold, added up
@@ -346,9 +347,10 @@ export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undef
     if (ranked[0] !== plain[0]) {
       const passed = plain[0], r = read?.(passed);
       if (r?.read === "heavy") {
-        why = `${passed.title} fits ${slot.name.toLowerCase()} as well, though it left you heavy, tired ${r.heavy === 1 ? "once" : r.heavy === 2 ? "twice" : `${r.heavy} times`}, so it comes second: Change brings it.`;
+        const n = r.heavy ?? 0;
+        why = w("plan.fillHeavy", { title: passed.title, meal: mealV(slot.name, true), times: n === 1 ? wordV("plan.timesOnce") : n === 2 ? wordV("plan.timesTwice") : (l) => wIn(l, "plan.timesN", { n }) });
         ranked = [ranked[0], passed, ...ranked.slice(1).filter((m) => m !== passed)];
-      } else if (read?.(ranked[0])?.read === "light") why = `${ranked[0].title} keeps you light, so it comes first for ${slot.name.toLowerCase()}.`;
+      } else if (read?.(ranked[0])?.read === "light") why = w("plan.fillLight", { title: ranked[0].title, meal: mealV(slot.name, true) });
     }
     used.add(ranked[0].title);
     rows.push({ slot, meal: ranked[0], alternatives: ranked.slice(1, 4), ...(why ? { why } : {}) });

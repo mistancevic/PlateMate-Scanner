@@ -3,6 +3,7 @@
 import type { Meal, StepMark } from "./pilot";
 import { fromDraft, tokenOf } from "./steps";
 import { movesFromDraft } from "./cook";
+import { w } from "./words";
 
 export type Drafted = { ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: import("./pilot").StepMoves } | { ok: false; why: string; cannot?: boolean };
 // changed: a dish changed on the plate (0.2.23, IM23), how its foods differ from the original, so the marks say "your change"
@@ -12,7 +13,7 @@ export async function draftSteps(meal: Meal, o: { library: string[]; equipment: 
     const res = await fetch("/api/steps", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: meal.title, items: items.map((i) => ({ name: i.food.name, grams: i.fry?.pot ?? i.grams, part: i.part ?? "" })), optional: (meal.optional ?? []).map((x) => ({ name: x.name, part: x.part ?? "" })), kitchens: o.kitchens, failed,
       original: meal.source?.steps ?? [], ...(meal.cooking?.length ? { cooking: meal.cooking } : {}), equipment: o.equipment, makes: meal.makes ?? null, ...(o.changed?.length ? { changed: o.changed } : {}), ...(o.tastes ? { tastes: o.tastes } : {}) }) });
     const d = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(d.error || "Chef Mealan could not answer. Try again.");
+    if (!res.ok) throw new Error(d.error || w("recipe.chefMealanCouldNotAnswer"));
     if (typeof d.cannot === "string" && d.cannot) return { ok: false, why: d.cannot, cannot: true };
     // optional foods may be named in words, where the original puts them (IM17)
     const optNames = new Set((meal.optional ?? []).map((x) => x.name.toLowerCase()));

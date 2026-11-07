@@ -8,7 +8,7 @@ import { recipeName } from "../recipeDiff";
 import { cookTitle } from "../cookWords";
 import { ThinkingCard } from "./ThinkingCard";
 import { sameFoodName } from "../mixtip";
-import { placeName } from "../places";
+import { placeName, placeNameEn } from "../places";
 import { carriedLists } from "../carry";
 import { tasteOfWords } from "../craving";
 import { tasteForReq } from "../tasteChips";
@@ -23,7 +23,6 @@ import { membersFor, portionOf, type SharedRecipe } from "../members";
 import { blockedByAllergy } from "../safety";
 import { tasteForChef } from "../kitchens";
 import { estimate } from "./RecipeInBlock";
-import { CHEF_NAME } from "./Mark";
 import { parseCraving, matchesCraving, splitByPd, recipeHay, foodPd, safeIdeaItem, type Row } from "../craving";
 
 type Ref = { kind: "mine" | "coach"; meal: Meal } | { kind: "member"; r: SharedRecipe } | { kind: "starter"; m: PlannedMeal };
@@ -83,10 +82,10 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
     try {
       const res = await fetch("/api/crave", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         craving, minPd: c.minPd, target, need, kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), region: p.region,
-        library: state.foods.filter(p.inPlace).slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), place: placeName(p.herePlace ?? p.region ?? "") || null, avoid: shown, carried: carriedLists(state.meals, state.feedback), tastes: tasteForReq(p.personal.tasteChips, state.preferences) }) });
+        library: state.foods.filter(p.inPlace).slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), place: placeNameEn(p.herePlace ?? p.region ?? "") || null, avoid: shown, carried: carriedLists(state.meals, state.feedback), tastes: tasteForReq(p.personal.tasteChips, state.preferences) }) });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not answer.`);
-      if (data.error) throw new Error(data.message || `${CHEF_NAME} has no idea for that right now.`);
+      if (!res.ok) throw new Error(data.error || w("craving.errNoAnswer"));
+      if (data.error) throw new Error(data.message || w("craving.errNoIdea"));
       // DT150 (0.2.131): the idea's parts (base, filling, topping) come with it; a dish of one part has none
       const raw: any[] = data.idea?.items ?? [];
       const partOf = (name: string) => { const r = raw.find((x) => String(x?.name ?? "").trim().toLowerCase() === name.toLowerCase()); const pt = typeof r?.part === "string" ? r.part.trim().slice(0, 24) : ""; return pt ? pt.charAt(0).toUpperCase() + pt.slice(1) : undefined; };
@@ -96,8 +95,8 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
         const part = partOf(i.name);
         return { id: uid(), food: lib ?? estimate(i), grams: i.grams, locked: true, ...(part ? { part } : {}) };
       }).filter((i: { food: Food }) => !validateFood(i.food).length);
-      if (items.length < 2) throw new Error(`${CHEF_NAME} has no idea for that right now. Try other words.`);
-      if (items.some((i: { food: Food }) => blockedByAllergy(i.food, allergies))) throw new Error(`${CHEF_NAME}'s idea had a food you can't have. Ask again.`);
+      if (items.length < 2) throw new Error(w("craving.errNoIdeaWords"));
+      if (items.some((i: { food: Food }) => blockedByAllergy(i.food, allergies))) throw new Error(w("craving.errCantHave"));
       const total = items.reduce((n: number, i: { grams: number }) => n + i.grams, 0);
       const meal: Meal = { id: uid(), title: cookTitle(String(data.idea.title).slice(0, 80)), items, portion: total, savedAt: new Date().toISOString(), steps: [], idea: { at: new Date().toISOString(), craving: craving.slice(0, 80), how: (Array.isArray(data.idea.how) ? data.idea.how : []).map((x: unknown) => String(x).slice(0, 220)).filter(Boolean).slice(0, 5) } };
       setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
@@ -108,7 +107,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
   const pdCell = (r: { kcal: number; protein: number }) => { const fit = fitOf(r, target, pdUnit()); return <div className={`pick-pd ${fit.state}`}><b>{pdVal(fit.pd)}</b><small>{fit.text}</small></div>; };
   const row = (r: Row<Ref>) => (
     <button key={r.key} type="button" className="menu-row pick-row" onClick={() => take(r.ref)} aria-label={`${r.title}, ${pdText(r.pd)}`}>
-      <div className="menu-row-text"><b>{r.title}</b><small>{fmt(r.kcal, 0)} kcal · {fmt(r.protein, 0)} g protein{r.ref.kind === "starter" ? ` · ${CHEF_NAME} makes it from your foods` : ""}</small></div>
+      <div className="menu-row-text"><b>{r.title}</b><small>{w("craving.kcalProt", { kcal: fmt(r.kcal, 0), protein: fmt(r.protein, 0) })}{r.ref.kind === "starter" ? ` · ${w("craving.makesFromYourFoods")}` : ""}</small></div>
       {pdCell(r)}
     </button>
   );
@@ -118,29 +117,29 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
     <div className="crave">
       <input className="search crave-box" aria-label={w("plate.craving")} placeholder={w("plate.cravingBox")} value={q} onChange={(e) => { setQ(e.target.value); setIdea(null); }} />
       {!active && <small className="muted crave-hint">{w("plate.cravingHint")}</small>}
-      {asking && <ThinkingCard className="crave-ask crave-thinking" title={`${CHEF_NAME} is making ${/^(a|an|the|some)\b/i.test(asking) ? asking : `an idea for ${asking}`}`} sub={`From your foods${placeName(p.herePlace ?? p.region ?? "") ? `, sold in ${placeName(p.herePlace ?? p.region ?? "")}` : ""}`} />}
+      {asking && <ThinkingCard className="crave-ask crave-thinking" title={/^(a|an|the|some)\b/i.test(asking) ? w("craving.making", { what: asking }) : w("craving.makingIdeaFor", { what: asking })} sub={placeName(p.herePlace ?? p.region ?? "") ? w("craving.fromFoodsSoldIn", { place: placeName(p.herePlace ?? p.region ?? "") }) : w("craving.fromYourFoods")} />}
       {active && groups && !idea && !asking && (<>
-        {c.minPd !== null && <div className="crave-chips"><button type="button" className="pill pill-small" aria-label={w("craving.removePdFilter", { pd: c.minPd })} onClick={() => setQ(q.replace(/\bpd\s*(?:of\s*)?(?:>=|≥|>|over|above|at least)?\s*\d{1,2}(?:[.,]\d)?\s*(?:\+|or more|and up|or higher|plus)?/i, "").replace(/\s+/g, " ").trim())}>PD {fmt(c.minPd, 1)} and up ✕</button></div>}
+        {c.minPd !== null && <div className="crave-chips"><button type="button" className="pill pill-small" aria-label={w("craving.removePdFilter", { pd: c.minPd })} onClick={() => setQ(q.replace(/\bpd\s*(?:of\s*)?(?:>=|≥|>|over|above|at least)?\s*\d{1,2}(?:[.,]\d)?\s*(?:\+|or more|and up|or higher|plus)?/i, "").replace(/\s+/g, " ").trim())}>{w("craving.pdAndUp", { pd: fmt(c.minPd, 1) })}</button></div>}
         {groups.groups.map((g) => <div key={g.key}><small className="pick-group crave-group">{g.title}</small><div className="menu-list pick-list">{g.shown.map(row)}</div></div>)}
         {groups.under.length > 0 && (showUnder
-          ? <><small className="pick-group crave-group">Under PD {fmt(c.minPd, 1)}</small><div className="menu-list pick-list">{groups.under.map(row)}</div></>
-          : <small className="muted crave-line">Under PD {fmt(c.minPd, 1)}: {groups.under.length === 1 ? `1 more dish, ${groups.under[0].title}, ${pdText(groups.under[0].pd)}` : `${groups.under.length} more dishes`}. <button type="button" className="link in-inline" onClick={() => setShowUnder(true)}>Show {groups.under.length === 1 ? "it" : "them"}</button></small>)}
+          ? <><small className="pick-group crave-group">{w("craving.underPd", { pd: fmt(c.minPd, 1) })}</small><div className="menu-list pick-list">{groups.under.map(row)}</div></>
+          : <small className="muted crave-line">{groups.under.length === 1 ? w("craving.underOne", { pd: fmt(c.minPd, 1), title: groups.under[0].title, dishPd: pdText(groups.under[0].pd) }) : w("craving.underMany", { pd: fmt(c.minPd, 1), n: groups.under.length })} <button type="button" className="link in-inline" onClick={() => setShowUnder(true)}>{w(groups.under.length === 1 ? "craving.showIt" : "craving.showThem")}</button></small>)}
         {groups.foods.length > 0 && <><small className="pick-group crave-group">{w("craving.yourFoods")}</small><div className="menu-list pick-list">{groups.foods.map((f) => (
           <button key={f.id} type="button" className="menu-row pick-row" onClick={() => { keepTaste(); onFood(f); }} aria-label={w("craving.addFood", { food: foodV(f) })}>
             <div className="menu-row-text"><b>{f.name}</b><small>{f.brand} · {pdText(foodPd(f))}</small></div><span className="crave-add"><Plus size={14} /> {w("craving.add")}</span>
           </button>))}</div></>}
-        {groups.foods.length === 0 && groups.foodsUnder.length > 0 && <small className="muted crave-line">No food of yours at PD {fmt(c.minPd, 1)} or more. {groups.foodsUnder.slice(0, 2).map((f) => `${f.name} is ${pdText(foodPd(f))}`).join("; ")}.</small>}
+        {groups.foods.length === 0 && groups.foodsUnder.length > 0 && <small className="muted crave-line">{w("craving.noFoodAt", { pd: fmt(c.minPd, 1), list: groups.foodsUnder.slice(0, 2).map((f) => w("craving.foodIs", { name: f.name, pd: pdText(foodPd(f)) })).join("; ") })}</small>}
         {groups.groups.length === 0 && <small className="pick-group crave-group">{w("craving.nothingFound")}</small>}
         {groups.groups.length === 0
           ? <div className="card crave-ask">
-              <small className="muted">Nothing in your recipes, Coach's, the members' or your foods is {crave}{c.minPd !== null ? ` at PD ${fmt(c.minPd, 1)} or more` : ""}.</small>
+              <small className="muted">{c.minPd !== null ? w("craving.nothingInPd", { crave, pd: fmt(c.minPd, 1) }) : w("craving.nothingIn", { crave })}</small>
               <button type="button" className="pill pill-wide pill-primary" disabled={Boolean(asking) || !crave} onClick={() => void askChef(crave)}>{asking ? w("craving.thinking") : w("craving.askForOne")}</button>
               {err && <small className="crave-err" role="alert">{err}</small>}
             </div>
           : <small className="muted crave-line">{w("craving.tapADishAndIt")} <button type="button" className="link in-inline" disabled={Boolean(asking) || !crave} onClick={() => void askChef(crave)}>{asking ? w("craving.thinking") : w("craving.askForAnother")}</button>{err && <span className="crave-err" role="alert"> {err}</span>}</small>}
       </>)}
       {idea && ideaNums && !asking && (<>
-        <small className="pick-group crave-group">{CHEF_NAME}'s idea</small>
+        <small className="pick-group crave-group">{w("craving.chefsIdea")}</small>
         <div className="card crave-idea">
           <div className="crave-idea-top"><b>{idea.meal.title}</b>{pdCell(ideaNums)}</div>
           {idea.why && <small className="muted">{idea.why}</small>}
@@ -150,15 +149,15 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
             <b>{w("craving.forOneServing")}</b>
             {/* DT150: a dish in parts lists its foods part by part */}
             {idea.meal.items.some((i) => i.part)
-              ? <ul className="crave-foods crave-parts">{[...new Set(idea.meal.items.map((i) => i.part ?? "Other"))].map((pt) => <li key={pt}><b>{pt}:</b> {idea.meal.items.filter((i) => (i.part ?? "Other") === pt).map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(", ")}</li>)}</ul>
-              : <ul className="crave-foods">{idea.meal.items.map((i) => <li key={i.id}>{fmt(i.grams, 0)} g {i.food.name}</li>)}</ul>}
+              ? <ul className="crave-foods crave-parts">{[...new Set(idea.meal.items.map((i) => i.part ?? w("craving.otherPart")))].map((pt) => <li key={pt}><b>{pt}:</b> {idea.meal.items.filter((i) => (i.part ?? w("craving.otherPart")) === pt).map((i) => w("craving.gFood", { grams: fmt(i.grams, 0), food: i.food.name })).join(", ")}</li>)}</ul>
+              : <ul className="crave-foods">{idea.meal.items.map((i) => <li key={i.id}>{w("craving.gFood", { grams: fmt(i.grams, 0), food: i.food.name })}</li>)}</ul>}
             {(idea.meal.idea?.how ?? []).length > 0 && <><b>{w("craving.howToMakeIt")}</b><ol className="crave-how">{idea.meal.idea!.how!.map((x, k) => <li key={k}>{x}</li>)}</ol></>}
           </div>
-          <small className="muted">One serving: {fmt(ideaNums.kcal, 0)} kcal · {fmt(ideaNums.protein, 0)} g protein. To change a food, put it on your plate: swap, remove, add and the amounts are all there.</small>
-          <small className="muted">The numbers are from the foods, calculated by the app; a food you don't have is {CHEF_NAME}'s estimate.</small>
+          <small className="muted">{w("craving.oneServing", { kcal: fmt(ideaNums.kcal, 0), protein: fmt(ideaNums.protein, 0) })}</small>
+          <small className="muted">{w("craving.numbersFrom")}</small>
           <small className="crave-kept">{w("craving.keptInMyRecipesAs")}</small>
           <button type="button" className="pill pill-primary pill-wide" onClick={() => { const m = idea.meal; setIdea(null); setQ(""); p.openOnPlate(m); keepTaste(); }}>{w("craving.putItOnMyPlate")}</button>
-          <button type="button" className="link crave-again" disabled={Boolean(asking)} onClick={() => void askChef(crave)}>{asking ? `${CHEF_NAME} is thinking…` : w("craving.anotherIdea")}</button>
+          <button type="button" className="link crave-again" disabled={Boolean(asking)} onClick={() => void askChef(crave)}>{asking ? w("craving.chefThinking") : w("craving.anotherIdea")}</button>
           {err && <small className="crave-err" role="alert">{err}</small>}
         </div>
       </>)}

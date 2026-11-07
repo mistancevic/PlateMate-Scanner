@@ -5,10 +5,11 @@
 // Sugar alcohols: a sweetener with no energy and carbohydrate (erythritol) is a real food, counted as polyols (Milan 14:02).
 import type { Food, Ingredient } from "./pilot";
 import { lineTotal } from "./labeltable";
+import { w } from "./words";
 
 export type NutRow = { key: string; label: string; unit: "kcal" | "g"; sub: boolean; serving: number | null; all: number | null; per100: number | null; missing: string[] };
 export type Nutrition = { rows: NutRow[]; servings: number; grams: number; pd: number | null; share: number | null };
-const CORE: [keyof Food, string, string][] = [["calories", "energy", "Energy"], ["fats", "fat", "Fat"], ["carbs", "carbs", "Carbohydrate"], ["fiber", "fibre", "Fibre"], ["protein", "protein", "Protein"]];
+const CORE: [keyof Food, string][] = [["calories", "energy"], ["fats", "fat"], ["carbs", "carbs"], ["fiber", "fibre"], ["protein", "protein"]];
 // polyols in a food: its label's line, or all of its carbohydrate when it brings no energy (a sweetener such as erythritol)
 export const polyolsOf = (f: Pick<Food, "calories" | "carbs"> & { table?: { key: string; amount: number | null; unit: string }[] }): number | null => {
   const row = f.table?.find((r) => r.key === "polyols" && r.amount != null && r.unit === "g");
@@ -27,16 +28,17 @@ export function nutritionOf(list: Pick<Ingredient, "grams" | "food">[], servings
   const extra = (key: string) => (items.every((i) => i.food.table?.some((r) => r.key === key && r.amount != null)) ? lineTotal(items, key) : null);
   const poly = items.reduce((n, i) => n + ((polyolsOf(i.food) ?? 0) * i.grams) / 100, 0);
   const rows: NutRow[] = [];
-  rows.push(row("energy", "Energy", "kcal", false, core.energy.s, core.energy.miss));
-  rows.push(row("fat", "Fat", "g", false, core.fat.s, core.fat.miss));
-  const sat = extra("saturates"); if (sat !== null) rows.push(row("saturates", "of which saturates", "g", true, sat, []));
-  rows.push(row("carbs", "Carbohydrate", "g", false, core.carbs.s, core.carbs.miss));
-  const sug = extra("sugars"); if (sug !== null) rows.push(row("sugars", "of which sugars", "g", true, sug, []));
-  if (poly > 0) rows.push(row("polyols", "of which polyols", "g", true, poly, []));
+  // DT243 part two: the row labels as the screen shows them, from src/i18n/en.json; the keys stay the code's own
+  rows.push(row("energy", w("nutrition.rowEnergy"), "kcal", false, core.energy.s, core.energy.miss));
+  rows.push(row("fat", w("nutrition.rowFat"), "g", false, core.fat.s, core.fat.miss));
+  const sat = extra("saturates"); if (sat !== null) rows.push(row("saturates", w("nutrition.rowSaturates"), "g", true, sat, []));
+  rows.push(row("carbs", w("nutrition.rowCarbs"), "g", false, core.carbs.s, core.carbs.miss));
+  const sug = extra("sugars"); if (sug !== null) rows.push(row("sugars", w("nutrition.rowSugars"), "g", true, sug, []));
+  if (poly > 0) rows.push(row("polyols", w("nutrition.rowPolyols"), "g", true, poly, []));
   // fibre is voluntary on a label: a row only when every food has a value (a recipe read from a picture has none)
-  if (!core.fibre.miss.length) rows.push(row("fibre", "Fibre", "g", false, core.fibre.s, []));
-  rows.push(row("protein", "Protein", "g", false, core.protein.s, core.protein.miss));
-  const salt = extra("salt"); if (salt !== null) rows.push(row("salt", "Salt", "g", false, salt, []));
+  if (!core.fibre.miss.length) rows.push(row("fibre", w("nutrition.rowFibre"), "g", false, core.fibre.s, []));
+  rows.push(row("protein", w("nutrition.rowProtein"), "g", false, core.protein.s, core.protein.miss));
+  const salt = extra("salt"); if (salt !== null) rows.push(row("salt", w("nutrition.rowSalt"), "g", false, salt, []));
   const kcal = core.energy.miss.length ? 0 : core.energy.s, prot = core.protein.miss.length ? null : core.protein.s;
   return { rows, servings, grams, pd: kcal > 0 && prot !== null ? (100 * prot) / kcal : null, share: kcal > 0 && prot !== null ? Math.round((400 * prot) / kcal) : null };
 }

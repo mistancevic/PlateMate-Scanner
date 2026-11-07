@@ -19,7 +19,7 @@ export function CookStrip({ p }: { p: AppApi }) {
   // the cook without the last answer; the card keeps everything else
   const cooking = c.stage === "make" || c.stage === "eat";
   if (ask && cooking) return (
-    <div className="cook-strip cook-strip-ask" role="group" aria-label={`Stop cooking ${c.title}`}>
+    <div className="cook-strip cook-strip-ask" role="group" aria-label={wd("strip.stopCooking", { title: c.title })}>
       <span className="cs-words"><b>{c.title}</b></span>
       {ask === "choose"
         ? <><button type="button" className="pill pill-small" onClick={() => { setAsk(null); p.saveCookForLater(); }}>{wd("strip.saveForLater")}</button><button type="button" className="pill pill-small cs-end-it" onClick={() => setAsk("end")}>{wd("strip.endIt")}</button></>
@@ -29,12 +29,12 @@ export function CookStrip({ p }: { p: AppApi }) {
   );
   return (
     <div className="cook-strip">
-      <button type="button" className="cs-main" onClick={() => p.goOnCook()} aria-label={`${w.lead}: ${w.rest}. Go on`}>
+      <button type="button" className="cs-main" onClick={() => p.goOnCook()} aria-label={wd("strip.goOnAria", { lead: w.lead, rest: w.rest })}>
         <Mark size={16} color="var(--brand)" />
         <span className="cs-words"><b>{w.lead}</b> · {w.rest}</span>
         <b className="cs-go">{wd("strip.goOn")}</b>
       </button>
-      <button type="button" className="cs-end" aria-label={cooking ? `Stop cooking ${c.title}` : wd("strip.endTheCook")} onClick={() => (cooking ? setAsk("choose") : p.endCook())}>✕</button>
+      <button type="button" className="cs-end" aria-label={cooking ? wd("strip.stopCooking", { title: c.title }) : wd("strip.endTheCook")} onClick={() => (cooking ? setAsk("choose") : p.endCook())}>✕</button>
     </div>
   );
 }

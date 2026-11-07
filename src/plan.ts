@@ -1,5 +1,5 @@
 import { workHoursOf, suggestWhen, type WorkHours } from "./slots";
-import { w } from "./words";
+import { w, dateText, type WordKey } from "./words";
 // The Training week and Lifestyle, as approved on the canvas on 6 October 2026.
 // Lifestyle is set once: work, recovery, nutrition. The Training week is the usual week, Monday to Sunday, one activity a day.
 // Today reads the plan; a change for one date is kept for that date only and never touches the plan.
@@ -17,8 +17,12 @@ export type PlanDay = { work: boolean; study?: boolean; kind: Kind; intensity?: 
   at?: string };
 export type Plan = PlanDay[]; // seven days, Monday first
 
-export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-export const WEEKDAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+// DT243: the day names in the language chosen, read when shown (Mon to Sun, Monday to Sunday in English); 1 January 2024 was a Monday
+const dayNames = (weekday: "short" | "long"): string[] => { const a: string[] = []; for (let i = 0; i < 7; i++) Object.defineProperty(a, i, { enumerable: true, get: () => dateText(new Date(2024, 0, 1 + i, 12), { weekday }) }); return a; };
+export const WEEKDAYS = dayNames("short");
+export const WEEKDAY_NAMES = dayNames("long");
+// the Explorer stays English (Coach Milan, until its own phase): its day names stay English too
+export const WEEKDAY_NAMES_EN = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 export const weekdayIndex = (d: Date) => (d.getDay() + 6) % 7;
 
 // METs from the Compendium of Physical Activities (2024), at easy, moderate and hard. Only the part above rest is added.
@@ -63,16 +67,11 @@ export const COMMUTE: Record<string, { met: number; minutes: number; name: strin
 // how each zone feels and what usually falls in it. The id "easy" stays, so saved plans keep reading.
 export const INTENSITIES: { id: Intensity; name: string }[] = [{ id: "easy", get name() { return w("plan.int.easy"); } }, { id: "moderate", get name() { return w("plan.int.moderate"); } }, { id: "hard", get name() { return w("plan.int.hard"); } }];
 export type Zone = { zone: string; feel: string; examples: string };
+const zone = (n: number): Zone => ({ get zone() { return w("plan.zoneN", { n }); }, get feel() { return w(`plan.zone${n}.feel` as WordKey); }, get examples() { return w(`plan.zone${n}.examples` as WordKey); } });
 export const ZONES: Record<Intensity, Zone[]> = {
-  easy: [{ zone: "Zone 1", feel: "very easy, you breathe calmly", examples: "yoga, mobility, stretching, easy cycling" }],
-  moderate: [
-    { zone: "Zone 2", feel: "easy, you can talk in full sentences", examples: "easy jog, cycling, swimming, hiking" },
-    { zone: "Zone 3", feel: "steady, you talk in short sentences", examples: "tempo run, spin class, team practice" },
-  ],
-  hard: [
-    { zone: "Zone 4", feel: "hard, only a few words at a time", examples: "intervals, HIIT, a football match" },
-    { zone: "Zone 5", feel: "all out, no words", examples: "sprints, the last minutes of a race" },
-  ],
+  easy: [zone(1)],
+  moderate: [zone(2), zone(3)],
+  hard: [zone(4), zone(5)],
 };
 export const intensityWord = (x?: Intensity) => (x === "hard" ? w("plan.intLow.hard") : x === "moderate" ? w("plan.intLow.moderate") : w("plan.intLow.easy"));
 // How long, as ranges from 15 minutes. A range counts as its middle. A length saved before (30, 45, 60, 75, 90 minutes)

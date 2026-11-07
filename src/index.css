@@ -2908,6 +2908,8 @@ html[lang="de"] :is(.card, .log-card, .plan, .missed-ask, [role="dialog"]) .butt
 html[lang="de"] .next-planned .button-row.next-planned-acts > .pill.pill-primary { flex-basis: 100%; }
 /* 2. The Plate: Fit and Prepare go one under the other when they don't fit side by side */
 html[lang="de"] .ways-out { flex-wrap: wrap; }
+/* 0.3.103: the PD band chips on Foods (Niedrig− Niedrig Im Plan Hoch Hoch+) are wider than a 360 px row: they wrap */
+html[lang="de"] .chips:has(> .chip-top) { flex-wrap: wrap; }
 html[lang="de"] .ways-out .pill-wide { flex: 1 1 auto; }
 /* 3. A wide button may take two lines; its words are never cut */
 html[lang="de"] :is(.pill-wide, .pill-tall) { white-space: normal; height: auto; min-height: 48px; padding-block: 8px; line-height: 1.25; text-align: center; }

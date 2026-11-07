@@ -1,5 +1,5 @@
 // Weigh-ins and the trend (canvas boards W0 to W2, approved 7 October 2026). One weigh-in per date; one morning is noise,
-import { dec } from "./words";
+import { dec, w } from "./words";
 import { wDelta } from "./units";
 // so the app only ever reads the 7-day average. The last 4 weeks compare the first week's average with the last week's,
 // against what the goal expects for the same time. Numbers change only when the person says so.
@@ -75,17 +75,18 @@ export function pctTrend(t: Trend, base: number): Trend {
     expected: [d(t.expected[0]), d(t.expected[1])], points: t.points.map((x) => ({ day: x.day, kg: p(x.kg) })), averages: t.averages.map((x) => ({ day: x.day, kg: p(x.kg) })) };
 }
 export const fmtPct = (x: number) => `${x > 0 ? "+" : x < 0 ? "−" : ""}${dec(Math.abs(x), 1)} %`;
-export const VERDICT_WORDS: Record<Verdict, string> = { "on track": "On track", faster: "Faster than expected", slower: "Slower than expected", up: "Going up", down: "Going down", "too few": "Not enough weigh-ins yet" };
+export const VERDICT_WORDS: Record<Verdict, string> = { get "on track"() { return w("weight.vOnTrack"); }, get faster() { return w("weight.vFaster"); }, get slower() { return w("weight.vSlower"); }, get up() { return w("weight.vUp"); }, get down() { return w("weight.vDown"); }, get "too few"() { return w("weight.vTooFew"); } };
 // what it usually means, and what to try: advice to read, never a change to the numbers
 export function verdictNote(band: string, v: Verdict): string | null {
   if (v === "on track") return null;
-  if (v === "too few") return "The trend needs 3 weigh-ins in the first week and 3 in the last. Most coaches ask for 3 to 7 mornings a week, same time, before breakfast.";
-  const n: Record<string, Partial<Record<Verdict, string>>> = {
-    gainsteady: { faster: "For Steady, faster usually means more of it is fat. Take about 100 kcal off, mostly carbs on days without training, and look again in 2 weeks.", slower: "If your lifts are going up, this is fine. If they're stuck too, add about 100 kcal, mostly carbs around training, and look again in 2 weeks." },
-    gain: { faster: "Faster than 0.5 % a week is mostly fat. Take about 150 kcal off and look again in 2 weeks.", slower: "Add about 150 kcal, mostly carbs around training, and look again in 2 weeks." },
-    fatloss: { faster: "Losing faster risks muscle and energy. Add about 100 to 150 kcal, keep protein and lifting as they are.", slower: "Look at the weekends first. Then take about 100 kcal off, or add steps, and look again in 2 weeks." },
+  if (v === "too few") return w("weight.noteTooFew");
+  const n: Record<string, Partial<Record<Verdict, "weight.noteSteadyFaster" | "weight.noteSteadySlower" | "weight.noteGainFaster" | "weight.noteGainSlower" | "weight.noteLossFaster" | "weight.noteLossSlower">>> = {
+    gainsteady: { faster: "weight.noteSteadyFaster", slower: "weight.noteSteadySlower" },
+    gain: { faster: "weight.noteGainFaster", slower: "weight.noteGainSlower" },
+    fatloss: { faster: "weight.noteLossFaster", slower: "weight.noteLossSlower" },
   };
-  return n[band]?.[v] ?? "More change than this goal expects. Small changes in food or steps bring it back; talk to your coach if it goes on.";
+  const k = n[band]?.[v];
+  return k ? w(k) : w("weight.noteOther");
 }
 // the trend in a sentence of numbers, for the coach's list
 // in the unit the person chose (0.2.18, board UN): +0.4 kg or +0.9 lb

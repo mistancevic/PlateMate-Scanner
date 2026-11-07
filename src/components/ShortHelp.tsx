@@ -52,13 +52,13 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
     // what was swapped, as the meal names it; what was marked, as the list says it
     const foods = named.join(", ").toLowerCase(), marked = missing.join(", ").toLowerCase();
     const note = o.kind === "standin"
-      ? `You swapped ${foods} for ${(o.swaps ?? []).map((w: any) => String(w.name).toLowerCase()).join(", ")} because you marked ${marked} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only; ${title} stays as it is.`
-      : `You picked this in place of ${title} because you marked ${marked} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only.`;
+      ? w("shorthelp.noteSwap", { foods, swaps: (o.swaps ?? []).map((x: any) => String(x.name).toLowerCase()).join(", "), marked, list, title })
+      : w("shorthelp.notePicked", { title, marked, list });
     return { kind: o.kind === "meal" ? "meal" : "standin", title: name, why: String(o.why || ""), note, items, kcal, protein, pd: density(protein, kcal), mealId, source };
   };
   const ask = async () => {
-    if (!p.ai.on) { setErr(p.ai.why || `${CHEF_NAME} is not available right now.`); return; }
-    if (!portion) { setErr("This meal has no foods saved, so there is nothing to stand in for."); return; }
+    if (!p.ai.on) { setErr(p.ai.why || w("shorthelp.notAvailable")); return; }
+    if (!portion) { setErr(w("shorthelp.noFoods")); return; }
     setBusy(true); setErr("");
     try {
       const r = await fetch("/api/short", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
@@ -68,7 +68,7 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
         library: p.state.foods.slice(0, 30).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
         goal: p.goal?.band, region: p.region, kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal) }) });
       const d = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(d.error || `${CHEF_NAME} didn't answer. Try again.`);
+      if (!r.ok) throw new Error(d.error || w("shorthelp.noAnswer"));
       setOpts(((d.options ?? []) as any[]).map(build).filter((x): x is Opt => !!x));
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   };
@@ -82,11 +82,11 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
   return (
     <div className="shop-help">
       <div className="shop-help-head">
-        <div className="menu-row-text"><b>{label}, {title}</b><small>Short: {missing.join(", ")}</small></div>
-        {!opts && <button type="button" className="pill pill-small" disabled={busy} onClick={ask}>{busy ? "Asking…" : `Ask ${CHEF_NAME}`}</button>}
+        <div className="menu-row-text"><b>{label}, {title}</b><small>{w("shorthelp.short", { foods: missing.join(", ") })}</small></div>
+        {!opts && <button type="button" className="pill pill-small" disabled={busy} onClick={ask}>{busy ? w("shorthelp.asking") : w("shorthelp.ask")}</button>}
       </div>
       {err && <small className="shop-missing-note">{err}</small>}
-      {opts && !opts.length && <small>{CHEF_NAME} found nothing that fits. Pick another meal for this slot in Plan.</small>}
+      {opts && !opts.length && <small>{w("shorthelp.nothingFits")}</small>}
       {opts?.map((o, k) => {
         const fits = target === null || (o.pd !== null && o.pd >= target - 0.05);
         return (
@@ -94,7 +94,7 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
             <small className="shop-help-kind">{o.kind === "standin" ? w("shorthelp.swapAFood") : w("shorthelp.anotherMeal")}</small>
             <b>{o.title}</b>
             {o.why && <small>{o.why}</small>}
-            <small className={fits ? "fit-ok" : "fit-under"}>{fmt(o.kcal, 0)} kcal · {o.protein} g protein · PD {pdVal(o.pd)}{fits ? " · fits" : ` · under your ${pdVal(target)}`}</small>
+            <small className={fits ? "fit-ok" : "fit-under"}>{fits ? w("shorthelp.optFits", { kcal: fmt(o.kcal, 0), protein: o.protein, pd: pdVal(o.pd) }) : w("shorthelp.optUnder", { kcal: fmt(o.kcal, 0), protein: o.protein, pd: pdVal(o.pd), target: pdVal(target) })}</small>
             <div className="button-row"><button type="button" className="pill pill-small" disabled={using} onClick={() => use(o)}>{w("shorthelp.useThis")}</button></div>
           </div>
         );

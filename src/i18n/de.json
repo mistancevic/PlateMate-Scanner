@@ -6658,7 +6658,7 @@
       "checked": true
     },
     "foods.jobBy": {
-      "text": "{job} von {brand}",
+      "text": "{job}, {brand}",
       "checked": true
     },
     "foods.per100": {
@@ -16019,6 +16019,4914 @@
     },
     "photo.idea": {
       "text": "{meal}, so wie auf dem Foto: {kcal} und {prot}. Pass es an, dann ist es für deinen Tag bemessen.",
+      "checked": true
+    },
+    "moment.hint.regular": {
+      "text": "Richtet sich nach dem Ziel deines Tages.",
+      "checked": true
+    },
+    "moment.hint.before": {
+      "text": "Energie, die leicht reingeht. Halte Fett und Ballaststoffe niedrig.",
+      "checked": true
+    },
+    "moment.hint.after": {
+      "text": "Zuerst Protein.",
+      "checked": true
+    },
+    "moment.hint.meeting": {
+      "text": "Gleichmäßige Energie, kein Tief. Halte den Teller klein.",
+      "checked": true
+    },
+    "moment.hint.travel": {
+      "text": "Nimm, was da ist. Protein, wo es geht, und jag nicht der Zahl hinterher.",
+      "checked": true
+    },
+    "moment.hint.celebration": {
+      "text": "Ist gerade passiert. Genieß es, halte es klein; die nächste Mahlzeit setzt mehr auf Protein.",
+      "checked": true
+    },
+    "moment.hint.afterwork": {
+      "text": "Ist gerade passiert. Genieß es, halte es klein; die nächste Mahlzeit setzt mehr auf Protein.",
+      "checked": true
+    },
+    "strip.stopCooking": {
+      "text": "Kochen von {title} beenden",
+      "checked": true
+    },
+    "strip.goOnAria": {
+      "text": "{lead}: {rest}. Weiter",
+      "checked": true
+    },
+    "busy.fromTo": {
+      "text": "{from} bis {to}",
+      "checked": true
+    },
+    "shorthelp.noteSwap": {
+      "text": "Getauscht: {foods} gegen {swaps}, weil du {marked} auf Einkaufsliste {list} als Diesmal nicht markiert hast. Aus den Ideen von Chef Mealan. Nur für diesen Tag; {title} bleibt, wie es ist.",
+      "checked": true
+    },
+    "shorthelp.notePicked": {
+      "text": "Statt {title} gewählt, weil du {marked} auf Einkaufsliste {list} als Diesmal nicht markiert hast. Aus den Ideen von Chef Mealan. Nur für diesen Tag.",
+      "checked": true
+    },
+    "shorthelp.notAvailable": {
+      "text": "Chef Mealan ist gerade nicht verfügbar.",
+      "checked": true
+    },
+    "shorthelp.noFoods": {
+      "text": "Für diese Mahlzeit sind keine Lebensmittel gespeichert, also gibt es nichts zu ersetzen.",
+      "checked": true
+    },
+    "shorthelp.noAnswer": {
+      "text": "Chef Mealan hat nicht geantwortet. Versuch es nochmal.",
+      "checked": true
+    },
+    "shorthelp.short": {
+      "text": "Fehlt: {foods}",
+      "checked": true
+    },
+    "shorthelp.asking": {
+      "text": "Frage…",
+      "checked": true
+    },
+    "shorthelp.ask": {
+      "text": "Frag Chef Mealan",
+      "checked": true
+    },
+    "shorthelp.nothingFits": {
+      "text": "Chef Mealan hat nichts Passendes gefunden. Wähle im Plan eine andere Mahlzeit für diesen Platz.",
+      "checked": true
+    },
+    "shorthelp.optFits": {
+      "text": "{kcal} kcal · {protein} g Protein · PD {pd} · passt",
+      "checked": true
+    },
+    "shorthelp.optUnder": {
+      "text": "{kcal} kcal · {protein} g Protein · PD {pd} · unter deinem Ziel {target}",
+      "checked": true
+    },
+    "publish.bylineOurs": {
+      "text": "Aus unserer Küche",
+      "checked": true
+    },
+    "publish.bylineName": {
+      "text": "Aus {name}s Küche",
+      "checked": true
+    },
+    "publish.bylineNameS": {
+      "text": "Aus {name}' Küche",
+      "checked": true
+    },
+    "publish.claimProblem": {
+      "text": "Das Wort proteinreich braucht mindestens 20 % der Kalorien aus Protein; dieses Rezept hat {share} %. Ändere den Namen oder die zwei Zeilen.",
+      "checked": true
+    },
+    "delrecipe.itsFoodsAndGrams": {
+      "text": "seine Lebensmittel und Grammangaben",
+      "checked": true
+    },
+    "delrecipe.partSteps": {
+      "text": "Schritte",
+      "checked": true
+    },
+    "delrecipe.partParts": {
+      "text": "Teile",
+      "checked": true
+    },
+    "delrecipe.partOptional": {
+      "text": "optionale Lebensmittel",
+      "checked": true
+    },
+    "delrecipe.partOriginalSteps": {
+      "text": "die Originalschritte",
+      "checked": true
+    },
+    "delrecipe.partOwnNumbers": {
+      "text": "die eigenen Zahlen des Rezepts",
+      "checked": true
+    },
+    "delrecipe.doneMembers": {
+      "text": "Aus Mitglieder zurückgezogen.",
+      "checked": true
+    },
+    "delrecipe.doneMembersDown": {
+      "text": "Aus Mitglieder zurückgezogen und auf chefmealan.com offline genommen.",
+      "checked": true
+    },
+    "delrecipe.doneMembersWithdrawn": {
+      "text": "Aus Mitglieder und bei {who} zurückgezogen.",
+      "checked": true
+    },
+    "delrecipe.doneDown": {
+      "text": "Auf chefmealan.com offline genommen.",
+      "checked": true
+    },
+    "delrecipe.doneWithdrawn": {
+      "text": "Bei {who} zurückgezogen.",
+      "checked": true
+    },
+    "delrecipe.leavesShot": {
+      "text": "Sein Screenshot wird beim nächsten Speichern aus deinem Konto entfernt.",
+      "checked": true
+    },
+    "delrecipe.leavesShots": {
+      "text": "Seine Screenshots werden beim nächsten Speichern aus deinem Konto entfernt.",
+      "checked": true
+    },
+    "delrecipe.leavesPicture": {
+      "text": "Sein Bild wird beim nächsten Speichern aus deinem Konto entfernt.",
+      "checked": true
+    },
+    "delrecipe.leavesPictures": {
+      "text": "Seine Bilder werden beim nächsten Speichern aus deinem Konto entfernt.",
+      "checked": true
+    },
+    "recipein.screenshotN": {
+      "text": "Screenshot {n}",
+      "checked": true
+    },
+    "recipein.removeScreenshotN": {
+      "text": "Screenshot {n} entfernen",
+      "checked": true
+    },
+    "recipein.slowPage": {
+      "text": "Diese Seite dauert länger als die meisten. Chef Mealan liest weiter: bis zu zwei Minuten.",
+      "checked": true
+    },
+    "recipein.slowPicture": {
+      "text": "Dieses Bild dauert länger als die meisten. Chef Mealan liest weiter: bis zu zwei Minuten.",
+      "checked": true
+    },
+    "recipein.slowPictures": {
+      "text": "Diese Bilder dauern länger als die meisten. Chef Mealan liest weiter: bis zu zwei Minuten.",
+      "checked": true
+    },
+    "recipein.how.converted": {
+      "text": "umgerechnet",
+      "checked": true
+    },
+    "recipein.picturesOrder": {
+      "text": "{n} Bild, gelesen in dieser Reihenfolge: das Gericht, dann die Zutaten. Bis zu {max}.|{n} Bilder, gelesen in dieser Reihenfolge: das Gericht, dann die Zutaten. Bis zu {max}.",
+      "checked": true
+    },
+    "recipein.addPlus": {
+      "text": "+ Hinzufügen",
+      "checked": true
+    },
+    "recipein.chefIsReading": {
+      "text": "Chef Mealan liest…",
+      "checked": true
+    },
+    "recipein.chefReadingPicture": {
+      "text": "Chef Mealan liest das Bild",
+      "checked": true
+    },
+    "recipein.chefReadingPictures": {
+      "text": "Chef Mealan liest die Bilder",
+      "checked": true
+    },
+    "recipein.chefReadingRecipe": {
+      "text": "Chef Mealan liest das Rezept",
+      "checked": true
+    },
+    "recipein.chefReadsFoods": {
+      "text": "Chef Mealan liest die Lebensmittel, die Mengen und woher das Rezept stammt. Die Bilder bleiben beim Rezept, nur für dich.",
+      "checked": true
+    },
+    "recipein.fromTheLink": {
+      "text": "aus dem Link",
+      "checked": true
+    },
+    "recipein.readFromShots": {
+      "text": "aus {n} Screenshot von dir gelesen|aus deinen {n} Screenshots gelesen",
+      "checked": true
+    },
+    "recipein.fromSource": {
+      "text": "Von {source}, {from}",
+      "checked": true
+    },
+    "recipein.noSource": {
+      "text": "Herkunft nicht angegeben, {from}",
+      "checked": true
+    },
+    "recipein.change": {
+      "text": "Ändern",
+      "checked": true
+    },
+    "recipein.writtenOnRecipe": {
+      "text": "{written} im Rezept",
+      "checked": true
+    },
+    "recipein.noAmountOnRecipe": {
+      "text": "keine Menge im Rezept",
+      "checked": true
+    },
+    "recipein.countedSize": {
+      "text": "nach Stück, Größe {size}",
+      "checked": true
+    },
+    "recipein.forFrying": {
+      "text": "zum Braten",
+      "checked": true
+    },
+    "recipein.optional": {
+      "text": "optional",
+      "checked": true
+    },
+    "recipein.onTheRecipe": {
+      "text": "im Rezept",
+      "checked": true
+    },
+    "recipein.recipeSays": {
+      "text": "Das Rezept sagt: {kcal} kcal · {protein} g Protein · {pd} pro {one}.",
+      "checked": true
+    },
+    "recipein.estimateHigher": {
+      "text": "Unsere Schätzung liegt {n}% höher: Das Rezept nutzt vielleicht andere Produkte. Der Teller nimmt unsere; ändere ein Lebensmittel, damit es zu deinem passt.",
+      "checked": true
+    },
+    "recipein.estimateLower": {
+      "text": "Unsere Schätzung liegt {n}% niedriger: Das Rezept nutzt vielleicht andere Produkte. Der Teller nimmt unsere; ändere ein Lebensmittel, damit es zu deinem passt.",
+      "checked": true
+    },
+    "recipein.estimateAgrees": {
+      "text": "Unsere Schätzung stimmt überein.",
+      "checked": true
+    },
+    "recipein.partAria": {
+      "text": "Teil: {part}",
+      "checked": true
+    },
+    "recipein.groupFoods": {
+      "text": "{n} Lebensmittel · {kcal} kcal|{n} Lebensmittel · {kcal} kcal",
+      "checked": true
+    },
+    "recipein.fryingNote": {
+      "text": "Das Öl zum Braten: Das Rezept braucht den ganzen Topf; die Zahlen zählen, was das Essen aufnimmt. Diese Menge ist eine Schätzung, 15% des gebratenen Essens, nach dem Fett eines glasierten Donuts (USDA).",
+      "checked": true
+    },
+    "recipein.forTheWholeRecipe": {
+      "text": "{how}, für das ganze Rezept.",
+      "checked": true
+    },
+    "recipein.pageNoSteps": {
+      "text": "Die Seite zeigt keine Schritte. Chef Mealan kann sie auf der Rezeptseite entwerfen.",
+      "checked": true
+    },
+    "recipein.screenshotNoSteps": {
+      "text": "Der Screenshot zeigt keine Schritte. Chef Mealan kann sie auf der Rezeptseite entwerfen.",
+      "checked": true
+    },
+    "recipein.wholeRecipe": {
+      "text": "Das ganze Rezept: {kcal} kcal · {protein} g Protein · {pd}.",
+      "checked": true
+    },
+    "recipein.leftOut": {
+      "text": "Weggelassen: {n} optionale, wie in den Zahlen des Rezepts; Hinzufügen nimmt eins dazu.",
+      "checked": true
+    },
+    "recipein.valuesTypical": {
+      "text": "Die Werte sind typische Werte, als Schätzung markiert; tippe auf ein Lebensmittel auf dem Teller, um es zu prüfen oder zu ändern.",
+      "checked": true
+    },
+    "recipein.sideOnTop": {
+      "text": "obendrauf",
+      "checked": true
+    },
+    "recipein.sideAfter": {
+      "text": "danach",
+      "checked": true
+    },
+    "recipein.sideOnTheSide": {
+      "text": "daneben",
+      "checked": true
+    },
+    "cookpair.kitchenClosed": {
+      "text": "Der Küchenbildschirm ist geschlossen.",
+      "checked": true
+    },
+    "cookpair.kitchenLeft": {
+      "text": "Der Küchenbildschirm hat sich abgemeldet.",
+      "checked": true
+    },
+    "cookpair.kitchenOn": {
+      "text": "Der Küchenbildschirm ist an.",
+      "checked": true
+    },
+    "cookpair.alsoOnKitchen": {
+      "text": "Auch auf dem Küchenbildschirm · Schritt {k} von {n}",
+      "checked": true
+    },
+    "cookpair.codeAria": {
+      "text": "Code {code}",
+      "checked": true
+    },
+    "cookpair.qrLabel": {
+      "text": "QR-Code für den Küchenbildschirm, Code {code}",
+      "checked": true
+    },
+    "kitchen.sessionEnded": {
+      "text": "Die Sitzung ist beendet.",
+      "checked": true
+    },
+    "kitchen.noPhoto": {
+      "text": "Kein Foto aufgenommen. Tippe auf Chef und schau nochmal.",
+      "checked": true
+    },
+    "kitchen.joinedLine": {
+      "text": "Küchenbildschirm · verbunden mit dem Handy, mit dem gekocht wird",
+      "checked": true
+    },
+    "kitchen.leave": {
+      "text": "Verlassen",
+      "checked": true
+    },
+    "kitchen.finish": {
+      "text": "Fertig",
+      "checked": true
+    },
+    "kitchen.title": {
+      "text": "Chef Mealan · Küchenbildschirm",
+      "checked": true
+    },
+    "photoask.fromToday": {
+      "text": "Ein Foto von heute um {time}.",
+      "checked": true
+    },
+    "photoask.fromYesterday": {
+      "text": "Ein Foto von gestern, {time}.",
+      "checked": true
+    },
+    "photoask.fromDay": {
+      "text": "Ein Foto vom {day}, {time}.",
+      "checked": true
+    },
+    "count.egg": {
+      "text": "{n} Ei|{n} Eier",
+      "checked": true
+    },
+    "count.banana": {
+      "text": "{n} Banane|{n} Bananen",
+      "checked": true
+    },
+    "count.apple": {
+      "text": "{n} Apfel|{n} Äpfel",
+      "checked": true
+    },
+    "count.peeled": {
+      "text": "geschält",
+      "checked": true
+    },
+    "count.weighed": {
+      "text": "gewogen",
+      "checked": true
+    },
+    "craving.errNoAnswer": {
+      "text": "Chef Mealan konnte nicht antworten.",
+      "checked": true
+    },
+    "craving.errNoIdea": {
+      "text": "Chef Mealan hat gerade keine Idee dafür.",
+      "checked": true
+    },
+    "craving.errNoIdeaWords": {
+      "text": "Chef Mealan hat gerade keine Idee dafür. Versuch es mit anderen Worten.",
+      "checked": true
+    },
+    "craving.errCantHave": {
+      "text": "In der Idee von Chef Mealan war ein Lebensmittel, das du nicht essen darfst. Frag nochmal.",
+      "checked": true
+    },
+    "craving.kcalProt": {
+      "text": "{kcal} kcal · {protein} g Protein",
+      "checked": true
+    },
+    "craving.makesFromYourFoods": {
+      "text": "Chef Mealan macht es aus deinen Lebensmitteln",
+      "checked": true
+    },
+    "craving.making": {
+      "text": "Chef Mealan macht {what}",
+      "checked": true
+    },
+    "craving.makingIdeaFor": {
+      "text": "Chef Mealan entwirft eine Idee für {what}",
+      "checked": true
+    },
+    "craving.fromYourFoods": {
+      "text": "Aus deinen Lebensmitteln",
+      "checked": true
+    },
+    "craving.fromFoodsSoldIn": {
+      "text": "Aus deinen Lebensmitteln, erhältlich in {place}",
+      "checked": true
+    },
+    "craving.pdAndUp": {
+      "text": "PD {pd} und mehr ✕",
+      "checked": true
+    },
+    "craving.underPd": {
+      "text": "Unter PD {pd}",
+      "checked": true
+    },
+    "craving.underOne": {
+      "text": "Unter PD {pd}: 1 weiteres Gericht, {title}, {dishPd}.",
+      "checked": true
+    },
+    "craving.underMany": {
+      "text": "Unter PD {pd}: {n} weitere Gerichte.",
+      "checked": true
+    },
+    "craving.showIt": {
+      "text": "Zeig es",
+      "checked": true
+    },
+    "craving.showThem": {
+      "text": "Zeig sie",
+      "checked": true
+    },
+    "craving.noFoodAt": {
+      "text": "Keins deiner Lebensmittel hat PD {pd} oder mehr. {list}.",
+      "checked": true
+    },
+    "craving.foodIs": {
+      "text": "{name} hat {pd}",
+      "checked": true
+    },
+    "craving.nothingIn": {
+      "text": "Nichts in deinen Rezepten, denen vom Coach, denen der Mitglieder oder deinen Lebensmitteln passt zu {crave}.",
+      "checked": true
+    },
+    "craving.nothingInPd": {
+      "text": "Nichts in deinen Rezepten, denen vom Coach, denen der Mitglieder oder deinen Lebensmitteln passt zu {crave} mit PD {pd} oder mehr.",
+      "checked": true
+    },
+    "craving.chefsIdea": {
+      "text": "Idee von Chef Mealan",
+      "checked": true
+    },
+    "craving.otherPart": {
+      "text": "Sonstiges",
+      "checked": true
+    },
+    "craving.gFood": {
+      "text": "{grams} g {food}",
+      "checked": true
+    },
+    "craving.oneServing": {
+      "text": "Eine Portion: {kcal} kcal · {protein} g Protein. Um ein Lebensmittel zu ändern, leg das Gericht auf deinen Teller: Tauschen, Entfernen, Hinzufügen und die Mengen, alles ist dort.",
+      "checked": true
+    },
+    "craving.numbersFrom": {
+      "text": "Die Zahlen kommen aus den Lebensmitteln, berechnet von der App; ein Lebensmittel, das du nicht hast, ist eine Schätzung von Chef Mealan.",
+      "checked": true
+    },
+    "craving.chefThinking": {
+      "text": "Chef Mealan denkt nach…",
+      "checked": true
+    },
+    "carbsfat.kindDays": {
+      "text": "{name}-Tage",
+      "checked": true
+    },
+    "carbsfat.onDaysCarbsAre": {
+      "text": "{days}: Deine Kohlenhydrate liegen",
+      "checked": true
+    },
+    "carbsfat.stepTitle": {
+      "text": "{n}. Kohlenhydrate und Fett",
+      "checked": true
+    },
+    "carbsfat.typeYourCarbs": {
+      "text": "Kohlenhydrate eingeben",
+      "checked": true
+    },
+    "carbsfat.gRange": {
+      "text": "{a} bis {b} g",
+      "checked": true
+    },
+    "carbsfat.lowStay": {
+      "text": "Deine Kohlenhydrate bleiben jeden Tag bei {low} g; Fett bekommt den Rest.",
+      "checked": true
+    },
+    "carbsfat.lowStayMoves": {
+      "text": "Deine Kohlenhydrate bleiben jeden Tag bei {low} g; Fett bekommt den Rest und geht mit deinem Training rauf und runter.",
+      "checked": true
+    },
+    "carbsfat.lowThatIs": {
+      "text": "Das sind {pct} deiner Energie aus Fett, {fat} dem Bereich von 20 bis 35 %, und die Kohlenhydrate {carbs} dem Bereich von 45 bis 60 % (EFSA). Deine Wahl: Entdecken zeigt, wo du bei beiden stehst.",
+      "checked": true
+    },
+    "carbsfat.pctRange": {
+      "text": "{a} bis {b} %",
+      "checked": true
+    },
+    "carbsfat.above": {
+      "text": "über",
+      "checked": true
+    },
+    "carbsfat.inside": {
+      "text": "in",
+      "checked": true
+    },
+    "carbsfat.below": {
+      "text": "unter",
+      "checked": true
+    },
+    "carbsfat.fatRangeLine": {
+      "text": "Der Bereich liegt bei 20 bis 35 % deiner Energie (EFSA), {lo} bis {hi} g bei den {kcal} kcal deiner Woche. Deiner liegt bei {pct} %: {split}. Kohlenhydrate bekommen den Rest, {carbs}.",
+      "checked": true
+    },
+    "carbsfat.carbsMove": {
+      "text": "{a} bis {b} g, rauf und runter mit deinem Training",
+      "checked": true
+    },
+    "carbsfat.belowBottom": {
+      "text": "{days} unter 45 % der Energie, dem unteren Ende des EFSA-Bereichs.",
+      "checked": true
+    },
+    "formula.kcalAtRest": {
+      "text": "{kcal} kcal in Ruhe",
+      "checked": true
+    },
+    "formula.automatic": {
+      "text": "Automatisch",
+      "checked": true
+    },
+    "formula.schofieldHint": {
+      "text": "Geschlecht, Gewicht, Altersgruppe {band}.",
+      "checked": true
+    },
+    "formula.dataLess": {
+      "text": "Deine Daten ergeben {kcal} kcal pro Tag weniger als {formula} mit deinem Alltag und Training. Deine Tage behalten ihre Form: Trainingstage bleiben höher als Ruhetage.",
+      "checked": true
+    },
+    "formula.dataMore": {
+      "text": "Deine Daten ergeben {kcal} kcal pro Tag mehr als {formula} mit deinem Alltag und Training. Deine Tage behalten ihre Form: Trainingstage bleiben höher als Ruhetage.",
+      "checked": true
+    },
+    "formula.schofieldMore": {
+      "text": "Schofield ergibt in Ruhe {rest} kcal mehr als Mifflin St Jeor. Mit deinem Alltag sind das etwa {day} kcal mehr pro Tag, vor dem Training.",
+      "checked": true
+    },
+    "formula.schofieldLess": {
+      "text": "Schofield ergibt in Ruhe {rest} kcal weniger als Mifflin St Jeor. Mit deinem Alltag sind das etwa {day} kcal weniger pro Tag, vor dem Training.",
+      "checked": true
+    },
+    "formula.kcalAllIn": {
+      "text": "{kcal} kcal pro Tag, alles inklusive",
+      "checked": true
+    },
+    "formula.whatYouAte": {
+      "text": "Was du gegessen hast und wie sich dein Gewicht verändert hat, {span}.",
+      "checked": true
+    },
+    "formula.readyOn": {
+      "text": "Frühestens fertig: {date}.",
+      "checked": true
+    },
+    "formula.setByCoach": {
+      "text": "Festgelegt von {coach}. Bitte {coach}, es zu ändern.",
+      "checked": true
+    },
+    "daytable.ownDays": {
+      "text": "deine eigenen 14 Tage, {from} bis {to}",
+      "checked": true
+    },
+    "daytable.proteinG": {
+      "text": "Protein g",
+      "checked": true
+    },
+    "daytable.fatG": {
+      "text": "Fett g",
+      "checked": true
+    },
+    "daytable.carbsG": {
+      "text": "Kohlenhydrate g",
+      "checked": true
+    },
+    "daytable.avg": {
+      "text": "Deine Woche liegt im Schnitt bei {kcal} kcal mit PD {pd}.",
+      "checked": true
+    },
+    "daytable.avgWith": {
+      "text": "Deine Woche liegt im Schnitt bei {kcal} kcal mit PD {pd}, mit {n} Trainingstag und {rest} ohne.|Deine Woche liegt im Schnitt bei {kcal} kcal mit PD {pd}, mit {n} Trainingstagen und {rest} ohne.",
+      "checked": true
+    },
+    "daytable.hide": {
+      "text": "Ausblenden",
+      "checked": true
+    },
+    "daytable.pd": {
+      "text": "PD {pd}",
+      "checked": true
+    },
+    "daytable.sourcesWeek": {
+      "text": "Protein und Fett bleiben jeden Tag gleich. Kohlenhydrate gehen mit deinem Training rauf und runter. Die Tage kommen aus deiner Trainingswoche. Quellen: {source}; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.",
+      "checked": true
+    },
+    "daytable.sourcesDays": {
+      "text": "Protein und Fett bleiben jeden Tag gleich. Kohlenhydrate gehen mit deinem Training rauf und runter. Quellen: Mifflin et al. 1990; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.",
+      "checked": true
+    },
+    "daytable.keptOnPurpose": {
+      "text": "Bewusst behalten: {title}",
+      "checked": true
+    },
+    "daytable.inGrams": {
+      "text": "{field} in Gramm",
+      "checked": true
+    },
+    "daytable.enter": {
+      "text": "eingeben",
+      "checked": true
+    },
+    "daytable.fillProtein": {
+      "text": "Protein aus deinen anderen Tagen",
+      "checked": true
+    },
+    "daytable.fillFat": {
+      "text": "Fett 30 % des durchschnittlichen Tages",
+      "checked": true
+    },
+    "daytable.fillCarbs": {
+      "text": "Kohlenhydrate der Rest",
+      "checked": true
+    },
+    "daytable.filled": {
+      "text": "Ergänzt: {list}",
+      "checked": true
+    },
+    "daytable.comesTo": {
+      "text": "Das ergibt {sum}, nicht {kcal}: {apart} kcal Unterschied",
+      "checked": true
+    },
+    "daytable.inRange": {
+      "text": "Im Bereich: {list}",
+      "checked": true
+    },
+    "voice.lineOff": {
+      "text": "Vorlesen aus · du steuerst mit den Buttons",
+      "checked": true
+    },
+    "voice.lineVoice": {
+      "text": "{name}, {lang}",
+      "checked": true
+    },
+    "voice.linePhoneVoice": {
+      "text": "die Stimme des Handys",
+      "checked": true
+    },
+    "voice.lineOnCutIn": {
+      "text": "Vorlesen · {voice} · Tempo: {speed} · Unterbrechen an",
+      "checked": true
+    },
+    "voice.lineOnNoCutIn": {
+      "text": "Vorlesen · {voice} · Tempo: {speed} · Unterbrechen aus",
+      "checked": true
+    },
+    "voice.speedSlower": {
+      "text": "langsamer",
+      "checked": true
+    },
+    "voice.speedNormal": {
+      "text": "normal",
+      "checked": true
+    },
+    "voice.speedFaster": {
+      "text": "schneller",
+      "checked": true
+    },
+    "travel.kitchen.hotel": {
+      "text": "Hotel, keine Küche",
+      "checked": true
+    },
+    "travel.kitchenHint.hotel": {
+      "text": "Auswärts essen und Essen, das du kaufen und direkt essen kannst. Chef Mealan schlägt nichts zum Kochen vor.",
+      "checked": true
+    },
+    "travel.kitchen.flat": {
+      "text": "Eine Wohnung mit Küche",
+      "checked": true
+    },
+    "travel.kitchenHint.flat": {
+      "text": "Grundausstattung: Herd, Pfanne, Topf. Kein Ofen, keine Waage.",
+      "checked": true
+    },
+    "travel.kitchen.family": {
+      "text": "Bei Familie oder Freunden",
+      "checked": true
+    },
+    "travel.kitchenHint.family": {
+      "text": "Eine voll ausgestattete Küche; ihre Läden. Chef Mealan kocht wie zu Hause.",
+      "checked": true
+    },
+    "travel.away": {
+      "text": "unterwegs",
+      "checked": true
+    },
+    "travel.sinceToday": {
+      "text": "seit heute",
+      "checked": true
+    },
+    "travel.since": {
+      "text": "seit {day}",
+      "checked": true
+    },
+    "clientweek.nOf": {
+      "text": "{n} von {of}",
+      "checked": true
+    },
+    "clientweek.extra": {
+      "text": "Extras ({n}): {list}",
+      "checked": true
+    },
+    "clientweek.extraItem": {
+      "text": "{title}, {kcal} kcal",
+      "checked": true
+    },
+    "clientweek.skippedOnPurpose": {
+      "text": "{n} bewusst ausgelassen",
+      "checked": true
+    },
+    "clientweek.nPlanned": {
+      "text": "{n} geplant",
+      "checked": true
+    },
+    "clientweek.nothingPlannedYet": {
+      "text": "Noch nichts geplant",
+      "checked": true
+    },
+    "clientweek.todaySoFar": {
+      "text": "Heute bisher",
+      "checked": true
+    },
+    "clientweek.mealAt": {
+      "text": "{meal} um {time}",
+      "checked": true
+    },
+    "clientweek.notPlanned": {
+      "text": "Nicht geplant",
+      "checked": true
+    },
+    "clientweek.mealSwapped": {
+      "text": "{meal} getauscht",
+      "checked": true
+    },
+    "clientweek.mealNotEaten": {
+      "text": "{meal} nicht gegessen",
+      "checked": true
+    },
+    "clientweek.nChanges": {
+      "text": "{n} Änderung|{n} Änderungen",
+      "checked": true
+    },
+    "clientweek.byThePlan": {
+      "text": "Nach Plan",
+      "checked": true
+    },
+    "clientweek.lived": {
+      "text": "{n} Tag nach Plan gelebt|{n} Tage nach Plan gelebt",
+      "checked": true
+    },
+    "clientweek.firstTwoWeeks": {
+      "text": "erste zwei Wochen, Tag {pd} von 14",
+      "checked": true
+    },
+    "clientweek.dayNotMeasured": {
+      "text": "Tag {pd}, noch nicht gemessen",
+      "checked": true
+    },
+    "clientweek.weekN": {
+      "text": "Woche {n}",
+      "checked": true
+    },
+    "clientweek.checkinToday": {
+      "text": "Check-in heute",
+      "checked": true
+    },
+    "clientweek.checkinOn": {
+      "text": "Check-in am {day}",
+      "checked": true
+    },
+    "clientweek.profileChanges": {
+      "text": "Profil: {n} Änderung, seit du zuletzt geschaut hast|Profil: {n} Änderungen, seit du zuletzt geschaut hast",
+      "checked": true
+    },
+    "clientweek.fullDays": {
+      "text": "{n} voller Tag|{n} volle Tage",
+      "checked": true
+    },
+    "clientweek.weighInsN": {
+      "text": "Gewichtseinträge: {n}",
+      "checked": true
+    },
+    "clientweek.readyOn": {
+      "text": "fertig am {date}",
+      "checked": true
+    },
+    "clientweek.notReadyYet": {
+      "text": "noch nicht fertig",
+      "checked": true
+    },
+    "clientweek.markPlan": {
+      "text": "Nach Plan",
+      "checked": true
+    },
+    "clientweek.markSwapped": {
+      "text": "Getauscht",
+      "checked": true
+    },
+    "clientweek.markSkipped": {
+      "text": "Bewusst ausgelassen",
+      "checked": true
+    },
+    "clientweek.markMissed": {
+      "text": "Nicht gegessen",
+      "checked": true
+    },
+    "clientweek.markOpen": {
+      "text": "Kommt noch",
+      "checked": true
+    },
+    "clientweek.span": {
+      "text": "{from} bis {to}",
+      "checked": true
+    },
+    "clientweek.sent": {
+      "text": "Gesendet. {name} sieht es unter Heute.",
+      "checked": true
+    },
+    "clientweek.fromToday": {
+      "text": "heute",
+      "checked": true
+    },
+    "clientweek.fromTomorrow": {
+      "text": "morgen",
+      "checked": true
+    },
+    "clientweek.goalNow": {
+      "text": "Das Ziel von {name} ist jetzt {goal}.",
+      "checked": true
+    },
+    "clientweek.goalStarts": {
+      "text": "{goal} beginnt für {name} am {date}.",
+      "checked": true
+    },
+    "clientweek.gProtein": {
+      "text": "{n} g Protein",
+      "checked": true
+    },
+    "clientweek.checkinDayIs": {
+      "text": "Check-in: {day}",
+      "checked": true
+    },
+    "clientweek.namesPage": {
+      "text": "Seite von {name}",
+      "checked": true
+    },
+    "clientweek.tabToday": {
+      "text": "Heute",
+      "checked": true
+    },
+    "clientweek.tabWeek": {
+      "text": "Woche",
+      "checked": true
+    },
+    "clientweek.tabShared": {
+      "text": "Geteilt",
+      "checked": true
+    },
+    "clientweek.tabSharedN": {
+      "text": "Geteilt ({n})",
+      "checked": true
+    },
+    "clientweek.tabGoal": {
+      "text": "Ziel",
+      "checked": true
+    },
+    "clientweek.namesWeek": {
+      "text": "Woche von {name}",
+      "checked": true
+    },
+    "clientweek.weekSpan": {
+      "text": "Woche {n}, {span}",
+      "checked": true
+    },
+    "clientweek.dayStatus": {
+      "text": "{day}: {status}",
+      "checked": true
+    },
+    "clientweek.dayPlanned": {
+      "text": "{day}: {n} geplant",
+      "checked": true
+    },
+    "clientweek.daysNothingPlanned": {
+      "text": "{days}: noch nichts geplant.",
+      "checked": true
+    },
+    "clientweek.nothingThisWeek": {
+      "text": "Diese Woche noch nichts von {name}. Die Woche füllt sich, wenn {name} Chef Mealan öffnet.",
+      "checked": true
+    },
+    "clientweek.ofKcal": {
+      "text": "von {n} kcal",
+      "checked": true
+    },
+    "clientweek.ofProtein": {
+      "text": "von {n} g Protein",
+      "checked": true
+    },
+    "clientweek.gProteinUnit": {
+      "text": "g Protein",
+      "checked": true
+    },
+    "clientweek.slotPlanned": {
+      "text": "{slot} · geplant: {what}",
+      "checked": true
+    },
+    "clientweek.nothing": {
+      "text": "nichts",
+      "checked": true
+    },
+    "clientweek.sharedNote": {
+      "text": "Mit dir geteilt: „{text}“",
+      "checked": true
+    },
+    "clientweek.extras": {
+      "text": "{n} Extra: {list}.|{n} Extras: {list}.",
+      "checked": true
+    },
+    "clientweek.sharedExtra": {
+      "text": "Mit dir geteilt, {title}: „{text}“",
+      "checked": true
+    },
+    "clientweek.thisWeekN": {
+      "text": "{n} diese Woche",
+      "checked": true
+    },
+    "clientweek.morningsWeighed": {
+      "text": "{n} Morgen gewogen|{n} Morgen gewogen",
+      "checked": true
+    },
+    "clientweek.trendLine": {
+      "text": "{verdict} für {goal}: {change} in 3 Wochen.",
+      "checked": true
+    },
+    "clientweek.meals": {
+      "text": "{n} Mahlzeit|{n} Mahlzeiten",
+      "checked": true
+    },
+    "clientweek.noneShared": {
+      "text": "Diese Woche nichts geteilt. {name} markiert eine Mahlzeit auf ihrer Karte als DaaM good.",
+      "checked": true
+    },
+    "clientweek.noteFor": {
+      "text": "Deine Notiz für {day}",
+      "checked": true
+    },
+    "clientweek.oneLineFor": {
+      "text": "Eine Zeile für {name}",
+      "checked": true
+    },
+    "clientweek.seesOnce": {
+      "text": "{name} sieht es einmal unter Heute und behält es unter Mein Coach.",
+      "checked": true
+    },
+    "clientweek.checkinSet": {
+      "text": "Check-in von {name}: {day}.",
+      "checked": true
+    },
+    "clientweek.checkinHint": {
+      "text": "Die Woche von {name} erscheint an diesem Tag unter Check-ins heute. Freitag, außer du änderst es.",
+      "checked": true
+    },
+    "clientweek.nameReplied": {
+      "text": "{name} hat geantwortet",
+      "checked": true
+    },
+    "clientweek.answeredOn": {
+      "text": "Geantwortet auf {title}",
+      "checked": true
+    },
+    "clientweek.answeredOnRead": {
+      "text": "Geantwortet auf {title} · gelesen",
+      "checked": true
+    },
+    "clientweek.suggestedLine": {
+      "text": "Vorgeschlagen: {title} · {answer}",
+      "checked": true
+    },
+    "clientweek.read": {
+      "text": "gelesen",
+      "checked": true
+    },
+    "clientweek.namesGoal": {
+      "text": "Ziel von {name}",
+      "checked": true
+    },
+    "clientweek.setByYou": {
+      "text": "von dir festgelegt",
+      "checked": true
+    },
+    "clientweek.setByName": {
+      "text": "festgelegt von {name}",
+      "checked": true
+    },
+    "clientweek.nextGoal": {
+      "text": "Als Nächstes: {goal}, ab {date}",
+      "checked": true
+    },
+    "clientweek.nextGoalByYou": {
+      "text": "Als Nächstes: {goal}, ab {date}, von dir festgelegt",
+      "checked": true
+    },
+    "clientweek.newGoalFor": {
+      "text": "Ein neues Ziel für {name}",
+      "checked": true
+    },
+    "clientweek.bandLine": {
+      "text": "{range} · {lo} bis {hi} kcal · {plo} bis {phi} g",
+      "checked": true
+    },
+    "clientweek.chipToday": {
+      "text": "Heute",
+      "checked": true
+    },
+    "clientweek.chipTomorrow": {
+      "text": "Morgen",
+      "checked": true
+    },
+    "clientweek.daysBefore": {
+      "text": "Die Tage von {name} davor behalten ihr bisheriges Ziel.",
+      "checked": true
+    },
+    "clientweek.applyFromDay": {
+      "text": "Ab {from} anwenden",
+      "checked": true
+    },
+    "client.markPlan": {
+      "text": "nach Plan",
+      "checked": true
+    },
+    "client.markSwapped": {
+      "text": "getauscht",
+      "checked": true
+    },
+    "client.markSkipped": {
+      "text": "ausgelassen",
+      "checked": true
+    },
+    "client.markMissed": {
+      "text": "verpasst",
+      "checked": true
+    },
+    "client.markOpen": {
+      "text": "offen",
+      "checked": true
+    },
+    "client.suggestedToast": {
+      "text": "Vorgeschlagen. {name} sieht es unter Heute, zum Antippen.",
+      "checked": true
+    },
+    "client.back": {
+      "text": "‹ Klienten",
+      "checked": true
+    },
+    "client.backWaiting": {
+      "text": "‹ Klienten · {n} warten",
+      "checked": true
+    },
+    "client.headWhat": {
+      "text": "{what}. Was {name} sieht, so wie {name} es sieht.",
+      "checked": true
+    },
+    "client.todayReadOnly": {
+      "text": "Heute, nur zum Lesen",
+      "checked": true
+    },
+    "client.planReadOnly": {
+      "text": "Plan, nur zum Lesen",
+      "checked": true
+    },
+    "client.namesPlan": {
+      "text": "Plan von {name}",
+      "checked": true
+    },
+    "client.today": {
+      "text": "Heute",
+      "checked": true
+    },
+    "client.planIsTheirs": {
+      "text": "Der Plan gehört {name}. Eine Änderung, die du willst, landet als Vorschlag unter Heute, nie im Plan selbst.",
+      "checked": true
+    },
+    "client.recipesReadOnly": {
+      "text": "Rezepte, nur zum Lesen",
+      "checked": true
+    },
+    "client.namesSharedCards": {
+      "text": "Geteilte Karten von {name}",
+      "checked": true
+    },
+    "client.noCardYet": {
+      "text": "{name} hat noch keine Karte geteilt. Eine Karte wird von ihrer eigenen Seite aus geteilt, mit einer Zeile an dich.",
+      "checked": true
+    },
+    "client.aMeal": {
+      "text": "Eine Mahlzeit",
+      "checked": true
+    },
+    "client.toSendRecipe": {
+      "text": "Um {name} eines deiner Rezepte zu schicken: Öffne es in deinen Rezepten, Mein Tag, und tippe auf Senden.",
+      "checked": true
+    },
+    "client.namesDay": {
+      "text": "Tag von {name}",
+      "checked": true
+    },
+    "client.dayOfTarget": {
+      "text": "{kcal} von {target} kcal · Protein {protein} von {proteinTarget} g",
+      "checked": true
+    },
+    "client.dayKcal": {
+      "text": "{kcal} kcal",
+      "checked": true
+    },
+    "client.nothingToday": {
+      "text": "Heute noch nichts von {name}.",
+      "checked": true
+    },
+    "client.eaten": {
+      "text": "gegessen",
+      "checked": true
+    },
+    "client.planned": {
+      "text": "geplant",
+      "checked": true
+    },
+    "client.training": {
+      "text": "Training: {what}",
+      "checked": true
+    },
+    "client.suggestHow": {
+      "text": "Ein Vorschlag landet unter Heute bei {name}, zum Antippen. Nichts ändert sich, bis {name} annimmt. {name} kann auch Nicht jetzt sagen, mit einem Grund, und du siehst, was gewählt wurde.",
+      "checked": true
+    },
+    "client.snackLands": {
+      "text": "Landet nach dem Annehmen diese Woche um {time} im Plan von {name}; die Standardeinstellung unter Alltag bleibt die von {name}.",
+      "checked": true
+    },
+    "client.noteAndRecipe": {
+      "text": "Eine Notiz und ein Rezept gehen wie bisher: die Notiz unter Klienten, Seite von {name}; ein Rezept aus deinen Rezepten mit Senden.",
+      "checked": true
+    },
+    "cardanswer.good": {
+      "text": "Gut 👍",
+      "checked": true
+    },
+    "cardanswer.sent": {
+      "text": "Gesendet. {name} sieht es unter Heute, mit der Mahlzeit.",
+      "checked": true
+    },
+    "cardanswer.goodOn": {
+      "text": "Gut, auf der Karte von {name}.",
+      "checked": true
+    },
+    "cardanswer.seenOn": {
+      "text": "Gesehen, auf der Karte von {name}.",
+      "checked": true
+    },
+    "cardanswer.answerOn": {
+      "text": "Antwort zu {title}",
+      "checked": true
+    },
+    "cardanswer.howItLands": {
+      "text": "Eine Antwort landet unter Heute bei {name}, mit der zitierten Mahlzeit und Verstanden. Gut oder Gesehen landet nur auf der Karte.",
+      "checked": true
+    },
+    "cardanswer.reactedAt": {
+      "text": "{word}, {when}",
+      "checked": true
+    },
+    "cardanswer.youAnswered": {
+      "text": "Du hast geantwortet, {when}",
+      "checked": true
+    },
+    "cardanswer.youAnsweredRead": {
+      "text": "Du hast geantwortet, {when} · gelesen",
+      "checked": true
+    },
+    "cardanswer.replied": {
+      "text": "{name} hat geantwortet, {when}: „{text}“",
+      "checked": true
+    },
+    "steps.stepN": {
+      "text": "Schritt {n}",
+      "checked": true
+    },
+    "steps.addAStep": {
+      "text": "+ Schritt hinzufügen",
+      "checked": true
+    },
+    "steps.putAria": {
+      "text": "{amount} {food} in den Schritt einfügen",
+      "checked": true
+    },
+    "steps.goneInStep": {
+      "text": "{foods} ist in einem Schritt, aber nicht mehr im Rezept. Ändere den Schritt oder tippe auf das Lebensmittel, das an seine Stelle tritt.|{foods} sind in einem Schritt, aber nicht mehr im Rezept. Ändere den Schritt oder tippe auf das Lebensmittel, das an ihre Stelle tritt.",
+      "checked": true
+    },
+    "steps.notInAnyStep": {
+      "text": "{foods} ist noch in keinem Schritt.|{foods} sind noch in keinem Schritt.",
+      "checked": true
+    },
+    "steps.everyFoodInStep": {
+      "text": "✓ Jedes Lebensmittel ist in einem Schritt. Die Mengen folgen den Lebensmitteln.",
+      "checked": true
+    },
+    "out.failTooLong": {
+      "text": "Ich habe zu lange gebraucht und aufgehört.",
+      "checked": true
+    },
+    "out.failNoReach": {
+      "text": "Ich war gerade nicht erreichbar. Prüf die Verbindung.",
+      "checked": true
+    },
+    "out.failMySide": {
+      "text": "Bei mir ist etwas schiefgelaufen.",
+      "checked": true
+    },
+    "today.andSep": {
+      "text": "und",
+      "checked": true
+    },
+    "today.nextHead": {
+      "text": "Als Nächstes: {meal}, {time}",
+      "checked": true
+    },
+    "today.asPlanned": {
+      "text": "Wie geplant · {kcal} kcal · {protein} g Protein · {pd}",
+      "checked": true
+    },
+    "today.eatenByPlan": {
+      "text": "{meals} gegessen, nach Plan.",
+      "checked": true
+    },
+    "today.fits": {
+      "text": "passt",
+      "checked": true
+    },
+    "today.travelling": {
+      "text": "Unterwegs · {place}",
+      "checked": true
+    },
+    "today.useAsCoverOf": {
+      "text": "Dieses Foto als Titelbild für {title} verwenden?",
+      "checked": true
+    },
+    "today.coverByChef": {
+      "text": "Das Titelbild dieses Rezepts ist ein Bild von Chef Mealan. Ein Foto von deinem Teller machen? Es kann das Titelbild werden.",
+      "checked": true
+    },
+    "today.whoSuggests": {
+      "text": "{who} schlägt vor. Nichts ändert sich, bis du tippst.",
+      "checked": true
+    },
+    "letters.word.fat": {
+      "text": "Fett",
+      "checked": true
+    },
+    "letters.word.carbs": {
+      "text": "Kohlenhydrate",
+      "checked": true
+    },
+    "letters.word.fibre": {
+      "text": "Ballaststoffe",
+      "checked": true
+    },
+    "letters.word.protein": {
+      "text": "Protein",
+      "checked": true
+    },
+    "letters.lineNoValue": {
+      "text": "{letter} {macro}: kein Wert auf dem Etikett.",
+      "checked": true
+    },
+    "letters.lineMore": {
+      "text": "{letter} {macro}: {v} g pro 100 kcal, mehr als dein Tag ({rate}).",
+      "checked": true
+    },
+    "letters.lineAs": {
+      "text": "{letter} {macro}: {v} g pro 100 kcal, wie dein Tag ({rate}).",
+      "checked": true
+    },
+    "letters.lineCloseToNone": {
+      "text": "{letter} {macro}: {v} g pro 100 kcal, fast nichts im Vergleich zu deinem Tag ({rate}).",
+      "checked": true
+    },
+    "letters.lineUnder": {
+      "text": "{letter} {macro}: {v} g pro 100 kcal, weniger als dein Tag ({rate}).",
+      "checked": true
+    },
+    "letters.wordNoValue": {
+      "text": "{macro}, kein Wert",
+      "checked": true
+    },
+    "letters.wordHigh": {
+      "text": "{macro}, hoch",
+      "checked": true
+    },
+    "letters.wordAs": {
+      "text": "{macro}, wie dein Tag",
+      "checked": true
+    },
+    "letters.wordCloseToNone": {
+      "text": "{macro}, fast nichts",
+      "checked": true
+    },
+    "letters.wordUnder": {
+      "text": "{macro}, darunter",
+      "checked": true
+    },
+    "letters.edgeClose": {
+      "text": "An der Grenze, fast nichts: das {ratio}-Fache deines Tages, die Grenze liegt bei {edge}.",
+      "checked": true
+    },
+    "letters.edgePlan": {
+      "text": "An der Grenze, wie dein Tag: das {ratio}-Fache deines Tages, die Grenze liegt bei {edge}.",
+      "checked": true
+    },
+    "letters.edgeHigh": {
+      "text": "An der Grenze, hoch: das {ratio}-Fache deines Tages, die Grenze liegt bei {edge}.",
+      "checked": true
+    },
+    "letters.bandsNote": {
+      "text": "Großbuchstabe mit Plus: mehr als dein Tag (ab dem {high}-Fachen seines Werts). Großbuchstabe: so, wie dein Tag es braucht (das {plan}-Fache bis {high}-Fache). Klein: darunter. Klein mit Minus: fast nichts (unter dem {close}-Fachen).",
+      "checked": true
+    },
+    "letters.name.fat": {
+      "text": "Fett",
+      "checked": true
+    },
+    "letters.name.carbs": {
+      "text": "Kohlenhydrate",
+      "checked": true
+    },
+    "letters.name.fibre": {
+      "text": "Ballaststoffe",
+      "checked": true
+    },
+    "letters.name.protein": {
+      "text": "Protein",
+      "checked": true
+    },
+    "letters.planSub": {
+      "text": "{meal}, der Teller und dein Plan",
+      "checked": true
+    },
+    "letters.energy": {
+      "text": "Energie",
+      "checked": true
+    },
+    "letters.weight": {
+      "text": "Gewicht",
+      "checked": true
+    },
+    "letters.protein": {
+      "text": "Protein",
+      "checked": true
+    },
+    "letters.pctPlate": {
+      "text": "% Teller",
+      "checked": true
+    },
+    "letters.pctDay": {
+      "text": "% Tag",
+      "checked": true
+    },
+    "letters.noteRead": {
+      "text": "Lies eine Spalte von oben nach unten.",
+      "checked": true
+    },
+    "letters.notePlan": {
+      "text": "Der Teller und dein Plan: der Teller im Vergleich zu deinem Plan für {meal}, % des Plans.",
+      "checked": true
+    },
+    "letters.notePlate": {
+      "text": "% Teller: jeweils der Anteil an der Energie des Tellers.",
+      "checked": true
+    },
+    "letters.noteDay": {
+      "text": "% Tag: im Vergleich zu deinem geplanten Tag.",
+      "checked": true
+    },
+    "letters.per100kcal": {
+      "text": "Pro 100 kcal",
+      "checked": true
+    },
+    "nutrition.rowEnergy": {
+      "text": "Energie",
+      "checked": true
+    },
+    "nutrition.rowFat": {
+      "text": "Fett",
+      "checked": true
+    },
+    "nutrition.rowSaturates": {
+      "text": "davon gesättigte Fettsäuren",
+      "checked": true
+    },
+    "nutrition.rowCarbs": {
+      "text": "Kohlenhydrate",
+      "checked": true
+    },
+    "nutrition.rowSugars": {
+      "text": "davon Zucker",
+      "checked": true
+    },
+    "nutrition.rowPolyols": {
+      "text": "davon mehrwertige Alkohole",
+      "checked": true
+    },
+    "nutrition.rowFibre": {
+      "text": "Ballaststoffe",
+      "checked": true
+    },
+    "nutrition.rowProtein": {
+      "text": "Eiweiß",
+      "checked": true
+    },
+    "nutrition.rowSalt": {
+      "text": "Salz",
+      "checked": true
+    },
+    "nutrition.pctTag": {
+      "text": "% Kalorien aus Protein",
+      "checked": true
+    },
+    "nutrition.pctText": {
+      "text": "{v} % Kalorien aus Protein",
+      "checked": true
+    },
+    "nutrition.pdValue": {
+      "text": "PD {v}",
+      "checked": true
+    },
+    "nutrition.pctRange": {
+      "text": "{from} bis {to} % Kalorien aus Protein",
+      "checked": true
+    },
+    "app.srcManual": {
+      "text": "Manuelle Eingabe",
+      "checked": true
+    },
+    "app.srcPhotos": {
+      "text": "Fotos · Prüfung nötig",
+      "checked": true
+    },
+    "app.srcBarcodePhotos": {
+      "text": "Barcode und Fotos · Prüfung nötig",
+      "checked": true
+    },
+    "app.srcLabelPhoto": {
+      "text": "Foto des Etiketts · Prüfung nötig",
+      "checked": true
+    },
+    "app.srcDatabase": {
+      "text": "Produktdatenbank · Prüfung nötig",
+      "checked": true
+    },
+    "app.srcDatabasePhotos": {
+      "text": "Produktdatenbank und Fotos · Prüfung nötig",
+      "checked": true
+    },
+    "app.mealanSelected": {
+      "text": "MEALAN · GEWÄHLTE PORTION",
+      "checked": true
+    },
+    "app.calShare": {
+      "text": "CAL {pct} der Tagesreferenz",
+      "checked": true
+    },
+    "app.gNutrient": {
+      "text": "{g} g {what}",
+      "checked": true
+    },
+    "app.nEnergy": {
+      "text": "Energie",
+      "checked": true
+    },
+    "app.nProtein": {
+      "text": "Protein",
+      "checked": true
+    },
+    "app.nFat": {
+      "text": "Fett",
+      "checked": true
+    },
+    "app.nCarbohydrate": {
+      "text": "Kohlenhydrate",
+      "checked": true
+    },
+    "app.nFibre": {
+      "text": "Ballaststoffe",
+      "checked": true
+    },
+    "app.wholeRecipeG": {
+      "text": "Ganzes Rezept: {g} g. Die Portion geht davon aus, dass die Zutaten gleichmäßig gemischt sind.",
+      "checked": true
+    },
+    "app.missingShownAs": {
+      "text": "Fehlende Daten werden als ? angezeigt.",
+      "checked": true
+    },
+    "app.pdExplain": {
+      "text": "PD sind Gramm Protein pro 100 kcal. PD {pd} beschreibt die Konzentration, nicht die Gesamtmenge, die du isst. Die Prozente zeigen den Anteil dieser Portion an deinen Tageszielen. Die Buchstaben vergleichen die Nährstoffdichte mit deinem Plan: + darüber, Großbuchstabe nah dran, Kleinbuchstabe darunter. Der Pilot nutzt einen Bereich von ±10%; er bezeichnet eine Mahlzeit nicht als gesund oder ungesund.",
+      "checked": true
+    },
+    "app.dsExplain": {
+      "text": "DS benennt die Dichtefamilie. Das kombinierte MD ist noch experimentell und wird nicht zur Bewertung von Mahlzeiten genutzt. Ein ? kann bedeuten, dass der Nährstoff oder sein Tagesziel fehlt.",
+      "checked": true
+    },
+    "app.kindBarcode": {
+      "text": "Barcode",
+      "checked": true
+    },
+    "app.useNonNegative": {
+      "text": "Gib eine nicht negative Dezimalzahl ein oder lass unbekannte Werte leer. Spuren oder <-Werte trägst du in die Notizen ein.",
+      "checked": true
+    },
+    "app.confirmLabelBasis": {
+      "text": "Bestätige vor dem Speichern das Etikett und die Angabe pro 100 g.",
+      "checked": true
+    },
+    "app.fromYourSearch": {
+      "text": "Aus deiner Suche: {q}.",
+      "checked": true
+    },
+    "app.leaveOutDbPhoto": {
+      "text": "Datenbankfoto {n} weglassen",
+      "checked": true
+    },
+    "app.keepDbPhoto": {
+      "text": "Datenbankfoto {n} behalten",
+      "checked": true
+    },
+    "app.photoNOf": {
+      "text": "Foto {n} von {of}",
+      "checked": true
+    },
+    "app.starMain": {
+      "text": "★ Hauptfoto",
+      "checked": true
+    },
+    "app.starMakeMain": {
+      "text": "☆ Zum Hauptfoto machen",
+      "checked": true
+    },
+    "app.capturedLabel": {
+      "text": "Aufgenommenes Nährwertetikett",
+      "checked": true
+    },
+    "app.photosSwipe": {
+      "text": "{n} Fotos · wische, um jedes zu sehen",
+      "checked": true
+    },
+    "app.sameBarcode": {
+      "text": "gleicher Barcode",
+      "checked": true
+    },
+    "app.sameValues": {
+      "text": "gleiche Werte pro 100 g",
+      "checked": true
+    },
+    "app.sourceCheck": {
+      "text": "Quelle: {source}. Prüfe die tatsächliche Verpackung. Alle Werte unten müssen {basis} sein, Kohlenhydrate ohne Ballaststoffe.",
+      "checked": true
+    },
+    "app.noLabelNeeded": {
+      "text": "Kein Etikett nötig. Aus der Referenztabelle, pro 100 g:",
+      "checked": true
+    },
+    "app.refRowLine": {
+      "text": "{names} · {kcal} kcal · {protein} g Protein",
+      "checked": true
+    },
+    "app.barcodeDigits": {
+      "text": "8 bis 14 Ziffern, unter den Strichen",
+      "checked": true
+    },
+    "app.servingExample": {
+      "text": "Riegel, Stück, Becher",
+      "checked": true
+    },
+    "app.rowByYou": {
+      "text": "von dir hinzugefügt",
+      "checked": true
+    },
+    "app.rowDatabase": {
+      "text": "Datenbank",
+      "checked": true
+    },
+    "app.rowFromPhoto": {
+      "text": "vom Foto gelesen",
+      "checked": true
+    },
+    "app.removeRow": {
+      "text": "{name} entfernen",
+      "checked": true
+    },
+    "app.underYourTarget": {
+      "text": "Unter deinem Ziel {target}: kombiniere es mit einer Proteinbasis, um dorthin zu kommen",
+      "checked": true
+    },
+    "app.onYourTarget": {
+      "text": "Auf deinem Ziel {target}. {reason}",
+      "checked": true
+    },
+    "app.aboutG": {
+      "text": "etwa {g} g",
+      "checked": true
+    },
+    "app.beforeFits": {
+      "text": "schnelle Energie, nichts hinzuzufügen: {amount} liefert etwa {carbs} g Kohlenhydrate für einen {day}",
+      "checked": true
+    },
+    "app.afterFits": {
+      "text": "passt nach dem Training: {amount} liefert etwa {protein} g Protein, dein Minimum {floor} g",
+      "checked": true
+    },
+    "app.gProteinPer": {
+      "text": "{protein} g Protein pro {kcal} kcal",
+      "checked": true
+    },
+    "app.servingIs": {
+      "text": "1 {name} sind {g} g, {kcal} kcal und {protein} g Protein",
+      "checked": true
+    },
+    "app.onItsOwn": {
+      "text": "Für sich allein:",
+      "checked": true
+    },
+    "app.beforeTrainingLabel": {
+      "text": "Vor dem Training:",
+      "checked": true
+    },
+    "app.afterTrainingLabel": {
+      "text": "Nach dem Training:",
+      "checked": true
+    },
+    "app.labelLabel": {
+      "text": "Etikett:",
+      "checked": true
+    },
+    "app.containsAvoid": {
+      "text": "Enthält, was du meidest:",
+      "checked": true
+    },
+    "app.neverSuggested": {
+      "text": "{list}. Wird nie vorgeschlagen; nur angezeigt, damit du es siehst.",
+      "checked": true
+    },
+    "app.otherLine": {
+      "text": "Anderes…",
+      "checked": true
+    },
+    "app.addLine": {
+      "text": "+ Zeile hinzufügen, von der Packung oder der Website des Herstellers",
+      "checked": true
+    },
+    "app.labelNotes": {
+      "text": "Notizen zum Etikett / Zubereitungszustand",
+      "checked": true
+    },
+    "app.readyCold": {
+      "text": "Verzehrfertig und geeignet zum kalten Mischen",
+      "checked": true
+    },
+    "app.iChecked": {
+      "text": "Ich habe die Werte, die Angabe pro 100 g und die Regel für Kohlenhydrate und Ballaststoffe geprüft.",
+      "checked": true
+    },
+    "app.perMlNote": {
+      "text": "Bei einem Etikett pro 100 ml oder pro Portion rechne vor dem Speichern aus einer bekannten Masse um. Nimm nicht an, dass ml gleich g ist. Nicht angegebene Nährstoffe lässt du leer.",
+      "checked": true
+    },
+    "app.mixCooking": {
+      "text": "Kochen",
+      "checked": true
+    },
+    "app.mixFromStarter": {
+      "text": "aus dem Startset",
+      "checked": true
+    },
+    "app.goalsEditorWhy": {
+      "text": "Gib deinen bestehenden Plan oder mit deinem Coach vereinbarte Ziele ein. Leere Felder bleiben unbekannt. Das sind Tagesmengen, keine Ziele für eine Mahlzeit.",
+      "checked": true
+    },
+    "app.referencePd": {
+      "text": "Referenz-PD: {pd} g Protein pro 100 kcal. Eine andere Referenz ändert nicht die Dichte eines Lebensmittels.",
+      "checked": true
+    },
+    "app.positiveTargets": {
+      "text": "Gib positive Ziele ein oder lass ein Feld leer.",
+      "checked": true
+    },
+    "app.savedRecords": {
+      "text": "Gespeichert. Einträge: {why}",
+      "checked": true
+    },
+    "app.savedWithPhotos": {
+      "text": "In deinem Konto gespeichert, mit {n} Foto|In deinem Konto gespeichert, mit {n} Fotos",
+      "checked": true
+    },
+    "app.savedPhotosWhy": {
+      "text": "In deinem Konto gespeichert. Fotos: {why}",
+      "checked": true
+    },
+    "app.foldedIntoOne": {
+      "text": "zu einem zusammengefasst.",
+      "checked": true
+    },
+    "app.entriesFolded": {
+      "text": "{n} Einträge mit denselben Lebensmitteln zu einem zusammengefasst.",
+      "checked": true
+    },
+    "app.storedUnreadable": {
+      "text": "Die gespeicherten Pilotdaten konnten nicht gelesen werden. Sie wurden aufbewahrt. Exportiere die Wiederherstellungssicherung, bevor du eine gültige Sicherung importierst oder die Daten dieser Website löschst.",
+      "checked": true
+    },
+    "app.browserCouldNotSave": {
+      "text": "Dieser Browser konnte deine Änderungen nicht speichern. Exportiere eine Sicherung, bevor du gehst.",
+      "checked": true
+    },
+    "app.notSavedYetWhy": {
+      "text": "Noch nicht gespeichert: {why}",
+      "checked": true
+    },
+    "app.tooSlow": {
+      "text": "die Verbindung ist gerade zu langsam",
+      "checked": true
+    },
+    "app.notConnected": {
+      "text": "Nicht verbunden: {why}",
+      "checked": true
+    },
+    "app.couldNotReach": {
+      "text": "Dein Konto war nicht erreichbar: {why}. Vorerst geht es auf diesem Handy weiter; Chef Mealan versucht es weiter.",
+      "checked": true
+    },
+    "app.loadedPhotos": {
+      "text": "Geladen. Fotos: {why}",
+      "checked": true
+    },
+    "app.coachSentSomething": {
+      "text": "{coach} hat dir etwas geschickt. Es ist unter Heute.",
+      "checked": true
+    },
+    "app.coachSetGoal": {
+      "text": "{coach} hat dein Ziel festgelegt.",
+      "checked": true
+    },
+    "app.coachSetNextGoal": {
+      "text": "{coach} hat dein nächstes Ziel festgelegt, ab {date}.",
+      "checked": true
+    },
+    "app.notSavedStays": {
+      "text": "Noch nicht in deinem Konto gespeichert. Es bleibt auf diesem Handy.",
+      "checked": true
+    },
+    "app.notSavedWhy": {
+      "text": "Nicht gespeichert: {why}",
+      "checked": true
+    },
+    "app.updatedFood": {
+      "text": "{name} aktualisiert.",
+      "checked": true
+    },
+    "app.inYourFoods": {
+      "text": "{name} ist in deinen Lebensmitteln.",
+      "checked": true
+    },
+    "app.starterAdded": {
+      "text": "{n} Basis-Lebensmittel hinzugefügt.",
+      "checked": true
+    },
+    "app.starterAddedLocal": {
+      "text": "{n} Basis-Lebensmittel hinzugefügt, {local} davon regional.",
+      "checked": true
+    },
+    "app.backFromTrip": {
+      "text": "Zurück aus {place}: Die Lebensmittel von dort sind weggeräumt. Schalte es unter Wo ich einkaufe ein, um sie zurückzuholen.",
+      "checked": true
+    },
+    "app.yourTrip": {
+      "text": "deine Reise",
+      "checked": true
+    },
+    "app.dayAndTime": {
+      "text": "{day} {time}",
+      "checked": true
+    },
+    "app.wouldJoinPlate": {
+      "text": "{name} käme auf einen Teller von {when}.",
+      "checked": true
+    },
+    "app.addedServing": {
+      "text": "Hinzugefügt: 1 {name}, {g} g. Stell die Menge ein, die du wirklich hast.",
+      "checked": true
+    },
+    "app.unknownItem": {
+      "text": "Unbekannter Artikel",
+      "checked": true
+    },
+    "app.labelUnreadable": {
+      "text": "Das Etikett konnte nicht gelesen werden. Versuch ein anderes Foto oder gib es manuell ein.",
+      "checked": true
+    },
+    "app.barcodeNumeric": {
+      "text": "Gib einen numerischen Barcode mit 8 bis 14 Ziffern ein.",
+      "checked": true
+    },
+    "app.lookingUp": {
+      "text": "Produkt wird gesucht…",
+      "checked": true
+    },
+    "app.alreadyInFoods": {
+      "text": "Schon in deinen Lebensmitteln.",
+      "checked": true
+    },
+    "app.readingNutrition": {
+      "text": "Nährwertfoto wird gelesen…",
+      "checked": true
+    },
+    "app.validPortion": {
+      "text": "Stell vor dem Speichern eine gültige Portion ein.",
+      "checked": true
+    },
+    "app.recipeSavedNotEaten": {
+      "text": "Rezept gespeichert. Es wurde nicht als gegessen eingetragen.",
+      "checked": true
+    },
+    "app.setTargetsFirst": {
+      "text": "Leg zuerst Tagesziele für Energie und Protein fest.",
+      "checked": true
+    },
+    "app.moveOneProduct": {
+      "text": "Lass Chef Mealan ein Produkt verschieben. Alles andere bleibt, wie du es eingestellt hast.",
+      "checked": true
+    },
+    "app.mixesReadyFoods": {
+      "text": "Chef Mealan mischt Lebensmittel, die du so essen kannst, wie sie sind.",
+      "checked": true
+    },
+    "app.mealLimits": {
+      "text": "Grenzen für Mahlzeiten müssen nicht negative Zahlen sein oder leer bleiben.",
+      "checked": true
+    },
+    "app.noCandidate": {
+      "text": "Keine Option erfüllt die gewählten Vorgaben.",
+      "checked": true
+    },
+    "app.changeALimit": {
+      "text": "Du kannst eine Grenze ändern oder ein anderes Lebensmittel wählen.",
+      "checked": true
+    },
+    "app.consideringTaste": {
+      "text": "Dein Geschmack wird berücksichtigt…",
+      "checked": true
+    },
+    "app.suggestionsRanked": {
+      "text": "Vorschläge aus den berechneten Optionen gereiht. Prüfe Zutaten und Geschmack, bevor du wählst.",
+      "checked": true
+    },
+    "app.photosStillComing": {
+      "text": "Die Fotos dieses Lebensmittels kommen noch aus deinem Konto. Versuch es gleich nochmal.",
+      "checked": true
+    },
+    "app.photoUnreadable": {
+      "text": "Dieses Foto konnte nicht gelesen werden. Versuch ein anderes.",
+      "checked": true
+    },
+    "app.photoAdded": {
+      "text": "Foto hinzugefügt.",
+      "checked": true
+    },
+    "app.labelled": {
+      "text": "Markiert: {job}.",
+      "checked": true
+    },
+    "app.loggedAsPlanned": {
+      "text": "Eingetragen, wie geplant.",
+      "checked": true
+    },
+    "app.loggedLeft": {
+      "text": "Eingetragen. Noch {n} übrig.",
+      "checked": true
+    },
+    "app.photoRemoved": {
+      "text": "Foto entfernt.",
+      "checked": true
+    },
+    "app.mainPhotoNow": {
+      "text": "Das ist jetzt das Hauptfoto.",
+      "checked": true
+    },
+    "app.mergedOne": {
+      "text": "Zu einem Lebensmittel zusammengeführt.",
+      "checked": true
+    },
+    "app.unusedDeleted": {
+      "text": "{n} unbenutztes Lebensmittel gelöscht.|{n} unbenutzte Lebensmittel gelöscht.",
+      "checked": true
+    },
+    "app.addToMyFoods": {
+      "text": "Zu meinen Lebensmitteln hinzufügen",
+      "checked": true
+    },
+    "app.readingPhotos": {
+      "text": "Deine {n} Fotos werden gelesen…",
+      "checked": true
+    },
+    "app.photoRead": {
+      "text": "Auf dem Foto wurde {n} Lebensmittel erkannt: {list}.|Auf dem Foto wurden {n} Lebensmittel erkannt: {list}.",
+      "checked": true
+    },
+    "app.listingFoods": {
+      "text": "Chef Mealan listet deine Lebensmittel auf…",
+      "checked": true
+    },
+    "app.noFoodCaught": {
+      "text": "Darin habe ich kein Lebensmittel verstanden. Sag die Lebensmittel, die du hast, zum Beispiel: Eier, Spinat, Feta.",
+      "checked": true
+    },
+    "app.fromWhatYouSaid": {
+      "text": "Aus dem, was du gesagt hast: {list}. An mein Ziel anpassen legt die Mengen fest.",
+      "checked": true
+    },
+    "app.youSaid": {
+      "text": "Du hast {n} Lebensmittel genannt: {list}.|Du hast {n} Lebensmittel genannt: {list}.",
+      "checked": true
+    },
+    "app.otherPortion": {
+      "text": "{title}, die andere Portion",
+      "checked": true
+    },
+    "app.otherPortions": {
+      "text": "{title}, die anderen {n} Portionen",
+      "checked": true
+    },
+    "app.otherHalf": {
+      "text": "{title}, die andere Hälfte",
+      "checked": true
+    },
+    "app.loggedAt": {
+      "text": "Um {time} eingetragen. Es ist unter Heute.",
+      "checked": true
+    },
+    "app.onePortionLogged": {
+      "text": "Eine Portion eingetragen. Die andere Portion ist unter Heute.",
+      "checked": true
+    },
+    "app.onePortionLoggedN": {
+      "text": "Eine Portion eingetragen. Die anderen {n} Portionen sind unter Heute.",
+      "checked": true
+    },
+    "app.fromRecipesHas": {
+      "text": "{title} aus deinen Rezepten hat {n}.",
+      "checked": true
+    },
+    "app.oldSavedForLater": {
+      "text": "{name} ist für später gespeichert, oben auf dem Teller.",
+      "checked": true
+    },
+    "app.savedForLaterTop": {
+      "text": "Für später gespeichert, oben auf dem Teller.",
+      "checked": true
+    },
+    "app.plateSavedForLater": {
+      "text": "Dein Teller ist für später gespeichert, oben auf dem Teller.",
+      "checked": true
+    },
+    "app.fromPlanHas": {
+      "text": "{title} aus deinem Plan hat {n} Lebensmittel.|{title} aus deinem Plan hat {n} Lebensmittel.",
+      "checked": true
+    },
+    "app.mixSet": {
+      "text": "{mix}: {kind}, {kcal} kcal. Mengen automatisch berechnet.",
+      "checked": true
+    },
+    "app.photoIsCover": {
+      "text": "Dein Foto ist jetzt das Titelbild.",
+      "checked": true
+    },
+    "app.onPlateYourPortion": {
+      "text": "Auf deinem Teller, in deiner Portion.",
+      "checked": true
+    },
+    "app.inMine": {
+      "text": "{title} ist unter Meine. Du kannst es ändern, wie du willst.",
+      "checked": true
+    },
+    "app.savedInMyRecipes": {
+      "text": "In Meine Rezepte gespeichert.",
+      "checked": true
+    },
+    "app.sharedWith": {
+      "text": "Mit {coach} geteilt.",
+      "checked": true
+    },
+    "app.youreWith": {
+      "text": "Du bist jetzt bei {coach}.",
+      "checked": true
+    },
+    "app.removingAll": {
+      "text": "Fotodateien, Datensatz, Karten, Rezepte und die Anmeldung werden entfernt",
+      "checked": true
+    },
+    "app.nothingKeptSignIn": {
+      "text": "Auf diesem Handy wird nichts aufbewahrt; melde dich neu an, um es zu prüfen.",
+      "checked": true
+    },
+    "app.more": {
+      "text": "Mehr",
+      "checked": true
+    },
+    "app.onYourPlate": {
+      "text": "{name} ist auf deinem Teller.",
+      "checked": true
+    },
+    "app.inYourRecipes": {
+      "text": "{title} ist in deinen Rezepten.",
+      "checked": true
+    },
+    "app.viewAsBack": {
+      "text": "Als {who} · Zurück zu mir",
+      "checked": true
+    },
+    "app.backupTooLarge": {
+      "text": "Die Sicherung ist zu groß.",
+      "checked": true
+    },
+    "app.backupImported": {
+      "text": "Sicherung importiert. Sie hat ersetzt, was auf diesem Gerät war.",
+      "checked": true
+    },
+    "app.referenceSaved": {
+      "text": "Tagesreferenz gespeichert. Die Zusammensetzung der Lebensmittel bleibt unverändert.",
+      "checked": true
+    },
+    "app.accessKeyWhy": {
+      "text": "Nutze den Zugangsschlüssel von der Person, die diesen Pilot betreut. Er wird für diese Browsersitzung aufbewahrt.",
+      "checked": true
+    },
+    "app.accessKeySaved": {
+      "text": "Zugangsschlüssel für diese Sitzung gespeichert. Versuch deine Anfrage nochmal.",
+      "checked": true
+    },
+    "app.feedbackTitle": {
+      "text": "Feedback: {title}",
+      "checked": true
+    },
+    "app.feedbackSaved": {
+      "text": "Feedback mit diesem Stand des Rezepts gespeichert.",
+      "checked": true
+    },
+    "app.crashTitle": {
+      "text": "Chef Mealan konnte nicht öffnen",
+      "checked": true
+    },
+    "app.crashDataSafe": {
+      "text": "Deine Daten sind noch auf diesem Handy und in deinem Konto. Schick Milan einen Screenshot von diesem Bildschirm.",
+      "checked": true
+    },
+    "app.crashTryAgain": {
+      "text": "Nochmal versuchen",
+      "checked": true
+    },
+    "app.crashSaveCopy": {
+      "text": "Kopie dieses Handys als Datei speichern",
+      "checked": true
+    },
+    "app.crashFromAccount": {
+      "text": "Aus der Kopie im Konto öffnen",
+      "checked": true
+    },
+    "app.crashFromAccountWhy": {
+      "text": "Aus der Kopie im Konto öffnen legt die Kopie dieses Handys beiseite, ohne sie zu löschen, und lädt die aus deinem Konto.",
+      "checked": true
+    },
+    "measured.gapUnder": {
+      "text": "Meistens bleiben einige Mahlzeiten uneingetragen. Prüf die Tage, bevor du den Wert nutzt.",
+      "checked": true
+    },
+    "measured.gapOver": {
+      "text": "Prüf das, bevor du den Wert nutzt: Ist dein Alltag bewegter, als das Profil sagt? Läuft das Wiegen jeden Morgen gleich ab?",
+      "checked": true
+    },
+    "measured.burnIsMeasured": {
+      "text": "DEIN VERBRAUCH IST GEMESSEN",
+      "checked": true
+    },
+    "measured.readyGive": {
+      "text": "Plus/minus {range}. Aus deinen 14 Tagen: {full} volle Tage und {weighed} Gewichtseinträge.",
+      "checked": true
+    },
+    "measured.formulaSaid": {
+      "text": "Die Formel ergab {kcal}.",
+      "checked": true
+    },
+    "measured.readyStay": {
+      "text": "Deine Zahlen bleiben, wie sie sind, bis du dich entscheidest.",
+      "checked": true
+    },
+    "measured.weightSame": {
+      "text": "gleich über 14 Tage",
+      "checked": true
+    },
+    "measured.weightDown": {
+      "text": "{kg} weniger in 14 Tagen",
+      "checked": true
+    },
+    "measured.weightUp": {
+      "text": "{kg} mehr in 14 Tagen",
+      "checked": true
+    },
+    "measured.between": {
+      "text": "Irgendwo zwischen {lo} und {hi}.",
+      "checked": true
+    },
+    "measured.formulaSays": {
+      "text": "Die Formel sagt {kcal}.",
+      "checked": true
+    },
+    "measured.nameAte": {
+      "text": "{name} hat gegessen",
+      "checked": true
+    },
+    "measured.ateAvg": {
+      "text": "{ate} kcal pro Tag im Schnitt, an {full} vollen Tagen",
+      "checked": true
+    },
+    "measured.weightCoach": {
+      "text": "{weight}, {n} Gewichtseinträge",
+      "checked": true
+    },
+    "measured.weightYou": {
+      "text": "{weight}, aus der Linie durch {n} Gewichtseinträge",
+      "checked": true
+    },
+    "measured.aboutSameCoach": {
+      "text": "etwa so viel wie gegessen",
+      "checked": true
+    },
+    "measured.aboutSameYou": {
+      "text": "etwa so viel, wie du gegessen hast",
+      "checked": true
+    },
+    "measured.burnMoreCoach": {
+      "text": "etwa {perDay} kcal pro Tag mehr als gegessen",
+      "checked": true
+    },
+    "measured.burnLessCoach": {
+      "text": "etwa {perDay} kcal pro Tag weniger als gegessen",
+      "checked": true
+    },
+    "measured.burnMoreYou": {
+      "text": "{kg} × 7.700 kcal ÷ 14 Tage = etwa {perDay} kcal pro Tag mehr, als du gegessen hast",
+      "checked": true
+    },
+    "measured.burnLessYou": {
+      "text": "{kg} × 7.700 kcal ÷ 14 Tage = etwa {perDay} kcal pro Tag weniger, als du gegessen hast",
+      "checked": true
+    },
+    "measured.gapMore": {
+      "text": "{kcal} kcal mehr als die Formel, {pct} %.",
+      "checked": true
+    },
+    "measured.gapLess": {
+      "text": "{kcal} kcal weniger als die Formel, {pct} %.",
+      "checked": true
+    },
+    "measured.toUseIt": {
+      "text": "Um ihn zu nutzen, wähle unter Formel Aus den Daten von {name} oder leg ein neues Ziel ab einem Datum fest.",
+      "checked": true
+    },
+    "measured.lineHow": {
+      "text": "Eine gerade Linie durch deine Gewichtseinträge, nicht der erste und der letzte Morgen. In deinen ersten zwei Wochen zählen Gewichtseinträge ab Tag {day}: Frühe Veränderungen sind meist Wasser.",
+      "checked": true
+    },
+    "measured.rangeHow": {
+      "text": "Je weiter deine Gewichtseinträge von der Linie abweichen, desto breiter ist sie. Es braucht {full} volle Tage und {weighed} Gewichtseinträge in 14 Tagen.",
+      "checked": true
+    },
+    "measured.inUseSince": {
+      "text": "In Verwendung seit {date}: {kcal} kcal pro Tag, aus {span}. Ein neuerer Wert wird erst verwendet, wenn du ihn erneut anwendest.",
+      "checked": true
+    },
+    "shop.grams": {
+      "text": "{g} g",
+      "checked": true
+    },
+    "shop.textHead": {
+      "text": "Einkaufsliste, {span}",
+      "checked": true
+    },
+    "shop.textCooked": {
+      "text": "({g} g gekocht)",
+      "checked": true
+    },
+    "shop.textHeadN": {
+      "text": "Einkaufsliste {n}, {span}",
+      "checked": true
+    },
+    "shop.textNotBought": {
+      "text": "(letztes Mal nicht gekauft)",
+      "checked": true
+    },
+    "plan.zoneN": {
+      "text": "Zone {n}",
+      "checked": true
+    },
+    "plan.zone1.feel": {
+      "text": "sehr leicht, du atmest ruhig",
+      "checked": true
+    },
+    "plan.zone1.examples": {
+      "text": "Yoga, Mobility, Dehnen, lockeres Radfahren",
+      "checked": true
+    },
+    "plan.zone2.feel": {
+      "text": "leicht, du kannst in ganzen Sätzen reden",
+      "checked": true
+    },
+    "plan.zone2.examples": {
+      "text": "lockeres Joggen, Radfahren, Schwimmen, Wandern",
+      "checked": true
+    },
+    "plan.zone3.feel": {
+      "text": "gleichmäßig, du redest in kurzen Sätzen",
+      "checked": true
+    },
+    "plan.zone3.examples": {
+      "text": "Tempolauf, Spinning-Kurs, Mannschaftstraining",
+      "checked": true
+    },
+    "plan.zone4.feel": {
+      "text": "hart, nur ein paar Worte am Stück",
+      "checked": true
+    },
+    "plan.zone4.examples": {
+      "text": "Intervalle, HIIT, ein Fußballspiel",
+      "checked": true
+    },
+    "plan.zone5.feel": {
+      "text": "volle Kraft, keine Worte",
+      "checked": true
+    },
+    "plan.zone5.examples": {
+      "text": "Sprints, die letzten Minuten eines Rennens",
+      "checked": true
+    },
+    "plan.fillHeavy": {
+      "text": "{title} passt auch für {meal}, war dir aber {times} zu schwer und hat dich müde gemacht, darum kommt es an zweiter Stelle: Ändern holt es.",
+      "checked": true
+    },
+    "plan.fillLight": {
+      "text": "{title} ist leicht für dich, darum kommt es für {meal} zuerst.",
+      "checked": true
+    },
+    "plan.timesOnce": {
+      "text": "einmal",
+      "checked": true
+    },
+    "plan.timesTwice": {
+      "text": "zweimal",
+      "checked": true
+    },
+    "plan.timesN": {
+      "text": "{n}-mal",
+      "checked": true
+    },
+    "plan.portionsN": {
+      "text": "{n} Portion|{n} Portionen",
+      "checked": true
+    },
+    "plan.kcalG": {
+      "text": "{kcal} kcal · {protein} g",
+      "checked": true
+    },
+    "plan.pdN": {
+      "text": "PD {pd}",
+      "checked": true
+    },
+    "foods.liquid.oliveOil": {
+      "text": "Olivenöl",
+      "checked": true
+    },
+    "foods.liquid.sunflowerOil": {
+      "text": "Sonnenblumenöl",
+      "checked": true
+    },
+    "foods.liquid.oil": {
+      "text": "Öl",
+      "checked": true
+    },
+    "foods.liquid.water": {
+      "text": "Wasser",
+      "checked": true
+    },
+    "foods.liquid.brine": {
+      "text": "Salzlake",
+      "checked": true
+    },
+    "foods.liquid.syrup": {
+      "text": "Sirup",
+      "checked": true
+    },
+    "foods.liquid.juice": {
+      "text": "Saft",
+      "checked": true
+    },
+    "foods.liquid.other": {
+      "text": "Sonstiges",
+      "checked": true
+    },
+    "foods.packIn": {
+      "text": "In {liquid}: {net} g.",
+      "checked": true
+    },
+    "foods.packInDrained": {
+      "text": "In {liquid}: {net} g, abgetropft {drained} g.",
+      "checked": true
+    },
+    "foods.packOilFromCan": {
+      "text": "{oil} aus der Dose",
+      "checked": true
+    },
+    "foods.packDrainedTwo": {
+      "text": "Die Werte gelten pro 100 g abgetropft. Auf dem Teller kommt die Dose als zwei Lebensmittel: {base}, abgetropft, {drained} g, und {oil}, bis zu {grams} g, wenn du es hinzufügst.",
+      "checked": true
+    },
+    "foods.packDrainedOne": {
+      "text": "Die Werte gelten pro 100 g abgetropft. Auf dem Teller kommt die Dose als {base}, abgetropft, {drained} g.",
+      "checked": true
+    },
+    "foods.packWhole": {
+      "text": "Die Werte gelten für den ganzen Inhalt, {liquid} inklusive, also ist die Dose ein Lebensmittel, {net} g.",
+      "checked": true
+    },
+    "foods.packUnknown": {
+      "text": "Das Etikett sagt nicht, ob die Werte für das Abtropfgewicht oder den ganzen Inhalt gelten. Prüf es.",
+      "checked": true
+    },
+    "foods.fitTop": {
+      "text": "Protein hoch+ für dein Ziel",
+      "checked": true
+    },
+    "foods.fitHigh": {
+      "text": "Protein hoch für dein Ziel",
+      "checked": true
+    },
+    "foods.fitPlan": {
+      "text": "im Plan",
+      "checked": true
+    },
+    "foods.fitClose": {
+      "text": "etwas unter deinem Ziel",
+      "checked": true
+    },
+    "foods.fitBelow": {
+      "text": "weit unter deinem Ziel",
+      "checked": true
+    },
+    "foods.inShopsIn": {
+      "text": "In Läden in {country}: {name}",
+      "checked": true
+    },
+    "foods.noBrand": {
+      "text": "ohne Marke",
+      "checked": true
+    },
+    "foods.tasteSweet": {
+      "text": "süß",
+      "checked": true
+    },
+    "foods.tasteSavoury": {
+      "text": "herzhaft",
+      "checked": true
+    },
+    "foods.commaTarget": {
+      "text": ", Zielwert {target}",
+      "checked": true
+    },
+    "foods.shareProtein": {
+      "text": "{share} % der Energie stammen aus Protein",
+      "checked": true
+    },
+    "foods.noProteinValue": {
+      "text": "kein Proteinwert",
+      "checked": true
+    },
+    "foods.kcalN": {
+      "text": "{kcal} kcal",
+      "checked": true
+    },
+    "foods.cooking": {
+      "text": "Kochen",
+      "checked": true
+    },
+    "foods.fromStarterSet": {
+      "text": "aus dem Startset",
+      "checked": true
+    },
+    "foods.addedByYou": {
+      "text": "von dir hinzugefügt",
+      "checked": true
+    },
+    "foods.readFromPhoto": {
+      "text": "vom Foto gelesen",
+      "checked": true
+    },
+    "foods.valuesFrom": {
+      "text": "Werte aus: {source}. Prüf deine Packung.",
+      "checked": true
+    },
+    "foods.nOf": {
+      "text": "{n} von {of}",
+      "checked": true
+    },
+    "foods.theMainPhoto": {
+      "text": "Das Hauptfoto",
+      "checked": true
+    },
+    "foods.makeItMainPhoto": {
+      "text": "Als Hauptfoto festlegen",
+      "checked": true
+    },
+    "foods.notSoldIn": {
+      "text": "Nicht erhältlich in {place}",
+      "checked": true
+    },
+    "foods.addAPlace": {
+      "text": "+ Ort",
+      "checked": true
+    },
+    "foods.portionKcalProt": {
+      "text": "{g} g haben {kcal} kcal und {prot} g Protein.",
+      "checked": true
+    },
+    "foods.portionKcal": {
+      "text": "{g} g haben {kcal} kcal.",
+      "checked": true
+    },
+    "foods.whatFlavour": {
+      "text": "Es bringt den Geschmack; lass eine Proteinbasis den Teller tragen.",
+      "checked": true
+    },
+    "foods.whatProtein": {
+      "text": "Es kann einen Teller allein tragen.",
+      "checked": true
+    },
+    "foods.whatFits": {
+      "text": "Es passt für sich allein.",
+      "checked": true
+    },
+    "foods.whatPair": {
+      "text": "Kombiniere es mit einer Proteinbasis, um dein Ziel zu erreichen.",
+      "checked": true
+    },
+    "foods.pdOn": {
+      "text": "PD {pd}, auf deinem Ziel von {target}.",
+      "checked": true
+    },
+    "foods.pdBelow": {
+      "text": "PD {pd}, unter deinem Ziel von {target}.",
+      "checked": true
+    },
+    "foods.oneServing": {
+      "text": "1 {serving} ({grams} g)",
+      "checked": true
+    },
+    "foods.aPortion": {
+      "text": "Eine Portion von {grams} g",
+      "checked": true
+    },
+    "foods.soFarToday": {
+      "text": "{eaten} von {day} kcal heute bisher",
+      "checked": true
+    },
+    "foods.plannedNothingLogged": {
+      "text": "{day} kcal geplant, noch nichts eingetragen",
+      "checked": true
+    },
+    "foods.todayNotToday": {
+      "text": "{day}: {so}. Heute nicht.",
+      "checked": true
+    },
+    "foods.todayMoreThanLeft": {
+      "text": "{day}: {so}. {portion} ist mehr als die übrigen {left} kcal.",
+      "checked": true
+    },
+    "foods.todayFits": {
+      "text": "{day}: {so}. {portion} passt.",
+      "checked": true
+    },
+    "foods.band.below": {
+      "text": "Niedrig−",
+      "checked": true
+    },
+    "foods.band.close": {
+      "text": "Niedrig",
+      "checked": true
+    },
+    "foods.band.plan": {
+      "text": "Im Plan",
+      "checked": true
+    },
+    "foods.band.high": {
+      "text": "Hoch",
+      "checked": true
+    },
+    "foods.band.top": {
+      "text": "Hoch+",
+      "checked": true
+    },
+    "foods.alreadyInYourFoods": {
+      "text": "{name} ist schon in deinen Lebensmitteln.",
+      "checked": true
+    },
+    "foods.isInYourFoods": {
+      "text": "{name} ist in deinen Lebensmitteln.",
+      "checked": true
+    },
+    "foods.moreIn": {
+      "text": "{n} weitere in {place}",
+      "checked": true
+    },
+    "foods.tapToSee": {
+      "text": "Tippe auf {places}, um sie zu sehen.",
+      "checked": true
+    },
+    "foods.or": {
+      "text": "{a} oder {b}",
+      "checked": true
+    },
+    "foods.possibleDupsN": {
+      "text": "{n} mögliches Duplikat in deinen Lebensmitteln. Prüfen und zusammenführen.|{n} mögliche Duplikate in deinen Lebensmitteln. Prüfen und zusammenführen.",
+      "checked": true
+    },
+    "foods.valuesReadFromLabel": {
+      "text": "Werte vom Etikett gelesen",
+      "checked": true
+    },
+    "foods.moreUnder": {
+      "text": "{n} weitere in deinen Lebensmitteln unter {bands}.",
+      "checked": true
+    },
+    "foods.qFoodsN": {
+      "text": "{q} · {n} Lebensmittel|{q} · {n} Lebensmittel",
+      "checked": true
+    },
+    "foods.lookingInDb": {
+      "text": "suche in der Produktdatenbank…",
+      "checked": true
+    },
+    "foods.addItYourselfNumber": {
+      "text": "Füg es selbst hinzu, die Nummer wird übernommen.",
+      "checked": true
+    },
+    "foods.addItYourselfName": {
+      "text": "Füg es selbst hinzu, „{q}“ wird übernommen.",
+      "checked": true
+    },
+    "foods.gProtein": {
+      "text": "{protein} g Protein",
+      "checked": true
+    },
+    "foods.mixDessert": {
+      "text": "DaaM Dessert",
+      "checked": true
+    },
+    "foods.mixMeal": {
+      "text": "Mahlzeit",
+      "checked": true
+    },
+    "foods.mixSnack": {
+      "text": "Snack",
+      "checked": true
+    },
+    "foods.mixFits": {
+      "text": "passt zu diesem Teller, so wie er ist",
+      "checked": true
+    },
+    "foods.mixUnknown": {
+      "text": "kein Ziel oder kein Proteinwert",
+      "checked": true
+    },
+    "foods.mixUnder": {
+      "text": "PD {pd} liegt unter deinem Ziel von {target}: es braucht eine Proteinbasis",
+      "checked": true
+    },
+    "foods.mixOver": {
+      "text": "PD {pd} liegt weit über deinem Ziel von {target}: allein ist es keine Mahlzeit",
+      "checked": true
+    },
+    "foods.mixLabelServings": {
+      "text": "{n} × {serving} mit {partners}|{n} × {serving} mit {partners}",
+      "checked": true
+    },
+    "foods.mixLabel": {
+      "text": "mit {partners}",
+      "checked": true
+    },
+    "me.periodSince": {
+      "text": "Seit {date}",
+      "checked": true
+    },
+    "me.periodFromTo": {
+      "text": "{from} bis {to}",
+      "checked": true
+    },
+    "me.periodDays": {
+      "text": "{span}, {n} Tag|{span}, {n} Tage",
+      "checked": true
+    },
+    "me.load.passive": {
+      "text": "Ruhe",
+      "checked": true
+    },
+    "me.load.passiveHint": {
+      "text": "kein Training",
+      "checked": true
+    },
+    "me.load.active": {
+      "text": "Leicht",
+      "checked": true
+    },
+    "me.load.activeHint": {
+      "text": "Zone 1 · Yoga, Mobility",
+      "checked": true
+    },
+    "me.load.easy": {
+      "text": "Mittel",
+      "checked": true
+    },
+    "me.load.easyHint": {
+      "text": "Zone 2 bis 3 · das meiste Training",
+      "checked": true
+    },
+    "me.load.hard": {
+      "text": "Hart",
+      "checked": true
+    },
+    "me.load.hardHint": {
+      "text": "Zone 4 bis 5 · du könntest nicht reden",
+      "checked": true
+    },
+    "me.averageDay": {
+      "text": "Durchschnittlicher Tag",
+      "checked": true
+    },
+    "me.dayAsPlanned": {
+      "text": "{day}, wie geplant",
+      "checked": true
+    },
+    "me.dayChangedToday": {
+      "text": "{day}, für heute geändert",
+      "checked": true
+    },
+    "me.dayWeekAverage": {
+      "text": "Der Durchschnitt deiner Woche, bis du den Tag wählst",
+      "checked": true
+    },
+    "me.split.balancedHint": {
+      "text": "Fett 30 % deiner Energie, Kohlenhydrate der Rest. Die Standardeinstellung von Chef Mealan.",
+      "checked": true
+    },
+    "me.split.carbsHint": {
+      "text": "Fett 25 %, mehr Platz für Kohlenhydrate: hartes Training und Ausdauer.",
+      "checked": true
+    },
+    "me.split.fatHint": {
+      "text": "Fett 35 %, das obere Ende des Bereichs, weniger Kohlenhydrate.",
+      "checked": true
+    },
+    "me.split.lowHint": {
+      "text": "Du legst deine Kohlenhydrate fest; Fett bekommt den Rest. Außerhalb der üblichen Bereiche.",
+      "checked": true
+    },
+    "me.calc.age18to30": {
+      "text": "18 bis 30",
+      "checked": true
+    },
+    "me.calc.age30to60": {
+      "text": "30 bis 60",
+      "checked": true
+    },
+    "me.calc.over60": {
+      "text": "über 60",
+      "checked": true
+    },
+    "me.calc.steps": {
+      "text": "+ {n} für deine Schritte, etwa {min} Min. Gehen über das hinaus, was dein Tag abdeckt (3,5 METs)",
+      "checked": true
+    },
+    "me.calc.shift": {
+      "text": "{shift}, passend zu deinem gemessenen Verbrauch, {kcal} kcal pro Tag ({from} bis {to})",
+      "checked": true
+    },
+    "me.calc.restKatch": {
+      "text": "Katch McArdle, aus der fettfreien Masse",
+      "checked": true
+    },
+    "me.calc.restSchofield": {
+      "text": "Schofield, {band}: Geschlecht und Gewicht",
+      "checked": true
+    },
+    "me.calc.restMifflin": {
+      "text": "Mifflin St Jeor: Geschlecht, Alter, Größe, Gewicht",
+      "checked": true
+    },
+    "me.calc.schoolDay": {
+      "text": "ein Schultag, meist sitzend",
+      "checked": true
+    },
+    "me.calc.studyDay": {
+      "text": "ein Lerntag, meist sitzend",
+      "checked": true
+    },
+    "me.calc.dayAtHome": {
+      "text": "ein Tag zu Hause",
+      "checked": true
+    },
+    "me.calc.atWork": {
+      "text": "{move} bei der Arbeit",
+      "checked": true
+    },
+    "me.calc.under18": {
+      "text": "Unter 18: kein Defizit, die Energie bleibt beim Erhaltungsbedarf.",
+      "checked": true
+    },
+    "me.calc.yourGoal": {
+      "text": "dein Ziel",
+      "checked": true
+    },
+    "me.calc.leanMass": {
+      "text": "Protein wird auf deine fettfreie Masse gerechnet, aus deinem Körperfett.",
+      "checked": true
+    },
+    "me.calc.whyLosing": {
+      "text": "Du verlierst Fett: Du isst weniger, als du verbrauchst, und mehr Protein hilft dir, deine Muskeln zu halten.",
+      "checked": true
+    },
+    "me.calc.whyPlant": {
+      "text": "Du isst vor allem pflanzliches Protein, das der Körper etwas schlechter verwertet.",
+      "checked": true
+    },
+    "me.calc.whyOver60": {
+      "text": "Du bist über 60: Muskeln reagieren mit dem Alter schwächer auf Protein.",
+      "checked": true
+    },
+    "me.calc.timesFor": {
+      "text": "× {f} für {what} = {n}",
+      "checked": true
+    },
+    "me.calc.training": {
+      "text": "+ {n} für {min} Min. {what} ({met} METs × {kg} kg × {h} h, abzüglich deines Ruheverbrauchs)",
+      "checked": true
+    },
+    "me.calc.lightTraining": {
+      "text": "leichtes Training",
+      "checked": true
+    },
+    "me.calc.moderateTraining": {
+      "text": "mittleres Training",
+      "checked": true
+    },
+    "me.calc.hardTraining": {
+      "text": "hartes Training",
+      "checked": true
+    },
+    "me.calc.noTraining": {
+      "text": "+ 0, kein Training",
+      "checked": true
+    },
+    "me.calc.total": {
+      "text": "= {n} kcal",
+      "checked": true
+    },
+    "me.calc.pctZero": {
+      "text": "± 0 % für {goal}",
+      "checked": true
+    },
+    "me.calc.pctUp": {
+      "text": "+ {pct} % für {goal}",
+      "checked": true
+    },
+    "me.calc.pctDown": {
+      "text": "− {pct} % für {goal}",
+      "checked": true
+    },
+    "me.calc.atRest": {
+      "text": "{n} in Ruhe ({how})",
+      "checked": true
+    },
+    "me.calc.restMinor": {
+      "text": "Schofield, für 10 bis 18 Jahre: Geschlecht und Gewicht",
+      "checked": true
+    },
+    "me.calc.noSchoolDay": {
+      "text": "ein Tag ohne Schule",
+      "checked": true
+    },
+    "me.calc.dayOff": {
+      "text": "ein freier Tag",
+      "checked": true
+    },
+    "me.calc.commute": {
+      "text": "+ {n} für {way} ({met} METs, {min} Min.)",
+      "checked": true
+    },
+    "me.calc.pe": {
+      "text": "+ {n} für {what} ({met} METs, {min} Min.)",
+      "checked": true
+    },
+    "me.calc.sportAtSchool": {
+      "text": "Sport in der Schule",
+      "checked": true
+    },
+    "me.calc.sportInClass": {
+      "text": "Sport im Unterricht",
+      "checked": true
+    },
+    "me.calc.trainingPlan": {
+      "text": "+ {n} für {min} Min. {what} ({met} METs × {kg} kg × {h} h, abzüglich deines Ruheverbrauchs; Compendium 2024)",
+      "checked": true
+    },
+    "me.calc.zeroAfterSchool": {
+      "text": "+ 0 nach der Schule",
+      "checked": true
+    },
+    "me.calc.zeroAfterClasses": {
+      "text": "+ 0 nach dem Unterricht",
+      "checked": true
+    },
+    "me.calc.fromData": {
+      "text": "Aus deinen Daten, {kcal} kcal pro Tag, um gleich zu bleiben, die Tage geformt nach {method}",
+      "checked": true
+    },
+    "me.calc.mSchofieldMinor": {
+      "text": "Schofield (10 bis 18 Jahre)",
+      "checked": true
+    },
+    "me.calc.mSchofield": {
+      "text": "Schofield ({band})",
+      "checked": true
+    },
+    "me.calc.mRest": {
+      "text": "{life} ×{f}, Aktivität pro Tag aus dem Compendium of Physical Activities",
+      "checked": true
+    },
+    "me.calc.math": {
+      "text": "Durchschnitt über deine Woche: {avg} kcal. Protein {lo} bis {hi} g pro kg × {ref} kg = {min} bis {max} g, Ziel {protein} g.",
+      "checked": true
+    },
+    "me.calc.mathTrains": {
+      "text": "Durchschnitt über deine Woche: {avg} kcal. Protein {lo} bis {hi} g pro kg, weil du trainierst × {ref} kg = {min} bis {max} g, Ziel {protein} g.",
+      "checked": true
+    },
+    "me.calc.setByYou": {
+      "text": "Von dir festgelegt.",
+      "checked": true
+    },
+    "me.calc.averageOfTyped": {
+      "text": "Nichts eingegeben und kein Profil zum Berechnen: der Durchschnitt der Tage, die du eingegeben hast.",
+      "checked": true
+    },
+    "share.targetSite": {
+      "text": "Öffnet die Startseite: was Chef Mealan macht, den Rechner und das Formular, um einen Code anzufragen.",
+      "checked": true
+    },
+    "share.targetBook": {
+      "text": "Öffnet die Buchseite: das kostenlose Buch und das Formular, um einen Code anzufragen.",
+      "checked": true
+    },
+    "cook.weighBoiled": {
+      "text": "gekocht wiegen",
+      "checked": true
+    },
+    "cook.phrase": {
+      "text": "{grams} g {food}",
+      "checked": true
+    },
+    "cook.phraseDry": {
+      "text": "{grams} g {food}, trocken",
+      "checked": true
+    },
+    "cook.phraseRaw": {
+      "text": "{grams} g {food}, roh",
+      "checked": true
+    },
+    "cook.phraseCooked": {
+      "text": "{grams} g {food}, gegart",
+      "checked": true
+    },
+    "cook.phraseBoiled": {
+      "text": "{grams} g {food}, gekocht",
+      "checked": true
+    },
+    "cook.phraseDrained": {
+      "text": "{grams} g {food}, abgetropft",
+      "checked": true
+    },
+    "cook.aroundFoods": {
+      "text": "Lebensmittel",
+      "checked": true
+    },
+    "cook.aboutRaw": {
+      "text": "etwa {grams} g roh",
+      "checked": true
+    },
+    "cook.aboutDry": {
+      "text": "etwa {grams} g trocken",
+      "checked": true
+    },
+    "cook.takenUpLine": {
+      "text": "beim Braten aufgenommen, eine Schätzung: 15% des Lebensmittels",
+      "checked": true
+    },
+    "cook.takenUpShort": {
+      "text": "Eine Schätzung: beim Braten aufgenommen",
+      "checked": true
+    },
+    "cook.potPlate": {
+      "text": "genug zum Braten: {amount}, wie im Rezept",
+      "checked": true
+    },
+    "cook.countedFrying": {
+      "text": "Gezählt: {grams}, beim Braten aufgenommen, eine Schätzung",
+      "checked": true
+    },
+    "cook.aPlate": {
+      "text": "Ein Teller",
+      "checked": true
+    },
+    "profile.oddBirthYear": {
+      "text": "das Geburtsjahr braucht vier Ziffern",
+      "checked": true
+    },
+    "profile.oddHeight": {
+      "text": "die Größe sieht falsch aus",
+      "checked": true
+    },
+    "profile.oddWeight": {
+      "text": "das Gewicht sieht falsch aus",
+      "checked": true
+    },
+    "profile.oddBodyFat": {
+      "text": "das Körperfett sieht falsch aus",
+      "checked": true
+    },
+    "goal.point.recomp.1": {
+      "text": "Gleichzeitig Fett verlieren und Muskeln aufbauen.",
+      "checked": true
+    },
+    "goal.point.recomp.2": {
+      "text": "Dein Gewicht bleibt etwa gleich; deine Form verändert sich.",
+      "checked": true
+    },
+    "goal.point.recomp.3": {
+      "text": "Etwas weniger Essen, als du verbrauchst, etwa 10 % weniger.",
+      "checked": true
+    },
+    "goal.point.recomp.4": {
+      "text": "Funktioniert mit regelmäßigem Krafttraining, mindestens zweimal pro Woche.",
+      "checked": true
+    },
+    "goal.point.fatloss.1": {
+      "text": "Dein Gewicht geht runter, etwa 0,5 bis 1 % pro Woche.",
+      "checked": true
+    },
+    "goal.point.fatloss.2": {
+      "text": "Weniger Essen, als du verbrauchst, etwa 20 % weniger.",
+      "checked": true
+    },
+    "goal.point.fatloss.3": {
+      "text": "Protein am oberen Ende deines Bereichs, um deine Muskeln zu halten.",
+      "checked": true
+    },
+    "goal.point.maintain.1": {
+      "text": "Dein Gewicht bleibt, wo es ist.",
+      "checked": true
+    },
+    "goal.point.maintain.2": {
+      "text": "Mit Training kannst du trotzdem stärker werden.",
+      "checked": true
+    },
+    "goal.point.maintain.3": {
+      "text": "So viel Essen, wie du verbrauchst.",
+      "checked": true
+    },
+    "goal.point.gain.1": {
+      "text": "Mehr Essen, als du verbrauchst, vor allem als Kohlenhydrate fürs Training.",
+      "checked": true
+    },
+    "goal.point.gain.2": {
+      "text": "Mit Training ist der größte Teil der Zunahme Muskulatur.",
+      "checked": true
+    },
+    "goal.point.performance.1": {
+      "text": "Für hartes Training oder Ausdauersport.",
+      "checked": true
+    },
+    "goal.point.performance.2": {
+      "text": "Genug Essen, um gut zu trainieren und dich zu erholen, mit mehr davon aus Kohlenhydraten.",
+      "checked": true
+    },
+    "goal.point.gainsteady.1": {
+      "text": "Mehr Essen, als du verbrauchst, etwa 5 % mehr.",
+      "checked": true
+    },
+    "goal.point.gainsteady.2": {
+      "text": "Zuerst steigen deine Gewichte beim Heben; dein Körpergewicht folgt langsam.",
+      "checked": true
+    },
+    "goal.paceHint.steady": {
+      "text": "etwa 5 % mehr Essen · Gewicht steigt etwa 0,05 bis 0,25 % pro Woche, je nachdem, wie lange du schon trainierst · für alle, die schon eine Weile trainieren und stärker werden wollen",
+      "checked": true
+    },
+    "goal.paceHint.faster": {
+      "text": "etwa 10 % mehr Essen · Gewicht steigt 0,25 bis 0,5 % pro Woche · für alle, die Muskeln aufzuholen haben",
+      "checked": true
+    },
+    "goal.age.1to3": {
+      "text": "1 bis 3 Jahre",
+      "checked": true
+    },
+    "goal.source.quick": {
+      "text": "Ein grobes Ziel, die Mitte des Bereichs",
+      "checked": true
+    },
+    "goal.source.profile": {
+      "text": "Aus deinem Profil berechnet",
+      "checked": true
+    },
+    "goal.source.exact": {
+      "text": "Deine eigenen Zahlen",
+      "checked": true
+    },
+    "goal.source.coach": {
+      "text": "Von deinem Coach festgelegt",
+      "checked": true
+    },
+    "goal.pd.below": {
+      "text": "Niedrig−",
+      "checked": true
+    },
+    "goal.pd.close": {
+      "text": "Niedrig",
+      "checked": true
+    },
+    "goal.pd.plan": {
+      "text": "Im Plan",
+      "checked": true
+    },
+    "goal.pd.high": {
+      "text": "Hoch",
+      "checked": true
+    },
+    "goal.pd.top": {
+      "text": "Hoch+",
+      "checked": true
+    },
+    "goal.rangeUnder": {
+      "text": "unter {n}",
+      "checked": true
+    },
+    "goal.rangeTo": {
+      "text": "{a} bis {b}",
+      "checked": true
+    },
+    "goal.rangeAndUp": {
+      "text": "{n} und mehr",
+      "checked": true
+    },
+    "goal.bandHint": {
+      "text": "{band}: PD {range} · dein Ziel {target}",
+      "checked": true
+    },
+    "goal.missBirthYear": {
+      "text": "dein Geburtsjahr",
+      "checked": true
+    },
+    "goal.missHeight": {
+      "text": "deine Größe",
+      "checked": true
+    },
+    "goal.missWeight": {
+      "text": "dein Gewicht",
+      "checked": true
+    },
+    "goal.dataLess": {
+      "text": "Aus deinen Daten: {kcal} kcal weniger als mit der Formel.",
+      "checked": true
+    },
+    "goal.dataMore": {
+      "text": "Aus deinen Daten: {kcal} kcal mehr als mit der Formel.",
+      "checked": true
+    },
+    "goal.fromToday": {
+      "text": "heute",
+      "checked": true
+    },
+    "goal.fromTomorrow": {
+      "text": "morgen",
+      "checked": true
+    },
+    "goal.applyFromDay": {
+      "text": "Ab {from} übernehmen",
+      "checked": true
+    },
+    "goal.applyFromKept": {
+      "text": "Ab {from} übernehmen, {n} bleibt, wie es ist|Ab {from} übernehmen, {n} bleiben, wie sie sind",
+      "checked": true
+    },
+    "goal.chipToday": {
+      "text": "Heute",
+      "checked": true
+    },
+    "goal.chipTomorrow": {
+      "text": "Morgen",
+      "checked": true
+    },
+    "goal.startsOn": {
+      "text": "{goal} beginnt am {date}.",
+      "checked": true
+    },
+    "goal.yourDays": {
+      "text": "Deine Tage",
+      "checked": true
+    },
+    "goal.dayAria": {
+      "text": "{day}: {what}",
+      "checked": true
+    },
+    "goal.noTrainingLow": {
+      "text": "kein Training",
+      "checked": true
+    },
+    "goal.dayHowHard": {
+      "text": "{day}, wie hart",
+      "checked": true
+    },
+    "goal.dayHowLong": {
+      "text": "{day}, wie lange",
+      "checked": true
+    },
+    "goal.to": {
+      "text": "bis",
+      "checked": true
+    },
+    "goal.dayWhen": {
+      "text": "{day}, wann",
+      "checked": true
+    },
+    "goal.inWorkHours": {
+      "text": "in der Arbeitszeit",
+      "checked": true
+    },
+    "goal.trainingDays": {
+      "text": "{n} Trainingstag|{n} Trainingstage",
+      "checked": true
+    },
+    "goal.without": {
+      "text": "{n} ohne",
+      "checked": true
+    },
+    "goal.stepShop": {
+      "text": "{n}. Wo du einkaufst und kochst",
+      "checked": true
+    },
+    "goal.shopWhy": {
+      "text": "Dein Zuhause bringt seine Basis-Lebensmittel mit. Die Küchen und womit du kochst sagen Chef Mealan, was es vorschlagen soll. Du kannst später alles unter Ich ändern.",
+      "checked": true
+    },
+    "goal.foodsFor": {
+      "text": "{n} Lebensmittel für {place}",
+      "checked": true
+    },
+    "goal.backToMe": {
+      "text": "← Ich",
+      "checked": true
+    },
+    "goal.close": {
+      "text": "Schließen",
+      "checked": true
+    },
+    "goal.nextYou": {
+      "text": "Weiter: {n}. Du",
+      "checked": true
+    },
+    "goal.stepYou": {
+      "text": "{n}. Du",
+      "checked": true
+    },
+    "goal.male": {
+      "text": "Männlich",
+      "checked": true
+    },
+    "goal.female": {
+      "text": "Weiblich",
+      "checked": true
+    },
+    "goal.stepsValue": {
+      "text": "{steps} Schritte",
+      "checked": true
+    },
+    "goal.bodyFatValue": {
+      "text": "Körperfett: {value}",
+      "checked": true
+    },
+    "goal.notGiven": {
+      "text": "nicht angegeben",
+      "checked": true
+    },
+    "goal.enterYear": {
+      "text": "Jahr eingeben",
+      "checked": true
+    },
+    "goal.under18Here": {
+      "text": "Nach diesem Geburtsjahr bist du unter 18, also kannst du Chef Mealan noch nicht nutzen. Wenn du dich vertippt hast, korrigiere es hier.",
+      "checked": true
+    },
+    "goal.yourWeekdays": {
+      "text": "Deine Wochentage: {what}, gezählt als meist sitzend. Du kannst es unter Alltag ändern.",
+      "checked": true
+    },
+    "goal.stepAfter": {
+      "text": "{n}. Was willst du erreichen?",
+      "checked": true
+    },
+    "goal.stepDays": {
+      "text": "{n}. Deine Tage",
+      "checked": true
+    },
+    "goal.fillIn": {
+      "text": "Um deine Zahlen zu berechnen, trag oben {missing} ein. Oder nutze Meine eigenen Zahlen.",
+      "checked": true
+    },
+    "goal.enterKcal": {
+      "text": "kcal eingeben",
+      "checked": true
+    },
+    "goal.enterProtein": {
+      "text": "Protein eingeben",
+      "checked": true
+    },
+    "goal.fillsInN": {
+      "text": "wird ergänzt: {n}",
+      "checked": true
+    },
+    "goal.fillsIn": {
+      "text": "wird ergänzt",
+      "checked": true
+    },
+    "goal.theRestN": {
+      "text": "der Rest: {n}",
+      "checked": true
+    },
+    "goal.theRest": {
+      "text": "der Rest",
+      "checked": true
+    },
+    "goal.oneNumber": {
+      "text": "Eine Zahl für jeden Tag. Das ist {pd}.",
+      "checked": true
+    },
+    "goal.oneNumberFull": {
+      "text": "Eine Zahl für jeden Tag. Das ist {pd}, {fat} g Fett und {carbs} g Kohlenhydrate.",
+      "checked": true
+    },
+    "goal.keptGoesTo": {
+      "text": "Alles, was du bewusst beibehältst, geht zur Freigabe an {coach}.",
+      "checked": true
+    },
+    "weight.vOnTrack": {
+      "text": "Im Plan",
+      "checked": true
+    },
+    "weight.vFaster": {
+      "text": "Schneller als erwartet",
+      "checked": true
+    },
+    "weight.vSlower": {
+      "text": "Langsamer als erwartet",
+      "checked": true
+    },
+    "weight.vUp": {
+      "text": "Steigt",
+      "checked": true
+    },
+    "weight.vDown": {
+      "text": "Sinkt",
+      "checked": true
+    },
+    "weight.vTooFew": {
+      "text": "Noch nicht genug Gewichtseinträge",
+      "checked": true
+    },
+    "weight.noteTooFew": {
+      "text": "Der Trend braucht 3 Gewichtseinträge in der ersten Woche und 3 in der letzten. Die meisten Coaches wollen 3 bis 7 Morgen pro Woche, zur gleichen Zeit, vor dem Frühstück.",
+      "checked": true
+    },
+    "weight.noteSteadyFaster": {
+      "text": "Bei Gleichmäßig heißt schneller meist, dass mehr davon Fett ist. Nimm etwa 100 kcal weg, vor allem Kohlenhydrate an Tagen ohne Training, und schau in 2 Wochen wieder.",
+      "checked": true
+    },
+    "weight.noteSteadySlower": {
+      "text": "Wenn deine Gewichte beim Heben steigen, ist das in Ordnung. Wenn sie auch feststecken, nimm etwa 100 kcal dazu, vor allem Kohlenhydrate rund ums Training, und schau in 2 Wochen wieder.",
+      "checked": true
+    },
+    "weight.noteGainFaster": {
+      "text": "Schneller als 0,5 % pro Woche ist meist Fett. Nimm etwa 150 kcal weg und schau in 2 Wochen wieder.",
+      "checked": true
+    },
+    "weight.noteGainSlower": {
+      "text": "Nimm etwa 150 kcal dazu, vor allem Kohlenhydrate rund ums Training, und schau in 2 Wochen wieder.",
+      "checked": true
+    },
+    "weight.noteLossFaster": {
+      "text": "Schneller abzunehmen kostet Muskeln und Energie. Nimm etwa 100 bis 150 kcal dazu, Protein und Krafttraining bleiben, wie sie sind.",
+      "checked": true
+    },
+    "weight.noteLossSlower": {
+      "text": "Schau zuerst auf die Wochenenden. Dann nimm etwa 100 kcal weg oder mach mehr Schritte, und schau in 2 Wochen wieder.",
+      "checked": true
+    },
+    "weight.noteOther": {
+      "text": "Mehr Veränderung, als dieses Ziel erwartet. Kleine Änderungen beim Essen oder bei den Schritten bringen es zurück; sprich mit deinem Coach, wenn es so weitergeht.",
+      "checked": true
+    },
+    "weight.last": {
+      "text": "zuletzt: {kg}, {day}",
+      "checked": true
+    },
+    "weight.avg7Value": {
+      "text": "7-Tage-Durchschnitt {kg}",
+      "checked": true
+    },
+    "weight.yourWeightUnit": {
+      "text": "Dein Gewicht, {unit}",
+      "checked": true
+    },
+    "weight.todayDate": {
+      "text": "Heute, {date}",
+      "checked": true
+    },
+    "weight.weeksAgo4": {
+      "text": "vor 4 Wochen",
+      "checked": true
+    },
+    "weight.yourWeighInsLow": {
+      "text": "deine Gewichtseinträge",
+      "checked": true
+    },
+    "weight.avg7": {
+      "text": "7-Tage-Durchschnitt",
+      "checked": true
+    },
+    "weight.expectedFor": {
+      "text": "erwartet für {goal}",
+      "checked": true
+    },
+    "weight.in3Weeks": {
+      "text": "{change} in 3 Wochen",
+      "checked": true
+    },
+    "weight.rangeTo": {
+      "text": "{a} bis {b}",
+      "checked": true
+    },
+    "weight.countIn4Weeks": {
+      "text": "{n} Gewichtseintrag in 4 Wochen.|{n} Gewichtseinträge in 4 Wochen.",
+      "checked": true
+    },
+    "weight.coachSeesSame": {
+      "text": "Dein Coach sieht dasselbe.",
+      "checked": true
+    },
+    "weight.updateTo": {
+      "text": "Meine Zahlen auf {n} {unit} aktualisieren",
+      "checked": true
+    },
+    "weight.removeOf": {
+      "text": "Gewichtseintrag vom {date} entfernen",
+      "checked": true
+    },
+    "weight.countPctAsOf": {
+      "text": "{n} Gewichtseintrag in 4 Wochen, Stand {date}. In Prozent des Körpergewichts: Die Person teilt keine Körperdaten.|{n} Gewichtseinträge in 4 Wochen, Stand {date}. In Prozent des Körpergewichts: Die Person teilt keine Körperdaten.",
+      "checked": true
+    },
+    "weight.countPct": {
+      "text": "{n} Gewichtseintrag in 4 Wochen. In Prozent des Körpergewichts: Die Person teilt keine Körperdaten.|{n} Gewichtseinträge in 4 Wochen. In Prozent des Körpergewichts: Die Person teilt keine Körperdaten.",
+      "checked": true
+    },
+    "sheet.pctOfWeight": {
+      "text": "{lo} bis {hi} % deines Gewichts",
+      "checked": true
+    },
+    "calendar.err.timeout": {
+      "text": "Google Kalender hat nicht rechtzeitig geantwortet. Versuch es nochmal.",
+      "checked": true
+    },
+    "calendar.err.noReach": {
+      "text": "Google Kalender war nicht erreichbar. Tippe auf Aktualisieren, um dort weiterzumachen, wo es aufgehört hat.",
+      "checked": true
+    },
+    "calendar.err.noAnswer": {
+      "text": "Google Kalender hat nicht geantwortet.",
+      "checked": true
+    },
+    "calendar.err.busyNotGiven": {
+      "text": "Google hat Chef Mealan deine belegten Zeiten nicht gegeben. Schalte Lesen, wann ich beschäftigt bin, aus und wieder ein.",
+      "checked": true
+    },
+    "calendar.err.busyNotRead": {
+      "text": "Deine belegten Zeiten konnten gerade nicht gelesen werden.",
+      "checked": true
+    },
+    "calendar.ev.open": {
+      "text": "In Chef Mealan öffnen: {link}",
+      "checked": true
+    },
+    "calendar.ev.cook": {
+      "text": "{meal} kochen",
+      "checked": true
+    },
+    "calendar.ev.cookAhead": {
+      "text": "Vorkochen für {day}",
+      "checked": true
+    },
+    "calendar.ev.weighIn": {
+      "text": "Wiegen",
+      "checked": true
+    },
+    "calendar.ev.shopping": {
+      "text": "Einkaufsliste {n}",
+      "checked": true
+    },
+    "calendar.ev.calDescription": {
+      "text": "Deine Mahlzeiten, dein Kochen und Training aus Chef Mealan. Nur Namen und Uhrzeiten.",
+      "checked": true
+    },
+    "calendar.err.answered": {
+      "text": "Google Kalender hat geantwortet: {status}",
+      "checked": true
+    },
+    "calendar.err.noBusy": {
+      "text": "Google Kalender hat deine belegten Zeiten nicht geteilt.",
+      "checked": true
+    },
+    "rf.lineMe": {
+      "text": "Ich",
+      "checked": true
+    },
+    "rf.lineAllMembers": {
+      "text": "Alle Mitglieder",
+      "checked": true
+    },
+    "rf.lineNoName": {
+      "text": "Ein Mitglied ohne Namen",
+      "checked": true
+    },
+    "rf.meUnnamed": {
+      "text": "{me}, {n} ohne deinen Namen geteilt|{me}, {n} ohne deinen Namen geteilt",
+      "checked": true
+    },
+    "slot.workWhen": {
+      "text": "Chef Mealan schlägt Training außerhalb deiner Arbeitszeit vor, {from} bis {to}. Jede Uhrzeit bleibt offen: Eine Pause bei der Arbeit kann Zeit fürs Gym sein.",
+      "checked": true
+    },
+    "coach.reasonNotThisWeek": {
+      "text": "Nicht diese Woche",
+      "checked": true
+    },
+    "coach.reasonDontLike": {
+      "text": "Mag ich nicht",
+      "checked": true
+    },
+    "coach.reasonTooMuch": {
+      "text": "Zu viel für mich",
+      "checked": true
+    },
+    "coach.reasonAskCheckin": {
+      "text": "Frag mich beim Check-in",
+      "checked": true
+    },
+    "coach.aMeal": {
+      "text": "eine Mahlzeit",
+      "checked": true
+    },
+    "coach.answerWaiting": {
+      "text": "wartet",
+      "checked": true
+    },
+    "coach.answerAccepted": {
+      "text": "angenommen",
+      "checked": true
+    },
+    "coach.answerNotNow": {
+      "text": "nicht jetzt",
+      "checked": true
+    },
+    "coach.answerNotNowWhy": {
+      "text": "nicht jetzt: {reason}",
+      "checked": true
+    },
+    "coach.sugSnackAt": {
+      "text": "Ein geplanter Snack um {time}: {text}",
+      "checked": true
+    },
+    "coach.sugSnack": {
+      "text": "Ein geplanter Snack: {text}",
+      "checked": true
+    },
+    "coach.sugPage": {
+      "text": "Eine Seite: {name}",
+      "checked": true
+    },
+    "coach.sugAnswer": {
+      "text": "Zu {title}: {text}",
+      "checked": true
+    },
+    "coach.sugGood": {
+      "text": "Gut: {title}",
+      "checked": true
+    },
+    "coach.sugSeen": {
+      "text": "Gesehen: {title}",
+      "checked": true
+    },
+    "coach.askLook": {
+      "text": "schau dir das an",
+      "checked": true
+    },
+    "coach.askOk": {
+      "text": "war das okay?",
+      "checked": true
+    },
+    "coach.askHelp": {
+      "text": "hilf mir beim nächsten Mal",
+      "checked": true
+    },
+    "coach.waitAskTitle": {
+      "text": "{ask}: {title}",
+      "checked": true
+    },
+    "coach.waitShared": {
+      "text": "{when} · mit dir geteilt",
+      "checked": true
+    },
+    "coach.waitReplied": {
+      "text": "hat geantwortet: „{text}“",
+      "checked": true
+    },
+    "coach.waitToNote": {
+      "text": "{when} · auf deine Notiz",
+      "checked": true
+    },
+    "coach.waitNumbers": {
+      "text": "Zahlen zur Freigabe",
+      "checked": true
+    },
+    "coach.waitGoalSheet": {
+      "text": "das Zielblatt",
+      "checked": true
+    },
+    "coach.waitCheckin": {
+      "text": "Check-in heute",
+      "checked": true
+    },
+    "coach.waitNoteNotSent": {
+      "text": "die Notiz ist noch nicht gesendet",
+      "checked": true
+    },
+    "coach.waitCards": {
+      "text": "{n} geteilte Karte|{n} geteilte Karten",
+      "checked": true
+    },
+    "coach.waitReplies": {
+      "text": "{n} Antwort|{n} Antworten",
+      "checked": true
+    },
+    "coach.waitCheckins": {
+      "text": "{n} Check-in heute|{n} Check-ins heute",
+      "checked": true
+    },
+    "coach.waitStrip": {
+      "text": "{n} Sache wartet unter Klienten: {parts}. Klienten öffnen ›|{n} Sachen warten unter Klienten: {parts}. Klienten öffnen ›",
+      "checked": true
+    },
+    "coach.isCookNow": {
+      "text": "{name} hat die Rolle Koch und kann dir Rezepte zum Veröffentlichen schicken.",
+      "checked": true
+    },
+    "coach.noLongerCook": {
+      "text": "{name} hat die Rolle Koch nicht mehr.",
+      "checked": true
+    },
+    "coach.waitingForYouN": {
+      "text": "Wartet auf dich ({n})",
+      "checked": true
+    },
+    "coach.checkinsToday": {
+      "text": "Check-ins heute, {day}",
+      "checked": true
+    },
+    "coach.toSend": {
+      "text": "{n} zu senden",
+      "checked": true
+    },
+    "coach.allSent": {
+      "text": "alles gesendet",
+      "checked": true
+    },
+    "coach.nToApprove": {
+      "text": "{n} zur Freigabe",
+      "checked": true
+    },
+    "coach.clientsN": {
+      "text": "Klienten ({n})",
+      "checked": true
+    },
+    "coach.isCook": {
+      "text": "{name} hat die Rolle Koch",
+      "checked": true
+    },
+    "coach.chatOnSwitchOff": {
+      "text": "Chat mit Chef Mealan ist an · ausschalten",
+      "checked": true
+    },
+    "coach.fromNamesData": {
+      "text": "Aus den Daten von {name}",
+      "checked": true
+    },
+    "coach.formulaData": {
+      "text": "{name}: der gemessene Verbrauch, ab heute fest.",
+      "checked": true
+    },
+    "coach.formulaSet": {
+      "text": "{name}: {formula}.",
+      "checked": true
+    },
+    "coach.youLower": {
+      "text": "dir",
+      "checked": true
+    },
+    "coach.sharedWithYouN": {
+      "text": "Mit dir geteilt ({n})",
+      "checked": true
+    },
+    "coach.sendTitle": {
+      "text": "„{title}“ senden",
+      "checked": true
+    },
+    "coach.sentTo": {
+      "text": "An {name} gesendet.",
+      "checked": true
+    },
+    "coach.sentToN": {
+      "text": "An {n} Klienten gesendet.",
+      "checked": true
+    },
+    "coach.reqCoach": {
+      "text": "Coach",
+      "checked": true
+    },
+    "coach.reqFrom": {
+      "text": "von {page}",
+      "checked": true
+    },
+    "coach.reqFromSrc": {
+      "text": "von {page}, {src}",
+      "checked": true
+    },
+    "coach.reqCount": {
+      "text": "{n} Anfragen",
+      "checked": true
+    },
+    "coach.markedHandled": {
+      "text": "Als erledigt markiert.",
+      "checked": true
+    },
+    "coach.whoClient": {
+      "text": "hat einen Coach",
+      "checked": true
+    },
+    "coach.whoCoach": {
+      "text": "ein Coach",
+      "checked": true
+    },
+    "coach.whoSelf": {
+      "text": "trainiert allein",
+      "checked": true
+    },
+    "coach.waitingList": {
+      "text": "Warteliste: {n}",
+      "checked": true
+    },
+    "coach.waitingListCoaches": {
+      "text": "Warteliste: {total}, {n} Coach|Warteliste: {total}, {n} Coaches",
+      "checked": true
+    },
+    "coach.leftWaitingList": {
+      "text": "{email} hat die Warteliste verlassen.",
+      "checked": true
+    },
+    "coach.bookSignups": {
+      "text": "Buch-Anmeldungen: Worth Eating {eating}, Worth Living {living}",
+      "checked": true
+    },
+    "coach.forEmail": {
+      "text": "für {email}",
+      "checked": true
+    },
+    "coach.codeCopied": {
+      "text": "Code kopiert.",
+      "checked": true
+    },
+    "coach.reviewSet": {
+      "text": "Klient {name} hat neue Zahlen festgelegt",
+      "checked": true
+    },
+    "coach.reviewReplied": {
+      "text": "Klient {name} hat geantwortet: {reply}",
+      "checked": true
+    },
+    "coach.keptOnPurpose": {
+      "text": "Bewusst behalten: {title}",
+      "checked": true
+    },
+    "coach.noteToClient": {
+      "text": "Eine Notiz an Klient {name}, falls du eine Änderung anfragst",
+      "checked": true
+    },
+    "coach.openNumbers": {
+      "text": "Zahlen von Klient {name} öffnen ›",
+      "checked": true
+    },
+    "coach.recipeLive": {
+      "text": "{title} ist live.",
+      "checked": true
+    },
+    "coach.recipeBack": {
+      "text": "{title} ging mit deiner Notiz zurück.",
+      "checked": true
+    },
+    "coach.changes": {
+      "text": "Änderungen",
+      "checked": true
+    },
+    "coach.new": {
+      "text": "Neu",
+      "checked": true
+    },
+    "coach.sentAt": {
+      "text": "gesendet am {date} um {time}",
+      "checked": true
+    },
+    "coach.previewWaiting": {
+      "text": "{who}: wartet auf dich. Nichts ist live, bis du es live schaltest.",
+      "checked": true
+    },
+    "coach.couldntSave": {
+      "text": "Speichern hat nicht geklappt. Versuch es nochmal.",
+      "checked": true
+    },
+    "menu.support": {
+      "text": "Support",
+      "checked": true
+    },
+    "menu.consentKept": {
+      "text": "Gespeichert:",
+      "checked": true
+    },
+    "menu.consentWhere": {
+      "text": "Wo:",
+      "checked": true
+    },
+    "menu.consentHowLong": {
+      "text": "Wie lange:",
+      "checked": true
+    },
+    "menu.consentYours": {
+      "text": "Deins:",
+      "checked": true
+    },
+    "menu.neededForNumbers": {
+      "text": "{field}: nötig für deine Zahlen.",
+      "checked": true
+    },
+    "menu.cmIsFtIn": {
+      "text": "{cm} cm sind {ft} ft {inch} in.",
+      "checked": true
+    },
+    "menu.notKeptYet": {
+      "text": "Noch nicht gespeichert: {what}.",
+      "checked": true
+    },
+    "menu.stillNeeded": {
+      "text": "Für deine Zahlen fehlt noch: {list}",
+      "checked": true
+    },
+    "menu.reviewWaiting": {
+      "text": "Wartet auf {coach}: {n} bewusst beibehalten",
+      "checked": true
+    },
+    "menu.reviewApproved": {
+      "text": "Freigegeben von {coach}, {date}",
+      "checked": true
+    },
+    "menu.reviewChangeOne": {
+      "text": "{coach} bittet dich, eine Zahl zu ändern",
+      "checked": true
+    },
+    "menu.reviewChangeAll": {
+      "text": "{coach} bittet dich, deine Zahlen zu ändern",
+      "checked": true
+    },
+    "menu.tagTarget": {
+      "text": "Ziel {tag}",
+      "checked": true
+    },
+    "menu.macroSame": {
+      "text": "{fat} g Fett · {carbs} g Kohlenhydrate · jeden Tag gleich",
+      "checked": true
+    },
+    "menu.nextFrom": {
+      "text": "NÄCHSTES, AB {date}",
+      "checked": true
+    },
+    "menu.setByCoach": {
+      "text": "Festgelegt von {coach}.",
+      "checked": true
+    },
+    "menu.nextGoalNumbers": {
+      "text": "{kcal} kcal und {protein} g Protein pro Tag im Durchschnitt. Der Plan nutzt es schon ab {date}.",
+      "checked": true
+    },
+    "menu.replyTo": {
+      "text": "{coach} antworten",
+      "checked": true
+    },
+    "menu.sentTo": {
+      "text": "An {coach} gesendet.",
+      "checked": true
+    },
+    "menu.nextGoalCancelled": {
+      "text": "Das nächste Ziel ist abgesagt.",
+      "checked": true
+    },
+    "menu.numbersNowUse": {
+      "text": "Deine Zahlen nutzen jetzt {kg}.",
+      "checked": true
+    },
+    "menu.reviewAbout": {
+      "text": "Betrifft: {list}",
+      "checked": true
+    },
+    "menu.findingsN": {
+      "text": "{n} Befund|{n} Befunde",
+      "checked": true
+    },
+    "menu.nKeptOnPurpose": {
+      "text": "{n} bewusst beibehalten",
+      "checked": true
+    },
+    "menu.nOpen": {
+      "text": "{n} offen",
+      "checked": true
+    },
+    "menu.formulaSetBy": {
+      "text": "{formula}, festgelegt von {coach}",
+      "checked": true
+    },
+    "menu.formulaAutoNow": {
+      "text": "Automatisch: jetzt {formula}",
+      "checked": true
+    },
+    "menu.kcalToStay": {
+      "text": "{kcal} kcal pro Tag, um gleich zu bleiben",
+      "checked": true
+    },
+    "menu.numbersSources": {
+      "text": "Quellen: Mifflin et al. 1990; Katch und McArdle; Schofield 1985 (FAO/WHO/UNU); FAO/WHO/UNU 2004, Aktivitätsniveaus; Compendium of Physical Activities 2024; US Dietary Guidelines 2025 bis 2030; ISSN position stand 2017; Morton et al. 2018.",
+      "checked": true
+    },
+    "menu.custom": {
+      "text": "Eigenes",
+      "checked": true
+    },
+    "menu.nowTag": {
+      "text": "JETZT",
+      "checked": true
+    },
+    "menu.atWeight": {
+      "text": "bei {kg}",
+      "checked": true
+    },
+    "menu.kcalProtein": {
+      "text": "kcal, {protein} g Protein",
+      "checked": true
+    },
+    "menu.myHours": {
+      "text": "{from} bis {to}, deine Zeit. Mahlzeiten und Training richten sich danach.",
+      "checked": true
+    },
+    "menu.myHoursNextDay": {
+      "text": "{from} bis {to} am nächsten Tag, deine Zeit. Mahlzeiten und Training richten sich danach.",
+      "checked": true
+    },
+    "menu.ownTime": {
+      "text": "{meal} um {time} ist deine eigene Zeit.",
+      "checked": true
+    },
+    "menu.backTo": {
+      "text": "Zurück zu {time}",
+      "checked": true
+    },
+    "menu.fromWorkLate": {
+      "text": "Nach deiner Arbeitszeit, {from} bis {to}: Frühstück am späten Vormittag, die Hauptmahlzeit eine Stunde vor der Arbeit, eine kleine in der Pause. Ändere es jederzeit, und deins bleibt.",
+      "checked": true
+    },
+    "menu.fromWork": {
+      "text": "Nach deiner Arbeitszeit, {from} bis {to}: Frühstück vor der Arbeit, Mittagessen in der Pause zur Hälfte, Abendessen danach. Ändere es jederzeit, und deins bleibt.",
+      "checked": true
+    },
+    "menu.fromSleep": {
+      "text": "Nach deiner Aufsteh- und Schlafenszeit, oben: die erste Mahlzeit um {from}, anderthalb Stunden nach dem Aufwachen; die letzte um {to}, zwei Stunden vor dem Schlafen; die anderen gleichmäßig dazwischen. Ändere es jederzeit, und deins bleibt.",
+      "checked": true
+    },
+    "menu.meatOnlyCarbs": {
+      "text": "Sie bringen fast keine Kohlenhydrate, also liegen deine Kohlenhydrate nahe null. Sehr wenig Kohlenhydrate passt zu deinen Zahlen:",
+      "checked": true
+    },
+    "menu.dietOtherExample": {
+      "text": "zum Beispiel mediterran, ohne Gluten",
+      "checked": true
+    },
+    "menu.work": {
+      "text": "Arbeit",
+      "checked": true
+    },
+    "menu.study": {
+      "text": "Studium",
+      "checked": true
+    },
+    "menu.averageKcal": {
+      "text": "durchschnittlich {kcal} kcal",
+      "checked": true
+    },
+    "menu.dayEveryWeek": {
+      "text": "{day}, jede Woche",
+      "checked": true
+    },
+    "menu.everyDayWhy": {
+      "text": "Jeden {day}. Um ein einzelnes Datum zu ändern, öffne diesen Tag im Plan. Tippe nochmal auf {day}, um zu schließen.",
+      "checked": true
+    },
+    "menu.moveDayTo": {
+      "text": "{day} verschieben auf",
+      "checked": true
+    },
+    "menu.copyDayTo": {
+      "text": "{day} kopieren auf",
+      "checked": true
+    },
+    "menu.moved": {
+      "text": "Das Training vom {from} ist jetzt am {to}.",
+      "checked": true
+    },
+    "menu.movedSwap": {
+      "text": "Das Training vom {from} ist jetzt am {to}, und das vom {to} am {from}.",
+      "checked": true
+    },
+    "menu.copyToN": {
+      "text": "Auf {n} Tag kopieren|Auf {n} Tage kopieren",
+      "checked": true
+    },
+    "menu.copiesSchool": {
+      "text": "Kopiert die Aktivität; jeder Tag behält seinen Schultag oder keine Schule.",
+      "checked": true
+    },
+    "menu.copiesWork": {
+      "text": "Kopiert die Aktivität; jeder Tag behält seinen Arbeitstag, Lerntag oder freien Tag.",
+      "checked": true
+    },
+    "menu.nFoods": {
+      "text": "{n} Lebensmittel|{n} Lebensmittel",
+      "checked": true
+    },
+    "menu.nFoodsKept": {
+      "text": "{n} Lebensmittel, aufbewahrt|{n} Lebensmittel, aufbewahrt",
+      "checked": true
+    },
+    "menu.yourTrip": {
+      "text": "deine Reise",
+      "checked": true
+    },
+    "menu.logsStay": {
+      "text": "Deine Einträge und Rezepte bleiben.",
+      "checked": true
+    },
+    "menu.deleteUnused": {
+      "text": "{n} unbenutzte löschen",
+      "checked": true
+    },
+    "menu.placeOn": {
+      "text": "{place}: an",
+      "checked": true
+    },
+    "menu.placeOff": {
+      "text": "{place}: aus",
+      "checked": true
+    },
+    "menu.noDishFits": {
+      "text": "Kein Gericht der Küche {kitchen} auf unserer Liste passt zu {diet}. Chef Mealan kocht die Küche auf deine Art: Sag ihm im Chat, was du kochst.",
+      "checked": true
+    },
+    "menu.wouldCookAll": {
+      "text": "von Chef Mealan für dich, alle ({diet}):",
+      "checked": true
+    },
+    "menu.wouldCook": {
+      "text": "von Chef Mealan für dich:",
+      "checked": true
+    },
+    "menu.notForYou": {
+      "text": "Nichts für dich: {list}.",
+      "checked": true
+    },
+    "menu.everyDishFits": {
+      "text": "Das sind alle Gerichte der Küche {kitchen}, die wir haben und die zu {diet} passen. Chef Mealan kocht die Küche auf deine Art: Sag ihm im Chat, was du kochst.",
+      "checked": true
+    },
+    "menu.everyDish": {
+      "text": "Das sind alle Gerichte, die wir für diese Küche haben. Sag Chef Mealan im Chat, was du kochst.",
+      "checked": true
+    },
+    "menu.yourCoachSince": {
+      "text": "Dein Coach seit {date}.",
+      "checked": true
+    },
+    "menu.yourCoachDot": {
+      "text": "Dein Coach.",
+      "checked": true
+    },
+    "menu.coachLooks": {
+      "text": "{coach} schaut sich deine Woche an und schickt eine Notiz.",
+      "checked": true
+    },
+    "menu.notesFrom": {
+      "text": "Notizen von {coach}",
+      "checked": true
+    },
+    "menu.onYour": {
+      "text": "Zu deiner Karte: {title}",
+      "checked": true
+    },
+    "menu.mealLow": {
+      "text": "Mahlzeit",
+      "checked": true
+    },
+    "menu.aSuggestion": {
+      "text": "Ein Vorschlag",
+      "checked": true
+    },
+    "menu.noAccount": {
+      "text": "kein Konto, die Daten bleiben hier",
+      "checked": true
+    },
+    "menu.deleteRemoves": {
+      "text": "Löschen entfernt alles, auch Fotos, Karten und Rezepte, und die Anmeldung. Nicht rückgängig zu machen.",
+      "checked": true
+    },
+    "menu.pilotLog": {
+      "text": "Pilot-Log: {n} Ereignis auf diesem Gerät.|Pilot-Log: {n} Ereignisse auf diesem Gerät.",
+      "checked": true
+    },
+    "menu.aiLabelOn": {
+      "text": "KI liest Etiketten: an",
+      "checked": true
+    },
+    "menu.aiLabelOff": {
+      "text": "KI liest Etiketten: aus",
+      "checked": true
+    },
+    "home.signInFailed": {
+      "text": "Anmeldung fehlgeschlagen.",
+      "checked": true
+    },
+    "plate.canNone": {
+      "text": "Nichts",
+      "checked": true
+    },
+    "plate.canSpoon": {
+      "text": "Ein Löffel",
+      "checked": true
+    },
+    "plate.canAll": {
+      "text": "Alles",
+      "checked": true
+    },
+    "plate.noteDough": {
+      "text": "Ein Teig braucht 5 bis 10 g.",
+      "checked": true
+    },
+    "plate.noteScoop": {
+      "text": "Ein Messlöffel sind etwa 30 g.",
+      "checked": true
+    },
+    "plate.noteHandful": {
+      "text": "Eine Handvoll sind etwa 30 g.",
+      "checked": true
+    },
+    "plate.noteOneServing": {
+      "text": "1 {serving} sind {grams} g.",
+      "checked": true
+    },
+    "plate.noteOneBar": {
+      "text": "Ein Riegel sind etwa 50 g.",
+      "checked": true
+    },
+    "plate.gIsServings": {
+      "text": "{grams} g sind {n} × {serving}.|{grams} g sind {n} × {serving}.",
+      "checked": true
+    },
+    "plate.gIsBars": {
+      "text": "{grams} g sind {n} Riegel.|{grams} g sind {n} Riegel.",
+      "checked": true
+    },
+    "plate.portionsN": {
+      "text": "{n} Portion|{n} Portionen",
+      "checked": true
+    },
+    "plate.mealsOf.breakfast": {
+      "text": "Frühstücke",
+      "checked": true
+    },
+    "plate.mealsOf.lunch": {
+      "text": "Mittagessen",
+      "checked": true
+    },
+    "plate.mealsOf.snack": {
+      "text": "Snacks",
+      "checked": true
+    },
+    "plate.mealsOf.dinner": {
+      "text": "Abendessen",
+      "checked": true
+    },
+    "plate.mealsOf.meal": {
+      "text": "Mahlzeiten",
+      "checked": true
+    },
+    "plate.nMeals.breakfast": {
+      "text": "{n} Frühstück|{n} Frühstücke",
+      "checked": true
+    },
+    "plate.nMeals.lunch": {
+      "text": "{n} Mittagessen|{n} Mittagessen",
+      "checked": true
+    },
+    "plate.nMeals.snack": {
+      "text": "{n} Snack|{n} Snacks",
+      "checked": true
+    },
+    "plate.nMeals.dinner": {
+      "text": "{n} Abendessen|{n} Abendessen",
+      "checked": true
+    },
+    "plate.nMeals.meal": {
+      "text": "{n} Mahlzeit|{n} Mahlzeiten",
+      "checked": true
+    },
+    "plate.oilChoice": {
+      "text": "{label}, {grams} g",
+      "checked": true
+    },
+    "fit.wholeEggs": {
+      "text": "ganze Eier",
+      "checked": true
+    },
+    "fit.wholeBananas": {
+      "text": "ganze Bananen",
+      "checked": true
+    },
+    "fit.wholeApples": {
+      "text": "ganze Äpfel",
+      "checked": true
+    },
+    "fit.wholePieces": {
+      "text": "Stücke",
+      "checked": true
+    },
+    "fit.asItWas": {
+      "text": "wie es war",
+      "checked": true
+    },
+    "fit.quarterMore": {
+      "text": "ein Viertel mehr",
+      "checked": true
+    },
+    "fit.thirdMore": {
+      "text": "ein Drittel mehr",
+      "checked": true
+    },
+    "fit.halfAgain": {
+      "text": "um die Hälfte mehr",
+      "checked": true
+    },
+    "fit.twiceAsMuch": {
+      "text": "doppelt so viel",
+      "checked": true
+    },
+    "fit.quarterLess": {
+      "text": "ein Viertel weniger",
+      "checked": true
+    },
+    "fit.thirdLess": {
+      "text": "ein Drittel weniger",
+      "checked": true
+    },
+    "fit.halfAsMuch": {
+      "text": "halb so viel",
+      "checked": true
+    },
+    "fit.pctMore": {
+      "text": "{d} % mehr",
+      "checked": true
+    },
+    "fit.pctLess": {
+      "text": "{d} % weniger",
+      "checked": true
+    },
+    "dish.heldBackDessert": {
+      "text": "{foods} ist in deinen Lebensmitteln, passt aber nicht zu diesem Dessert.|{foods} sind in deinen Lebensmitteln, passen aber nicht zu diesem Dessert.",
+      "checked": true
+    },
+    "dish.heldBackDish": {
+      "text": "{foods} ist in deinen Lebensmitteln, passt aber nicht zu diesem Gericht.|{foods} sind in deinen Lebensmitteln, passen aber nicht zu diesem Gericht.",
+      "checked": true
+    },
+    "dish.tasteSavoury": {
+      "text": "Herzhaft",
+      "checked": true
+    },
+    "dish.tasteDaam": {
+      "text": "Süß, ein DaaM",
+      "checked": true
+    },
+    "dish.tasteBoth": {
+      "text": "Beides",
+      "checked": true
+    },
+    "dish.tasteSavouryAndSweet": {
+      "text": "Herzhaft und süß",
+      "checked": true
+    },
+    "make.method.and": {
+      "text": "{a} und {b}",
+      "checked": true
+    },
+    "make.method.mixed": {
+      "text": "Alles in einem",
+      "checked": true
+    },
+    "make.method.mixedWhy": {
+      "text": "Eine Schüssel, ein Löffel. Der Geschmack ist vom ersten bis zum letzten Bissen gleich.",
+      "checked": true
+    },
+    "make.method.putInBowl": {
+      "text": "Gib {food} in eine Schüssel.",
+      "checked": true
+    },
+    "make.method.addAndStir": {
+      "text": "Gib {foods} dazu und rühre, bis alles eine Farbe hat.",
+      "checked": true
+    },
+    "make.method.crumble": {
+      "text": "Zerbrösle {food} darüber, oder heb es unter, wenn du es weich magst.",
+      "checked": true
+    },
+    "make.method.topped": {
+      "text": "Obendrauf",
+      "checked": true
+    },
+    "make.method.toppedCrunchWhy": {
+      "text": "Das Knusprige bleibt knusprig, und der Geschmack sitzt da, wo du ihn am meisten schmeckst.",
+      "checked": true
+    },
+    "make.method.spreadOn": {
+      "text": "Streich {foods} auf {food}.",
+      "checked": true
+    },
+    "make.method.putInSmallBowl": {
+      "text": "Gib {food} in eine kleine Schüssel daneben.",
+      "checked": true
+    },
+    "make.method.eatTogether": {
+      "text": "Iss sie zusammen, von jedem einen Bissen.",
+      "checked": true
+    },
+    "make.method.toppedWhy": {
+      "text": "Der Geschmack bleibt oben, so beginnt jeder Löffel damit.",
+      "checked": true
+    },
+    "make.method.dropOnTop": {
+      "text": "Gib {foods} obendrauf. Nicht umrühren.",
+      "checked": true
+    },
+    "make.method.baseFirst": {
+      "text": "Zuerst Protein",
+      "checked": true
+    },
+    "make.method.baseFirstWhy": {
+      "text": "Die Basis macht dich vor der Leckerei satt, so bleibt die Leckerei so groß, wie sie ist.",
+      "checked": true
+    },
+    "make.method.eatFirst": {
+      "text": "Iss zuerst {food}, pur oder mit einer Prise Zimt.",
+      "checked": true
+    },
+    "make.method.thenSlowly": {
+      "text": "Dann {foods}, langsam.",
+      "checked": true
+    },
+    "recipe.markCooked": {
+      "text": "Aus der Küche",
+      "checked": true
+    },
+    "recipe.markPaper": {
+      "text": "Auf Papier",
+      "checked": true
+    },
+    "recipe.markLineCookedOn": {
+      "text": "Zuerst am {date} gekocht und gewogen. Die Zahlen kommen von Etiketten und Nährwerttabellen.",
+      "checked": true
+    },
+    "recipe.markLineCooked": {
+      "text": "Gekocht und gewogen. Die Zahlen kommen von Etiketten und Nährwerttabellen.",
+      "checked": true
+    },
+    "recipe.markLinePaper": {
+      "text": "Berechnet aus Etiketten und Nährwerttabellen, noch nicht gekocht. Koch es einmal bis zum Ende von Essen, dann steht dort Aus der Küche.",
+      "checked": true
+    },
+    "recipe.unit.portions": {
+      "text": "Portion|Portionen",
+      "checked": true
+    },
+    "recipe.unit.servings": {
+      "text": "Portion|Portionen",
+      "checked": true
+    },
+    "recipe.unit.pieces": {
+      "text": "Stück|Stück",
+      "checked": true
+    },
+    "recipe.part.other": {
+      "text": "Sonstiges",
+      "checked": true
+    },
+    "recipe.part.main": {
+      "text": "Hauptgericht",
+      "checked": true
+    },
+    "recipe.part.sweetFinish": {
+      "text": "Süßer Abschluss",
+      "checked": true
+    },
+    "recipe.diffOut": {
+      "text": "{food} raus",
+      "checked": true
+    },
+    "recipe.diffIn": {
+      "text": "{food} {grams} g dazu",
+      "checked": true
+    },
+    "recipe.diffMoved": {
+      "text": "{food} {from} auf {to} g",
+      "checked": true
+    },
+    "recipe.nameWith": {
+      "text": "{title} mit {food}",
+      "checked": true
+    },
+    "recipe.nameWithout": {
+      "text": "{title} ohne {food}",
+      "checked": true
+    },
+    "recipe.nameChanged": {
+      "text": "{title}, geändert",
+      "checked": true
+    },
+    "recipe.stepsDiffBoth": {
+      "text": "Dein Gericht hat {added}. Das Original hat {gone}.",
+      "checked": true
+    },
+    "recipe.stepsDiffAdds": {
+      "text": "Dein Gericht fügt {added} hinzu.",
+      "checked": true
+    },
+    "recipe.stepsDiffLeavesOut": {
+      "text": "Dein Gericht lässt {gone} weg.",
+      "checked": true
+    },
+    "recipe.testModelCheapest": {
+      "text": "Am günstigsten",
+      "checked": true
+    },
+    "place.germany": {
+      "text": "Deutschland",
+      "checked": true
+    },
+    "place.serbia": {
+      "text": "Serbien",
+      "checked": true
+    },
+    "place.spain": {
+      "text": "Spanien",
+      "checked": true
+    },
+    "place.cyprus": {
+      "text": "Zypern",
+      "checked": true
+    },
+    "account.stepLock": {
+      "text": "Sperren deiner Anmeldung",
+      "checked": true
+    },
+    "account.stepFiles": {
+      "text": "deine Fotodateien",
+      "checked": true
+    },
+    "account.stepRecord": {
+      "text": "dein Datensatz, mit Karten und Rezepten",
+      "checked": true
+    },
+    "account.stepRequests": {
+      "text": "deine Zugangsanfragen und Einladungen",
+      "checked": true
+    },
+    "account.stepSignin": {
+      "text": "deine Anmeldung",
+      "checked": true
+    },
+    "account.deleteNotStarted": {
+      "text": "Nichts wurde gelöscht: Das Löschen konnte nicht starten. Deine Daten sind, wie sie waren. Versuch es später nochmal.",
+      "checked": true
+    },
+    "account.deleteSigninLeft": {
+      "text": "Deine Daten sind gelöscht. Deine Anmeldung ist abgeschaltet, aber das Entfernen hat nicht geklappt. Chef Mealan entfernt sie für dich.",
+      "checked": true
+    },
+    "account.deleteStoppedAt": {
+      "text": "Das Löschen hat angehalten bei: {step}.",
+      "checked": true
+    },
+    "account.deleteRemovedSoFar": {
+      "text": "Bisher entfernt: {removed}.",
+      "checked": true
+    },
+    "account.deleteNothingRemoved": {
+      "text": "Nichts wurde entfernt.",
+      "checked": true
+    },
+    "account.deleteSigninWorks": {
+      "text": "Deine Anmeldung funktioniert noch: Melde dich an und tippe nochmal auf Mein Konto löschen, um es abzuschließen.",
+      "checked": true
+    },
+    "account.deleteSigninOff": {
+      "text": "Deine Anmeldung ist abgeschaltet; Chef Mealan schließt das Löschen für dich ab.",
+      "checked": true
+    },
+    "account.deleted": {
+      "text": "Gelöscht: {list}.",
+      "checked": true
+    },
+    "analysis.yourGoal": {
+      "text": "dein Ziel",
+      "checked": true
+    },
+    "analysis.looksDeeperCut": {
+      "text": "einem stärkeren Defizit",
+      "checked": true
+    },
+    "analysis.looksFatLoss": {
+      "text": "Fettabbau",
+      "checked": true
+    },
+    "analysis.looksBiggerSurplus": {
+      "text": "einem größeren Überschuss",
+      "checked": true
+    },
+    "analysis.looksBuilding": {
+      "text": "Aufbau",
+      "checked": true
+    },
+    "analysis.asFatloss": {
+      "text": "Fettverlust",
+      "checked": true
+    },
+    "analysis.asRecomp": {
+      "text": "Rekomposition",
+      "checked": true
+    },
+    "analysis.asMaintain": {
+      "text": "Halten",
+      "checked": true
+    },
+    "analysis.asGain": {
+      "text": "Muskelaufbau",
+      "checked": true
+    },
+    "analysis.asGainsteady": {
+      "text": "gleichmäßigem Muskelaufbau",
+      "checked": true
+    },
+    "analysis.asPerformance": {
+      "text": "Leistung",
+      "checked": true
+    },
+    "analysis.energyUnder": {
+      "text": "Dein Durchschnitt liegt bei {avg}; dein berechneter Verbrauch bei {burn}: {pct} % darunter.",
+      "checked": true
+    },
+    "analysis.energyOver": {
+      "text": "Dein Durchschnitt liegt bei {avg}; dein berechneter Verbrauch bei {burn}: {pct} % darüber.",
+      "checked": true
+    },
+    "analysis.expectsWithin": {
+      "text": "Für {goal} sind höchstens 5 % Abweichung zu erwarten.",
+      "checked": true
+    },
+    "analysis.expectsUnder": {
+      "text": "Für {goal} sind etwa {pct} % darunter zu erwarten, plus minus 5.",
+      "checked": true
+    },
+    "analysis.expectsOver": {
+      "text": "Für {goal} sind etwa {pct} % darüber zu erwarten, plus minus 5.",
+      "checked": true
+    },
+    "analysis.looksMoreLike": {
+      "text": "Das sieht eher nach {looks} aus als nach {goal}",
+      "checked": true
+    },
+    "analysis.energyFits": {
+      "text": "Energie passt zum Ziel",
+      "checked": true
+    },
+    "analysis.proteinLow": {
+      "text": "Zu wenig Protein, um Muskeln zu halten",
+      "checked": true
+    },
+    "analysis.proteinHigh": {
+      "text": "Mehr Protein, als irgendeine Leitlinie verlangt",
+      "checked": true
+    },
+    "analysis.proteinLowBody": {
+      "text": "{g} g pro kg im Durchschnitt. Erwachsene brauchen meist 1,2 bis 1,6, und 1,6 bis 2,2, wenn sie trainieren.",
+      "checked": true
+    },
+    "analysis.proteinHighBody": {
+      "text": "{g} g pro kg im Durchschnitt. Über 2,2 g pro kg zeigen die Studien keinen zusätzlichen Nutzen.",
+      "checked": true
+    },
+    "analysis.proteinOk": {
+      "text": "Protein {g} g pro kg",
+      "checked": true
+    },
+    "analysis.fatLow": {
+      "text": "Wenig Fett",
+      "checked": true
+    },
+    "analysis.fatHigh": {
+      "text": "Viel Fett",
+      "checked": true
+    },
+    "analysis.fatBody": {
+      "text": "{pct} % deiner Energie. Der veröffentlichte Bereich liegt bei 20 bis 35 %.",
+      "checked": true
+    },
+    "analysis.fatOk": {
+      "text": "Fett {pct} % der Energie",
+      "checked": true
+    },
+    "analysis.carbsHour": {
+      "text": "Eine Stunde Training am Tag braucht meist 5 bis 7.",
+      "checked": true
+    },
+    "analysis.carbsLight": {
+      "text": "Leichtes Training braucht meist 3 bis 5.",
+      "checked": true
+    },
+    "analysis.carbsHeavy": {
+      "text": "Hartes oder langes Training braucht meist 6 bis 10.",
+      "checked": true
+    },
+    "analysis.carbsLow": {
+      "text": "Wenig Kohlenhydrate für einen Trainingstag",
+      "checked": true
+    },
+    "analysis.carbsBody": {
+      "text": "{g} g pro kg hier. {why}",
+      "checked": true
+    },
+    "analysis.restAbove": {
+      "text": "Ein Ruhetag liegt über einem Trainingstag",
+      "checked": true
+    },
+    "analysis.restAboveBody": {
+      "text": "Ruhe, passiv {rest}; Training, leicht {easy}; Training, hart {hard}. Normalerweise tragen die Trainingstage mehr.",
+      "checked": true
+    },
+    "analysis.restBelow": {
+      "text": "Ruhe unter Training",
+      "checked": true
+    },
+    "analysis.farApart": {
+      "text": "Deine Tage liegen weit auseinander",
+      "checked": true
+    },
+    "analysis.farApartBody": {
+      "text": "Von {lo} bis {hi} kcal, {pct} % auseinander. Training kostet selten mehr als ein Drittel eines Tages.",
+      "checked": true
+    },
+    "cloud.savingPaused": {
+      "text": "Das Speichern ist pausiert, während dein Konto gelöscht wird.",
+      "checked": true
+    },
+    "cloud.joinFailed": {
+      "text": "Beitritt mit diesem Code hat nicht geklappt.",
+      "checked": true
+    },
+    "cloud.notAllowed": {
+      "text": "dein Konto darf noch nicht speichern (die Datenbankregeln)",
+      "checked": true
+    },
+    "cloud.tooMuch": {
+      "text": "zu viel, um es auf einmal zu speichern",
+      "checked": true
+    },
+    "cloud.noConnection": {
+      "text": "keine Verbindung",
+      "checked": true
+    },
+    "cloud.unknownError": {
+      "text": "unbekannter Fehler",
+      "checked": true
+    },
+    "fitness.preNeedsCarbFood": {
+      "text": "{reason}; die Energie vor dem Training kommt aus einem Kohlenhydrat-Lebensmittel",
+      "checked": true
+    },
+    "fitness.preFits": {
+      "text": "schnelle Energie, nichts hinzuzufügen: etwa {grams} g liefern {carbs} g Kohlenhydrate für diesen Tag: {day}",
+      "checked": true
+    },
+    "fitness.postFits": {
+      "text": "passt nach dem Training: etwa {grams} g liefern {floor} g Protein",
+      "checked": true
+    },
+    "fitness.postWants": {
+      "text": "{reason}; der Teller braucht {floor} g Protein",
+      "checked": true
+    },
+    "fitness.restDay": {
+      "text": "Ruhetag",
+      "checked": true
+    },
+    "fitness.activeRestDay": {
+      "text": "aktiver Ruhetag",
+      "checked": true
+    },
+    "fitness.trainingDay": {
+      "text": "Trainingstag",
+      "checked": true
+    },
+    "fitness.hardTrainingDay": {
+      "text": "harter Trainingstag",
+      "checked": true
+    },
+    "guide.recomp.happens": {
+      "text": "Du isst etwas weniger, als du verbrauchst, etwa 10 % weniger. Dein Gewicht bleibt etwa gleich, während deine Taille schmaler wird und deine Gewichte beim Heben steigen. Am besten klappt es, wenn du neu im Krafttraining bist, nach einer Pause zurückkommst oder etwas Fett zu viel hast. Die ersten Veränderungen zeigen sich nach 6 bis 8 Wochen.",
+      "checked": true
+    },
+    "guide.recomp.training": {
+      "text": "Krafttraining mindestens 2 bis 3 Mal pro Woche, mit der Zeit etwas schwerer oder eine Wiederholung mehr. Schritte helfen; langes Cardio ist optional.",
+      "checked": true
+    },
+    "guide.recomp.food": {
+      "text": "Protein jeden Tag gleich, 1,6 bis 2,2 g pro kg. Verteile es auf 3 bis 6 Mahlzeiten, etwa 0,4 bis 0,55 g pro kg pro Mahlzeit.",
+      "checked": true
+    },
+    "guide.recomp.watch": {
+      "text": "Deine Taille einmal pro Woche, dein Krafttagebuch, dein 7-Tage-Durchschnittsgewicht. Die Waage allein sagt hier wenig.",
+      "checked": true
+    },
+    "guide.recomp.mistakes": {
+      "text": "Nach der Waage urteilen. Zu stark kürzen und Kraft verlieren. Krafttraining auslassen.",
+      "checked": true
+    },
+    "guide.recomp.switchWhen": {
+      "text": "Gewicht und Taille steigen beide: zurück zu Halten. Kraftwerte stecken 6 Wochen fest, während die Taille schmaler wird: Sprich mit deinem Coach über Muskeln aufbauen, Gleichmäßig.",
+      "checked": true
+    },
+    "guide.fatloss.happens": {
+      "text": "Du isst etwa 20 % weniger, als du verbrauchst. Dein Gewicht geht etwa 0,5 bis 1 % pro Woche runter. In der ersten Woche fällt es stärker: Das ist Wasser. Plane 8 bis 16 Wochen, dann eine Pause beim Erhaltungsbedarf.",
+      "checked": true
+    },
+    "guide.fatloss.training": {
+      "text": "Heb weiter schwer, damit dein Körper seine Muskeln behält; weniger Sätze sind in Ordnung. Mehr Schritte verbrennen mehr, als du denkst; Cardio ist ein Werkzeug, kein Muss.",
+      "checked": true
+    },
+    "guide.fatloss.food": {
+      "text": "Protein am oberen Ende deines Bereichs, jeden Tag gleich. Viel Gemüse und Ballaststoffe, um satt zu bleiben. Die Kalorien, die du einsparst, kommen aus Fett und Kohlenhydraten, nie aus Protein.",
+      "checked": true
+    },
+    "guide.fatloss.watch": {
+      "text": "Dein 7-Tage-Durchschnittsgewicht, deine Taille und ob deine Kraftwerte halten. Auch Hunger, Schlaf und Energie.",
+      "checked": true
+    },
+    "guide.fatloss.mistakes": {
+      "text": "Zu schnell kürzen und Muskeln verlieren. Krafttraining für Cardio aufgeben. Wochenenden, die die Woche zunichtemachen.",
+      "checked": true
+    },
+    "guide.fatloss.switchWhen": {
+      "text": "Nach 12 bis 16 Wochen oder wenn Schlaf und Energie leiden: 2 bis 4 Wochen Halten, dann mit deinem Coach entscheiden.",
+      "checked": true
+    },
+    "guide.maintain.happens": {
+      "text": "Du isst so viel, wie du verbrauchst. Dein Gewicht bleibt innerhalb von 1 bis 2 kg. Mit Training kannst du trotzdem stärker werden.",
+      "checked": true
+    },
+    "guide.maintain.training": {
+      "text": "Was dir Spaß macht und wobei du bleibst. Zwei Krafteinheiten pro Woche halten Muskeln und Knochen stark.",
+      "checked": true
+    },
+    "guide.maintain.food": {
+      "text": "Protein jeden Tag in deinem Bereich. Der Rest nach Appetit und deinem Plan.",
+      "checked": true
+    },
+    "guide.maintain.watch": {
+      "text": "Dass dein 7-Tage-Durchschnittsgewicht in seiner Spanne bleibt. Deine Taille einmal im Monat.",
+      "checked": true
+    },
+    "guide.maintain.mistakes": {
+      "text": "Halten als keinen Plan zu sehen: Das Gewicht kriecht ein, zwei Kilo pro Jahr nach oben, ohne dass es jemand merkt.",
+      "checked": true
+    },
+    "guide.maintain.switchWhen": {
+      "text": "Gewicht weicht einen Monat lang um mehr als 2 kg ab: Sprich mit deinem Coach. Bereit für etwas Neues: Wähl es unter Ich › Ziel.",
+      "checked": true
+    },
+    "guide.gainsteady.happens": {
+      "text": "Du isst etwas mehr, als du verbrauchst, etwa 5 % mehr. Zuerst steigen deine Gewichte beim Heben; die Waage bewegt sich langsam. Die ersten klaren Veränderungen zeigen sich nach 6 bis 8 Wochen.",
+      "checked": true
+    },
+    "guide.gainsteady.training": {
+      "text": "Krafttraining ist die Hauptsache: 3 bis 5 Einheiten pro Woche, mit der Zeit etwas schwerer oder eine Wiederholung mehr. Cardio bleibt für deine Gesundheit, nicht um das zusätzliche Essen zu verbrennen.",
+      "checked": true
+    },
+    "guide.gainsteady.food": {
+      "text": "Protein jeden Tag gleich, 1,6 bis 2,2 g pro kg. Verteile es auf 3 bis 6 Mahlzeiten, etwa 0,4 bis 0,55 g pro kg pro Mahlzeit. Mehr Kohlenhydrate an Trainingstagen.",
+      "checked": true
+    },
+    "guide.gainsteady.watch": {
+      "text": "Dein Krafttagebuch, dein 7-Tage-Durchschnittsgewicht, deine Taille einmal pro Woche. Fotos alle 4 Wochen, wenn du sie magst.",
+      "checked": true
+    },
+    "guide.gainsteady.mistakes": {
+      "text": "Viel mehr essen „zum Wachsen“ und vor allem Fett zunehmen. Nach dem Gewicht eines einzelnen Morgens urteilen. Den Plan jede Woche ändern.",
+      "checked": true
+    },
+    "guide.gainsteady.switchWhen": {
+      "text": "Taille wächst schneller als die Kraftwerte: für ein paar Wochen zurück zu Halten. Gewicht bewegt sich 6 Wochen nicht und die Kraftwerte stecken fest: Sprich mit deinem Coach über Schneller.",
+      "checked": true
+    },
+    "guide.gain.happens": {
+      "text": "Du isst etwa 10 % mehr, als du verbrauchst. Dein Gewicht steigt etwa 0,25 bis 0,5 % pro Woche, das meiste davon Muskulatur, wenn du gut trainierst. Am besten, wenn du neu im Krafttraining bist oder Muskeln aufzuholen hast.",
+      "checked": true
+    },
+    "guide.gain.training": {
+      "text": "Krafttraining 3 bis 5 Mal pro Woche, mit der Zeit mehr Sätze, alle ein bis zwei Wochen etwas schwerer. Halte Cardio kurz, damit es das zusätzliche Essen nicht aufbraucht.",
+      "checked": true
+    },
+    "guide.gain.food": {
+      "text": "Protein jeden Tag gleich, 1,6 bis 2,2 g pro kg. Verteile es auf 3 bis 6 Mahlzeiten, etwa 0,4 bis 0,55 g pro kg pro Mahlzeit. Mehr Kohlenhydrate rund ums Training.",
+      "checked": true
+    },
+    "guide.gain.watch": {
+      "text": "Dein 7-Tage-Durchschnittsgewicht, deine Taille einmal pro Woche, dein Krafttagebuch.",
+      "checked": true
+    },
+    "guide.gain.mistakes": {
+      "text": "Schneller als 0,5 % pro Woche zunehmen: Das ist meist Fett. An Ruhetagen zu wenig essen. Mahlzeiten auslassen, wenn der Appetit gering ist.",
+      "checked": true
+    },
+    "guide.gain.switchWhen": {
+      "text": "Taille wächst schnell: auf Gleichmäßig verlangsamen. Nach 1 bis 3 Jahren gleichmäßiger Fortschritte passt Gleichmäßig besser.",
+      "checked": true
+    },
+    "guide.performance.happens": {
+      "text": "Du isst genug, um gut zu trainieren und dich zu erholen, mit mehr davon aus Kohlenhydraten. Dein Gewicht bleibt stabil.",
+      "checked": true
+    },
+    "guide.performance.training": {
+      "text": "Dein Sport kommt zuerst. Krafttraining unterstützt ihn, 1 bis 3 Mal pro Woche.",
+      "checked": true
+    },
+    "guide.performance.food": {
+      "text": "Mehr Kohlenhydrate an harten Tagen und vor langen Einheiten. Protein jeden Tag gleich. Kohlenhydrate und Protein zusammen nach hartem Training.",
+      "checked": true
+    },
+    "guide.performance.watch": {
+      "text": "Wie sich das Training anfühlt, Erholung, Schlaf und dass dein Gewicht stabil bleibt.",
+      "checked": true
+    },
+    "guide.performance.mistakes": {
+      "text": "Hart trainieren bei zu wenig Essen. Wenig Kohlenhydrate vor langen oder harten Einheiten.",
+      "checked": true
+    },
+    "guide.performance.switchWhen": {
+      "text": "Nebensaison oder weniger Training: zurück zu Halten.",
+      "checked": true
+    },
+    "guide.part.happens": {
+      "text": "Was passiert",
+      "checked": true
+    },
+    "guide.part.training": {
+      "text": "Training",
+      "checked": true
+    },
+    "guide.part.food": {
+      "text": "Essen",
+      "checked": true
+    },
+    "guide.part.watch": {
+      "text": "Worauf achten",
+      "checked": true
+    },
+    "guide.part.mistakes": {
+      "text": "Häufige Fehler",
+      "checked": true
+    },
+    "guide.part.switchWhen": {
+      "text": "Wann wechseln",
       "checked": true
     }
   }

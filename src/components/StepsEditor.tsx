@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { w } from "../words";
+import { w, wn } from "../words";
 import type { Ingredient } from "../pilot";
 import { amountOf } from "../recipes";
 import { missingFoods, stepParts, tokenOf, usedIds } from "../steps";
@@ -104,29 +104,29 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
       {rows.map((key, k) => (
         <div className="st-row" key={key}>
           <span className="st-n">{k + 1}</span>
-          <div className="st-field" role="textbox" aria-label={`Step ${k + 1}`} aria-multiline="false" contentEditable suppressContentEditableWarning
+          <div className="st-field" role="textbox" aria-label={w("steps.stepN", { n: k + 1 })} aria-multiline="false" contentEditable suppressContentEditableWarning
             ref={(el) => fill(key, el)} onFocus={() => { lastFocus.current = key; }} onInput={() => read(key)}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addRow(k); } }}
             onPaste={(e) => { e.preventDefault(); document.execCommand("insertText", false, e.clipboardData.getData("text/plain").replace(/\s*\n\s*/g, " ")); }}
             data-placeholder={k === 0 ? w("steps.whiskTheEggsWithThe") : ""} />
         </div>
       ))}
-      <button type="button" className="link st-add" onClick={() => addRow(rows.length - 1)}>+ Add a step</button>
+      <button type="button" className="link st-add" onClick={() => addRow(rows.length - 1)}>{w("steps.addAStep")}</button>
       {shown.length > 0 && (
         <div className="st-foods">
           <small>{w("steps.tapAFoodToPut")}</small>
           <div className="st-chips">
             {shown.map((i) => (
               <button type="button" key={i.id} className={`st-chip${used.has(i.id) ? " used" : ""}`} onMouseDown={(e) => e.preventDefault()} onClick={() => put(i)}
-                aria-label={`Put ${amountOf(i.grams)} ${i.food.name} in the step`}>{used.has(i.id) ? "✓" : "+"} {amountOf(i.grams)} {i.food.name}</button>
+                aria-label={w("steps.putAria", { amount: amountOf(i.grams), food: i.food.name })}>{used.has(i.id) ? "✓" : "+"} {amountOf(i.grams)} {i.food.name}</button>
             ))}
           </div>
         </div>
       )}
-      {gone.length > 0 && <p className="st-note warn">{gone.join(", ")} {gone.length === 1 ? "is" : "are"} in a step but no longer in the recipe. Change the step, or tap the food that takes {gone.length === 1 ? "its" : "their"} place.</p>}
+      {gone.length > 0 && <p className="st-note warn">{wn("steps.goneInStep", gone.length, { foods: gone.join(", ") })}</p>}
       {missing.length > 0
-        ? <p className="st-note warn">{missing.map((i) => i.food.name).join(", ")} {missing.length === 1 ? "is" : "are"} not in any step yet.</p>
-        : used.size > 0 && gone.length === 0 && <p className="st-note ok">✓ Every food is in a step. The amounts follow the foods.</p>}
+        ? <p className="st-note warn">{wn("steps.notInAnyStep", missing.length, { foods: missing.map((i) => i.food.name).join(", ") })}</p>
+        : used.size > 0 && gone.length === 0 && <p className="st-note ok">{w("steps.everyFoodInStep")}</p>}
     </div>
   );
 }

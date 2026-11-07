@@ -2,6 +2,7 @@
 // until the next one starts. Two applied on one day: the second replaces the first, so trying leaves no trace. The same
 // goal with new numbers (a weigh-in, a new formula) stays one period with the newest numbers.
 import type { GoalEntry } from "./goal";
+import { w, wn, dateText } from "./words";
 
 const localDay = (iso: string) => { const d = new Date(iso); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 const sameGoal = (a: GoalEntry, b: GoalEntry) => a.band === b.band && a.source === b.source;
@@ -35,11 +36,11 @@ export function periodsOf(log: GoalEntry[]): Period[] {
     return { entry: e, from, to, days, now: !next };
   }).filter((p) => p.days === null || p.days > 0).reverse();
 }
-const D = (ymd: string, month = true) => new Date(`${ymd}T12:00:00`).toLocaleDateString("en-GB", month ? { day: "numeric", month: "long" } : { day: "numeric" });
+const D = (ymd: string, month = true) => dateText(new Date(`${ymd}T12:00:00`), month ? { day: "numeric", month: "long" } : { day: "numeric" }, "en-GB");
 // "Since 12 October" or "9 to 11 October, 3 days"
 export function periodLine(p: Period): string {
-  if (!p.to) return `Since ${D(p.from)}`;
+  if (!p.to) return w("me.periodSince", { date: D(p.from) });
   const sameMonth = p.from.slice(0, 7) === p.to.slice(0, 7);
-  const span = p.from === p.to ? D(p.from) : `${D(p.from, !sameMonth)} to ${D(p.to)}`;
-  return `${span}, ${p.days} ${p.days === 1 ? "day" : "days"}`;
+  const span = p.from === p.to ? D(p.from) : w("me.periodFromTo", { from: D(p.from, !sameMonth), to: D(p.to) });
+  return wn("me.periodDays", p.days ?? 0, { span });
 }

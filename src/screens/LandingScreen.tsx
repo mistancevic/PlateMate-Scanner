@@ -11,7 +11,7 @@ import { signIn } from "../cloud";
 import { pendingCode } from "../pendingCode";
 import { hit } from "../metrics";
 import { VERSION_LINE } from "../version";
-import { w, wn, type WordKey } from "../words";
+import { w, wn, type WordKey, dec } from "../words";
 import { useLang, getLang, setLang, type Lang } from "../lang";
 import { LangSwitch, LangAsk, pageLang, langPath } from "../components/LangAsk";
 import { IDLE_DAYS } from "../idle";
@@ -35,7 +35,7 @@ export function LandingScreen() {
   const [busy, setBusy] = useState(false);
   // signed out on an app address (chefmealan.com/foods): the home page sits at chefmealan.com
   useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "recipes", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
-  const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
+  const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || w("home.signInFailed")); } finally { setBusy(false); } };
   // home page counts (0.2.5+r17, board M): a visit, a Try tap; no cookie, no visitor id
   useEffect(() => {
     hit("hp_visit");
@@ -457,9 +457,9 @@ function TryIt() {
       <div className="l-try-result" aria-live="polite">
         <b>{fits ? w("home.plateFits") : w("home.underPd", { pd: DEMO_GOAL.pd })}</b>
         <div className="l-jump">
-          <div className="l-jump-from"><small>{w("home.alone", { g: wg, food: wnm })}</small><b>PD {a.pd.toFixed(1)}</b><small>{w("home.kcalProtein", { kcal: a.kcal, protein: a.protein })}</small></div>
+          <div className="l-jump-from"><small>{w("home.alone", { g: wg, food: wnm })}</small><b>PD {dec(a.pd, 1)}</b><small>{w("home.kcalProtein", { kcal: a.kcal, protein: a.protein })}</small></div>
           <b className="l-jump-arrow" aria-hidden="true">→</b>
-          <div className={fits ? "l-jump-to" : "l-jump-from"}><small>{w("home.withFood", { g: hg, unit: hu, food: hn })}</small><b>PD {p.pd.toFixed(1)}</b><small>{w("home.kcalProtein", { kcal: p.kcal, protein: Math.round(p.protein) })}</small></div>
+          <div className={fits ? "l-jump-to" : "l-jump-from"}><small>{w("home.withFood", { g: hg, unit: hu, food: hn })}</small><b>PD {dec(p.pd, 1)}</b><small>{w("home.kcalProtein", { kcal: p.kcal, protein: Math.round(p.protein) })}</small></div>
         </div>
         <span>{cr.note} {PAIR_NOTES[`${cr.id}|${h.id}`] ?? ""} {fits ? w("home.addsProtein", { food: hn }) : reach ? w("home.reaches", { g: need.grams, unit: hu, food: hn, pd: DEMO_GOAL.pd }) : `${w("home.tooLittle", { food: h.name, pd: DEMO_GOAL.pd })}${others.length ? ` ${w("home.tryFoods", { foods: others.length > 1 ? w("home.orList", { rest: others.slice(0, -1).join(", "), last: others[others.length - 1] }) : others[0] })}` : ""}`}</span>
         {reach && <button type="button" className="pill pill-small" onClick={() => { used(); setHg(need.grams); }}>{w("home.useG", { g: need.grams, unit: hu })}</button>}

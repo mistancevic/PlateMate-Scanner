@@ -6,6 +6,7 @@ import { Letters, NumbersTable } from "./Letters";
 import type { Ingredient, Meal } from "../pilot";
 import { fmt } from "../ui";
 import { nutritionOf, byPart } from "../nutrition";
+import { partName } from "../recipeWords";
 // a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
 const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 
@@ -31,7 +32,7 @@ export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, r
       <div className="readout-top"><span>{many ? w("nutrition.oneServing", { one }) : w("nutrition.allOfIt")}</span><span>{w("nutrition.pd")}</span></div>
       <div className="readout-mid">
         <b>{pd1 === null ? "?" : dec(pd1, 1)}</b>
-        <div><span>{pd1 === null || pdRef === null ? w("nutrition.noTargetSet") : n.pd! >= pdRef ? w("nutrition.fitsYourPlan") : w("nutrition.underYour", { under: (Math.round((pdRef - n.pd!) * 10) / 10).toFixed(1), target: pdRef.toFixed(1) })}</span>
+        <div><span>{pd1 === null || pdRef === null ? w("nutrition.noTargetSet") : n.pd! >= pdRef ? w("nutrition.fitsYourPlan") : w("nutrition.underYour", { under: dec(Math.round((pdRef - n.pd!) * 10) / 10, 1), target: dec(pdRef, 1) })}</span>
           <small>{w("nutrition.kcalProteinGrams", { kcal: energy === null ? "?" : fmt(many ? energy : n.rows[0].all ?? 0, 0), protein: fmt((many ? prot?.serving : prot?.all) ?? 0, 1), grams: fmt(grams / (many ? serves : 1), 0) })}</small></div>
       </div>
       {/* DT113 (0.2.94): the four letters, the same for one portion or all of it (they are rates) */}
@@ -54,7 +55,7 @@ export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, r
         <div className="nt-parts-box">
           <b>{many ? w("nutrition.byPartOne", { one }) : w("nutrition.byPart")}</b>
           <div className="nt-parts nt-th"><span /><b>{w("nutrition.kcalHead")}</b><b>{w("nutrition.proteinHead")}</b><b>{w("nutrition.pd")}</b></div>
-          {parts.map((pt) => <div className="nt-parts" key={pt.part}><span>{pt.part}</span><b>{fmt(pt.kcal, 0)}</b><b>{fmt(pt.protein, 1)} g</b><b>{pt.pd === null ? "?" : (Math.round(pt.pd * 10) / 10).toFixed(1)}</b></div>)}
+          {parts.map((pt) => <div className="nt-parts" key={pt.part}><span>{partName(pt.part)}</span><b>{fmt(pt.kcal, 0)}</b><b>{fmt(pt.protein, 1)} g</b><b>{pt.pd === null ? "?" : dec(Math.round(pt.pd * 10) / 10, 1)}</b></div>)}
         </div>
       )}
       {stated && (

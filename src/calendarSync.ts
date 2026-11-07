@@ -1,6 +1,7 @@
 // DT178 (0.3.21, board Stories126): the phone's side of the Chef Mealan calendar. The token lives in this tab for about an
 // hour (sessionStorage); with it, every change goes across within seconds. Without it, Plan and the Calendar page show one
 // button, Update Google Calendar, and a tap brings the next 14 days up to date.
+import { w } from "./words";
 import { useEffect, useState } from "react";
 import { CAL_SCOPE, syncCalendar, removeCalendar, freeBusy, type CalEvent, type CalMove, type Fetch } from "./gcal";
 import { calendarToken } from "./cloud";
@@ -64,10 +65,10 @@ export async function runSync(token: string, id: string | undefined, events: Cal
       return r.id;
     } catch (e: any) {
       if (e?.status === 401) { dropToken(); setCalStatus({ state: "tap" }); return null; }
-      if (e?.name === "TimeoutError" || e?.name === "AbortError") { setCalStatus({ state: "error", message: "Google Calendar did not answer in time. Try again." }); return null; }
+      if (e?.name === "TimeoutError" || e?.name === "AbortError") { setCalStatus({ state: "error", message: w("calendar.err.timeout") }); return null; }
       // 0.3.24: the phone could not reach Google, even after trying again: plain words, and the tap goes on where it stopped
-      if (e?.name === "TypeError") { setCalStatus({ state: "error", message: "Google Calendar could not be reached. Tap Update to go on where it stopped." }); return null; }
-      setCalStatus({ state: "error", message: e?.message || "Google Calendar did not answer." });
+      if (e?.name === "TypeError") { setCalStatus({ state: "error", message: w("calendar.err.noReach") }); return null; }
+      setCalStatus({ state: "error", message: e?.message || w("calendar.err.noAnswer") });
       return null;
     }
   })();
@@ -95,7 +96,7 @@ export async function readBusy(token: string, from: string, to: string, timeZone
   if (reading) return reading;
   reading = (async () => {
     try { setBusy({ at: Date.now(), from, to, list: await freeBusy(f, token, from, to, timeZone) }); }
-    catch (e: any) { setBusy({ at: Date.now(), from, to, list: busyNow?.list ?? [], error: e?.status === 403 ? "Google has not given Chef Mealan your busy times. Turn Read when I'm busy off and on again." : "Your busy times could not be read just now." }); }
+    catch (e: any) { setBusy({ at: Date.now(), from, to, list: busyNow?.list ?? [], error: e?.status === 403 ? w("calendar.err.busyNotGiven") : w("calendar.err.busyNotRead") }); }
   })();
   try { await reading; } finally { reading = null; }
 }

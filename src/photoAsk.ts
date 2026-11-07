@@ -3,7 +3,7 @@
 // 12:40 (the photo's time; Ate it logs it then, in the meal that time belongs to), Eating now (as from the camera), An idea
 // (a friend's dinner, a plate online: the same read, nothing logged). This file holds the rules, by code: the photo's time
 // from the file, which chip starts on, and the line under the chips.
-import { w, mealV } from "./words";
+import { w, mealV, dateText } from "./words";
 
 export type Who = "ate" | "now" | "idea";
 export const WHO_ORDER: Who[] = ["ate", "now", "idea"];
@@ -61,9 +61,9 @@ export function startWho(at: Date, now: Date, exploring = false): Who {
 // "A photo from 12:40 today." / "from yesterday, 19:10" / "from Sunday 25 October, 19:10"
 export function photoFrom(at: Date, now: Date): string {
   const y = new Date(now); y.setDate(y.getDate() - 1);
-  if (ymdOf(at) === ymdOf(now)) return `A photo from ${hhmm(at)} today.`;
-  if (ymdOf(at) === ymdOf(y)) return `A photo from yesterday, ${hhmm(at)}.`;
-  return `A photo from ${at.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}, ${hhmm(at)}.`;
+  if (ymdOf(at) === ymdOf(now)) return w("photoask.fromToday", { time: hhmm(at) });
+  if (ymdOf(at) === ymdOf(y)) return w("photoask.fromYesterday", { time: hhmm(at) });
+  return w("photoask.fromDay", { day: dateText(at, { weekday: "long", day: "numeric", month: "long" }), time: hhmm(at) });
 }
 
 // the chip's words: short (Milan 15:45)

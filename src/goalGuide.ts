@@ -4,13 +4,12 @@ import { wIn, wUnit } from "./units";
 // Sources: Iraki et al. 2019 (surplus, weekly rate, protein per meal); Aragon (muscle gain by training age);
 // Helms et al. 2014 (protein when losing fat); ISSN 2017 (protein range).
 import { bandOf, goalLabel, goalName, type Goal, type TrainingAge } from "./goal";
-import { w, dateText, type WordKey } from "./words";
+import { w, dateText, numLocale, type WordKey } from "./words";
 
 export type Guide = { happens: string; training: string; food: string; watch: string; mistakes: string; switchWhen: string };
-export const GUIDE_PARTS: { key: keyof Guide; name: string }[] = [
-  { key: "happens", name: "What happens" }, { key: "training", name: "Training" }, { key: "food", name: "Food" },
-  { key: "watch", name: "What to watch" }, { key: "mistakes", name: "Common mistakes" }, { key: "switchWhen", name: "When to switch" },
-];
+const PART_KEYS: (keyof Guide)[] = ["happens", "training", "food", "watch", "mistakes", "switchWhen"];
+// DT243: the part names and each goal's page are lines of the app (guide.<goal>.<part>); GUIDES below stays the English the chat reads
+export const GUIDE_PARTS: { key: keyof Guide; name: string }[] = PART_KEYS.map((key) => ({ key, get name() { return w(`guide.part.${key}` as WordKey); } }));
 const PROTEIN = "Protein the same every day, 1.6–2.2 g per kg. Spread it over 3 to 6 meals, about 0.4–0.55 g per kg each.";
 export const GUIDES: Record<string, Guide> = {
   recomp: {
@@ -62,13 +61,16 @@ export const GUIDES: Record<string, Guide> = {
     switchWhen: "Off-season or less training: back to Maintain.",
   },
 };
-export const guideOf = (id?: string): Guide | null => (id ? GUIDES[id] ?? null : null);
+// the page as the screens show it, in the app's language
+export const guideOf = (id?: string): Guide | null => (id && GUIDES[id] ? Object.fromEntries(PART_KEYS.map((k) => [k, w(`guide.${id}.${k}` as WordKey)])) as Guide : null);
 
 // The goal sheet: what to expect, in the person's own kilos where the weight is known.
+const num = (n: number) => n.toLocaleString(numLocale(), { maximumFractionDigits: 2 });
+const wd = w;
 const kg = (w: number | undefined, pctLo: number, pctHi: number) => {
-  if (!w) return `${pctLo}–${pctHi} % of your weight`;
+  if (!w) return wd("sheet.pctOfWeight", { lo: num(pctLo), hi: num(pctHi) });
   // to 0.05 kg under half a kilo, to 0.1 kg above: 0.25–0.5 kg, 0.5–1 kg
-  const f = (pct: number) => { const v = wIn((w * pct) / 100); const r = v < 0.5 ? Math.round(v * 20) / 20 : Math.round(v * 10) / 10; return String(Number(r.toFixed(2))); };
+  const f = (pct: number) => { const v = wIn((w * pct) / 100); const r = v < 0.5 ? Math.round(v * 20) / 20 : Math.round(v * 10) / 10; return num(Number(r.toFixed(2))); };
   return `${f(pctLo)}–${f(pctHi)} ${wUnit()}`;
 };
 export type Sheet = { title: string; byLine: string; food: string; weight: string; counted: string; progress: string; checkIn: string };
@@ -105,6 +107,6 @@ export function sheetOf(goal: Goal | null, opts: { weightKg?: number; trainingAg
 }
 // what the chat gets: the goal, what to expect and the food part of its page
 export function guideForChat(id?: string): { goal: string; food: string; watch: string } | null {
-  const g = guideOf(id); if (!g) return null;
+  const g = id ? GUIDES[id] : null; if (!g) return null;
   return { goal: goalLabel(id), food: g.food, watch: g.watch };
 }

@@ -41,12 +41,12 @@ import { quickPicks } from "../quick";
 import { lineTotal } from "../labeltable";
 import { SwipeRow } from "../components/SwipeRow";
 import { dishTaste, goesInDish, heldBackLine, offerTaste, presetOf, bothPartOf, PLATE_TASTE_WORD, PLATE_TASTE_LINE, type PlateTaste } from "../dishTaste";
-import { TAKEN_UP_SHORT, capOil } from "../frying";
+import { takenUpShort, capOil } from "../frying";
 import { plural, yourPortions } from "../portions";
 import { methodsFor } from "../methods";
 import { rankSwaps } from "../swaps";
 import { PlateHelper } from "../components/PlateHelper";
-import { momentOf, orderMoments, REGIONS } from "../moments";
+import { momentOf, orderMoments, REGIONS, regionName, regionV } from "../moments";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
@@ -75,7 +75,7 @@ import { foodNames, originalFoodsOf, diffFoods, diffLine } from "../stepsState";
 import { OriginalSteps, StepsHint } from "../components/StepsView";
 import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
-import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, cookedFood, rawHint, cookTitle } from "../cookWords";
+import { cookName, cookPhrase, weighLine, aroundWord, aroundSaved, needsCooking, cookedFood, rawHint, cookTitle } from "../cookWords";
 import { PairedCookMode } from "../components/CookPair";
 import { stepPicOf, setStepPic } from "../photos";
 import { kitchenName } from "../travel";
@@ -638,6 +638,10 @@ export function JourneyScreen(p: AppApi) {
   };
   const mealWord = (mealSlot?.name ?? "meal").toLowerCase();
   const mealW = mealV(mealWord, true), MealW = mealV(mealWord);
+  // DT243: the meals in the plural and counted, in the language chosen; a slot named otherwise keeps the English s
+  const mealKey = ["breakfast", "lunch", "snack", "dinner", "meal"].includes(mealWord) ? mealWord : null;
+  const mealsW = mealKey ? w(`plate.mealsOf.${mealKey}` as WordKey) : plural(mealWord);
+  const nMeals = (k: number) => (mealKey ? wn(`plate.nMeals.${mealKey}` as WordKey, k) : `${k} ${k === 1 ? mealWord : plural(mealWord)}`);
   // R11 (0.2.37): the line says what the plate is for; the section's chips and their hint
   const capName = (n: string) => n.charAt(0).toUpperCase() + n.slice(1);
   const numsOf = share ? w("plate.numsOf", { kcal: fmt(share.kcal, 0), protein: fmt(share.protein, 0), pd: pdText(pdRef) }) : "";
@@ -807,7 +811,10 @@ export function JourneyScreen(p: AppApi) {
     return <select className="pt-chip pt-select" aria-label={w("plate.part")} value={value} onChange={(e) => onPick(e.target.value)}><option value="">{w("plate.noPart")}</option>{all.map((x) => <option key={x} value={x}>{x}</option>)}</select>;
   };
   const mealNeed = share && share.kcal >= 150 && p.kind !== "dessert" ? share.kcal : null;
-  const unitOf = (m: Meal) => m.makes?.unit || w("plate.portionsWord"), oneOf = (m: Meal) => unitOf(m).replace(/s$/, "");
+  // DT243: a recipe's own unit (pancakes) stays as written, one of it by its trailing s; portions are the app's words, in count lines
+  const ownUnit = (m: Meal | null | undefined) => (m?.makes?.unit && m.makes.unit !== "portions" ? m.makes.unit : null);
+  const unitOf = (m: Meal) => ownUnit(m) ?? w("plate.portionsWord"), oneOf = (m: Meal) => ownUnit(m)?.replace(/s$/, "") ?? w("plate.portionWord");
+  const countUnit = (n: number, m: Meal | null | undefined) => { const u = ownUnit(m); return u ? countOf(n, u) : wn("plate.portionsN", n); };
   const portionItems = (m: Meal, mode: "whole" | "sized" | "recipe"): Ingredient[] => {
     const whole = m.items.map((i) => ({ ...i, dish: undefined }));
     // DT81: the whole recipe goes on the plate as the batch you cook (Cook it on its page: 10 sarmas of 8)
@@ -1024,7 +1031,7 @@ export function JourneyScreen(p: AppApi) {
   const stage = (at: string, ...done: string[]) => setChefStage((c) => ({ at, done: [...new Set([...c.done, ...done])] }));
   const chefSteps = (): WaitStep[] => [
     { key: "read", text: w("plate.stepRead", { foods: items.map((i) => cookPhrase(i.food.name, i.grams)).join(", "), kcal: fmt(t.calories, 0) }) },
-    { key: "ask", text: (p.personal.kitchens ?? []).length ? w("plate.stepAskKitchens", { meals: plural(mealWord), kitchens: (p.personal.kitchens ?? []).reduce((a, b) => (a ? w("gates.and", { a, b }) : b), "") }) : w("plate.stepAsk", { meals: plural(mealWord) }) },
+    { key: "ask", text: (p.personal.kitchens ?? []).length ? w("plate.stepAskKitchens", { meals: mealsW, kitchens: (p.personal.kitchens ?? []).reduce((a, b) => (a ? w("gates.and", { a, b }) : b), "") }) : w("plate.stepAsk", { meals: mealsW }) },
     { key: "check", text: w(pdRef !== null ? "plate.stepCheckPd" : "plate.stepCheck", { what: share ? w("plate.kcalRange", { low: fmt(mealRange(share.kcal)[0], 0), high: fmt(mealRange(share.kcal)[1], 0) }) : w("plate.theMeal"), pd: pdVal(pdRef) }) },
     { key: "again", text: w("make.askingAgainForAnIdea") },
   ];
@@ -1157,7 +1164,7 @@ export function JourneyScreen(p: AppApi) {
   const photoTime = (iso: string) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
   const bigN = tooBig && share && !imported && !madeBy ? mealsOn(t.calories ?? 0, sizeRef ?? share.kcal) : 0;
   const bigPlate = bigN > 0 && bigKept !== dishSig;
-  const mealsWord = plural(mealWord);
+  const mealsWord = mealsW;
   const numWord = (n: number) => ["", "one", "two", "three", "four", "five"][n] ?? String(n);
   // Make it N breakfasts: saved as a recipe that makes N; one portion stays on the plate, the next one goes on Plan for tomorrow
   const makeItN = () => {
@@ -1515,10 +1522,10 @@ export function JourneyScreen(p: AppApi) {
             <p className="label">{w("make.whereTo")}</p>
             <div className="moments">
               {REGIONS.filter((r) => r.id !== p.region).map((r) => (
-                <button key={r.id} className={`choice ${p.travelTo === r.id ? "on" : ""}`} onClick={() => p.setTravelTo(p.travelTo === r.id ? null : r.id)}>{r.name}</button>
+                <button key={r.id} className={`choice ${p.travelTo === r.id ? "on" : ""}`} onClick={() => p.setTravelTo(p.travelTo === r.id ? null : r.id)}>{regionName(r.id)}</button>
               ))}
             </div>
-            <p className="small moment-hint">{p.travelTo ? w("plate.travelPlans", { place: REGIONS.find((r) => r.id === p.travelTo)?.name ?? "" }) : w("make.pickThePlaceAndChef")}</p>
+            <p className="small moment-hint">{p.travelTo ? w("plate.travelPlans", { place: REGIONS.some((r) => r.id === p.travelTo) ? regionV(p.travelTo!) : "" }) : w("make.pickThePlaceAndChef")}</p>
           </>
         )}
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
@@ -1648,7 +1655,7 @@ export function JourneyScreen(p: AppApi) {
             {rec.makes.n >= 2 && pmode !== "whole" && <small className="muted in-next">{w("make.nextOnHowToMake")}</small>}
             {(() => { const one = kcalOfItems(portionItems(rec, "recipe")), pct = Math.round((kcalOfItems(portionItems(rec, "sized")) / Math.max(1, one)) * 100);
               // R15: one portion's kcal is the plate's own, so the line and the card give one number
-              return <small className="muted">{[pmode === "whole" ? w("plate.wholeAsMapped", { count: countOf(rec.makes!.n, unitOf(rec)) }) : "", w("plate.oneIsKcal", { one: oneOf(rec), kcal: fmt(one, 0) }), mealNeed ? w(sizedFits(mealNeed, one) ? "plate.sizedForItFits" : "plate.sizedForItNot", { meal: mealW, need: fmt(mealNeed, 0), pct, one: oneOf(rec) }) : "", pmode === "whole" ? w("plate.pickWhatYouEat") : ""].filter(Boolean).join(" ")}</small>; })()}
+              return <small className="muted">{[pmode === "whole" ? w("plate.wholeAsMapped", { count: countUnit(rec.makes!.n, rec) }) : "", w("plate.oneIsKcal", { one: oneOf(rec), kcal: fmt(one, 0) }), mealNeed ? w(sizedFits(mealNeed, one) ? "plate.sizedForItFits" : "plate.sizedForItNot", { meal: mealW, need: fmt(mealNeed, 0), pct, one: oneOf(rec) }) : "", pmode === "whole" ? w("plate.pickWhatYouEat") : ""].filter(Boolean).join(" ")}</small>; })()}
           </div>
         )}
         {imported && way?.kind === "change" && !way.part && (
@@ -1706,7 +1713,7 @@ export function JourneyScreen(p: AppApi) {
             return (
               <div className="can-oil" role="group" aria-label={f.name}>
                 <span className="can-oil-h"><b>{f.name}</b><small>{g > 0 ? w("plate.canOilIn", { grams: fmt(g, 0), kcal: fmt((f.calories! * g) / 100, 0) }) : w("plate.canOilUpTo", { grams: o.grams })}</small></span>
-                <span className="pt-chips">{oilChoices(o.grams).map((c) => { const on = c.grams === g; return <button key={c.key} type="button" className={`pt-chip${on ? "" : " off"}`} aria-pressed={on} onClick={() => { log("can_oil", { how: c.key }); setCanOil(i, c.grams); }}>{c.key === "none" ? w("plate.none") : `${c.label}, ${c.grams} g`}</button>; })}</span>
+                <span className="pt-chips">{oilChoices(o.grams).map((c) => { const on = c.grams === g; return <button key={c.key} type="button" className={`pt-chip${on ? "" : " off"}`} aria-pressed={on} onClick={() => { log("can_oil", { how: c.key }); setCanOil(i, c.grams); }}>{c.key === "none" ? w("plate.none") : w("plate.oilChoice", { label: c.label, grams: c.grams })}</button>; })}</span>
               </div>
             );
           };
@@ -1730,7 +1737,7 @@ export function JourneyScreen(p: AppApi) {
                   {!partsMode && weighLine(i.food.name) && <small className="weigh">{weighLine(i.food.name)}{rawHint(i.food.name, i.grams) ? `, ${rawHint(i.food.name, i.grams)}` : ""}</small>}
                   {partsMode ? <small className="pt-chips"><PartChip value={i.part ?? ""} onPick={(v) => setPartOf(i.id, v)} /> <button type="button" className="pt-chip off" aria-pressed={false} onClick={() => setOptional(i.id, true)}>{w("plate.optional")}</button></small>
                     : i.optional ? <small className="pt-wrap">{w("plate.optionalAdded")} <button className="link pt-inline" onClick={() => leaveOpt(i.id)}>{w("make.leaveItOut")}</button></small>
-                    : i.fry ? <small>{TAKEN_UP_SHORT}</small>
+                    : i.fry ? <small>{takenUpShort()}</small>
                     : <small>{p.rates && i.food.calories ? <><span className="letters">{lettersOf(i.food, p.rates).join(" ")}</span> · </> : null}{i.food.calories === 0 ? w("plate.noEnergy") : pdText(density(i.food.protein, i.food.calories))} · {imported ? w("plate.amountYours") : i.locked ? w("plate.amountStays") : w("plate.amountChef")}</small>}
                 </div>
                 {/* CT (0.2.24): eggs, bananas and a pack's pieces are counted; the size and the grams small */}
@@ -2203,8 +2210,8 @@ export function JourneyScreen(p: AppApi) {
   const perOne = wholeN > 1 ? kcalOfItems(items) / wholeN : 0;
   const eatenKcal = wholeN > 1 ? perOne * eatN : kcalOfItems(items);
   const dayKcal = dayNums?.kcal ?? p.todayKcal ?? state.goals.calories ?? null;
-  const leftOne = sizedPlate ? mealWord : rec ? oneOf(rec) : w("plate.portionWord"), leftMany = sizedPlate ? plural(mealWord) : rec ? unitOf(rec) : w("plate.portionsWord");
-  const leftWords = (k: number) => `${k} ${k === 1 ? leftOne : leftMany}`;
+  const leftMany = sizedPlate ? mealsW : rec ? unitOf(rec) : w("plate.portionsWord");
+  const leftWords = (k: number) => (sizedPlate ? nMeals(k) : countUnit(k, rec));
   // DT216 (0.3.56): a recipe of yours that kept the bowl steps (its way) from an earlier save, now on a plate you cook: it gets
   // Chef Mealan's steps; Lock the recipe keeps them with it
   const bowlKept = !rec && !!plateRecipe?.way && (plateRecipe?.steps?.length ?? 0) > 0 && bowlKeptOn(items);
@@ -2508,7 +2515,7 @@ export function JourneyScreen(p: AppApi) {
         // 02:11: a bowl way chosen at Lock (All in one, Topped, Protein first) is the recipe's process too; it was lost at Save
         const wayNow = method ? methodsFor(items).find((w) => w.id === method) : undefined;
         const ps = cooksPlate(items) && heldSteps?.steps.length ? { steps: heldSteps.steps, stepsFor: foodNames(items), ...(heldSteps.moves ? { moves: heldSteps.moves } : {}) } : wayNow ? { steps: wayNow.steps, stepsFor: foodNames(items), way: wayNow.name } : {};
-        const chefMade = madeBy ? { ...(state.cooking?.length ? { cooking: state.cooking } : {}), kitchen: madeBy.kitchen, byChef: { kitchen: madeBy.kitchen, meal: mealWord, around: aroundWord(madeBy.from.filter((i) => !isDrink(i.food)).map((i) => i.food.name)), at: new Date().toISOString() } } : {};
+        const chefMade = madeBy ? { ...(state.cooking?.length ? { cooking: state.cooking } : {}), kitchen: madeBy.kitchen, byChef: { kitchen: madeBy.kitchen, meal: mealWord, around: aroundSaved(madeBy.from.filter((i) => !isDrink(i.food)).map((i) => i.food.name)), at: new Date().toISOString() } } : {};
         const meal: Meal = { id: origin?.id ?? uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind, ...src, ...adaptedFrom, ...ps, ...chefMade };
         // the recipe kept (0.2.19, IM18b): its parts on its foods; optional foods, added or not, in its optional list
         const keptOpt = [...(state.optional ?? []), ...items.filter((i) => i.optional).map(itemToOpt)].map((o) => ({ name: o.name, written: o.written ?? "", ...(o.note ? { note: o.note } : {}), grams: o.grams, food: leanFood(o.food), ...(o.part ? { part: o.part } : {}) }));
@@ -2556,7 +2563,7 @@ export function JourneyScreen(p: AppApi) {
         // RP4 (0.2.25, Milan 17:42): every recipe you make ends on its page; a plate that is no recipe ends on Today
         const landId = keep ? kept.id : (fromRec ?? origin ?? updateBase ?? null)?.id ?? null;
         const leftN = wholeN > 1 ? wholeN - eatN : madeWhole && rec?.makes ? Math.max(0, leftK) : 0;
-        const landLine = status !== "eaten" ? "" : [w("make.youAte", { what: wholeN > 1 && rec ? (eatN === wholeN ? w("make.allNLow", { n: wholeN }) : countOf(eatN, unitOf(rec))) : rec && pmode === "recipe" && !way ? w("make.oneUnit", { one: oneOf(rec) }) : w("make.yourPlate") }), leftN > 0 ? wn("make.leftToEat", leftN, { count: sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!)) }) : "", chgKept && fromRec ? w("make.originalStays", { title: fromRec.title }) : ""].filter(Boolean).join(" ");
+        const landLine = status !== "eaten" ? "" : [w("make.youAte", { what: wholeN > 1 && rec ? (eatN === wholeN ? w("make.allNLow", { n: wholeN }) : countUnit(eatN, rec)) : rec && pmode === "recipe" && !way ? w("make.oneUnit", { one: oneOf(rec) }) : w("make.yourPlate") }), leftN > 0 ? wn("make.leftToEat", leftN, { count: sizedPlate ? leftWords(leftN) : countUnit(leftN, rec) }) : "", chgKept && fromRec ? w("make.originalStays", { title: fromRec.title }) : ""].filter(Boolean).join(" ");
         setState((s) => ({ ...s, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (updateBase && m.id === updateBase.id ? { ...m, items: structuredClone(keptItems), portion: keptWeight } : m)).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m))
           // DT85 (Milan 23 October 20:58 and 24 October 09:44): the photo taken while making it is the cover of a recipe with no
           // photo of its own yet (no cover, or one Chef Mealan drew); a drawn picture stays behind it. A cover of your own stays.
@@ -2597,14 +2604,14 @@ export function JourneyScreen(p: AppApi) {
           <button type="button" className="pill pill-small" aria-label={w("make.itMadeOneMore")} onClick={() => setMadeN(wholeN + 1)}>+</button>
         </div>
         {wholeN !== cookCount && cookCount === rec.makes!.n && <button type="button" className={`choice ${keepMade ? "on" : ""}`} aria-pressed={keepMade} onClick={() => setKeepMade(!keepMade)}>{w("make.alwaysMakes", { n: wholeN })}</button>}
-        <ChefLine text={say("howManyAte", countOf(wholeN, unitOf(rec)))} />
+        <ChefLine text={say("howManyAte", countUnit(wholeN, rec))} />
         <div className="eat-count" role="group" aria-label={w("make.howManyDidYouEat")}>
           <button type="button" className="pill pill-small" aria-label={w("make.oneLess")} disabled={ate !== "all" || eatN <= 1} onClick={() => { setEatN((k) => Math.max(1, k - 1)); setBigAsk(false); }}>−</button>
           <b aria-live="polite">{ate === "all" ? eatN : 0}</b><span>{ate === "all" && eatN === 1 ? oneOf(rec) : unitOf(rec)}</span>
           <button type="button" className="pill pill-small" aria-label={w("make.oneMore")} disabled={ate !== "all" || eatN >= wholeN} onClick={() => { setEatN((k) => Math.min(wholeN, k + 1)); setBigAsk(false); }}>+</button>
           {ate === "all" && <small className="muted">{w("plate.kcalPd", { kcal: fmt(perOne * eatN, 0), pd: pdText(density(aggregate(items).protein, aggregate(items).calories)) })}</small>}
         </div>
-        {ate === "all" && wholeN - eatN > 0 && <small className="eat-left">{wn("make.leftToEat", wholeN - eatN, { count: countOf(wholeN - eatN, unitOf(rec)) })}</small>}
+        {ate === "all" && wholeN - eatN > 0 && <small className="eat-left">{wn("make.leftToEat", wholeN - eatN, { count: countUnit(wholeN - eatN, rec) })}</small>}
         <div className="reasons">
           <button className={`choice ${ate === "all" && eatN === wholeN ? "on" : ""}`} onClick={() => { setAte("all"); setEatN(wholeN); setBigAsk(false); }}>{w("make.allN", { n: wholeN })}</button>
           {([["later", w("make.laterToday")], ["not", w("make.notAfterAll")]] as const).map(([k, l]) => (
@@ -2622,7 +2629,7 @@ export function JourneyScreen(p: AppApi) {
       {bigAsk && (
         <section className="card big-ask" role="alertdialog" aria-label={w("make.aBigMeal")}>
           <b>{w("make.kcalInOneMeal", { kcal: fmt(eatenKcal, 0) })}</b>
-          <small>{dayKcal && eatenKcal > dayKcal ? w("make.moreThanDay", { kcal: fmt(dayKcal, 0) }) : w("make.thatIsALotFor")} {wholeN > 1 && rec ? w("make.ifYouAteN", { what: eatN === wholeN ? w("make.allNLow", { n: wholeN }) : countOf(eatN, unitOf(rec)) }) : w("make.ifYouAteAllOf")}</small>
+          <small>{dayKcal && eatenKcal > dayKcal ? w("make.moreThanDay", { kcal: fmt(dayKcal, 0) }) : w("make.thatIsALotFor")} {wholeN > 1 && rec ? w("make.ifYouAteN", { what: eatN === wholeN ? w("make.allNLow", { n: wholeN }) : countUnit(eatN, rec) }) : w("make.ifYouAteAllOf")}</small>
           <div className="button-row">
             <button type="button" className="pill pill-small" onClick={() => { setBigAsk(false); saveEat(true); }}>{wholeN > 1 && eatN === wholeN ? w("make.yesAllN", { n: wholeN }) : w("make.yesIAteIt")}</button>
             <button type="button" className="pill pill-small pill-primary" onClick={() => { setBigAsk(false); if (!(wholeN > 1)) setStep("in"); }}>{wholeN > 1 ? w("make.howManyIAte") : w("make.changeTheAmounts")}</button>
@@ -2671,7 +2678,7 @@ export function JourneyScreen(p: AppApi) {
       ) : origin ? <p className="small">{w("make.inMyRecipesAlready", { title: origin.title })}</p> : <section className="card save-recipe">
         <div className="card-top"><span>{chgW ? w("make.saveYourChangedDish") : w("make.saveInMyRecipes")}</span></div>
         {chgW && fromRec
-          ? <small>{wx(fromRec.makes ? (fromRec.source?.steps?.length ? "make.changedSaveNOrig" : "make.changedSaveN") : fromRec.source?.steps?.length ? "make.changedSaveOrig" : "make.changedSave", { name: <b>{title.trim() || plateName}</b>, count: fromRec.makes ? countOf(fromRec.makes.n, fromRec.makes.unit || w("plate.portionsWord")) : "", what: w(chgW.drafted ? "make.stepsForChange" : "make.itsFoodsGrams"), from: `${fromRec.title}${fromRec.source?.name ? `, ${fromRec.source.name}` : ""}` })}</small>
+          ? <small>{wx(fromRec.makes ? (fromRec.source?.steps?.length ? "make.changedSaveNOrig" : "make.changedSaveN") : fromRec.source?.steps?.length ? "make.changedSaveOrig" : "make.changedSave", { name: <b>{title.trim() || plateName}</b>, count: fromRec.makes ? countUnit(fromRec.makes.n, fromRec) : "", what: w(chgW.drafted ? "make.stepsForChange" : "make.itsFoodsGrams"), from: `${fromRec.title}${fromRec.source?.name ? `, ${fromRec.source.name}` : ""}` })}</small>
           : <small>{w("make.keepsTheFoodsTheGrams")}</small>}
         <div className="reasons">
           <button className={`choice ${saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(true)}>{w("make.yesSaveIt")}</button>
