@@ -3334,5 +3334,33 @@
   "dish.dish": "Dish",
   "dish.addDish": "+ A dish",
   "dish.fitOne": "Fit works on {dish} and keeps {other} as it was served: {dish} makes room for it.",
-  "dish.savedForLater": "Your plate is saved for later, at the top of the Plate."
+  "dish.savedForLater": "Your plate is saved for later, at the top of the Plate.",
+  "cookmode.sayStep": "Step {n}.",
+  "cookmode.sayTimerDone": "The {name} timer is done.",
+  "cookmode.sayAgain": "Sorry, say that again?",
+  "cookmode.recipeSteps": {
+    "one": "This recipe has {n} step.",
+    "other": "This recipe has {n} steps."
+  },
+  "cookmode.chefCantAnswer": "Chef Mealan can't answer right now. The steps, the commands and the timers still work.",
+  "cookmode.sayTheFood": "Say the food too: how much rice, for example.",
+  "cookmode.notInRecipe": "{food} is not in this recipe.",
+  "cookmode.amountInStep": "{amount}. In step {n}.",
+  "cookmode.lastStep": "This is the last step.",
+  "cookmode.stepsAfter": {
+    "one": "{n} step after this one. Next:",
+    "other": "{n} steps after this one. Next:"
+  },
+  "cookmode.timerSet": "{name} timer, {time}.",
+  "cookmode.minutes": {
+    "one": "{n} minute",
+    "other": "{n} minutes"
+  },
+  "cookmode.seconds": {
+    "one": "{n} second",
+    "other": "{n} seconds"
+  },
+  "make.photoOfTheMeal": "Your photo of the meal",
+  "make.photosOfTheMeal": "The photos of the meal",
+  "make.photoN": "Photo {n}"
 }

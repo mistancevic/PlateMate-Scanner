@@ -3,6 +3,7 @@
 // goes to Gemini. This file is the part without a screen: what a step's timer is, what was said, how much of a food.
 import type { Ingredient, StepMoves } from "./pilot";
 import { TOKEN, stepText, shortName } from "./steps";
+import { w, wn } from "./words";
 
 // a timer from the step's own words: "for 12 minutes", "6 to 8 minutes" (the first, to check early), "1 hour", "30 seconds"
 const WORDS: Record<string, number> = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, fifteen: 15, twenty: 20, thirty: 30, forty: 40, "forty-five": 45, sixty: 60 };
@@ -78,20 +79,26 @@ const plain = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g
 const stem = (w: string) => w.replace(/(ies)$/, "y").replace(/(es|s)$/, "");
 export function howMuch(food: string, steps: string[], items: Ingredient[]): string {
   const want = plain(food).split(" ").filter((w) => w.length > 2 && !["the", "and", "some"].includes(w)).map(stem);
-  if (!want.length) return "Say the food too: how much rice, for example.";
+  if (!want.length) return w("cookmode.sayTheFood");
   const score = (i: Ingredient) => { const words = plain(`${i.food.name} ${i.food.brand ?? ""}`).split(" ").map(stem); return want.filter((w) => words.some((x) => x === w || (w.length > 3 && x.startsWith(w)))).length; };
   const best = items.filter((i) => i.grams > 0).map((i) => ({ i, s: score(i) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s)[0];
-  if (!best) return `${food.charAt(0).toUpperCase() + food.slice(1)} is not in this recipe.`;
+  if (!best) return w("cookmode.notInRecipe", { food: food.charAt(0).toUpperCase() + food.slice(1) });
   const tok = `[[i:${best.i.id}|${shortName(best.i.food)}]]`;
   const amount = stepText(tok, items);
   const at = steps.findIndex((x) => new RegExp(`\\[\\[i:${best.i.id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\|`).test(x));
-  return `${amount.charAt(0).toUpperCase() + amount.slice(1)}${at >= 0 ? `. In step ${at + 1}.` : "."}`;
+  const cap1 = amount.charAt(0).toUpperCase() + amount.slice(1);
+  return at >= 0 ? w("cookmode.amountInStep", { amount: cap1, n: at + 1 }) : `${cap1}.`;
 }
 // what is left, said aloud
-export function leftLine(k: number, steps: string[], items: Ingredient[]): string {
+// DT248 (0.3.98): in two parts, so the voice says the first in the app's language and the next step in the recipe's
+export function leftSay(k: number, steps: string[], items: Ingredient[]): { head: string; next: string | null } {
   const left = steps.length - k - 1;
-  if (left <= 0) return "This is the last step.";
-  return `${left} ${left === 1 ? "step" : "steps"} after this one. Next: ${stepText(steps[k + 1], items)}`;
+  if (left <= 0) return { head: w("cookmode.lastStep"), next: null };
+  return { head: wn("cookmode.stepsAfter", left), next: stepText(steps[k + 1], items) };
+}
+export function leftLine(k: number, steps: string[], items: Ingredient[]): string {
+  const s = leftSay(k, steps, items);
+  return s.next ? `${s.head} ${s.next}` : s.head;
 }
 // the step as it is read aloud: amounts in words the voice reads well
 export const spoken = (step: string, items: Ingredient[]) => stepText(step, items).replace(/(\d+(?:[.,]\d+)?) g\b/g, "$1 grams").replace(/(\d+) ml\b/g, "$1 millilitres").replace(/°C\b/g, " degrees");
@@ -195,6 +202,10 @@ export function movesFromDraft(moves: unknown, draftSteps: string[], items: Ingr
 // DT221 (0.3.58, board Stories164; Coach Milan 2 November 17:58): when cook mode doesn't catch what was said, the phone says
 // only this. The words the cook can say stay on the screen, small, never read aloud (canSayLine).
 export const SAY_AGAIN = "Sorry, say that again?";
+// DT248 (0.3.98): the same line, in the app's language
+export const sayAgain = () => w("cookmode.sayAgain");
+// DT248: a time said aloud, in the app's language (minutesWords stays for the screen's Start 12 min timer)
+export const timeSaid = (sec: number) => (sec % 60 === 0 ? wn("cookmode.minutes", sec / 60) : sec < 60 ? wn("cookmode.seconds", sec) : `${wn("cookmode.minutes", Math.floor(sec / 60))} ${wn("cookmode.seconds", sec % 60)}`);
 export function canSayLine(step: string, items: Ingredient[]): string {
   const low = (s: string) => s.toLowerCase();
   const word = (i: Ingredient) => low(i.food.name.split(/[ ,(]/)[0] ?? "");

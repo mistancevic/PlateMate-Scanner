@@ -3050,6 +3050,22 @@
     "chef.cookOpen": {"en":"You were cooking {cook}. A new plate came in. Go on with {dish}, or end it?","area":"Cooking","where":"A new plate while a cook is open","release":"0.3.96"},
     "chef.photoLost": {"en":"The connection was lost. Your photo is kept.","area":"The Plate","where":"A photo whose answer was lost","release":"0.3.96"},
     "chef.plateFills": {"en":"Your plate already fills this {meal}: {kcal} kcal, in its range.","area":"The Plate","where":"Fit to my target on a plate that fills its meal","release":"0.3.96"},
-    "chef.secondDish": {"en":"{dish}, {minutes} after your {prev}. Dessert to your {meal}, or its own snack?","area":"The Plate","where":"A second photo soon after a meal","release":"0.3.96"}
+    "chef.secondDish": {"en":"{dish}, {minutes} after your {prev}. Dessert to your {meal}, or its own snack?","area":"The Plate","where":"A second photo soon after a meal","release":"0.3.96"},
+    "screen.cookmode.sayStep": {"en":"Step {n}.","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.sayTimerDone": {"en":"The {name} timer is done.","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.sayAgain": {"en":"Sorry, say that again?","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.recipeSteps": {"en":"This recipe has {n} step.|This recipe has {n} steps.","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.chefCantAnswer": {"en":"Chef Mealan can't answer right now. The steps, the commands and the timers still work.","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.sayTheFood": {"en":"Say the food too: how much rice, for example.","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.notInRecipe": {"en":"{food} is not in this recipe.","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.amountInStep": {"en":"{amount}. In step {n}.","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.lastStep": {"en":"This is the last step.","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.stepsAfter": {"en":"{n} step after this one. Next:|{n} steps after this one. Next:","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.timerSet": {"en":"{name} timer, {time}.","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.minutes": {"en":"{n} minute|{n} minutes","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.cookmode.seconds": {"en":"{n} second|{n} seconds","area":"Cooking","where":"Cooking","release":"0.3.98"},
+    "screen.make.photoOfTheMeal": {"en":"Your photo of the meal","area":"The Plate","where":"The Plate","release":"0.3.98"},
+    "screen.make.photosOfTheMeal": {"en":"The photos of the meal","area":"The Plate","where":"The Plate","release":"0.3.98"},
+    "screen.make.photoN": {"en":"Photo {n}","area":"The Plate","where":"The Plate","release":"0.3.98"}
   }
 }

@@ -65,7 +65,7 @@ export function englishRows(): EnRow[] {
 const AREA_OF: [RegExp, string, string][] = [
   [/^home\./, "Home page", "The home page"], [/^(plate|make|journey|photo|ideas|fit|dish|out)\./i, "The Plate", "The Plate"],
   [/^(today|home|carry|busy|measured)\./i, "Today", "Today"], [/^plan\./i, "Plan", "Plan"], [/^(recipe|recipes|publish|members)\./i, "Recipes", "Recipes"],
-  [/^(cook|cooking)\./i, "Cooking", "Cooking"], [/^(foods|food)\./i, "Foods", "Foods"], [/^(summary|share)\./i, "Your summary and the coach", "Your summary"],
+  [/^(cook|cooking|cookmode)\./i, "Cooking", "Cooking"], [/^(foods|food)\./i, "Foods", "Foods"], [/^(summary|share)\./i, "Your summary and the coach", "Your summary"],
   [/^(coach|client)\./i, "Clients", "Clients"], [/^(menu|settings|langpanel|voice)\./i, "Menu and settings", "Settings"],
 ];
 export function areaOf(r: EnRow, made: MadeFor): { area: string; where: string } {

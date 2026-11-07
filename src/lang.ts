@@ -19,6 +19,24 @@ export const LANG_NAMES: Record<Lang, string> = { en: "English", "sr-Latn": "Srp
 export const locOf = (l: Lang) => (l === "sr-Latn" ? "sr-Latn-RS" : l === "de" ? "de-DE" : "en-GB");
 // the phone's voice and its listening for a language
 export const speechLang = (l: Lang) => (l === "sr-Latn" ? "sr-RS" : l === "de" ? "de-DE" : "en-GB");
+// DT248 (0.3.98, board Stories184): the language a recipe's own words are in, by their common words and letters, so cook mode
+// reads a step in a voice of that language. English unless the words say otherwise.
+const WORDS: Record<Lang, string[]> = {
+  en: ["the", "and", "with", "until", "for", "into", "add", "cook", "minutes", "of", "to", "in", "a", "on", "then", "it", "salt", "water",
+    "that", "this", "is", "not", "you", "your", "say", "sorry", "again", "step", "steps", "after", "next", "last", "timer", "done", "enjoy", "meal", "recipe", "has", "can't", "still", "work"],
+  "sr-Latn": ["i", "u", "sa", "na", "dok", "da", "se", "minuta", "dodaj", "kuvaj", "pa", "zatim", "ga", "je", "so", "vode", "vodi", "ili", "od"],
+  de: ["und", "mit", "die", "der", "das", "bis", "minuten", "den", "dem", "in", "zugeben", "kochen", "dann", "es", "salz", "wasser", "ein", "eine", "auf"],
+};
+export function langScore(text: string, l: Lang): number {
+  const t = text.toLowerCase(), ws = t.match(/[a-zčćšžđäöüß']+/g) ?? [];
+  return ws.filter((x) => WORDS[l].includes(x)).length + (l === "sr-Latn" ? (t.match(/[čćšžđ]/g) ?? []).length : l === "de" ? (t.match(/[äöüß]/g) ?? []).length : 0);
+}
+export function textLang(text: string): Lang {
+  const t = text.toLowerCase(), ws = t.match(/[a-zčćšžđäöüß]+/g) ?? [];
+  const score = (l: Lang) => ws.filter((x) => WORDS[l].includes(x)).length + (l === "sr-Latn" ? (t.match(/[čćšžđ]/g) ?? []).length : l === "de" ? (t.match(/[äöüß]/g) ?? []).length : 0);
+  const best = (["sr-Latn", "de"] as Lang[]).map((l) => ({ l, s: score(l) })).sort((a, b) => b.s - a.s)[0];
+  return best.s > score("en") ? best.l : "en";
+}
 // Serbian counts: 1 namirnica, 2 to 4 namirnice, 5 and on namirnica (11 to 14 are the many form)
 export function srCount(n: number, one: string, few: string, many: string): string {
   const a = Math.abs(n) % 100, b = a % 10;

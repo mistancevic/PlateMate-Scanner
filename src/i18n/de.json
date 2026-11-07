@@ -12204,6 +12204,70 @@
     "dish.savedForLater": {
       "text": "Dein Teller ist für später gespeichert, oben auf dem Teller.",
       "checked": true
+    },
+    "cookmode.sayStep": {
+      "text": "Schritt {n}.",
+      "checked": true
+    },
+    "cookmode.sayTimerDone": {
+      "text": "Der Timer ({name}) ist fertig.",
+      "checked": true
+    },
+    "cookmode.sayAgain": {
+      "text": "Entschuldige, sag das noch mal?",
+      "checked": true
+    },
+    "cookmode.recipeSteps": {
+      "text": "Dieses Rezept hat {n} Schritt.|Dieses Rezept hat {n} Schritte.",
+      "checked": true
+    },
+    "cookmode.chefCantAnswer": {
+      "text": "Chef Mealan kann gerade nicht antworten. Die Schritte, die Befehle und die Timer funktionieren weiter.",
+      "checked": true
+    },
+    "cookmode.sayTheFood": {
+      "text": "Sag auch das Lebensmittel: wie viel Reis, zum Beispiel.",
+      "checked": true
+    },
+    "cookmode.notInRecipe": {
+      "text": "{food} ist nicht in diesem Rezept.",
+      "checked": true
+    },
+    "cookmode.amountInStep": {
+      "text": "{amount}. In Schritt {n}.",
+      "checked": true
+    },
+    "cookmode.lastStep": {
+      "text": "Das ist der letzte Schritt.",
+      "checked": true
+    },
+    "cookmode.stepsAfter": {
+      "text": "Danach noch {n} Schritt. Als Nächstes:|Danach noch {n} Schritte. Als Nächstes:",
+      "checked": true
+    },
+    "cookmode.timerSet": {
+      "text": "Timer ({name}): {time}.",
+      "checked": true
+    },
+    "cookmode.minutes": {
+      "text": "{n} Minute|{n} Minuten",
+      "checked": true
+    },
+    "cookmode.seconds": {
+      "text": "{n} Sekunde|{n} Sekunden",
+      "checked": true
+    },
+    "make.photoOfTheMeal": {
+      "text": "Dein Foto der Mahlzeit",
+      "checked": true
+    },
+    "make.photosOfTheMeal": {
+      "text": "Die Fotos der Mahlzeit",
+      "checked": true
+    },
+    "make.photoN": {
+      "text": "Foto {n}",
+      "checked": true
     }
   }
 }
