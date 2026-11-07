@@ -618,6 +618,13 @@
       "epic": "trust",
       "state": "next",
       "why": "Coach Milan 4 November 06:01 to 06:09. Not checked yet: contrast, colour alone (PD verdict, letters), screen readers in practice, large text, photo descriptions, the page's language (lang sr for Srpski, English parts marked). Plan: axe in the walkthroughs on every release, a manual pass with VoiceOver and TalkBack on the Plate, Today and cooking, fixes area by area. Whether the European Accessibility Act applies is a question for a lawyer."
+    },
+    {
+      "id": "DT248",
+      "title": "Voice in the app's language",
+      "epic": "cooking",
+      "state": "later",
+      "why": "Coach Milan 7 November 05:54 (test with Darinka, Srpski UI, English recipe, a loud room): voice felt English only. Check: cook mode listens in the app's language (sr-RS) and hears Srpski, English and German commands; Chef Mealan's answers are spoken in the app's language. Still English: every fixed line cook mode says (Step 1., Done. Enjoy your meal., the timer is done, Sorry, say that again?, This recipe has N steps, the how-much answers) and its English voice; the step's own words are read with an English voice whatever language the recipe is in; Say what you have on the Plate listens in English only (en-GB)."
     }
   ]
 }
