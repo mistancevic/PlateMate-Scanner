@@ -20,3 +20,6 @@ tests/walkthroughs.html
 evals/photos/*
 !evals/photos/README.md
 evals/results/
+
+# working copies made while building (never part of the app)
+.claude/
