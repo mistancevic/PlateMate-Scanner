@@ -24,8 +24,8 @@ test("every ChefLine takes its words from the script", () => {
 
 test("the script's lines read as he says them: one question, numbers filled in", () => {
   assert.equal(say("carryNow", 1), "How did it carry you? Answer now, or in 1 minute, when I ask.");
-  assert.equal(say("plateAddOrNew", 2, "", "Skyr would join it.", false), "Your plate already has 2 foods. Skyr would join it. Start a new plate with it, or add it to yours?");
-  assert.equal(say("busyLate", "18:30", "Dinner", "19:00", 30, "dinner", null), "Busy until 18:30. Dinner at 19:00 leaves 30 minutes to cook. A quick dinner?");
+  assert.equal(say("plateAddOrNew", 2, "", "Skyr would join it."), "Your plate already has 2 foods. Skyr would join it. Start a new plate with it, or add it to yours?");
+  assert.equal(say("busyLate", "18:30", "Dinner", "19:00", 30, "dinner"), "Busy until 18:30. Dinner at 19:00 leaves 30 minutes to cook. A quick dinner?");
   for (const k of Object.keys(CHEF) as (keyof typeof CHEF)[]) assert.ok(k.length > 2);
 });
 

@@ -698,6 +698,22 @@
       "state": "done",
       "why": "Coach Milan 8 November 00:04: Add a photo in step one has no upload. On Android the camera-only input opened the camera alone. Board 192 (00:08), Go 00:09; built in 0.3.111: a tap asks Camera or Gallery, in cook mode and on Make.",
       "board": 192
+    },
+    {
+      "id": "DT258",
+      "title": "Chef Mealan speaks one language: his eight waiting lines in Srpski and German",
+      "epic": "lang",
+      "state": "done",
+      "why": "Coach Milan 8 November 08:11: number 1 of DT203's gaps. Eight lines were translated and ticked but stayed English or half English, because their words (a weekday, a meal, a count) were made in English. Board 193 (08:19), Go 08:21; built in 0.3.112: the words in the phone's language, Srpski accusatives (za večeru, u subotu), her form, the cook-ahead part, German keine Zeit and no colon without a plate name.",
+      "board": 193
+    },
+    {
+      "id": "DT259",
+      "title": "Sign in with any email, by a link; remove old invites",
+      "epic": "trust",
+      "state": "next",
+      "why": "Coach Milan 8 November 08:11: Dajana applied with Hotmail; only Google works and nothing said so. Revoked invites (Dajana, Dada) cannot be removed. 08:21: so we can have any email sign up. Board 194 drawn 08:30: Google or an email link, Check your inbox, the link on another phone, Delete my account by a fresh link, remove on revoked and expired invites. Asked 08:33 whether to add the security steps (Send it again waits 60 s, enumeration protection, one account per email, mail from chefmealan.com, the privacy page). Waits for his answer and the Go.",
+      "board": 194
     }
   ]
 }

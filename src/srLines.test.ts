@@ -23,7 +23,7 @@ test("each Serbian line names exactly the slots the app fills", () => {
 });
 
 test("the slots the app fills match the slots each line is allowed", () => {
-  const dummy: Record<string, unknown[]> = { cookOpen: ["a", "b"], recipeOther: ["sr-Latn", "en"], cookOther: ["sr-Latn", "en"], plateFills: ["Dinner", "700"], secondDish: ["a", 5, "b", "Dinner"], scanWhileCooking: ["a", "b"], useInCook: ["a", "b"], carryNow: [5], didTryWork: ["side"], plateOldAte: [new Date(), () => "x"], plateOldBeforeCook: [new Date(), () => "x"], plateSaveOrClear: [2, new Date(), "x"] };
+  const dummy: Record<string, unknown[]> = { cookOpen: ["a", "b"], recipeOther: ["sr-Latn", "en"], cookOther: ["sr-Latn", "en"], plateFills: ["Dinner", "700"], secondDish: ["a", 5, "b", "Dinner"], scanWhileCooking: ["a", "b"], useInCook: ["a", "b"], carryNow: [5], didTryWork: ["side"], plateOldAte: [new Date(), () => "x"], plateOldBeforeCook: [new Date(), () => "x"], plateSaveOrClear: [2, new Date(), "x"], photoWhose: ["A photo."], plateAddOrNew: [2, "", "x"], plateAddPhoto: [2, "t", "x"], busyMeal: ["Lunch", "12:30", "b", "Sunday"], busyLate: ["18:30", "Dinner", "19:00", 30, "dinner"], busyLateAhead: ["18:30", "Dinner", "19:00", 30, "dinner", "Saturday"], busyCarry: ["b", "lunch"], busyTraining: ["12:30", "b", "Sunday"], resume: ["d", ""], howManyAte: ["4"] };
   for (const [k, f] of Object.entries(SR_SLOTS)) {
     if (k === "didTryWork") continue; // a choice of two lines, not a slot
     assert.deepEqual(Object.keys(f!(...dummy[k])).sort(), [...(SR_ALLOWED[k as keyof typeof CHEF] ?? [])].sort(), k);
@@ -86,7 +86,8 @@ test("a ticked line shows in Serbian when Srpski is chosen; its slots filled", a
     localStorage.removeItem("chefmealan-personal");
     assert.equal(fixedLine("diabetes"), FIXED.diabetes, "an unticked safety line stays English");
     sr.chef.photoWhose.checked = true;
-    assert.equal(say("photoWhose", "Read from the photo."), CHEF.photoWhose("Read from the photo."), "a line waiting for the screens stays English even ticked");
+    // DT258 (0.3.112): no line waits for the screens any more; a ticked one is in Srpski, its slot filled
+    assert.equal(say("photoWhose", "Read from the photo."), "Read from the photo. Čiji je ovo tanjir, i kada?", "a ticked line in Srpski");
     sr.chef.photoWhose.checked = false;
   } finally {
     setLang("en"); Object.assign(sr.chef.useInCook, keep.u); Object.assign(sr.chef.whatMoment, keep.w); Object.assign(sr.safety.eating, keep.e); Object.assign(sr.safety.diabetes, keep.d);

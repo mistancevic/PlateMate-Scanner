@@ -17,7 +17,9 @@ export const CHEF = {
   plateOldAte: (at: Date, plate: PlateIn) => `Your plate from ${whenWords(at)}. ${plate("en")}. Did you eat it?`,
   plateOldBeforeCook: (at: Date, plate: PlateIn) => `Before you cook: your plate from ${whenWords(at)}. ${plate("en")}. Did you eat it?`,
   plateSaveOrClear: (foods: number, since: Date | null, dish: string) => `Your plate has ${n(foods, "food")}, from ${since ? agoWords(since) : "now"}. ${dish} starts on its own plate. Shall I save yours for later, or clear it?`,
-  plateAddOrNew: (foods: number, title: string, what: string, photo: boolean) => `Your plate already has ${n(foods, "food")}${title ? `: ${title}` : ""}. ${what} ${photo ? "Add them to yours, or start a new plate with them?" : "Start a new plate with it, or add it to yours?"}`,
+  plateAddOrNew: (foods: number, title: string, what: string) => `Your plate already has ${n(foods, "food")}${title ? `: ${title}` : ""}. ${what} Start a new plate with it, or add it to yours?`,
+  // DT258 (0.3.112, board Stories193): the same with a photo's foods, its own line, so each language says the whole sentence
+  plateAddPhoto: (foods: number, title: string, what: string) => `Your plate already has ${n(foods, "food")}${title ? `: ${title}` : ""}. ${what} Add them to yours, or start a new plate with them?`,
   whereGoes: () => "Where does this go?",
   // ---- cooking ----
   scanWhileCooking: (dish: string, food: string) => `You are cooking ${dish}. Shall I use this ${food} in it, put it on the Plate, or keep it in your foods?`,
@@ -38,7 +40,9 @@ export const CHEF = {
   whichMeal: () => "Which meal is it?",
   whatDay: () => "What kind of day is it?",
   busyMeal: (meal: string, time: string, block: string, day: string) => `${meal} at ${time} is in a busy block, ${block}. Move it for ${day}?`,
-  busyLate: (until: string, meal: string, time: string, free: number, quick: string, aheadDay: string | null) => `Busy until ${until}. ${meal} at ${time} leaves ${free ? `${free} minutes` : "no time"} to cook. A quick ${quick}${aheadDay ? `, or cook on ${aheadDay} and warm it up` : ""}?`,
+  busyLate: (until: string, meal: string, time: string, free: number, quick: string) => `Busy until ${until}. ${meal} at ${time} leaves ${free ? `${free} minutes` : "no time"} to cook. A quick ${quick}?`,
+  // DT258: with a cook the day before, its own line
+  busyLateAhead: (until: string, meal: string, time: string, free: number, quick: string, day: string) => `Busy until ${until}. ${meal} at ${time} leaves ${free ? `${free} minutes` : "no time"} to cook. A quick ${quick}, or cook on ${day} and warm it up?`,
   busyCarry: (block: string, meal: string) => `Booked from ${block}. Take ${meal} along?`,
   busyTraining: (time: string, block: string, day: string) => `Training at ${time} is in a busy block, ${block}. Move it for ${day}?`,
   // ---- DT240 to DT247 (0.3.96, boards Stories182 and Stories183; Go 6 November 12:24) ----
@@ -60,7 +64,37 @@ type SrSlots = (...a: any[]) => Record<string, string | null>;
 const local = (): Exclude<Lang, "en"> => { const l = getLang(); return l === "en" ? "sr-Latn" : l; };
 // a plate in words, in a language: its name, or its foods; null while a word of it has no ticked Serbian
 export type PlateIn = (l: Lang) => string | null;
+// DT258 (0.3.112, board Stories193; Go 8 November 08:21): the words his eight waiting lines take, in the phone's language.
+// Srpski: a meal or a weekday after za, u or a verb takes its accusative (za večeru, u subotu, za nedelju); a name of your own stays
+const EN_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const acc = (t: string) => (t.endsWith("a") ? t.slice(0, -1) + "u" : t);
+export function dayIn(l: Exclude<Lang, "en">, day: string): string {
+  const i = EN_DAYS.indexOf(day);
+  if (i < 0) return day;
+  const t = new Date(Date.UTC(2026, 10, 1 + i, 12)).toLocaleDateString(l === "de" ? "de-DE" : "sr-Latn-RS", { weekday: "long", timeZone: "UTC" });
+  return l === "de" ? t : acc(t.toLowerCase());
+}
+const MEAL_KEYS = ["breakfast", "lunch", "snack", "dinner", "meal"];
+export function mealAcc(l: Exclude<Lang, "en">, name: string): string {
+  const t = (mealV(name, true) as (x: Lang) => string | null)(l) ?? name;
+  return l === "sr-Latn" && MEAL_KEYS.includes(name.toLowerCase()) ? acc(t) : t;
+}
+const mealIn = (name: string) => (mealV(name) as (x: Lang) => string | null)(local()) ?? name;
+const minutesIn = (m: number) => (getLang() === "de" ? (m ? `${m} ${m === 1 ? "Minute" : "Minuten"}` : "keine Zeit") : srCount(m, "minut", "minuta", "minuta"));
+const foodsHas = (k: number) => (getLang() === "de" ? wnIn("de", "plate.foodsCount", k) : srCount(k, "namirnicu", "namirnice", "namirnica"));
+const addOrNew = (foods: number, title: string, what: string) => ({ foods: foodsHas(foods), title: title ? `: ${title}` : "", what });
+const late = (until: string, meal: string, time: string, free: number, quick: string) => ({ until, meal: mealIn(meal), time, free: minutesIn(free), quick: mealAcc(local(), quick) });
 export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
+  photoWhose: (from: string) => ({ from: from.replace(/\.$/, "") }),
+  plateAddOrNew: addOrNew,
+  plateAddPhoto: addOrNew,
+  busyMeal: (meal: string, time: string, block: string, day: string) => ({ meal: mealIn(meal), time, block, day: dayIn(local(), day) }),
+  busyLate: late,
+  busyLateAhead: (until: string, meal: string, time: string, free: number, quick: string, day: string) => ({ ...late(until, meal, time, free, quick), day: dayIn(local(), day) }),
+  busyCarry: (block: string, meal: string) => ({ block, meal: mealAcc(local(), meal) }),
+  busyTraining: (time: string, block: string, day: string) => ({ time, block, day: dayIn(local(), day) }),
+  resume: (dish: string, done: string) => ({ dish, done: done ? `: ${done}` : "" }),
+  howManyAte: (made: string) => ({ made }),
   scanWhileCooking: (dish: string, food: string) => ({ dish, food }),
   useInCook: (food: string, dish: string) => ({ food, dish }),
   carryNow: (min: number) => ({ minutes: getLang() === "de" ? `${min} ${min === 1 ? "Minute" : "Minuten"}` : srCount(min, "minut", "minuta", "minuta") }),
@@ -79,8 +113,8 @@ export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
 // the slots each line takes, by name: the Serbian line names each of them once or more, and no other (the release check, the table)
 export const SR_ALLOWED: Partial<Record<ChefLineName, string[]>> = {
   photoWhose: ["from"], plateOldAte: ["when", "plate"], plateOldBeforeCook: ["when", "plate"], plateSaveOrClear: ["foods", "ago", "dish"],
-  plateAddOrNew: ["foods", "title", "what"], scanWhileCooking: ["dish", "food"], useInCook: ["food", "dish"], resume: ["dish", "done"],
-  howManyAte: ["made"], carryNow: ["minutes"], busyMeal: ["meal", "time", "block", "day"], busyLate: ["until", "meal", "time", "free", "quick"],
+  plateAddOrNew: ["foods", "title", "what"], plateAddPhoto: ["foods", "title", "what"], scanWhileCooking: ["dish", "food"], useInCook: ["food", "dish"], resume: ["dish", "done"],
+  howManyAte: ["made"], carryNow: ["minutes"], busyMeal: ["meal", "time", "block", "day"], busyLate: ["until", "meal", "time", "free", "quick"], busyLateAhead: ["until", "meal", "time", "free", "quick", "day"],
   busyCarry: ["block", "meal"], busyTraining: ["time", "block", "day"],
   cookOpen: ["cook", "dish"], plateFills: ["meal", "kcal"], secondDish: ["dish", "minutes", "prev", "meal"], recipeOther: ["from", "to"], cookOther: ["from", "to"],
 };
@@ -97,8 +131,8 @@ export function slotProblems(k: string, t: string): string[] {
   if (k === "didTryWork" || parts.length === 1) { out.length = two.length; out.push(...want.filter((x) => !have.includes(x)).map((x) => `{${x}} is missing`), ...have.filter((x) => !want.includes(x)).map((x) => `{${x}} is not a slot here`)); }
   return [...new Set(out)];
 }
-// the lines that wait for the screens: their slots are English words made outside the script
-export const SR_LATER: ChefLineName[] = ["photoWhose", "plateAddOrNew", "busyMeal", "busyLate", "busyCarry", "busyTraining", "resume", "howManyAte"];
+// the lines that wait for the screens: their slots are English words made outside the script. DT258 (0.3.112): none left
+export const SR_LATER: ChefLineName[] = [];
 type SrLine = { text: string; checked: boolean };
 const SR = (srLines as unknown as { chef: Record<string, SrLine> }).chef;
 const DE = (deLines as unknown as { chef: Record<string, SrLine> }).chef;

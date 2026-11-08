@@ -1418,7 +1418,7 @@ export function JourneyScreen(p: AppApi) {
       const fresh = <button key="new" type="button" className={`pill${photo ? "" : " pill-primary"}`} onClick={() => p.answerPlateAsk("new")}>{w("plate.startNew")}</button>;
       return (
         <section className="chef-ask pa plate-ask" aria-label={w("make.addToThisPlateOr")}>
-          <ChefLine image={a.image} text={say("plateAddOrNew", items.length, state.title && state.title !== "DaaM" ? state.title : "", a.what, photo)} />
+          <ChefLine image={a.image} text={say(photo ? "plateAddPhoto" : "plateAddOrNew", items.length, state.title && state.title !== "DaaM" ? state.title : "", a.what)} />
           <div className="ca-go pa-go">{photo ? [add, fresh] : [fresh, add]}</div>
           <div className="ca-links"><button type="button" className="link pa-keep" onClick={() => p.answerPlateAsk(null)}>{photo ? w("plate.dropPhoto") : w("plate.keepMine")}</button></div>
           <small>{w(photo ? "plate.addOrNewHelpPhoto" : "plate.addOrNewHelp")}</small>

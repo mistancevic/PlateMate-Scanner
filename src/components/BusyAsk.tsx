@@ -65,7 +65,7 @@ export function AskCard({ p, date, a, training, cooked, title }: { p: AppApi; da
     buttons = [a.before && btn(a.before, () => moveTo(a.slotId, a.before!, a.name), true), a.after && btn(a.after, () => moveTo(a.slotId, a.after!, a.name), !a.before), btn(w("busy.keepTime", { time: a.time }), keep)].filter(Boolean) as ReactNode[];
   } else if (a.kind === "late") {
     const prev = dayBefore(date);
-    text = say("busyLate", clock(a.block.to), a.name, a.time, a.free ?? 0, lower(a.name), cooked ? WD(prev) : null);
+    text = cooked ? say("busyLateAhead", clock(a.block.to), a.name, a.time, a.free ?? 0, lower(a.name), WD(prev)) : say("busyLate", clock(a.block.to), a.name, a.time, a.free ?? 0, lower(a.name));
     buttons = [
       btn(w("busy.quickIdeas", { meal: mealV(a.name, true) }), () => p.openOut({ q: w("busy.quickQuestion", { meal: mealV(a.name, true), day: WDV(date), until: clock(a.block.to), time: a.time, free: String(a.free) }) }), true),
       cooked && btn(w("busy.cookAheadOn", { day: WDV(prev) }), () => { const now = getPersonal(); p.setPersonal({ ...now, calendar: { ...(now.calendar ?? c), ahead: { ...(now.calendar?.ahead ?? {}), [`${date}|${a.slotId}`]: prev }, kept: [...(now.calendar?.kept ?? []), askKey(date, a)] } }); calendarNudge(); p.notify(w("busy.isCookedOn", { title: title ?? a.name, ahead: WDV(prev), day: WDV(date) })); }),

@@ -1,6 +1,6 @@
 {
-  "release": "0.3.111",
-  "at": "2026-11-07T23:14:36.835Z",
+  "release": "0.3.112",
+  "at": "2026-11-08T07:25:01.806Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -40917,6 +40917,162 @@
       "release": "0.3.111",
       "order": 900004,
       "at": "2026-11-07T23:14:36.835Z"
+    },
+    {
+      "id": "chef.plateAddPhoto",
+      "kind": "chef",
+      "key": "plateAddPhoto",
+      "en": "Your plate already has {foods}: {title}. {what} Add them to yours, or start a new plate with them?",
+      "forms": "chef",
+      "slots": [
+        "foods",
+        "title",
+        "what"
+      ],
+      "later": false,
+      "area": "The Plate",
+      "where": "Adding a photo's foods to a plate that has some",
+      "sr": "Tvoj tanjir već ima {foods}{title}. {what} Da ih dodaš svom, ili da počneš nov tanjir s njima?",
+      "de": "Dein Teller hat schon {foods}{title}. {what} Zu deinem hinzufügen oder einen neuen Teller damit beginnen?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.112",
+      "order": 900000,
+      "at": "2026-11-08T07:25:01.806Z"
+    },
+    {
+      "id": "chef.busyLate",
+      "kind": "chef",
+      "key": "busyLate",
+      "en": "Busy until {until}. {meal} at {time} leaves {free} to cook. A quick {quick}?",
+      "forms": "chef",
+      "slots": [
+        "until",
+        "meal",
+        "time",
+        "free",
+        "quick"
+      ],
+      "later": false,
+      "area": "Chef Mealan",
+      "where": "Busy until late, little time to cook",
+      "enBefore": "Busy until {until}. {meal} at {time} leaves {free} minutes to cook. A quick {quick}?",
+      "sr": "Zauzet si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}?|Zauzeta si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}?",
+      "de": "Verplant bis {until}. {meal} um {time} lässt dir {free} zum Kochen. Etwas Schnelles zum {quick}?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.112",
+      "order": 900001,
+      "at": "2026-11-08T07:25:01.806Z"
+    },
+    {
+      "id": "chef.busyLateAhead",
+      "kind": "chef",
+      "key": "busyLateAhead",
+      "en": "Busy until {until}. {meal} at {time} leaves {free} to cook. A quick {quick}, or cook on {day} and warm it up?",
+      "forms": "chef",
+      "slots": [
+        "until",
+        "meal",
+        "time",
+        "free",
+        "quick",
+        "day"
+      ],
+      "later": false,
+      "area": "The day",
+      "where": "Busy until late, with a cook the day before",
+      "sr": "Zauzet si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}, ili da skuvaš u {day} i podgreješ?|Zauzeta si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}, ili da skuvaš u {day} i podgreješ?",
+      "de": "Verplant bis {until}. {meal} um {time} lässt dir {free} zum Kochen. Etwas Schnelles zum {quick}, oder am {day} kochen und aufwärmen?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.112",
+      "order": 900002,
+      "at": "2026-11-08T07:25:01.806Z"
+    },
+    {
+      "id": "chef.plateAddOrNew",
+      "kind": "chef",
+      "key": "plateAddOrNew",
+      "en": "Your plate already has {foods}: {title}. {what} Start a new plate with it, or add it to yours?",
+      "forms": "chef",
+      "slots": [
+        "foods",
+        "title",
+        "what"
+      ],
+      "later": false,
+      "area": "Chef Mealan",
+      "where": "Adding foods to a plate that has some",
+      "sr": "Tvoj tanjir već ima {foods}{title}. {what} Da počneš nov tanjir s tim, ili da ga dodaš svom?",
+      "de": "Dein Teller hat schon {foods}{title}. {what} Einen neuen Teller damit beginnen oder zu deinem hinzufügen?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.112",
+      "order": 901227,
+      "at": "2026-11-08T07:25:24.121Z"
+    },
+    {
+      "id": "chef.busyCarry",
+      "kind": "chef",
+      "key": "busyCarry",
+      "en": "Booked from {block}. Take {meal} along?",
+      "forms": "chef",
+      "slots": [
+        "block",
+        "meal"
+      ],
+      "later": false,
+      "area": "Chef Mealan",
+      "where": "A booked block: take the meal along",
+      "sr": "Zauzet si od {block}. Da poneseš {meal}?|Zauzeta si od {block}. Da poneseš {meal}?",
+      "de": "Von {block} verplant. {meal} mitnehmen?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.112",
+      "order": 901228,
+      "at": "2026-11-08T07:25:24.121Z"
+    },
+    {
+      "id": "chef.resume",
+      "kind": "chef",
+      "key": "resume",
+      "en": "You were cooking {dish}: {done}. Go on where you left off?",
+      "forms": "chef",
+      "slots": [
+        "dish",
+        "done"
+      ],
+      "later": false,
+      "area": "Chef Mealan",
+      "where": "Opening the app in the middle of a cook",
+      "sr": "Kuvanje: {dish}{done}. Da nastaviš gde si stao?|Kuvanje: {dish}{done}. Da nastaviš gde si stala?",
+      "de": "Du hast {dish} gekocht{done}. Da weitermachen, wo du aufgehört hast?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.112",
+      "order": 901229,
+      "at": "2026-11-08T07:25:24.121Z"
+    },
+    {
+      "id": "chef.howManyAte",
+      "kind": "chef",
+      "key": "howManyAte",
+      "en": "You made {made}. How many did you eat?",
+      "forms": "chef",
+      "slots": [
+        "made"
+      ],
+      "later": false,
+      "area": "Chef Mealan",
+      "where": "Pieces made: how many eaten",
+      "sr": "Napravio si {made}. Koliko si pojeo?|Napravila si {made}. Koliko si pojela?",
+      "de": "Du hast {made} gemacht. Wie viele hast du gegessen?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.112",
+      "order": 901230,
+      "at": "2026-11-08T07:25:24.121Z"
     }
   ]
 }
