@@ -762,8 +762,8 @@
       "id": "DT265",
       "title": "A demo account a coach can open: a real week, a real client, before any pitch",
       "epic": "coach",
-      "state": "next",
-      "why": "Coach Milan 8 November 15:12: yes, demo account. Today a prospect sees only the home page. Brainstormed with PR1; a board comes next. Board 196 drawn 15:59, the seat rule and day 15 added 16:05. 16:21: waits until the app is ready for random users; the waiting list stays the door until then. Built without checkout: the price as a line, Get my coach code as the door."
+      "state": "parked",
+      "why": "Coach Milan 8 November 15:12: yes, demo account. Today a prospect sees only the home page. Brainstormed with PR1; a board comes next. Board 196 drawn 15:59, the seat rule and day 15 added 16:05. 16:21: waits until the app is ready for random users; the waiting list stays the door until then. Built without checkout: the price as a line, Get my coach code as the door. 16:44: parked; unlocked phase by phase with PR2 and PR3."
     },
     {
       "id": "PR2",
@@ -778,6 +778,13 @@
       "epic": "trust",
       "state": "later",
       "why": "Coach Milan 8 November 16:21: the second build after PR2. Card on the web first (3% fees), the app stores later. The server's membership check is where the paid plan replaces the code."
+    },
+    {
+      "id": "DT266",
+      "title": "Who's behind it: Coach Milan's certifications, for trust",
+      "epic": "home",
+      "state": "next",
+      "why": "Coach Milan 8 November 16:44: the app goes deeper into coaching, so the background on the page should carry it. Six certificates sent: Product Faculty AI Product Management (Aug 2026), Mindvalley AI Mastery (Jan 2026), Certified Nutrition Coach with Viome (Feb 2024), 10X Fitness Coaching Certification (May 2023), Certified Holobody Coach (Jan 2023), Certified Business Coach, ICF CCE (Aug 2022). Brainstorm first, then a board."
     }
   ]
 }
