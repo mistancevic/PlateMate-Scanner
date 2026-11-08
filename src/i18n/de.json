@@ -2,11 +2,11 @@
   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Drafted by Claude in the table Chef Mealan Deutsch; every line confirmed as Beta by Coach Milan. Same rules as sr-Latn.json: slots in braces stay; a count is one|other; a line with two forms is he|she, most German lines need one.",
   "chef": {
     "busyCarry": {
-      "text": "Ab {block} verplant. {meal} mitnehmen?",
+      "text": "Von {block} verplant. {meal} mitnehmen?",
       "checked": true
     },
     "busyLate": {
-      "text": "Verplant bis {until}. {meal} um {time} lässt dir {free} Minuten zum Kochen. Etwas Schnelles: {quick}?",
+      "text": "Verplant bis {until}. {meal} um {time} lässt dir {free} zum Kochen. Etwas Schnelles zum {quick}?",
       "checked": true
     },
     "busyMeal": {
@@ -62,7 +62,7 @@
       "checked": true
     },
     "plateAddOrNew": {
-      "text": "Auf deinem Teller sind schon {foods}: {title}. {what} Einen neuen Teller damit beginnen oder zu deinem hinzufügen?",
+      "text": "Dein Teller hat schon {foods}{title}. {what} Einen neuen Teller damit beginnen oder zu deinem hinzufügen?",
       "checked": true
     },
     "plateOldAte": {
@@ -82,7 +82,7 @@
       "checked": true
     },
     "resume": {
-      "text": "Du hast {dish} gekocht: {done}. Da weitermachen, wo du aufgehört hast?",
+      "text": "Du hast {dish} gekocht{done}. Da weitermachen, wo du aufgehört hast?",
       "checked": true
     },
     "scanWhileCooking": {
@@ -135,6 +135,14 @@
     },
     "cookOther": {
       "text": "Dieses Rezept ist {from}. Willst du es {to} kochen?",
+      "checked": true
+    },
+    "plateAddPhoto": {
+      "text": "Dein Teller hat schon {foods}{title}. {what} Zu deinem hinzufügen oder einen neuen Teller damit beginnen?",
+      "checked": true
+    },
+    "busyLateAhead": {
+      "text": "Verplant bis {until}. {meal} um {time} lässt dir {free} zum Kochen. Etwas Schnelles zum {quick}, oder am {day} kochen und aufwärmen?",
       "checked": true
     }
   },

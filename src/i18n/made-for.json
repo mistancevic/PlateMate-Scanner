@@ -32,7 +32,7 @@
     "chef.whichMeal": {"en":"Which meal is it?","area":"Chef Mealan","where":"Which meal is it"},
     "chef.whatDay": {"en":"What kind of day is it?","area":"Chef Mealan","where":"What kind of day"},
     "chef.busyMeal": {"en":"{meal} at {time} is in a busy block, {block}. Move it for {day}?","area":"Chef Mealan","where":"A meal inside a calendar block"},
-    "chef.busyLate": {"en":"Busy until {until}. {meal} at {time} leaves {free} minutes to cook. A quick {quick}?","area":"Chef Mealan","where":"Busy until late, little time to cook"},
+    "chef.busyLate": {"en":"Busy until {until}. {meal} at {time} leaves {free} to cook. A quick {quick}?","area":"Chef Mealan","where":"Busy until late, little time to cook","release":"0.3.112"},
     "chef.busyCarry": {"en":"Booked from {block}. Take {meal} along?","area":"Chef Mealan","where":"A booked block: take the meal along"},
     "chef.busyTraining": {"en":"Training at {time} is in a busy block, {block}. Move it for {day}?","area":"Chef Mealan","where":"Training inside a calendar block"},
     "screen.tab.today": {"en":"Today","area":"Words used across the app","where":"Across the app"},
@@ -5255,6 +5255,8 @@
     "screen.photo.gallery": {"en":"🖼 Gallery","area":"The Plate","where":"The Plate","release":"0.3.111"},
     "screen.photo.cancel": {"en":"Cancel","area":"The Plate","where":"The Plate","release":"0.3.111"},
     "screen.photo.from": {"en":"Take the photo with the camera, or pick one from the gallery","area":"The Plate","where":"The Plate","release":"0.3.111"},
-    "screen.recipe.stepsReadAloudOrig": {"en":"{n} step, as the original writes it, read aloud. Say next, back or repeat. A second phone can show it.|{n} steps, as the original writes them, read aloud. Say next, back or repeat. A second phone can show them.","area":"Recipes","where":"Recipes","release":"0.3.111"}
+    "screen.recipe.stepsReadAloudOrig": {"en":"{n} step, as the original writes it, read aloud. Say next, back or repeat. A second phone can show it.|{n} steps, as the original writes them, read aloud. Say next, back or repeat. A second phone can show them.","area":"Recipes","where":"Recipes","release":"0.3.111"},
+    "chef.plateAddPhoto": {"en":"Your plate already has {foods}: {title}. {what} Add them to yours, or start a new plate with them?","area":"The Plate","where":"Adding a photo's foods to a plate that has some","release":"0.3.112"},
+    "chef.busyLateAhead": {"en":"Busy until {until}. {meal} at {time} leaves {free} to cook. A quick {quick}, or cook on {day} and warm it up?","area":"The day","where":"Busy until late, with a cook the day before","release":"0.3.112"}
   }
 }

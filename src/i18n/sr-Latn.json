@@ -30,7 +30,7 @@
       "checked": true
     },
     "plateAddOrNew": {
-      "text": "Na tvom tanjiru već je {foods}{title}. {what} Da počneš nov tanjir s tim, ili da ga dodaš svom?",
+      "text": "Tvoj tanjir već ima {foods}{title}. {what} Da počneš nov tanjir s tim, ili da ga dodaš svom?",
       "checked": true
     },
     "whereGoes": {
@@ -58,7 +58,7 @@
       "checked": true
     },
     "resume": {
-      "text": "Kuvanje: {dish}{done}. Da nastaviš gde si stao?",
+      "text": "Kuvanje: {dish}{done}. Da nastaviš gde si stao?|Kuvanje: {dish}{done}. Da nastaviš gde si stala?",
       "checked": true
     },
     "howMuchAte": {
@@ -66,7 +66,7 @@
       "checked": true
     },
     "howManyAte": {
-      "text": "Napravio si {made}. Koliko si pojeo?",
+      "text": "Napravio si {made}. Koliko si pojeo?|Napravila si {made}. Koliko si pojela?",
       "checked": true
     },
     "howTaste": {
@@ -102,11 +102,11 @@
       "checked": true
     },
     "busyLate": {
-      "text": "Zauzet si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}?",
+      "text": "Zauzet si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}?|Zauzeta si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}?",
       "checked": true
     },
     "busyCarry": {
-      "text": "Zauzet od {block}. Da poneseš {meal}?",
+      "text": "Zauzet si od {block}. Da poneseš {meal}?|Zauzeta si od {block}. Da poneseš {meal}?",
       "checked": true
     },
     "busyTraining": {
@@ -135,6 +135,14 @@
     },
     "cookOther": {
       "text": "Ovaj recept je {from}. Da kuvamo {to}?",
+      "checked": true
+    },
+    "plateAddPhoto": {
+      "text": "Tvoj tanjir već ima {foods}{title}. {what} Da ih dodaš svom, ili da počneš nov tanjir s njima?",
+      "checked": true
+    },
+    "busyLateAhead": {
+      "text": "Zauzet si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}, ili da skuvaš u {day} i podgreješ?|Zauzeta si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}, ili da skuvaš u {day} i podgreješ?",
       "checked": true
     }
   },

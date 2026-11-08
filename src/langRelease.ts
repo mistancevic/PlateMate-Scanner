@@ -16,7 +16,7 @@ const CHEF_WHERE: Record<string, [string, string]> = {
   photoWhose: ["The Plate", "After a photo of a plate is read"], photoNoFoods: ["The Plate", "A photo where no food was found"],
   oneDish: ["The Plate", "Foods that look cooked together"], whatMoment: ["The Plate", "Saving a plate: what kind of moment"],
   plateOldAte: ["The Plate", "Opening the app with an old plate"], plateOldBeforeCook: ["The Plate", "Starting a cook with an old plate"],
-  plateSaveOrClear: ["The Plate", "A recipe starts while the plate has foods"], plateAddOrNew: ["The Plate", "Adding foods to a plate that has some"],
+  plateSaveOrClear: ["The Plate", "A recipe starts while the plate has foods"], plateAddOrNew: ["The Plate", "Adding foods to a plate that has some"], plateAddPhoto: ["The Plate", "Adding a photo's foods to a plate that has some"],
   whereGoes: ["The Plate", "A scanned food: where it goes"], scanWhileCooking: ["Cooking", "Scanning a food in the middle of a cook"],
   useInCook: ["Cooking", "Using a scanned food in the cook"], handsFree: ["Cooking", "Before the steps: hands free"],
   whoMadePhoto: ["Cooking", "A photo of a dish: who made it"], howCooking: ["Cooking", "After the last step"],
@@ -25,7 +25,7 @@ const CHEF_WHERE: Record<string, [string, string]> = {
   didTryWork: ["Eating", "After a swap or a side. Two lines, split by |"], remember: ["Eating", "A note to keep"],
   carryLater: ["Eating", "About 30 minutes after eating"], carryNow: ["Eating", "Right after eating: answer now or later"],
   whichMeal: ["The day", "Which meal is it"], whatDay: ["The day", "What kind of day"], busyMeal: ["The day", "A meal inside a calendar block"],
-  busyLate: ["The day", "Busy until late, little time to cook"], busyCarry: ["The day", "A booked block: take the meal along"],
+  busyLate: ["The day", "Busy until late, little time to cook"], busyLateAhead: ["The day", "Busy until late, with a cook the day before"], busyCarry: ["The day", "A booked block: take the meal along"],
   busyTraining: ["The day", "Training inside a calendar block"],
   cookOpen: ["Cooking", "A new plate while a cook is open"], photoLost: ["The Plate", "A photo whose answer was lost"],
   plateFills: ["The Plate", "Fit to my target on a plate that fills its meal"], secondDish: ["The Plate", "A second photo soon after a meal"],
@@ -41,13 +41,13 @@ function chefTemplate(k: string): string {
   const D = new Date(2026, 0, 5, 9, 0), plate = () => "{plate}";
   const args: Record<string, any[]> = {
     photoWhose: ["{from}"], plateOldAte: [D, plate], plateOldBeforeCook: [D, plate], plateSaveOrClear: [2, D, "{dish}"],
-    plateAddOrNew: [2, "{title}", "{what}", false], scanWhileCooking: ["{dish}", "{food}"], useInCook: ["{food}", "{dish}"], resume: ["{dish}", "{done}"],
-    howManyAte: ["{made}"], carryNow: [7], busyMeal: ["{meal}", "{time}", "{block}", "{day}"], busyLate: ["{until}", "{meal}", "{time}", 7, "{quick}", null],
+    plateAddOrNew: [2, "{title}", "{what}"], plateAddPhoto: [2, "{title}", "{what}"], scanWhileCooking: ["{dish}", "{food}"], useInCook: ["{food}", "{dish}"], resume: ["{dish}", "{done}"],
+    howManyAte: ["{made}"], carryNow: [7], busyMeal: ["{meal}", "{time}", "{block}", "{day}"], busyLate: ["{until}", "{meal}", "{time}", 7, "{quick}"], busyLateAhead: ["{until}", "{meal}", "{time}", 7, "{quick}", "{day}"],
     busyCarry: ["{block}", "{meal}"], busyTraining: ["{time}", "{block}", "{day}"],
     cookOpen: ["{cook}", "{dish}"], plateFills: ["{meal}", "{kcal}"], secondDish: ["{dish}", 7, "{prev}", "{meal}"], recipeOther: ["sr-Latn", "en"], cookOther: ["sr-Latn", "en"],
   };
   if (k === "recipeOther" || k === "cookOther") return f(...args[k]).replace("in Srpski", "{from}").replace("in English", "{to}");
-  return f(...args[k]).replace(whenWords(D), "{when}").replace(agoWords(D), "{ago}").replace("2 foods", "{foods}").replace("7 minutes", "{minutes}").replace("leaves {minutes}", "leaves {free} minutes");
+  return f(...args[k]).replace(whenWords(D), "{when}").replace(agoWords(D), "{ago}").replace("2 foods", "{foods}").replace("7 minutes", "{minutes}").replace("leaves {minutes}", "leaves {free}");
 }
 const slotsIn = (t: string) => [...new Set([...t.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))].sort();
 
