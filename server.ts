@@ -22,7 +22,7 @@ import { getAuth as adminAuth } from "firebase-admin/auth";
 import { getFirestore as adminDb, FieldValue, FieldPath } from "firebase-admin/firestore";
 import { getStorage as adminStorage } from "firebase-admin/storage";
 import { createHash } from "node:crypto";
-import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
+import { deleteAccount as deleteAccountSteps, signedInRecently } from "./src/accountDelete";
 import { guideForChat } from "./src/goalGuide";
 import { synonymsOf } from "./src/reference";
 import { BOOK_PAGES, BOOK_HITS, BOOKS as BOOK_LIST, BOOK_SOURCES } from "./src/bookPages";
@@ -152,6 +152,7 @@ async function requireUser(req: express.Request, res: express.Response, next: ex
     const user = await adminAuth().verifyIdToken(token);
     (req as any).uid = user.uid;
     (req as any).email = user.email_verified ? String(user.email || "").toLowerCase() : "";
+    (req as any).authTime = Number(user.auth_time) || 0;
     next();
   } catch (e: any) {
     console.warn(`[auth] token refused: ${e?.code || ""} ${String(e?.message || "").slice(0, 160)}`);
@@ -505,9 +506,12 @@ app.post("/api/export", requireUser, async (req, res) => {
 // first (nothing is deleted if that fails), then photo files, the record with everything under it, access requests and
 // invites by email, and the sign-in last. A data step that fails unlocks the sign-in again, so the person can finish.
 // The answer says which steps were done and which one stopped, so the phone knows whether to clear itself.
+// DT259e (0.3.113, board Stories194): only right after the check that it is you (a link, or Google once more): a sign-in
+// older than 15 minutes is refused, and nothing is deleted
 app.post("/api/account/delete", requireUser, async (req, res) => {
   const uid = (req as any).uid as string | undefined;
   if (!uid) return res.status(401).json({ error: "Please sign in." });
+  if (FB_PROJECT && !signedInRecently((req as any).authTime, Math.floor(Date.now() / 1000))) return res.status(403).json({ code: "recent", error: "To be sure it is you, start Delete my account again." });
   const r = await deleteAccountOf(uid, String((req as any).email || "").toLowerCase());
   return res.status(r.ok ? 200 : 500).json(r);
 });
@@ -2353,6 +2357,19 @@ app.post("/api/invites/:code/revoke", requireUser, requireMember, requireCoach, 
     const snap = await ref.get();
     if (!snap.exists || snap.data()?.coachId !== (req as any).uid) return res.status(404).json({ error: "No such invite." });
     if (snap.data()?.status === "open") await ref.update({ status: "revoked" });
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+// DT259 (0.3.113, board Stories194): remove a revoked or an expired invite from the coach's list. A used one stays: it ties a
+// client to the coach. An open one is revoked first.
+app.delete("/api/invites/:code", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const ref = db().collection("invites").doc(String(req.params.code).toUpperCase().slice(0, 12));
+    const snap = await ref.get();
+    if (!snap.exists || snap.data()?.coachId !== (req as any).uid) return res.status(404).json({ error: "No such invite." });
+    const x = snap.data() as any, expired = x.status === "open" && x.expiresAt < new Date().toISOString();
+    if (x.status !== "revoked" && !expired) return res.status(400).json({ error: "Only a revoked or an expired invite can be removed." });
+    await ref.delete();
     res.json({ ok: true });
   } catch (e) { fail(res, e); }
 });

@@ -3008,3 +3008,19 @@ button.cook-meal-take { width: 100%; }
 button.mk-photo { padding: 0; font: inherit; }
 button.mk-photo:not(.empty) { border: 0; background: none; }
 button.plate-photo { width: 100%; padding: 0; font: inherit; text-align: center; cursor: pointer; }
+
+/* DT259 (0.3.113, board Stories194): Sign in with Google or an email link; Delete my account with the check that it is you */
+.signin-panel, .delete-check { display: flex; flex-direction: column; gap: 10px; margin: 12px auto; max-width: 480px; box-sizing: border-box; padding: 16px; }
+.signin-panel h2, .delete-check h2 { margin: 0; font-size: 20px; }
+.signin-panel p, .delete-check p { margin: 0; font-size: 16px; line-height: 1.5; }
+.signin-panel .pill, .delete-check .pill { min-height: 48px; }
+.signin-panel .link, .delete-check .link { min-height: 44px; }
+.si-or { text-align: center; color: var(--muted); font-size: 14px; }
+.si-line { color: var(--muted); font-size: 14px; line-height: 1.45; }
+.si-email { min-height: 48px; font-size: 16px; padding: 0 12px; border: 1.5px solid var(--line, #c5d2e8); border-radius: 12px; box-sizing: border-box; width: 100%; }
+.si-err { color: var(--low-text, var(--low)); margin: 0; }
+.si-busy, .dc-busy { color: var(--muted); }
+.pill.pill-danger { background: var(--low-text); border-color: var(--low-text); color: #fff; }
+.pill.pill-danger:disabled { opacity: .55; }
+.gate .delete-check { text-align: left; }
+.inv-remove { min-height: 44px; }

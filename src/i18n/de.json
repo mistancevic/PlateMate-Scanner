@@ -21032,6 +21032,138 @@
     "recipe.stepsReadAloudOrig": {
       "text": "{n} Schritt, wie ihn das Original schreibt, laut vorgelesen. Sag weiter, zurück oder nochmal. Ein zweites Handy kann ihn zeigen.|{n} Schritte, wie sie das Original schreibt, laut vorgelesen. Sag weiter, zurück oder nochmal. Ein zweites Handy kann sie zeigen.",
       "checked": true
+    },
+    "signin.title": {
+      "text": "Anmelden",
+      "checked": true
+    },
+    "signin.orEmail": {
+      "text": "oder mit deiner E-Mail",
+      "checked": true
+    },
+    "signin.yourEmail": {
+      "text": "Deine E-Mail",
+      "checked": true
+    },
+    "signin.sendLink": {
+      "text": "Schick mir einen Link",
+      "checked": true
+    },
+    "signin.linkLine": {
+      "text": "Kein Passwort. Wir schicken dir einen Link per E-Mail. Öffne ihn auf diesem Handy, und du bist drin. Jede E-Mail geht: Gmail, Hotmail, deine Arbeits-E-Mail.",
+      "checked": true
+    },
+    "signin.checkInbox": {
+      "text": "Schau in dein Postfach",
+      "checked": true
+    },
+    "signin.sentTo": {
+      "text": "Wir haben einen Link an {email} geschickt. Öffne ihn auf diesem Handy, um dich anzumelden.",
+      "checked": true
+    },
+    "signin.spam": {
+      "text": "Nach einer Minute noch nicht da? Schau im Spam nach.",
+      "checked": true
+    },
+    "signin.sendAgain": {
+      "text": "Noch mal schicken",
+      "checked": true
+    },
+    "signin.sendAgainIn": {
+      "text": "Noch mal schicken in {time}",
+      "checked": true
+    },
+    "signin.otherEmail": {
+      "text": "Andere E-Mail nehmen",
+      "checked": true
+    },
+    "signin.whichEmail": {
+      "text": "Für welche E-Mail ist dieser Link?",
+      "checked": true
+    },
+    "signin.whichEmailLine": {
+      "text": "Du hast den Link auf einem anderen Handy oder Browser geöffnet. Gib die E-Mail noch einmal ein, damit wir wissen, dass du es bist.",
+      "checked": true
+    },
+    "signin.signIn": {
+      "text": "Anmelden",
+      "checked": true
+    },
+    "signin.signingIn": {
+      "text": "Wir melden dich an…",
+      "checked": true
+    },
+    "signin.checkEmail": {
+      "text": "Prüf die E-Mail.",
+      "checked": true
+    },
+    "signin.linkFailed": {
+      "text": "Dieser Link hat nicht geklappt. Vielleicht ist er alt oder schon benutzt. Schick dir einen neuen.",
+      "checked": true
+    },
+    "signin.liveOnly": {
+      "text": "Die Anmeldung geht nur in der echten App.",
+      "checked": true
+    },
+    "signin.cancel": {
+      "text": "Abbrechen",
+      "checked": true
+    },
+    "app.signInFirst": {
+      "text": "Melde dich zuerst an.",
+      "checked": true
+    },
+    "delete.title": {
+      "text": "Mein Konto löschen",
+      "checked": true
+    },
+    "delete.removes": {
+      "text": "Das löscht alles: dein Profil, Teller, Lebensmittel, Rezepte, Fotos, Karten, die Verbindung zu deinem Coach und die Anmeldung. Das lässt sich nicht rückgängig machen.",
+      "checked": true
+    },
+    "delete.exportFirst": {
+      "text": "Erst meine Daten exportieren",
+      "checked": true
+    },
+    "delete.checkEmail": {
+      "text": "Damit wir sicher sind, dass du es bist, schicken wir einen Link an {email}. Nichts wird gelöscht, bevor du ihn öffnest.",
+      "checked": true
+    },
+    "delete.checkGoogle": {
+      "text": "Damit wir sicher sind, dass du es bist, bittet dich Google noch einmal um die Anmeldung. Vorher wird nichts gelöscht.",
+      "checked": true
+    },
+    "delete.sendLink": {
+      "text": "Link schicken",
+      "checked": true
+    },
+    "delete.continueGoogle": {
+      "text": "Weiter mit Google",
+      "checked": true
+    },
+    "delete.cancel": {
+      "text": "Abbrechen",
+      "checked": true
+    },
+    "delete.sent": {
+      "text": "Wir haben einen Link an {email} geschickt. Öffne ihn auf diesem Handy, dann geht das Löschen weiter.",
+      "checked": true
+    },
+    "delete.deleting": {
+      "text": "Wir löschen alles…",
+      "checked": true
+    },
+    "delete.again": {
+      "text": "Damit wir sicher sind, dass du es bist, starte Mein Konto löschen noch einmal.",
+      "checked": true
+    },
+    "delete.linkFailed": {
+      "text": "Dieser Link hat nicht geklappt. Vielleicht ist er alt oder schon benutzt. Starte Mein Konto löschen noch einmal.",
+      "checked": true
+    },
+    "coach.couldNotRemove": {
+      "text": "Die Einladung ließ sich nicht entfernen. Versuch es noch mal.",
+      "checked": true
     }
   }
 }

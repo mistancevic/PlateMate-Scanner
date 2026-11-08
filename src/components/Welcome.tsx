@@ -1,4 +1,6 @@
-import { ConfirmButton } from "./Confirm";
+import { useState } from "react";
+import { DeleteCheck } from "./DeleteCheck";
+import { linkInUrl } from "../cloud";
 import { w } from "../words";
 import { APP_NAME } from "./Mark";
 import { ADULT_ONLY } from "../safety";
@@ -34,7 +36,9 @@ export function Welcome({ name, onConfirm, onSignOut }: { name: string; onConfir
 }
 
 // Canvas board R2: a birth year under 18 on the profile, at setup or later. The reason is the AI; the person corrects the year or deletes the account.
-export function AdultOnly({ onCorrect, onDelete }: { onCorrect: () => void; onDelete: (() => void) | null }) {
+export function AdultOnly({ onCorrect, onDelete, email }: { onCorrect: () => void; onDelete: (() => Promise<void>) | null; email?: string }) {
+  // DT259e: the same check that it is you as in the Menu
+  const [deleting, setDeleting] = useState(() => linkInUrl() === "delete");
   return (
     <main className="gate">
       <b className="gate-brand">{APP_NAME}</b>
@@ -44,8 +48,9 @@ export function AdultOnly({ onCorrect, onDelete }: { onCorrect: () => void; onDe
       <p>{w("welcome.ifYouTypedTheYear")}</p>
       <div className="actions gate-actions">
         <button className="pill pill-primary action-main" onClick={onCorrect}>{w("welcome.correctMyBirthYear")}</button>
-        {onDelete && <ConfirmButton className="link action-cancel" label={w("welcome.deleteMyAccount")} confirmLabel={w("welcome.tapAgainToDeleteEverything")} onConfirm={onDelete} />}
+        {onDelete && !deleting && <button className="link action-cancel" onClick={() => setDeleting(true)}>{w("welcome.deleteMyAccount")}</button>}
       </div>
+      {onDelete && deleting && <DeleteCheck email={email ?? ""} run={onDelete} cancel={() => setDeleting(false)} />}
     </main>
   );
 }

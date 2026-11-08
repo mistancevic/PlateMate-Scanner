@@ -7,7 +7,8 @@ import type { PublicRecipe } from "../recipes";
 import { Check } from "lucide-react";
 import { WANTS, HAVES, DEMO_GOAL, lift, alone, part, plate, unitOf, havesFor, PAIR_NOTES, type DemoFood } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
-import { signIn } from "../cloud";
+import { linkInUrl } from "../cloud";
+import { SignInPanel } from "../components/SignInPanel";
 import { pendingCode } from "../pendingCode";
 import { hit } from "../metrics";
 import { VERSION_LINE } from "../version";
@@ -32,10 +33,11 @@ export function LandingScreen() {
   const formRef = useRef<HTMLDivElement>(null);
   const [idle] = useState(() => takeIdleOut());   // DT196: signed out after 30 days, said once
   const [err, setErr] = useState("");
-  const [busy, setBusy] = useState(false);
   // signed out on an app address (chefmealan.com/foods): the home page sits at chefmealan.com
   useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "recipes", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
-  const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || w("home.signInFailed")); } finally { setBusy(false); } };
+  // DT259 (0.3.113, board Stories194): Sign in opens the choice, Google or a link by email, under the top bar
+  const [signing, setSigning] = useState(() => linkInUrl() === "signin");
+  const go = () => { setErr(""); setSigning(true); window.scrollTo({ top: 0, behavior: "smooth" }); };
   // home page counts (0.2.5+r17, board M): a visit, a Try tap; no cookie, no visitor id
   useEffect(() => {
     hit("hp_visit");
@@ -80,14 +82,15 @@ export function LandingScreen() {
     <div className="landing">
       <header className="l-top">
         <div className="l-brand"><Mark size={30} color="var(--brand)" /><b>{APP_NAME}</b></div>
-        <span className="l-topnav"><button type="button" className="link l-coaches" onClick={toCoaches}>{w("home.coaches")}</button><a className="l-recipes" href="/recipes">{w("home.recipes")}</a><LangSwitch /><button className="pill pill-small l-signin" disabled={busy} onClick={go}>{w("home.signIn")}</button></span>
+        <span className="l-topnav"><button type="button" className="link l-coaches" onClick={toCoaches}>{w("home.coaches")}</button><a className="l-recipes" href="/recipes">{w("home.recipes")}</a><LangSwitch /><button className="pill pill-small l-signin" onClick={go}>{w("home.signIn")}</button></span>
       </header>
+      {signing && <SignInPanel close={() => setSigning(false)} />}
       <LangAsk />
       {idle && (
         <section className="sh-arrived">
           <b>{w("home.signedOut")}</b>
           <span>{w("home.idleLine", { days: IDLE_DAYS })}</span>
-          <button className="pill pill-primary" disabled={busy} onClick={go}>{w("home.signIn")}</button>
+          <button className="pill pill-primary" onClick={go}>{w("home.signIn")}</button>
         </section>
       )}
       {/* SH73: someone who scanned a coach's QR code sees their code and the one step left */}
@@ -95,7 +98,7 @@ export function LandingScreen() {
         <section className="sh-arrived">
           <b>{w("home.yourCode", { code: pendingCode() ?? "" })}</b>
           <span>{w("home.yourCodeLine")}</span>
-          <button className="pill pill-primary" disabled={busy} onClick={go}>{w("home.signIn")}</button>
+          <button className="pill pill-primary" onClick={go}>{w("home.signIn")}</button>
         </section>
       )}
 

@@ -3,7 +3,8 @@ import { fixMoves } from "./pilot";
 import { w } from "./words";
 import { notesOf, checkinOf } from "./coachNotes";
 import { initializeApp, type FirebaseApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, EmailAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, reauthenticateWithCredential, linkWithPopup, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, type User } from "firebase/auth";
+import { getLang } from "./lang";
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, deleteField, type Firestore } from "firebase/firestore";
 import { splitSave, mergeLoad, coachFieldsOf } from "./privateSplit";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
@@ -53,6 +54,62 @@ export async function signIn() {
   }
 }
 export const signOutCloud = () => signOut(auth());
+
+// DT259 (0.3.113, board Stories194; Coach Milan Go 8 November 09:12): sign in with any email, by a link Firebase sends. No
+// password. The email is kept on this phone until the link comes back, so the same phone signs in with one tap; another
+// phone asks for it once more. A link also confirms Delete my account for an email account (purpose "delete").
+// Without the cloud (local runs and the walkthroughs) window.__authStub stands in for Firebase; the live app never has one.
+export type LinkPurpose = "signin" | "delete";
+const LINK_EMAIL = "chefmealan-link-email", LINK_AT = "chefmealan-link-at";
+const stub = (): any => (typeof window !== "undefined" ? (window as any).__authStub : null);
+const langCode = () => { const l = getLang(); return l === "sr-Latn" ? "sr" : l; };
+export const WAIT_AGAIN_S = 60;
+// how many seconds until Send it again works: 0 when it may go now
+export const waitLeft = (sentAt: number | null, now: number) => (sentAt === null ? 0 : Math.max(0, Math.ceil(WAIT_AGAIN_S - (now - sentAt) / 1000)));
+export async function sendSignInLink(email: string, purpose: LinkPurpose): Promise<void> {
+  const e = email.trim().toLowerCase();
+  if (!cloudEnabled) { if (stub()?.sendLink) await stub().sendLink(e, purpose); else throw new Error(w("signin.liveOnly")); }
+  else {
+    const a = auth(); a.languageCode = langCode();
+    await sendSignInLinkToEmail(a, e, { url: `${location.origin}/?link=${purpose}`, handleCodeInApp: true });
+  }
+  try { localStorage.setItem(LINK_EMAIL, e); localStorage.setItem(LINK_AT, String(Date.now())); } catch { /* the other phone's way: asked once more */ }
+}
+// the page was opened from a sign-in link: which kind, or null
+export function linkInUrl(): LinkPurpose | null {
+  if (typeof location === "undefined") return null;
+  const ok = cloudEnabled ? isSignInWithEmailLink(auth(), location.href) : Boolean(stub()?.isLink?.(location.href));
+  if (!ok) return null;
+  return new URLSearchParams(location.search).get("link") === "delete" ? "delete" : "signin";
+}
+export const linkEmail = (): string | null => { try { return localStorage.getItem(LINK_EMAIL); } catch { return null; } };
+const dropLink = () => { try { localStorage.removeItem(LINK_EMAIL); localStorage.removeItem(LINK_AT); } catch { /* none kept */ } history.replaceState(null, "", location.pathname); };
+// sign in with the link, or for a delete confirm it is you with it; the address bar loses the link either way
+export async function finishLink(email: string): Promise<LinkPurpose> {
+  const purpose = linkInUrl() ?? "signin", e = email.trim().toLowerCase(), href = location.href;
+  if (!cloudEnabled) { await stub()?.finishLink?.(e, purpose); dropLink(); return purpose; }
+  const u = auth().currentUser;
+  if (purpose === "delete" && u) { await reauthenticateWithCredential(u, EmailAuthProvider.credentialWithLink(e, href)); await u.getIdToken(true); }
+  else await signInWithEmailLink(auth(), e, href);
+  dropLink();
+  return purpose;
+}
+// how this account signs in: Google, or an email link
+export function signInKind(): "google" | "email" | null {
+  if (!cloudEnabled) return stub()?.kind ?? null;
+  const u = auth().currentUser;
+  if (!u) return null;
+  return u.providerData.some((x) => x.providerId === "google.com") ? "google" : "email";
+}
+// Delete my account, for a Google account: Google asks once more, then a fresh token carries the new sign-in time
+export async function confirmWithGoogle(): Promise<void> {
+  if (!cloudEnabled) { await stub()?.google?.(); return; }
+  const u = auth().currentUser; if (!u) throw new Error(w("app.signInFirst"));
+  const provider = new GoogleAuthProvider();
+  if (u.email) provider.setCustomParameters({ login_hint: u.email });
+  await reauthenticateWithPopup(u, provider);
+  await u.getIdToken(true);
+}
 // DT178 (0.3.21): a Google token for one right, the Chef Mealan calendar (calendar.app.created). Asked for with a tap, in
 // Google's own window; Google gives it for about an hour. Nothing of it is sent to our server.
 export async function calendarToken(scopes: string[]): Promise<{ token: string; until: number; scopes: string[] } | null> {
@@ -62,7 +119,9 @@ export async function calendarToken(scopes: string[]): Promise<{ token: string; 
   const provider = new GoogleAuthProvider();
   for (const s of scopes) provider.addScope(s);
   if (u.email) provider.setCustomParameters({ login_hint: u.email });
-  const r = await reauthenticateWithPopup(u, provider);
+  // DT259: an email account has no Google yet: Connect Google links one, for the calendar
+  const google = u.providerData.some((x) => x.providerId === "google.com");
+  const r = google ? await reauthenticateWithPopup(u, provider) : await linkWithPopup(u, provider);
   const token = GoogleAuthProvider.credentialFromResult(r)?.accessToken;
   return token ? { token, until: Date.now() + 55 * 60 * 1000, scopes } : null;
 }

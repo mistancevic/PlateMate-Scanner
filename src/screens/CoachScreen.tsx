@@ -390,6 +390,8 @@ export function Invites(p: AppApi) {
                 <div><b>{i.name || i.email}</b><small>{i.email} · {i.code}</small></div>
                 <div className="history-num"><b className={`inv-${i.status}`}>{wordIn(getLang(), `coach.inv.${i.status}` as WordKey) ?? i.status}</b>
                   {i.status === "open" && <small><a href={inviteMail(i)}>{w("coach.resend")}</a> · <button className="link" onClick={async () => { await fetch(`/api/invites/${i.code}/revoke`, { method: "POST" }); load(); }}>{w("coach.revoke")}</button></small>}
+                  {/* DT259: a revoked or an expired invite can go from the list; a used one stays */}
+                  {(i.status === "revoked" || i.status === "expired") && <small><button className="link inv-remove" onClick={async () => { const r = await fetch(`/api/invites/${i.code}`, { method: "DELETE" }); if (r.ok) setList(list.filter((x) => x.code !== i.code)); else p.notify(w("coach.couldNotRemove")); }}>{w("coach.remove")}</button></small>}
                 </div>
               </div>
             ))}

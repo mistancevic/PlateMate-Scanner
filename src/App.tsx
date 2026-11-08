@@ -91,7 +91,7 @@ import { bookOfPath } from "./bookPages";
 import { PilotGate } from "./screens/PilotGate";
 import { takeCodeFromUrl } from "./pendingCode";
 takeCodeFromUrl();  // SH73: chefmealan.com/?code=AB12CD from a coach's QR code
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, forgetSaved, loadMain, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { linkInUrl, cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, forgetSaved, loadMain, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalName, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, ymd, isoWeek, planLine as planLineOf, type PlanDay } from "./plan";
 import { todayIndex } from "./screens/ClientWeek";
@@ -926,6 +926,13 @@ export default function App() {
     if (i >= 0) return t.slice(0, i + 1);
     return up && t.length ? [...t.slice(0, -1), s] : [...t, s];
   });
+  // DT259: back from a link. Delete my account goes on in its screen; a sign-in link once signed in has nothing left to do
+  useEffect(() => {
+    if (!user) return;
+    const k = linkInUrl();
+    if (k === "delete") setMenuSection("delete");
+    else if (k === "signin") history.replaceState(null, "", location.pathname);
+  }, [user?.uid]);
   const importRef = useRef<HTMLInputElement>(null),
     runRef = useRef(0),
     fromCloud = useRef(false),
@@ -2921,7 +2928,9 @@ export default function App() {
       try {
         const res = await fetch("/api/account/delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}", signal: AbortSignal.timeout(65000) });
         r = await res.json().catch(() => null);
-      } catch { r = null; }
+        // DT259e: the server wants a fresh check that it is you; nothing was deleted
+        if (res.status === 403 && (r as any)?.code === "recent") { setDeleteSteps(""); pauseAccountWrites(false); throw new Error(w("delete.again")); }
+      } catch (e) { if ((e as Error)?.message === w("delete.again")) throw e; r = null; }
       setDeleteSteps("");
       if (!r || (r.ok === undefined && r.dataGone === undefined)) {
         // no answer: the delete may or may not have run; the phone's copy goes, so it can't come back, and the account decides
@@ -3028,7 +3037,7 @@ export default function App() {
       <div className="app-shell">
         {menuSection
           ? <main><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} /></main>
-          : <AdultOnly onCorrect={() => screenProps.openMenu("profile")} onDelete={cloudEnabled && user ? screenProps.deleteAccount : null} />}
+          : <AdultOnly onCorrect={() => screenProps.openMenu("profile")} onDelete={cloudEnabled && user ? screenProps.deleteAccount : null} email={user?.email} />}
       </div>
     );
   if (goalOpen)
