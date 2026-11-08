@@ -35,6 +35,7 @@ import { FORMULA_NAME } from "../components/FormulaCard";
 import { BurnCard } from "../components/Measured";
 import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
+import { DeleteCheck } from "../components/DeleteCheck";
 import { openStats, savedDataKb } from "../openStats";
 import { saveStats } from "../cloud";
 import { looseWanted } from "../photos";
@@ -158,7 +159,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
   return (
     <>
       <div className="menu-head"><button className="link" onClick={() => ((from as string) === "me" || ME_SECTIONS.includes(section) && !from ? setSection("me", true) : setSection(from ?? "list", true))}><ChevronLeft size={16} /> {(from as string) === "me" ? w("menu.me") : from ? (ITEMS.find((i) => i.id === from)?.name ?? w("menu.menu")) : ME_SECTIONS.includes(section) ? w("menu.me") : w("menu.menu")}</button><button className="link" onClick={close}>{w("menu.close")}</button></div>
-      <h2 className="menu-title">{section === "me" ? w("menu.me") : title}</h2>
+      {(section === "me" || title) && <h2 className="menu-title">{section === "me" ? w("menu.me") : title}</h2>}
       {section === "me" && <MeScreen {...p} />}
       {section === "profile" && <ProfilePanel {...p} />}
       {section === "goal" && <GoalPanel {...p} />}
@@ -168,7 +169,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "coach" && <CoachPanel {...p} />}
       {section === "summary" && <SummaryPanel {...p} />}
       {section === "calendar" && <CalendarPage p={p} />}
-      {section === "account" && <AccountPanel {...p} />}
+      {section === "account" && <AccountPanel {...p} toDelete={() => setSection("delete")} />}
+      {section === "delete" && p.user && <DeleteCheck email={p.user.email} run={p.deleteAccount} exportData={p.exportMyData} cancel={() => setSection("account")} />}
       {section === "support" && <SupportPanel {...p} />}
       {section === "about" && <AboutPanel />}
       {section === "evals" && <EvalsScreen {...p} />}
@@ -810,8 +812,8 @@ function CoachPanel(p: AppApi) {
   );
 }
 
-function AccountPanel(p: AppApi) {
-  const { cloudEnabled, user, cloudStatus, signOut, deleteAccount } = p;
+function AccountPanel(p: AppApi & { toDelete: () => void }) {
+  const { cloudEnabled, user, cloudStatus, signOut } = p;
   // the export is the person's whatever the sign-in: on this phone only, the file holds what the phone holds
   if (!cloudEnabled) return (
     <>
@@ -840,7 +842,8 @@ function AccountPanel(p: AppApi) {
       </section>
       <div className="button-row">
         {user && <SignOut p={p} inline />}
-        {user && <ConfirmButton className="pill pill-small danger" label={w("menu.deleteMyAccount")} confirmLabel={w("menu.tapAgainToDeleteEverything")} onConfirm={deleteAccount} />}
+        {/* DT259e: its own screen, with the check that it is you */}
+        {user && <button className="pill pill-small danger" onClick={p.toDelete}>{w("menu.deleteMyAccount")}</button>}
         {!user && <button className="pill pill-small" onClick={() => { localStorage.removeItem("chefmealan-local-only"); location.reload(); }}>{w("menu.signIn")}</button>}
       </div>
     </>

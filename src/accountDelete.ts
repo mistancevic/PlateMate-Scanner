@@ -51,3 +51,8 @@ export async function deleteAccount(deps: DeleteDeps): Promise<DeleteResult> {
   }
   return { ok: true, done, dataGone: true, message: w("account.deleted", { list: list(done) }) };
 }
+
+// DT259e (0.3.113, board Stories194): the server deletes only right after the check that it is you (a link, or Google once
+// more): a sign-in older than 15 minutes is refused, and nothing is deleted
+export const RECENT_S = 15 * 60;
+export const signedInRecently = (authTime: number, nowS: number) => authTime > 0 && nowS - authTime >= -60 && nowS - authTime <= RECENT_S;

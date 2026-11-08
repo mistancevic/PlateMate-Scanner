@@ -711,9 +711,17 @@
       "id": "DT259",
       "title": "Sign in with any email, by a link; remove old invites",
       "epic": "trust",
-      "state": "next",
-      "why": "Coach Milan 8 November 08:11: Dajana applied with Hotmail; only Google works and nothing said so. Revoked invites (Dajana, Dada) cannot be removed. 08:21: so we can have any email sign up. Board 194 drawn 08:30: Google or an email link, Check your inbox, the link on another phone, Delete my account by a fresh link, remove on revoked and expired invites. Asked 08:33 whether to add the security steps (Send it again waits 60 s, enumeration protection, one account per email, mail from chefmealan.com, the privacy page). Waits for his answer and the Go.",
+      "state": "done",
+      "why": "Coach Milan 8 November 08:11: Dajana applied with Hotmail; only Google works and nothing said so. Revoked invites (Dajana, Dada) cannot be removed. 08:21: so we can have any email sign up. Board 194 drawn 08:30: Google or an email link, Check your inbox, the link on another phone, Delete my account by a fresh link, remove on revoked and expired invites. Asked 08:33 whether to add the security steps (Send it again waits 60 s, enumeration protection, one account per email, mail from chefmealan.com, the privacy page). Waits for his answer and the Go. 08:36: yes, all four. 08:47: DT259e redrawn as its own screen. Go 09:12; built in 0.3.113: Sign in with Google or an email link, Check your inbox, Send it again after 60 s, the link on another phone asks the email, Delete my account on its own screen with Export first and the check that it is you (a link, or Google once more), the server deletes only within 15 minutes of that check, remove on revoked and expired invites, Connect Google for the calendar links Google to an email account, the privacy page. His Firebase steps: docs/rules/email-sign-in.md.",
       "board": 194
+    },
+    {
+      "id": "DT260",
+      "title": "How to: situations and their happy path; a task list for beta testers",
+      "epic": "home",
+      "state": "progress",
+      "why": "Coach Milan 8 November 08:53: How to in the menu: situations and how the app solves them, the happy path in short steps, less 1:1 explaining, a task list for beta testers. 08:59: draw with your picks. Board 195 (09:10); 09:16: the Today card below the title and the goal; what one tester ticked. Go 09:22.",
+      "board": 195
     }
   ]
 }

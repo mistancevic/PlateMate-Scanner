@@ -21032,6 +21032,138 @@
     "recipe.stepsReadAloudOrig": {
       "text": "{n} korak, kako ga original piše, čita se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ga prikaže.|{n} koraka, kako ih original piše, čitaju se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ih prikaže.|{n} koraka, kako ih original piše, čitaju se naglas. Reci dalje, nazad ili ponovi. Drugi telefon može da ih prikaže.",
       "checked": true
+    },
+    "signin.title": {
+      "text": "Prijava",
+      "checked": true
+    },
+    "signin.orEmail": {
+      "text": "ili preko svog emaila",
+      "checked": true
+    },
+    "signin.yourEmail": {
+      "text": "Tvoj email",
+      "checked": true
+    },
+    "signin.sendLink": {
+      "text": "Pošalji mi link",
+      "checked": true
+    },
+    "signin.linkLine": {
+      "text": "Bez lozinke. Pošaljemo ti link na email. Otvori ga na ovom telefonu i to je to. Radi svaki email: Gmail, Hotmail, poslovni email.",
+      "checked": true
+    },
+    "signin.checkInbox": {
+      "text": "Pogledaj svoj inbox",
+      "checked": true
+    },
+    "signin.sentTo": {
+      "text": "Poslali smo link na {email}. Otvori ga na ovom telefonu da se prijaviš.",
+      "checked": true
+    },
+    "signin.spam": {
+      "text": "Nema ga ni posle minut? Pogledaj u spam.",
+      "checked": true
+    },
+    "signin.sendAgain": {
+      "text": "Pošalji ponovo",
+      "checked": true
+    },
+    "signin.sendAgainIn": {
+      "text": "Pošalji ponovo za {time}",
+      "checked": true
+    },
+    "signin.otherEmail": {
+      "text": "Koristi drugi email",
+      "checked": true
+    },
+    "signin.whichEmail": {
+      "text": "Za koji email je ovaj link?",
+      "checked": true
+    },
+    "signin.whichEmailLine": {
+      "text": "Link je otvoren na drugom telefonu ili pregledaču. Upiši email još jednom, da znamo da si to ti.",
+      "checked": true
+    },
+    "signin.signIn": {
+      "text": "Prijavi se",
+      "checked": true
+    },
+    "signin.signingIn": {
+      "text": "Prijavljujemo te…",
+      "checked": true
+    },
+    "signin.checkEmail": {
+      "text": "Proveri email.",
+      "checked": true
+    },
+    "signin.linkFailed": {
+      "text": "Ovaj link nije uspeo. Možda je star ili već iskorišćen. Pošalji novi.",
+      "checked": true
+    },
+    "signin.liveOnly": {
+      "text": "Prijava radi samo u pravoj aplikaciji.",
+      "checked": true
+    },
+    "signin.cancel": {
+      "text": "Otkaži",
+      "checked": true
+    },
+    "app.signInFirst": {
+      "text": "Prvo se prijavi.",
+      "checked": true
+    },
+    "delete.title": {
+      "text": "Obriši moj nalog",
+      "checked": true
+    },
+    "delete.removes": {
+      "text": "Ovo briše sve: tvoj profil, tanjire, namirnice, recepte, fotografije, kartice, vezu sa tvojim trenerom i prijavu. Ne može da se vrati.",
+      "checked": true
+    },
+    "delete.exportFirst": {
+      "text": "Prvo izvezi moje podatke",
+      "checked": true
+    },
+    "delete.checkEmail": {
+      "text": "Da budemo sigurni da si to ti, šaljemo link na {email}. Ništa se ne briše dok ga ne otvoriš.",
+      "checked": true
+    },
+    "delete.checkGoogle": {
+      "text": "Da budemo sigurni da si to ti, Google te još jednom pita da se prijaviš. Pre toga se ništa ne briše.",
+      "checked": true
+    },
+    "delete.sendLink": {
+      "text": "Pošalji link",
+      "checked": true
+    },
+    "delete.continueGoogle": {
+      "text": "Nastavi preko Googlea",
+      "checked": true
+    },
+    "delete.cancel": {
+      "text": "Otkaži",
+      "checked": true
+    },
+    "delete.sent": {
+      "text": "Poslali smo link na {email}. Otvori ga na ovom telefonu i brisanje se nastavlja.",
+      "checked": true
+    },
+    "delete.deleting": {
+      "text": "Brišemo sve…",
+      "checked": true
+    },
+    "delete.again": {
+      "text": "Da budemo sigurni da si to ti, ponovo pokreni Obriši moj nalog.",
+      "checked": true
+    },
+    "delete.linkFailed": {
+      "text": "Ovaj link nije uspeo. Možda je star ili već iskorišćen. Ponovo pokreni Obriši moj nalog.",
+      "checked": true
+    },
+    "coach.couldNotRemove": {
+      "text": "Pozivnica nije uklonjena. Pokušaj ponovo.",
+      "checked": true
     }
   }
 }
