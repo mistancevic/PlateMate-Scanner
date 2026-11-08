@@ -130,9 +130,9 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       <>
         <div className="menu-head"><h2>{w("menu.menu")}</h2><button className="link" onClick={close}>{w("menu.close")}</button></div>
         <div className="menu-list">
-          {/* DT260 (0.3.114, board Stories195): How to, the first row */}
-          <HowToRow open={() => setSection("howto")} />
           <button className="menu-row" onClick={() => setSection("me")}><span className="menu-icon"><User size={20} /></span><b>{w("menu.me")}</b><ChevronRight size={18} /></button>
+          {/* DT260 (0.3.114, board Stories195): How to; 0.3.116 (Coach Milan 8 November 17:11): under Me, which is the starting point */}
+          <HowToRow open={() => setSection("howto")} />
           {/* Foods lives here from 0.2.0 (X0): the library, reached day to day from the Plate's search and Quick picks */}
           <button className="menu-row" onClick={() => p.setTab("foods")}><span className="menu-icon"><BookOpen size={20} /></span><b>{w("menu.foods")}</b><ChevronRight size={18} /></button>
           {/* DT215 v3 (0.3.66, board Stories162b; Coach Milan 23:22 to 23:37): Settings, how the app works, not who you are */}

@@ -15,7 +15,7 @@ export const useHowMarks = () => useKept<HowMarks>(HOWTO_KEY, {});
 const tell = (id: string, s: "tried" | "didnt" | null, note?: string) =>
   fetch("/api/howto", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, s, note, v: VERSION }) }).catch(() => {});
 
-// the Menu's first row: How to, with how many you tried and how many are new
+// the Menu's row under Me (0.3.116): How to, with how many you tried and how many are new
 export function HowToRow({ open }: { open: () => void }) {
   const [marks] = useHowMarks();
   const n = newToTry(marks, VERSION).length;

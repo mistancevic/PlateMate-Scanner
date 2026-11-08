@@ -3061,3 +3061,29 @@ section.howto-one .button-row > .pill.pill-small, section.howto-today .button-ro
 .ht-count { color: var(--top); font-weight: 800; white-space: nowrap; }
 .ht-trow { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--line); }
 .ht-notyet, .ht-gap { color: var(--muted); }
+
+/* DT266 (0.3.116, board Stories197): the certifications */
+.cert-row { margin: 14px 0 12px; min-width: 0; }
+.cert-eyebrow { display: block; margin-bottom: 8px; }
+.cert-strip { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 8px; -webkit-overflow-scrolling: touch; }
+.cert-card { flex: none; width: 236px; scroll-snap-align: start; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 6px 6px 10px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-card); text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.cert-card img { width: 224px; border-radius: 8px; display: block; }
+.cert-card b { font-size: 13px; line-height: 1.3; padding: 2px 4px 0; }
+.cert-card small, .cert-hint, .cert-item small, .cert-view-nav small { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+.cert-card small { padding: 0 4px; }
+.cert-hint { display: block; margin-top: 2px; }
+.cert-view { position: fixed; inset: 0; z-index: 60; background: rgba(15, 25, 42, .92); display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 16px; color: #fff; }
+.cert-view-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 16px; }
+.cert-view .cert-close { min-width: 44px; min-height: 44px; background: none; border: 0; color: #fff; font-size: 22px; }
+.cert-view img { width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px; }
+.cert-view-nav { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.cert-view-nav .link { color: #c9d6ee; min-height: 44px; }
+.cert-view-nav .link:disabled { opacity: 0; pointer-events: none; }
+.cert-list { display: flex; flex-direction: column; gap: 14px; margin: 18px 0; }
+.cert-list h2 { margin: 0; }
+.cert-item { display: flex; flex-direction: column; gap: 6px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.cert-item .cert-open { padding: 0; background: none; border: 0; cursor: pointer; }
+.cert-item img { width: 100%; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.cert-item b { font-size: 16px; }
+.cert-item p { margin: 0; font-size: 15px; line-height: 1.45; }
+.l-behind .l-split > div { min-width: 0; }

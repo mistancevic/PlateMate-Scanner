@@ -1,4 +1,5 @@
 import { BOOKS } from "../bookPages";
+import { CertRow } from "../components/Certs";
 import { useEffect, useRef, useState } from "react";
 import { tabOfPath } from "../back";
 import { takeIdleOut } from "../idle";
@@ -272,6 +273,8 @@ export function LandingScreen() {
                 the personal page, not here */}
             <p>{w("home.behind2")}</p>
             <p>{withLinks(w("home.authorOf"), { wb: <a href="/built#books">Worth Building</a>, wn: <a href="/worthy-numbers?from=hp">Worthy Numbers</a> })}</p>
+            {/* DT266 (0.3.116, board Stories197): the certifications, thumbnails that open whole */}
+            <CertRow />
             <p className="l-behind-links"><a href="/built">{w("home.howBuilt")}</a><a href="/about">{w("home.moreMilan")}</a></p>
           </div>
           <figure className="l-hero-art">

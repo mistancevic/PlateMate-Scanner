@@ -21524,6 +21524,82 @@
     "howto.busyDay.s4": {
       "text": "Antworte Chef Mealan: die Mahlzeit verschieben, die Zeit behalten, oder sie mitnehmen.",
       "checked": true
+    },
+    "certs.certified": {
+      "text": "Zertifiziert",
+      "checked": true
+    },
+    "certs.title": {
+      "text": "Zertifikate",
+      "checked": true
+    },
+    "certs.tapOne": {
+      "text": "Tipp auf eins, um das Zertifikat zu sehen.",
+      "checked": true
+    },
+    "certs.tapFull": {
+      "text": "Tipp auf ein Zertifikat, um es in voller Größe zu sehen, mit seiner Nummer.",
+      "checked": true
+    },
+    "certs.openFull": {
+      "text": "{name} in voller Größe öffnen",
+      "checked": true
+    },
+    "certs.close": {
+      "text": "Schließen",
+      "checked": true
+    },
+    "certs.nOf": {
+      "text": "{n} von {total}",
+      "checked": true
+    },
+    "certs.nutrition.name": {
+      "text": "Zertifizierter Ernährungscoach (Certified Nutrition Coach)",
+      "checked": true
+    },
+    "certs.nutrition.line": {
+      "text": "Die Antworten zum Essen: was ein Teller bewirkt, und wie viel.",
+      "checked": true
+    },
+    "certs.fitness.name": {
+      "text": "10X Fitness Coaching Certification",
+      "checked": true
+    },
+    "certs.fitness.line": {
+      "text": "Die Trainingswoche und die Tagesarten.",
+      "checked": true
+    },
+    "certs.holobody.name": {
+      "text": "Certified Holobody Coach",
+      "checked": true
+    },
+    "certs.holobody.line": {
+      "text": "Der Blick auf den ganzen Körper hinter den Zielen.",
+      "checked": true
+    },
+    "certs.ai-pm.name": {
+      "text": "AI Product Management Certificate",
+      "checked": true
+    },
+    "certs.ai-pm.line": {
+      "text": "Wie Chef Mealan gebaut wurde, mit Auszeichnung für das Abschlussprojekt, und wo es begann.",
+      "checked": true
+    },
+    "certs.ai-mastery.name": {
+      "text": "AI Mastery",
+      "checked": true
+    },
+    "certs.ai-mastery.line": {
+      "text": "Die KI-Seite des Machers.",
+      "checked": true
+    },
+    "certs.business.name": {
+      "text": "Zertifizierter Business-Coach (Certified Business Coach)",
+      "checked": true
+    },
+    "certs.business.line": {
+      "text": "Für Coaches: das Geschäft mit Chef Mealan.",
+      "checked": true
     }
   }
 }

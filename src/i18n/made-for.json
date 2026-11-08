@@ -5380,6 +5380,25 @@
     "screen.howto.busyDay.s1": {"en":"Menu, Me, Google Calendar: tap Connect Google Calendar.","area":"Words used across the app","where":"Across the app","release":"0.3.114"},
     "screen.howto.busyDay.s2": {"en":"Turn on Read when I'm busy.","area":"Words used across the app","where":"Across the app","release":"0.3.114"},
     "screen.howto.busyDay.s3": {"en":"Open Plan: busy times show in your day.","area":"Words used across the app","where":"Across the app","release":"0.3.114"},
-    "screen.howto.busyDay.s4": {"en":"Answer Chef Mealan: move the meal, keep its time, or take it along.","area":"Words used across the app","where":"Across the app","release":"0.3.114"}
+    "screen.howto.busyDay.s4": {"en":"Answer Chef Mealan: move the meal, keep its time, or take it along.","area":"Words used across the app","where":"Across the app","release":"0.3.114"},
+    "screen.certs.certified": {"en":"Certified","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.title": {"en":"Certifications","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.tapOne": {"en":"Tap one to see the certificate.","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.tapFull": {"en":"Tap a certificate to see it full size, with its number.","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.openFull": {"en":"Open {name} full size","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.close": {"en":"Close","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.nOf": {"en":"{n} of {total}","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.nutrition.name": {"en":"Certified Nutrition Coach","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.nutrition.line": {"en":"The food answers: what a plate does, and how much.","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.fitness.name": {"en":"10X Fitness Coaching Certification","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.fitness.line": {"en":"The training week and the day types.","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.holobody.name": {"en":"Certified Holobody Coach","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.holobody.line": {"en":"The whole-body frame behind the goals.","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.ai-pm.name": {"en":"AI Product Management Certificate","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.ai-pm.line": {"en":"How Chef Mealan was built, with capstone honors, and where it started.","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.ai-mastery.name": {"en":"AI Mastery","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.ai-mastery.line": {"en":"The AI side of the builder.","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.business.name": {"en":"Certified Business Coach","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.certs.business.line": {"en":"Coaching coaches on the business with Chef Mealan.","area":"Words used across the app","where":"Across the app","release":"0.3.116"}
   }
 }

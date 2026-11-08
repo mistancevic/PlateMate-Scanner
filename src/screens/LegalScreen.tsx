@@ -1,4 +1,5 @@
 import { Mark, APP_NAME } from "../components/Mark";
+import { CertList } from "../components/Certs";
 import { VERSION_LINE } from "../version";
 
 // The pages the law asks for, readable without signing in: /impressum, /privacy, /disclaimer, /about.
@@ -38,6 +39,8 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <p>After hours, Milan is a certified fitness and nutrition coach, known to his clients as Coach Milan. He cooks every day for himself and his family. The recipes he has cooked are marked From the kitchen; the numbers come from labels and food tables.</p>
           <p>In Chef Mealan, a calculator calculates the numbers, the AI reads labels and talks, and you and your coach decide. Chef Mealan is being tested by a small group right now; most people join with a code from their coach.</p>
           <p>Milan is also the author of Worth Building, a product playbook.</p>
+          {/* DT266 (0.3.116, board Stories197): the six certifications, one under another, with one line each */}
+          <CertList />
           <div className="about-links"><a href="/built">How Chef Mealan is built</a><a href="/built#books">Worth Building</a><a href="https://www.linkedin.com/in/milanstancevic" target="_blank" rel="noreferrer">Milan on LinkedIn</a></div>
           <p>Questions, feedback, a code: <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>.</p>
         </article>

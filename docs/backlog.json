@@ -783,8 +783,8 @@
       "id": "DT266",
       "title": "Who's behind it: Coach Milan's certifications, for trust",
       "epic": "home",
-      "state": "next",
-      "why": "Coach Milan 8 November 16:44: the app goes deeper into coaching, so the background on the page should carry it. Six certificates sent: Product Faculty AI Product Management (Aug 2026), Mindvalley AI Mastery (Jan 2026), Certified Nutrition Coach with Viome (Feb 2024), 10X Fitness Coaching Certification (May 2023), Certified Holobody Coach (Jan 2023), Certified Business Coach, ICF CCE (Aug 2022). Brainstorm first, then a board."
+      "state": "done",
+      "why": "Coach Milan 8 November 16:44: the app goes deeper into coaching, so the background on the page should carry it. Six certificates sent: Product Faculty AI Product Management (Aug 2026), Mindvalley AI Mastery (Jan 2026), Certified Nutrition Coach with Viome (Feb 2024), 10X Fitness Coaching Certification (May 2023), Certified Holobody Coach (Jan 2023), Certified Business Coach, ICF CCE (Aug 2022). Brainstorm first, then a board. Board 197 (16:52), thumbnails and /about as a list (16:57), the coach section line dropped (17:04), one and a half in view (17:08), Go 17:09. Built in 0.3.116: the carousel under Who's behind it, the whole certificate on a tap with ‹ ›, all six on /about with one line each; the Menu puts Me above How to (17:11)."
     }
   ]
 }
