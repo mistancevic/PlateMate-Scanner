@@ -1,4 +1,5 @@
 // DT211 v8 (0.3.53): Start cooking in the recipe's Steps block opens cook mode. Earlier: DT174 (0.3.16, board Stories121; Coach Milan 30 October 16:39 Go): two doors on a recipe, Cook it as written straight to
+// HOWTO: fitTarget (DT260): this walkthrough follows How to's situation fitTarget; when it fails after a screen changed, update that situation's steps in src/i18n/en.json
 // Make and Change it first through the Plate; Start cooking on Make opens cook mode: one big step, read aloud, steered by voice
 // or by tap; timers from the step; how much from the amounts cooked; every finished step ticked on Make; voice asked once.
 // The browser's speech is stood in for: a stand-in recognition hears what the walkthrough says, a stand-in voice records.

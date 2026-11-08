@@ -21164,6 +21164,366 @@
     "coach.couldNotRemove": {
       "text": "Pozivnica nije uklonjena. Pokušaj ponovo.",
       "checked": true
+    },
+    "howto.title": {
+      "text": "Kako da",
+      "checked": true
+    },
+    "howto.intro": {
+      "text": "Situacije iz tvojih dana i kako Chef Mealan pomaže. Svaka traje minut.",
+      "checked": true
+    },
+    "howto.beta": {
+      "text": "Beta: probano {n} od {total}",
+      "checked": true
+    },
+    "howto.betaLine": {
+      "text": "Probaj svaku jednom. Kad nešto ne radi, dodirni Nije uspelo. Trener Milan vidi šta je probano i tvoje beleške.",
+      "checked": true
+    },
+    "howto.group.day": {
+      "text": "Svaki dan",
+      "checked": true
+    },
+    "howto.group.cook": {
+      "text": "Recepti i kuvanje",
+      "checked": true
+    },
+    "howto.group.week": {
+      "text": "Tvoja nedelja",
+      "checked": true
+    },
+    "howto.tried": {
+      "text": "✓ Probano",
+      "checked": true
+    },
+    "howto.new": {
+      "text": "Novo",
+      "checked": true
+    },
+    "howto.tryIt": {
+      "text": "Probaj ›",
+      "checked": true
+    },
+    "howto.triedIt": {
+      "text": "✓ Probano",
+      "checked": true
+    },
+    "howto.didnt": {
+      "text": "Nije uspelo",
+      "checked": true
+    },
+    "howto.back": {
+      "text": "‹ Kako da",
+      "checked": true
+    },
+    "howto.whatHappened": {
+      "text": "Šta se desilo?",
+      "checked": true
+    },
+    "howto.whatLine": {
+      "text": "{title}. Trener Milan ovo čita i javlja ti se.",
+      "checked": true
+    },
+    "howto.send": {
+      "text": "Pošalji",
+      "checked": true
+    },
+    "howto.cancel": {
+      "text": "Otkaži",
+      "checked": true
+    },
+    "howto.sent": {
+      "text": "Hvala. Trener Milan je dobio.",
+      "checked": true
+    },
+    "howto.triedOf": {
+      "text": "probano {n} od {total}",
+      "checked": true
+    },
+    "howto.newN": {
+      "text": "{n} novo|{n} nova|{n} novih",
+      "checked": true
+    },
+    "howto.newWays": {
+      "text": "{n} nov način da koristiš Chef Mealana|{n} nova načina da koristiš Chef Mealana|{n} novih načina da koristiš Chef Mealana",
+      "checked": true
+    },
+    "howto.seeHow": {
+      "text": "Pogledaj kako ›",
+      "checked": true
+    },
+    "howto.notNow": {
+      "text": "Ne sada",
+      "checked": true
+    },
+    "howto.testers": {
+      "text": "Kako da: tvoji testeri",
+      "checked": true
+    },
+    "howto.testerHead": {
+      "text": "{name}: probano {n} od {total}",
+      "checked": true
+    },
+    "howto.notYet": {
+      "text": "Još ne",
+      "checked": true
+    },
+    "howto.triedOn": {
+      "text": "✓ Probano, {day}",
+      "checked": true
+    },
+    "howto.didntOn": {
+      "text": "Nije uspelo, {day}",
+      "checked": true
+    },
+    "howto.backTesters": {
+      "text": "‹ Tvoji testeri",
+      "checked": true
+    },
+    "howto.noOneYet": {
+      "text": "Niko još nije probao: {title}. Dobra tema za sledeći razgovor 1:1.",
+      "checked": true
+    },
+    "howto.noTesters": {
+      "text": "Nijedan tester još nije otvorio Kako da.",
+      "checked": true
+    },
+    "howto.someone": {
+      "text": "Tester",
+      "checked": true
+    },
+    "howto.eatNow.title": {
+      "text": "Šta da jedem sada?",
+      "checked": true
+    },
+    "howto.eatNow.line": {
+      "text": "Reci šta ti se jede; on to uklopi u tvoj dan.",
+      "checked": true
+    },
+    "howto.eatNow.what": {
+      "text": "Glad je tu, a ne znaš šta da napraviš. Chef Mealan nađe jelo koje ti se jede i podesi količine za tvoj cilj.",
+      "checked": true
+    },
+    "howto.eatNow.s1": {
+      "text": "Otvori Tanjir. Pita te: Šta ti se jede?",
+      "checked": true
+    },
+    "howto.eatNow.s2": {
+      "text": "Upiši jelo ili želju, npr. sarma ili čokolada.",
+      "checked": true
+    },
+    "howto.eatNow.s3": {
+      "text": "Dodirni neki od Tvoji recepti, ili Pitaj Chef Mealana za jedno.",
+      "checked": true
+    },
+    "howto.eatNow.s4": {
+      "text": "Dodirni Uklopi u moj cilj, pa Pripremi ›.",
+      "checked": true
+    },
+    "howto.photoLog.title": {
+      "text": "Zabeleži obrok slikom",
+      "checked": true
+    },
+    "howto.photoLog.line": {
+      "text": "Jedna slika, on pročita namirnice; ti kažeš čiji je i kada.",
+      "checked": true
+    },
+    "howto.photoLog.what": {
+      "text": "Nešto je pojedeno i hoćeš da se računa, bez kucanja. Slika je dovoljna.",
+      "checked": true
+    },
+    "howto.photoLog.s1": {
+      "text": "Na Tanjiru dodirni Slika mog obroka.",
+      "checked": true
+    },
+    "howto.photoLog.s2": {
+      "text": "Slikaj ceo tanjir odozgo, pa Pročitaj ga. Ili izaberi sliku iz galerije.",
+      "checked": true
+    },
+    "howto.photoLog.s3": {
+      "text": "Reci čiji je tanjir i kada: Pojedeno u, Jedem sada, ili Istraživanje.",
+      "checked": true
+    },
+    "howto.photoLog.s4": {
+      "text": "Proveri namirnice koje je pročitao, pa dodirni Pojedeno ili Pola pojedeno.",
+      "checked": true
+    },
+    "howto.bigBatch.title": {
+      "text": "Velika tura kuvanja",
+      "checked": true
+    },
+    "howto.bigBatch.line": {
+      "text": "Reci koliko je ispalo i koliko je pojedeno; ostatak čeka u Planu.",
+      "checked": true
+    },
+    "howto.bigBatch.what": {
+      "text": "Recept od više komada, npr. 12 uštipaka. Chef Mealan broji pojedene; ostatak ide na druge dane u Planu.",
+      "checked": true
+    },
+    "howto.bigBatch.s1": {
+      "text": "Otvori recept od više komada i dodirni Prvo ga promeni.",
+      "checked": true
+    },
+    "howto.bigBatch.s2": {
+      "text": "Na Tanjiru izaberi Ceo recept, pa Pripremi ›.",
+      "checked": true
+    },
+    "howto.bigBatch.s3": {
+      "text": "Posle kuvanja dodirni Skuvano. Sledeće: Jelo ›.",
+      "checked": true
+    },
+    "howto.bigBatch.s4": {
+      "text": "Postavi koliko je ispalo, pa koliko je pojedeno, i Sačuvaj.",
+      "checked": true
+    },
+    "howto.bigBatch.s5": {
+      "text": "Stavi recept u Plan za dane kad jedeš ostatak.",
+      "checked": true
+    },
+    "howto.screenshot.title": {
+      "text": "Recept sa snimka ekrana",
+      "checked": true
+    },
+    "howto.screenshot.line": {
+      "text": "Instagram, knjiga, ChatGPT: slika postaje tvoj recept.",
+      "checked": true
+    },
+    "howto.screenshot.what": {
+      "text": "Jelo sa Instagrama, iz knjige, ili od ChatGPT-a. Chef Mealan pročita sliku u tvoj recept, sa količinama.",
+      "checked": true
+    },
+    "howto.screenshot.s1": {
+      "text": "Otvori Recepte. Pod Dodaj recept dodirni Snimak ekrana.",
+      "checked": true
+    },
+    "howto.screenshot.s2": {
+      "text": "Izaberi jednu ili više slika, pa Pročitaj ga.",
+      "checked": true
+    },
+    "howto.screenshot.s3": {
+      "text": "Proveri namirnice koje je pročitao.",
+      "checked": true
+    },
+    "howto.screenshot.s4": {
+      "text": "Dodirni Sačuvaj u Moji recepti.",
+      "checked": true
+    },
+    "howto.fitTarget.title": {
+      "text": "Uklopi recept u moj cilj",
+      "checked": true
+    },
+    "howto.fitTarget.line": {
+      "text": "Uklapanje podesi količine; zameni namirnicu koju nemaš.",
+      "checked": true
+    },
+    "howto.fitTarget.what": {
+      "text": "Recept koji voliš ima količine koje ne odgovaraju tvom danu. Uklopi u moj cilj ih podesi, a namirnicu koju nemaš možeš da zameniš.",
+      "checked": true
+    },
+    "howto.fitTarget.s1": {
+      "text": "Otvori recept i dodirni Prvo ga promeni.",
+      "checked": true
+    },
+    "howto.fitTarget.s2": {
+      "text": "Na Tanjiru dodirni Uklopi u moj cilj.",
+      "checked": true
+    },
+    "howto.fitTarget.s3": {
+      "text": "Prevuci namirnicu ulevo da je zameniš, ili je dodirni: Nemaš je? Nađi nešto drugo.",
+      "checked": true
+    },
+    "howto.fitTarget.s4": {
+      "text": "Dodirni Pripremi ›.",
+      "checked": true
+    },
+    "howto.handsFree.title": {
+      "text": "Kuvaj bez ruku",
+      "checked": true
+    },
+    "howto.handsFree.line": {
+      "text": "Pripremi sve, pa reci dalje, nazad, tajmer 5 minuta.",
+      "checked": true
+    },
+    "howto.handsFree.what": {
+      "text": "Ruke su ti zauzete, telefon je na pultu. Chef Mealan čita svaki korak, a ti mu odgovaraš, na svom jeziku.",
+      "checked": true
+    },
+    "howto.handsFree.s1": {
+      "text": "Otvori recept sa koracima i dodirni Počni da kuvaš.",
+      "checked": true
+    },
+    "howto.handsFree.s2": {
+      "text": "Pripremi sve: izvadi svaku namirnicu. Reci dalje, ili dodirni.",
+      "checked": true
+    },
+    "howto.handsFree.s3": {
+      "text": "Dodirni Uključi glas.",
+      "checked": true
+    },
+    "howto.handsFree.s4": {
+      "text": "Reci dalje, nazad, ponovi, koliko, šta je ostalo, ili tajmer 5 minuta.",
+      "checked": true
+    },
+    "howto.handsFree.s5": {
+      "text": "Na kraju dodirni Skuvano. Sledeće: Jelo ›.",
+      "checked": true
+    },
+    "howto.otherLang.title": {
+      "text": "Recept na drugom jeziku",
+      "checked": true
+    },
+    "howto.otherLang.line": {
+      "text": "Prikaži ga, ili kuvaj, na svom jeziku.",
+      "checked": true
+    },
+    "howto.otherLang.what": {
+      "text": "Recept je na drugom jeziku od tvog. Chef Mealan ti ga nudi na tvom, a original je na jedan dodir.",
+      "checked": true
+    },
+    "howto.otherLang.s1": {
+      "text": "Otvori recept.",
+      "checked": true
+    },
+    "howto.otherLang.s2": {
+      "text": "Chef Mealan pita da ga prikaže na tvom jeziku. Dodirni Prikaži ga.",
+      "checked": true
+    },
+    "howto.otherLang.s3": {
+      "text": "Prelazi između svog jezika i originala kad god hoćeš.",
+      "checked": true
+    },
+    "howto.otherLang.s4": {
+      "text": "Još nije na tvom jeziku? Počni da kuvaš nudi da ga kuvaš na tvom jeziku.",
+      "checked": true
+    },
+    "howto.busyDay.title": {
+      "text": "Gust dan",
+      "checked": true
+    },
+    "howto.busyDay.line": {
+      "text": "Poveži Google kalendar: on pomeri obrok, ili ga spakuje.",
+      "checked": true
+    },
+    "howto.busyDay.what": {
+      "text": "Sastanci ti popune dan i obroci se izgube. Sa tvojim kalendarom Chef Mealan vidi zauzeto vreme i pita pre nego što se obrok poklopi.",
+      "checked": true
+    },
+    "howto.busyDay.s1": {
+      "text": "Meni, Ja, Google kalendar: dodirni Poveži Google kalendar.",
+      "checked": true
+    },
+    "howto.busyDay.s2": {
+      "text": "Uključi čitanje zauzetih termina.",
+      "checked": true
+    },
+    "howto.busyDay.s3": {
+      "text": "Otvori Plan: zauzeto vreme se vidi u tvom danu.",
+      "checked": true
+    },
+    "howto.busyDay.s4": {
+      "text": "Odgovori Chef Mealanu: pomeri obrok, zadrži vreme, ili ga ponesi.",
+      "checked": true
     }
   }
 }

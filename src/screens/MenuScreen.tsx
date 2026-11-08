@@ -36,6 +36,7 @@ import { BurnCard } from "../components/Measured";
 import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
 import { DeleteCheck } from "../components/DeleteCheck";
+import { HowToRow, HowToScreen } from "../components/HowTo";
 import { openStats, savedDataKb } from "../openStats";
 import { saveStats } from "../cloud";
 import { looseWanted } from "../photos";
@@ -129,6 +130,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       <>
         <div className="menu-head"><h2>{w("menu.menu")}</h2><button className="link" onClick={close}>{w("menu.close")}</button></div>
         <div className="menu-list">
+          {/* DT260 (0.3.114, board Stories195): How to, the first row */}
+          <HowToRow open={() => setSection("howto")} />
           <button className="menu-row" onClick={() => setSection("me")}><span className="menu-icon"><User size={20} /></span><b>{w("menu.me")}</b><ChevronRight size={18} /></button>
           {/* Foods lives here from 0.2.0 (X0): the library, reached day to day from the Plate's search and Quick picks */}
           <button className="menu-row" onClick={() => p.setTab("foods")}><span className="menu-icon"><BookOpen size={20} /></span><b>{w("menu.foods")}</b><ChevronRight size={18} /></button>
@@ -153,7 +156,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
         {p.user && <SignOut p={p} />}
       </>
     );
-  const title = ITEMS.find((i) => i.id === section)?.name ?? "";
+  const title = section === "howto" ? w("howto.title") : ITEMS.find((i) => i.id === section)?.name ?? "";
   // a section opens at its top, whatever the scroll of the one before
   useEffect(() => { try { window.scrollTo({ top: 0 }); document.querySelector("main")?.scrollTo?.({ top: 0 }); } catch {} }, [section]);
   return (
@@ -170,6 +173,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "summary" && <SummaryPanel {...p} />}
       {section === "calendar" && <CalendarPage p={p} />}
       {section === "account" && <AccountPanel {...p} toDelete={() => setSection("delete")} />}
+      {section === "howto" && <HowToScreen {...p} closeMenu={close} />}
       {section === "delete" && p.user && <DeleteCheck email={p.user.email} run={p.deleteAccount} exportData={p.exportMyData} cancel={() => setSection("account")} />}
       {section === "support" && <SupportPanel {...p} />}
       {section === "about" && <AboutPanel />}

@@ -1,4 +1,5 @@
 // JOURNEY (0.2.108, board Stories75, DT127; Milan 25 October 14:26 to 16:29): a photo of the meal in front of you. One tap on
+// HOWTO: photoLog (DT260): this walkthrough follows How to's situation photoLog; when it fails after a screen changed, update that situation's steps in src/i18n/en.json
 // Today or the Plate, the read lands on the Plate as estimates (~, a range, a tap to correct), the photo stays on it (small in
 // the line, large with the foods over it), the three gates read it, Chef Mealan's line says what to do by code, and the
 // buttons log it now: Ate it, Ate half (the other half kept on Today), Not mine. A food read from the photo gets no

@@ -541,6 +541,7 @@ async function deleteAccountOf(uid: string, emailIn: string) {
         for (let i = 0; i < mine.docs.length; i += 400) { const b = d.batch(); mine.docs.slice(i, i + 400).forEach((x) => b.delete(x.ref)); await b.commit(); }
       }
       await d.collection("cooks").doc(uid).delete();
+      await d.collection("howto").doc(uid).delete();   // DT260: what they tried under How to
       if (!email) { try { email = String((await adminAuth().getUser(uid)).email || "").toLowerCase(); } catch { /* no email, nothing to clean by it */ } }
       if (!email) return;
       for (const col of ["accessRequests", "invites", "bookSignups", "waitlist"]) {
@@ -2312,6 +2313,33 @@ app.get("/api/book-signups", requireUser, requireMember, requireCoach, async (re
     if (!ownerOnly(req)) return notOwner(res);
     const snap = await db().collection("bookSignups").orderBy("createdAt", "desc").limit(200).get();
     res.json({ signups: snap.docs.map((d) => ({ id: d.id, email: d.data().email, books: d.data().books ?? [], createdAt: d.data().createdAt })) });
+  } catch (e) { fail(res, e); }
+});
+
+// DT260 (0.3.114, board Stories195; Coach Milan Go 8 November 09:22): How to. What a tester tried, on which day, and what
+// they wrote under Didn't work, one record per person, written by the server only. The owner reads all of them (Clients,
+// How to: your testers). Without a database (local runs) it is kept in memory.
+const memHowto = new Map<string, any>();
+const HOWTO_ID = /^[a-z][a-zA-Z]{2,30}$/;
+app.post("/api/howto", requireUser, requireMember, async (req, res) => {
+  try {
+    const uid = String((req as any).uid || "local"), b = req.body ?? {};
+    const id = String(b.id ?? ""), s = b.s === "didnt" ? "didnt" : b.s === "tried" ? "tried" : b.s === null ? null : "";
+    if (!HOWTO_ID.test(id) || s === "") return res.status(400).json({ error: "Not a situation." });
+    const note = String(b.note ?? "").trim().slice(0, 600), v = String(b.v ?? "").slice(0, 20);
+    const item = s ? { s, at: new Date().toISOString(), ...(s === "didnt" && note ? { note } : {}), v } : null;
+    if (!FB_PROJECT) { const r = memHowto.get(uid) ?? { uid, name: "", email: "", items: {} }; if (item) r.items[id] = item; else delete r.items[id]; r.name = String(b.name ?? "").slice(0, 80); memHowto.set(uid, r); return res.json({ ok: true }); }
+    const me = await db().collection("users").doc(uid).get();
+    await db().collection("howto").doc(uid).set({ name: String(me.data()?.clientName || "").slice(0, 80), email: String((req as any).email || ""), at: new Date().toISOString(), items: { [id]: item ?? FieldValue.delete() } }, { merge: true });
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+app.get("/api/howto", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    if (!ownerOnly(req)) return notOwner(res);
+    if (!FB_PROJECT) return res.json({ testers: [...memHowto.values()] });
+    const snap = await db().collection("howto").limit(500).get();
+    res.json({ testers: snap.docs.map((d) => ({ uid: d.id, name: d.data().name ?? "", email: d.data().email ?? "", items: d.data().items ?? {} })) });
   } catch (e) { fail(res, e); }
 });
 

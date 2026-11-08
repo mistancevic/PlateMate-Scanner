@@ -1,4 +1,5 @@
 import { BOOK_PAGES, BOOK_SOURCES } from "../bookPages";
+import { HowToTesters } from "../components/HowTo";
 import { getLang } from "../lang";
 import { w, wn, numLocale, phoneLoc, dateText, wIn as wordIn, type WordKey } from "../words";
 import { weekdayName } from "../weekdayWords";
@@ -133,6 +134,8 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
       {!p.demo && <p className="label coach-static">{w("coach.codesAndSignUps")}</p>}
       {!p.demo && <Invites {...p} />}
       {!p.demo && <AccessRequests {...p} />}
+      {/* DT260: what each tester tried under How to */}
+      {!p.demo && <HowToTesters />}
       {!p.demo && <WaitingList {...p} />}
       {!p.demo && <BookSignups {...p} />}
     </>

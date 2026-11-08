@@ -1,4 +1,5 @@
 // A recipe from a screenshot or a link (0.2.16, canvas board IM, IM1 to IM7; Milan 16 October 2026, 20:28 to 22:17).
+// HOWTO: screenshot (DT260): this walkthrough follows How to's situation screenshot; when it fails after a screen changed, update that situation's steps in src/i18n/en.json
 // Milan's day: 2,800 kcal, 180 g protein (PD 6.4), dinner at 18:30 about 933 kcal. A Margherita from two screenshots,
 // read by Chef Mealan (faked here: no AI key), saved in Mine with where it came from, sized for dinner, then fitted:
 // Change the dish (the first try fails the checks and goes back once), Add on the side (your way first, a side that

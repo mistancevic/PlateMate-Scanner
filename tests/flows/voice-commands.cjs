@@ -1,4 +1,5 @@
 // DT255 (0.3.110, board Stories190; Coach Milan 7 November 22:25, Go): cook mode hears its commands in Srpski and German.
+// HOWTO: handsFree (DT260): this walkthrough follows How to's situation handsFree; when it fails after a screen changed, update that situation's steps in src/i18n/en.json
 // A timer by voice, a step's own minutes with their timer button, what is left, a step by its number, a food in any ending.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");

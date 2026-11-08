@@ -1,4 +1,5 @@
 // JOURNEY INVARIANT (Milan, 18 October 2026, 23:04 to 23:34, story R17 on canvas board RS16): find what you crave. On an empty
+// HOWTO: eatNow (DT260): this walkthrough follows How to's situation eatNow; when it fails after a screen changed, update that situation's steps in src/i18n/en.json
 // Plate, What are you craving? has its box. You type in your words: crêpes, sarma, chocolate PD 7+, tiramisu. The app looks
 // first, at once: your recipes, Coach's, the members' and Chef Mealan's starters, and your foods, by name, food, part and taste;
 // PD 7+ is a filter shown as a chip with ✕, and a dish under it is named, not hidden. A tap puts a dish on the plate. When

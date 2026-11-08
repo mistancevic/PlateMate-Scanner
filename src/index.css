@@ -3024,3 +3024,40 @@ button.plate-photo { width: 100%; padding: 0; font: inherit; text-align: center;
 .pill.pill-danger:disabled { opacity: .55; }
 .gate .delete-check { text-align: left; }
 .inv-remove { min-height: 44px; }
+
+/* DT260 (0.3.114, board Stories195): How to */
+.howto { display: flex; flex-direction: column; gap: 10px; }
+.howto > p { margin: 0; line-height: 1.45; }
+.ht-beta { display: flex; flex-direction: column; gap: 6px; }
+.ht-bar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.ht-bar span { display: block; height: 8px; background: var(--top); border-radius: 4px; }
+.ht-beta small, .ht-sit small, .howto-one small { color: var(--muted); line-height: 1.4; }
+.ht-group { display: flex; flex-direction: column; gap: 8px; }
+.ht-group .label { margin: 6px 0 0; }
+.ht-sit { display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%; min-height: 64px; font: inherit; color: inherit; cursor: pointer; }
+.ht-icon { font-size: 24px; line-height: 1.2; }
+.ht-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.ht-new { align-self: flex-start; background: var(--brand); color: #fff; border-radius: 999px; padding: 1px 8px; font-size: 12px; font-weight: 800; }
+.ht-done { color: var(--top); font-weight: 800; font-size: 14px; white-space: nowrap; }
+.ht-bad { color: var(--low-text); font-weight: 800; font-size: 14px; }
+.howto-one, .howto-ask, .howto-tester { display: flex; flex-direction: column; gap: 12px; }
+.howto-one h3, .howto-ask h3, .howto-tester h3 { margin: 0; font-size: 22px; }
+.howto-one p, .howto-ask p { margin: 0; line-height: 1.5; }
+.ht-back, .ht-cancel, .ht-later { min-height: 44px; align-self: flex-start; }
+.ht-big { font-size: 30px; }
+.ht-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ht-steps li { display: flex; gap: 10px; line-height: 1.45; }
+.ht-steps li > b { flex: none; width: 26px; height: 26px; border-radius: 13px; background: var(--brand-soft, #e6f0ff); color: var(--brand-text, #1f5fc7); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.ht-try, .ht-send { min-height: 48px; }
+section.howto-one .button-row > .pill.pill-small, section.howto-today .button-row > .pill.pill-small { min-height: 44px; }
+.ht-tried.on { background: var(--top); border-color: var(--top); color: #fff; }
+.ht-didnt.on { border-color: var(--low-text); color: var(--low-text); }
+.ht-note { min-height: 96px; font: inherit; font-size: 16px; padding: 10px; border: 1.5px solid var(--line); border-radius: 12px; }
+.howto-today { display: flex; flex-direction: column; gap: 6px; }
+.howto-today p { margin: 0; line-height: 1.45; }
+.howto-testers { display: flex; flex-direction: column; gap: 8px; }
+.ht-tester { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; text-align: left; min-height: 48px; padding: 8px 0; background: none; border: 0; border-bottom: 1px solid var(--line); font: inherit; color: inherit; cursor: pointer; }
+.ht-tester > span { display: flex; flex-direction: column; gap: 2px; }
+.ht-count { color: var(--top); font-weight: 800; white-space: nowrap; }
+.ht-trow { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.ht-notyet, .ht-gap { color: var(--muted); }
