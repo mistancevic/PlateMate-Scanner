@@ -1,4 +1,5 @@
 // DT179 and DT179a (0.3.23, boards Stories127 and Stories128; Coach Milan 31 October 09:07 Go): from your calendar to the
+// HOWTO: busyDay (DT260): this walkthrough follows How to's situation busyDay; when it fails after a screen changed, update that situation's steps in src/i18n/en.json
 // app, and which meals go in. Read when I'm busy, off at first: busy times only, kept on the phone. Plan shows a busy block
 // and asks where it meets the day: a meal in a meeting, a late evening, a full day, training. A meal moved in Google comes
 // back. Which meals: every slot, or only the planned ones. Google is a stand-in: an in-memory calendar with busy times.

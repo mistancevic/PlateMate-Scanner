@@ -1,4 +1,5 @@
 // JOURNEY INVARIANT (Milan, 20 October 2026, 01:19 to 01:30, story R25 on canvas board RS25): a whole recipe is never logged as
+// HOWTO: bigBatch (DT260): this walkthrough follows How to's situation bigBatch; when it fails after a screen changed, update that situation's steps in src/i18n/en.json
 // one meal by accident. With the whole recipe on the plate, How did making it go? counts: You made 12 fritters. How many did
 // you eat?, starting on 1, with the kcal; the rest is said, not followed. All 12 stays a choice. A meal over 2,000 kcal, or
 // over the whole day, is asked once before it is logged; nothing is blocked. Never rewrite these lines to fit a change.

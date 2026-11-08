@@ -21164,6 +21164,366 @@
     "coach.couldNotRemove": {
       "text": "Die Einladung ließ sich nicht entfernen. Versuch es noch mal.",
       "checked": true
+    },
+    "howto.title": {
+      "text": "So geht's",
+      "checked": true
+    },
+    "howto.intro": {
+      "text": "Situationen aus deinen Tagen, und wie Chef Mealan hilft. Jede dauert eine Minute.",
+      "checked": true
+    },
+    "howto.beta": {
+      "text": "Beta: {n} von {total} ausprobiert",
+      "checked": true
+    },
+    "howto.betaLine": {
+      "text": "Probier jede einmal aus. Tipp auf Hat nicht geklappt, wenn etwas nicht geht. Coach Milan sieht, was du ausprobiert hast, und deine Notizen.",
+      "checked": true
+    },
+    "howto.group.day": {
+      "text": "Jeden Tag",
+      "checked": true
+    },
+    "howto.group.cook": {
+      "text": "Rezepte und Kochen",
+      "checked": true
+    },
+    "howto.group.week": {
+      "text": "Deine Woche",
+      "checked": true
+    },
+    "howto.tried": {
+      "text": "✓ Ausprobiert",
+      "checked": true
+    },
+    "howto.new": {
+      "text": "Neu",
+      "checked": true
+    },
+    "howto.tryIt": {
+      "text": "Ausprobieren ›",
+      "checked": true
+    },
+    "howto.triedIt": {
+      "text": "✓ Ausprobiert",
+      "checked": true
+    },
+    "howto.didnt": {
+      "text": "Hat nicht geklappt",
+      "checked": true
+    },
+    "howto.back": {
+      "text": "‹ So geht's",
+      "checked": true
+    },
+    "howto.whatHappened": {
+      "text": "Was ist passiert?",
+      "checked": true
+    },
+    "howto.whatLine": {
+      "text": "{title}. Coach Milan liest das und meldet sich bei dir.",
+      "checked": true
+    },
+    "howto.send": {
+      "text": "Senden",
+      "checked": true
+    },
+    "howto.cancel": {
+      "text": "Abbrechen",
+      "checked": true
+    },
+    "howto.sent": {
+      "text": "Danke. Coach Milan hat es bekommen.",
+      "checked": true
+    },
+    "howto.triedOf": {
+      "text": "{n} von {total} ausprobiert",
+      "checked": true
+    },
+    "howto.newN": {
+      "text": "{n} neu|{n} neu",
+      "checked": true
+    },
+    "howto.newWays": {
+      "text": "{n} neue Art, Chef Mealan zu nutzen|{n} neue Arten, Chef Mealan zu nutzen",
+      "checked": true
+    },
+    "howto.seeHow": {
+      "text": "Zeig mir wie ›",
+      "checked": true
+    },
+    "howto.notNow": {
+      "text": "Nicht jetzt",
+      "checked": true
+    },
+    "howto.testers": {
+      "text": "So geht's: deine Tester",
+      "checked": true
+    },
+    "howto.testerHead": {
+      "text": "{name}: {n} von {total} ausprobiert",
+      "checked": true
+    },
+    "howto.notYet": {
+      "text": "Noch nicht",
+      "checked": true
+    },
+    "howto.triedOn": {
+      "text": "✓ Ausprobiert, {day}",
+      "checked": true
+    },
+    "howto.didntOn": {
+      "text": "Hat nicht geklappt, {day}",
+      "checked": true
+    },
+    "howto.backTesters": {
+      "text": "‹ Deine Tester",
+      "checked": true
+    },
+    "howto.noOneYet": {
+      "text": "Noch niemand hat ausprobiert: {title}. Gut für das nächste 1:1.",
+      "checked": true
+    },
+    "howto.noTesters": {
+      "text": "Noch kein Tester hat So geht's geöffnet.",
+      "checked": true
+    },
+    "howto.someone": {
+      "text": "Ein Tester",
+      "checked": true
+    },
+    "howto.eatNow.title": {
+      "text": "Was soll ich jetzt essen?",
+      "checked": true
+    },
+    "howto.eatNow.line": {
+      "text": "Sag, worauf du Lust hast; er passt es an deinen Tag an.",
+      "checked": true
+    },
+    "howto.eatNow.what": {
+      "text": "Du hast Hunger und weißt nicht, was du machen sollst. Chef Mealan findet ein Gericht, auf das du Lust hast, und stellt die Mengen auf dein Ziel ein.",
+      "checked": true
+    },
+    "howto.eatNow.s1": {
+      "text": "Öffne den Teller. Er fragt: Worauf hast du Lust?",
+      "checked": true
+    },
+    "howto.eatNow.s2": {
+      "text": "Tipp ein Gericht oder eine Lust ein, etwa Sarma oder Schokolade.",
+      "checked": true
+    },
+    "howto.eatNow.s3": {
+      "text": "Tipp auf eins unter Deine Rezepte, oder auf Chef Mealan nach einem fragen.",
+      "checked": true
+    },
+    "howto.eatNow.s4": {
+      "text": "Tipp auf An mein Ziel anpassen, dann Zubereiten ›.",
+      "checked": true
+    },
+    "howto.photoLog.title": {
+      "text": "Ich habe etwas gegessen: mit einem Foto festhalten",
+      "checked": true
+    },
+    "howto.photoLog.line": {
+      "text": "Ein Foto, er liest die Lebensmittel; du sagst, wessen Teller und wann.",
+      "checked": true
+    },
+    "howto.photoLog.what": {
+      "text": "Du hast etwas gegessen und willst es zählen, ohne zu tippen. Ein Foto reicht.",
+      "checked": true
+    },
+    "howto.photoLog.s1": {
+      "text": "Tipp auf dem Teller auf Foto meiner Mahlzeit.",
+      "checked": true
+    },
+    "howto.photoLog.s2": {
+      "text": "Fotografier den ganzen Teller von oben, dann Lesen. Oder wähl ein Foto, das du schon gemacht hast.",
+      "checked": true
+    },
+    "howto.photoLog.s3": {
+      "text": "Sag, wessen Teller und wann: Gegessen um, Ich esse gerade, oder Entdecken.",
+      "checked": true
+    },
+    "howto.photoLog.s4": {
+      "text": "Prüf die gelesenen Lebensmittel, dann tipp auf Gegessen oder Halb gegessen.",
+      "checked": true
+    },
+    "howto.bigBatch.title": {
+      "text": "Ich habe eine große Menge gekocht",
+      "checked": true
+    },
+    "howto.bigBatch.line": {
+      "text": "Sag, wie viele du gemacht und gegessen hast; der Rest wartet im Plan.",
+      "checked": true
+    },
+    "howto.bigBatch.what": {
+      "text": "Du hast ein Rezept mit mehreren Stücken gekocht, etwa 12 Puffer. Chef Mealan zählt, was du gegessen hast; der Rest kommt auf andere Tage im Plan.",
+      "checked": true
+    },
+    "howto.bigBatch.s1": {
+      "text": "Öffne ein Rezept mit mehreren Stücken und tipp auf Erst ändern.",
+      "checked": true
+    },
+    "howto.bigBatch.s2": {
+      "text": "Wähl auf dem Teller Das ganze Rezept, dann Zubereiten ›.",
+      "checked": true
+    },
+    "howto.bigBatch.s3": {
+      "text": "Nach dem Kochen tipp auf Gekocht. Weiter: Essen ›.",
+      "checked": true
+    },
+    "howto.bigBatch.s4": {
+      "text": "Stell ein, wie viele es wurden und wie viele du gegessen hast, und Speichern.",
+      "checked": true
+    },
+    "howto.bigBatch.s5": {
+      "text": "Setz das Rezept in den Plan, für die Tage, an denen du den Rest isst.",
+      "checked": true
+    },
+    "howto.screenshot.title": {
+      "text": "Ein Rezept aus einem Screenshot",
+      "checked": true
+    },
+    "howto.screenshot.line": {
+      "text": "Instagram, ein Buch, ChatGPT: ein Bild wird dein Rezept.",
+      "checked": true
+    },
+    "howto.screenshot.what": {
+      "text": "Du hast ein Gericht auf Instagram oder in einem Buch gesehen, oder ChatGPT gefragt. Chef Mealan liest das Bild in dein Rezept, mit Mengen.",
+      "checked": true
+    },
+    "howto.screenshot.s1": {
+      "text": "Öffne Rezepte. Unter Rezept hinzufügen tipp auf Screenshot.",
+      "checked": true
+    },
+    "howto.screenshot.s2": {
+      "text": "Wähl ein oder mehrere Bilder, dann Lesen.",
+      "checked": true
+    },
+    "howto.screenshot.s3": {
+      "text": "Prüf die gelesenen Lebensmittel.",
+      "checked": true
+    },
+    "howto.screenshot.s4": {
+      "text": "Tipp auf In Meine Rezepte speichern.",
+      "checked": true
+    },
+    "howto.fitTarget.title": {
+      "text": "Ein Rezept an mein Ziel anpassen",
+      "checked": true
+    },
+    "howto.fitTarget.line": {
+      "text": "Anpassen stellt die Mengen ein; tausch ein Lebensmittel, das du nicht hast.",
+      "checked": true
+    },
+    "howto.fitTarget.what": {
+      "text": "Ein Rezept, das du magst, passt mit seinen Mengen nicht zu deinem Tag. An mein Ziel anpassen stellt sie ein, und ein Lebensmittel, das du nicht hast, lässt sich tauschen.",
+      "checked": true
+    },
+    "howto.fitTarget.s1": {
+      "text": "Öffne das Rezept und tipp auf Erst ändern.",
+      "checked": true
+    },
+    "howto.fitTarget.s2": {
+      "text": "Tipp auf dem Teller auf An mein Ziel anpassen.",
+      "checked": true
+    },
+    "howto.fitTarget.s3": {
+      "text": "Wisch ein Lebensmittel nach links, um es zu tauschen, oder tipp darauf: Hast du es nicht? Such stattdessen etwas anderes.",
+      "checked": true
+    },
+    "howto.fitTarget.s4": {
+      "text": "Tipp auf Zubereiten ›.",
+      "checked": true
+    },
+    "howto.handsFree.title": {
+      "text": "Freihändig kochen",
+      "checked": true
+    },
+    "howto.handsFree.line": {
+      "text": "Alles bereitlegen, dann sag weiter, zurück, Timer 5 Minuten.",
+      "checked": true
+    },
+    "howto.handsFree.what": {
+      "text": "Deine Hände sind beschäftigt, das Handy liegt auf der Arbeitsfläche. Chef Mealan liest jeden Schritt vor, und du antwortest, in deiner Sprache.",
+      "checked": true
+    },
+    "howto.handsFree.s1": {
+      "text": "Öffne ein Rezept mit Schritten und tipp auf Kochen starten.",
+      "checked": true
+    },
+    "howto.handsFree.s2": {
+      "text": "Alles bereitlegen: stell jedes Lebensmittel hin. Sag weiter, oder tipp.",
+      "checked": true
+    },
+    "howto.handsFree.s3": {
+      "text": "Tipp auf Stimme einschalten.",
+      "checked": true
+    },
+    "howto.handsFree.s4": {
+      "text": "Sag weiter, zurück, wiederholen, wie viel, was fehlt noch, oder Timer 5 Minuten.",
+      "checked": true
+    },
+    "howto.handsFree.s5": {
+      "text": "Am Ende tipp auf Gekocht. Weiter: Essen ›.",
+      "checked": true
+    },
+    "howto.otherLang.title": {
+      "text": "Ein Rezept in einer anderen Sprache",
+      "checked": true
+    },
+    "howto.otherLang.line": {
+      "text": "Zeig es, oder koch es, in deiner Sprache.",
+      "checked": true
+    },
+    "howto.otherLang.what": {
+      "text": "Ein Rezept ist in einer anderen Sprache als deiner. Chef Mealan bietet es dir in deiner an, und das Original bleibt einen Tipp entfernt.",
+      "checked": true
+    },
+    "howto.otherLang.s1": {
+      "text": "Öffne das Rezept.",
+      "checked": true
+    },
+    "howto.otherLang.s2": {
+      "text": "Chef Mealan fragt, ob er es in deiner Sprache zeigen soll. Tipp auf Zeig es.",
+      "checked": true
+    },
+    "howto.otherLang.s3": {
+      "text": "Wechsle jederzeit zwischen deiner Sprache und dem Original.",
+      "checked": true
+    },
+    "howto.otherLang.s4": {
+      "text": "Noch nicht in deiner Sprache? Kochen starten bietet an, es in deiner Sprache zu kochen.",
+      "checked": true
+    },
+    "howto.busyDay.title": {
+      "text": "Ein voller Tag",
+      "checked": true
+    },
+    "howto.busyDay.line": {
+      "text": "Verbinde Google Kalender: er verschiebt eine Mahlzeit, oder packt sie ein.",
+      "checked": true
+    },
+    "howto.busyDay.what": {
+      "text": "Termine füllen deinen Tag, und Mahlzeiten gehen verloren. Mit deinem Kalender sieht Chef Mealan belegte Zeiten und fragt, bevor eine Mahlzeit kollidiert.",
+      "checked": true
+    },
+    "howto.busyDay.s1": {
+      "text": "Menü, Ich, Google Kalender: tipp auf Google Kalender verbinden.",
+      "checked": true
+    },
+    "howto.busyDay.s2": {
+      "text": "Schalte Lesen, wann ich beschäftigt bin, ein.",
+      "checked": true
+    },
+    "howto.busyDay.s3": {
+      "text": "Öffne den Plan: belegte Zeiten zeigen sich in deinem Tag.",
+      "checked": true
+    },
+    "howto.busyDay.s4": {
+      "text": "Antworte Chef Mealan: die Mahlzeit verschieben, die Zeit behalten, oder sie mitnehmen.",
+      "checked": true
     }
   }
 }

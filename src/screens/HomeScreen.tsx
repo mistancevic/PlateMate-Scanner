@@ -1,4 +1,5 @@
 import { ChefLine } from "../components/ChefLine";
+import { HowToToday } from "../components/HowTo";
 import { w, wn, mealV, mealName, dateText, dateV, enOnly, phoneLoc, numLocale } from "../words";
 import { locOf } from "../lang";
 import { say } from "../chefScript";
@@ -230,6 +231,8 @@ export function HomeScreen(p: AppApi) {
         {/* 0.2.57 (board DS6, I, Milan 10:21 to 10:46): no day part. The day header has the date; Maintain › opens Goal; one set
             of numbers every day has nothing to say here. Where training and rest days differ, the kind of day stays, without the date. */}
       </section>
+      {/* DT260 (board Stories195; Coach Milan 09:16): new ways, below the title and below the goal */}
+      {!clientName && <HowToToday open={() => p.openMenu("howto")} />}
       {/* DT214 v2 (0.3.53, board Stories162): while a cook runs, the strip under the My goal block */}
       <CookStrip p={p} />
       {/* DT189 (0.3.31): the strip in words instead of a number on an icon; it opens Clients on the list */}

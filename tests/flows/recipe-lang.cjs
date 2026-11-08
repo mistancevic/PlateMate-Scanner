@@ -1,4 +1,5 @@
 // DT250 (0.3.99, board Stories185; Coach Milan 7 November 06:14 to 08:05, Go): a recipe in your language. The app in English, a
+// HOWTO: otherLang (DT260): this walkthrough follows How to's situation otherLang; when it fails after a screen changed, update that situation's steps in src/i18n/en.json
 // recipe written in Srpski: its page offers once (Show it in English, or Keep it in Srpski); translated, it shows in English
 // with a switch to the original; Start cooking asks once and cook mode reads the version picked; a recipe that just came in
 // from a link is read into English by itself, with Original ›. Chef Mealan's translation is stubbed; what the app sends and
