@@ -21524,6 +21524,82 @@
     "howto.busyDay.s4": {
       "text": "Odgovori Chef Mealanu: pomeri obrok, zadrži vreme, ili ga ponesi.",
       "checked": true
+    },
+    "certs.certified": {
+      "text": "Sertifikati",
+      "checked": true
+    },
+    "certs.title": {
+      "text": "Sertifikati",
+      "checked": true
+    },
+    "certs.tapOne": {
+      "text": "Dodirni jedan da vidiš sertifikat.",
+      "checked": true
+    },
+    "certs.tapFull": {
+      "text": "Dodirni sertifikat da ga vidiš u punoj veličini, sa brojem.",
+      "checked": true
+    },
+    "certs.openFull": {
+      "text": "Otvori {name} u punoj veličini",
+      "checked": true
+    },
+    "certs.close": {
+      "text": "Zatvori",
+      "checked": true
+    },
+    "certs.nOf": {
+      "text": "{n} od {total}",
+      "checked": true
+    },
+    "certs.nutrition.name": {
+      "text": "Sertifikovani trener ishrane (Certified Nutrition Coach)",
+      "checked": true
+    },
+    "certs.nutrition.line": {
+      "text": "Odgovori o hrani: šta tanjir radi, i koliko.",
+      "checked": true
+    },
+    "certs.fitness.name": {
+      "text": "10X Fitness Coaching Certification",
+      "checked": true
+    },
+    "certs.fitness.line": {
+      "text": "Trening nedelja i vrste dana.",
+      "checked": true
+    },
+    "certs.holobody.name": {
+      "text": "Certified Holobody Coach",
+      "checked": true
+    },
+    "certs.holobody.line": {
+      "text": "Celovit pogled na telo iza ciljeva.",
+      "checked": true
+    },
+    "certs.ai-pm.name": {
+      "text": "AI Product Management Certificate",
+      "checked": true
+    },
+    "certs.ai-pm.line": {
+      "text": "Kako je Chef Mealan napravljen, sa pohvalom za završni projekat, i odakle je krenuo.",
+      "checked": true
+    },
+    "certs.ai-mastery.name": {
+      "text": "AI Mastery",
+      "checked": true
+    },
+    "certs.ai-mastery.line": {
+      "text": "AI strana graditelja.",
+      "checked": true
+    },
+    "certs.business.name": {
+      "text": "Sertifikovani biznis trener (Certified Business Coach)",
+      "checked": true
+    },
+    "certs.business.line": {
+      "text": "Trenerima: kako da vode posao sa Chef Mealanom.",
+      "checked": true
     }
   }
 }

@@ -66,7 +66,7 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
     ok(/\/me\/calendar$/.test(page.url()), "Try it for A busy day opens Google Calendar: " + page.url());
     await page.goto(U + "/today"); await page.waitForTimeout(1000);
     await page.locator("header .menu-button").click(); await page.waitForTimeout(500);
-    ok(await page.locator(".menu-list .menu-row").first().evaluate((x) => x.classList.contains("howto-row")) && /How to\s*1 of 8 tried · 2 new/.test(await text(".howto-row")), "the Menu's first row: " + await text(".howto-row"));
+    ok(await page.locator(".menu-list .menu-row").nth(1).evaluate((x) => x.classList.contains("howto-row")) && /How to\s*1 of 8 tried · 2 new/.test(await text(".howto-row")), "the Menu's second row, under Me (0.3.116): " + await text(".howto-row"));
     await page.locator(".howto-row").click(); await page.waitForTimeout(400);
     await page.locator(".ht-eatNow").click(); await page.waitForTimeout(300);
     await page.locator(".ht-try").click(); await page.waitForTimeout(700);
