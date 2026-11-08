@@ -66,12 +66,16 @@ const langCode = () => { const l = getLang(); return l === "sr-Latn" ? "sr" : l;
 export const WAIT_AGAIN_S = 60;
 // how many seconds until Send it again works: 0 when it may go now
 export const waitLeft = (sentAt: number | null, now: number) => (sentAt === null ? 0 : Math.max(0, Math.ceil(WAIT_AGAIN_S - (now - sentAt) / 1000)));
+// 0.3.115 (Coach Milan's test 8 November 12:13): the address the link comes back to. Its marker is "for", never "link":
+// Firebase reads a "link" in the address as a link of its own, and then did not see the sign-in (the home page showed)
+export const LINK_MARK = "for";
+export const continueUrl = (origin: string, purpose: LinkPurpose) => `${origin}/?${LINK_MARK}=${purpose}`;
 export async function sendSignInLink(email: string, purpose: LinkPurpose): Promise<void> {
   const e = email.trim().toLowerCase();
   if (!cloudEnabled) { if (stub()?.sendLink) await stub().sendLink(e, purpose); else throw new Error(w("signin.liveOnly")); }
   else {
     const a = auth(); a.languageCode = langCode();
-    await sendSignInLinkToEmail(a, e, { url: `${location.origin}/?link=${purpose}`, handleCodeInApp: true });
+    await sendSignInLinkToEmail(a, e, { url: continueUrl(location.origin, purpose), handleCodeInApp: true });
   }
   try { localStorage.setItem(LINK_EMAIL, e); localStorage.setItem(LINK_AT, String(Date.now())); } catch { /* the other phone's way: asked once more */ }
 }
@@ -80,7 +84,7 @@ export function linkInUrl(): LinkPurpose | null {
   if (typeof location === "undefined") return null;
   const ok = cloudEnabled ? isSignInWithEmailLink(auth(), location.href) : Boolean(stub()?.isLink?.(location.href));
   if (!ok) return null;
-  return new URLSearchParams(location.search).get("link") === "delete" ? "delete" : "signin";
+  return new URLSearchParams(location.search).get(LINK_MARK) === "delete" ? "delete" : "signin";
 }
 export const linkEmail = (): string | null => { try { return localStorage.getItem(LINK_EMAIL); } catch { return null; } };
 const dropLink = () => { try { localStorage.removeItem(LINK_EMAIL); localStorage.removeItem(LINK_AT); } catch { /* none kept */ } history.replaceState(null, "", location.pathname); };

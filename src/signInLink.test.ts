@@ -35,3 +35,16 @@ test("the server checks the sign-in time before anything is deleted, and a used 
 test("Delete my account is never a second tap on the same button any more", () => {
   for (const f of ["src/screens/MenuScreen.tsx", "src/components/Welcome.tsx"]) assert.doesNotMatch(fs.readFileSync(f, "utf8"), /tapAgainToDeleteEverything/, f);
 });
+
+// 0.3.115 (Coach Milan's test, 8 November 12:13): the link came back and the home page showed. Firebase reads a "link" in the
+// address as a link of its own; the real check, not a stand-in, must see the sign-in for both kinds of link
+test("Firebase's own check sees the sign-in in the address the link comes back to", async () => {
+  const { initializeApp } = await import("firebase/app");
+  const { getAuth, isSignInWithEmailLink } = await import("firebase/auth");
+  const { continueUrl, LINK_MARK } = await import("./cloud");
+  const a = getAuth(initializeApp({ apiKey: "k", projectId: "p", appId: "a", authDomain: "d.firebaseapp.com" }, "linktest"));
+  const back = (u: string) => `${u}&apiKey=k&oobCode=abc&mode=signIn&lang=en`;   // what Firebase's page adds
+  assert.notEqual(LINK_MARK, "link");
+  for (const p of ["signin", "delete"] as const) assert.equal(isSignInWithEmailLink(a, back(continueUrl("https://chefmealan.com", p))), true, p);
+  assert.equal(isSignInWithEmailLink(a, back("https://chefmealan.com/?link=signin")), false, "the 0.3.113 marker: not seen");
+});

@@ -67,7 +67,7 @@ const STUB = () => {
     await page.context().close();
     // 3. the link back on the same phone: no question
     page = await fresh("dajana@hotmail.com");
-    await page.goto(U + "/?home&link=signin&apiKey=k&oobCode=abc&mode=signIn"); await page.waitForTimeout(900);
+    await page.goto(U + "/?home&for=signin&apiKey=k&oobCode=abc&mode=signIn"); await page.waitForTimeout(900);
     const fin = await page.evaluate(() => window.__finished);
     ok(fin.length === 1 && fin[0][0] === "dajana@hotmail.com" && fin[0][1] === "signin", "the same phone signs in with the kept email: " + JSON.stringify(fin));
     ok(!page.url().includes("oobCode"), "the link leaves the address bar");
@@ -75,7 +75,7 @@ const STUB = () => {
     await page.context().close();
     // 4. on another phone: Which email is this link for?
     page = await fresh();
-    await page.goto(U + "/?home&link=signin&apiKey=k&oobCode=abc&mode=signIn"); await page.waitForTimeout(900);
+    await page.goto(U + "/?home&for=signin&apiKey=k&oobCode=abc&mode=signIn"); await page.waitForTimeout(900);
     ok(await text(page, ".signin-panel h2") === "Which email is this link for?", "another phone asks for the email");
     ok(await page.locator(".si-finish").isDisabled(), "Sign in waits for an email");
     await page.locator(".si-email").fill("dajana@hotmail.com"); await page.locator(".si-finish").click(); await page.waitForTimeout(300);
