@@ -757,6 +757,13 @@
       "epic": "ops",
       "state": "next",
       "why": "Coach Milan 8 November 13:23: the next big topic. Cost basis in the doc Chef Mealan: running costs; its open questions: who pays, price, free part, cap, payment and VAT, what testers get at launch."
+    },
+    {
+      "id": "DT265",
+      "title": "A demo account a coach can open: a real week, a real client, before any pitch",
+      "epic": "coach",
+      "state": "next",
+      "why": "Coach Milan 8 November 15:12: yes, demo account. Today a prospect sees only the home page. Brainstormed with PR1; a board comes next."
     }
   ]
 }
