@@ -719,9 +719,44 @@
       "id": "DT260",
       "title": "How to: situations and their happy path; a task list for beta testers",
       "epic": "home",
-      "state": "progress",
-      "why": "Coach Milan 8 November 08:53: How to in the menu: situations and how the app solves them, the happy path in short steps, less 1:1 explaining, a task list for beta testers. 08:59: draw with your picks. Board 195 (09:10); 09:16: the Today card below the title and the goal; what one tester ticked. Go 09:22.",
+      "state": "done",
+      "why": "Coach Milan 8 November 08:53: How to in the menu: situations and how the app solves them, the happy path in short steps, less 1:1 explaining, a task list for beta testers. 08:59: draw with your picks. Board 195 (09:10); 09:16: the Today card below the title and the goal; what one tester ticked. Go 09:22. Built in 0.3.114: How to in the Menu with 8 situations, Try it, Tried it and Didn't work; the card on Today below the goal; How to: your testers under Clients; the privacy line.",
       "board": 195
+    },
+    {
+      "id": "DT261",
+      "title": "A monthly AI cap per member",
+      "epic": "trust",
+      "state": "later",
+      "why": "Coach Milan 8 November 12:57: he pays Gemini; today only the 120 calls an hour limit exists. Brainstorm the cap and what happens when it is reached."
+    },
+    {
+      "id": "DT262",
+      "title": "Calendar: ask Do you use Google Calendar?; a one-way meals feed for Apple and Outlook",
+      "epic": "home",
+      "state": "later",
+      "why": "Coach Milan 8 November 08:31: ask about Google when Calendar opens; Apple Calendar has no web access like Google, so a subscribed feed of meals only."
+    },
+    {
+      "id": "DT263",
+      "title": "The privacy page in Srpski and German",
+      "epic": "lang",
+      "state": "later",
+      "why": "0.3.113: the privacy page is English only; its new lines on email sign in and How to are English."
+    },
+    {
+      "id": "DT264",
+      "title": "How to for coaches",
+      "epic": "coach",
+      "state": "later",
+      "why": "Board 195, open for later: invite a client, see a client's week, answer a card."
+    },
+    {
+      "id": "PR1",
+      "title": "Pricing and the way to a profitable business",
+      "epic": "ops",
+      "state": "next",
+      "why": "Coach Milan 8 November 13:23: the next big topic. Cost basis in the doc Chef Mealan: running costs; its open questions: who pays, price, free part, cap, payment and VAT, what testers get at launch."
     }
   ]
 }
