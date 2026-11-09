@@ -3134,3 +3134,11 @@ section.sv-plate .sv-dishes > .pill.pill-small, section.sv-ate-card .sv-chips > 
 .sv-ate-dish > span { width: 72px; color: var(--muted); flex: none; } .sv-ate-dish > b { flex: 1; min-width: 0; } .sv-ate-dish > small { color: var(--muted); white-space: nowrap; }
 .sv-do { display: flex; gap: 8px; flex-wrap: wrap; } .sv-do > .pill { flex: 1 1 140px; min-width: 0; white-space: normal; } .sv-remove { color: var(--low-text); align-self: center; }
 .sv-eaten { color: var(--muted); font-weight: 700; } .sv-ate-title { color: var(--muted); } .sv-date { min-height: 44px; }
+/* DT268 step 2 (0.3.119): the numbers with their ranges; Share the numbers */
+.sv-table { border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--surface); padding: 2px 12px; }
+.sv-num { display: flex; align-items: baseline; gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--line); } .sv-num > span { width: 5.6em; flex: none; color: var(--muted); overflow-wrap: anywhere; } .sv-num > b { flex: 1; min-width: 0; white-space: nowrap; } .sv-num > small { color: var(--muted); white-space: nowrap; font-size: var(--fs-small); }
+.sv-table > .sv-num:last-of-type { border-bottom: 0; } .sv-range-note { display: block; padding: 8px 0; color: var(--muted); line-height: 1.45; border-top: 1px solid var(--line); }
+.sv-share { display: flex; flex-direction: column; gap: 10px; } .sv-share h3 { margin: 0; }
+.sv-picture { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r-control); display: block; background: var(--tint, #e7eefb); } .sv-drawing { display: flex; align-items: center; justify-content: center; color: var(--muted); }
+.sv-share-foot { text-align: center; } .sv-ate-range { color: var(--muted); margin-top: -4px; }
+section.sv-plate .button-row.sv-acts { flex-wrap: wrap; }

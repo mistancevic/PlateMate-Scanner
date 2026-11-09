@@ -24,20 +24,27 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
   try {
     // 1. Today: the card below the title and the goal
     await page.goto(U + "/today"); await page.waitForTimeout(1200);
-    ok(await page.locator(".howto-today").count() === 1, "a card on Today after a release with new ways");
+    // 0.3.119: New means added in the last 20 releases, so what is new depends on the version this runs at; the walkthrough
+    // works it out as the app does, and when nothing is new any more there is no card and How to opens from the Menu
+    const VER = require(path.join(ROOT, "package.json")).version, pv = (v) => { const m = /^0\.(\d+)\.(\d+)/.exec(v); return Number(m[1]) * 1000 + Number(m[2]); };
+    const NEW = [["handsFree", "Cook hands free", "0.3.110"], ["otherLang", "A recipe in another language", "0.3.99"]].filter((x) => pv(VER) - pv(x[2]) < 20);
+    const newN = (n) => (n ? ` · ${n} new` : "");
+    ok(await page.locator(".howto-today").count() === (NEW.length ? 1 : 0), NEW.length ? "a card on Today after a release with new ways" : "nothing new in the last 20 releases: no card on Today");
+    if (NEW.length) {
     const below = await page.evaluate(() => { const g = document.querySelector("section.plan").getBoundingClientRect(), c = document.querySelector(".howto-today").getBoundingClientRect(); return c.top >= g.bottom - 1; });
     ok(below, "the card sits below the goal");
-    ok(/^2 new ways to use Chef Mealan/.test(await text(".howto-today b")), "it names how many: " + await text(".howto-today b"));
-    ok(/Cook hands free\. A recipe in another language\./.test(await text(".howto-today p")), "and which: " + await text(".howto-today p"));
+    ok(new RegExp(`^${NEW.length} new way${NEW.length === 1 ? "" : "s"} to use Chef Mealan`).test(await text(".howto-today b")), "it names how many: " + await text(".howto-today b"));
+    ok((await text(".howto-today p")) === NEW.map((x) => x[1]).join(". ") + ".", "and which: " + await text(".howto-today p"));
     // 2. See how opens How to
     await page.locator(".ht-see").click(); await page.waitForTimeout(600);
+    } else { await page.locator("header .menu-button").click(); await page.waitForTimeout(500); await page.locator(".howto-row").click(); await page.waitForTimeout(500); }
     ok(await text(".menu-title") === "How to", "See how opens How to");
     ok(/Beta: 0 of 8 tried/.test(await text(".ht-beta")), "the beta count");
     ok(/Coach Milan sees what you tried/.test(await text(".ht-beta")), "it says Coach Milan sees what you tried");
     const groups = await page.locator(".ht-group .label").allInnerTexts();
     ok(groups.map((x) => x.toUpperCase()).join("|") === "EVERY DAY|RECIPES AND COOKING|YOUR WEEK", "three parts of the day: " + groups.join("|"));
     ok(await page.locator(".ht-sit").count() === 8, "eight situations");
-    ok(await page.locator(".ht-handsFree .ht-new").count() === 1 && await page.locator(".ht-eatNow .ht-new").count() === 0, "New on the new ones only");
+    ok(await page.locator(".ht-sit .ht-new").count() === NEW.length && (await Promise.all(NEW.map((x) => page.locator(`.ht-${x[0]} .ht-new`).count()))).every((n) => n === 1) && await page.locator(".ht-eatNow .ht-new").count() === 0, "New on the new ones only");
     // 3. one situation: steps, Tried it, Didn't work
     await page.locator(".ht-screenshot").click(); await page.waitForTimeout(400);
     ok(await text(".howto-one h3") === "A recipe from a screenshot", "the situation opens");
@@ -66,14 +73,14 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
     ok(/\/me\/calendar$/.test(page.url()), "Try it for A busy day opens Google Calendar: " + page.url());
     await page.goto(U + "/today"); await page.waitForTimeout(1000);
     await page.locator("header .menu-button").click(); await page.waitForTimeout(500);
-    ok(await page.locator(".menu-list .menu-row").nth(1).evaluate((x) => x.classList.contains("howto-row")) && /How to\s*1 of 8 tried · 2 new/.test(await text(".howto-row")), "the Menu's second row, under Me (0.3.116): " + await text(".howto-row"));
+    ok(await page.locator(".menu-list .menu-row").nth(1).evaluate((x) => x.classList.contains("howto-row")) && (await text(".howto-row")).replace(/\s+/g, "") === `How to 1 of 8 tried${newN(NEW.length)}`.replace(/\s+/g, ""), "the Menu's second row, under Me (0.3.116): " + await text(".howto-row"));
     await page.locator(".howto-row").click(); await page.waitForTimeout(400);
     await page.locator(".ht-eatNow").click(); await page.waitForTimeout(300);
     await page.locator(".ht-try").click(); await page.waitForTimeout(700);
     ok(/\/plate$/.test(page.url()) && await page.locator(".menu-title").count() === 0, "Try it for What should I eat now? opens the Plate: " + page.url());
     // 5. Not now: gone until the next release
     await page.goto(U + "/today"); await page.waitForTimeout(1000);
-    await page.locator(".ht-later").click(); await page.waitForTimeout(300);
+    if (NEW.length) { await page.locator(".ht-later").click(); await page.waitForTimeout(300); }
     ok(await page.locator(".howto-today").count() === 0, "Not now closes the card");
     await page.reload(); await page.waitForTimeout(1200);
     ok(await page.locator(".howto-today").count() === 0, "and it stays closed in this release");

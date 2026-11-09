@@ -21820,6 +21820,86 @@
     "served.chip": {
       "text": "Posluženo · {n}",
       "checked": true
+    },
+    "served.num.energy": {
+      "text": "Energija",
+      "checked": true
+    },
+    "served.num.protein": {
+      "text": "Proteini",
+      "checked": true
+    },
+    "served.num.fat": {
+      "text": "Masti",
+      "checked": true
+    },
+    "served.num.carbs": {
+      "text": "Ugljeni hidrati",
+      "checked": true
+    },
+    "served.num.pd": {
+      "text": "PD",
+      "checked": true
+    },
+    "served.aboutKcalV": {
+      "text": "oko {n} kcal",
+      "checked": true
+    },
+    "served.aboutG": {
+      "text": "oko {n} g",
+      "checked": true
+    },
+    "served.aboutV": {
+      "text": "oko {n}",
+      "checked": true
+    },
+    "served.toKcal": {
+      "text": "{low} do {high}",
+      "checked": true
+    },
+    "served.toG": {
+      "text": "{low} do {high} g",
+      "checked": true
+    },
+    "served.rangeNote": {
+      "text": "Procena sa rasponom. Masti može biti više nego što fotografija pokazuje, pa njihov raspon ide više naviše.",
+      "checked": true
+    },
+    "served.totalRange": {
+      "text": "{low} do {high} kcal",
+      "checked": true
+    },
+    "served.shareNumbers": {
+      "text": "Podeli brojeve",
+      "checked": true
+    },
+    "served.sendIt": {
+      "text": "Pošalji ›",
+      "checked": true
+    },
+    "served.shareFoot": {
+      "text": "Otvara deljenje na telefonu: Viber, WhatsApp, Poruke.",
+      "checked": true
+    },
+    "served.pictureLine": {
+      "text": "Posluženo · pročitano sa fotografije · {day}",
+      "checked": true
+    },
+    "served.pictureOf": {
+      "text": "Slika: {name}, sa brojevima",
+      "checked": true
+    },
+    "served.drawing": {
+      "text": "Crtam sliku…",
+      "checked": true
+    },
+    "served.savedToPhone": {
+      "text": "Sačuvano na telefonu.",
+      "checked": true
+    },
+    "served.back": {
+      "text": "‹ Nazad",
+      "checked": true
     }
   }
 }

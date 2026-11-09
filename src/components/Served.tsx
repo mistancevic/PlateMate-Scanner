@@ -1,4 +1,4 @@
-// DT268 step 1 (0.3.118, board Stories201; Coach Milan 9 November 21:46 to 23:21, Go): Served on the screens. The Plate's block
+// DT268 steps 1 and 2 (0.3.118 and 0.3.119, board Stories201; Coach Milan 9 November 21:46 to 23:44, Go): Served on the screens. The Plate's block
 // for an Exploring plate (kept, its name and dish filled by Chef Mealan, Scan another plate: mine or someone else's); in Recipes
 // the visits, each one card; a Served plate open; and I ate this, which asks the day and the meal out loud.
 import { useEffect, useState } from "react";
@@ -10,6 +10,8 @@ import { ymd } from "../plan";
 import { slotsOn, slotAt } from "../slots";
 import { lifestyleOf } from "../personal";
 import { PhotoPick } from "./PhotoPick";
+import { numbersOf, type Range } from "../servedNumbers";
+import { numbersPicture, sendPicture } from "../servedPicture";
 import type { AppApi } from "../screens/api";
 
 const k = (s: string) => s as WordKey;
@@ -26,11 +28,52 @@ function whenOf(p: AppApi, at: string): string {
   return sl ? w("served.dayMeal", { day, meal: mealName(sl.name, true) }) : day;
 }
 
+// ---- step 2: the numbers, each with its range; Share the numbers ----
+const num = (n: number) => n.toLocaleString(numLocale());
+const pdNum = (n: number) => n.toLocaleString(numLocale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+function NumbersTable({ items }: { items: Ingredient[] }) {
+  const n = numbersOf(items);
+  const row = (id: string, r: Range, about: string, range: string) => (
+    <div className="sv-num" key={id}><span>{w(k(`served.num.${id}`))}</span><b>{about}</b>{n.ranged && r.high > r.low && <small>{range}</small>}</div>
+  );
+  return (
+    <div className="sv-table" role="group" aria-label={w("served.rangeNote")}>
+      {row("energy", n.kcal, w("served.aboutKcalV", { n: num(n.kcal.mid) }), w("served.toKcal", { low: num(n.kcal.low), high: num(n.kcal.high) }))}
+      {row("protein", n.protein, w("served.aboutG", { n: n.protein.mid }), w("served.toG", { low: n.protein.low, high: n.protein.high }))}
+      {row("fat", n.fat, w("served.aboutG", { n: n.fat.mid }), w("served.toG", { low: n.fat.low, high: n.fat.high }))}
+      {row("carbs", n.carbs, w("served.aboutG", { n: n.carbs.mid }), w("served.toG", { low: n.carbs.low, high: n.carbs.high }))}
+      {row("pd", n.pd, w("served.aboutV", { n: pdNum(n.pd.mid) }), w("served.toKcal", { low: pdNum(n.pd.low), high: pdNum(n.pd.high) }))}
+      {n.ranged && <small className="sv-range-note">{w("served.rangeNote")}</small>}
+    </div>
+  );
+}
+// the picture that goes to the friend whose plate it is: drawn on the phone, sent through the phone's share sheet
+export function ServedShare({ p, s, back }: { p: AppApi; s: Pick<Served, "name" | "items" | "photo" | "at">; back: () => void }) {
+  const [url, setUrl] = useState<string | null>(null), [busy, setBusy] = useState(false);
+  useEffect(() => {
+    let on = true; const n = numsOf(s.items);
+    void numbersPicture(s.photo, { name: s.name, kcal: w("served.aboutKcalV", { n: num(n.kcal) }), protein: `${n.protein} g ${w("plan.protein")}`, pd: pdText(n.pd),
+      line: w("served.pictureLine", { day: dateText(new Date(s.at), { day: "numeric", month: "short" }) }), site: "chefmealan.com" }).then((u) => { if (on) setUrl(u); }).catch(() => { if (on) setUrl(""); });
+    window.scrollTo({ top: 0 });
+    return () => { on = false; };
+  }, [s.name, s.photo, s.at]);
+  const send = async () => { if (!url) return; setBusy(true); try { const how = await sendPicture(url, `${s.name.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "").toLowerCase() || "plate"}.jpg`, s.name); if (how === "saved") p.notify(w("served.savedToPhone")); } finally { setBusy(false); } };
+  return (
+    <section className="card sv-share" aria-label={w("served.shareNumbers")}>
+      <button type="button" className="link sv-back" onClick={back}>{w("served.back")}</button>
+      <h3>{w("served.shareNumbers")}</h3>
+      {url ? <img className="sv-picture" src={url} alt={w("served.pictureOf", { name: s.name })} /> : <div className="sv-picture sv-drawing"><small>{url === null ? w("served.drawing") : ""}</small></div>}
+      <button type="button" className="pill pill-primary pill-wide sv-send" disabled={!url || busy} onClick={() => void send()}>{w("served.sendIt")}</button>
+      <small className="sv-foot sv-share-foot">{w("served.shareFoot")}</small>
+    </section>
+  );
+}
+
 // ---- the Plate, after a photo read as Exploring ----
 export function ServedOnPlate({ p, items, title }: { p: AppApi; items: Ingredient[]; title: string }) {
   const photo = p.state.photo!, on = photo.served!;
   const [named, setNamed] = useState(false), [picked, setPicked] = useState(false);
-  const [ate, setAte] = useState(false);
+  const [ate, setAte] = useState(false), [share, setShare] = useState(false);
   const name = on.name ?? title;
   // the plate as it stands is the plate that is kept: every change of its foods, its name, its dish or its photos
   useEffect(() => {
@@ -42,6 +85,7 @@ export function ServedOnPlate({ p, items, title }: { p: AppApi; items: Ingredien
   if (photo.keep === false) return (
     <section className="card sv-plate sv-off"><small>{w("served.notKept")}</small></section>
   );
+  if (share) return <ServedShare p={p} s={{ name, items, photo: photo.image, at: photo.at }} back={() => setShare(false)} />;
   if (ate && me) { const v = visitsOf(list).find((x) => x.id === me.visit)!; return <ServedAte p={p} plates={me.mine && v.mine.length ? v.mine : [me]} title={v.note || whenOf(p, v.at)} close={() => setAte(false)} />; }
   return (
     <section className="card sv-plate" aria-label={w("served.keptHead")}>
@@ -59,6 +103,7 @@ export function ServedOnPlate({ p, items, title }: { p: AppApi; items: Ingredien
         <PhotoPick onFile={(f) => void next(false)(f)}>{({ toggle, open }) => <button type="button" className="pill pill-small sv-other" aria-expanded={open} onClick={toggle}>{w("served.someoneElses")}</button>}</PhotoPick>
       </div>
       <div className="button-row sv-acts">
+        <button type="button" className="pill pill-small sv-share-it" onClick={() => setShare(true)}>{w("served.shareNumbers")}</button>
         <button type="button" className="pill pill-small sv-ate" onClick={() => setAte(true)}>{w("served.iAteThis")}</button>
         <button type="button" className="link sv-drop" onClick={() => p.servedRemove(on.id)}>{w("served.dontKeep")}</button>
       </div>
@@ -118,13 +163,14 @@ export function ServedGroup({ p, open }: { p: AppApi; open: (id: string) => void
 // ---- a Served plate, open ----
 export function ServedOne({ p, id, back }: { p: AppApi; id: string; back: () => void }) {
   const list = p.state.served ?? [], s = list.find((x) => x.id === id);
-  const [at, setAt] = useState(0), [ate, setAte] = useState(false), [sure, setSure] = useState(false);
-  useEffect(() => { window.scrollTo({ top: 0 }); }, [id, ate]);
+  const [at, setAt] = useState(0), [ate, setAte] = useState(false), [sure, setSure] = useState(false), [share, setShare] = useState(false);
+  useEffect(() => { window.scrollTo({ top: 0 }); }, [id, ate, share]);
   if (!s) return null;
   const v = visitsOf(list).find((x) => x.id === s.visit)!;
   const title = v.note || whenOf(p, v.at);
   if (ate) return <ServedAte p={p} plates={s.mine && v.mine.length ? v.mine : [s]} title={title} close={() => setAte(false)} />;
-  const all = [s.photo, ...(s.more ?? [])], n = numsOf(s.items);
+  if (share) return <ServedShare p={p} s={s} back={() => setShare(false)} />;
+  const all = [s.photo, ...(s.more ?? [])];
   return (
     <section className="card sv-one">
       <button type="button" className="link sv-back" onClick={back}>{w("served.backToRecipes")}</button>
@@ -133,9 +179,10 @@ export function ServedOne({ p, id, back }: { p: AppApi; id: string; back: () => 
       <img className="sv-photo" src={all[at] ?? s.photo} alt={w("plan.photoOf", { title: s.name })} />
       {all.length > 1 && <div className="sv-more">{all.map((src, i) => <button type="button" key={i} className={`sv-thumb${i === at ? " on" : ""}`} aria-pressed={i === at} aria-label={w("plan.photoN", { n: i + 1 })} onClick={() => setAt(i)}><img src={src} alt="" /></button>)}</div>}
       <p className="sv-honest">{w("served.honest")}</p>
-      <div className="sv-nums"><span>{w("served.aboutKcal", { kcal: n.kcal.toLocaleString(numLocale()) })}</span><span><b>{n.protein} g</b> {w("plan.protein")}</span><span><b>{pdText(n.pd)}</b></span></div>
+      <NumbersTable items={s.items} />
       <div className="sv-foods">{s.items.map((it) => <div key={it.id} className="sv-food"><span>{it.food.name}</span><b>{Math.round(it.grams)} g</b></div>)}</div>
       {s.eatenAt && <small className="sv-eaten">{w("served.eatenOn", { day: dateText(new Date(s.eatenAt), { weekday: "long", day: "numeric", month: "long" }) })}</small>}
+      <button type="button" className="pill pill-primary pill-wide sv-share-it" onClick={() => setShare(true)}>{w("served.shareNumbers")}</button>
       <div className="sv-do">
         <button type="button" className="pill pill-small sv-ate" onClick={() => setAte(true)}>{w("served.iAteThis")}</button>
         <button type="button" className="pill pill-small sv-plate-it" onClick={() => p.servedToPlate(s.id)}>{w("served.onThePlate")}</button>
@@ -155,7 +202,7 @@ export function ServedAte({ p, plates, title, close }: { p: AppApi; plates: Serv
   const d0 = new Date(first.at), hm = `${String(d0.getHours()).padStart(2, "0")}:${String(d0.getMinutes()).padStart(2, "0")}`;
   const [slotId, setSlotId] = useState<string | null>(null);
   const sl = slots.find((s) => s.id === slotId) ?? slotAt(slots, hm) ?? slots[0];
-  const all = plates.flatMap((s) => s.items), n = numsOf(all);
+  const all = plates.flatMap((s) => s.items), n = numsOf(all), rng = numbersOf(all);
   const day = new Date(`${date}T12:00:00`);
   const put = () => {
     if (!sl) return;
@@ -172,6 +219,7 @@ export function ServedAte({ p, plates, title, close }: { p: AppApi; plates: Serv
         {plates.map((s) => <div key={s.id} className="sv-ate-dish"><span>{plates.length > 1 ? dishWord(s.dish) : ""}</span><b>{s.name}</b><small>{w("served.aboutN", { kcal: numsOf(s.items).kcal.toLocaleString(numLocale()) })}</small></div>)}
         {plates.length > 1 && <div className="sv-ate-total"><b>{w("served.oneMeal")}</b><b>{w("served.about", { kcal: n.kcal.toLocaleString(numLocale()), protein: n.protein })}</b></div>}
       </div>
+      {rng.ranged && <small className="sv-ate-range">{w("served.totalRange", { low: num(rng.kcal.low), high: num(rng.kcal.high) })}</small>}
       <small className="sv-label">{w("served.day")}</small>
       <div className="sv-chips" role="radiogroup" aria-label={w("served.day")}>
         <button type="button" role="radio" aria-checked={!other && date === photoDay} className={`pill pill-small${!other && date === photoDay ? " on" : ""}`} onClick={() => { setOther(false); setDate(photoDay); }}>{w("served.photoDay", { day: dateText(new Date(first.at), { weekday: "short", day: "numeric", month: "short" }) })}</button>

@@ -1,7 +1,7 @@
-// DT268 step 1 (0.3.118, board Stories201; Coach Milan 9 November 21:46 to 23:21, Go): Served. A plate read as Exploring is kept
+// DT268 steps 1 and 2 (0.3.118, 0.3.119, board Stories201; Coach Milan 9 November 21:46 to 23:44, Go): Served. A plate read as Exploring is kept
 // on its own: the name and the dish as Chef Mealan read them; Scan another plate, mine or someone else's, joins the visit;
 // nothing is logged. Recipes shows the visit as one card with its note; a Served plate opens with its photo, the honest line
-// and its foods; I ate this asks the day and the meal and puts your dishes in as one meal. The read is a stand-in (no AI here).
+// its numbers each with a range, and its foods; Share the numbers draws the picture and opens the share sheet; I ate this asks the day and the meal and puts your dishes in as one meal. The read is a stand-in (no AI here).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -34,6 +34,8 @@ const READS = [
       localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-20T16:00:00Z", consentBodyAt: "2026-10-20T16:00:00Z", declaredAt: "2026-10-20T16:00:00Z", aiConfirmedAt: "2026-10-20T16:00:00Z" }));
       localStorage.setItem("seeded", "1"); }, seed);
     await require("./adult.cjs")(page);
+    // the stand-in share sheet: what would be shared is kept
+    await page.addInitScript(() => { window.__shared = []; navigator.canShare = (d) => !!(d && d.files && d.files.length); navigator.share = async (d) => { window.__shared.push({ title: d.title, files: (d.files || []).map((f) => ({ name: f.name, type: f.type, size: f.size })) }); }; });
     let n = 0;
     await page.route("**/api/plate-photo", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(READS[Math.min(n++, READS.length - 1)]) }));
     await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "A classic.", around: "", better_as: "" }) }));
@@ -57,6 +59,7 @@ const READS = [
     ok(await sv.getByRole("radio", { name: "Main" }).getAttribute("aria-checked") === "true" && await sv.getByRole("radio").count() === 5, "five dishes, Main set by the read");
     ok(s.feedback.length === 0 && /Nothing is logged/.test(await text(".sv-foot")), "nothing is logged");
     ok(await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1, "the idea's buttons stay as they were");
+    ok(await sv.getByRole("button", { name: "Share the numbers" }).count() === 1, "the Plate's block has Share the numbers");
     // a tap corrects the dish; the name takes whose
     await sv.getByRole("radio", { name: "Dessert" }).click(); await page.waitForTimeout(300);
     ok((await st()).served[0].dish === "dessert" && await sv.locator(".sv-by").count() === 1, "a tap corrects the dish, and the dish no longer says filled by Chef Mealan");
@@ -104,7 +107,26 @@ const READS = [
     const one = page.locator(".sv-one");
     ok(await one.locator("h3").innerText() === "Marko's quesadilla" && await one.locator(".sv-mark").count() === 1 && /Café Jadran/.test(await text(".sv-tags")), "the plate opens: its name, the Served mark, the visit");
     ok(/Read from a photo, not weighed\. A kitchen you did not cook in often uses more oil and butter/.test(await text(".sv-honest")), "the honest line");
-    ok(await one.locator(".sv-food").count() === 2 && /about [\d,]+ kcal/.test(await text(".sv-nums")) && /^data:image/.test(await one.locator(".sv-photo").getAttribute("src")), "the photo, the numbers as about, the foods as read");
+    ok(await one.locator(".sv-food").count() === 2 && /^data:image/.test(await one.locator(".sv-photo").getAttribute("src")), "the photo and the foods as read");
+    // step 2: the numbers, each with its range
+    const nums = (await one.locator(".sv-num").allInnerTexts()).map((x) => x.replace(/\s+/g, " "));
+    ok(nums.length === 5 && /^Energy about [\d,]+ kcal [\d,]+ to [\d,]+$/.test(nums[0]) && /^Protein about \d+ g \d+ to \d+ g$/.test(nums[1]) && /^Fat about/.test(nums[2]) && /^Carbs about/.test(nums[3]) && /^PD about [\d.]+ [\d.]+ to [\d.]+$/.test(nums[4]), "energy, protein, fat, carbs and PD, each about a number with its range: " + nums.join(" | "));
+    const rg = (t) => { const m = t.replace(/,/g, "").match(/about ([\d.]+).*? ([\d.]+) to ([\d.]+)/); return m ? m.slice(1).map(Number) : [0, 0, 0]; };
+    const [fm, fl, fh] = rg(nums[2]), [km, kl, kh] = rg(nums[0]);
+    ok(kl < km && km < kh && fl <= fm && fm < fh && fh - fm > fm - fl, `the range holds the number; fat reaches further up than down (${fl}, ${fm}, ${fh})`);
+    ok(/A guess with its range\. Fat can be higher than a photo shows/.test(await text(".sv-range-note")), "the line under the table says it is a guess");
+    // Share the numbers: the picture, then the phone's share sheet
+    await one.locator(".sv-share-it").click(); await page.waitForTimeout(1200);
+    const sh = page.locator(".sv-share");
+    ok(await sh.locator("h3").innerText() === "Share the numbers" && /^data:image\/jpeg/.test((await sh.locator("img.sv-picture").getAttribute("src")) ?? ""), "Share the numbers draws the picture");
+    const dim = await sh.locator("img.sv-picture").evaluate((i) => new Promise((res) => { const j = new Image(); j.onload = () => res(j.naturalWidth + "x" + j.naturalHeight); j.src = i.src; }));
+    ok(dim === "1080x1350", "the picture is 1080 by 1350: " + dim);
+    await sh.getByRole("button", { name: "Send it ›" }).click(); await page.waitForTimeout(600);
+    const shared = await page.evaluate(() => window.__shared);
+    ok(shared.length === 1 && shared[0].files.length === 1 && shared[0].files[0].type === "image/jpeg" && /^marko-s-quesadilla\.jpg$/.test(shared[0].files[0].name) && shared[0].files[0].size > 20000, "Send it hands one picture to the share sheet: " + JSON.stringify(shared));
+    ok(await sh.locator("button").evaluateAll((xs) => xs.every((x) => x.getBoundingClientRect().height >= 44)), "its buttons are at least 44 px");
+    await sh.locator(".sv-back").click(); await page.waitForTimeout(300);
+    ok(await page.locator(".sv-one").count() === 1, "Back returns to the plate");
     ok(await one.getByRole("button", { name: /Start cooking|Cook again/ }).count() === 0 && await one.getByRole("button", { name: "I ate this" }).count() === 1 && await one.getByRole("button", { name: "Put it on the Plate" }).count() === 1, "no cooking; I ate this and Put it on the Plate");
     const low2 = await one.locator("button").evaluateAll((xs) => xs.filter((x) => x.getBoundingClientRect().height < 44).map((x) => x.className));
     ok(low2.length === 0, "every button at least 44 px: " + low2.join(", "));
@@ -118,6 +140,7 @@ const READS = [
     await page.locator(".sv-one .sv-ate").click(); await page.waitForTimeout(400);
     const ate = page.locator(".sv-ate-card");
     ok(/When did you eat it\?/.test(await text(".sv-ate-card h3")) && await ate.locator(".sv-ate-dish").count() === 2 && /One meal\s*about [\d,]+ kcal · \d+ g protein/.test(await text(".sv-ate-total")), "it asks when; your two dishes and the one meal's total, not Marko's");
+    ok(/^[\d,]+ to [\d,]+ kcal$/.test((await text(".sv-ate-range")).trim()), "the meal's range under the total: " + await text(".sv-ate-range"));
     ok(await ate.getByRole("radio", { name: /the day of the photo/ }).getAttribute("aria-checked") === "true" && await ate.getByRole("radio", { name: "Lunch" }).getAttribute("aria-checked") === "true", "the day of the photo and the meal by its time are set");
     ok(/Put it in Saturday's lunch, eaten/.test(await text(".sv-put")), "the button says where it goes: " + await text(".sv-put"));
     await ate.locator(".sv-put").click(); await page.waitForTimeout(600);
@@ -157,7 +180,7 @@ const READS = [
       ok(!/Served|Mine ·|Others at the table/.test(await text(".sv-group")), `${l}: the group in the language: ` + (await text(".sv-group .rc-group-title")));
       ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${l}: Recipes fits the width`);
       await page.locator(".sv-row").first().click(); await page.waitForTimeout(400);
-      ok(!/Read from a photo|I ate this|Put it on the Plate|Remove/.test(await text(".sv-one")) && await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${l}: the plate in the language, fits the width: ` + (await page.evaluate(() => document.documentElement.scrollWidth + "/" + window.innerWidth)) + " " + ((await text(".sv-one")).match(/Read from a photo|I ate this|Put it on the Plate|Remove/) || [""])[0]); if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT + `/sv-${l}.png`, fullPage: true });
+      ok(!/Read from a photo|I ate this|Put it on the Plate|Remove|Energy|about|Share the numbers/.test(await text(".sv-one")) && await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${l}: the plate in the language, fits the width: ` + (await page.evaluate(() => document.documentElement.scrollWidth + "/" + window.innerWidth)) + " " + ((await text(".sv-one")).match(/Read from a photo|I ate this|Put it on the Plate|Remove/) || [""])[0]); if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT + `/sv-${l}.png`, fullPage: true });
       await page.locator(".sv-one .sv-ate").click(); await page.waitForTimeout(400);
       ok(!/When did you eat|Put it in|Another day/.test(await text(".sv-ate-card")) && await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${l}: I ate this in the language, fits the width: ` + await text(".sv-put"));
     }
