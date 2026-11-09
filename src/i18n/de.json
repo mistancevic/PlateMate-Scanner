@@ -21820,6 +21820,86 @@
     "served.chip": {
       "text": "Serviert · {n}",
       "checked": true
+    },
+    "served.num.energy": {
+      "text": "Energie",
+      "checked": true
+    },
+    "served.num.protein": {
+      "text": "Protein",
+      "checked": true
+    },
+    "served.num.fat": {
+      "text": "Fett",
+      "checked": true
+    },
+    "served.num.carbs": {
+      "text": "Kohlen­hydrate",
+      "checked": true
+    },
+    "served.num.pd": {
+      "text": "PD",
+      "checked": true
+    },
+    "served.aboutKcalV": {
+      "text": "etwa {n} kcal",
+      "checked": true
+    },
+    "served.aboutG": {
+      "text": "etwa {n} g",
+      "checked": true
+    },
+    "served.aboutV": {
+      "text": "etwa {n}",
+      "checked": true
+    },
+    "served.toKcal": {
+      "text": "{low} bis {high}",
+      "checked": true
+    },
+    "served.toG": {
+      "text": "{low} bis {high} g",
+      "checked": true
+    },
+    "served.rangeNote": {
+      "text": "Eine Schätzung mit ihrer Spanne. Fett kann mehr sein, als ein Foto zeigt, deshalb reicht seine Spanne weiter nach oben.",
+      "checked": true
+    },
+    "served.totalRange": {
+      "text": "{low} bis {high} kcal",
+      "checked": true
+    },
+    "served.shareNumbers": {
+      "text": "Die Zahlen teilen",
+      "checked": true
+    },
+    "served.sendIt": {
+      "text": "Senden ›",
+      "checked": true
+    },
+    "served.shareFoot": {
+      "text": "Öffnet das Teilen des Telefons: Viber, WhatsApp, Nachrichten.",
+      "checked": true
+    },
+    "served.pictureLine": {
+      "text": "Serviert · vom Foto gelesen · {day}",
+      "checked": true
+    },
+    "served.pictureOf": {
+      "text": "Das Bild von {name} mit den Zahlen",
+      "checked": true
+    },
+    "served.drawing": {
+      "text": "Das Bild wird gezeichnet…",
+      "checked": true
+    },
+    "served.savedToPhone": {
+      "text": "Auf dem Telefon gespeichert.",
+      "checked": true
+    },
+    "served.back": {
+      "text": "‹ Zurück",
+      "checked": true
     }
   }
 }

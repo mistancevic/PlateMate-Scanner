@@ -5454,6 +5454,26 @@
     "screen.served.putIn": {"en":"Put it in {day}'s {meal}, eaten","area":"Words used across the app","where":"Across the app","release":"0.3.118"},
     "screen.served.ateFoot": {"en":"It counts on that day with its photo. The plate stays in Served.","area":"Words used across the app","where":"Across the app","release":"0.3.118"},
     "screen.served.ateFootMany": {"en":"Your dishes go in as one meal, with their photos. The plates of the others are not counted. Everything stays in Served.","area":"Words used across the app","where":"Across the app","release":"0.3.118"},
-    "screen.served.chip": {"en":"Served · {n}","area":"Words used across the app","where":"Across the app","release":"0.3.118"}
+    "screen.served.chip": {"en":"Served · {n}","area":"Words used across the app","where":"Across the app","release":"0.3.118"},
+    "screen.served.num.energy": {"en":"Energy","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.num.protein": {"en":"Protein","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.num.fat": {"en":"Fat","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.num.carbs": {"en":"Carbs","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.num.pd": {"en":"PD","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.aboutKcalV": {"en":"about {n} kcal","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.aboutG": {"en":"about {n} g","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.aboutV": {"en":"about {n}","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.toKcal": {"en":"{low} to {high}","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.toG": {"en":"{low} to {high} g","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.rangeNote": {"en":"A guess with its range. Fat can be higher than a photo shows, so its range reaches further up.","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.totalRange": {"en":"{low} to {high} kcal","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.shareNumbers": {"en":"Share the numbers","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.sendIt": {"en":"Send it ›","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.shareFoot": {"en":"Opens the phone's share sheet: Viber, WhatsApp, Messages.","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.pictureLine": {"en":"Served · read from a photo · {day}","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.pictureOf": {"en":"The picture of {name} with its numbers","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.drawing": {"en":"Drawing the picture…","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.savedToPhone": {"en":"Saved to the phone.","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.back": {"en":"‹ Back","area":"Words used across the app","where":"Across the app","release":"0.3.119"}
   }
 }
