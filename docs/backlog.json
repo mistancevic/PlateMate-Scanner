@@ -792,6 +792,29 @@
       "epic": "recipes",
       "state": "later",
       "why": "Coach Milan 8 November 18:53 to 18:56: recipe and meal creators and influencers are a separate niche with separate pricing, a monthly fee plus credits. Outputs: recipe, photos, video, post, a published recipe book with its own design. In the pricing paper under Creator. Brainstorm, then a board, after the gate opens."
+    },
+    {
+      "id": "DT267",
+      "title": "Plan, a past day: the eaten meal's picture, and the meal opens",
+      "epic": "plate",
+      "state": "done",
+      "version": "0.3.117",
+      "board": "Stories200",
+      "why": "Tester 2, 9 November: she scanned a breakfast out on Saturday and two days later could not find the picture; the values stayed. The photo was saved with the meal but shown only on Today, on the day. Now the row on Plan shows it and opens the meal: photo large, its other photos, numbers, foods with grams; Cook again only for a meal from a recipe."
+    },
+    {
+      "id": "DT268",
+      "title": "A place for plates scanned to explore: friends' meals at a restaurant, measured for them and kept for the next time",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 9 November 21:46 to 21:56: Today's plan is not the place for a photo taken to explore. He expects a space to draft or save meals scanned just for exploration: at a restaurant, a photo of each friend's meal, to measure it for them and to keep it for himself for the next time. Now Exploring logs nothing and the read is gone when the Plate is cleared, unless Save as an idea puts it in Recipes. More important than saving photos to the gallery. To ask Tester 2: what she expected from the other plates she scanned."
+    },
+    {
+      "id": "DT269",
+      "title": "Save a meal's photo to the phone",
+      "epic": "plate",
+      "state": "parked",
+      "why": "Coach Milan 9 November 21:52 to 21:56: photos taken in the app do not land in the phone's gallery (the browser decides, not the app). A Save to the phone button on the opened meal would do it. Parked; DT268 is more important."
     }
   ]
 }

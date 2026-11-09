@@ -19,7 +19,8 @@ import { countOf, countLabel } from "../counted";
 import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, proteinOff, bandOf, fitPortions, usualPortions, amountText, isBatch, isFitted, piecesFor, withPieces, oneWord, type PlannedMeal } from "../planned";
 import { PlanRow } from "../components/PlanRow";
 import { ShortHelp } from "../components/ShortHelp";
-import { pictureOfRecipe } from "../components/MealPicture";
+import { Picture, pictureOfRecipe } from "../components/MealPicture";
+import { PastMeal, recipeOfEaten } from "../components/PastMeal";
 import { DayEditor } from "../components/DayEditor";
 import { dayLog } from "../today";
 import { dayRecord } from "../record";
@@ -262,6 +263,10 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
   const lived = livedByPlan({ planned: rec.planned, open: rec.open.length, kcal: rec.kcal, protein: rec.protein }, numbers).lived;
   const slotName = (id?: string) => slots.find((s) => s.id === id)?.name;
   const toAdd = slots.filter((sl) => rec.open.includes(sl) || rec.empty.includes(sl) || rec.skipped.includes(sl));
+  const [openId, setOpenId] = useState<string | null>(null);
+  const opened = openId ? log.logged.find((f) => f.id === openId) ?? null : null;
+  useEffect(() => { setOpenId(null); }, [dayKey]);
+  if (opened) return <PastMeal p={p} f={opened} day={w("plan.date", { date: (l) => (l === "en" ? `${WEEKDAY_OF(date)}, ${date.getDate()} ${MONTH(date)}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })} slot={slotName(opened.slot?.slotId)} back={() => setOpenId(null)} />;
   return (
     <section className="card plan-day plan-past">
       <div className="plan-day-head">
@@ -279,10 +284,17 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
           {log.logged.map((f) => {
             const a = aggregate(f.meal.items);
             const name = slotName(f.slot?.slotId);
+            // DT267 (0.3.117, board Stories200): the meal's picture as on Today; the whole row opens the meal; Cook again
+            // only for a meal that came from a recipe
+            const r = recipeOfEaten(f, p.state.meals);
+            const again = () => { p.setState((s) => ({ ...s, items: f.meal.items.map((it) => ({ ...it, id: uid() })) })); p.setTab("journey"); };
             return (
-              <div className="past-plate" key={f.id}>
+              <div className="past-plate past-eaten" key={f.id} role="button" tabIndex={0} aria-label={w("plan.openMeal", { title: f.meal.title })}
+                onClick={(e) => { if ((e.target as HTMLElement).closest("button")) return; setOpenId(f.id); }} onKeyDown={(e) => { if (e.key === "Enter" && e.target === e.currentTarget) setOpenId(f.id); }}>
+                <Picture src={f.photo ?? pictureOfRecipe(r)} />
                 <span><b>{f.meal.title}</b><small>{name ? `${mealName(name)}, ` : ""}{new Date(f.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · {w("plan.kcalProteinG", { kcal: Math.round(a.calories ?? 0), protein: Math.round(a.protein ?? 0) })}</small></span>
-                <button type="button" className="pill pill-small" onClick={() => { p.setState((s) => ({ ...s, items: f.meal.items.map((it) => ({ ...it, id: uid() })) })); p.setTab("journey"); }}>{w("plan.cookAgain")}</button>
+                {r ? <button type="button" className="pill pill-small" onClick={again}>{w("plan.cookAgain")}</button>
+                  : <button type="button" className="pill pill-small past-open" onClick={() => setOpenId(f.id)}>{w("plan.openIt")}</button>}
               </div>
             );
           })}

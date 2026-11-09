@@ -1,6 +1,6 @@
 {
-  "release": "0.3.116",
-  "at": "2026-11-08T16:13:13.529Z",
+  "release": "0.3.117",
+  "at": "2026-11-09T20:55:24.405Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -43522,6 +43522,131 @@
       "release": "0.3.116",
       "order": 900018,
       "at": "2026-11-08T16:13:13.529Z"
+    },
+    {
+      "id": "screen.plan.openIt",
+      "kind": "screen",
+      "key": "plan.openIt",
+      "en": "Open ›",
+      "forms": "plain",
+      "slots": [],
+      "area": "Plan",
+      "where": "Plan",
+      "sr": "Otvori ›",
+      "de": "Öffnen ›",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.117",
+      "order": 900000,
+      "at": "2026-11-09T20:55:24.405Z"
+    },
+    {
+      "id": "screen.plan.openMeal",
+      "kind": "screen",
+      "key": "plan.openMeal",
+      "en": "Open {title}",
+      "forms": "plain",
+      "slots": [
+        "title"
+      ],
+      "area": "Plan",
+      "where": "Plan",
+      "sr": "Otvori {title}",
+      "de": "{title} öffnen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.117",
+      "order": 900001,
+      "at": "2026-11-09T20:55:24.405Z"
+    },
+    {
+      "id": "screen.plan.onThePlateAgain",
+      "kind": "screen",
+      "key": "plan.onThePlateAgain",
+      "en": "Put it on the Plate again",
+      "forms": "plain",
+      "slots": [],
+      "area": "Plan",
+      "where": "Plan",
+      "sr": "Stavi ponovo na Tanjir",
+      "de": "Wieder auf den Teller legen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.117",
+      "order": 900002,
+      "at": "2026-11-09T20:55:24.405Z"
+    },
+    {
+      "id": "screen.plan.photoOf",
+      "kind": "screen",
+      "key": "plan.photoOf",
+      "en": "Photo of {title}",
+      "forms": "plain",
+      "slots": [
+        "title"
+      ],
+      "area": "Plan",
+      "where": "Plan",
+      "sr": "Fotografija: {title}",
+      "de": "Foto: {title}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.117",
+      "order": 900003,
+      "at": "2026-11-09T20:55:24.405Z"
+    },
+    {
+      "id": "screen.plan.photoN",
+      "kind": "screen",
+      "key": "plan.photoN",
+      "en": "Photo {n}",
+      "forms": "plain",
+      "slots": [
+        "n"
+      ],
+      "area": "Plan",
+      "where": "Plan",
+      "sr": "Fotografija {n}",
+      "de": "Foto {n}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.117",
+      "order": 900004,
+      "at": "2026-11-09T20:55:24.405Z"
+    },
+    {
+      "id": "screen.plan.noPhoto",
+      "kind": "screen",
+      "key": "plan.noPhoto",
+      "en": "No photo with this meal.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Plan",
+      "where": "Plan",
+      "sr": "Uz ovaj obrok nema fotografije.",
+      "de": "Zu dieser Mahlzeit gibt es kein Foto.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.117",
+      "order": 900005,
+      "at": "2026-11-09T20:55:24.405Z"
+    },
+    {
+      "id": "screen.plan.protein",
+      "kind": "screen",
+      "key": "plan.protein",
+      "en": "protein",
+      "forms": "plain",
+      "slots": [],
+      "area": "Plan",
+      "where": "Plan",
+      "sr": "proteina",
+      "de": "Protein",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.117",
+      "order": 900006,
+      "at": "2026-11-09T20:55:24.405Z"
     }
   ]
 }

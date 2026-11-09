@@ -1470,6 +1470,20 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .date-sheet-actions { margin-top: 12px; }
 .plan-past .past-label { display: block; margin-top: 10px; }
 .plan-past .past-plate { margin-top: 6px; }
+/* DT267 (0.3.117): an eaten meal on a past day: its picture, the row opens it; and the meal open */
+.past-plate.past-eaten { cursor: pointer; justify-content: flex-start; } .past-plate.past-eaten > span { flex: 1; min-width: 0; }
+.past-plate.past-eaten .log-photo { width: 56px; height: 56px; flex: none; border-radius: var(--r-control); object-fit: cover; }
+.past-plate.past-eaten > .pill { flex: none; min-height: 44px; }
+.card.plan-day.past-meal { display: flex; flex-direction: column; gap: 8px; padding: 8px 16px 16px; } .past-meal h3 { margin: 0; } .past-meal .pm-back { align-self: flex-start; min-height: 44px; }
+.past-meal .pm-when { color: var(--muted); font-weight: 600; }
+.past-meal .pm-photo { width: 100%; max-height: 70vh; object-fit: contain; border-radius: var(--r-control); background: var(--surface); display: block; }
+.past-meal .pm-nophoto { display: flex; align-items: center; gap: 10px; color: var(--muted); }
+.past-meal .pm-more { display: flex; gap: 8px; overflow-x: auto; } .past-meal .pm-thumb { padding: 0; border: 2px solid transparent; border-radius: var(--r-control); background: none; flex: none; min-width: 64px; min-height: 64px; }
+.past-meal .pm-thumb.on { border-color: var(--brand); } .past-meal .pm-thumb img { width: 64px; height: 64px; object-fit: cover; border-radius: calc(var(--r-control) - 2px); display: block; }
+.past-meal .pm-nums { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; } .past-meal .pm-nums b { font-size: 1.25rem; }
+.past-meal .pm-foods { border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--surface); padding: 2px 12px; }
+.past-meal .pm-food { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); } .past-meal .pm-food:last-child { border-bottom: 0; }
+section.past-meal .button-row.pm-actions > .pill.pill-small { min-height: 44px; }
 .plan-past .past-lived { display: block; margin-top: 8px; color: var(--good-text); font-weight: 900; }
 .plan-past .past-none { padding: 4px 16px 14px; }
 
