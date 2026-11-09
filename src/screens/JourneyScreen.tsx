@@ -1,4 +1,5 @@
 import { w, wn, wIn, dec, mealV, mealName, wordV, dateV, dateText, type Val, type WordKey } from "../words";
+import { ServedOnPlate } from "../components/Served";
 import { locOf, getLang, speechLang, useLang } from "../lang";
 import { shownMeal } from "../recipeLang";
 import type { PlateIn } from "../chefScript";
@@ -1933,6 +1934,8 @@ export function JourneyScreen(p: AppApi) {
           </section>
         )}
         {/* DT127: under the gates, one line what to do with the plate in front of you, by code, and the buttons, the advice first */}
+        {/* DT268 (0.3.118, board Stories201): an Exploring plate is kept as Served; its name, its dish, the next plate */}
+        {state.photo && state.photo.who === "idea" && state.photo.served && items.length > 0 && <ServedOnPlate p={p} items={items} title={state.title && state.title !== "DaaM" ? state.title : autoTitle(items)} />}
         {state.photo && state.photo.who === "idea" && items.length > 0 && (() => {
           // DT130 (0.2.110, board Stories78, DT130d): an idea: the same read and gates; the buttons are for cooking it, not logging it
           const line = ideaAdvice({ items, protein: t.protein ?? 0, mealWord, big: bigN, nutrition: nutri });

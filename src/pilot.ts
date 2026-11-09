@@ -296,7 +296,9 @@ export type PilotState = {
     // DT130 (0.2.110): a photo from Your photos says whose plate and when: ate (logged at the photo's time), idea (nothing logged)
     who?: "ate" | "now" | "idea";
     // DT228 v2 (0.3.63): the other photos of the meal (thumbnails, at most 3), the person's words, and the kind the read could not tell
-    more?: string[]; note?: string; which?: import("./mealPhoto").Which | null };
+    more?: string[]; note?: string; which?: import("./mealPhoto").Which | null;
+    // DT268 (0.3.118): an Exploring plate is kept as Served: its id there, whose it is, its visit, which dish; keep false: Don't keep it
+    served?: import("./served").OnPlate; keep?: false };
   // DT212 (0.3.53): a plate from an earlier meal you chose to keep working on is not asked about again (its plateAt)
   plateAsked?: string;
   // DT246 (0.3.96): the meal this plate is recorded in; while it is the same plate, its changes go there too
@@ -306,6 +308,8 @@ export type PilotState = {
   // DT214 (0.3.53, board Stories162): the cook that runs, and the plates and cooks saved for later (see cooking.ts)
   cook?: import("./cooking").Cook;
   later?: import("./cooking").Later[];
+  // DT268 (0.3.118, board Stories201): plates scanned to explore, kept: cooked in another kitchen, read from a photo (served.ts)
+  served?: import("./served").Served[];
 };
 export const EMPTY: Nutrition = {
   calories: null,

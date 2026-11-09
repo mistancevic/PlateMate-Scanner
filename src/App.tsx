@@ -120,6 +120,7 @@ import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip }
 import { ratesOf } from "./letters";
 import { asMine, travels, toShare } from "./memberFoods";
 import { cleanRead, itemsOfRead } from "./mealPhoto";
+import { dishOf, visitFor, upsertServed, withNote, mealItems, mealTitle, type Served, type OnPlate } from "./served";
 import { identityTwins } from "./foodId";
 import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
@@ -2463,7 +2464,7 @@ export default function App() {
     addFromDatabase: (code: string) => { setEditTitle(w("app.addToMyFoods")); lookup(code); },
     searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (shopRegion ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
     // DT127 (0.2.108, board Stories75): a photo of the meal in front of you, read onto the Plate as estimates
-    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string }) => {
+    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string } }) => {
       const more0 = (x?.more ?? []).slice(0, 3), note = (x?.note ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
       setBusy(more0.length ? w("app.readingPhotos", { n: more0.length + 1 }) : w("app.readingYourPlate"));
       try {
@@ -2498,7 +2499,12 @@ export default function App() {
         const at = (x?.who === "ate" || x?.replace) && x.at ? x.at : new Date().toISOString();
         // 0.3.62 (Coach Milan 20:21 to 20:55): Exploring in the pencil block makes a camera photo Exploring too
         const who = x?.who ?? (pick === "exploring" ? "idea" : undefined);
-        const photo = { image: thumb, at, unsure: read.unsure, ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null };
+        // DT268 (0.3.118, board Stories201): an Exploring plate is kept as Served. Read again keeps its place there; another
+        // plate (x.served) or a first one gets a new one: whose it is, its visit (the sitting it was scanned at), the dish as read
+        const kept = x?.replace && !x?.served ? state.photo?.served : undefined;
+        const served: OnPlate | undefined = who !== "idea" ? undefined : kept ? { ...kept, dish: kept.dish ?? dishOf(read.course) }
+          : { id: uid(), mine: x?.served?.mine ?? true, visit: x?.served?.visit ?? visitFor(state.served ?? [], at) ?? uid(), dish: dishOf(read.course) };
+        const photo = { image: thumb, at, unsure: read.unsure, ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}) };
         const land = (how: "add" | "new") => {
           // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
           // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
@@ -2594,6 +2600,25 @@ export default function App() {
       setStep("in");
       setLanding({ id: m.id, line: slot ? w("app.anIdeaFromAPhoto") : w("app.anIdeaFromAPhoto2"), quiet: false }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes");
     },
+    // DT268 (0.3.118, board Stories201): Served plates. The Plate keeps the one it is exploring in step (keepServed); the rest
+    // is what Recipes does with them
+    keepServed: (next: Served) => setState((s) => { const list = upsertServed(s.served ?? [], next); return list === (s.served ?? []) && s.served ? s : { ...s, served: list }; }),
+    servedPatch: (id: string, patch: Partial<Pick<Served, "name" | "dish" | "mine">>) => setState((s) => ({ ...s, served: (s.served ?? []).map((x) => (x.id === id ? { ...x, ...patch } : x)),
+      ...(s.photo?.served?.id === id ? { photo: { ...s.photo, served: { ...s.photo.served, ...patch } } } : {}) })),
+    servedRemove: (id: string) => setState((s) => ({ ...s, served: (s.served ?? []).filter((x) => x.id !== id), ...(s.photo?.served?.id === id ? { photo: { ...s.photo, keep: false as const } } : {}) })),
+    servedNote: (visit: string, note: string) => setState((s) => ({ ...s, served: withNote(s.served ?? [], visit, note) })),
+    // I ate this: your dishes of the visit go to the day as one meal, with their photos; the plates stay in Served
+    servedAte: (ids: string[], slot: NonNullable<Feedback["slot"]>, at: string) => {
+      const plates = (state.served ?? []).filter((x) => ids.includes(x.id));
+      if (!plates.length) return;
+      const items = mealItems(plates), photos = plates.flatMap((x) => [x.photo, ...(x.more ?? [])]).filter(Boolean);
+      const main = plates.find((x) => x.dish === "main") ?? plates[0];
+      const meal: Meal = { id: uid(), title: mealTitle(plates) || "Meal", items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: at };
+      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten", slot, taste: "", notes: "", createdAt: at, photo: main.photo, photos } as Feedback, ...s.feedback],
+        served: (s.served ?? []).map((x) => (ids.includes(x.id) ? { ...x, eatenAt: at } : x)) }));
+      notify(w("app.loggedAt", { time: new Date(at).toTimeString().slice(0, 5) }));
+    },
+    servedToPlate: (id: string) => { const x = (state.served ?? []).find((y) => y.id === id); if (!x) return; setState((s) => ({ ...s, items: x.items.map((i) => ({ ...i, id: uid(), est: undefined })), portion: null, title: x.name, photo: undefined })); setKind("meal"); setStep("in"); setMenuSection(null); setTab("journey"); },
     // DT115 (0.2.97): the members' catalogue, searched by words; a member's food becomes a copy in your library
     memberFoods: async (q: string) => { try { const d = await api(`/api/members/foods?q=${encodeURIComponent(q)}&region=${encodeURIComponent(shopRegion ?? "")}`); return Array.isArray(d?.foods) ? d.foods : []; } catch { return []; } },
     addMemberFood: (m, to = "foods") => {

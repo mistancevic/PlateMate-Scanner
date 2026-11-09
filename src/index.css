@@ -3101,3 +3101,36 @@ section.howto-one .button-row > .pill.pill-small, section.howto-today .button-ro
 .cert-item b { font-size: 16px; }
 .cert-item p { margin: 0; font-size: 15px; line-height: 1.45; }
 .l-behind .l-split > div { min-width: 0; }
+
+/* DT268 step 1 (0.3.118, board Stories201): Served. The mark, the Plate's block, a visit in Recipes, a plate open, I ate this */
+.sv-mark { background: #fde9c8; color: #7a4b00; border-radius: 999px; padding: 2px 9px; font-size: var(--fs-small); font-weight: 800; white-space: nowrap; flex: none; }
+.sv-dish-tag { background: var(--tint, #e7eefb); color: var(--brand-text, #1f5fc7); border-radius: 999px; padding: 2px 9px; font-size: var(--fs-small); font-weight: 800; white-space: nowrap; flex: none; }
+.sv-by { background: #e7eefb; color: #1f5fc7; border-radius: 999px; padding: 1px 8px; font-size: 0.72rem; font-weight: 800; margin-left: 6px; text-transform: none; letter-spacing: 0; }
+.sv-plate, .sv-ate-card, .sv-one { display: flex; flex-direction: column; gap: 10px; }
+.sv-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.sv-label { font-size: var(--fs-small); font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; display: block; }
+.sv-label .sv-name { display: block; width: 100%; margin-top: 6px; min-height: 44px; text-transform: none; letter-spacing: 0; }
+.sv-dishes, .sv-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+section.sv-plate .sv-dishes > .pill.pill-small, section.sv-ate-card .sv-chips > .pill.pill-small, section.sv-plate .sv-next .pill.pill-small, section.sv-plate .button-row.sv-acts > .pill.pill-small, section.sv-one .sv-do > .pill.pill-small, section.sv-one .button-row.sv-sure > .pill.pill-small, .sv-note-form .pill.pill-small { min-height: 44px; }
+.sv-dishes .pill.on, .sv-chips .pill.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.sv-next { display: flex; gap: 8px; flex-wrap: wrap; } .sv-next > .pill { flex: 1; white-space: normal; } .sv-next .pp-row { flex-basis: 100%; }
+.sv-acts { align-items: center; } .sv-drop, .sv-remove, .sv-cancel, .sv-back, .sv-note-edit { min-height: 44px; }
+.sv-foot { color: var(--muted); }
+.sv-group { display: flex; flex-direction: column; gap: 8px; } .sv-lead { display: block; }
+.sv-visit { border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--surface); padding: 10px 12px; display: flex; flex-direction: column; }
+.sv-visit-top { display: flex; gap: 8px; align-items: flex-start; } .sv-visit-title { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; } .sv-visit-title small { color: var(--muted); font-weight: 600; }
+.sv-note-form { flex: 1; display: flex; gap: 8px; min-width: 0; } .sv-note-form .sv-note { flex: 1; min-width: 0; min-height: 44px; }
+.sv-part { margin-top: 8px; font-size: var(--fs-small); font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.sv-row { display: flex; gap: 10px; align-items: center; width: 100%; padding: 8px 0; border: 0; border-top: 1px solid var(--line); background: none; text-align: left; color: inherit; font: inherit; min-height: 56px; cursor: pointer; }
+.sv-row img { width: 52px; height: 52px; object-fit: cover; border-radius: var(--r-control); flex: none; } .sv-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; } .sv-row-text small { color: var(--muted); font-weight: 600; }
+.sv-one h3, .sv-ate-card h3 { margin: 0; } .sv-back { align-self: flex-start; }
+.sv-tags { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; } .sv-tags small { color: var(--muted); font-weight: 600; }
+.sv-photo { width: 100%; max-height: 70vh; object-fit: contain; border-radius: var(--r-control); background: var(--surface); display: block; }
+.sv-more { display: flex; gap: 8px; overflow-x: auto; } .sv-thumb { padding: 0; border: 2px solid transparent; border-radius: var(--r-control); background: none; flex: none; min-width: 64px; min-height: 64px; } .sv-thumb.on { border-color: var(--brand); } .sv-thumb img { width: 64px; height: 64px; object-fit: cover; border-radius: calc(var(--r-control) - 2px); display: block; }
+.sv-honest { margin: 0; background: #fff8ec; border-radius: var(--r-control); padding: 10px 12px; font-size: var(--fs-small); line-height: 1.45; }
+.sv-nums { display: flex; gap: 16px; flex-wrap: wrap; } .sv-nums b { font-size: 1.15rem; }
+.sv-foods, .sv-ate-dishes { border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--surface); padding: 2px 12px; }
+.sv-food, .sv-ate-dish, .sv-ate-total { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); } .sv-food:last-child, .sv-ate-dishes > :last-child { border-bottom: 0; }
+.sv-ate-dish > span { width: 72px; color: var(--muted); flex: none; } .sv-ate-dish > b { flex: 1; min-width: 0; } .sv-ate-dish > small { color: var(--muted); white-space: nowrap; }
+.sv-do { display: flex; gap: 8px; flex-wrap: wrap; } .sv-do > .pill { flex: 1 1 140px; min-width: 0; white-space: normal; } .sv-remove { color: var(--low-text); align-self: center; }
+.sv-eaten { color: var(--muted); font-weight: 700; } .sv-ate-title { color: var(--muted); } .sv-date { min-height: 44px; }

@@ -1,4 +1,5 @@
 import { plateWhenOf, atMeal } from "../plateMode";
+import { ServedGroup, ServedOne } from "../components/Served";
 import { w, wn, mealV, dateV, type Val } from "../words";
 import type { Lang } from "../lang";
 import { kitchenMark, markWord } from "../recipeMark";
@@ -96,6 +97,9 @@ export function RecipesScreen(p: AppApi) {
   const [publishing, setPublishing] = useState<string | null>(null);
   // the recipe's own page (0.2.5+r11, board S3, R8 to R11): which recipe is open
   const [openId, setOpenId] = useState<string | null>(null);
+  // DT268 (0.3.118, board Stories201): Served plates: the chip shows them alone; one of them open
+  const [servedOn, setServedOn] = useState(false), [servedOpen, setServedOpen] = useState<string | null>(null);
+  const servedN = (p.state.served ?? []).length;
   const patchMeal = (id: string, patch: Partial<Meal>) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === id ? { ...x, ...patch } : x)) }));
   // R4: a live recipe whose page has a photo and the app has none takes the page's photo once, as its cover
   useEffect(() => {
@@ -303,6 +307,7 @@ export function RecipesScreen(p: AppApi) {
       let done = false; const put = () => { if (done) return; done = true; window.removeEventListener("popstate", put); toUrl(n); };
       window.addEventListener("popstate", put); window.setTimeout(put, 900); }}
     takeDown={() => { fetch(`/api/members/${encodeURIComponent(member.id)}`, { method: "DELETE" }).then(() => { setMemberOpen(null); loadMembers(true); p.notify(w("recipes.takenDownForEveryMember")); }).catch(() => {}); }} />;
+  if (servedOpen && !opened) return <ServedOne p={p} id={servedOpen} back={() => setServedOpen(null)} />;
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
@@ -365,7 +370,7 @@ export function RecipesScreen(p: AppApi) {
       {recipeIn.inFlow
         ? <RecipeInFlow flow={recipeIn} put={(f) => void saveRead(f)} putLabel={w("recipes.saveInMyRecipes")} />
         : (<>
-          {(rows.length > 0 || bar.madeBy) && <RecipeBar f={bar} set={setBar} sort={sort} setSort={setSort} kitchens={kitchenLines(applyFilters(rows, { ...bar, kitchen: null }, ctx))} madeBy={madeByLines(applyFilters(rows, { ...bar, madeBy: null }, ctx), p.coachLabel)} shown={kept.length} total={rows.length} coachLabel={p.coachLabel} />}
+          {(rows.length > 0 || bar.madeBy) && <RecipeBar f={bar} set={setBar} sort={sort} setSort={setSort} kitchens={kitchenLines(applyFilters(rows, { ...bar, kitchen: null }, ctx))} madeBy={madeByLines(applyFilters(rows, { ...bar, madeBy: null }, ctx), p.coachLabel)} shown={kept.length} total={rows.length} coachLabel={p.coachLabel} served={{ n: servedN, on: servedOn, toggle: () => setServedOn((x) => !x) }} />}
           <section className="card plate-card recipe-add" aria-label={w("recipes.addARecipe")}>
             <div className="card-top"><span>{w("recipes.addARecipe")}</span></div>
             <small className="muted">{w("recipes.fromALinkOrScreenshots")}</small>
@@ -380,7 +385,8 @@ export function RecipesScreen(p: AppApi) {
           {kept.length === 0 && bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null }) && <section className="card recipes-empty"><small className="rc-lead">{membersLead(ahead)}</small><small>{w("recipes.nothingSharedYetARecipe")}</small></section>}
           {rows.length > 0 && kept.length === 0 && !(bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null })) && <section className="card recipes-empty"><small>{w("recipes.nothingMatchesClearAFilter")}</small></section>}
           {membersErr && <small className="muted">{membersErr}</small>}
-          {groups.map((g) => {
+          {(servedOn || idle) && <ServedGroup p={p} open={setServedOpen} />}
+          {!servedOn && groups.map((g) => {
             // idle: two rows per group and a line for the rest (a lone group, or one of three rows or fewer, shows whole); a search or a filter: every hit
             const cut = idle && groups.length > 1 && g.rows.length > 3 ? 2 : g.rows.length, shownRows = g.rows.slice(0, cut), more = g.rows.length - shownRows.length;
             return (
