@@ -806,9 +806,10 @@
       "id": "DT268",
       "title": "Served: plates scanned to explore, kept in Recipes, in three steps",
       "epic": "plate",
-      "state": "progress",
-      "why": "Coach Milan 9 November 21:46 to 21:56: Today's plan is not the place for a photo taken to explore. He expects a space to draft or save meals scanned just for exploration: at a restaurant, a photo of each friend's meal, to measure it for them and to keep it for himself for the next time. Now Exploring logs nothing and the read is gone when the Plate is cleared, unless Save as an idea puts it in Recipes. More important than saving photos to the gallery. To ask Tester 2: what she expected from the other plates she scanned. 22:28 to 23:21: in Recipes, marked Served (cooked in another kitchen, read from a photo, not weighed); AI fills the name and the dish; visits; guessed numbers with a range; a photo of the menu for the mapping. Three steps: 1 keep and find (built 0.3.118), 2 ranges and Share the numbers (built 0.3.119; the hidden fat share on the high side is our own figure, 25 percent, not calibrated), 3 the menu. Each of the dish guess, the ranges and the menu match needs cases in the photo eval; the dish guess of step 1 is not tested with the real AI yet.",
-      "board": "Stories201"
+      "state": "done",
+      "why": "Coach Milan 9 November 21:46 to 21:56: Today's plan is not the place for a photo taken to explore. He expects a space to draft or save meals scanned just for exploration: at a restaurant, a photo of each friend's meal, to measure it for them and to keep it for himself for the next time. Now Exploring logs nothing and the read is gone when the Plate is cleared, unless Save as an idea puts it in Recipes. More important than saving photos to the gallery. To ask Tester 2: what she expected from the other plates she scanned. 22:28 to 23:21: in Recipes, marked Served (cooked in another kitchen, read from a photo, not weighed); AI fills the name and the dish; visits; guessed numbers with a range; a photo of the menu for the mapping. Three steps: 1 keep and find (built 0.3.118), 2 ranges and Share the numbers (built 0.3.119; the hidden fat share on the high side is our own figure, 25 percent, not calibrated) 3 the menu (built 0.3.120: a menu weight sets the plate's total and a band of 15 percent either way, our own figure). Each of the dish guess, the ranges and the menu match needs cases in the photo eval; the dish guess of step 1 is not tested with the real AI yet.",
+      "board": "Stories201",
+      "version": "0.3.120"
     },
     {
       "id": "DT269",
@@ -816,6 +817,27 @@
       "epic": "plate",
       "state": "parked",
       "why": "Coach Milan 9 November 21:52 to 21:56: photos taken in the app do not land in the phone's gallery (the browser decides, not the app). A Save to the phone button on the opened meal would do it. Parked; DT268 is more important."
+    },
+    {
+      "id": "DT270",
+      "title": "Photo eval cases for Served: the dish guess, the ranges against weighed plates, the menu match",
+      "epic": "plate",
+      "state": "next",
+      "why": "DT268 was built and tested with a stand-in for the AI (0.3.118 to 0.3.120). The board says each of the three needs cases in the photo eval before it is trusted. Needs real plates and a real menu from Coach Milan; the ranges need the weighed plates the photo eval already waits for. Two figures are ours and not calibrated: 25 percent more fat on the high side, and 15 percent either way with a menu weight."
+    },
+    {
+      "id": "DT271",
+      "title": "Served: say whose a kept plate is, after it was kept; and Make it my recipe (Served to On paper)",
+      "epic": "plate",
+      "state": "later",
+      "why": "From building DT268: the first Exploring plate counts as yours and there is no tap to change whose a kept plate is. Make it my recipe is the next step of the path Served, On paper, From the kitchen (board Stories201, Not in DT268)."
+    },
+    {
+      "id": "DT272",
+      "title": "How to: New by time, not by 20 releases",
+      "epic": "home",
+      "state": "later",
+      "why": "Found at 0.3.119: New means added in the last 20 releases. With several releases a day a new way stops being New within days (A recipe in another language, 0.3.99, went at 0.3.119), and at 0.4.0 every New goes at once. A window in days would hold."
     }
   ]
 }

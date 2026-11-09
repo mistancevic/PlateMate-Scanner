@@ -1,9 +1,9 @@
-// DT268 steps 1 and 2 (0.3.118 and 0.3.119, board Stories201; Coach Milan 9 November 21:46 to 23:44, Go): Served on the screens. The Plate's block
+// DT268 steps 1 to 3 (0.3.118 to 0.3.120, board Stories201; Coach Milan 9 November 21:46 to 23:44, Go): Served on the screens. The Plate's block
 // for an Exploring plate (kept, its name and dish filled by Chef Mealan, Scan another plate: mine or someone else's); in Recipes
 // the visits, each one card; a Served plate open; and I ate this, which asks the day and the meal out loud.
 import { useEffect, useState } from "react";
 import { aggregate, density, type Ingredient } from "../pilot";
-import { DISHES, visitsOf, type Dish, type Served, type Visit } from "../served";
+import { DISHES, visitsOf, type Dish, type Served, type Visit, type VisitMenu } from "../served";
 import { w, wn, dateText, dateV, mealName, mealV, numLocale, type WordKey } from "../words";
 import { pdText } from "../ui";
 import { ymd } from "../plan";
@@ -122,7 +122,9 @@ function PlateRow({ s, open }: { s: Served; open: () => void }) {
     </button>
   );
 }
-function VisitCard({ p, v, open }: { p: AppApi; v: Visit; open: (id: string) => void }) {
+function VisitCard({ p, v, open, openMenu }: { p: AppApi; v: Visit; open: (id: string) => void; openMenu: (visit: string) => void }) {
+  const menu = (p.state.servedMenus ?? []).find((m) => m.visit === v.id);
+  const readMenu = async (f: File) => { try { const image = await readFile(f); if (await p.readMenu(v.id, image)) openMenu(v.id); } catch { /* the choice stays open */ } };
   const [edit, setEdit] = useState(false), [note, setNote] = useState(v.note);
   const when = whenOf(p, v.at);
   const mine = v.mine.flatMap((s) => s.items);
@@ -140,6 +142,9 @@ function VisitCard({ p, v, open }: { p: AppApi; v: Visit; open: (id: string) => 
         )}
         <ServedMark />
       </div>
+      {menu
+        ? <button type="button" className="pill pill-small sv-menu-open" onClick={() => openMenu(v.id)}>{w("served.theMenu")}{menu.asks.length > 0 && <span className="sv-menu-ask-n">{menu.asks.length}</span>}</button>
+        : <div className="sv-menu-add"><PhotoPick onFile={(f) => void readMenu(f)}>{({ toggle, open: o }) => <button type="button" className="pill pill-small sv-menu-btn" aria-expanded={o} onClick={toggle}>{w("served.addMenu")}</button>}</PhotoPick></div>}
       {v.mine.length > 0 && <small className="sv-part">{w("served.mine")} · {aboutLine(mine)}</small>}
       {v.mine.map((s) => <PlateRow key={s.id} s={s} open={() => open(s.id)} />)}
       {v.others.length > 0 && <small className="sv-part">{w("served.others")}</small>}
@@ -147,7 +152,7 @@ function VisitCard({ p, v, open }: { p: AppApi; v: Visit; open: (id: string) => 
     </div>
   );
 }
-export function ServedGroup({ p, open }: { p: AppApi; open: (id: string) => void }) {
+export function ServedGroup({ p, open, openMenu }: { p: AppApi; open: (id: string) => void; openMenu: (visit: string) => void }) {
   const list = p.state.served ?? [];
   if (!list.length) return null;
   const visits = visitsOf(list);
@@ -155,7 +160,7 @@ export function ServedGroup({ p, open }: { p: AppApi; open: (id: string) => void
     <section className="rc-group sv-group" aria-label={w("served.mark")}>
       <p className="label rc-group-title">{w("served.mark")} · {wn("served.visits", visits.length)}, {wn("served.plates", list.length)}</p>
       <small className="muted sv-lead">{w("served.lead")}</small>
-      {visits.map((v) => <VisitCard key={v.id} p={p} v={v} open={open} />)}
+      {visits.map((v) => <VisitCard key={v.id} p={p} v={v} open={open} openMenu={openMenu} />)}
     </section>
   );
 }
@@ -176,10 +181,12 @@ export function ServedOne({ p, id, back }: { p: AppApi; id: string; back: () => 
       <button type="button" className="link sv-back" onClick={back}>{w("served.backToRecipes")}</button>
       <h3>{s.name}</h3>
       <div className="sv-tags"><ServedMark /><span className="sv-dish-tag">{dishWord(s.dish)}</span><small>{v.note ? `${v.note} · ${whenOf(p, v.at)}` : title}</small></div>
+      {s.menu && <div className="sv-on-menu"><span><b>{w("served.onTheMenu")}</b> {menuText(s.menu)}{s.menu.about ? <small>{s.menu.about}</small> : null}</span><button type="button" className="link sv-not-this" onClick={() => p.dropMenuLine(s.id)}>{w("served.notThis")}</button></div>}
       <img className="sv-photo" src={all[at] ?? s.photo} alt={w("plan.photoOf", { title: s.name })} />
       {all.length > 1 && <div className="sv-more">{all.map((src, i) => <button type="button" key={i} className={`sv-thumb${i === at ? " on" : ""}`} aria-pressed={i === at} aria-label={w("plan.photoN", { n: i + 1 })} onClick={() => setAt(i)}><img src={src} alt="" /></button>)}</div>}
       <p className="sv-honest">{w("served.honest")}</p>
       <NumbersTable items={s.items} />
+      {s.menu?.grams && <small className="sv-tighter">{w("served.menuTighter")}</small>}
       <div className="sv-foods">{s.items.map((it) => <div key={it.id} className="sv-food"><span>{it.food.name}</span><b>{Math.round(it.grams)} g</b></div>)}</div>
       {s.eatenAt && <small className="sv-eaten">{w("served.eatenOn", { day: dateText(new Date(s.eatenAt), { weekday: "long", day: "numeric", month: "long" }) })}</small>}
       <button type="button" className="pill pill-primary pill-wide sv-share-it" onClick={() => setShare(true)}>{w("served.shareNumbers")}</button>
@@ -234,6 +241,47 @@ export function ServedAte({ p, plates, title, close }: { p: AppApi; plates: Serv
       {sl && <button type="button" className="pill pill-primary pill-wide sv-put" onClick={put}>{w("served.putIn", { day: dateV(day, { weekday: "long" }), meal: mealV(sl.name, true) })}</button>}
       <button type="button" className="link sv-cancel" onClick={close}>{w("served.cancel")}</button>
       <small className="sv-foot">{plates.length > 1 ? w("served.ateFootMany") : w("served.ateFoot")}</small>
+    </section>
+  );
+}
+
+// ---- step 3: the menu of a visit ----
+const menuText = (l: { name: string; grams?: number; unit?: "g" | "ml" }) => (l.grams ? `${l.name}, ${l.grams} ${l.unit ?? "g"}` : l.name);
+export function ServedMenu({ p, visit, back }: { p: AppApi; visit: string; back: () => void }) {
+  const list = p.state.served ?? [], v = visitsOf(list).find((x) => x.id === visit), menu = (p.state.servedMenus ?? []).find((m) => m.visit === visit);
+  useEffect(() => { window.scrollTo({ top: 0 }); }, [visit]);
+  if (!v || !menu) return null;
+  const plates = [...v.mine, ...v.others];
+  const matched = new Set(plates.filter((s) => s.menu).map((s) => s.menu!.name));
+  const again = async (f: File) => { try { await p.readMenu(visit, await readFile(f)); } catch { /* the menu stays as it was */ } };
+  const askOf = (id: string) => menu.asks.find((a) => a.plate === id);
+  return (
+    <section className="card sv-menu" aria-label={w("served.menuTitle")}>
+      <button type="button" className="link sv-back" onClick={back}>{w("served.backToVisit", { title: v.note || whenOf(p, v.at) })}</button>
+      <h3>{w("served.menuTitle")}</h3>
+      <img className="sv-menu-photo" src={menu.photo} alt={w("served.menuPhoto")} />
+      <small className="sv-label">{wn("served.menuLines", menu.lines.length)}</small>
+      <div className="sv-menu-lines">
+        {menu.lines.map((l, i) => <div key={i} className={`sv-menu-line${matched.has(l.name) ? " on" : ""}`}><span>{l.name}{l.course ? <small>{dishWord(l.course)}</small> : null}</span><b>{l.grams ? `${l.grams} ${l.unit ?? "g"}` : ""}</b></div>)}
+      </div>
+      <div className="sv-menu-plates">
+        {plates.map((s) => { const a = askOf(s.id); return (
+          <div key={s.id} className="sv-menu-plate">
+            <img src={s.photo} alt="" />
+            <span className="sv-row-text"><b>{s.name}</b><small>{s.menu ? `${menuText(s.menu)}${s.menu.course ? ` · ${dishWord(s.menu.course).toLowerCase()}` : ""}` : a ? a.options.map((i) => menu.lines[i]?.name).filter(Boolean).join(" / ") : ""}</small></span>
+            <span className={`sv-menu-state ${s.menu ? "ok" : a ? "ask" : "none"}`}>{s.menu ? w("served.matched") : a ? w("served.notSure") : w("served.notOnMenu")}</span>
+          </div>); })}
+      </div>
+      {menu.asks.map((a) => { const s = plates.find((x) => x.id === a.plate); if (!s) return null; return (
+        <div key={a.plate} className="sv-menu-ask" role="group" aria-label={w("served.whichOnMenu", { name: s.name })}>
+          <b>{w("served.whichOnMenu", { name: s.name })}</b>
+          <div className="sv-chips">
+            {a.options.map((i) => <button key={i} type="button" className="pill pill-small" onClick={() => p.pickMenuLine(s.id, i)}>{menuText(menu.lines[i])}</button>)}
+            <button type="button" className="link sv-neither" onClick={() => p.pickMenuLine(s.id, null)}>{w("served.neither")}</button>
+          </div>
+        </div>); })}
+      <PhotoPick onFile={(f) => void again(f)}>{({ toggle, open }) => <button type="button" className="link sv-menu-again" aria-expanded={open} onClick={toggle}>{w("served.menuAgain")}</button>}</PhotoPick>
+      <small className="sv-foot">{w("served.menuLimit")}</small>
     </section>
   );
 }

@@ -38,6 +38,10 @@ export interface AppApi {
   servedNote: (visit: string, note: string) => void;
   servedAte: (ids: string[], slot: { date: string; slotId: string; name: string; time: string }, at: string) => void;
   servedToPlate: (id: string) => void;
+  // DT268 step 3 (0.3.120): the menu of a visit
+  readMenu: (visit: string, image: string) => Promise<boolean>;
+  pickMenuLine: (plate: string, line: number | null) => void;
+  dropMenuLine: (plate: string) => void;
   ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean }) => void;
   // DT130 (0.2.110): Photo of my meal opens the meal camera; a photo from Your photos waits on the Plate for whose and when
   mealCamera: () => void;

@@ -1637,6 +1637,27 @@ const photoReadSchema = { ...photoSchema, properties: { ...photoSchema.propertie
   course: { type: "string", enum: ["starter", "main", "side", "dessert", "drink"] },
   which: { type: "object", properties: { name: { type: "string" }, question: { type: "string" }, options: { type: "array", items: { type: "object", properties: {
     name: { type: "string" }, calories: { type: "number" }, protein: { type: "number" }, fats: { type: "number" }, carbs: { type: "number" }, fiber: { type: "number" } }, required: ["name", "calories", "protein", "fats", "carbs"] } } }, required: ["name", "options"], nullable: true } } };
+// DT268 step 3 (0.3.120, board Stories201, DT268g): a photo of a restaurant's menu, for a visit. The menu's lines as printed,
+// in its own language, and each plate of the visit matched to a line; where two lines fit a plate, both come back and the
+// person is asked. The plates go as their names and foods, no photo of them.
+const menuSchema = { type: "object", properties: {
+  lines: { type: "array", items: { type: "object", properties: { name: { type: "string" }, grams: { type: "number", nullable: true }, unit: { type: "string", enum: ["g", "ml"] },
+    course: { type: "string", enum: ["starter", "main", "side", "dessert", "drink"] }, about: { type: "string" } }, required: ["name"] } },
+  matches: { type: "array", items: { type: "object", properties: { plate: { type: "string" }, line: { type: "number" }, sure: { type: "boolean" }, options: { type: "array", items: { type: "number" } } }, required: ["plate", "line", "sure"] } },
+}, required: ["lines", "matches"] };
+app.post("/api/menu-read", requireUser, requireMember, requireAI, async (req, res) => {
+  try {
+    const m = typeof req.body?.image === "string" && req.body.image.length <= 4_000_000 ? req.body.image.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/) : null;
+    if (!m) return res.status(400).json({ error: "A photo of the menu is needed." });
+    const plates = (Array.isArray(req.body?.plates) ? req.body.plates : []).slice(0, 12).map((p: any) => ({ id: String(p?.id ?? "").slice(0, 40), name: String(p?.name ?? "").replace(/\s+/g, " ").slice(0, 60),
+      foods: (Array.isArray(p?.foods) ? p.foods : []).slice(0, 8).map((f: unknown) => String(f).slice(0, 60)), grams: typeof p?.grams === "number" ? Math.round(p.grams) : 0 })).filter((p: any) => p.id);
+    const lang = langOf(req), langName = lang === "sr-Latn" ? "Serbian, Latin script (srpski, latinica), ekavian" : lang === "de" ? "German" : "English";
+    const prompt = `You are Chef Mealan, a chef reading a photo of a restaurant's menu. In lines, list the dishes and drinks printed on it, at most 40, in the order printed. name: the dish exactly as the menu prints it, in the menu's own language, without the price. grams: the weight or the volume the menu prints next to it (300 g, 0.33 l as 330), null when the menu prints none; never guess one. unit: g or ml. course: from the section it is printed under or from what it plainly is: starter, main, side, dessert or drink. about: in ${langName}, in a few words, what the menu says is in the dish or how it is cooked (in cream sauce, fried in butter, with fries); leave it out when the menu says nothing more than the name.`
+      + ` Then match the plates a person photographed at this restaurant to the menu. The plates, each with an id, the name a photo read gave it, its foods and the grams the photo read guessed: ${JSON.stringify(plates)}. In matches, one entry per plate: plate is its id; line is the index in lines (0 for the first) of the dish it is; sure is true when one line plainly fits. When two or more lines fit and the photo's foods cannot tell them apart (the same dish with chicken or with cheese), sure is false and options holds the indexes of the two to four lines it could be, the likeliest first, line being the first of them. Leave a plate out of matches when nothing on the menu fits it. Do not match two plates to one line unless they plainly are the same dish.`;
+    const data = await generate(prompt, menuSchema, [{ inlineData: { mimeType: m[1], data: m[2] } }] as any[]);
+    res.json({ lines: Array.isArray(data.lines) ? data.lines.slice(0, 40) : [], matches: Array.isArray(data.matches) ? data.matches.slice(0, 12) : [] });
+  } catch (error) { fail(res, error); }
+});
 app.post("/api/plate-photo", requireUser, requireMember, requireAI, async (req, res) => {
   try {
     const { image } = req.body ?? {};

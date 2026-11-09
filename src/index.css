@@ -3142,3 +3142,17 @@ section.sv-plate .sv-dishes > .pill.pill-small, section.sv-ate-card .sv-chips > 
 .sv-picture { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r-control); display: block; background: var(--tint, #e7eefb); } .sv-drawing { display: flex; align-items: center; justify-content: center; color: var(--muted); }
 .sv-share-foot { text-align: center; } .sv-ate-range { color: var(--muted); margin-top: -4px; }
 section.sv-plate .button-row.sv-acts { flex-wrap: wrap; }
+/* DT268 step 3 (0.3.120): the menu of a visit */
+.sv-menu-add, .sv-menu-open { margin-top: 8px; align-self: flex-start; } .sv-visit .sv-menu-btn, .sv-visit .sv-menu-open { min-height: 44px; }
+.sv-menu-ask-n { background: #fde9c8; color: #7a4b00; border-radius: 999px; padding: 0 7px; margin-left: 6px; font-size: var(--fs-small); font-weight: 800; }
+.sv-menu { display: flex; flex-direction: column; gap: 10px; } .sv-menu h3 { margin: 0; }
+.sv-menu-photo { width: 100%; max-height: 60vh; object-fit: contain; border-radius: var(--r-control); background: var(--surface); display: block; }
+.sv-menu-lines, .sv-menu-plates { border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--surface); padding: 2px 8px; }
+.sv-menu-line { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 7px 4px; border-bottom: 1px solid var(--line); font-size: var(--fs-small); } .sv-menu-line:last-child { border-bottom: 0; }
+.sv-menu-line.on { background: #fff3b8; border-radius: 6px; font-weight: 800; } .sv-menu-line small { color: var(--muted); font-weight: 600; margin-left: 6px; } .sv-menu-line b { white-space: nowrap; }
+.sv-menu-plate { display: flex; gap: 10px; align-items: center; padding: 8px 4px; border-bottom: 1px solid var(--line); } .sv-menu-plate:last-child { border-bottom: 0; } .sv-menu-plate img { width: 48px; height: 48px; object-fit: cover; border-radius: var(--r-control); flex: none; }
+.sv-menu-state { font-size: var(--fs-small); font-weight: 800; white-space: nowrap; flex: none; } .sv-menu-state.ok { color: #0f7d5b; } .sv-menu-state.ask { color: #7a4b00; } .sv-menu-state.none { color: var(--muted); }
+.sv-menu-ask { background: #fff8d6; border-radius: var(--r-control); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; white-space: normal; } .sv-neither, .sv-menu-again, .sv-not-this { min-height: 44px; } .sv-menu-again { align-self: flex-start; }
+.sv-on-menu { background: #e7f4ec; border-radius: var(--r-control); padding: 8px 10px; font-size: var(--fs-small); line-height: 1.4; display: flex; gap: 8px; align-items: center; } .sv-on-menu > span { flex: 1; min-width: 0; } .sv-on-menu small { display: block; color: var(--muted); }
+.sv-tighter { color: var(--muted); line-height: 1.45; }

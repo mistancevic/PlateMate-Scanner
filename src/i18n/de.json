@@ -21900,6 +21900,78 @@
     "served.back": {
       "text": "‹ Zurück",
       "checked": true
+    },
+    "served.addMenu": {
+      "text": "📷 Foto der Speisekarte hinzufügen",
+      "checked": true
+    },
+    "served.theMenu": {
+      "text": "Die Speisekarte ›",
+      "checked": true
+    },
+    "served.menuTitle": {
+      "text": "Die Speisekarte",
+      "checked": true
+    },
+    "served.readingMenu": {
+      "text": "Die Speisekarte wird gelesen…",
+      "checked": true
+    },
+    "served.menuNotRead": {
+      "text": "Die Speisekarte konnte nicht gelesen werden. Versuch ein schärferes Foto, gerade von vorn.",
+      "checked": true
+    },
+    "served.menuAgain": {
+      "text": "📷 Ein anderes Foto der Speisekarte",
+      "checked": true
+    },
+    "served.menuPhoto": {
+      "text": "Das Foto der Speisekarte",
+      "checked": true
+    },
+    "served.menuLines": {
+      "text": "{n} Zeile gelesen|{n} Zeilen gelesen",
+      "checked": true
+    },
+    "served.matched": {
+      "text": "✓ zugeordnet",
+      "checked": true
+    },
+    "served.notSure": {
+      "text": "nicht sicher",
+      "checked": true
+    },
+    "served.notOnMenu": {
+      "text": "nicht auf der Karte",
+      "checked": true
+    },
+    "served.whichOnMenu": {
+      "text": "{name}: welches auf der Speisekarte?",
+      "checked": true
+    },
+    "served.neither": {
+      "text": "Keines",
+      "checked": true
+    },
+    "served.onTheMenu": {
+      "text": "Auf der Speisekarte:",
+      "checked": true
+    },
+    "served.notThis": {
+      "text": "Nicht das",
+      "checked": true
+    },
+    "served.menuTighter": {
+      "text": "Die Speisekarte nennt das Gewicht. Die Mengen folgen jetzt der Karte, nicht der Schätzung vom Foto.",
+      "checked": true
+    },
+    "served.menuLimit": {
+      "text": "Ein Gewicht auf der Speisekarte ist die Angabe der Küche, oft vor dem Kochen. Es macht die Spanne enger; die Teller bleiben Serviert, nicht gewogen.",
+      "checked": true
+    },
+    "served.backToVisit": {
+      "text": "‹ {title}",
+      "checked": true
     }
   }
 }

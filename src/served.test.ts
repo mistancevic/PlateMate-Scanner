@@ -54,3 +54,48 @@ test("DT268: your dishes as one meal: every food once, named after the main", ()
   assert.equal(mealTitle(plates), "Croque madame");
   assert.equal(mealTitle([plates[0]]), "Bruschetta");
 });
+
+// ---- step 3: the menu ----
+import { cleanMenu, withMenuLine, withoutMenuLine, applyMenu, MENU_BAND } from "./served";
+const raw = { lines: [{ name: " Ćufte u paradajz sosu, pire ", grams: 300, unit: "g", course: "main", about: "fried, in tomato sauce" }, { name: "Kesadilja sa piletinom", grams: 320, course: "main" }, { name: "Kesadilja sa sirom", grams: 280, course: "main" }, { name: "Limunada", grams: 330, unit: "ml", course: "drink" }, { name: "", grams: 100 }, { name: "Hleb", grams: 5 }],
+  matches: [{ plate: "a", line: 0, sure: true }, { plate: "b", line: 1, sure: false, options: [1, 2, 9] }, { plate: "zz", line: 0, sure: true }, { plate: "c", line: 4, sure: true }] };
+test("DT268 step 3: the menu read is checked: names, weights in sense, plates of the visit, lines that exist", () => {
+  const m = cleanMenu(raw, ["a", "b", "c"])!;
+  assert.equal(m.lines[0].name, "Ćufte u paradajz sosu, pire"); assert.equal(m.lines[0].grams, 300); assert.equal(m.lines[0].unit, "g");
+  assert.equal(m.lines[3].unit, "ml");
+  assert.equal(m.lines[5].grams, undefined, "5 g is no weight of a dish");
+  assert.deepEqual(m.matches, [{ plate: "a", line: 0 }]);
+  assert.deepEqual(m.asks, [{ plate: "b", options: [1, 2] }], "two lines fit: asked, with the lines that exist");
+  assert.equal(cleanMenu({ lines: [{ name: "" }] }, ["a"]), null);
+  assert.equal(cleanMenu(null, ["a"]), null);
+});
+test("DT268 step 3: a plate takes its line: the menu's weight is the plate's total, each food in proportion, the range the menu's band", () => {
+  const p0 = plate("a", "2026-11-07T12:00:00", { dish: "starter", items: [{ id: "1", grams: 150, locked: false, est: { low: 100, high: 220 }, food: food("meat") } as any, { id: "2", grams: 50, locked: false, est: { low: 30, high: 80 }, food: food("mash") } as any] });
+  const m = cleanMenu(raw, ["a"])!;
+  const p1 = withMenuLine(p0, m.lines[0]);
+  assert.deepEqual(p1.items.map((i) => i.grams), [225, 75]);
+  assert.equal(p1.items.reduce((n, i) => n + i.grams, 0), 300);
+  assert.deepEqual(p1.items[0].est, { low: Math.round(225 * (1 - MENU_BAND)), high: Math.round(225 * (1 + MENU_BAND)) });
+  assert.equal(p1.dish, "main"); assert.equal(p1.menu?.name, "Ćufte u paradajz sosu, pire");
+  // another line later starts from the photo's foods again, not from the scaled ones
+  const p2 = withMenuLine(p1, m.lines[2]);
+  assert.equal(p2.items.reduce((n, i) => n + i.grams, 0), 280);
+  // Not this: back to the photo's read
+  const back = withoutMenuLine(p2);
+  assert.deepEqual(back.items.map((i) => i.grams), [150, 50]); assert.deepEqual(back.items[0].est, { low: 100, high: 220 }); assert.equal(back.menu, undefined);
+});
+test("DT268 step 3: a line with no weight names the plate and its dish, and leaves the amounts", () => {
+  const p0 = plate("a", "2026-11-07T12:00:00");
+  const p1 = withMenuLine(p0, { name: "Supa dana", course: "starter" });
+  assert.deepEqual(p1.items, p0.items); assert.equal(p1.dish, "starter"); assert.equal(p1.menu?.was, undefined);
+});
+test("DT268 step 3: the read is applied to the plates of that visit only", () => {
+  const list = [plate("a", "2026-11-07T12:00:00"), plate("b", "2026-11-07T12:10:00"), plate("x", "2026-11-01T12:00:00", { visit: "v0" })];
+  const out = applyMenu(list, "v1", cleanMenu({ lines: raw.lines, matches: [{ plate: "a", line: 0, sure: true }, { plate: "x", line: 1, sure: true }] }, ["a", "b", "x"])!);
+  assert.equal(out[0].menu?.grams, 300); assert.equal(out[1].menu, undefined); assert.equal(out[2].menu, undefined);
+});
+test("DT268 step 3: a plate matched to the menu keeps its match while it is still on the Plate", () => {
+  const p1 = withMenuLine(plate("a", "2026-11-07T12:00:00"), { name: "X", grams: 300, unit: "g" });
+  const list = [p1];
+  assert.equal(upsertServed(list, plate("a", "2026-11-07T12:00:00")), list);
+});

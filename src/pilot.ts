@@ -310,6 +310,8 @@ export type PilotState = {
   later?: import("./cooking").Later[];
   // DT268 (0.3.118, board Stories201): plates scanned to explore, kept: cooked in another kitchen, read from a photo (served.ts)
   served?: import("./served").Served[];
+  // DT268 step 3 (0.3.120): the menu of a visit, as read from its photo
+  servedMenus?: import("./served").VisitMenu[];
 };
 export const EMPTY: Nutrition = {
   calories: null,

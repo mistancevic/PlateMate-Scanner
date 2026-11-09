@@ -1,5 +1,5 @@
 import { plateWhenOf, atMeal } from "../plateMode";
-import { ServedGroup, ServedOne } from "../components/Served";
+import { ServedGroup, ServedOne, ServedMenu } from "../components/Served";
 import { w, wn, mealV, dateV, type Val } from "../words";
 import type { Lang } from "../lang";
 import { kitchenMark, markWord } from "../recipeMark";
@@ -98,7 +98,7 @@ export function RecipesScreen(p: AppApi) {
   // the recipe's own page (0.2.5+r11, board S3, R8 to R11): which recipe is open
   const [openId, setOpenId] = useState<string | null>(null);
   // DT268 (0.3.118, board Stories201): Served plates: the chip shows them alone; one of them open
-  const [servedOn, setServedOn] = useState(false), [servedOpen, setServedOpen] = useState<string | null>(null);
+  const [servedOn, setServedOn] = useState(false), [servedOpen, setServedOpen] = useState<string | null>(null), [menuOpen, setMenuOpen] = useState<string | null>(null);
   const servedN = (p.state.served ?? []).length;
   const patchMeal = (id: string, patch: Partial<Meal>) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === id ? { ...x, ...patch } : x)) }));
   // R4: a live recipe whose page has a photo and the app has none takes the page's photo once, as its cover
@@ -308,6 +308,7 @@ export function RecipesScreen(p: AppApi) {
       window.addEventListener("popstate", put); window.setTimeout(put, 900); }}
     takeDown={() => { fetch(`/api/members/${encodeURIComponent(member.id)}`, { method: "DELETE" }).then(() => { setMemberOpen(null); loadMembers(true); p.notify(w("recipes.takenDownForEveryMember")); }).catch(() => {}); }} />;
   if (servedOpen && !opened) return <ServedOne p={p} id={servedOpen} back={() => setServedOpen(null)} />;
+  if (menuOpen && !opened && (p.state.servedMenus ?? []).some((m) => m.visit === menuOpen)) return <ServedMenu p={p} visit={menuOpen} back={() => setMenuOpen(null)} />;
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
@@ -385,7 +386,7 @@ export function RecipesScreen(p: AppApi) {
           {kept.length === 0 && bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null }) && <section className="card recipes-empty"><small className="rc-lead">{membersLead(ahead)}</small><small>{w("recipes.nothingSharedYetARecipe")}</small></section>}
           {rows.length > 0 && kept.length === 0 && !(bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null })) && <section className="card recipes-empty"><small>{w("recipes.nothingMatchesClearAFilter")}</small></section>}
           {membersErr && <small className="muted">{membersErr}</small>}
-          {(servedOn || idle) && <ServedGroup p={p} open={setServedOpen} />}
+          {(servedOn || idle) && <ServedGroup p={p} open={setServedOpen} openMenu={setMenuOpen} />}
           {!servedOn && groups.map((g) => {
             // idle: two rows per group and a line for the rest (a lone group, or one of three rows or fewer, shows whole); a search or a filter: every hit
             const cut = idle && groups.length > 1 && g.rows.length > 3 ? 2 : g.rows.length, shownRows = g.rows.slice(0, cut), more = g.rows.length - shownRows.length;
