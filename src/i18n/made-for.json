@@ -5399,6 +5399,13 @@
     "screen.certs.ai-mastery.name": {"en":"AI Mastery","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
     "screen.certs.ai-mastery.line": {"en":"The AI side of the builder.","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
     "screen.certs.business.name": {"en":"Certified Business Coach","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
-    "screen.certs.business.line": {"en":"Coaching coaches on the business with Chef Mealan.","area":"Words used across the app","where":"Across the app","release":"0.3.116"}
+    "screen.certs.business.line": {"en":"Coaching coaches on the business with Chef Mealan.","area":"Words used across the app","where":"Across the app","release":"0.3.116"},
+    "screen.plan.openIt": {"en":"Open ›","area":"Plan","where":"Plan","release":"0.3.117"},
+    "screen.plan.openMeal": {"en":"Open {title}","area":"Plan","where":"Plan","release":"0.3.117"},
+    "screen.plan.onThePlateAgain": {"en":"Put it on the Plate again","area":"Plan","where":"Plan","release":"0.3.117"},
+    "screen.plan.photoOf": {"en":"Photo of {title}","area":"Plan","where":"Plan","release":"0.3.117"},
+    "screen.plan.photoN": {"en":"Photo {n}","area":"Plan","where":"Plan","release":"0.3.117"},
+    "screen.plan.noPhoto": {"en":"No photo with this meal.","area":"Plan","where":"Plan","release":"0.3.117"},
+    "screen.plan.protein": {"en":"protein","area":"Plan","where":"Plan","release":"0.3.117"}
   }
 }

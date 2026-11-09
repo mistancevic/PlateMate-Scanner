@@ -21600,6 +21600,34 @@
     "certs.business.line": {
       "text": "Für Coaches: das Geschäft mit Chef Mealan.",
       "checked": true
+    },
+    "plan.openIt": {
+      "text": "Öffnen ›",
+      "checked": true
+    },
+    "plan.openMeal": {
+      "text": "{title} öffnen",
+      "checked": true
+    },
+    "plan.onThePlateAgain": {
+      "text": "Wieder auf den Teller legen",
+      "checked": true
+    },
+    "plan.photoOf": {
+      "text": "Foto: {title}",
+      "checked": true
+    },
+    "plan.photoN": {
+      "text": "Foto {n}",
+      "checked": true
+    },
+    "plan.noPhoto": {
+      "text": "Zu dieser Mahlzeit gibt es kein Foto.",
+      "checked": true
+    },
+    "plan.protein": {
+      "text": "Protein",
+      "checked": true
     }
   }
 }
