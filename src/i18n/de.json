@@ -21628,6 +21628,198 @@
     "plan.protein": {
       "text": "Protein",
       "checked": true
+    },
+    "served.mark": {
+      "text": "Serviert",
+      "checked": true
+    },
+    "served.keptHead": {
+      "text": "In Rezepte behalten, unter Serviert",
+      "checked": true
+    },
+    "served.name": {
+      "text": "Name",
+      "checked": true
+    },
+    "served.filledBy": {
+      "text": "von Chef Mealan ausgefüllt",
+      "checked": true
+    },
+    "served.whichDish": {
+      "text": "Welcher Gang",
+      "checked": true
+    },
+    "served.dish.starter": {
+      "text": "Vorspeise",
+      "checked": true
+    },
+    "served.dish.main": {
+      "text": "Hauptgang",
+      "checked": true
+    },
+    "served.dish.side": {
+      "text": "Beilage",
+      "checked": true
+    },
+    "served.dish.dessert": {
+      "text": "Dessert",
+      "checked": true
+    },
+    "served.dish.drink": {
+      "text": "Getränk",
+      "checked": true
+    },
+    "served.scanAnother": {
+      "text": "📷 Noch einen Teller scannen",
+      "checked": true
+    },
+    "served.anotherMine": {
+      "text": "Noch ein Gang von mir",
+      "checked": true
+    },
+    "served.someoneElses": {
+      "text": "Der Teller von jemand anderem",
+      "checked": true
+    },
+    "served.iAteThis": {
+      "text": "Das habe ich gegessen",
+      "checked": true
+    },
+    "served.dontKeep": {
+      "text": "Nicht behalten",
+      "checked": true
+    },
+    "served.nothingLogged": {
+      "text": "Nichts wurde eingetragen. Dein Tag bleibt, wie er war.",
+      "checked": true
+    },
+    "served.notKept": {
+      "text": "Nicht behalten. Dieser Teller ist nur auf dem Teller.",
+      "checked": true
+    },
+    "served.about": {
+      "text": "etwa {kcal} kcal · {protein} g Protein",
+      "checked": true
+    },
+    "served.aboutKcal": {
+      "text": "etwa {kcal} kcal",
+      "checked": true
+    },
+    "served.aboutN": {
+      "text": "etwa {kcal}",
+      "checked": true
+    },
+    "served.dayMeal": {
+      "text": "{day}, {meal}",
+      "checked": true
+    },
+    "served.visits": {
+      "text": "{n} Besuch|{n} Besuche",
+      "checked": true
+    },
+    "served.plates": {
+      "text": "{n} Teller|{n} Teller",
+      "checked": true
+    },
+    "served.lead": {
+      "text": "In einer anderen Küche gekocht. Vom Foto gelesen, nicht gewogen.",
+      "checked": true
+    },
+    "served.mine": {
+      "text": "Meins",
+      "checked": true
+    },
+    "served.others": {
+      "text": "Die anderen am Tisch",
+      "checked": true
+    },
+    "served.addNote": {
+      "text": "Notiz hinzufügen",
+      "checked": true
+    },
+    "served.changeNote": {
+      "text": "Notiz ändern",
+      "checked": true
+    },
+    "served.noteLabel": {
+      "text": "Eine Notiz zu diesem Besuch",
+      "checked": true
+    },
+    "served.notePlaceholder": {
+      "text": "Wo, oder mit wem",
+      "checked": true
+    },
+    "served.save": {
+      "text": "Speichern",
+      "checked": true
+    },
+    "served.backToRecipes": {
+      "text": "‹ Rezepte",
+      "checked": true
+    },
+    "served.honest": {
+      "text": "Vom Foto gelesen, nicht gewogen. Eine Küche, in der du nicht gekocht hast, nimmt oft mehr Öl und Butter, als ein Foto zeigt.",
+      "checked": true
+    },
+    "served.eatenOn": {
+      "text": "In deinem Tag: {day}.",
+      "checked": true
+    },
+    "served.onThePlate": {
+      "text": "Auf den Teller legen",
+      "checked": true
+    },
+    "served.remove": {
+      "text": "Entfernen",
+      "checked": true
+    },
+    "served.removeYes": {
+      "text": "Diesen Teller entfernen",
+      "checked": true
+    },
+    "served.cancel": {
+      "text": "Abbrechen",
+      "checked": true
+    },
+    "served.whenAte": {
+      "text": "Wann hast du es gegessen?",
+      "checked": true
+    },
+    "served.oneMeal": {
+      "text": "Eine Mahlzeit",
+      "checked": true
+    },
+    "served.day": {
+      "text": "Tag",
+      "checked": true
+    },
+    "served.photoDay": {
+      "text": "{day}, der Tag des Fotos",
+      "checked": true
+    },
+    "served.anotherDay": {
+      "text": "Ein anderer Tag",
+      "checked": true
+    },
+    "served.meal": {
+      "text": "Mahlzeit",
+      "checked": true
+    },
+    "served.putIn": {
+      "text": "Als gegessen eintragen: {day}, {meal}",
+      "checked": true
+    },
+    "served.ateFoot": {
+      "text": "Es zählt an diesem Tag, mit seinem Foto. Der Teller bleibt in Serviert.",
+      "checked": true
+    },
+    "served.ateFootMany": {
+      "text": "Deine Gänge gehen als eine Mahlzeit ein, mit ihren Fotos. Die Teller der anderen zählen nicht. Alles bleibt in Serviert.",
+      "checked": true
+    },
+    "served.chip": {
+      "text": "Serviert · {n}",
+      "checked": true
     }
   }
 }

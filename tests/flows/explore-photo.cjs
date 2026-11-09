@@ -68,7 +68,9 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     ok(/Exploring a photo\. 2 foods read/.test(await text(".mp-big-say")), "the photo line says Exploring");
     const say = await text(".mp-say");
     ok(/Exploring, so wednesday's lunch stays as it was\./i.test(say) && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Put it in my plan" }).count() === 1, "Chef Mealan says the lunch stays as it was; the idea's buttons show: " + say.slice(0, 160));
-    ok(!/Your day/.test(await text()) && !/eating window/.test(await text()), "no eating-window check while exploring");
+    // DT268 (0.3.118): the Served block says "Your day stays as it was"; the check is about the gates, so it reads the Plate without that block
+    const noServed = (await page.evaluate(() => { const m = document.querySelector("main").cloneNode(true); m.querySelectorAll(".sv-plate").forEach((x) => x.remove()); return m.textContent; })).replace(/\s+/g, " ");
+    ok(!/Your day/.test(noServed) && !/eating window/.test(noServed), "no eating-window check while exploring");
     ok((await st()).feedback.length === before, "nothing logged");
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
     // ---- the pencil block on Exploring first: a camera photo is Exploring too ----

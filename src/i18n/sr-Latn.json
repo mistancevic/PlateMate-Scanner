@@ -21628,6 +21628,198 @@
     "plan.protein": {
       "text": "proteina",
       "checked": true
+    },
+    "served.mark": {
+      "text": "Posluženo",
+      "checked": true
+    },
+    "served.keptHead": {
+      "text": "Sačuvano u Receptima, pod Posluženo",
+      "checked": true
+    },
+    "served.name": {
+      "text": "Naziv",
+      "checked": true
+    },
+    "served.filledBy": {
+      "text": "popunio Chef Mealan",
+      "checked": true
+    },
+    "served.whichDish": {
+      "text": "Koje jelo",
+      "checked": true
+    },
+    "served.dish.starter": {
+      "text": "Predjelo",
+      "checked": true
+    },
+    "served.dish.main": {
+      "text": "Glavno jelo",
+      "checked": true
+    },
+    "served.dish.side": {
+      "text": "Prilog",
+      "checked": true
+    },
+    "served.dish.dessert": {
+      "text": "Desert",
+      "checked": true
+    },
+    "served.dish.drink": {
+      "text": "Piće",
+      "checked": true
+    },
+    "served.scanAnother": {
+      "text": "📷 Skeniraj još jedan tanjir",
+      "checked": true
+    },
+    "served.anotherMine": {
+      "text": "Još jedno moje jelo",
+      "checked": true
+    },
+    "served.someoneElses": {
+      "text": "Tuđi tanjir",
+      "checked": true
+    },
+    "served.iAteThis": {
+      "text": "Pojeo sam ovo|Pojela sam ovo",
+      "checked": true
+    },
+    "served.dontKeep": {
+      "text": "Nemoj da čuvaš",
+      "checked": true
+    },
+    "served.nothingLogged": {
+      "text": "Ništa nije upisano. Tvoj dan ostaje kakav je bio.",
+      "checked": true
+    },
+    "served.notKept": {
+      "text": "Nije sačuvano. Ovaj tanjir je samo na Tanjiru.",
+      "checked": true
+    },
+    "served.about": {
+      "text": "oko {kcal} kcal · {protein} g proteina",
+      "checked": true
+    },
+    "served.aboutKcal": {
+      "text": "oko {kcal} kcal",
+      "checked": true
+    },
+    "served.aboutN": {
+      "text": "oko {kcal}",
+      "checked": true
+    },
+    "served.dayMeal": {
+      "text": "{day}, {meal}",
+      "checked": true
+    },
+    "served.visits": {
+      "text": "{n} poseta|{n} posete|{n} poseta",
+      "checked": true
+    },
+    "served.plates": {
+      "text": "{n} tanjir|{n} tanjira|{n} tanjira",
+      "checked": true
+    },
+    "served.lead": {
+      "text": "Skuvano u drugoj kuhinji. Pročitano sa fotografije, nije izmereno.",
+      "checked": true
+    },
+    "served.mine": {
+      "text": "Moje",
+      "checked": true
+    },
+    "served.others": {
+      "text": "Ostali za stolom",
+      "checked": true
+    },
+    "served.addNote": {
+      "text": "Dodaj belešku",
+      "checked": true
+    },
+    "served.changeNote": {
+      "text": "Promeni belešku",
+      "checked": true
+    },
+    "served.noteLabel": {
+      "text": "Beleška za ovu posetu",
+      "checked": true
+    },
+    "served.notePlaceholder": {
+      "text": "Gde, ili sa kim",
+      "checked": true
+    },
+    "served.save": {
+      "text": "Sačuvaj",
+      "checked": true
+    },
+    "served.backToRecipes": {
+      "text": "‹ Recepti",
+      "checked": true
+    },
+    "served.honest": {
+      "text": "Pročitano sa fotografije, nije izmereno. Kuhinja u kojoj nisi kuvao često koristi više ulja i putera nego što fotografija pokazuje.|Pročitano sa fotografije, nije izmereno. Kuhinja u kojoj nisi kuvala često koristi više ulja i putera nego što fotografija pokazuje.",
+      "checked": true
+    },
+    "served.eatenOn": {
+      "text": "U tvom danu: {day}.",
+      "checked": true
+    },
+    "served.onThePlate": {
+      "text": "Stavi na Tanjir",
+      "checked": true
+    },
+    "served.remove": {
+      "text": "Ukloni",
+      "checked": true
+    },
+    "served.removeYes": {
+      "text": "Ukloni ovaj tanjir",
+      "checked": true
+    },
+    "served.cancel": {
+      "text": "Otkaži",
+      "checked": true
+    },
+    "served.whenAte": {
+      "text": "Kada si ovo pojeo?|Kada si ovo pojela?",
+      "checked": true
+    },
+    "served.oneMeal": {
+      "text": "Jedan obrok",
+      "checked": true
+    },
+    "served.day": {
+      "text": "Dan",
+      "checked": true
+    },
+    "served.photoDay": {
+      "text": "{day}, dan fotografije",
+      "checked": true
+    },
+    "served.anotherDay": {
+      "text": "Drugi dan",
+      "checked": true
+    },
+    "served.meal": {
+      "text": "Obrok",
+      "checked": true
+    },
+    "served.putIn": {
+      "text": "Upiši kao pojedeno: {day}, {meal}",
+      "checked": true
+    },
+    "served.ateFoot": {
+      "text": "Računa se u taj dan, sa fotografijom. Tanjir ostaje u Posluženo.",
+      "checked": true
+    },
+    "served.ateFootMany": {
+      "text": "Tvoja jela ulaze kao jedan obrok, sa fotografijama. Tanjiri ostalih se ne računaju. Sve ostaje u Posluženo.",
+      "checked": true
+    },
+    "served.chip": {
+      "text": "Posluženo · {n}",
+      "checked": true
     }
   }
 }

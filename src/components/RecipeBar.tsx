@@ -10,8 +10,10 @@ import { EMPTY, MOMENTS, SORTS, countLine, isIdle, madeByLabel, type Filters, ty
 
 type Open = "madeBy" | "kitchen" | "moment" | null;
 
-export function RecipeBar({ f, set, sort, setSort, kitchens, madeBy, shown, total, coachLabel }:
-  { f: Filters; set: (f: Filters) => void; sort: Sort; setSort: (s: Sort) => void; kitchens: Line[]; madeBy: Line[]; shown: number; total: number; coachLabel: string }) {
+export function RecipeBar({ f, set, sort, setSort, kitchens, madeBy, shown, total, coachLabel, served }:
+  { f: Filters; set: (f: Filters) => void; sort: Sort; setSort: (s: Sort) => void; kitchens: Line[]; madeBy: Line[]; shown: number; total: number; coachLabel: string;
+    // DT268 (0.3.118): the Served chip, when there are plates scanned to explore
+    served?: { n: number; on: boolean; toggle: () => void } }) {
   const [open, setOpen] = useState<Open>(null);
   const toggle = (o: Open) => setOpen(open === o ? null : o);
   const drop = (id: Exclude<Open, null>, label: string, lit: string | null, lines: Line[], value: string | null) => (
@@ -39,6 +41,7 @@ export function RecipeBar({ f, set, sort, setSort, kitchens, madeBy, shown, tota
         {chip(f.day, w("recipebar.fitsMyDay"), () => set({ ...f, day: !f.day }))}
         {chip(f.nocook, w("recipebar.noCooking"), () => set({ ...f, nocook: !f.nocook }))}
         {chip(f.withMine, w("recipebar.withMyFoods"), () => set({ ...f, withMine: !f.withMine }))}
+        {served && served.n > 0 && <span className="rb-served">{chip(served.on, w("served.chip", { n: served.n }), served.toggle)}</span>}
       </div>
       {sheet("madeBy", w("recipebar.madeBy"), madeBy, f.madeBy, (k) => set({ ...f, madeBy: k }), w("rb.all"), String(total))}
       {sheet("kitchen", w("rb.kitchen"), kitchens, f.kitchen, (k) => set({ ...f, kitchen: k }), w("recipebar.allKitchens"), String(total))}

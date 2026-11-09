@@ -10,10 +10,11 @@ import { w, mealV } from "./words";
 
 // DT244 (0.3.96, board Stories182; Coach Milan 6 November 10:38 and 10:39): local, the name in the app's language (Srpski or
 // German, also in Travel mode); name stays English, kept as the food's other name (aliases) for search and the food table
+import { DISHES } from "./served";
 export type PhotoFood = { name: string; local?: string; grams: number; low: number; high: number; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; confidence: "high" | "medium" | "low" };
 // DT228 v2 (0.3.63): a food whose kind the read cannot tell, with two to four kinds it could be and Chef Mealan's question
 export type Which = { name: string; question: string; options: { name: string; calories: number; protein: number; fats: number | null; carbs: number | null; fiber: number | null }[] };
-export type PhotoRead = { dish: string; dishLocal?: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null; which?: Which | null };
+export type PhotoRead = { course?: import("./served").Dish; dish: string; dishLocal?: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null; which?: Which | null };
 export type Estimate = { low: number; high: number };
 
 // what the server returns, checked: names, numbers, at most eight foods, grams in sense
@@ -31,7 +32,9 @@ export function cleanRead(d: any): PhotoRead | null {
   const a = num(u?.options?.[0], 1), b = num(u?.options?.[1], 1);
   const unsure = u && typeof u.name === "string" && a !== null && b !== null && a !== b && foods.some((f) => f.name.toLowerCase() === String(u.name).toLowerCase()) ? { name: String(u.name).slice(0, 60), options: [Math.min(a, b), Math.max(a, b)] as [number, number] } : null;
   const dishLocal = typeof d.dishLocal === "string" ? d.dishLocal.replace(/\s+/g, " ").trim().slice(0, 60) : "";
-  return { dish: String(d.dish ?? "").trim().slice(0, 60), ...(dishLocal ? { dishLocal } : {}), foods, unsure, which: whichOf(d.which, foods, num) };
+  // DT268 (0.3.118): which dish of a meal it is, as the read guessed; anything else is no guess
+  const course = (DISHES as readonly string[]).includes(String(d.course)) ? (d.course as PhotoRead["course"]) : undefined;
+  return { dish: String(d.dish ?? "").trim().slice(0, 60), ...(dishLocal ? { dishLocal } : {}), ...(course ? { course } : {}), foods, unsure, which: whichOf(d.which, foods, num) };
 }
 // DT228 v2: the question about a food's kind, checked: it names a food of the read; two to four kinds, each with its values
 function whichOf(wh: any, foods: PhotoFood[], num: (x: unknown, lo?: number, hi?: number) => number | null): Which | null {
