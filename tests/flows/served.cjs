@@ -1,4 +1,4 @@
-// DT268 steps 1 and 2 (0.3.118, 0.3.119, board Stories201; Coach Milan 9 November 21:46 to 23:44, Go): Served. A plate read as Exploring is kept
+// DT268 steps 1 to 3 (0.3.118 to 0.3.120, board Stories201; Coach Milan 9 November 21:46 to 23:44, Go): Served. A plate read as Exploring is kept
 // on its own: the name and the dish as Chef Mealan read them; Scan another plate, mine or someone else's, joins the visit;
 // nothing is logged. Recipes shows the visit as one card with its note; a Served plate opens with its photo, the honest line
 // its numbers each with a range, and its foods; Share the numbers draws the picture and opens the share sheet; I ate this asks the day and the meal and puts your dishes in as one meal. The read is a stand-in (no AI here).
@@ -38,6 +38,13 @@ const READS = [
     await page.addInitScript(() => { window.__shared = []; navigator.canShare = (d) => !!(d && d.files && d.files.length); navigator.share = async (d) => { window.__shared.push({ title: d.title, files: (d.files || []).map((f) => ({ name: f.name, type: f.type, size: f.size })) }); }; });
     let n = 0;
     await page.route("**/api/plate-photo", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(READS[Math.min(n++, READS.length - 1)]) }));
+    // the stand-in menu read: the plates come as names and foods; the meatballs match a line with a weight, the quesadilla could be two
+    let menuAsked = null;
+    await page.route("**/api/menu-read", (r) => { const body = JSON.parse(r.request().postData() || "{}"); menuAsked = body; const id = (re) => (body.plates.find((x) => re.test(x.name)) || {}).id;
+      r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ lines: [
+        { name: "Brusketi sa paradajzom", grams: 150, unit: "g", course: "starter" }, { name: "Ćufte u paradajz sosu, pire", grams: 300, unit: "g", course: "main", about: "in tomato sauce, fried" },
+        { name: "Kesadilja sa piletinom", grams: 320, unit: "g", course: "main" }, { name: "Kesadilja sa sirom", grams: 280, unit: "g", course: "main" }, { name: "Limunada", grams: 330, unit: "ml", course: "drink" }],
+        matches: [{ plate: id(/Meatballs/), line: 1, sure: true }, { plate: id(/Bruschetta/), line: 0, sure: true }, { plate: id(/quesadilla/), line: 2, sure: false, options: [2, 3] }] }) }); });
     await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "A classic.", around: "", better_as: "" }) }));
     await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
     await page.route("**/api/members/foods**", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, foods: [] }) }));
@@ -102,12 +109,38 @@ const READS = [
     s = await st();
     ok(/Café Jadran/.test(await text(".sv-visit-title b")) && /Saturday/.test(await text(".sv-visit-title small")) && s.served.every((x) => x.note === "Café Jadran"), "the note is the visit's title, the day under it, on every plate of the visit");
     ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "Recipes fits the width");
+    // ---- step 3: a photo of the menu ----
+    const before = (await st()).served.find((x) => /Meatballs/.test(x.name));
+    ok(await g.getByRole("button", { name: "📷 Add a photo of the menu" }).count() === 1, "the visit has Add a photo of the menu");
+    await g.locator(".sv-menu-btn").click(); await page.waitForTimeout(300);
+    await g.locator(".sv-menu-add .pp-gallery input[type=file]").setInputFiles(file); await page.waitForTimeout(2200);
+    const mn = page.locator(".sv-menu");
+    ok(await mn.count() === 1 && await mn.locator("h3").innerText() === "The menu" && /^data:image/.test(await mn.locator(".sv-menu-photo").getAttribute("src")), "the menu opens with its photo");
+    ok(menuAsked && menuAsked.plates.length === 3 && menuAsked.plates.every((x) => x.id && x.name && x.foods.length && !("photo" in x)) && /^data:image/.test(menuAsked.image), "the read gets the menu's photo and the plates as names and foods, no photo of them");
+    ok(/5 lines read/.test(await text(".sv-menu .sv-label")) && await mn.locator(".sv-menu-line").count() === 5 && await mn.locator(".sv-menu-line.on").count() === 2, "five lines as printed; the two matched ones marked");
+    const mp = (await mn.locator(".sv-menu-plate").allInnerTexts()).map((x) => x.replace(/\s+/g, " "));
+    ok(/Bruschetta Brusketi sa paradajzom, 150 g · starter ✓ matched/.test(mp[0]) && /Meatballs, mine Ćufte u paradajz sosu, pire, 300 g · main ✓ matched/.test(mp[1]) && /Marko's quesadilla Kesadilja sa piletinom \/ Kesadilja sa sirom not sure/.test(mp[2]), "each plate with its line, weight and course; one not sure: " + mp.join(" | "));
+    s = await st();
+    const after = s.served.find((x) => /Meatballs/.test(x.name));
+    ok(after.menu?.grams === 300 && after.items.reduce((n, i) => n + i.grams, 0) === 300 && before.items.reduce((n, i) => n + i.grams, 0) === 245 && after.items.every((i) => i.est && i.est.high - i.est.low < i.grams * 0.32), "the menu's weight is the plate's total (245 g read, 300 g printed), with the menu's tighter range");
+    ok(s.servedMenus?.length === 1 && s.servedMenus[0].lines.length === 5 && s.servedMenus[0].asks.length === 1, "the menu is kept with the visit, one question open");
+    ok(/Marko's quesadilla: which one on the menu\?/.test(await text(".sv-menu-ask")) && await mn.locator(".sv-menu-ask .pill").count() === 2 && await mn.getByRole("button", { name: "Neither" }).count() === 1, "the one question: which of the two, or Neither");
+    ok(/A menu weight is what the kitchen says, often before cooking/.test(await text(".sv-menu .sv-foot")), "the limit is said: a menu weight is the kitchen's word");
+    const lowM = await mn.locator("button, label.pill").evaluateAll((xs) => xs.filter((x) => x.getBoundingClientRect().height < 44).map((x) => x.className));
+    ok(lowM.length === 0, "every button at least 44 px: " + lowM.join(", "));
+    await mn.getByRole("button", { name: "Kesadilja sa sirom, 280 g" }).click(); await page.waitForTimeout(400);
+    s = await st();
+    ok(s.served.find((x) => /quesadilla/.test(x.name)).menu?.name === "Kesadilja sa sirom" && s.servedMenus[0].asks.length === 0 && await mn.locator(".sv-menu-ask").count() === 0 && await mn.locator(".sv-menu-line.on").count() === 3, "the answer matches the plate and the question goes");
+    ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "the menu fits the width");
+    await mn.locator(".sv-back").click(); await page.waitForTimeout(400);
+    ok(await g.getByRole("button", { name: "The menu ›" }).count() === 1 && await g.locator(".sv-menu-btn").count() === 0, "back on Recipes the visit says The menu");
     // ---- 5. a Served plate, open ----
     await g.locator(".sv-row").filter({ hasText: "Marko's quesadilla" }).click(); await page.waitForTimeout(500);
     const one = page.locator(".sv-one");
     ok(await one.locator("h3").innerText() === "Marko's quesadilla" && await one.locator(".sv-mark").count() === 1 && /Café Jadran/.test(await text(".sv-tags")), "the plate opens: its name, the Served mark, the visit");
     ok(/Read from a photo, not weighed\. A kitchen you did not cook in often uses more oil and butter/.test(await text(".sv-honest")), "the honest line");
     ok(await one.locator(".sv-food").count() === 2 && /^data:image/.test(await one.locator(".sv-photo").getAttribute("src")), "the photo and the foods as read");
+    ok(/On the menu: Kesadilja sa sirom, 280 g/.test(await text(".sv-on-menu")) && /The menu gave the weight\. The amounts follow the menu now/.test(await text(".sv-tighter")), "the plate says its line on the menu, and that its amounts follow the menu");
     // step 2: the numbers, each with its range
     const nums = (await one.locator(".sv-num").allInnerTexts()).map((x) => x.replace(/\s+/g, " "));
     ok(nums.length === 5 && /^Energy about [\d,]+ kcal [\d,]+ to [\d,]+$/.test(nums[0]) && /^Protein about \d+ g \d+ to \d+ g$/.test(nums[1]) && /^Fat about/.test(nums[2]) && /^Carbs about/.test(nums[3]) && /^PD about [\d.]+ [\d.]+ to [\d.]+$/.test(nums[4]), "energy, protein, fat, carbs and PD, each about a number with its range: " + nums.join(" | "));
@@ -130,6 +163,10 @@ const READS = [
     ok(await one.getByRole("button", { name: /Start cooking|Cook again/ }).count() === 0 && await one.getByRole("button", { name: "I ate this" }).count() === 1 && await one.getByRole("button", { name: "Put it on the Plate" }).count() === 1, "no cooking; I ate this and Put it on the Plate");
     const low2 = await one.locator("button").evaluateAll((xs) => xs.filter((x) => x.getBoundingClientRect().height < 44).map((x) => x.className));
     ok(low2.length === 0, "every button at least 44 px: " + low2.join(", "));
+    const tight = rg(nums[0]);
+    await one.locator(".sv-not-this").click(); await page.waitForTimeout(400);
+    const wide = rg((await one.locator(".sv-num").first().innerText()).replace(/\s+/g, " "));
+    ok(await one.locator(".sv-on-menu").count() === 0 && await one.locator(".sv-tighter").count() === 0 && (wide[2] - wide[1]) / wide[0] > (tight[2] - tight[1]) / tight[0] && wide[0] < tight[0] && !(await st()).served.find((x) => /quesadilla/.test(x.name)).menu, `Not this takes the match off; the amounts are the photo's again, with its wider range for their size (about ${tight[0]}, ${tight.slice(1).join(" to ")} was; about ${wide[0]}, ${wide.slice(1).join(" to ")} now)`);
     // Remove asks first
     await one.locator(".sv-remove").click(); await page.waitForTimeout(200);
     ok((await st()).served.length === 3 && await one.getByRole("button", { name: "Remove this plate" }).count() === 1, "Remove asks first");

@@ -120,7 +120,7 @@ import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip }
 import { ratesOf } from "./letters";
 import { asMine, travels, toShare } from "./memberFoods";
 import { cleanRead, itemsOfRead } from "./mealPhoto";
-import { dishOf, visitFor, upsertServed, withNote, mealItems, mealTitle, type Served, type OnPlate } from "./served";
+import { dishOf, visitFor, upsertServed, withNote, mealItems, mealTitle, cleanMenu, applyMenu, withMenuLine, withoutMenuLine, type Served, type OnPlate, type VisitMenu } from "./served";
 import { identityTwins } from "./foodId";
 import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
@@ -2605,7 +2605,8 @@ export default function App() {
     keepServed: (next: Served) => setState((s) => { const list = upsertServed(s.served ?? [], next); return list === (s.served ?? []) && s.served ? s : { ...s, served: list }; }),
     servedPatch: (id: string, patch: Partial<Pick<Served, "name" | "dish" | "mine">>) => setState((s) => ({ ...s, served: (s.served ?? []).map((x) => (x.id === id ? { ...x, ...patch } : x)),
       ...(s.photo?.served?.id === id ? { photo: { ...s.photo, served: { ...s.photo.served, ...patch } } } : {}) })),
-    servedRemove: (id: string) => setState((s) => ({ ...s, served: (s.served ?? []).filter((x) => x.id !== id), ...(s.photo?.served?.id === id ? { photo: { ...s.photo, keep: false as const } } : {}) })),
+    servedRemove: (id: string) => setState((s) => { const served = (s.served ?? []).filter((x) => x.id !== id), visits = new Set(served.map((x) => x.visit));
+      return { ...s, served, ...(s.servedMenus ? { servedMenus: s.servedMenus.filter((m) => visits.has(m.visit)).map((m) => ({ ...m, asks: m.asks.filter((a) => a.plate !== id) })) } : {}), ...(s.photo?.served?.id === id ? { photo: { ...s.photo, keep: false as const } } : {}) }; }),
     servedNote: (visit: string, note: string) => setState((s) => ({ ...s, served: withNote(s.served ?? [], visit, note) })),
     // I ate this: your dishes of the visit go to the day as one meal, with their photos; the plates stay in Served
     servedAte: (ids: string[], slot: NonNullable<Feedback["slot"]>, at: string) => {
@@ -2618,6 +2619,32 @@ export default function App() {
         served: (s.served ?? []).map((x) => (ids.includes(x.id) ? { ...x, eatenAt: at } : x)) }));
       notify(w("app.loggedAt", { time: new Date(at).toTimeString().slice(0, 5) }));
     },
+    // DT268 step 3 (0.3.120, board Stories201, DT268g): the menu of a visit, read from its photo. The plates go as names and
+    // foods; each is matched to a line, or asked about when two lines fit
+    readMenu: async (visit: string, image: string) => {
+      const plates = (state.served ?? []).filter((x) => x.visit === visit);
+      if (!plates.length) return false;
+      setBusy(w("served.readingMenu"));
+      try {
+        // the whole menu is kept to look at, not a square cut of it
+        const [sent, thumb] = await Promise.all([resizeImageBase64(image, 1600, 1600), resizeImageBase64(image, 1000, 1000)]);
+        const d = await api("/api/menu-read", { image: sent, plates: plates.map((x) => ({ id: x.id, name: x.name, foods: (x.menu?.was ?? x.items).map((i) => i.food.name), grams: Math.round((x.menu?.was ?? x.items).reduce((n, i) => n + i.grams, 0)) })) });
+        const read = cleanMenu(d, plates.map((x) => x.id));
+        if (!read) { setError(w("served.menuNotRead")); return false; }
+        const menu: VisitMenu = { visit, photo: thumb, at: new Date().toISOString(), lines: read.lines, asks: read.asks };
+        setState((s) => ({ ...s, served: applyMenu((s.served ?? []).map((x) => (x.visit === visit ? withoutMenuLine(x) : x)), visit, read), servedMenus: [menu, ...(s.servedMenus ?? []).filter((m) => m.visit !== visit)] }));
+        return true;
+      } catch (e: any) { setError(e?.message || w("served.menuNotRead")); return false; } finally { setBusy(""); }
+    },
+    // the one question for a plate, answered: that line, or none of them
+    pickMenuLine: (plate: string, line: number | null) => setState((s) => {
+      const x = (s.served ?? []).find((y) => y.id === plate), m = x ? (s.servedMenus ?? []).find((y) => y.visit === x.visit) : undefined;
+      if (!x || !m) return s;
+      const l = line === null ? null : m.lines[line];
+      return { ...s, served: (s.served ?? []).map((y) => (y.id === plate && l ? withMenuLine(withoutMenuLine(y), l) : y)), servedMenus: (s.servedMenus ?? []).map((y) => (y.visit === m.visit ? { ...y, asks: y.asks.filter((a) => a.plate !== plate) } : y)) };
+    }),
+    // Not this: the match comes off
+    dropMenuLine: (plate: string) => setState((s) => ({ ...s, served: (s.served ?? []).map((y) => (y.id === plate ? withoutMenuLine(y) : y)) })),
     servedToPlate: (id: string) => { const x = (state.served ?? []).find((y) => y.id === id); if (!x) return; setState((s) => ({ ...s, items: x.items.map((i) => ({ ...i, id: uid(), est: undefined })), portion: null, title: x.name, photo: undefined })); setKind("meal"); setStep("in"); setMenuSection(null); setTab("journey"); },
     // DT115 (0.2.97): the members' catalogue, searched by words; a member's food becomes a copy in your library
     memberFoods: async (q: string) => { try { const d = await api(`/api/members/foods?q=${encodeURIComponent(q)}&region=${encodeURIComponent(shopRegion ?? "")}`); return Array.isArray(d?.foods) ? d.foods : []; } catch { return []; } },

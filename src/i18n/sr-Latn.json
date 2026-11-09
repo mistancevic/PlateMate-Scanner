@@ -21900,6 +21900,78 @@
     "served.back": {
       "text": "‹ Nazad",
       "checked": true
+    },
+    "served.addMenu": {
+      "text": "📷 Dodaj fotografiju jelovnika",
+      "checked": true
+    },
+    "served.theMenu": {
+      "text": "Jelovnik ›",
+      "checked": true
+    },
+    "served.menuTitle": {
+      "text": "Jelovnik",
+      "checked": true
+    },
+    "served.readingMenu": {
+      "text": "Čitam jelovnik…",
+      "checked": true
+    },
+    "served.menuNotRead": {
+      "text": "Jelovnik nije mogao da se pročita. Probaj oštriju fotografiju, pravo odozgo.",
+      "checked": true
+    },
+    "served.menuAgain": {
+      "text": "📷 Druga fotografija jelovnika",
+      "checked": true
+    },
+    "served.menuPhoto": {
+      "text": "Fotografija jelovnika",
+      "checked": true
+    },
+    "served.menuLines": {
+      "text": "{n} red pročitan|{n} reda pročitana|{n} redova pročitano",
+      "checked": true
+    },
+    "served.matched": {
+      "text": "✓ povezano",
+      "checked": true
+    },
+    "served.notSure": {
+      "text": "nije sigurno",
+      "checked": true
+    },
+    "served.notOnMenu": {
+      "text": "nije na jelovniku",
+      "checked": true
+    },
+    "served.whichOnMenu": {
+      "text": "{name}: koje je to na jelovniku?",
+      "checked": true
+    },
+    "served.neither": {
+      "text": "Nijedno",
+      "checked": true
+    },
+    "served.onTheMenu": {
+      "text": "Na jelovniku:",
+      "checked": true
+    },
+    "served.notThis": {
+      "text": "Nije ovo",
+      "checked": true
+    },
+    "served.menuTighter": {
+      "text": "Jelovnik je dao težinu. Količine sada prate jelovnik, a ne procenu sa fotografije.",
+      "checked": true
+    },
+    "served.menuLimit": {
+      "text": "Težina na jelovniku je ono što kuhinja kaže, često pre kuvanja. Ona sužava raspon; tanjiri ostaju Posluženo, nisu izmereni.",
+      "checked": true
+    },
+    "served.backToVisit": {
+      "text": "‹ {title}",
+      "checked": true
     }
   }
 }

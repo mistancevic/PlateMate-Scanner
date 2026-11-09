@@ -5474,6 +5474,24 @@
     "screen.served.pictureOf": {"en":"The picture of {name} with its numbers","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
     "screen.served.drawing": {"en":"Drawing the picture…","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
     "screen.served.savedToPhone": {"en":"Saved to the phone.","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
-    "screen.served.back": {"en":"‹ Back","area":"Words used across the app","where":"Across the app","release":"0.3.119"}
+    "screen.served.back": {"en":"‹ Back","area":"Words used across the app","where":"Across the app","release":"0.3.119"},
+    "screen.served.addMenu": {"en":"📷 Add a photo of the menu","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.theMenu": {"en":"The menu ›","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.menuTitle": {"en":"The menu","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.readingMenu": {"en":"Reading the menu…","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.menuNotRead": {"en":"The menu could not be read. Try a sharper photo, straight on.","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.menuAgain": {"en":"📷 Another photo of the menu","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.menuPhoto": {"en":"The photo of the menu","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.menuLines": {"en":"{n} line read|{n} lines read","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.matched": {"en":"✓ matched","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.notSure": {"en":"not sure","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.notOnMenu": {"en":"not on the menu","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.whichOnMenu": {"en":"{name}: which one on the menu?","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.neither": {"en":"Neither","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.onTheMenu": {"en":"On the menu:","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.notThis": {"en":"Not this","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.menuTighter": {"en":"The menu gave the weight. The amounts follow the menu now, not the photo's guess.","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.menuLimit": {"en":"A menu weight is what the kitchen says, often before cooking. It tightens the range; the plates stay Served, not weighed.","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.served.backToVisit": {"en":"‹ {title}","area":"Words used across the app","where":"Across the app","release":"0.3.120"}
   }
 }

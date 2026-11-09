@@ -49,7 +49,7 @@
  "src/components/SafetyNote.tsx": 0,
  "src/components/SafetyQuestion.tsx": 1,
  "src/components/SayHave.tsx": 1,
- "src/components/Served.tsx": 5,
+ "src/components/Served.tsx": 7,
  "src/components/SetupRow.tsx": 0,
  "src/components/ShortHelp.tsx": 0,
  "src/components/SignInPanel.tsx": 1,
@@ -96,7 +96,7 @@
  "src/screens/PilotGate.tsx": 0,
  "src/screens/PlanScreen.tsx": 14,
  "src/screens/RecipePages.tsx": 58,
- "src/screens/RecipesScreen.tsx": 4,
+ "src/screens/RecipesScreen.tsx": 5,
  "src/screens/ShareScreen.tsx": 1,
  "src/screens/SignInScreen.tsx": 0,
  "src/screens/SummaryPanel.tsx": 1
