@@ -2273,14 +2273,16 @@ export default function App() {
     setPlateTaste(presetOf(dishTaste(meal.items.map((i) => i.food.name))));
     // a recipe that came in from a screenshot or a link opens as it did the first time (0.2.19, IM13): the Plate does it
     if (meal.makes) setState((s) => ({ ...s, title: meal.title, items: [], portion: null, photo: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, openRecipe: meal.id }));
-    else setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null, fromRecipe: undefined, leftOut: undefined, emptyParts: undefined, optional: optAt(meal.optional, 1 / portionsIn(meal), uid) }));
+    // 0.3.126 (blind run 10 November, finding 1): a new plate lets go of the Served plate it was exploring. Its photo stayed,
+    // so the Served plate kept saving and took the recipe's foods under a friend's cake.
+    else setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null, fromRecipe: undefined, leftOut: undefined, emptyParts: undefined, optional: optAt(meal.optional, 1 / portionsIn(meal), uid), ...(s.photo?.served ? { photo: undefined } : {}) }));
     setKind(meal.kind ?? "meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
   };
   // a slot's meal onto the Plate as it always opened
   const fillOnPlateNow = (f: Filling, meal?: Meal | null, title?: string) => {
     setFilling(f);
     setPlateRecipeId(meal?.id || f.mealId || null);
-    setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? asDish(meal) : [], portion: null, fromRecipe: undefined, leftOut: undefined, emptyParts: undefined, optional: meal ? optAt(meal.optional, 1 / portionsIn(meal), uid) : undefined }));
+    setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? asDish(meal) : [], portion: null, fromRecipe: undefined, leftOut: undefined, emptyParts: undefined, optional: meal ? optAt(meal.optional, 1 / portionsIn(meal), uid) : undefined, ...(s.photo?.served ? { photo: undefined } : {}) }));
     setKind("meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
   };
   // DT131 (0.2.113): foods about to land on a plate that has foods wait for one answer; on an empty plate they land at once

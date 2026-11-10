@@ -259,6 +259,14 @@ const READS = [
     ok(s.photo?.who === "idea" && s.photo?.served?.byHand === true && s.served.length === n274 && s.served[0].mine === true && s.feedback.length === fb274, "the pencil on Exploring: an Exploring plate, kept as Served; nothing logged");
     ok(await page.locator(".sv-plate").count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Ate it" }).count() === 0, "the Served card shows and the buttons are an Exploring plate's");
     ok(await page.locator(".sv-plate .sv-by").count() === 1, "the dish was not read for this plate, so only the name says filled by Chef Mealan");
+    // 0.3.126 (blind run 10 November, finding 1): a recipe as a new plate lets go of the Served plate; the kept plate keeps its foods
+    const kept126 = JSON.stringify((await st()).served[0].items.map((i) => [i.food.name, i.grams]));
+    await page.goto(U + "/my-recipes/m-bowl"); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: /^(Make it|Change it first)/ }).first().click(); await page.waitForTimeout(900);
+    await page.locator(".plate-ask").getByRole("button", { name: "Start a new plate" }).click(); await page.waitForTimeout(900);
+    s = await st();
+    ok(!s.photo && s.items.length === 2 && /Skyr/.test(s.items[0].food.name) && s.served.length === n274 && JSON.stringify(s.served[0].items.map((i) => [i.food.name, i.grams])) === kept126, "a recipe as a new plate: the Plate has the recipe, the Served plate keeps its own foods: " + s.served[0].items.map((i) => i.food.name).join(", "));
+    ok(await page.locator(".sv-plate").count() === 0, "the Served card is off the Plate");
     // emptying the Plate takes nothing out of Served
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(600);
     s = await st();
