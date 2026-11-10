@@ -2450,7 +2450,9 @@ export function JourneyScreen(p: AppApi) {
         {madeSteps.length > 0 && (
           <section className="card mk-card" aria-label={w("make.theSteps")}>
             <b>{w("make.tickEachStepWhenIt")}</b>
-            {madeSteps.map((x, k) => { const on = ticks.has(`s${k}`), ph = stepPhotos[String(k)]; return (
+            {/* DT276 step 1 (0.3.127, board Stories205; Coach Milan 10 November 22:37, Go): a step has one picture and every place
+                shows it. This list showed only this cook's photos, so a step the recipe has a picture of said ＋ Photo. */}
+            {madeSteps.map((x, k) => { const on = ticks.has(`s${k}`), src = rec?.steps?.length ? rec : plateRecipe?.steps?.length ? plateRecipe : null, ph = stepPhotos[String(k)] ?? stepPicOf(src, x)?.src; return (
               <PhotoPick key={k} onFile={(f) => stepPhotoFile(k, f)}>{({ toggle, open }) => <div className="mk-row">
                 <button type="button" className={`mk-check ${on ? "on" : ""}`} aria-pressed={on} onClick={() => tick(k)}>
                   <span className="mk-box">{on ? "✓" : ""}</span><span>{stepParts(tempsIn(x), stepItems).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</span>

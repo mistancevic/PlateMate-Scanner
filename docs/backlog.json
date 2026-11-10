@@ -866,6 +866,30 @@
       "epic": "plate",
       "state": "later",
       "why": "Coach Milan 10 November 09:42: because there is no save button, everything is saved based on the last setting? Yes for where a meal lands: the pencil line at the moment of the tap. The tap does not say so. To look at after the blind run."
+    },
+    {
+      "id": "DT276",
+      "title": "Photos on the steps: one store, shown everywhere, more than one per step, several at once",
+      "epic": "recipes",
+      "state": "next",
+      "board": "Stories205",
+      "why": "Coach Milan 10 November 21:24 to 22:37, Go: step photos seemed to live in three places and went in one by one. Step 1 (Make's tick list shows the recipe's step picture) is built, 0.3.127. Step 2: a step can have two or more pictures, all kept in the recipe's photos. Step 3: pick several at once and place them on the steps.",
+      "version": "0.3.127"
+    },
+    {
+      "id": "DT277",
+      "title": "Training week: a day shows it can be opened",
+      "epic": "me",
+      "state": "next",
+      "board": "Stories206",
+      "why": "Coach Milan 10 November 21:54: it is not clear what to do here. A pencil on a day with training, a plus on a day with none. Drawn; waits for Go."
+    },
+    {
+      "id": "DT278",
+      "title": "Blind run 10 November: the friend's plate, the menu, numbers, Srpski",
+      "epic": "plate",
+      "state": "later",
+      "why": "docs/qa/blind/2026-11-10-jelena-first-run. Finding 1 (a new plate overwrote a Served plate) is fixed, 0.3.126. Findings 2 to 4 are one problem: the app never offers someone else's plate where it asks. To draw."
     }
   ]
 }
