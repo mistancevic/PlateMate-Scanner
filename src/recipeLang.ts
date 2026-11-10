@@ -22,7 +22,8 @@ export function shownMeal(m: Meal, lang: Lang): Meal {
   const tr = m.tr;
   if (!tr || !current(m, lang) || m.trShow === "orig") return m;
   const steps = m.steps ?? [];
-  const meta = m.stepPicMeta?.map((x, k) => (x && x.step === steps[k] && tr.steps[k] ? { ...x, step: tr.steps[k] } : x));
+  // DT276 step 2 (0.3.129): a step's other pictures sit after the steps, so each picture finds its step by its words
+  const meta = m.stepPicMeta?.map((x) => { const k = x ? steps.indexOf(x.step) : -1; return x && k >= 0 && tr.steps[k] ? { ...x, step: tr.steps[k] } : x; });
   return {
     ...m, title: tr.title || m.title, steps: tr.steps.length === steps.length ? tr.steps : steps,
     items: m.items.map((i) => (tr.foods?.[i.id] && !i.food.refId ? { ...i, food: { ...i.food, name: tr.foods[i.id] } } : i)),

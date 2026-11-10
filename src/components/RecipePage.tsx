@@ -2,7 +2,7 @@ import { StepPicShown, StepPicSheet, StepPlayer, CoverVideo } from "./StepPics";
 import { w, wn, wIn, wordV, dateText, mealV, type Val, type WordKey } from "../words";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
-import { stepPicOf, setStepPic, alignStepPics, allStepPics } from "../photos";
+import { stepPicOf, stepPicsOf, setStepPic, addStepPic, removeStepPic, firstStepPic, alignStepPics, allStepPics } from "../photos";
 import { ThinkingCard } from "./ThinkingCard";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cookName, weighLine, aroundV } from "../cookWords";
@@ -265,6 +265,12 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         {!full && <button className="publish-photo add rph-add" disabled={busy} onClick={() => fileRef.current?.click()}><Camera size={18} /><span>{w("recipe.add")}</span></button>}
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void fromFile(f); }} />
       </div>
+      {/* DT276 step 2 (0.3.129, board Stories205): the photos on the steps are this recipe's photos too; a tap opens the step */}
+      {!edit && (() => { const on = (meal.steps ?? []).flatMap((t, k) => (meal.steps!.indexOf(t) === k ? stepPicsOf(meal, t).map((x) => ({ k, src: x.src })) : [])); return on.length > 0 && (
+        <div className="rq-on-steps">
+          <b>{w("recipe.onTheSteps")}</b>
+          <div>{on.map((x, i) => <button key={i} type="button" aria-label={w("recipe.photoOfStep", { n: x.k + 1 })} onClick={() => setPicAt(x.k)}><img src={x.src} alt="" /><span>{x.k + 1}</span></button>)}</div>
+        </div>); })()}
       {picture && list.length === 0 && !drawn && (() => {
         const c = picture.count, out = c ? c.used >= c.limit : false;
         return (
@@ -447,7 +453,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               {meal.stepMarks && <small className="muted">{meal.stepsKitchen || w("recipe.chefStepsFromOriginal")}</small>}
               <ol className="rp-steps">{own.map((x, k) => [partHead(meal.stepParts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div>
                 {/* DT211 v8 (0.3.53): the step's photo comes from cooking; no + slot here, a tap changes or removes it */}
-                <StepPicShown pic={stepPicOf(meal, x)} k={k} onOpen={() => setPicAt(k)} /></li>])}</ol>
+                <StepPicShown pic={stepPicOf(meal, x)} k={k} more={Math.max(0, stepPicsOf(meal, x).length - 1)} onOpen={() => setPicAt(k)} /></li>])}</ol>
               <small className="muted">{w("recipe.photosForTheSteps")}</small>
             </>);
             // DT256: steps made the recipe's own from the original, word for word: one list, with the original's line
@@ -542,7 +548,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         </>
       )}
       {picAt !== null && meal.steps?.[picAt] !== undefined && <StepPicSheet k={picAt} step={meal.steps[picAt]} items={meal.items} pic={stepPicOf(meal, meal.steps[picAt])} fromCooks={cookPhotosFor(meal, cards, picAt)}
-        onKeep={(pic) => { onPatch(setStepPic(meal, picAt, pic)); setPicAt(null); }} onRemove={() => { onPatch(setStepPic(meal, picAt, null)); setPicAt(null); }} onClose={() => setPicAt(null)} />}
+        all={stepPicsOf(meal, meal.steps[picAt])} onFirst={(src) => { onPatch(firstStepPic(meal, picAt, src)); setPicAt(null); }}
+        // DT276 step 2 (0.3.129): a new picture is added to the step; the one it has stays. The first one kept again only says who made it
+        onKeep={(pic) => { const first = stepPicOf(meal, meal.steps![picAt]); onPatch(!first || first.src === pic.src ? setStepPic(meal, picAt, pic) : addStepPic(meal, picAt, pic)); setPicAt(null); }}
+        onRemove={(src) => { onPatch(src ? removeStepPic(meal, picAt, src) : setStepPic(meal, picAt, null)); setPicAt(null); }} onClose={() => setPicAt(null)} />}
       {watching && meal.steps && allStepPics(meal, meal.steps) && <StepPlayer title={meal.title} steps={meal.steps} items={meal.items} pics={meal.steps.map((t) => stepPicOf(meal, t)!)} onClose={() => setWatching(false)} onCook={onCookIt ? () => { setWatching(false); onCookIt(); } : null} />}
     </div>
   );

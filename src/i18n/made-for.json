@@ -5509,6 +5509,20 @@
     "screen.plate.plusOther": {"en":"A different meal","area":"The Plate","where":"The Plate","release":"0.3.123"},
     "screen.plate.plusOtherLine": {"en":"A new plate. This one is saved for later.","area":"The Plate","where":"The Plate","release":"0.3.123"},
     "screen.served.whose": {"en":"Whose plate","area":"Words used across the app","where":"Across the app","release":"0.3.125"},
-    "screen.served.someoneElse": {"en":"Someone else's","area":"Words used across the app","where":"Across the app","release":"0.3.125"}
+    "screen.served.someoneElse": {"en":"Someone else's","area":"Words used across the app","where":"Across the app","release":"0.3.125"},
+    "screen.steppics.thisStepsPhotos": {"en":"This step's photos","area":"Recipes","where":"Recipes","release":"0.3.129"},
+    "screen.steppics.photoNOfStep": {"en":"Photo {k} of step {n}","area":"Recipes","where":"Recipes","release":"0.3.129"},
+    "screen.steppics.makeItFirst": {"en":"Make it first","area":"Recipes","where":"Recipes","release":"0.3.129"},
+    "screen.steppics.firstPhotoWhy": {"en":"The first photo is the one the recipe page and Watch the steps show. Keep it adds a new photo to the step.","area":"Recipes","where":"Recipes","release":"0.3.129"},
+    "screen.cookmode.addAnotherPhoto": {"en":"Add another photo","area":"Cooking","where":"Cooking","release":"0.3.129"},
+    "screen.cookmode.picNOf": {"en":"{k} of {n}","area":"Cooking","where":"Cooking","release":"0.3.129"},
+    "screen.cookmode.nextPhoto": {"en":"The next photo of this step","area":"Cooking","where":"Cooking","release":"0.3.129"},
+    "screen.make.stepPhotoN": {"en":"Photo {k} of step {n}","area":"The Plate","where":"The Plate","release":"0.3.129"},
+    "screen.make.makeItFirst": {"en":"Make it first","area":"The Plate","where":"The Plate","release":"0.3.129"},
+    "screen.make.removeFromStep": {"en":"Remove from this step","area":"The Plate","where":"The Plate","release":"0.3.129"},
+    "screen.make.closePhoto": {"en":"Close","area":"The Plate","where":"The Plate","release":"0.3.129"},
+    "screen.make.firstPhotoWhy": {"en":"The first photo is the one the recipe page and Watch the steps show.","area":"The Plate","where":"The Plate","release":"0.3.129"},
+    "screen.recipe.onTheSteps": {"en":"On the steps","area":"Recipes","where":"Recipes","release":"0.3.129"},
+    "screen.recipe.photoOfStep": {"en":"A photo of step {n}","area":"Recipes","where":"Recipes","release":"0.3.129"}
   }
 }

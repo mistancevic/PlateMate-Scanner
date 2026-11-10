@@ -78,7 +78,7 @@ import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 import { cookName, cookPhrase, weighLine, aroundWord, aroundSaved, needsCooking, cookedFood, rawHint, cookTitle } from "../cookWords";
 import { PairedCookMode } from "../components/CookPair";
-import { stepPicOf, setStepPic } from "../photos";
+import { stepPicOf, stepPicsOf, addStepPic, removeStepPic, firstStepPic } from "../photos";
 import { kitchenName } from "../travel";
 import { SayHave } from "../components/SayHave";
 import { type CookUi, type Later, stripWords, resumeLine, cookStarted, plateSince, plateOldOf, whenWords, dayWord, dayIn, foodsLineIn, laterRow } from "../cooking";
@@ -210,6 +210,8 @@ export function JourneyScreen(p: AppApi) {
   const [plate, setPlate] = useState<string>(() => ui0.final ?? "");
   // DT211 v8: a photo on each step, by its place
   const [stepPhotos, setStepPhotos] = useState<Record<string, string>>(() => ui0.stepPhotos ?? {});
+  // DT276 step 2 (0.3.129): the step picture shown large in Make's list
+  const [picOpen, setPicOpen] = useState<{ k: number; src: string } | null>(null);
   // How did making it go? (Y1 column 9, 10 October 2026): photos while it's on the counter, how it went, how much was eaten
   const [photos, setPhotos] = useState<string[]>([]);
   const [went, setWent] = useState<"as" | "not">(() => ui0.went ?? "as");
@@ -1291,14 +1293,15 @@ export function JourneyScreen(p: AppApi) {
   // DT212 v4 (board Stories159): Read the photo again asks first
   const [readAgain, setReadAgain] = useState(false);
   // DT223 (0.3.60): from cook mode the photo is the recipe's step picture, taken again or not (keep)
-  const stepPhotoFile = (k: number, file?: File | null, keep = false) => {
+  const stepPhotoFile = (k: number, file?: File | null, _keep = false) => {
     if (!file) return;
     const r = new FileReader();
     r.onload = () => thumbnailBase64(String(r.result), 480).then((d) => {
       setStepPhotos((x) => ({ ...x, [String(k)]: d }));
-      // DT211 v8 (gap 6): the step's photo on the recipe too, when the step has none yet; else it stays with the cook
+      // DT276 step 2 (0.3.129, board Stories205): the photo goes on the recipe's step too: its first when the step has none,
+      // one more when it has. Nothing is replaced and nothing is asked.
       const m = cookRecipe, words = m?.steps?.[k];
-      if (m && words !== undefined && (keep || !stepPicOf(m, words))) setState((st) => ({ ...st, meals: st.meals.map((x) => (x.id === m.id ? { ...x, ...setStepPic(x, k, { src: d, by: "me" }) } : x)) }));
+      if (m && words !== undefined) setState((st) => ({ ...st, meals: st.meals.map((x) => (x.id === m.id ? { ...x, ...addStepPic(x, k, { src: d, by: "me" }) } : x)) }));
     }).catch(() => {});
     r.readAsDataURL(file);
   };
@@ -2438,6 +2441,7 @@ export function JourneyScreen(p: AppApi) {
             return String(d.reply || "");
           } : null}
           pics={(() => { const src = rec?.steps?.length ? rec : plateRecipe?.steps?.length ? plateRecipe : null; return madeSteps.map((t, k) => (stepPhotos[String(k)] ? { src: stepPhotos[String(k)], by: "me" as const } : stepPicOf(src, t))); })()}
+          allPics={(() => { const src = rec?.steps?.length ? rec : plateRecipe?.steps?.length ? plateRecipe : null; return madeSteps.map((t) => stepPicsOf(src, t)); })()}
           link={{
             // DT222 (0.3.60, board Stories165): done leads to Eat: the meal's photo, then Cooked. Next: Eat
             since: state.cook?.startedAt,
@@ -2450,16 +2454,33 @@ export function JourneyScreen(p: AppApi) {
         {madeSteps.length > 0 && (
           <section className="card mk-card" aria-label={w("make.theSteps")}>
             <b>{w("make.tickEachStepWhenIt")}</b>
-            {/* DT276 step 1 (0.3.127, board Stories205; Coach Milan 10 November 22:37, Go): a step has one picture and every place
-                shows it. This list showed only this cook's photos, so a step the recipe has a picture of said ＋ Photo. */}
-            {madeSteps.map((x, k) => { const on = ticks.has(`s${k}`), src = rec?.steps?.length ? rec : plateRecipe?.steps?.length ? plateRecipe : null, ph = stepPhotos[String(k)] ?? stepPicOf(src, x)?.src; return (
-              <PhotoPick key={k} onFile={(f) => stepPhotoFile(k, f)}>{({ toggle, open }) => <div className="mk-row">
+            {/* DT276 step 1 (0.3.127, board Stories205; Coach Milan 10 November 22:37, Go): a step's pictures are the recipe's,
+                and every place shows them. Step 2 (0.3.129): a step can have two or more; a new photo is added next to the
+                others. A tap on a picture shows it large: make it the first, or take it off the step. */}
+            {madeSteps.map((x, k) => { const on = ticks.has(`s${k}`), src = rec?.steps?.length ? rec : plateRecipe?.steps?.length ? plateRecipe : null;
+              const kept = stepPicsOf(src, x).map((y) => y.src), mine = stepPhotos[String(k)], list = kept.length ? kept : mine ? [mine] : [];
+              const shown = picOpen?.k === k && list.includes(picOpen.src) ? picOpen.src : null;
+              const drop = (y: string) => { if (src && kept.includes(y)) setState((st) => ({ ...st, meals: st.meals.map((m) => (m.id === src.id ? { ...m, ...removeStepPic(m, k, y) } : m)) })); if (mine === y) setStepPhotos((o) => { const n = { ...o }; delete n[String(k)]; return n; }); setPicOpen(null); };
+              return (
+              <PhotoPick key={k} onFile={(f) => stepPhotoFile(k, f)}>{({ toggle, open }) => <div className="mk-step"><div className="mk-row">
                 <button type="button" className={`mk-check ${on ? "on" : ""}`} aria-pressed={on} onClick={() => tick(k)}>
                   <span className="mk-box">{on ? "✓" : ""}</span><span>{stepParts(tempsIn(x), stepItems).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</span>
                 </button>
-                <button type="button" className={`mk-photo${ph ? "" : " empty"}`} aria-expanded={open} onClick={toggle} aria-label={ph ? w("make.changeStepPhoto", { n: k + 1 }) : w("make.addStepPhoto", { n: k + 1 })}>
-                  {ph ? <img src={ph} alt="" /> : <><b>＋</b><span>{w("make.photo")}</span></>}
-                </button>
+                {!list.length && <button type="button" className="mk-photo empty" aria-expanded={open} onClick={toggle} aria-label={w("make.addStepPhoto", { n: k + 1 })}><b>＋</b><span>{w("make.photo")}</span></button>}
+              </div>
+              {list.length > 0 && <div className="mk-pics">
+                {list.map((y, n) => <button key={n} type="button" className={`mk-pic${shown === y ? " on" : ""}`} aria-expanded={shown === y} aria-label={w("make.stepPhotoN", { k: n + 1, n: k + 1 })} onClick={() => setPicOpen(shown === y ? null : { k, src: y })}><img src={y} alt="" /></button>)}
+                <button type="button" className="mk-photo empty" aria-expanded={open} onClick={toggle} aria-label={w("make.addStepPhoto", { n: k + 1 })}><b>＋</b><span>{w("make.photo")}</span></button>
+              </div>}
+              {shown && <div className="mk-pic-open">
+                <img src={shown} alt={w("make.stepPhotoN", { k: list.indexOf(shown) + 1, n: k + 1 })} />
+                <div className="button-row">
+                  {src && kept.indexOf(shown) > 0 && <button type="button" className="pill pill-small" onClick={() => { setState((st) => ({ ...st, meals: st.meals.map((m) => (m.id === src.id ? { ...m, ...firstStepPic(m, k, shown) } : m)) })); setPicOpen(null); }}>{w("make.makeItFirst")}</button>}
+                  <button type="button" className="pill pill-small" onClick={() => drop(shown)}>{w("make.removeFromStep")}</button>
+                  <button type="button" className="pill pill-small" onClick={() => setPicOpen(null)}>{w("make.closePhoto")}</button>
+                </div>
+                {src && kept.length > 1 && <small className="muted">{w("make.firstPhotoWhy")}</small>}
+              </div>}
               </div>}</PhotoPick>); })}
           </section>
         )}
