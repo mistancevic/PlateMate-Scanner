@@ -1,0 +1,358 @@
+{
+ "title": "Jelena, first run, 0.3.125",
+ "who": "Jelena, 41, office worker from Novi Sad, 170 cm and 74 kg, wants to lose a few kilos slowly, does pilates twice a week, cooks Balkan and Italian food, reads Serbian on an Android phone and is not technical.",
+ "goal": "Set up the app on Saturday 7 November, then at a café log her own croque madame, keep Ana's meatballs and Marko's chocolate cake without counting them, add the menu and send Ana her numbers. On Monday 9 November find Saturday's lunch and the friends' plates again and plan a dinner to cook.",
+ "result": "Jelena finished setup (goal 1) in 24 taps and 3 typed fields, about 6 minutes, and logged her own lunch in 5 taps (643 kcal, 42 g protein). Goal 2 took two tries and about 30 taps over roughly 12 minutes: her first try at Ana's plate ended with the plate thrown away by 'Nije moje', and she found the way to keep a friend's plate (pencil, 'Istraživanje', 'Tuđi') by luck. From there Marko's plate, the menu (goal 3, 5 taps) and sending Ana's numbers (goal 4, 2 taps) went well, though the menu changed Ana's numbers from 603 to 528 kcal after she had sent them. On Monday she found Saturday's lunch in 2 taps and the friends' plates under Recepti, Posluženo (goal 5), and planned dinner for today and tomorrow in 2 and 4 taps (goal 6), but cooking steps need the AI and planning sarma overwrote Marko's saved plate. The biggest problems: no 'someone else's plate' answer where the app asks, a friend's plate that stays on the Tanjir and corrupts later work, and a lot of English on Serbian screens. Test notes: the app was reopened between scripts, which interrupted setup once; I restarted fresh once to count taps on a clean path; the test phone does not carry the photo store between scripts, so the lunch photo on Monday was checked in one unbroken session (it is kept).",
+ "build": "0.3.125, the local build without accounts; the AI is a stand-in for plate and menu photos, absent elsewhere",
+ "compared": "",
+ "steps": [
+  [
+   "01-first-open.jpg",
+   "First open. Banner 'Chef Mealan je i na srpskom.' above an English welcome. She taps 'Na srpskom'."
+  ],
+  [
+   "03-after-18.jpg",
+   "Setup page 'Tvoj dan u pet brojeva'. A consent card 'Pre tvojih brojeva' sits above a greyed body form. Labels 'Weight, kg', 'enter cm', 'enter kg' are English."
+  ],
+  [
+   "05-crash.jpg",
+   "After 'Slažem se' the body form is gone and a health question 'Da li nešto od ovoga važi za tebe?' takes its place. She did not expect it. (File name says crash: only my script stopped.)"
+  ],
+  [
+   "07-after-none-applies.jpg",
+   "She ticks 'Ništa od ovoga ne važi za mene'. A line reads '7. novembar 2026, current: none applies'. Button 'Dalje: 1. Ti'."
+  ],
+  [
+   "15-what-light-means.jpg",
+   "She opens 'Šta znače lako, umereno i jako ›' to place pilates. It lists 'joga, mobilnost, istezanje', then 'Walking goes in steps.' in English. Pilates is not named. She picks 'Lako'."
+  ],
+  [
+   "22-after-goal-tap-same-scroll.jpg",
+   "She taps 'Gubitak masti'. The card gets a tick and nothing else changes on screen. The numbers appeared further down, under three more goal cards."
+  ],
+  [
+   "24-five-numbers.jpg",
+   "Her numbers: '7,7 PD', '1.550 kcal', '120 g proteina', '52 g masti', '151 g ugljenih hidrata'. Above them a warning about carbs 'ispod 45 % energije'. Below, 'Trener može kasnije da podesi ove brojeve.'"
+  ],
+  [
+   "101-replay-step-5-where-you-shop.jpg",
+   "Step 5 'Gde kupuješ i kuvaš'. Places are in English: 'Munich', 'Belgrade', 'Serbia, elsewhere', 'Elsewhere'. Novi Sad is not there, she takes 'Serbia, elsewhere'."
+  ],
+  [
+   "103-replay-step-5-filled.jpg",
+   "Home, 'Balkanska', 'Italijanska' and tools chosen. 'Rerna', 'Ringla', 'Mikrotalasna' were already ticked. Button 'Gotovo: do Danas'."
+  ],
+  [
+   "104-replay-home-after-setup.jpg",
+   "Home 'Danas' with 'Tvoj dan je podešen. Ovo je Danas.' Setup took 24 taps and 3 typed fields when not interrupted."
+  ],
+  [
+   "36-home-saturday.jpg",
+   "First run only: she reopened the app in the middle of step 5. Home shows a yellow row 'Za podešavanje: gde kupuješ'."
+  ],
+  [
+   "30-home-serbia-picked.jpg",
+   "That row leads to 'Gde kupujem i kuvam' in 'Ja'. Each place has a link 'Neka bude dom' and a pill 'Isključeno'. She turned the pill on ('Uključeno'). The yellow row on home stayed until she also tapped 'Neka bude dom'."
+  ],
+  [
+   "35-your-overview.jpg",
+   "'Tvoj pregled' lists what she told the app. It also lists things she was never asked: 'fiksno radno vreme, 09:00 do 17:00' and 'Obroci 3 dnevno, 07:30, 13:45 i 20:00'."
+  ],
+  [
+   "40-log-what-you-ate.jpg",
+   "At the café she taps 'Zapiši šta si jela'. The screen is titled 'Šta ti se jede?' with 'Dodaj svoje namirnice'. She finds 'Slika mog obroka'."
+  ],
+  [
+   "41-photo-of-my-meal.jpg",
+   "Camera. Tabs in English: 'Barcode', 'Label', 'Group', 'Meal'. Hint 'Ceo tanjir, odozgo. Zatim unutrašnjost, druga strana ili jelovnik'."
+  ],
+  [
+   "47-her-plate-read-top.jpg",
+   "Her plate is read. Title in English 'Croque madame with salad', foods in Serbian ('Tost hleb ~90 g', 'Grijer ~45 g')."
+  ],
+  [
+   "48-her-plate-read-y700.jpg",
+   "Numbers card: 'PD 6,5', '643 kcal', '327 g', '42 g' proteina, and a strip of codes 'F | c | fi- | p'."
+  ],
+  [
+   "49-her-plate-read-y1400.jpg",
+   "Further down: 'Koraci' for a recipe, and 'Chef Mealan nije mogao da pročita tvoj tanjir.' although the plate was read (AI stand-in)."
+  ],
+  [
+   "50-her-plate-read-y2100.jpg",
+   "About 2.5 screens down she finds 'Pojedeno', 'Pola pojedeno', 'Dodaj namirnicu', 'Nije moje'. The big button is 'Uklopi u moj cilj'. Three energy figures on one screen: 643, '520 do 850', 'oko 517 kcal'."
+  ],
+  [
+   "51-after-eaten.jpg",
+   "'Pojedeno' takes her to Danas with 'Upisano. Na Danas je.' and '643 od 1.550 kcal danas', '42 od 120 g proteina'. Clear."
+  ],
+  [
+   "107-replay-todays-meals.jpg",
+   "'Današnji obroci' shows her lunch with its photo, 'Ručak', 'Po planu'. The plate screen had said 'Van plana'."
+  ],
+  [
+   "56-anas-plate-read.jpg",
+   "Ana's plate, photographed the same way. The app asks 'Meatballs in tomato sauce, 1 minut posle obroka (Croque madame with salad). Dezert uz obrok (ručak) ili posebna užina?'. There is no answer for a friend's plate. She picks 'Posebna užina'."
+  ],
+  [
+   "57-ana-after-separate-snack.jpg",
+   "Ana's plate read as 'Užina · van plana': 603 kcal, 32 g protein. The app coaches it as hers: 'Tvoj tanjir je 2,5 ispod cilja'."
+  ],
+  [
+   "58-ana-plate-actions.jpg",
+   "She taps the small link 'Nije moje' (20 px high)."
+  ],
+  [
+   "59-after-not-mine.jpg",
+   "The plate is empty again. No message. She cannot tell whether Ana's plate was kept."
+  ],
+  [
+   "60-istrazivac.jpg",
+   "She tries the 'Istraživač' tab. It is entirely in English ('Nutrients', 'The body', 'Not all proteins are equal') and has no plates."
+  ],
+  [
+   "64-camera-group-mode.jpg",
+   "She tries camera tab 'Group', hoping it means a group of people. Hint changes to 'Ceo proizvod, jedna strana po fotografiji'. It is for packaged products."
+  ],
+  [
+   "65-change-what-this-plate-is.jpg",
+   "Second try with Ana's plate. By luck she taps the pencil next to 'Užina · van plana'. Under 'Za šta je?' the first chip is 'Istraživanje': 'tanjir koji samo gledaš. Ništa se ne upisuje. Sa fotografijom se čuva u Receptima, pod Posluženo.'"
+  ],
+  [
+   "69-served-card-lower.jpg",
+   "With 'Istraživanje' a card 'Posluženo' appears: 'ČIJI JE TANJIR' Moje / Tuđi, 'NAZIV', 'KOJE JELO', 'Tuđi tanjir', 'Podeli brojeve'. 'Moje' is preselected. She taps 'Tuđi' and types 'Ana: ćufte u paradajz sosu' as the name."
+  ],
+  [
+   "73-share-panel.jpg",
+   "'Podeli brojeve' builds a card with the photo: 'Ana: ćufte u paradajz sosu', 'oko 603 kcal', '32 g proteina', 'PD 5,2'. 'Pošalji ›' opens the phone's sharing (here it saved the picture: 'Sačuvano na telefonu.')."
+  ],
+  [
+   "75-scan-another-plate-someone-elses.jpg",
+   "For Marko she taps 'Tuđi tanjir'. Two more choices appear: '📷 Kamera', '🖼 Galerija'."
+  ],
+  [
+   "80-marko-served-card.jpg",
+   "Marko's cake is read at once as someone else's, 'Desert' already chosen: 456 kcal, 6 g protein. She names it 'Marko: čokoladna torta'. No dessert question this time."
+  ],
+  [
+   "81-recipes-with-served.jpg",
+   "'Recepti' now has 'Posluženo · 1 poseta, 2 tanjira' with 'OSTALI ZA STOLOM': Marko and Ana with photos. Above it still 'Ovde još nema ničega.' Her own lunch is not in this visit."
+  ],
+  [
+   "85-menu-read.jpg",
+   "'📷 Dodaj fotografiju jelovnika' reads the menu: '6 REDOVA PROČITANO', each with course and weight. The round chef button covers '330 ml'."
+  ],
+  [
+   "87-menu-which-one.jpg",
+   "Ana's plate is '✓ povezano' to 'Ćufte u paradajz sosu, pire, 350 g'. For Marko it asks 'koje je to na jelovniku?': 'Čokoladna torta, 130 g' or 'Sacher torta, 120 g'. She picks the first."
+  ],
+  [
+   "86-visit-after-menu.jpg",
+   "Back on the visit Ana's numbers have changed from 603 kcal and 32 g to 'oko 528 kcal · 28 g proteina'. Later Marko's go from 456 to 494 kcal. Nothing on this screen says why."
+  ],
+  [
+   "90-ana-detail-top.jpg",
+   "Ana's saved plate explains it: 'Jelovnik je dao težinu. Količine sada prate jelovnik, a ne procenu sa fotografije.' with ranges for every number."
+  ],
+  [
+   "91-ana-share-card-after-menu.jpg",
+   "She shares again from here. The card now says 'oko 528 kcal', '28 g proteina'. Ana already has the 603 version."
+  ],
+  [
+   "96-monday-home-earlier-days.jpg",
+   "Monday 14:40. At the bottom of Danas: 'Ranije, poslednja dva dana', with 'subota, 7. novembar: 1 obrok upisan, 643 kcal i 42 g proteina.'"
+  ],
+  [
+   "97-saturday-reopened.jpg",
+   "Saturday opens in Plan: '643 od 1.550 kcal', '42 od 120 g proteina', 'Pojedeno: Croque madame with salad, Ručak, 12:40'."
+  ],
+  [
+   "111-check-monday-saturday-meal-with-photo-same-browser.jpg",
+   "'Otvori ›' shows the meal with its photo and foods. (Checked in one unbroken session. In the main run my test phone lost its photo store between scripts, see 98.)"
+  ],
+  [
+   "99-monday-recipes-served.jpg",
+   "Friends' plates on Monday: Recepti, then scroll to 'Posluženo'. Both are there with photos and the menu weights."
+  ],
+  [
+   "113-choose-dinner.jpg",
+   "Monday evening. 'Izaberi obrok: večera' opens a list 'OSNOVNA JELA OD CHEF MEALANA'. Dish names and marks are English: 'Skyr bowl with berries', 'fits', 'close', '2,4 under'. One Balkan dish: 'Sarma'."
+  ],
+  [
+   "114-sarma-picked.jpg",
+   "One tap plans it: 'Sarma: večera, danas.' The Plan shows '409 od 1.550 kcal danas'."
+  ],
+  [
+   "115-sarma-opened.jpg",
+   "The sarma has no cooking steps, only foods in English: 'Cabbage, raw', 'Beef mince, 15 % fat, raw', 'Olive oil'."
+  ],
+  [
+   "116-sarma-on-plate.jpg",
+   "'Napravi ga na Tanjiru': 'Tvoj tanjir već ima 1 namirnicu: Chocolate cake.' That is Marko's cake from Saturday. She taps 'Počni nov tanjir'."
+  ],
+  [
+   "119-marko-plate-after-sarma.jpg",
+   "Marko's saved plate now reads 'oko 409 kcal', 22 g protein, with 'Cabbage, raw', 'Beef mince' under his cake photo. The sarma has overwritten it."
+  ],
+  [
+   "121-steps-with-chef-attempt.jpg",
+   "'Napiši korake sa Chef Mealanom' answers 'AI is not configured. Use manual entry or barcode lookup.' (AI absent in this build)."
+  ],
+  [
+   "124-tuesday-dinner-planned.jpg",
+   "Tomorrow: Plan, 'uto 10', 'Večera, 20:00', 'Chicken, rice and greens'. Planned: 'večera, utorak', marked 'uklapa se'. The day says 'od 1.550 kcal, utorak' although setup gave Tuesday 1.600."
+  ],
+  [
+   "126-home-tomorrow-english-meal-names.jpg",
+   "Danas shows tonight's Sarma with 'Pojela sam' and tomorrow's plan. Under 'Sutra' the meal names are 'Breakfast, 07:30' and 'Lunch, 13:45'."
+  ]
+ ],
+ "findings": [
+  [
+   "Blocker",
+   "Planning dinner overwrote Marko's saved plate",
+   "Monday evening she planned Sarma and tapped 'Napravi ga na Tanjiru'. The app said 'Tvoj tanjir već ima 1 namirnicu: Chocolate cake.' (Marko's cake, still on the Tanjir since Saturday). She tapped 'Počni nov tanjir'. The new plate kept the card 'Posluženo, Sačuvano u Receptima, pod Posluženo' with 'NAZIV: Marko: čokoladna torta', and the line 'Istražujem sliku. 6 namirnica pročitano ... Nije upisano: nije tvoj obrok.' In Recepti, 'Marko: čokoladna torta' now shows 'oko 409 kcal · 22 g proteina' and the foods 'Cabbage, raw 150 g, Beef mince, 15 % fat, raw 90 g ...' under his cake photo. On reopening, Tanjir asked 'Tvoj tanjir od subota, 12:40: Sarma, sa tvoje slike. Da li si to pojela?'. She cannot get Marko's cake numbers back.",
+   "When a plate is saved under Posluženo, take it off the Tanjir, or cut the link the moment the Tanjir gets other food. 'Počni nov tanjir' must start a plate with no photo, no Posluženo card and no 'Istraživanje' label."
+  ],
+  [
+   "Friction",
+   "The second plate at the table can only be a dessert or a snack of hers",
+   "One minute after logging her lunch she photographed Ana's meatballs. The app asked 'Meatballs in tomato sauce, 1 minut posle obroka (Croque madame with salad). Dezert uz obrok (ručak) ili posebna užina?' with two buttons, 'Dezert uz obrok (ručak)' and 'Posebna užina'. Both mean she ate it. She picked 'Posebna užina' because 'računa se zasebno' sounded closest to 'not with mine'. The question also vanished when the app was reopened, and the plate became 'Večera, 20:00'.",
+   "Add a third answer on this question: 'Tuđi tanjir (ne računa se)', which saves it under Posluženo as someone else's. Do not call a main dish a dessert: ask 'Još jedno tvoje jelo, ili tuđi tanjir?'."
+  ],
+  [
+   "Friction",
+   "'Nije moje' throws the plate away and says nothing",
+   "On Ana's read plate she tapped the link 'Nije moje' (20 px high, next to 'Pojedeno', 'Pola pojedeno', 'Dodaj namirnicu'). The plate went back to 'Tanjir je još prazan.' with no message. 'Recepti' said 'Ovde još nema ničega.' She wanted to keep the plate and expected 'Nije moje' to do that. She had to photograph Ana's plate again.",
+   "Make 'Nije moje' save the plate under Posluženo as 'Tuđi' and say so ('Sačuvano kao tuđi tanjir, u Receptima pod Posluženo'). Offer 'Nemoj da čuvaš' separately. Make it a button of 44 px."
+  ],
+  [
+   "Friction",
+   "Keeping a friend's plate is hidden behind a pencil and the word 'Istraživanje'",
+   "The only way she found: tap the unlabeled pencil beside 'Užina · van plana', then under 'Za šta je?' choose 'Istraživanje', then 'Gotovo'. Only then the card 'Posluženo' with 'ČIJI JE TANJIR: Moje / Tuđi', 'Tuđi tanjir' and 'Podeli brojeve' appears. She found it by luck on the second try. 'Istraživanje' does not say 'someone else's plate' to her. After choosing it, 'ČIJI JE TANJIR' still had 'Moje' selected. A photo picked from 'Tvoje fotografije' does get the question 'Čiji je ovo tanjir, i kada?' with 'Pojedeno u 12:13 / Jedem sada / Istraživanje'. A photo taken with the shutter does not.",
+   "Ask 'Čiji je ovo tanjir?' after every plate photo, with 'Moj, jedem sada' and 'Tuđi tanjir'. Rename 'Istraživanje' to something like 'Samo gledam / tuđi tanjir'. When she picks it, preselect 'Tuđi' or ask."
+  ],
+  [
+   "Confusing",
+   "The menu photo silently changed numbers she had already sent",
+   "Before the menu Ana's plate was '603 kcal, 32 g proteina' and she sent that card. After the menu photo the visit list showed 'oko 528 kcal · 28 g proteina'. Marko's went from 'oko 456 kcal · 6 g' to 'oko 494 kcal · 7 g' after she picked 'Čokoladna torta, 130 g'. The list gives no reason. Only the plate's own page says 'Jelovnik je dao težinu. Količine sada prate jelovnik, a ne procenu sa fotografije.' The share card still says 'pročitano sa fotografije'. The Tanjir tab kept showing Marko's cake at '~120 g'.",
+   "After a menu match show one line on the visit: 'Jelovnik je promenio: Ana 603 → 528 kcal'. Offer the menu photo before 'Podeli brojeve' ('Imaš jelovnik? Slikaj ga pre slanja'). Put 'težina sa jelovnika' on the share card."
+  ],
+  [
+   "Confusing",
+   "The menu did nothing for her own lunch, and her lunch is not part of the visit",
+   "She hoped the menu would help all three dishes. The menu page read 'Krok madam, salata, 280 g' but linked only Ana and Marko. Her lunch stayed at 643 kcal from the photo estimate of 327 g. The visit is titled 'Posluženo · 1 poseta, 2 tanjira' and lists only 'OSTALI ZA STOLOM'. Nothing says that her own plate is elsewhere (on Danas).",
+   "Show her logged meal from the same hour in the visit ('Tvoj tanjir: Croque madame, 643 kcal, upisano') and let the menu match it too, with a question before changing a logged meal."
+  ],
+  [
+   "Confusing",
+   "Friend plates left on the Tanjir are treated as hers",
+   "With Ana's and Marko's plates on screen the app kept coaching her: 'Tvoj tanjir je 2,5 ispod cilja. Dodaj jednu od ovih iz svojih namirnica da ga podigneš', 'Tvoj tanjir je 6,4 ispod cilja', 'Uklopi u moj obrok (obrok)', '✕ Nutritivno. Više od pola energije ovog obroka (obrok) je mast: 53 posto, 35 g.' Marko's cake stayed on the Tanjir for two days.",
+   "For a plate marked 'Tuđi' hide goal coaching and 'Uklopi'. Show only numbers, name, share, and 'Sledeći tanjir'. Clear the Tanjir once the plate is saved."
+  ],
+  [
+   "Friction",
+   "Friends' plates are kept under 'Recepti', below a line that says nothing is there",
+   "On Monday she found Ana's and Marko's plates only because she remembered 'Sačuvano u Receptima, pod Posluženo'. The Recepti tab opens with 'Dodaj recept' and 'Ovde još nema ničega. Dodaj jedan gore, ili napravi prvi na Tanjiru.' and a big 'Napravi moj prvi recept'. The plates are one screen further down. Saturday's day view in Plan and the 'Ranije' card on Danas do not mention the visit.",
+   "Link the visit from that day ('Subota: ručak + 2 tanjira za stolom ›'). In Recepti show Posluženo first when there are no recipes, and drop 'Ovde još nema ničega' when the tab has content."
+  ],
+  [
+   "Confusing",
+   "The read plate screen is long and its numbers disagree",
+   "After reading her plate the screen ran about four phone heights. 'Pojedeno' sat about 2.5 screens down, after 'Koraci' (recipe steps she does not need at a café). The largest button was 'Uklopi u moj cilj'. Energy appeared three ways: '643 kcal', 'Oko 520 do 850 kcal i 42 g proteina', 'Ručak: oko 517 kcal od tvojih 1.550'. The text 'Ostavi kako jeste uzima tanjir kakav jeste' names a button that is not on the screen. The strip 'F | c | fi- | p' and lines like 'f- C+ fi- p-' are codes with no key. The breakfast question says 'Jela sam ga / Preskočila sam' and then explains 'Pojela sam: ...'.",
+   "For a photo taken now, put photo, name, kcal, protein and 'Pojedeno / Tuđi tanjir' on the first screen. Show one energy figure and say once what the range is. Remove or explain the letter codes. Move 'Koraci' and 'Uklopi' below."
+  ],
+  [
+   "Confusing",
+   "'Zapiši šta si jela' opens 'Šta ti se jede?', and labels change between screens",
+   "From Danas she tapped 'Zapiši šta si jela' and landed on 'Šta ti se jede? Dodaj svoje namirnice. Chef Mealan određuje količine.' The only photo entry is 'Slika mog obroka', which she also had to use for Ana's plate. Next to it 'Skeniraj' opens the same camera in another mode. The plate line read 'Ručak, 13:45 po satu · Van plana · Regularan obrok · Mešavina'. After logging, Danas said 'Po planu' and 'Pojedeno po planu: Ručak.'",
+   "Open the camera or a 'Šta si jela?' title from 'Zapiši šta si jela'. Rename the button 'Slikaj tanjir'. Use one word for the same state (Van plana or Po planu)."
+  ],
+  [
+   "Confusing",
+   "Plan and Danas show different numbers under the same words",
+   "On Saturday after lunch Danas said '643 od 1.550 kcal danas'. The Plan tab for the same day said '0 od 1.550 kcal danas', '3 slobodna termina', 'Ručak, 13:45: Izaberi obrok'. Plan counts what is planned, Danas what is eaten, but both use 'od 1.550 kcal danas'. On Monday the Plan said 'od 1.550 kcal, utorak' for Tuesday, a pilates day that setup gave '1.600' kcal.",
+   "Label Plan numbers 'planirano' and Danas numbers 'pojedeno'. Show the eaten lunch in its Plan slot. Use the training-day target on training days."
+  ],
+  [
+   "Confusing",
+   "Setup tells her she does not train, and shows things she was never asked",
+   "She entered pilates on Tuesday and Thursday. The protein text then said 'Tvoj raspon je 90 do 120 g dnevno ... jer još ne treniraš redovno.' Her pilates is renamed 'Mobilnost, lako'. Pilates is not in the examples under 'Lako' ('joga, mobilnost, istezanje, lagana vožnja bicikla'). The summary 'Ti' card lists body, job and steps but not training. 'Tvoj pregled' states 'Posao, fiksno radno vreme, 09:00 do 17:00' and 'Obroci 3 dnevno, 07:30, 13:45 i 20:00', which she never entered. A warning says 'Svakog dana tvoji ugljeni hidrati su ispod 45 % energije, donje granice EFSA opsega.' with nothing to do about it. 'Trener može kasnije da podesi ove brojeve.' and 'Tvoj trener vidi da si nešto označio' appear though she has no trainer. 'PD' is the first of her five numbers and is explained as 'broj koji razlikuje hranu od marketinške tvrdnje'. She wanted to lose weight slowly. 'Gubitak masti' offers only 'oko 20 % manje'.",
+   "Say 'jer treniraš lako, bez treninga snage' when days are set. Add pilates to the 'Lako' examples and keep her word. Ask or mark the assumed work and meal times as 'pretpostavka, promeni'. Drop trainer lines when there is no trainer. Explain PD with an example plate. Offer a slower pace."
+  ],
+  [
+   "Friction",
+   "Tapping a goal shows no result on screen",
+   "She tapped 'Gubitak masti'. The card got a tick. The numbers appeared below 'Održavanje', 'Izgradnja mišića' and 'Performanse', out of view. The hint 'Izaberi šta želiš, i pojaviće se tvoji brojevi.' was itself at the bottom. She scrolled by habit.",
+   "Scroll to the numbers after a goal is chosen, or collapse the other goal cards."
+  ],
+  [
+   "Confusing",
+   "'Slažem se' swaps the form for a health question",
+   "She tapped 'Slažem se' under 'Pre tvojih brojeva' expecting the grey body form below to become active. The form disappeared and 'Da li nešto od ovoga važi za tebe?' took its place, with 'Dalje: 1. Ti' at the bottom. The step numbers then changed (the goal step was '1.' before, '2.' after).",
+   "Number the health question as its own step and say 'još jedno pitanje pre tvojih podataka'. Keep step numbers fixed."
+  ],
+  [
+   "Friction",
+   "After an interrupted setup, 'Uključeno' is not 'dom'",
+   "She left the app in step 5 and came back. Danas showed 'Za podešavanje: gde kupuješ'. That opened 'Gde kupujem i kuvam' in Ja, where each place has a link 'Neka bude dom' (19 px high) and a pill 'Isključeno'. She tapped the pill for 'Serbia, elsewhere': 'Uključeno', toast 'Dodate osnovne namirnice: 17.' She finished the page and 'Tvoj pregled'. Danas still said 'Za podešavanje: gde kupuješ' until she went back and tapped 'Neka bude dom'. In the uninterrupted setup one chip does it. On this page the other places are in Serbian ('Minhen, Nemačka, Austrija') while the chips are English.",
+   "On the Ja page ask one thing first: 'Gde živiš?' with the same chips as in setup. Show the on/off pills for extra places only after a home exists."
+  ],
+  [
+   "Language",
+   "Dish names and whole lists in English on Serbian screens",
+   "Plate titles: 'Croque madame with salad', 'Meatballs in tomato sauce', 'Chocolate cake', while the foods under them are Serbian ('Ćufte', 'Pire krompir'). These names go to Danas, Plan and the saved plates. Dinner list: 'Skyr bowl with berries', 'Oats, skyr and banana', 'Omelette with bread', 'Chicken, rice and greens', 'Tuna salad wrap', 'Protein pancakes', 'Cottage cheese and fruit', with marks 'fits', 'close', '2,4 under' (the Plan later says 'uklapa se'). Sarma's foods: 'Cabbage, raw', 'Beef mince, 15 % fat, raw', 'Rice, white, raw', 'Onion, raw', 'Tomato passata', 'Olive oil'. Quick list: 'Greek yogurt 2%', 'Quark, low fat (Magerquark)', 'Cottage cheese (Hüttenkäse)', 'Eggs', 'Salmon, cooked', 'Rice, cooked', 'Oats', with 'typical values, check your pack' and 'estimate · often'. 'Chicken breast, cooked' in one list and 'Pileća prsa, pečena' in another. Grouping question: 'Main: cabbage, beef mince, onion, tomato passata, olive oil · Side: rice'. Cuisine texts: 'Grilled meat and peppers, fresh white cheese and sour cream ...', 'Šopska salad with grilled chicken', 'Ćevapi with ajvar and onion'.",
+   "Use the Serbian dish name the reader returns. Translate the basic dishes, their foods, the fit marks and the starter foods. Give a Serbian home Serbian staples (kiseli kupus, kajmak, pavlaka) instead of Magerquark and Hüttenkäse."
+  ],
+  [
+   "Language",
+   "Camera and small labels in English",
+   "Camera tabs 'Barcode', 'Label', 'Group', 'Meal'. She read 'Group' as a group of people and tried it for her friends. It is for products ('Ceo proizvod, jedna strana po fotografiji'). Counter '1 photo of this meal'. On Plan and Danas: 'Swap' beside 'Isprazni' and 'Preskoči'. Under 'Sutra' on Danas: 'Breakfast, 07:30', 'Lunch, 13:45' next to 'Večera, 20:00'. Menu: 'Evals'. Setup: 'Weight, kg', 'enter cm', 'enter kg', 'Walking goes in steps.', '7. novembar 2026, current: none applies', a full English paragraph under 'To je dnevni zbir, raspoređen tokom dana' ('Your body uses protein best in portions of about 0.4 g per kg ...'), places 'Munich', 'Germany, elsewhere', 'Belgrade', 'Serbia, elsewhere', 'Elsewhere', and 'Namirnice za Serbia: 17'.",
+   "Translate: 'Barkod', 'Deklaracija', 'Pakovanje' (or 'Više strana'), 'Obrok', '1 fotografija ovog obroka', 'Zameni', 'Doručak', 'Ručak', 'Težina, kg', 'unesi cm', 'unesi kg', 'Minhen', 'Beograd', 'Srbija, drugo mesto'."
+  ],
+  [
+   "Language",
+   "The 'Istraživač' tab is entirely in English",
+   "'Nutrients', 'The body', 'Situations', 'Calculated for you. Ranges and meal amounts here come from your goal and setup: Lose fat, Balanced, 74 kg, three meals. Today: bez treninga, 1,550 kcal.', 'Not all proteins are equal', 'Search Explorer', about 19,000 characters of English. She went there looking for Ana's plate because the plate option is called 'Istraživanje'.",
+   "Translate it or hide the tab in Serbian until it is. Do not use 'Istraživanje' and 'Istraživač' for two unrelated things."
+  ],
+  [
+   "Language",
+   "Masculine forms and unclear Serbian",
+   "She chose 'Žensko', and many lines follow it ('Zapiši šta si jela', 'Jela sam ga', 'Pojela sam'). Others do not: 'Tvoj trener vidi da si nešto označio i kada, nikad šta si napisao.', 'Šta si naveo i kada se promenilo', 'tada dodirni Pojeo sam', 'Pojeo sam ga upisuje u dan' (under a button that says 'Pojela sam'). 'ČIJI JE TANJIR: Moje / Tuđi' mixes gender. Unclear: 'Ništa u tvojim namirnicama ga samo ne podiže.', 'Za jelo oko ovih namirnica, pitaj kuvara.', 'pun obrok (obrok) za tvoj dan', 'Uklopi u moj obrok (obrok)', 'Slatko, DaaM', '9,9 tanjir', '6,5 od PD 7,7', 'Računa se u tvoj dan kada dodirneš Jelo' (no such button), 'Skuvano u drugoj kuhinji' for a café.",
+   "Use the chosen gender everywhere or neutral wording. 'Moj / Tuđi'. Remove the doubled '(obrok)'. Replace 'DaaM' and '9,9 tanjir' with plain words ('PD tanjira posle dodavanja: 9,9')."
+  ],
+  [
+   "Confusing",
+   "The dinner offer ignores her kitchens, and sarma has no steps",
+   "She chose 'Balkanska' and 'Italijanska'. The dinner list has eight dishes, one Balkan ('Sarma', marked '2,4 under'), none Italian, and several breakfasts for a 20:00 slot. The sarma is 'Cabbage, raw', 'Beef mince', 'Rice', 'Onion', 'Tomato passata', 'Olive oil': fresh cabbage and olive oil, not what she knows as sarma. There are no cooking steps. The list says each dish needs 'oko 517 kcal i 40 g proteina', sarma has 409 kcal and 22 g.",
+   "Order the list by her kitchens and the meal slot. Ship written steps with the basic dishes. Make sarma with kiseli kupus, or name the dish differently."
+  ],
+  [
+   "Small",
+   "The round chef button covers text and buttons",
+   "It hid part of 'Odbaci fotografiju' on the photo question, '330 ml' in the menu list, '✓ Chef čita' in 'Tvoj pregled', 'Pitaj Chef Mealana' on the Plan row, the end of '+ Dodaj' in the quick list, and words in several paragraphs ('gradi obr... oko nje').",
+   "Leave room for it at the right edge of the last visible row, or move it into the bottom bar."
+  ],
+  [
+   "Small",
+   "Controls under 44 px",
+   "20 px: 'Ne sada', 'Izmeni', 'Kako računamo ›', 'Šta znače lako, umereno i jako ›', 'Zatvori', 'Nije moje', 'Odbaci fotografiju', 'Grupiši u delove', 'Napiši svoje', 'Obroci i vremena ›', 'Nedelja treninga ›', '✈ Isplaniraj putovanje', 'Kako radi ›', 'Stariji dani su u Planu ›'. 19 px: 'Neka bude dom', 'Promeni ›', 'Ova sedmica'. 14 to 15 px: 'Zaključaj: ...' circles, 'M · 52 g'. 23 to 24 px: 'Zameni: večera', 'Isprazni: večera', 'Isprazni tanjir'. 28 to 36 px: 'Gubitak masti', the egg '−' and '+' (30), all setup chips and day tabs (34), 'Slažem se', 'Gotovo', 'Pojedeno', 'Pola pojedeno', 'Dodaj', 'Meni', the pencil (36). 40 px: camera tabs. 43 px: training day rows.",
+   "Give links a 44 px tap area and raise chips and the 'Pojedeno' row to 44 px."
+  ],
+  [
+   "Small",
+   "Other small things",
+   "The third chip 'Istraživanje' sticks out past the right edge of its card on the photo question. Toasts ('Upisano. Na Danas je.', 'Sarma: večera, danas.', 'Sačuvano na telefonu.') cover the page heading or the share card. The checkbox for 'Lekovi koji utiču na hranu' is drawn smaller than the others. The menu shows 'Evals', 'Metrike', 'Troškovi rada' to a member. At 14:40 on Monday Danas says 'Sledeći obrok: Ručak, u 13:45'. 'Prosek tvoje nedelje: 1.550 kcal' with five days at 1.550 and two at 1.600. The shutter button has no name for screen readers. The top field 'Ime obroka' kept 'Meatballs in tomato sauce' after she renamed the plate in 'NAZIV'. 'Isprazni tanjir' asks for a second tap ('Dodirni ponovo da ispraznim'), which is good, but the label is easy to miss.",
+   "Fix each in place."
+  ]
+ ],
+ "good": "Language choice on the first screen is clear and holds. Body data is saved as she types, and after an interruption the app comes back to Danas with a pointer to the unfinished part. With the live camera, her own lunch took 5 taps from Danas to 'Upisano. Na Danas je.' and the day totals were right at once (643 kcal, 42 g protein). Once she reached the 'Posluženo' card, the rest of the café job was good: 'Tuđi tanjir' read Marko's cake in one step with 'Desert' filled in, the menu photo read six lines, linked Ana's plate by itself and asked one clear question for Marko's ('Čokoladna torta, 130 g' or 'Sacher torta, 120 g'), and the saved plate explains estimates with ranges ('Pročitano sa fotografije, nije izmereno'). 'Podeli brojeve' makes a clean card with photo, name, kcal and protein in two taps. On Monday the 'Ranije' card on Danas led to Saturday in two taps, with the eaten meal, its foods and its photo. Planning a dinner is one tap on a slot and one on a dish, with a clear toast. The guard 'Tvoj tanjir već ima 1 namirnicu ... Počni nov tanjir / Dodaj na moj tanjir / Zadrži moj tanjir' is the right question, and most Serbian text uses the feminine form after she chose 'Žensko'.",
+ "ai": [
+  "After every plate photo a second AI call for the dish failed: 'Chef Mealan nije mogao da pročita tvoj tanjir. Pokušaj ponovo', shown right under 'Pročitano sa tvoje slike'. The wording clashes with a plate that was read.",
+  "Cooking steps for sarma: 'Napiši korake sa Chef Mealanom' answered 'AI is not configured. Use manual entry or barcode lookup.' (English). She could not get steps.",
+  "Chat (round chef button): she asked 'Kako da skuvam sarmu večeras?'. Answer: 'Ovaj put nisam odgovorio: AI is not configured. Use manual entry or barcode lookup. Tvoje pitanje je sačuvano.' with 'Pitaj ponovo'.",
+  "Not tried because they need the AI: 'Neka Chef Mealan popuni slobodne obroke', 'Pitaj Chef Mealana šta da dodaš', 'Pogrešne namirnice? Pomozi Chef Mealanu da pročita ›'.",
+  "Plate and menu photos used the stand-in. Plate photos gave croque madame, meatballs, chocolate cake. The stand-in restarts its order with each script, so the first photo of Ana's plate came back as croque madame. I emptied that plate and advanced the stand-in by hand before retaking it."
+ ]
+}
