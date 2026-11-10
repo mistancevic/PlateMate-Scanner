@@ -18,7 +18,7 @@ const tell = (id: string, s: "tried" | "didnt" | null, note?: string) =>
 // the Menu's row under Me (0.3.116): How to, with how many you tried and how many are new
 export function HowToRow({ open }: { open: () => void }) {
   const [marks] = useHowMarks();
-  const n = newToTry(marks, VERSION).length;
+  const n = newToTry(marks).length;
   const sub = [BETA ? w("howto.triedOf", { n: triedCount(marks), total: SITUATIONS.length }) : "", n ? wn("howto.newN", n) : ""].filter(Boolean).join(" · ");
   return (
     <button className="menu-row howto-row" onClick={open}><span className="menu-icon"><Lightbulb size={20} /></span>
@@ -31,7 +31,7 @@ export function HowToToday({ open }: { open: () => void }) {
   const [marks] = useHowMarks();
   const [later, setLater] = useKept<string | null>(LATER_KEY, null);
   if (!showOnToday(marks, VERSION, later)) return null;
-  const fresh = newToTry(marks, VERSION);
+  const fresh = newToTry(marks);
   return (
     <section className="card howto-today">
       <b>{wn("howto.newWays", fresh.length)}</b>
@@ -90,7 +90,7 @@ export function HowToScreen(p: AppApi & { closeMenu: () => void }) {
           {SITUATIONS.filter((s) => s.group === g).map((s) => (
             <button key={s.id} className={`card ht-sit ht-${s.id}`} onClick={() => setOpen(s)}>
               <span className="ht-icon" aria-hidden="true">{s.icon}</span>
-              <span className="ht-text"><b>{w(k(`howto.${s.id}.title`))}</b>{isNew(s, VERSION) && <span className="ht-new">{w("howto.new")}</span>}<small>{w(k(`howto.${s.id}.line`))}</small></span>
+              <span className="ht-text"><b>{w(k(`howto.${s.id}.title`))}</b>{isNew(s) && <span className="ht-new">{w("howto.new")}</span>}<small>{w(k(`howto.${s.id}.line`))}</small></span>
               {marks[s.id]?.s === "tried" && <span className="ht-done">{w("howto.tried")}</span>}
               {marks[s.id]?.s === "didnt" && <span className="ht-bad">{w("howto.didnt")}</span>}
             </button>

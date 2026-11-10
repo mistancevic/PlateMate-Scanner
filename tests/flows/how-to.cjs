@@ -15,6 +15,7 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
   const errs = [];
   const page = await b.newPage({ viewport: { width: 390, height: 844 } });
   page.on("pageerror", (e) => errs.push(e.message));
+  await page.clock.setFixedTime(new Date("2026-11-10T09:00:00"));
   await page.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
     localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" }));
     localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z" }));
@@ -24,10 +25,8 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
   try {
     // 1. Today: the card below the title and the goal
     await page.goto(U + "/today"); await page.waitForTimeout(1200);
-    // 0.3.119: New means added in the last 20 releases, so what is new depends on the version this runs at; the walkthrough
-    // works it out as the app does, and when nothing is new any more there is no card and How to opens from the Menu
-    const VER = require(path.join(ROOT, "package.json")).version, pv = (v) => { const m = /^0\.(\d+)\.(\d+)/.exec(v); return Number(m[1]) * 1000 + Number(m[2]); };
-    const NEW = [["handsFree", "Cook hands free", "0.3.110"], ["otherLang", "A recipe in another language", "0.3.99"]].filter((x) => pv(VER) - pv(x[2]) < 20);
+        // DT272 (0.3.124): New is 14 days from the day a way came; the clock here is 10 November 2026, so the two of 7 November are new
+    const NEW = [["handsFree", "Cook hands free"], ["otherLang", "A recipe in another language"]];
     const newN = (n) => (n ? ` · ${n} new` : "");
     ok(await page.locator(".howto-today").count() === (NEW.length ? 1 : 0), NEW.length ? "a card on Today after a release with new ways" : "nothing new in the last 20 releases: no card on Today");
     if (NEW.length) {
@@ -94,6 +93,15 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
       ok(!/Every day|Try it/.test(await text(".howto")), `${l}: How to in the language`);
     }
     await page.evaluate(() => localStorage.removeItem("chefmealan-lang"));
+    // DT272: fifteen days after they came nothing is New, whatever the version: no card, no badge, no count
+    await page.clock.setFixedTime(new Date("2026-11-22T09:00:00"));
+    await page.evaluate(() => { localStorage.removeItem("chefmealan-howto-later"); });
+    await page.goto(U + "/today"); await page.waitForTimeout(1000);
+    ok(await page.locator(".howto-today").count() === 0, "on 22 November nothing is new: no card on Today");
+    await page.locator("header .menu-button").click(); await page.waitForTimeout(500);
+    ok(!/new/.test(await text(".howto-row")), "the Menu's row has no new count: " + await text(".howto-row"));
+    await page.locator(".howto-row").click(); await page.waitForTimeout(400);
+    ok(await page.locator(".ht-new").count() === 0 && await page.locator(".ht-sit").count() === 8, "no New badge in the list; the eight ways stay");
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
   await b.close(); server.kill();

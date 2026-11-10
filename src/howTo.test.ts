@@ -29,15 +29,22 @@ test("each situation follows a walkthrough that names it", () => {
 
 test("New, the count, and the card on Today", () => {
   const hands = SITUATIONS.find((s) => s.id === "handsFree")!, eat = SITUATIONS.find((s) => s.id === "eatNow")!;
-  assert.equal(isNew(hands, "0.3.114"), true);
-  assert.equal(isNew(eat, "0.3.114"), false);
-  assert.equal(isNew(hands, "0.3.140"), false, "it ages out");
+  // DT272 (0.3.124): New is 14 days from the day it came, not 20 releases
+  const d = (x: string) => new Date(`${x}T12:00:00`);
+  assert.equal(isNew(hands, d("2026-11-07")), true, "new on its day");
+  assert.equal(isNew(hands, d("2026-11-20")), true, "still new on day 14");
+  assert.equal(isNew(hands, d("2026-11-21")), false, "it ages out after 14 days");
+  assert.equal(isNew(hands, d("2026-11-06")), false, "not before it came");
+  assert.equal(isNew(eat, d("2026-11-10")), false, "there from the start");
   const marks = { eatNow: { s: "tried" as const, at: "2026-11-08" }, photoLog: { s: "didnt" as const, at: "2026-11-08", note: "x" } };
   assert.equal(triedCount(marks), 1, "Didn't work is not counted as tried");
-  assert.deepEqual(newToTry({}, "0.3.114").map((s) => s.id), ["handsFree", "otherLang"]);
-  assert.equal(showOnToday({}, "0.3.114", null), true);
-  assert.equal(showOnToday({}, "0.3.114", "0.3.114"), false, "Not now: until the next release");
-  assert.equal(showOnToday({}, "0.3.115", "0.3.114"), true, "the next release shows it again");
-  assert.equal(showOnToday({ handsFree: { s: "tried", at: "" }, otherLang: { s: "tried", at: "" } }, "0.3.114", null), false, "all new ones tried");
+  const now = d("2026-11-10");
+  assert.deepEqual(newToTry({}, now).map((s) => s.id), ["handsFree", "otherLang"]);
+  assert.deepEqual(newToTry({}, d("2026-11-25")).map((s) => s.id), [], "many releases or none: after 14 days nothing is new");
+  assert.equal(showOnToday({}, "0.3.124", null, now), true);
+  assert.equal(showOnToday({}, "0.3.124", "0.3.124", now), false, "Not now: until the next release");
+  assert.equal(showOnToday({}, "0.3.125", "0.3.124", now), true, "the next release shows it again");
+  assert.equal(showOnToday({}, "0.4.0", null, now), true, "a jump to 0.4.0 changes nothing: New goes by the day");
+  assert.equal(showOnToday({ handsFree: { s: "tried", at: "" }, otherLang: { s: "tried", at: "" } }, "0.3.124", null, now), false, "all new ones tried");
   assert.equal(untried([{ items: { eatNow: { s: "tried", at: "" } } }])?.id, "photoLog");
 });
