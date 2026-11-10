@@ -21988,6 +21988,50 @@
     "make.forMeal": {
       "text": "deine Mahlzeit. Sie zählt in deinem Tag, wenn du Essen oder Gegessen tippst. War sie unter Serviert, verlässt sie Serviert.",
       "checked": true
+    },
+    "strip.goOnWithIt": {
+      "text": "Weitermachen",
+      "checked": true
+    },
+    "strip.staleAria": {
+      "text": "{title} ist offen geblieben",
+      "checked": true
+    },
+    "strip.staleAt": {
+      "text": "Du hast {title} am {day} begonnen und bei Schritt {k} von {n} aufgehört.",
+      "checked": true
+    },
+    "strip.staleNoStep": {
+      "text": "Du hast {title} am {day} begonnen und nicht beendet.",
+      "checked": true
+    },
+    "strip.staleDays": {
+      "text": "Das ist {n} Tag her. Weitermachen oder beenden?|Das ist {n} Tage her. Weitermachen oder beenden?",
+      "checked": true
+    },
+    "strip.staleHelp": {
+      "text": "Beenden behält nichts von den Schritten. Dein Rezept bleibt, wie es ist.",
+      "checked": true
+    },
+    "plate.plusWhat": {
+      "text": "Was zeigt das neue Foto?",
+      "checked": true
+    },
+    "plate.plusSame": {
+      "text": "Noch ein Foto von dieser Mahlzeit",
+      "checked": true
+    },
+    "plate.plusSameLine": {
+      "text": "Das Innere, eine andere Seite, die Speisekarte. Zusammen gelesen als ein Teller.",
+      "checked": true
+    },
+    "plate.plusOther": {
+      "text": "Eine andere Mahlzeit",
+      "checked": true
+    },
+    "plate.plusOtherLine": {
+      "text": "Ein neuer Teller. Dieser wird für später gespeichert.",
+      "checked": true
     }
   }
 }

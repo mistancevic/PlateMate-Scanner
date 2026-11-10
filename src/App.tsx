@@ -2727,6 +2727,8 @@ export default function App() {
       setPlateKey((k) => k + 1);
     },
     endCook: () => { setState((s) => cooking.closeCook(s)); setPlateKey((k) => k + 1); setCarryNow(null); },
+    // DT273 (0.3.123): a cook left open was asked about; it is not asked again
+    cookAsked: () => setState((s) => (s.cook && !s.cook.staleAsked ? { ...s, cook: { ...s.cook, staleAsked: true } } : s)),
     setCookSteps: (n: number) => setState((s) => (s.cook && s.cook.steps !== n ? { ...s, cook: { ...s.cook, steps: n } } : s)),
     // DT212 v4: Save for later, Continue, swipe to remove; Keep working on it
     savePlate: () => { setPlateAsk(null); setState((s) => cooking.savePlate(s)); setPlateKey((k) => k + 1); notify(w("app.savedForLaterTop")); },

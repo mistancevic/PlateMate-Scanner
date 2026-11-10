@@ -1,4 +1,4 @@
-// DT267 (0.3.117, board Stories200; Coach Milan 9 November 21:31 to 21:51, Go; from Tester 2: "I can't find the picture, the
+// DT267 (0.3.117, board Stories200; Coach Milan 9 November 21:31 to 21:51, Go; from a tester: "I can't find the picture, the
 // sandwich's values stayed"): a meal eaten on a past day, opened from Plan. The photo large, the meal's other photos under it,
 // the numbers, the foods with their grams as they were logged. Put it on the Plate again, or Save in My recipes.
 import { useState } from "react";

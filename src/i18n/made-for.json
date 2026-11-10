@@ -5496,6 +5496,17 @@
     "screen.make.forExploringHead": {"en":"Exploring:","area":"The Plate","where":"The Plate","release":"0.3.122"},
     "screen.make.forExploring": {"en":"a plate you look at. Nothing is logged. With a photo it is kept in Recipes, under Served.","area":"The Plate","where":"The Plate","release":"0.3.122"},
     "screen.make.forMealHead": {"en":"A meal (Breakfast, Lunch, Dinner):","area":"The Plate","where":"The Plate","release":"0.3.122"},
-    "screen.make.forMeal": {"en":"your meal. It counts in your day when you tap Eat or Ate it. If it was under Served, it leaves Served.","area":"The Plate","where":"The Plate","release":"0.3.122"}
+    "screen.make.forMeal": {"en":"your meal. It counts in your day when you tap Eat or Ate it. If it was under Served, it leaves Served.","area":"The Plate","where":"The Plate","release":"0.3.122"},
+    "screen.strip.goOnWithIt": {"en":"Go on with it","area":"Cooking","where":"Cooking","release":"0.3.123"},
+    "screen.strip.staleAria": {"en":"{title} was left open","area":"Cooking","where":"Cooking","release":"0.3.123"},
+    "screen.strip.staleAt": {"en":"You started {title} on {day} and stopped at step {k} of {n}.","area":"Cooking","where":"Cooking","release":"0.3.123"},
+    "screen.strip.staleNoStep": {"en":"You started {title} on {day} and did not finish it.","area":"Cooking","where":"Cooking","release":"0.3.123"},
+    "screen.strip.staleDays": {"en":"That is {n} day ago. Go on with it, or end it?|That is {n} days ago. Go on with it, or end it?","area":"Cooking","where":"Cooking","release":"0.3.123"},
+    "screen.strip.staleHelp": {"en":"End it keeps nothing of its steps. Your recipe stays as it is.","area":"Cooking","where":"Cooking","release":"0.3.123"},
+    "screen.plate.plusWhat": {"en":"What is the new photo?","area":"The Plate","where":"The Plate","release":"0.3.123"},
+    "screen.plate.plusSame": {"en":"Another photo of this meal","area":"The Plate","where":"The Plate","release":"0.3.123"},
+    "screen.plate.plusSameLine": {"en":"The inside, another side, the menu. Read together as one plate.","area":"The Plate","where":"The Plate","release":"0.3.123"},
+    "screen.plate.plusOther": {"en":"A different meal","area":"The Plate","where":"The Plate","release":"0.3.123"},
+    "screen.plate.plusOtherLine": {"en":"A new plate. This one is saved for later.","area":"The Plate","where":"The Plate","release":"0.3.123"}
   }
 }

@@ -198,6 +198,7 @@ export interface AppApi {
   cookEaten: (cardId: string) => void;
   cookLater: () => void;
   endCook: () => void;
+  cookAsked: () => void;
   setCookSteps: (n: number) => void;
   // DT212 v4 (board Stories159): Save for later, Continue, swipe to remove; Keep working on it; Clear it
   savePlate: () => void;

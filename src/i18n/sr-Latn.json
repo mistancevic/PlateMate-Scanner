@@ -21988,6 +21988,50 @@
     "make.forMeal": {
       "text": "tvoj obrok. Računa se u tvoj dan kada dodirneš Jelo ili potvrdiš da je pojedeno. Ako je bio pod Posluženo, odatle izlazi.",
       "checked": true
+    },
+    "strip.goOnWithIt": {
+      "text": "Nastavi",
+      "checked": true
+    },
+    "strip.staleAria": {
+      "text": "{title} je ostalo otvoreno",
+      "checked": true
+    },
+    "strip.staleAt": {
+      "text": "Kuvanje jela {title} je počelo {day} i stalo na koraku {k} od {n}.",
+      "checked": true
+    },
+    "strip.staleNoStep": {
+      "text": "Kuvanje jela {title} je počelo {day} i nije završeno.",
+      "checked": true
+    },
+    "strip.staleDays": {
+      "text": "To je bilo pre {n} dan. Da nastaviš, ili da završiš?|To je bilo pre {n} dana. Da nastaviš, ili da završiš?|To je bilo pre {n} dana. Da nastaviš, ili da završiš?",
+      "checked": true
+    },
+    "strip.staleHelp": {
+      "text": "Završi ne čuva ništa od koraka. Tvoj recept ostaje kakav jeste.",
+      "checked": true
+    },
+    "plate.plusWhat": {
+      "text": "Šta je nova fotografija?",
+      "checked": true
+    },
+    "plate.plusSame": {
+      "text": "Još jedna fotografija ovog obroka",
+      "checked": true
+    },
+    "plate.plusSameLine": {
+      "text": "Unutrašnjost, druga strana, jelovnik. Čita se zajedno kao jedan tanjir.",
+      "checked": true
+    },
+    "plate.plusOther": {
+      "text": "Drugi obrok",
+      "checked": true
+    },
+    "plate.plusOtherLine": {
+      "text": "Novi tanjir. Ovaj se čuva za kasnije.",
+      "checked": true
     }
   }
 }

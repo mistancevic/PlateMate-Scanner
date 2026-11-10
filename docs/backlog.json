@@ -800,14 +800,14 @@
       "state": "done",
       "version": "0.3.117",
       "board": "Stories200",
-      "why": "Tester 2, 9 November: she scanned a breakfast out on Saturday and two days later could not find the picture; the values stayed. The photo was saved with the meal but shown only on Today, on the day. Now the row on Plan shows it and opens the meal: photo large, its other photos, numbers, foods with grams; Cook again only for a meal from a recipe."
+      "why": "A tester, 9 November (not Tester 2, as first written): she scanned a breakfast out on Saturday and two days later could not find the picture; the values stayed. The photo was saved with the meal but shown only on Today, on the day. Now the row on Plan shows it and opens the meal: photo large, its other photos, numbers, foods with grams; Cook again only for a meal from a recipe."
     },
     {
       "id": "DT268",
       "title": "Served: plates scanned to explore, kept in Recipes, in three steps",
       "epic": "plate",
       "state": "done",
-      "why": "Coach Milan 9 November 21:46 to 21:56: Today's plan is not the place for a photo taken to explore. He expects a space to draft or save meals scanned just for exploration: at a restaurant, a photo of each friend's meal, to measure it for them and to keep it for himself for the next time. Now Exploring logs nothing and the read is gone when the Plate is cleared, unless Save as an idea puts it in Recipes. More important than saving photos to the gallery. To ask Tester 2: what she expected from the other plates she scanned. 22:28 to 23:21: in Recipes, marked Served (cooked in another kitchen, read from a photo, not weighed); AI fills the name and the dish; visits; guessed numbers with a range; a photo of the menu for the mapping. Three steps: 1 keep and find (built 0.3.118), 2 ranges and Share the numbers (built 0.3.119; the hidden fat share on the high side is our own figure, 25 percent, not calibrated) 3 the menu (built 0.3.120: a menu weight sets the plate's total and a band of 15 percent either way, our own figure). Each of the dish guess, the ranges and the menu match needs cases in the photo eval; the dish guess of step 1 is not tested with the real AI yet.",
+      "why": "Coach Milan 9 November 21:46 to 21:56: Today's plan is not the place for a photo taken to explore. He expects a space to draft or save meals scanned just for exploration: at a restaurant, a photo of each friend's meal, to measure it for them and to keep it for himself for the next time. Now Exploring logs nothing and the read is gone when the Plate is cleared, unless Save as an idea puts it in Recipes. More important than saving photos to the gallery. To ask the tester: what she expected from the other plates she scanned. 22:28 to 23:21: in Recipes, marked Served (cooked in another kitchen, read from a photo, not weighed); AI fills the name and the dish; visits; guessed numbers with a range; a photo of the menu for the mapping. Three steps: 1 keep and find (built 0.3.118), 2 ranges and Share the numbers (built 0.3.119; the hidden fat share on the high side is our own figure, 25 percent, not calibrated) 3 the menu (built 0.3.120: a menu weight sets the plate's total and a band of 15 percent either way, our own figure). Each of the dish guess, the ranges and the menu match needs cases in the photo eval; the dish guess of step 1 is not tested with the real AI yet.",
       "board": "Stories201",
       "version": "0.3.120"
     },
@@ -852,9 +852,10 @@
       "id": "DT273",
       "title": "＋ Photo says what it does; a cook left open for more than a day is asked about once",
       "epic": "plate",
-      "state": "now",
+      "state": "done",
       "board": "Stories202",
-      "why": "Coach Milan 10 November 07:50: a restaurant's pancake went in as one more photo of an old plate, and a cook left at step 1 since 28 October asked about itself. Drawn; waits for Go. The re-read part is built (0.3.121)."
+      "why": "Coach Milan 10 November 07:50: a restaurant's pancake went in as one more photo of an old plate, and a cook left at step 1 since 28 October asked about itself. Drawn; waits for Go. The re-read part is built (0.3.121).",
+      "version": "0.3.123"
     },
     {
       "id": "DT275",
