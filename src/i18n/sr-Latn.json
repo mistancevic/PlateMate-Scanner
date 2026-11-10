@@ -22032,6 +22032,14 @@
     "plate.plusOtherLine": {
       "text": "Novi tanjir. Ovaj se čuva za kasnije.",
       "checked": true
+    },
+    "served.whose": {
+      "text": "Čiji je tanjir",
+      "checked": true
+    },
+    "served.someoneElse": {
+      "text": "Tuđi",
+      "checked": true
     }
   }
 }

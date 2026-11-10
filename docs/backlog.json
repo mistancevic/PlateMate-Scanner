@@ -827,10 +827,12 @@
     },
     {
       "id": "DT271",
-      "title": "Served: say whose a kept plate is, after it was kept; and Make it my recipe (Served to On paper)",
+      "title": "Served: say whose a kept plate is",
       "epic": "plate",
-      "state": "later",
-      "why": "From building DT268: the first Exploring plate counts as yours and there is no tap to change whose a kept plate is. Make it my recipe is the next step of the path Served, On paper, From the kitchen (board Stories201, Not in DT268)."
+      "state": "done",
+      "why": "From building DT268: the first Exploring plate counts as yours and there is no tap to change whose a kept plate is. Make it my recipe is the next step of the path Served, On paper, From the kitchen (board Stories201, Not in DT268). Built 0.3.125: Whose plate, Mine or Someone else's, on the Plate's card and on a plate open; an eaten plate keeps its meal in the day. Make it my recipe stays for later.",
+      "version": "0.3.125",
+      "board": "Stories204"
     },
     {
       "id": "DT272",

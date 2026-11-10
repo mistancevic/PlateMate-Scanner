@@ -63,10 +63,18 @@ const READS = [
     let s = await st();
     ok(s.served?.length === 1 && s.served[0].mine === true && s.served[0].dish === "main" && s.served[0].name === "Meatballs in tomato sauce" && s.served[0].items.length === 2 && /^data:image/.test(s.served[0].photo), "kept by itself: the name and the dish as read, the foods, the photo");
     ok(await sv.locator(".sv-name").inputValue() === "Meatballs in tomato sauce" && await sv.locator(".sv-by").count() === 2, "the name and the dish say filled by Chef Mealan");
-    ok(await sv.getByRole("radio", { name: "Main" }).getAttribute("aria-checked") === "true" && await sv.getByRole("radio").count() === 5, "five dishes, Main set by the read");
+    ok(await sv.getByRole("radio", { name: "Main" }).getAttribute("aria-checked") === "true" && await sv.locator(".sv-dishes").getByRole("radio").count() === 5, "five dishes, Main set by the read");
     ok(s.feedback.length === 0 && /Nothing is logged/.test(await text(".sv-foot")), "nothing is logged");
     ok(await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1, "the idea's buttons stay as they were");
     ok(await sv.getByRole("button", { name: "Share the numbers" }).count() === 1, "the Plate's block has Share the numbers");
+    // DT271 (0.3.125, board Stories204): whose plate it is, on the Plate's card
+    const whose = sv.getByRole("radiogroup", { name: "Whose plate" });
+    ok(await whose.getByRole("radio", { name: "Mine" }).getAttribute("aria-checked") === "true" && await whose.getByRole("radio").count() === 2, "Whose plate: Mine or Someone else's; the first plate starts as Mine");
+    await whose.getByRole("radio", { name: "Someone else's" }).click(); await page.waitForTimeout(300);
+    s = await st();
+    ok(s.served[0].mine === false && s.photo.served.mine === false && s.served.length === 1 && await whose.getByRole("radio", { name: "Someone else's" }).getAttribute("aria-checked") === "true", "a tap says it is someone else's, on the kept plate too");
+    await whose.getByRole("radio", { name: "Mine" }).click(); await page.waitForTimeout(300);
+    ok((await st()).served[0].mine === true, "and a tap makes it mine again");
     // a tap corrects the dish; the name takes whose
     await sv.getByRole("radio", { name: "Dessert" }).click(); await page.waitForTimeout(300);
     ok((await st()).served[0].dish === "dessert" && await sv.locator(".sv-by").count() === 1, "a tap corrects the dish, and the dish no longer says filled by Chef Mealan");
@@ -167,6 +175,13 @@ const READS = [
     await one.locator(".sv-not-this").click(); await page.waitForTimeout(400);
     const wide = rg((await one.locator(".sv-num").first().innerText()).replace(/\s+/g, " "));
     ok(await one.locator(".sv-on-menu").count() === 0 && await one.locator(".sv-tighter").count() === 0 && (wide[2] - wide[1]) / wide[0] > (tight[2] - tight[1]) / tight[0] && wide[0] < tight[0] && !(await st()).served.find((x) => /quesadilla/.test(x.name)).menu, `Not this takes the match off; the amounts are the photo's again, with its wider range for their size (about ${tight[0]}, ${tight.slice(1).join(" to ")} was; about ${wide[0]}, ${wide.slice(1).join(" to ")} now)`);
+    // DT271: an open plate says whose it is, and a tap moves it
+    const whose1 = one.getByRole("radiogroup", { name: "Whose plate" });
+    ok(await whose1.getByRole("radio", { name: "Someone else's" }).getAttribute("aria-checked") === "true", "the open plate says it is someone else's");
+    await whose1.getByRole("radio", { name: "Mine" }).click(); await page.waitForTimeout(300);
+    ok((await st()).served.find((x) => /quesadilla/.test(x.name)).mine === true, "a tap makes it mine");
+    await whose1.getByRole("radio", { name: "Someone else's" }).click(); await page.waitForTimeout(300);
+    ok((await st()).served.find((x) => /quesadilla/.test(x.name)).mine === false, "and someone else's again");
     // Remove asks first
     await one.locator(".sv-remove").click(); await page.waitForTimeout(200);
     ok((await st()).served.length === 3 && await one.getByRole("button", { name: "Remove this plate" }).count() === 1, "Remove asks first");
@@ -186,6 +201,11 @@ const READS = [
     ok(s.feedback.length === 1 && fb.status === "eaten" && fb.meal.items.length === 4 && fb.meal.title === "Meatballs, mine" && fb.slot?.slotId === "lunch" && fb.slot?.date === "2026-11-07", "one meal logged: four foods, named after the main, in Saturday's lunch");
     ok(s.served.length === 3 && s.served.filter((x) => x.eatenAt).length === 2 && !s.served.find((x) => !x.mine).eatenAt, "the plates stay in Served; yours say they were eaten");
     ok(/In your day: Saturday/.test(await text(".sv-eaten")), "the open plate says it is in your day");
+    // DT271: a plate you already ate, said to be someone else's: the meal stays in your day
+    await page.locator(".sv-one").getByRole("radio", { name: "Someone else's" }).click(); await page.waitForTimeout(300);
+    s = await st();
+    ok(s.feedback.length === 1 && s.served.find((x) => /Meatballs/.test(x.name)).mine === false && !!s.served.find((x) => /Meatballs/.test(x.name)).eatenAt && /In your day/.test(await text(".sv-eaten")), "an eaten plate said to be someone else's: the meal stays in your day");
+    await page.locator(".sv-one").getByRole("radio", { name: "Mine" }).click(); await page.waitForTimeout(300);
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(900);
     ok(/Meatballs, mine/.test(await text(".meals-card")) && /^(data:image|blob:)/.test((await page.locator(".meals-card img.log-photo").first().getAttribute("src")) ?? ""), "Today shows the meal with its photo");
     // ---- 7. Put it on the Plate; Remove ----

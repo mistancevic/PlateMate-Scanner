@@ -350,6 +350,8 @@
   },
   "served.lead": "Cooked in another kitchen. Read from a photo, not weighed.",
   "served.mine": "Mine",
+  "served.whose": "Whose plate",
+  "served.someoneElse": "Someone else's",
   "served.others": "Others at the table",
   "served.addNote": "Add a note",
   "served.changeNote": "Change the note",

@@ -1,6 +1,6 @@
 {
-  "release": "0.3.123",
-  "at": "2026-11-10T16:19:26.743Z",
+  "release": "0.3.125",
+  "at": "2026-11-10T19:59:44.346Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -45424,6 +45424,40 @@
       "release": "0.3.123",
       "order": 900010,
       "at": "2026-11-10T16:19:26.743Z"
+    },
+    {
+      "id": "screen.served.whose",
+      "kind": "screen",
+      "key": "served.whose",
+      "en": "Whose plate",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Čiji je tanjir",
+      "de": "Wessen Teller",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.125",
+      "order": 900000,
+      "at": "2026-11-10T19:59:44.346Z"
+    },
+    {
+      "id": "screen.served.someoneElse",
+      "kind": "screen",
+      "key": "served.someoneElse",
+      "en": "Someone else's",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Tuđi",
+      "de": "Von jemand anderem",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.125",
+      "order": 900001,
+      "at": "2026-11-10T19:59:44.346Z"
     }
   ]
 }
