@@ -51,7 +51,7 @@ import { dayLog } from "../today";
 import { aggregate, uid } from "../pilot";
 import { MeScreen, TasteSetting } from "./MeScreen";
 import { SummaryPanel } from "./SummaryPanel";
-import { ClipboardList, CalendarClock } from "lucide-react";
+import { ClipboardList, CalendarClock, Pencil, Plus } from "lucide-react";
 import { CalendarPage } from "../components/Calendar";
 import { ExplorerScreen } from "./ExplorerScreen";
 import { AdminPanel } from "./AdminPanel";
@@ -631,6 +631,9 @@ function PlanPanel(p: AppApi) {
             <b>{WEEKDAYS[i]}</b>
             <span className="agenda-what">{planShort(d)}</span>
             <small className={dayWord(d) ? "work" : ""}>{dayWord(d)}</small>
+            {/* DT277 (0.3.128, board Stories206; Coach Milan 10 November 22:53, Go): the day shows it can be opened: a pencil on
+                a day with training, a plus on a day with none, from the bottom menu's icon set. The whole row is the button. */}
+            <span className="agenda-go" aria-hidden="true">{d.kind === "rest" && !d.pe ? <Plus size={18} /> : <Pencil size={16} />}</span>
           </button>
           {open.includes(i) && (
             <div className="agenda-open" role="group" aria-label={w("menu.dayEveryWeek", { day: weekdayName(i) })}>
@@ -661,7 +664,6 @@ function PlanPanel(p: AppApi) {
           </Fragment>
         ))}
         <div className="load-key">{(["hard", "easy", "active", "passive"] as DayType[]).filter((t) => counts[t]).map((t) => <span key={t}><i className={`load-${t}`} />{LOAD_NAME[t]} {counts[t]}</span>)}</div>
-        <small className="week-card-foot">{minor ? w("week.barFootSchool") : w("week.barFoot")}</small>
       </section>
       <NextLink p={p} to="shop" from="week" text={w("menu.whereIShopAndCook")} hint={w("me.shopHint")} />
     </>
