@@ -72,6 +72,22 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     ok(await p.locator(".cook-open-ask").count() === 0 && await p.locator(".cook-strip").count() === 0 && !(await saved(p)).cook, "End it: the cook ends, no strip");
     ok(/Chicken breast/.test(await main(p)), "the new plate stays as it is");
     await p.context().close();
+
+    // 0.3.121 (Coach Milan 10 November): the same photo read again is no new plate. With a cook still open it does not ask
+    // about the cook again, and an Exploring plate that was on the Plate before Served came is not kept as Served by it
+    const old = { ...seed, cook, items: TAVA.slice(0, 2).map(([g, name, calories, protein, fats, carbs], k) => ({ id: "o" + k, grams: g, locked: false, fromPhoto: true, est: { low: Math.round(g * 0.8), high: Math.round(g * 1.25) }, food: F("of" + k, name, calories, protein, fats, carbs) })),
+      title: "Sweet egg white pancake", photo: { image: PHOTO, at: day(18, 5), who: "idea", unsure: null, which: null }, pick: "exploring", plateAt: day(18, 5) };
+    p = await open(old);
+    await p.goto(U + "/plate"); await p.waitForTimeout(1200);
+    ok(await p.locator(".cook-open-ask").count() === 0 && await p.locator(".cook-strip").count() === 1 && await p.locator(".sv-plate").count() === 0, "an Exploring plate from before, a cook open: the strip shows, no question, no Served block");
+    await p.locator(".mp-again-link").click(); await p.waitForTimeout(300);
+    await p.locator(".mp-help").getByLabel("Tell Chef Mealan what it is").fill("egg whites with hazelnut cream and cocoa");
+    await p.locator(".mp-help .pill-primary").click(); await p.waitForTimeout(2000);
+    const reread = await saved(p);
+    ok(/Chicken breast/.test(await main(p)) && reread.items.length === 5, "Read it again replaces the foods with the new read");
+    ok(await p.locator(".cook-open-ask").count() === 0 && await p.locator(".cook-strip").count() === 1 && !!reread.cook, "reading the same photo again does not ask about the open cook; the strip stays");
+    ok(!(reread.served || []).length && !reread.photo?.served && await p.locator(".sv-plate").count() === 0, "and it is not kept as Served: it was on the Plate before Served came");
+    await p.context().close();
     p = await open({ ...seed, cook }); await photo(p);
     await p.locator(".cook-open-ask").getByRole("button", { name: "Go on with Test" }).click(); await p.waitForTimeout(800);
     ok(await p.locator(".cook-open-ask").count() === 0 && (await saved(p)).cook?.inView === true, "Go on with Test opens the cook");
