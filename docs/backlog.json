@@ -834,10 +834,11 @@
     },
     {
       "id": "DT272",
-      "title": "How to: New by time, not by 20 releases",
+      "title": "How to: New is 14 days, not 20 releases",
       "epic": "home",
-      "state": "later",
-      "why": "Found at 0.3.119: New means added in the last 20 releases. With several releases a day a new way stops being New within days (A recipe in another language, 0.3.99, went at 0.3.119), and at 0.4.0 every New goes at once. A window in days would hold."
+      "state": "done",
+      "why": "Found at 0.3.119: New means added in the last 20 releases. With several releases a day a new way stops being New within days (A recipe in another language, 0.3.99, went at 0.3.119), and at 0.4.0 every New goes at once. A window in days would hold. Coach Milan 10 November 20:12: yes, 14 days.",
+      "version": "0.3.124"
     },
     {
       "id": "DT274",
