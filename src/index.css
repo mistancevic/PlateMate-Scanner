@@ -2249,8 +2249,16 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .mp-big-row { flex-wrap: wrap; }
 .mp-big-go { display: flex; gap: 8px; }
 .mp-big-go .pill { min-height: 44px; }
-.mp-add-photo { position: relative; overflow: hidden; cursor: pointer; display: inline-flex; align-items: center; }
-.mp-add-photo input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.mp-add-photo { cursor: pointer; display: inline-flex; align-items: center; }
+/* DT273 (0.3.123): + Photo asks what the photo is; a cook left open is asked about once */
+.mp-plus-ask { margin-top: 10px; padding: 12px; border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--surface); display: flex; flex-direction: column; gap: 8px; }
+.mp-plus-opt { position: relative; overflow: hidden; display: block; text-align: left; border-radius: 14px; padding: 10px 12px; min-height: 48px; font: inherit; font-weight: 800; line-height: 1.35; cursor: pointer; border: 1.5px solid var(--line); background: var(--surface); color: var(--brand-text, #1f5fc7); }
+.mp-plus-opt small { display: block; font-weight: 600; font-size: var(--fs-small); color: var(--muted); }
+.mp-plus-opt.mp-plus-same { background: var(--brand); border-color: var(--brand); color: #fff; } .mp-plus-opt.mp-plus-same small { color: #fff; }
+.mp-plus-opt input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.mp-plus-cancel { align-self: flex-start; min-height: 44px; }
+.cook-stale { display: flex; flex-direction: column; gap: 8px; } .cook-stale small { color: var(--muted); line-height: 1.45; }
+.cook-stale-go { display: flex; gap: 8px; flex-wrap: wrap; } section.cook-stale .cook-stale-go > .pill.pill-small { flex: 1 1 130px; min-height: 48px; }
 .mp-ask { background: var(--warn-soft, #fff8d6); border-radius: var(--r-control); padding: 10px 12px; margin: 0 0 10px; display: flex; flex-direction: column; gap: 8px; }
 .mp-ask .button-row { align-items: center; }
 .mp-est { font-weight: 900; color: var(--brand-text); margin-right: 2px; }

@@ -222,6 +222,15 @@
   "today.replyTo": "Reply to {who}",
   "strip.saveForLater": "Save for later",
   "strip.endIt": "End it",
+  "strip.goOnWithIt": "Go on with it",
+  "strip.staleAria": "{title} was left open",
+  "strip.staleAt": "You started {title} on {day} and stopped at step {k} of {n}.",
+  "strip.staleNoStep": "You started {title} on {day} and did not finish it.",
+  "strip.staleDays": {
+    "one": "That is {n} day ago. Go on with it, or end it?",
+    "other": "That is {n} days ago. Go on with it, or end it?"
+  },
+  "strip.staleHelp": "End it keeps nothing of its steps. Your recipe stays as it is.",
   "strip.tapAgainToEnd": "Tap again to end",
   "strip.keep": "Keep",
   "strip.goOn": "Go on ›",
@@ -5188,6 +5197,11 @@
   },
   "plate.retake": "📷 Retake",
   "plate.addPhoto": "＋ Photo",
+  "plate.plusWhat": "What is the new photo?",
+  "plate.plusSame": "Another photo of this meal",
+  "plate.plusSameLine": "The inside, another side, the menu. Read together as one plate.",
+  "plate.plusOther": "A different meal",
+  "plate.plusOtherLine": "A new plate. This one is saved for later.",
   "plate.photoReadIdea": {
     "one": "{n} food read, amounts estimated (~). Not logged: it is not your meal.",
     "other": "{n} foods read, amounts estimated (~). Not logged: it is not your meal."

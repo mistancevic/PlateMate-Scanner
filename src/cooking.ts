@@ -50,6 +50,8 @@ export type Cook = {
   plate: PlateSnap;
   free?: PlateSnap;
   inView?: boolean;
+  // DT273 (0.3.123): when you last left this cook, and that a cook left open was asked about (once)
+  leftAt?: string; staleAsked?: boolean;
   ui: CookUi;
   steps?: number;
   cardId?: string;
@@ -80,7 +82,7 @@ export const plateEmpty = (x: PlateSnap | undefined) => !x?.items?.length;
 export function swapOut(s: PilotState): PilotState {
   const c = s.cook;
   if (!c || !c.inView) return s;
-  return { ...withSnap(s, c.free), cook: { ...c, plate: snapOf(s), free: undefined, inView: false } };
+  return { ...withSnap(s, c.free), cook: { ...c, plate: snapOf(s), free: undefined, inView: false, leftAt: new Date().toISOString() } };
 }
 // Go on: back into the cook, the free Plate waits
 export function swapIn(s: PilotState): PilotState {
@@ -236,3 +238,13 @@ export function foodsLineIn(l: Lang, items: { food: { name: string; refId?: stri
   return n.length > 1 ? wIn(l, "list.and", { rest: n.slice(0, -1).join(", "), last: n[n.length - 1] }) : n[0] ?? "";
 }
 export const foodsLine = (items: { food: { name: string; refId?: string } }[]): string => foodsLineIn("en", items)!;
+
+// DT273 (0.3.123, board Stories202; Coach Milan 10 November, Go): a cook left open for more than a day is asked about once, in
+// place of its strip: End it, or Go on with it. Left open: still at Make or Eat, not in view, a day since you last left it (or
+// since it was started, for a cook from before this was kept). Asked once: Go on with it marks it.
+export const STALE_HOURS = 24;
+export function staleCook(c: Cook | undefined, now = new Date()): { days: number; since: string } | null {
+  if (!c || c.inView || c.staleAsked || (c.stage !== "make" && c.stage !== "eat")) return null;
+  const since = c.leftAt ?? c.startedAt, h = (now.getTime() - new Date(since).getTime()) / 3600_000;
+  return h > STALE_HOURS ? { days: Math.max(1, Math.floor(h / 24)), since: c.startedAt } : null;
+}

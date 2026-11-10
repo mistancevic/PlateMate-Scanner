@@ -73,6 +73,58 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     ok(/Chicken breast/.test(await main(p)), "the new plate stays as it is");
     await p.context().close();
 
+    // DT273 (0.3.123, board Stories202; Coach Milan 10 November, Go): ＋ Photo asks first what the photo is
+    p = await open(seed); await photo(p);
+    ok(await p.locator(".mp-plus-ask").count() === 0 && await p.locator("button.mp-add-photo").count() === 1, "under the photo: ＋ Photo, a button");
+    await p.locator(".mp-add-photo").click(); await p.waitForTimeout(300);
+    const plusAsk = p.locator(".mp-plus-ask");
+    ok(/What is the new photo\?/.test(await plusAsk.innerText()) && /Another photo of this meal\s*The inside, another side, the menu\. Read together as one plate\./.test(await plusAsk.locator(".mp-plus-same").innerText()) && /A different meal\s*A new plate\. This one is saved for later\./.test(await plusAsk.locator(".mp-plus-other").innerText()), "it asks what the new photo is: this meal, or a different meal");
+    const lowP = await plusAsk.locator("button, label").evaluateAll((xs) => xs.filter((x) => x.getBoundingClientRect().height < 44).map((x) => x.className));
+    ok(lowP.length === 0, "every choice at least 44 px: " + lowP.join(", "));
+    await plusAsk.getByRole("button", { name: "Cancel" }).click(); await p.waitForTimeout(200);
+    ok(await p.locator(".mp-plus-ask").count() === 0, "Cancel closes it");
+    await p.locator(".mp-add-photo").click(); await p.waitForTimeout(200);
+    await p.locator(".mp-plus-same input").setInputFiles(path.join(__dirname, "plate.jpg")); await p.waitForTimeout(900);
+    ok(await p.locator(".mp-help").count() === 1 && await p.locator(".mp-help .mp-help-photos img").count() === 2 && await p.locator(".mp-plus-ask").count() === 0, "Another photo of this meal: as before, the two photos to read together");
+    await p.locator(".mp-help").getByRole("button", { name: "Cancel" }).click().catch(() => {}); await p.waitForTimeout(300);
+    await p.locator(".mp-add-photo").click(); await p.waitForTimeout(200);
+    await p.locator(".mp-plus-other").click(); await p.waitForTimeout(1500);
+    let d273 = await saved(p);
+    ok((d273.later || []).length === 1 && d273.later[0].kind === "plate" && d273.items.length === 0 && !d273.photo, "A different meal: the plate that was there is saved for later, the Plate is free");
+    ok(await p.locator("#camera-shutter-button").count() === 1, "and the camera opens for the new plate");
+    await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(2500);
+    d273 = await saved(p);
+    ok(d273.items.length === 5 && !!d273.photo && !d273.photo.more && (d273.later || []).length === 1, "the new photo is read as a new plate, one photo; the other still waits");
+    await p.context().close();
+
+    // DT273: a cook left open for more than a day is asked about once, in place of the strip
+    const stale = { id: "ck9", startedAt: new Date(2026, 9, 24, 13, 30).toISOString(), title: "Chicken rice bowl", stage: "make", plate: { items: [], title: "Chicken rice bowl" }, ui: { ticks: [] }, steps: 5 };
+    p = await open({ ...seed, cook: stale });
+    await p.goto(U + "/plate"); await p.waitForTimeout(1200);
+    const staleCard = p.locator(".cook-stale");
+    ok(await staleCard.count() === 1 && await p.locator(".cook-strip").count() === 0, "a cook from 24 October: asked about, in place of the strip");
+    const said = (await staleCard.innerText()).replace(/\s+/g, " ");
+    ok(/You started Chicken rice bowl on 24 October and stopped at step 1 of 5\./.test(said) && /That is 13 days ago\. Go on with it, or end it\?/.test(said) && /End it keeps nothing of its steps\. Your recipe stays as it is\./.test(said), "it says when it started, where it stopped and how long ago: " + said);
+    const btns = await staleCard.locator("button").allInnerTexts();
+    ok(btns[0] === "End it" && btns[1] === "Go on with it" && await staleCard.locator("button").evaluateAll((xs) => xs.every((x) => x.getBoundingClientRect().height >= 44)), "End it is the first button, then Go on with it; both at least 44 px");
+    await p.goto(U + "/today"); await p.waitForTimeout(1000);
+    ok(await p.locator(".cook-stale").count() === 1, "Today asks too");
+    await p.locator(".cook-stale").getByRole("button", { name: "Go on with it" }).click(); await p.waitForTimeout(1000);
+    let c273 = (await saved(p)).cook;
+    ok(c273 && c273.staleAsked === true && c273.inView === true, "Go on with it opens the cook, and it is marked as asked");
+    await p.locator("nav button").filter({ hasText: "Today" }).click(); await p.waitForTimeout(900);
+    ok(await p.locator(".cook-stale").count() === 0 && await p.locator(".cook-strip").count() === 1 && !!(await saved(p)).cook.leftAt, "back on Today the strip is there again, not the question");
+    await p.context().close();
+    p = await open({ ...seed, cook: { ...stale, staleAsked: true } });
+    await p.goto(U + "/plate"); await p.waitForTimeout(1200);
+    ok(await p.locator(".cook-stale").count() === 0 && await p.locator(".cook-strip").count() === 1, "a cook that was asked about is not asked about again, however old");
+    await p.context().close();
+    p = await open({ ...seed, cook: stale });
+    await p.goto(U + "/plate"); await p.waitForTimeout(1200);
+    await p.locator(".cook-stale").getByRole("button", { name: "End it" }).click(); await p.waitForTimeout(700);
+    ok(!(await saved(p)).cook && await p.locator(".cook-stale").count() === 0 && await p.locator(".cook-strip").count() === 0, "End it ends the cook: no question, no strip");
+    await p.context().close();
+
     // 0.3.121 (Coach Milan 10 November): the same photo read again is no new plate. With a cook still open it does not ask
     // about the cook again, and an Exploring plate that was on the Plate before Served came is not kept as Served by it
     const old = { ...seed, cook, items: TAVA.slice(0, 2).map(([g, name, calories, protein, fats, carbs], k) => ({ id: "o" + k, grams: g, locked: false, fromPhoto: true, est: { low: Math.round(g * 0.8), high: Math.round(g * 1.25) }, food: F("of" + k, name, calories, protein, fats, carbs) })),

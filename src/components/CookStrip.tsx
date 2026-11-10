@@ -1,9 +1,9 @@
 // DT214 v2 (0.3.53, board Stories162): while a cook runs, a strip on every tab, never above the page's title: Cooking now, the
 // dish, the step, Go on. After eating it says when Chef Mealan asks how it carried you.
-import { w as wd } from "../words";
+import { w as wd, wn as wdn, dateText } from "../words";
 import { useEffect, useState } from "react";
 import type { AppApi } from "../screens/api";
-import { stripWords } from "../cooking";
+import { stripWords, staleCook, stepAt } from "../cooking";
 import { Mark } from "./Mark";
 export function CookStrip({ p }: { p: AppApi }) {
   const c = p.state.cook;
@@ -18,6 +18,19 @@ export function CookStrip({ p }: { p: AppApi }) {
   // DT218 (0.3.58, board Stories164; Coach Milan 2 November 17:53): after eating, Go on asks on the meal's card, and a ✕ ends
   // the cook without the last answer; the card keeps everything else
   const cooking = c.stage === "make" || c.stage === "eat";
+  // DT273 (0.3.123, board Stories202): a cook left open for more than a day is asked about once, in place of the strip
+  const stale = staleCook(c);
+  if (stale) { const at = stepAt(c); return (
+    <section className="card cook-stale" role="group" aria-label={wd("strip.staleAria", { title: c.title })}>
+      <b>{at ? wd("strip.staleAt", { title: c.title, day: dateText(new Date(stale.since), { day: "numeric", month: "long" }), k: at.k, n: at.n }) : wd("strip.staleNoStep", { title: c.title, day: dateText(new Date(stale.since), { day: "numeric", month: "long" }) })}</b>
+      <small>{wdn("strip.staleDays", stale.days)}</small>
+      <div className="cook-stale-go">
+        <button type="button" className="pill pill-small pill-primary cs-stale-end" onClick={() => p.endCook()}>{wd("strip.endIt")}</button>
+        <button type="button" className="pill pill-small cs-stale-go" onClick={() => { p.cookAsked(); p.goOnCook(); }}>{wd("strip.goOnWithIt")}</button>
+      </div>
+      <small className="cook-stale-help">{wd("strip.staleHelp")}</small>
+    </section>
+  ); }
   if (ask && cooking) return (
     <div className="cook-strip cook-strip-ask" role="group" aria-label={wd("strip.stopCooking", { title: c.title })}>
       <span className="cs-words"><b>{c.title}</b></span>

@@ -1161,6 +1161,7 @@ export function JourneyScreen(p: AppApi) {
   const [shotAt, setShotAt] = useState(0);
   useEffect(() => { setShotAt(0); }, [state.photo?.at, state.photo?.image]);
   const [morePhoto, setMorePhoto] = useState<{ file: File; at: number } | null>(null);
+  const [plusAsk, setPlusAsk] = useState(false);
   // DT130: Put it in my plan, for an idea: the day and the meal picked in two rows of chips
   const [ideaPlan, setIdeaPlan] = useState<{ date: string; slotId: string } | null>(null);
   const photoTime = (iso: string) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
@@ -1595,8 +1596,19 @@ export function JourneyScreen(p: AppApi) {
                 : wn("plate.photoLine", items.length, { time: photoTime(state.photo.at) })}</small>
               <span className="mp-big-go">
                 <button type="button" className="pill pill-small mp-retake" onClick={p.mealCamera}>{w("plate.retake")}</button>
-                {p.ai.on && <label className="pill pill-small mp-add-photo">{w("plate.addPhoto")}<input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; if (f) setMorePhoto({ file: f, at: Date.now() }); e.target.value = ""; }} /></label>}
-              </span></div>
+                {p.ai.on && <button type="button" className="pill pill-small mp-add-photo" aria-expanded={plusAsk} onClick={() => setPlusAsk((x) => !x)}>{w("plate.addPhoto")}</button>}
+              </span>
+              {/* DT273 (0.3.123, board Stories202; Coach Milan 10 November 07:50 to 17:16, Go): + Photo asks first what the photo is.
+                  A restaurant's pancake went in as one more photo of an old plate, because nothing said it would */}
+              {plusAsk && p.ai.on && (
+                <div className="mp-plus-ask" role="group" aria-label={w("plate.plusWhat")}>
+                  <b>{w("plate.plusWhat")}</b>
+                  <label className="mp-plus-opt mp-plus-same">{w("plate.plusSame")}<small>{w("plate.plusSameLine")}</small>
+                    <input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; setPlusAsk(false); if (f) setMorePhoto({ file: f, at: Date.now() }); }} /></label>
+                  <button type="button" className="mp-plus-opt mp-plus-other" onClick={() => { setPlusAsk(false); p.savePlate(); p.mealCamera(); }}>{w("plate.plusOther")}<small>{w("plate.plusOtherLine")}</small></button>
+                  <button type="button" className="link mp-plus-cancel" onClick={() => setPlusAsk(false)}>{w("photo.cancel")}</button>
+                </div>
+              )}</div>
           </div>
         ) : (
           <button type="button" className="mp-line" onClick={() => setPhotoBig(true)} aria-label={w("make.yourPhotoTapToSee")}>

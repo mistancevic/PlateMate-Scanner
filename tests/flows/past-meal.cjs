@@ -1,4 +1,4 @@
-// DT267 (0.3.117, board Stories200; Coach Milan 9 November, Go; from Tester 2): a meal eaten on a past day keeps its picture on
+// DT267 (0.3.117, board Stories200; Coach Milan 9 November, Go; from a tester): a meal eaten on a past day keeps its picture on
 // Plan. The row shows the picture, the whole row opens the meal: the photo large, its other photos, the numbers, the foods
 // with grams. Cook again only for a meal from a recipe; any other says Open, and inside Put it on the Plate again.
 const { chromium } = require("playwright");
