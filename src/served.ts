@@ -26,7 +26,8 @@ export type Served = {
   menu?: MenuLine & { was?: Ingredient[] };
 };
 // what the Plate carries about the plate it is exploring
-export type OnPlate = { id: string; mine: boolean; visit: string; dish: Dish; name?: string };
+// byHand: the plate became Exploring by the pencil, so its dish is not the read's guess
+export type OnPlate = { id: string; mine: boolean; visit: string; dish: Dish; name?: string; byHand?: boolean };
 
 // plates of one sitting: the same calendar day, within this many hours of another plate of the visit
 export const VISIT_HOURS = 2.5;

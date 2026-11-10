@@ -1501,7 +1501,9 @@ export function JourneyScreen(p: AppApi) {
             {daySlots.map((x) => <button key={x.id} className={`choice ${forKey === `meal:${x.id}` ? "on" : ""}`} aria-pressed={forKey === `meal:${x.id}`} onClick={() => p.setPick(`meal:${x.id}`)}>{mealName(x.name)}</button>)}
             {!daySlots.some((x) => /snack/i.test(x.name)) && <button className={`choice ${forKey === "snack" ? "on" : ""}`} aria-pressed={forKey === "snack"} onClick={() => p.setPick("snack")}>{w("meal.snack")}</button>}
           </div>
-          <p className="small for-hint">{forHint}</p>
+          {/* DT274 (0.3.122, board Stories203): what each choice does; on Exploring in place of the one line that was there */}
+          {p.pick !== "exploring" && <p className="small for-hint">{forHint}</p>}
+          <p className="small for-say"><b>{w("make.forExploringHead")}</b> {w("make.forExploring")}<br /><b>{w("make.forMealHead")}</b> {w("make.forMeal")}</p>
         </>}
         {/* R22 (0.2.50, board RS21): What is it? in place of Meal or Dessert; a small thing is a Snack, above */}
         <p className="label">{w("make.whatIsIt")}</p>

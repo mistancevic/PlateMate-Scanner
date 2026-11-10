@@ -215,6 +215,34 @@ const READS = [
     await page.locator(".mp-help .pill-primary").click(); await page.waitForTimeout(2000);
     s = await st();
     ok(s.served.length === 2 && s.photo?.keep === false && /Not kept/.test(await text(".sv-off")), "Read it again on a plate you did not keep: still not kept");
+    // ---- DT274 (0.3.122, board Stories203): one Exploring, the pencil decides ----
+    await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
+    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
+    await page.locator(".pa-chip").filter({ hasText: "Exploring" }).click(); await page.waitForTimeout(200);
+    await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
+    s = await st();
+    const n274 = s.served.length, fb274 = s.feedback.length;
+    ok(s.photo?.who === "idea" && !!s.photo?.served && await page.locator(".sv-plate").count() === 1, "an Exploring plate, kept");
+    await page.locator(".plan-line").click(); await page.waitForTimeout(300);
+    const forGroup = page.getByRole("radiogroup", { name: "What the plate is for" });
+    const say = await text(".for-say");
+    ok(/Exploring: a plate you look at\. Nothing is logged\. With a photo it is kept in Recipes, under Served\./.test(say) && /A meal \(Breakfast, Lunch, Dinner\): your meal\. It counts in your day when you tap Eat or Ate it\. If it was under Served, it leaves Served\./.test(say) && await page.locator(".for-hint").count() === 0, "the pencil's sheet says what each choice does, in place of the old line on Exploring");
+    // back to a meal: your meal again, out of Served
+    await forGroup.getByRole("button", { name: "Dinner", exact: true }).click(); await page.waitForTimeout(600);
+    s = await st();
+    ok(s.photo && s.photo.who !== "idea" && !s.photo.served && s.served.length === n274 - 1 && s.feedback.length === fb274 && s.items.length > 0, "the pencil on Dinner: your meal again, out of Served, the foods stay, nothing logged");
+    ok(await page.locator(".sv-plate").count() === 0 && await page.locator(".mp-say").getByRole("button", { name: "Ate it" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 0, "the Served card is gone and the buttons are a meal's");
+    // and to Exploring again: an Exploring plate, kept
+    await forGroup.getByRole("button", { name: "Exploring", exact: true }).click(); await page.waitForTimeout(600);
+    s = await st();
+    ok(s.photo?.who === "idea" && s.photo?.served?.byHand === true && s.served.length === n274 && s.served[0].mine === true && s.feedback.length === fb274, "the pencil on Exploring: an Exploring plate, kept as Served; nothing logged");
+    ok(await page.locator(".sv-plate").count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Ate it" }).count() === 0, "the Served card shows and the buttons are an Exploring plate's");
+    ok(await page.locator(".sv-plate .sv-by").count() === 1, "the dish was not read for this plate, so only the name says filled by Chef Mealan");
+    // emptying the Plate takes nothing out of Served
+    await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(600);
+    s = await st();
+    ok(!s.photo && s.items.length === 0 && s.served.length === n274, "emptying the Plate leaves the kept plate in Served");
     // ---- 9. Srpski and German ----
     for (const l of ["sr-Latn", "de"]) {
       await page.evaluate((l) => localStorage.setItem("chefmealan-lang", l), l);

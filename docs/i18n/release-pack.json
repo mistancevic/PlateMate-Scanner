@@ -1,6 +1,6 @@
 {
-  "release": "0.3.120",
-  "at": "2026-11-09T23:07:23.024Z",
+  "release": "0.3.122",
+  "at": "2026-11-10T09:43:46.901Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -45157,6 +45157,74 @@
       "release": "0.3.120",
       "order": 900017,
       "at": "2026-11-09T23:07:23.024Z"
+    },
+    {
+      "id": "screen.make.forExploringHead",
+      "kind": "screen",
+      "key": "make.forExploringHead",
+      "en": "Exploring:",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Istraživanje:",
+      "de": "Entdecken:",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.122",
+      "order": 900000,
+      "at": "2026-11-10T09:43:46.901Z"
+    },
+    {
+      "id": "screen.make.forExploring",
+      "kind": "screen",
+      "key": "make.forExploring",
+      "en": "a plate you look at. Nothing is logged. With a photo it is kept in Recipes, under Served.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "tanjir koji samo gledaš. Ništa se ne upisuje. Sa fotografijom se čuva u Receptima, pod Posluženo.",
+      "de": "ein Teller, den du dir ansiehst. Nichts wird eingetragen. Mit einem Foto bleibt er in Rezepte, unter Serviert.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.122",
+      "order": 900001,
+      "at": "2026-11-10T09:43:46.901Z"
+    },
+    {
+      "id": "screen.make.forMealHead",
+      "kind": "screen",
+      "key": "make.forMealHead",
+      "en": "A meal (Breakfast, Lunch, Dinner):",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Obrok (doručak, ručak, večera):",
+      "de": "Eine Mahlzeit (Frühstück, Mittagessen, Abendessen):",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.122",
+      "order": 900002,
+      "at": "2026-11-10T09:43:46.901Z"
+    },
+    {
+      "id": "screen.make.forMeal",
+      "kind": "screen",
+      "key": "make.forMeal",
+      "en": "your meal. It counts in your day when you tap Eat or Ate it. If it was under Served, it leaves Served.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "tvoj obrok. Računa se u tvoj dan kada dodirneš Jelo ili potvrdiš da je pojedeno. Ako je bio pod Posluženo, odatle izlazi.",
+      "de": "deine Mahlzeit. Sie zählt in deinem Tag, wenn du Essen oder Gegessen tippst. War sie unter Serviert, verlässt sie Serviert.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.122",
+      "order": 900003,
+      "at": "2026-11-10T09:43:46.901Z"
     }
   ]
 }

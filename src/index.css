@@ -3156,3 +3156,5 @@ section.sv-plate .button-row.sv-acts { flex-wrap: wrap; }
 section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; white-space: normal; } .sv-neither, .sv-menu-again, .sv-not-this { min-height: 44px; } .sv-menu-again { align-self: flex-start; }
 .sv-on-menu { background: #e7f4ec; border-radius: var(--r-control); padding: 8px 10px; font-size: var(--fs-small); line-height: 1.4; display: flex; gap: 8px; align-items: center; } .sv-on-menu > span { flex: 1; min-width: 0; } .sv-on-menu small { display: block; color: var(--muted); }
 .sv-tighter { color: var(--muted); line-height: 1.45; }
+/* DT274 (0.3.122): what each choice of the pencil does */
+.for-say { margin-top: 8px; padding: 8px 10px; border-radius: var(--r-control); background: var(--surface); border: 1.5px solid var(--line); line-height: 1.5; }

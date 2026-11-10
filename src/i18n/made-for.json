@@ -5492,6 +5492,10 @@
     "screen.served.notThis": {"en":"Not this","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
     "screen.served.menuTighter": {"en":"The menu gave the weight. The amounts follow the menu now, not the photo's guess.","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
     "screen.served.menuLimit": {"en":"A menu weight is what the kitchen says, often before cooking. It tightens the range; the plates stay Served, not weighed.","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
-    "screen.served.backToVisit": {"en":"‹ {title}","area":"Words used across the app","where":"Across the app","release":"0.3.120"}
+    "screen.served.backToVisit": {"en":"‹ {title}","area":"Words used across the app","where":"Across the app","release":"0.3.120"},
+    "screen.make.forExploringHead": {"en":"Exploring:","area":"The Plate","where":"The Plate","release":"0.3.122"},
+    "screen.make.forExploring": {"en":"a plate you look at. Nothing is logged. With a photo it is kept in Recipes, under Served.","area":"The Plate","where":"The Plate","release":"0.3.122"},
+    "screen.make.forMealHead": {"en":"A meal (Breakfast, Lunch, Dinner):","area":"The Plate","where":"The Plate","release":"0.3.122"},
+    "screen.make.forMeal": {"en":"your meal. It counts in your day when you tap Eat or Ate it. If it was under Served, it leaves Served.","area":"The Plate","where":"The Plate","release":"0.3.122"}
   }
 }

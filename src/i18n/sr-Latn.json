@@ -21972,6 +21972,22 @@
     "served.backToVisit": {
       "text": "‹ {title}",
       "checked": true
+    },
+    "make.forExploringHead": {
+      "text": "Istraživanje:",
+      "checked": true
+    },
+    "make.forExploring": {
+      "text": "tanjir koji samo gledaš. Ništa se ne upisuje. Sa fotografijom se čuva u Receptima, pod Posluženo.",
+      "checked": true
+    },
+    "make.forMealHead": {
+      "text": "Obrok (doručak, ručak, večera):",
+      "checked": true
+    },
+    "make.forMeal": {
+      "text": "tvoj obrok. Računa se u tvoj dan kada dodirneš Jelo ili potvrdiš da je pojedeno. Ako je bio pod Posluženo, odatle izlazi.",
+      "checked": true
     }
   }
 }
