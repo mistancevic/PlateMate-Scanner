@@ -880,9 +880,10 @@
       "id": "DT277",
       "title": "Training week: a day shows it can be opened",
       "epic": "me",
-      "state": "next",
+      "state": "done",
       "board": "Stories206",
-      "why": "Coach Milan 10 November 21:54: it is not clear what to do here. A pencil on a day with training, a plus on a day with none. Drawn; waits for Go."
+      "why": "Coach Milan 10 November 21:54: it is not clear what to do here. A pencil on a day with training, a plus on a day with none, from the bottom menu's icon set. Go 22:53.",
+      "version": "0.3.128"
     },
     {
       "id": "DT278",
