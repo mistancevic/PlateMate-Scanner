@@ -3171,3 +3171,21 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .for-say { margin-top: 8px; padding: 8px 10px; border-radius: var(--r-control); background: var(--surface); border: 1.5px solid var(--line); line-height: 1.5; }
 /* DT271 (0.3.125): whose plate it is */
 .sv-whose { display: flex; gap: 6px; flex-wrap: wrap; } section.sv-plate .sv-whose > .pill.pill-small, section.sv-one .sv-whose > .pill.pill-small { min-height: 44px; } .sv-whose .pill.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+/* DT276 step 2 (0.3.129, board Stories205): a step's pictures one after another in cook mode, and several in Make's list */
+.cook-pic-box { position: relative; margin: -14px -14px 0; } .cook-pic-box .cook-pic { width: 100%; margin: 0; }
+.cook-pic-next { position: absolute; right: 8px; top: 8px; min-height: 44px; min-width: 44px; padding: 0 12px; border: 0; border-radius: 999px; background: rgba(23, 39, 66, .82); color: #fff; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+.mk-step { display: flex; flex-direction: column; gap: 6px; }
+.mk-pics { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-left: 34px; }
+.mk-pic { width: 48px; height: 48px; padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: none; cursor: pointer; } .mk-pic img { width: 48px; height: 48px; object-fit: cover; display: block; }
+.mk-pic.on { outline: 3px solid var(--brand); outline-offset: 2px; }
+.mk-pics .mk-photo { width: 48px; height: 48px; }
+.mk-pic-open { margin-left: 34px; display: flex; flex-direction: column; gap: 8px; background: var(--tint); border-radius: 12px; padding: 10px; }
+.mk-pic-open img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; display: block; }
+.mk-pic-open .button-row { display: flex; flex-wrap: wrap; gap: 8px; } .mk-pic-open .pill { min-height: 44px; }
+.rq-step-pic .more { position: absolute; right: 2px; bottom: 2px; background: rgba(23, 39, 66, .82); color: #fff; border-radius: 999px; padding: 1px 6px; font-size: 12px; font-weight: 800; }
+.rq-step-pic button { position: relative; }
+.sp-all { display: flex; flex-wrap: wrap; gap: 8px; }
+.rq-on-steps { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; } .rq-on-steps > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.rq-on-steps button { width: 56px; height: 56px; padding: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: none; position: relative; cursor: pointer; } .rq-on-steps img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rq-on-steps button span { position: absolute; left: 2px; bottom: 2px; background: rgba(23, 39, 66, .82); color: #fff; border-radius: 999px; padding: 1px 6px; font-size: 12px; font-weight: 800; }

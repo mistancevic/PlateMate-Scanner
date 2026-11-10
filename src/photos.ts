@@ -349,22 +349,80 @@ export function stepPicOf(m: { stepPics?: (string | null)[]; stepPicMeta?: ({ by
   const src = n >= 0 ? m.stepPics[n] : null;
   return src && isData(src) ? { src, by: m.stepPicMeta[n]!.by } : null;
 }
-// the patch that sets (or, with null, removes) the picture of the step at place k with these words
-export function setStepPic(m: { stepPics?: (string | null)[]; stepPicMeta?: ({ by: "me" | "ai"; step: string } | null)[]; steps?: string[] }, k: number, pic: StepPic | null) {
-  const len = Math.max(m.steps?.length ?? 0, k + 1);
-  const pics = Array.from({ length: len }, (_, i) => m.stepPics?.[i] ?? null), meta = Array.from({ length: len }, (_, i) => m.stepPicMeta?.[i] ?? null);
+// DT276 step 2 (0.3.129, board Stories205; Coach Milan 10 November 22:37, Go): a step can have two or more pictures. The
+// store is the same list: a place k below the number of steps holds step k's first picture, as before; the places after
+// the steps hold the other pictures, each named by its step's words. So the files, the fingerprints and the other phones
+// treat them as they always did.
+type Pics = { stepPics?: (string | null)[]; stepPicMeta?: ({ by: "me" | "ai"; step: string } | null)[]; steps?: string[] };
+// every picture of the step with these words, the first one first
+export function stepPicsOf(m: Pics | null | undefined, step: string): StepPic[] {
+  if (!m || !Array.isArray(m.stepPics) || !Array.isArray(m.stepPicMeta)) return [];
+  const out: StepPic[] = [];
+  m.stepPicMeta.forEach((x, n) => { const src = m.stepPics![n]; if (x?.step === step && src && isData(src)) out.push({ src, by: x.by }); });
+  return out;
+}
+const lists = (m: Pics, len: number) => { const n = Math.max(len, m.stepPics?.length ?? 0, m.stepPicMeta?.length ?? 0);
+  return { pics: Array.from({ length: n }, (_, i) => m.stepPics?.[i] ?? null), meta: Array.from({ length: n }, (_, i) => m.stepPicMeta?.[i] ?? null) }; };
+// the list without empty places at its end, never shorter than the steps
+const trimmed = (pics: (string | null)[], meta: ({ by: "me" | "ai"; step: string } | null)[], steps: number) => {
+  let n = pics.length; while (n > steps && !pics[n - 1]) n--;
+  return { stepPics: pics.slice(0, n), stepPicMeta: meta.slice(0, n) };
+};
+// the patch that sets (or, with null, removes) the first picture of the step at place k with these words; its other
+// pictures stay
+export function setStepPic(m: Pics, k: number, pic: StepPic | null) {
+  const steps = m.steps?.length ?? 0, len = Math.max(steps, k + 1);
+  const { pics, meta } = lists(m, len);
   const step = m.steps?.[k] ?? "";
-  // the same words at another place: that picture moves here
+  // the same words at another step's place: that picture moves here
   for (let i = 0; i < len; i++) if (i !== k && meta[i]?.step === step) { pics[i] = null; meta[i] = null; }
   pics[k] = pic ? pic.src : null; meta[k] = pic ? { by: pic.by, step } : null;
+  // the first picture removed: the next one of the step takes its place
+  if (!pic) { const n = meta.findIndex((x, i) => i >= len && x?.step === step && !!pics[i]); if (n >= 0) { pics[k] = pics[n]; meta[k] = meta[n]; pics[n] = null; meta[n] = null; } }
+  return trimmed(pics, meta, steps);
+}
+// one more picture for the step at place k: its first when it has none, else after the ones it has. The same picture twice is once
+export function addStepPic(m: Pics, k: number, pic: StepPic) {
+  const step = m.steps?.[k] ?? "";
+  const has = stepPicsOf(m, step);
+  if (!has.length) return setStepPic(m, k, pic);
+  if (has.some((x) => x.src === pic.src)) return {};
+  const { pics, meta } = lists(m, m.steps?.length ?? 0);
+  const free = pics.findIndex((x, i) => i >= (m.steps?.length ?? 0) && !x);
+  if (free >= 0) { pics[free] = pic.src; meta[free] = { by: pic.by, step }; } else { pics.push(pic.src); meta.push({ by: pic.by, step }); }
   return { stepPics: pics, stepPicMeta: meta };
 }
-// after the steps changed: each picture follows its words to the step's new place; a step rewritten loses its picture
+// this picture off the step at place k; the others stay, and the next one is the first
+export function removeStepPic(m: Pics, k: number, src: string) {
+  const step = m.steps?.[k] ?? "", steps = m.steps?.length ?? 0;
+  if (stepPicOf(m, step)?.src === src) return setStepPic(m, k, null);
+  const { pics, meta } = lists(m, steps);
+  const n = meta.findIndex((x, i) => x?.step === step && pics[i] === src);
+  if (n < 0) return {};
+  pics[n] = null; meta[n] = null;
+  return trimmed(pics, meta, steps);
+}
+// this picture becomes the step's first: the one the recipe page and Watch the steps show
+export function firstStepPic(m: Pics, k: number, src: string) {
+  const step = m.steps?.[k] ?? "";
+  const { pics, meta } = lists(m, Math.max(m.steps?.length ?? 0, k + 1));
+  const n = meta.findIndex((x, i) => x?.step === step && pics[i] === src);
+  if (n < 0 || n === k) return {};
+  [pics[k], pics[n]] = [pics[n], pics[k]]; [meta[k], meta[n]] = [meta[n], meta[k]];
+  if (!pics[n]) meta[n] = null;
+  return { stepPics: pics, stepPicMeta: meta };
+}
+// after the steps changed: each picture follows its words to the step's new place; a step rewritten loses its pictures
 export function alignStepPics(m: { stepPics?: (string | null)[]; stepPicMeta?: ({ by: "me" | "ai"; step: string } | null)[]; stepPicSigs?: string[] }, steps: string[]) {
   if (!Array.isArray(m.stepPicMeta) || !m.stepPicMeta.some(Boolean)) return {};
   if (!Array.isArray(m.stepPics)) return {}; // not on this phone yet: left as they are
-  const pics = steps.map((t) => { const n = m.stepPicMeta!.findIndex((x) => x?.step === t); return n >= 0 ? m.stepPics![n] ?? null : null; });
-  const meta = steps.map((t) => { const x = m.stepPicMeta!.find((y) => y?.step === t); return x ? { by: x.by, step: t } : null; });
+  const all = steps.map((t) => stepPicsOf(m, t));
+  const pics: (string | null)[] = all.map((x) => x[0]?.src ?? null);
+  const meta: ({ by: "me" | "ai"; step: string } | null)[] = all.map((x, k) => (x[0] ? { by: x[0].by, step: steps[k] } : null));
+  // the other pictures after the steps, a step written twice only once
+  const seen = new Set<string>();
+  all.forEach((x, k) => { if (seen.has(steps[k])) return; seen.add(steps[k]); x.slice(1).forEach((p) => { pics.push(p.src); meta.push({ by: p.by, step: steps[k] }); }); });
+  steps.forEach((t, k) => { if (steps.indexOf(t) !== k) { pics[k] = null; meta[k] = null; } });
   return { stepPics: pics, stepPicMeta: meta };
 }
 // every step has its picture: Watch the steps can play

@@ -34,7 +34,7 @@ export type CookLink = { remoteStep?: { k: number; rev: number } | null; onStep?
   eat?: () => void; mealPhoto?: { src: string; take: (file: File) => void }; since?: string;
   // DT223 (0.3.60): a photo of this step while cooking; kept says it goes with the recipe
   stepPhoto?: { take: (k: number, file: File) => void; kept: boolean } };
-export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null, pics = [], link = {}, moves }: {
+export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null, pics = [], allPics = [], link = {}, moves }: {
   title: string; steps: string[]; items: Ingredient[]; ticks: Set<number>;
   // DT217 (0.3.56): the moves of each step as Chef Mealan drafted them; a step without them gets them in code (movesFor)
   moves?: import("../pilot").StepMoves;
@@ -43,10 +43,15 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   ask?: ((question: string, step: number, history: { role: "cook" | "chef"; text: string }[]) => Promise<string>) | null;
   // DT175a (0.3.18): the step pictures, one per step or null; the label sits under the picture, never on it
   pics?: ({ src: string; by: "me" | "ai" } | null)[];
+  // DT276 step 2 (0.3.129): every picture of each step, the first first; a step with two or more shows them one after another
+  allPics?: { src: string; by: "me" | "ai" }[][];
   link?: CookLink;
 }) {
   const first = Math.max(0, steps.findIndex((_, k) => !ticks.has(k)));
   const [k, setK] = useState(ticks.size >= steps.length ? 0 : first);
+  // DT276 step 2: which of the step's pictures shows; a new step starts at its first
+  const [picN, setPicN] = useState(0);
+  useEffect(() => { setPicN(0); }, [k]);
   const [done, setDone] = useState(false);
   // DT251 (0.3.104, board Stories186; Coach Milan 7 November 08:07 to 12:28, Go): Get it ready. A cook that starts at the
   // beginning opens on the foods first: each with its amount, read aloud one at a time; next ticks it and goes on, repeat says
@@ -319,9 +324,12 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
           </section>
           ) : (
           <section className={`cook-card cook-step${pics[k] ? " has-pic" : ""}`} aria-live="polite">
-            {pics[k] && <><img className="cook-pic" src={pics[k]!.src} alt={w("cookmode.stepN", { n: k + 1 })} /><small className="cook-pic-label">{pics[k]!.by === "ai" ? w("cookmode.pictureDrawnByAiBeta") : link.stepPhoto?.kept ? w("cookmode.yourPhotoKeptWithThe") : w("cookmode.yourPhoto")}
-              {/* DT223 (0.3.60): your photo of the step can be taken again */}
-              {pics[k]!.by === "me" && link.stepPhoto && <PhotoPick key={`again-${k}`} onFile={(f) => link.stepPhoto!.take(k, f)}>{({ toggle, open }) => <button type="button" className="link cook-pic-again" aria-expanded={open} onClick={toggle}>{w("cookmode.takeItAgain")}</button>}</PhotoPick>}</small></>}
+            {pics[k] && (() => { const list = allPics[k]?.length ? allPics[k] : [pics[k]!], n = Math.min(picN, list.length - 1), pic = list[n]; return <>
+              <div className="cook-pic-box"><img className="cook-pic" src={pic.src} alt={w("cookmode.stepN", { n: k + 1 })} />
+                {list.length > 1 && <button type="button" className="cook-pic-next" aria-label={w("cookmode.nextPhoto")} onClick={() => setPicN((n + 1) % list.length)}>{w("cookmode.picNOf", { k: n + 1, n: list.length })} ›</button>}</div>
+              <small className="cook-pic-label">{pic.by === "ai" ? w("cookmode.pictureDrawnByAiBeta") : link.stepPhoto?.kept ? w("cookmode.yourPhotoKeptWithThe") : w("cookmode.yourPhoto")}
+              {/* DT276 step 2: one more photo of the step; nothing is replaced */}
+              {link.stepPhoto && <PhotoPick key={`again-${k}`} onFile={(f) => link.stepPhoto!.take(k, f)}>{({ toggle, open }) => <button type="button" className="link cook-pic-again" aria-expanded={open} onClick={toggle}>{w("cookmode.addAnotherPhoto")}</button>}</PhotoPick>}</small></>; })()}
             <small>{w("cookmode.stepCaps", { n: k + 1 })}</small>
             <div className={`cook-text${mvs.length > 1 ? " cook-text-whole" : ""}`}>{stepParts(tempsIn(steps[k]), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}</div>
             {/* DT223 (0.3.60, board Stories165): a step without a picture: a small button to add your photo of it */}

@@ -20,11 +20,12 @@ const words = (step: string, items: Ingredient[]) => stepParts(tempsIn(step), it
 export const picLabel = (p: StepPic) => (p.by === "ai" ? w("steppics.pictureDrawnByAiBeta") : w("steppics.yourPhoto"));
 
 // DT211 v8 (0.3.53, board Stories158): on the recipe a step shows its photo, from cooking; no + slot. A tap changes or removes it
-export function StepPicShown({ pic, k, onOpen }: { pic: StepPic | null; k: number; onOpen: () => void }) {
+export function StepPicShown({ pic, k, onOpen, more = 0 }: { pic: StepPic | null; k: number; onOpen: () => void; more?: number }) {
   if (!pic) return null;
   return (
     <div className="rq-step-pic">
-      <button type="button" onClick={onOpen} aria-label={w("steppics.changeOrRemoveThePhoto", { n: k + 1 })}><img src={pic.src} alt="" /></button>
+      {/* DT276 step 2 (0.3.129): the first picture, and how many more the step has */}
+      <button type="button" onClick={onOpen} aria-label={w("steppics.changeOrRemoveThePhoto", { n: k + 1 })}><img src={pic.src} alt="" />{more > 0 && <span className="more">+{more}</span>}</button>
       <small>{pic.by === "ai" ? w("steppics.aiBeta") : w("steppics.yours")}</small>
     </div>
   );
@@ -42,9 +43,11 @@ export function StepPicSlot({ pic, k, onOpen }: { pic: StepPic | null; k: number
 }
 
 // adding or changing a step's picture: camera or gallery, who made it, the checks, then Keep it
-export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, fromCooks = [] }: {
+export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, fromCooks = [], all = [], onFirst }: {
   k: number; step: string; items: Ingredient[]; pic: StepPic | null; fromCooks?: string[];
-  onKeep: (p: StepPic) => void; onRemove: () => void; onClose: () => void;
+  // DT276 step 2 (0.3.129): every picture of the step, the first first; Keep it adds a new one, Remove takes the shown one off
+  all?: StepPic[]; onFirst?: (src: string) => void;
+  onKeep: (p: StepPic) => void; onRemove: (src?: string) => void; onClose: () => void;
 }) {
   const [src, setSrc] = useState<string | null>(pic?.src ?? null);
   const [by, setBy] = useState<"me" | "ai" | null>(pic?.by ?? null);
@@ -60,6 +63,12 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, f
     <div className="sp-sheet" role="dialog" aria-label={w("steppics.pictureForStep", { n: k + 1 })}>
       <div className="cook-top"><button className="pill pill-small" style={{ height: 44 }} onClick={onClose}>{w("steppics.close")}</button><b className="cook-title">{w("steppics.pictureForStep", { n: k + 1 })}</b><span /></div>
       <small className="sp-step" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.45 }}>{words(step, items)}</small>
+      {all.length > 1 && <>
+        <b>{w("steppics.thisStepsPhotos")}</b>
+        <div className="sp-all">{all.map((x, i) => <button key={i} type="button" className={`publish-photo${src === x.src ? " on" : ""}`} aria-pressed={src === x.src} aria-label={w("steppics.photoNOfStep", { k: i + 1, n: k + 1 })} onClick={() => { setSrc(x.src); setBy(x.by); }}><img src={x.src} alt="" /></button>)}</div>
+        {src && all.findIndex((x) => x.src === src) > 0 && onFirst && <button className="pill pill-small" style={{ alignSelf: "flex-start", minHeight: 44 }} onClick={() => onFirst(src)}>{w("steppics.makeItFirst")}</button>}
+        <small className="muted">{w("steppics.firstPhotoWhy")}</small>
+      </>}
       <div className="sp-grid">
         <button className="pill" disabled={busy} onClick={() => cam.current?.click()}>{w("steppics.takeAPhoto")}</button>
         <button className={`pill ${src ? "" : "pill-primary"}`} disabled={busy} onClick={() => gal.current?.click()}>{w("steppics.fromMyGallery")}</button>
@@ -96,7 +105,7 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, f
         {!by && <small className="muted">{w("steppics.sayWhoMadeItFirst")}</small>}
         <small className="muted">{w("steppics.drawnByAiSaysSo")}</small>
       </>}
-      {pic && <button className="link" style={{ alignSelf: "flex-start", minHeight: 44 }} onClick={onRemove}>{w("steppics.removeThisPicture")}</button>}
+      {pic && (!all.length || all.some((x) => x.src === src)) && <button className="link" style={{ alignSelf: "flex-start", minHeight: 44 }} onClick={() => onRemove(src ?? undefined)}>{w("steppics.removeThisPicture")}</button>}
       <small className="muted">{w("steppics.yourPicturesStayWithYour")}</small>
     </div>
   );

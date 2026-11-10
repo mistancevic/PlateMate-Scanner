@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { photosOf, photosWanted, withPhotos, withoutStored, isOrphan, stepPicOf, setStepPic, alignStepPics, allStepPics, stepPicSigsOf, sig } from "./photos";
+import { photosOf, photosWanted, withPhotos, withoutStored, isOrphan, stepPicOf, stepPicsOf, addStepPic, removeStepPic, firstStepPic, setStepPic, alignStepPics, allStepPics, stepPicSigsOf, sig } from "./photos";
 import { clean } from "./records";
 import { stripPhotos } from "./cloud";
 
@@ -58,4 +58,44 @@ test("a step picture leaves the phone and the account when its place is emptied 
   assert.equal(isOrphan("step:m1:4", st), true);
   assert.equal(isOrphan("step:m1:1", { meals: [] }), true);
   assert.equal(isOrphan("step:m1:3", { meals: [{ id: "m1", stepPicSigs: ["x", "", "y"] }] }), false, "not loaded on this phone: kept");
+});
+
+// DT276 step 2 (0.3.129): two or more pictures on a step
+test("a step can have two or more pictures; the first is the one shown", () => {
+  const C = "data:image/jpeg;base64,CCCC";
+  let m: any = { ...meal(), ...setStepPic(meal(), 0, { src: A, by: "me" }) };
+  m = { ...m, ...addStepPic(m, 0, { src: B, by: "me" }) };
+  m = { ...m, ...addStepPic(m, 0, { src: C, by: "ai" }) };
+  const steps = m.steps as string[];
+  assert.deepEqual(stepPicsOf(m, steps[0]).map((x) => x.src), [A, B, C], "three pictures, in the order added");
+  assert.equal(stepPicOf(m, steps[0])!.src, A, "the first is the step's picture");
+  assert.equal(m.stepPics.length, steps.length + 2, "the others sit after the steps");
+  assert.deepEqual(addStepPic(m, 0, { src: B, by: "me" }), {}, "the same picture twice is once");
+  // a step without a picture: the added one is its first, at its own place
+  const one = { ...m, ...addStepPic(m, 1, { src: B, by: "me" }) };
+  assert.equal(one.stepPics[1], B); assert.equal(stepPicsOf(one, steps[1]).length, 1);
+  // setting the first again keeps the others
+  const again = { ...m, ...setStepPic(m, 0, { src: C, by: "me" }) };
+  assert.deepEqual(stepPicsOf(again, steps[0]).map((x) => x.src), [C, B, C]);
+  // make it first
+  const first = { ...m, ...firstStepPic(m, 0, C) };
+  assert.deepEqual(stepPicsOf(first, steps[0]).map((x) => x.src), [C, B, A], "C is first, A took its place");
+  assert.equal(stepPicOf(first, steps[0])!.by, "ai", "who made it moves with it");
+  // remove one of the others, then the first: the next one is the first
+  const less = { ...m, ...removeStepPic(m, 0, B) };
+  assert.deepEqual(stepPicsOf(less, steps[0]).map((x) => x.src), [A, C]);
+  const noFirst = { ...less, ...removeStepPic(less, 0, A) };
+  assert.deepEqual(stepPicsOf(noFirst, steps[0]).map((x) => x.src), [C], "the next one took the first place");
+  assert.equal(noFirst.stepPics[0], C); assert.equal(noFirst.stepPics.length, steps.length, "no empty places left after the steps");
+  const none = { ...noFirst, ...removeStepPic(noFirst, 0, C) };
+  assert.equal(stepPicsOf(none, steps[0]).length, 0);
+  // the files and the fingerprints see every picture, by its place
+  assert.equal([...photosOf({ meals: [m] } as any).keys()].filter((k) => k.startsWith("step:")).length, 3);
+  assert.equal(stepPicSigsOf(m)!.filter(Boolean).length, 3);
+  // the steps moved: every picture follows its words; a step rewritten loses all of its pictures
+  const moved = [steps[1], steps[0], ...steps.slice(2)];
+  const al = { ...m, steps: moved, ...alignStepPics(m, moved) } as any;
+  assert.deepEqual(stepPicsOf(al, steps[0]).map((x) => x.src), [A, B, C]); assert.equal(al.stepPics[1], A, "the first at the step's new place");
+  const re = alignStepPics(m, ["new words", ...steps.slice(1)]) as any;
+  assert.equal(re.stepPics.filter(Boolean).length, 0, "a step rewritten loses its pictures");
 });

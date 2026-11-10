@@ -22040,6 +22040,62 @@
     "served.someoneElse": {
       "text": "Tuđi",
       "checked": true
+    },
+    "steppics.thisStepsPhotos": {
+      "text": "Slike ovog koraka",
+      "checked": true
+    },
+    "steppics.photoNOfStep": {
+      "text": "Slika {k} koraka {n}",
+      "checked": true
+    },
+    "steppics.makeItFirst": {
+      "text": "Stavi je prvu",
+      "checked": true
+    },
+    "steppics.firstPhotoWhy": {
+      "text": "Prva slika je ona koju pokazuju stranica recepta i Pogledaj korake. Zadrži je dodaje novu sliku koraku.",
+      "checked": true
+    },
+    "cookmode.addAnotherPhoto": {
+      "text": "Dodaj još jednu sliku",
+      "checked": true
+    },
+    "cookmode.picNOf": {
+      "text": "{k} od {n}",
+      "checked": true
+    },
+    "cookmode.nextPhoto": {
+      "text": "Sledeća slika ovog koraka",
+      "checked": true
+    },
+    "make.stepPhotoN": {
+      "text": "Slika {k} koraka {n}",
+      "checked": true
+    },
+    "make.makeItFirst": {
+      "text": "Stavi je prvu",
+      "checked": true
+    },
+    "make.removeFromStep": {
+      "text": "Ukloni sa ovog koraka",
+      "checked": true
+    },
+    "make.closePhoto": {
+      "text": "Zatvori",
+      "checked": true
+    },
+    "make.firstPhotoWhy": {
+      "text": "Prva slika je ona koju pokazuju stranica recepta i Pogledaj korake.",
+      "checked": true
+    },
+    "recipe.onTheSteps": {
+      "text": "Na koracima",
+      "checked": true
+    },
+    "recipe.photoOfStep": {
+      "text": "Slika koraka {n}",
+      "checked": true
     }
   }
 }

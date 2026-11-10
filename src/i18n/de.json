@@ -22040,6 +22040,62 @@
     "served.someoneElse": {
       "text": "Von jemand anderem",
       "checked": true
+    },
+    "steppics.thisStepsPhotos": {
+      "text": "Fotos dieses Schritts",
+      "checked": true
+    },
+    "steppics.photoNOfStep": {
+      "text": "Foto {k} von Schritt {n}",
+      "checked": true
+    },
+    "steppics.makeItFirst": {
+      "text": "Als erstes setzen",
+      "checked": true
+    },
+    "steppics.firstPhotoWhy": {
+      "text": "Das erste Foto ist das, das die Rezeptseite und Schritte ansehen zeigen. Behalten fügt dem Schritt ein neues Foto hinzu.",
+      "checked": true
+    },
+    "cookmode.addAnotherPhoto": {
+      "text": "Noch ein Foto hinzufügen",
+      "checked": true
+    },
+    "cookmode.picNOf": {
+      "text": "{k} von {n}",
+      "checked": true
+    },
+    "cookmode.nextPhoto": {
+      "text": "Das nächste Foto dieses Schritts",
+      "checked": true
+    },
+    "make.stepPhotoN": {
+      "text": "Foto {k} von Schritt {n}",
+      "checked": true
+    },
+    "make.makeItFirst": {
+      "text": "Als erstes setzen",
+      "checked": true
+    },
+    "make.removeFromStep": {
+      "text": "Von diesem Schritt entfernen",
+      "checked": true
+    },
+    "make.closePhoto": {
+      "text": "Schließen",
+      "checked": true
+    },
+    "make.firstPhotoWhy": {
+      "text": "Das erste Foto ist das, das die Rezeptseite und Schritte ansehen zeigen.",
+      "checked": true
+    },
+    "recipe.onTheSteps": {
+      "text": "Bei den Schritten",
+      "checked": true
+    },
+    "recipe.photoOfStep": {
+      "text": "Ein Foto von Schritt {n}",
+      "checked": true
     }
   }
 }
