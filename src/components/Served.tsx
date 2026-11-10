@@ -20,6 +20,18 @@ const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new 
 const numsOf = (items: Ingredient[]) => { const a = aggregate(items); return { kcal: Math.round(a.calories ?? 0), protein: Math.round(a.protein ?? 0), pd: density(a.protein ?? 0, a.calories ?? 0) }; };
 const aboutLine = (items: Ingredient[]) => { const n = numsOf(items); return w("served.about", { kcal: n.kcal.toLocaleString(numLocale()), protein: n.protein }); };
 export const ServedMark = () => <span className="sv-mark">{w("served.mark")}</span>;
+// DT271 (0.3.125, board Stories204; Coach Milan 10 November 19:02 to 20:57, Go): whose plate it is, said and changed by a tap,
+// on the Plate's Served card and on a Served plate open. The first plate still starts as yours. Nothing here touches a day:
+// a plate you already ate stays in your day when you say it is someone else's.
+function Whose({ mine, set }: { mine: boolean; set: (mine: boolean) => void }) {
+  return (<>
+    <small className="sv-label">{w("served.whose")}</small>
+    <div className="sv-whose" role="radiogroup" aria-label={w("served.whose")}>
+      <button type="button" role="radio" aria-checked={mine} className={`pill pill-small${mine ? " on" : ""}`} onClick={() => { if (!mine) set(true); }}>{w("served.mine")}</button>
+      <button type="button" role="radio" aria-checked={!mine} className={`pill pill-small${!mine ? " on" : ""}`} onClick={() => { if (mine) set(false); }}>{w("served.someoneElse")}</button>
+    </div>
+  </>);
+}
 // the day and the meal a visit happened at: its title when it has no note
 function whenOf(p: AppApi, at: string): string {
   const d = new Date(at), hm = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
@@ -90,6 +102,7 @@ export function ServedOnPlate({ p, items, title }: { p: AppApi; items: Ingredien
   return (
     <section className="card sv-plate" aria-label={w("served.keptHead")}>
       <div className="sv-head"><ServedMark /><b>{w("served.keptHead")}</b></div>
+      <Whose mine={on.mine} set={(mine) => p.servedPatch(on.id, { mine })} />
       <label className="sv-label">{w("served.name")}{!named && on.name === undefined && <span className="sv-by">{w("served.filledBy")}</span>}
         <input className="search sv-name" value={name} maxLength={60} onChange={(e) => { setNamed(true); p.servedPatch(on.id, { name: e.target.value }); }} />
       </label>
@@ -181,6 +194,7 @@ export function ServedOne({ p, id, back }: { p: AppApi; id: string; back: () => 
       <button type="button" className="link sv-back" onClick={back}>{w("served.backToRecipes")}</button>
       <h3>{s.name}</h3>
       <div className="sv-tags"><ServedMark /><span className="sv-dish-tag">{dishWord(s.dish)}</span><small>{v.note ? `${v.note} · ${whenOf(p, v.at)}` : title}</small></div>
+      <Whose mine={s.mine} set={(mine) => p.servedPatch(s.id, { mine })} />
       {s.menu && <div className="sv-on-menu"><span><b>{w("served.onTheMenu")}</b> {menuText(s.menu)}{s.menu.about ? <small>{s.menu.about}</small> : null}</span><button type="button" className="link sv-not-this" onClick={() => p.dropMenuLine(s.id)}>{w("served.notThis")}</button></div>}
       <img className="sv-photo" src={all[at] ?? s.photo} alt={w("plan.photoOf", { title: s.name })} />
       {all.length > 1 && <div className="sv-more">{all.map((src, i) => <button type="button" key={i} className={`sv-thumb${i === at ? " on" : ""}`} aria-pressed={i === at} aria-label={w("plan.photoN", { n: i + 1 })} onClick={() => setAt(i)}><img src={src} alt="" /></button>)}</div>}

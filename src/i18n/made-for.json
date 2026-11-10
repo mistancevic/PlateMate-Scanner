@@ -5507,6 +5507,8 @@
     "screen.plate.plusSame": {"en":"Another photo of this meal","area":"The Plate","where":"The Plate","release":"0.3.123"},
     "screen.plate.plusSameLine": {"en":"The inside, another side, the menu. Read together as one plate.","area":"The Plate","where":"The Plate","release":"0.3.123"},
     "screen.plate.plusOther": {"en":"A different meal","area":"The Plate","where":"The Plate","release":"0.3.123"},
-    "screen.plate.plusOtherLine": {"en":"A new plate. This one is saved for later.","area":"The Plate","where":"The Plate","release":"0.3.123"}
+    "screen.plate.plusOtherLine": {"en":"A new plate. This one is saved for later.","area":"The Plate","where":"The Plate","release":"0.3.123"},
+    "screen.served.whose": {"en":"Whose plate","area":"Words used across the app","where":"Across the app","release":"0.3.125"},
+    "screen.served.someoneElse": {"en":"Someone else's","area":"Words used across the app","where":"Across the app","release":"0.3.125"}
   }
 }

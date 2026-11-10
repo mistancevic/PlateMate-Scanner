@@ -3166,3 +3166,5 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .sv-tighter { color: var(--muted); line-height: 1.45; }
 /* DT274 (0.3.122): what each choice of the pencil does */
 .for-say { margin-top: 8px; padding: 8px 10px; border-radius: var(--r-control); background: var(--surface); border: 1.5px solid var(--line); line-height: 1.5; }
+/* DT271 (0.3.125): whose plate it is */
+.sv-whose { display: flex; gap: 6px; flex-wrap: wrap; } section.sv-plate .sv-whose > .pill.pill-small, section.sv-one .sv-whose > .pill.pill-small { min-height: 44px; } .sv-whose .pill.on { background: var(--ink); border-color: var(--ink); color: #fff; }

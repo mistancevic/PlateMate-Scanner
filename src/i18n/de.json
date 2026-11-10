@@ -22032,6 +22032,14 @@
     "plate.plusOtherLine": {
       "text": "Ein neuer Teller. Dieser wird für später gespeichert.",
       "checked": true
+    },
+    "served.whose": {
+      "text": "Wessen Teller",
+      "checked": true
+    },
+    "served.someoneElse": {
+      "text": "Von jemand anderem",
+      "checked": true
     }
   }
 }
