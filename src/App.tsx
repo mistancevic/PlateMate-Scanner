@@ -1710,7 +1710,23 @@ export default function App() {
   }, []);
   // DT137 (0.2.122): the recipe a plate came from is forgotten when the plate is emptied
   useEffect(() => { if (!state.items.length && plateRecipeId) setPlateRecipeId(null); }, [state.items.length, plateRecipeId]);
-  const setPick = (x: string | null) => { setPickState(x); setState((s) => (s.pick === x ? s : { ...s, pick: x })); };
+  // DT274 (0.3.122, board Stories203; Coach Milan 10 November 08:52 to 10:40, Yes): one Exploring, and the pencil decides.
+  // A plate with a photo set to Exploring is an Exploring plate: kept as Served, with an Exploring plate's buttons. Set to a
+  // meal, it is your meal again and leaves Served. Only a choice you make does this: emptying the Plate (null) changes nothing
+  // of it, and nothing here touches a day.
+  const setPick = (x: string | null) => { setPickState(x); setState((s) => {
+    let n = s.pick === x ? s : { ...s, pick: x };
+    const ph = n.photo;
+    if (!ph || !n.items.length || !x) return n;
+    if (x === "exploring" && ph.who !== "idea") {
+      const { keep: _k, ...rest } = ph;
+      n = { ...n, photo: { ...rest, who: "idea", served: ph.served ?? { id: uid(), mine: true, visit: visitFor(n.served ?? [], ph.at) ?? uid(), dish: "main", byHand: true } } };
+    } else if (x !== "exploring" && ph.who === "idea") {
+      const { served, keep: _k, who: _w, ...rest } = ph;
+      n = { ...n, photo: rest, ...(served ? { served: (n.served ?? []).filter((y) => y.id !== served.id) } : {}) };
+    }
+    return n;
+  }); };
   // DT136 (0.2.120, board Stories93): foods by place. today's places that are on; a food shows when sold everywhere or there
   const todayKeyP = ymd(new Date());
   // DT176 (0.3.19, board Stories124): Travel mode on: the place you are in is where the app serves you, until you switch it off

@@ -21972,6 +21972,22 @@
     "served.backToVisit": {
       "text": "‹ {title}",
       "checked": true
+    },
+    "make.forExploringHead": {
+      "text": "Entdecken:",
+      "checked": true
+    },
+    "make.forExploring": {
+      "text": "ein Teller, den du dir ansiehst. Nichts wird eingetragen. Mit einem Foto bleibt er in Rezepte, unter Serviert.",
+      "checked": true
+    },
+    "make.forMealHead": {
+      "text": "Eine Mahlzeit (Frühstück, Mittagessen, Abendessen):",
+      "checked": true
+    },
+    "make.forMeal": {
+      "text": "deine Mahlzeit. Sie zählt in deinem Tag, wenn du Essen oder Gegessen tippst. War sie unter Serviert, verlässt sie Serviert.",
+      "checked": true
     }
   }
 }

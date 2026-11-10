@@ -838,6 +838,30 @@
       "epic": "home",
       "state": "later",
       "why": "Found at 0.3.119: New means added in the last 20 releases. With several releases a day a new way stops being New within days (A recipe in another language, 0.3.99, went at 0.3.119), and at 0.4.0 every New goes at once. A window in days would hold."
+    },
+    {
+      "id": "DT274",
+      "title": "One Exploring: the pencil decides",
+      "epic": "plate",
+      "state": "done",
+      "version": "0.3.122",
+      "board": "Stories203",
+      "why": "Coach Milan 10 November 08:52 to 10:40: his Plate said Exploring at the top and offered Ate it at the bottom; nothing was under Served. Two places held what a plate is for (the photo's answer, the pencil) and could disagree. Now the pencil decides: Exploring on a plate with a photo makes it an Exploring plate, kept as Served; a meal makes it your meal again and takes it out of Served. A logged meal stays in its day; a plate with no photo is not kept; old plates are kept only when the pencil is set again."
+    },
+    {
+      "id": "DT273",
+      "title": "＋ Photo says what it does; a cook left open for more than a day is asked about once",
+      "epic": "plate",
+      "state": "now",
+      "board": "Stories202",
+      "why": "Coach Milan 10 November 07:50: a restaurant's pancake went in as one more photo of an old plate, and a cook left at step 1 since 28 October asked about itself. Drawn; waits for Go. The re-read part is built (0.3.121)."
+    },
+    {
+      "id": "DT275",
+      "title": "The button that saves a meal says where: Ate it, breakfast, today",
+      "epic": "plate",
+      "state": "later",
+      "why": "Coach Milan 10 November 09:42: because there is no save button, everything is saved based on the last setting? Yes for where a meal lands: the pencil line at the moment of the tap. The tap does not say so. To look at after the blind run."
     }
   ]
 }

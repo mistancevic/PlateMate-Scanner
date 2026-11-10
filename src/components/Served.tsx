@@ -93,7 +93,7 @@ export function ServedOnPlate({ p, items, title }: { p: AppApi; items: Ingredien
       <label className="sv-label">{w("served.name")}{!named && on.name === undefined && <span className="sv-by">{w("served.filledBy")}</span>}
         <input className="search sv-name" value={name} maxLength={60} onChange={(e) => { setNamed(true); p.servedPatch(on.id, { name: e.target.value }); }} />
       </label>
-      <small className="sv-label">{w("served.whichDish")}{!picked && <span className="sv-by">{w("served.filledBy")}</span>}</small>
+      <small className="sv-label">{w("served.whichDish")}{!picked && !on.byHand && <span className="sv-by">{w("served.filledBy")}</span>}</small>
       <div className="sv-dishes" role="radiogroup" aria-label={w("served.whichDish")}>
         {DISHES.map((d) => <button key={d} type="button" role="radio" aria-checked={on.dish === d} className={`pill pill-small sv-dish${on.dish === d ? " on" : ""}`} onClick={() => { setPicked(true); p.servedPatch(on.id, { dish: d }); }}>{dishWord(d)}</button>)}
       </div>
