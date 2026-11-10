@@ -2501,16 +2501,22 @@ export default function App() {
         const who = x?.who ?? (pick === "exploring" ? "idea" : undefined);
         // DT268 (0.3.118, board Stories201): an Exploring plate is kept as Served. Read again keeps its place there; another
         // plate (x.served) or a first one gets a new one: whose it is, its visit (the sitting it was scanned at), the dish as read
-        const kept = x?.replace && !x?.served ? state.photo?.served : undefined;
+        // 0.3.121 (Coach Milan 10 November 07:50 to 08:09, Go): reading the same photo again (Help Chef Mealan read it, a photo
+        // more) is no new plate. It keeps what the plate was: kept as Served, or not kept after Don't keep it, or never kept at
+        // all, as a plate that was on the Plate before Served came (a home pancake of 28 October became a visit).
+        const again = Boolean(x?.replace && !x?.served);
+        const kept = again ? state.photo?.served : undefined;
         const served: OnPlate | undefined = who !== "idea" ? undefined : kept ? { ...kept, dish: kept.dish ?? dishOf(read.course) }
+          : again ? undefined
           : { id: uid(), mine: x?.served?.mine ?? true, visit: x?.served?.visit ?? visitFor(state.served ?? [], at) ?? uid(), dish: dishOf(read.course) };
-        const photo = { image: thumb, at, unsure: read.unsure, ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}) };
+        const photo = { image: thumb, at, unsure: read.unsure, ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}) };
         const land = (how: "add" | "new") => {
           // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
           // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
           if (who === "idea") { if (filling) { setExploreLeft(fillingName(filling)); setFilling(null); } else setExploreLeft(null); setPick("exploring"); } else setExploreLeft(null);
           // DT240 (0.3.96, board Stories182; Coach Milan 10:14 and 10:32, b): a cook still open asks once
-          if (state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat")) setCookOpenAsk(true);
+          // 0.3.121: only when a plate comes in; the same photo read again brings nothing new, so it does not ask
+          if (!again && state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat")) setCookOpenAsk(true);
           // DT247 (0.3.96, board Stories183): a second photo soon after a meal of today asks once
           const second = who !== "idea" && how === "new" && !filling ? secondDish(state.feedback, new Date(at)) : null;
           setDishAsk(second && second.prev.slot && second.prev.slot.date === ymd(new Date()) ? { dish: read.dish || "", prev: second.prev.meal.title, minutes: second.minutes, dessertFirst: second.dessertFirst, slotId: second.prev.slot.slotId, meal: second.prev.slot.name } : null);
