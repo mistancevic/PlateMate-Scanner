@@ -1714,6 +1714,10 @@
     "other": "{n} apples"
   },
   "count.peeled": "peeled",
+  "count.pieces": {
+    "one": "{n} piece",
+    "other": "{n} pieces"
+  },
   "count.weighed": "weighed",
   "sayhave.done": "Done",
   "sayhave.cancel": "Cancel",
@@ -2934,6 +2938,7 @@
   "steps.stepN": "Step {n}",
   "steps.addAStep": "+ Add a step",
   "steps.putAria": "Put {amount} {food} in the step",
+  "steps.takeOutAria": "Take {food} out of the step",
   "steps.goneInStep": {
     "one": "{foods} is in a step but no longer in the recipe. Change the step, or tap the food that takes its place.",
     "other": "{foods} are in a step but no longer in the recipe. Change the step, or tap the food that takes their place."

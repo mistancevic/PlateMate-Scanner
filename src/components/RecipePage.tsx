@@ -270,13 +270,15 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         ? <figure className="rq-hero"><img src={list[0]} alt={w("recipe.pictureOfBy", { title: meal.title })} /><span className="rq-drawn">{w("recipe.drawnByChef")}</span></figure>
         : shown
         ? <figure className="rq-hero"><img src={shown} alt={shown === list[0] ? w("recipe.coverOf", { title: meal.title }) : w("recipe.photoOf", { n: gal.findIndex((g) => g.src === shown) + 1, title: meal.title })} />{shown === list[0] && <span className="rph-cover">{w("recipe.cover")}</span>}{isDrawnPhoto(meal, shown) && <span className="rq-drawn">{w("recipe.drawnByChef")}</span>}</figure>
+        // 0.3.134: with no photo at all, the card below (Chef Mealan draws one, Add my photo) is the one place to add it
+        : picture && gal.length === 0 ? null
         : <button className="rq-hero rq-hero-empty" onClick={() => fileRef.current?.click()}><Camera size={26} /><span>{w("recipe.addAPhoto")}</span></button>}
       {drawn && (<>
         <small className="muted rq-hint">{w("recipe.chefDrewIt")}</small>
         <div className="button-row rq-drawn-row"><button className="pill pill-small" disabled={busy} onClick={() => fileRef.current?.click()}>{w("recipe.addMyPhoto")}</button></div>
       </>)}
       {/* a drawn cover hides the row, unless the recipe has step photos: they are changed here too */}
-      <div className="rq-thumbs" hidden={drawn && gal.length <= list.length}>
+      <div className="rq-thumbs" hidden={(drawn && gal.length <= list.length) || (!!picture && gal.length === 0)}>
         {gal.map((g, i) => (
           <div key={g.src.slice(-24) + i} className="rq-thumb">
             <button className={`publish-photo ${pk === g.src ? "on" : ""}`} aria-pressed={pk === g.src} onClick={() => setPicked(pk === g.src ? null : g.src)} aria-label={w("recipe.photoAria", { n: i + 1, cover: g.src === list[0] ? wordV("recipe.photoAriaCover") : "", picked: pk === g.src ? wordV("recipe.photoAriaPicked") : "" })}><img src={g.src} alt="" /></button>
@@ -387,7 +389,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <div className="sheet-row rq-food" key={it.id}>
             {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="link rq-swap-link" aria-label={w("recipe.swapFood", { food: it.food.name })} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>{w("recipe.swap")}</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>{w("recipe.optional")}</button></span>}</span> : <small>{cookName(it.food.name).short}{weighLine(it.food.name) && <span className="rq-weigh"> · {weighLine(it.food.name)}</span>}{it.fry && <span className="rq-fry">{it.fry.written ? w("recipe.writtenForFrying", { written: it.fry.written }) : w("recipe.forFrying")}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
               ? <span className="rq-grams">
-                  <input inputMode="numeric" aria-label={w("recipe.gramsOf", { food: it.food.name })} className={fresh.includes(it.id) && !(it.grams > 0) ? "rq-g-need" : undefined} placeholder={fresh.includes(it.id) ? "?" : undefined} autoFocus={fresh.includes(it.id) && !(it.grams > 0)} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setNeed(null); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
+                  {/* 0.3.134 (Coach Milan 11 November 20:49): in Edit, eggs and other counted foods are counted, as on the Plate */}
+                  {isCounted(it) && !fresh.includes(it.id) ? <CountAmount item={it} editable onGrams={(g, c) => { setNeed(null); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g, ...(c ? { count: c } : {}) } : x)) }); }} /> : <>
+                  <input inputMode="numeric" aria-label={w("recipe.gramsOf", { food: it.food.name })} className={fresh.includes(it.id) && !(it.grams > 0) ? "rq-g-need" : undefined} placeholder={fresh.includes(it.id) ? "?" : undefined} autoFocus={fresh.includes(it.id) && !(it.grams > 0)} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setNeed(null); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g </>}
                   <button className="rq-x" aria-label={w("recipe.removeFood", { food: it.food.name })} onClick={() => { setRemoved({ item: it, at: k }); setPick(null); setFresh((f) => f.filter((x) => x !== it.id)); change(edit.items.filter((_, j) => j !== k)); }}><X size={14} /></button>
                 </span>
               : isCounted(it) ? <CountAmount item={it} editable={false} whole onGrams={() => {}} /> : <b>{fmt(it.fry ? it.fry.pot : it.grams, 0)} g</b>}

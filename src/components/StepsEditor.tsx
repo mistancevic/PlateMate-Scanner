@@ -2,7 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { w, wn } from "../words";
 import type { Ingredient } from "../pilot";
 import { amountOf } from "../recipes";
-import { missingFoods, stepParts, tokenOf, usedIds } from "../steps";
+import { amountFor, missingFoods, stepParts, tokenOf, usedIds } from "../steps";
+import { countOf } from "../counted";
 
 // The steps, one field each, and the foods as chips (0.2.5+r16, canvas board S4, R13a and R13b). A tap on a food puts
 // the food and its amount into the step where the cursor is, as a blue chip; the amount is read from the recipe, so a
@@ -48,7 +49,7 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
   useLayoutEffect(() => {
     els.current.forEach((el) => el.querySelectorAll<HTMLElement>("[data-item]").forEach((c) => {
       const it = items.find((i) => i.id === c.dataset.item && i.grams > 0);
-      c.textContent = it ? `${amountOf(it.grams)} ${c.dataset.name}` : (c.dataset.name ?? "");
+      c.textContent = it ? amountFor(it.id, c.dataset.name ?? "", [it]) : (c.dataset.name ?? "");
       c.classList.toggle("gone", !it);
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -94,6 +95,18 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
     lastFocus.current = key;
     read(key);
   };
+  // 0.3.134 (Coach Milan 11 November 20:55; a tester put bread in a step by mistake and the phone's keyboard could not take
+  // it out): a tap on a food that is in a step takes it out again, from the step where the cursor is, else the last one with it
+  const takeOut = (item: Ingredient) => {
+    const has = (key: string) => !!els.current.get(key)?.querySelector(`[data-item="${CSS.escape(item.id)}"]`);
+    const key = lastFocus.current && rows.includes(lastFocus.current) && has(lastFocus.current) ? lastFocus.current : [...rows].reverse().find(has);
+    const el = key ? els.current.get(key) : null; if (!key || !el) return;
+    const chips = el.querySelectorAll(`[data-item="${CSS.escape(item.id)}"]`), chip = chips[chips.length - 1] as HTMLElement;
+    const next = chip.nextSibling; if (next && next.nodeType === Node.TEXT_NODE && /^ /.test(next.textContent ?? "")) next.textContent = (next.textContent ?? "").slice(1);
+    chip.remove();
+    lastFocus.current = key;
+    read(key);
+  };
   useEffect(() => () => { els.current.clear(); }, []);
   const used = usedIds(values.current);
   const missing = missingFoods(values.current, items);
@@ -117,8 +130,8 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
           <small>{w("steps.tapAFoodToPut")}</small>
           <div className="st-chips">
             {shown.map((i) => (
-              <button type="button" key={i.id} className={`st-chip${used.has(i.id) ? " used" : ""}`} onMouseDown={(e) => e.preventDefault()} onClick={() => put(i)}
-                aria-label={w("steps.putAria", { amount: amountOf(i.grams), food: i.food.name })}>{used.has(i.id) ? "✓" : "+"} {amountOf(i.grams)} {i.food.name}</button>
+              <button type="button" key={i.id} className={`st-chip${used.has(i.id) ? " used" : ""}`} onMouseDown={(e) => e.preventDefault()} onClick={() => (used.has(i.id) ? takeOut(i) : put(i))}
+                aria-label={used.has(i.id) ? w("steps.takeOutAria", { food: i.food.name }) : w("steps.putAria", { amount: amountOf(i.grams), food: i.food.name })}>{used.has(i.id) ? "✓" : "+"} {/* 0.3.134 (Coach Milan 11 November 20:53): counted foods as the step writes them */}{countOf(i) ? amountFor(i.id, i.food.name, [i]) : `${amountOf(i.grams)} ${i.food.name}`}</button>
             ))}
           </div>
         </div>

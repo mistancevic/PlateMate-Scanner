@@ -2,8 +2,9 @@
 // Real photos of the plate are the goal; a drawn picture holds the place until one exists. One picture per recipe, drawn
 // once and never again, even when a food changes. Recipes are never limited: pictures are paced, up to ten a day per
 // member, and the rest wait for the next day ("Picture tomorrow"). The server keeps both counts.
-import { sig, recipePhotosOf, recipeHasPhotos } from "./photos";
+import { sig, recipePhotosOf, recipeHasPhotos, withRecipePhotos } from "./photos";
 import type { Feedback, Meal } from "./pilot";
+import { cardsOfRecipe } from "./carry";
 import { w } from "./words";
 
 export const COVER_DAILY = 10;
@@ -73,4 +74,25 @@ export function cardHasPhoto(m: Pick<Meal, "id" | "title">, cards: Feedback[]): 
   const real = (x: unknown) => typeof x === "string" && x.startsWith("data:image/") && !x.startsWith("data:image/svg");
   return cards.some((c: any) => (c.meal?.id === m.id || c.meal?.title === m.title || c.recipeId === m.id)
     && (real(c.photo) || (c.photos ?? []).some(real) || (Array.isArray(c.photoSigs) && c.photoSigs.some(Boolean))));
+}
+
+// 0.3.134 (Coach Milan 11 November 20:42 to 20:46, Go; a tester's recipe had her cook's photo but no cover): a recipe with no
+// photo of its own takes the photo of its latest cook as its cover, by itself. The cook's card is marked used, so a cover you
+// delete does not come back from that cook; a later cook's photo becomes the cover again. A recipe with a drawn cover keeps
+// the question it had (Use as cover, Keep it just for me).
+const realPhoto = (x: unknown): x is string => typeof x === "string" && x.startsWith("data:image/") && !x.startsWith("data:image/svg");
+export function coversFromCooks(meals: Meal[], cards: Feedback[]): { meals: Meal[]; cards: Feedback[] } | null {
+  let ms = meals, cs = cards, changed = false;
+  for (const m of meals) {
+    // only a recipe with no picture at all: one with a drawn cover keeps its question on Today (Use as cover, Keep it just for me)
+    if (recipePhotosOf(m).length) continue;
+    const c = cardsOfRecipe(m, cs).filter((f) => f.status === "eaten" && !f.coverAsk).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+      .find((f) => realPhoto(f.photo) || (f.photos ?? []).some(realPhoto));
+    if (!c) continue;
+    const photo = realPhoto(c.photo) ? c.photo : [...(c.photos ?? [])].reverse().find(realPhoto)!;
+    ms = ms.map((x) => (x.id === m.id ? { ...x, ...withRecipePhotos([photo, ...recipePhotosOf(x).filter((y) => y !== photo)]) } : x));
+    cs = cs.map((f) => (f.id === c.id ? { ...f, coverAsk: "used" as const } : f));
+    changed = true;
+  }
+  return changed ? { meals: ms, cards: cs } : null;
 }

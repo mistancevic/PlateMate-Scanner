@@ -82,7 +82,7 @@ import { clearKept } from "./kept";
 const PHONE_OWNER = "chefmealan-phone-owner";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
 import { logPhoto, photosOf, withPhotos, withoutStored, looseIn, loosePhotosOf, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn, recipePhotosOf, withRecipePhotos, recipeHasPhotos } from "./photos";
-import { needsCover, cardHasPhoto } from "./covers";
+import { coversFromCooks, needsCover, cardHasPhoto } from "./covers";
 import { itemsOf as itemsOfShared, type SharedRecipe } from "./members";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { BuiltScreen } from "./screens/BuiltScreen";
@@ -994,6 +994,8 @@ export default function App() {
   const filesRef = useRef({ uid: "", ready: false, running: false, again: false, up: new Map<string, string>() });
   const [, setPhotoCountState] = useState(0);
   const setPhotoCount = (n: number) => { openStats.photos = n; setPhotoCountState(n); };
+  // 0.3.134: a recipe with no photo of its own takes its latest cook's photo as its cover
+  useEffect(() => { const x = coversFromCooks(state.meals, state.feedback); if (x) setState((s) => { const y = coversFromCooks(s.meals, s.feedback); return y ? { ...s, meals: y.meals, feedback: y.cards } : s; }); }, [state.meals, state.feedback]);
   const writeLocal = () => {
     const ph = photoRef.current, st = stateRef.current;
     localStorage.setItem(STORE, JSON.stringify(ph.ok && ph.ready ? withoutStored(st, ph.stored) : st));

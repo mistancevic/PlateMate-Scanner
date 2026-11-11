@@ -62,6 +62,9 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   ok(asked.length === 3, "CO1: drawn once: nothing is asked again after a reload");
   await recipes();
   ok(/Drawn by Chef Mealan/.test(await page.locator(".recipe-tile").filter({ hasText: "Šopska" }).textContent()), "CO1: the tile says Drawn by Chef Mealan");
+  // 0.3.134: the Skyr bowl took its plate photo as its cover, so the order changed; the group shows two, the rest behind its link
+  // Tuna salad's tile is then behind the group's more link
+  if (!(await page.locator(".recipe-tile").filter({ hasText: "Tuna salad" }).count())) { await page.locator(".rc-more").first().click(); await page.waitForTimeout(400); }
   ok(/Picture tomorrow/.test(await page.locator(".recipe-tile").filter({ hasText: "Tuna salad" }).textContent()), "CO1: the waiting recipe's tile says Picture tomorrow");
   await page.locator(".recipe-tile").filter({ hasText: "Šopska" }).click(); await page.waitForTimeout(500);
   ok(await page.locator(".rq-drawn").filter({ hasText: "Drawn by Chef Mealan" }).count() === 1 && await page.getByRole("button", { name: "Add my photo" }).count() === 1 && !(await page.locator(".rq-thumbs").isVisible()), "CO1: the page shows the drawn cover, labelled, with Add my photo");
