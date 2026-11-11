@@ -40,7 +40,7 @@ seed.meals = [{ id: "m-b", title: "Skyr bowl", items: [{ id: "b1", food: F(/^Sky
     ok(lay.numLeft && lay.top && lay.under && lay.wide && lay.noPic, "DT281: the number at the top left, the photo wide beside it, the words under it; a step with no photo has none: " + JSON.stringify(lay));
     await page.locator(".rq-step-wide-next").click(); await page.waitForTimeout(200);
     ok(/2 of 2/.test(await page.locator(".rq-step-wide-next").textContent()), "DT281: 1 of 2 shows the second");
-    ok(await page.locator(".rq-on-steps button").count() === 2 && /On the steps/.test(await page.locator(".rq-on-steps").textContent()), "the two step pictures show among the recipe's photos, On the steps");
+    ok(await page.locator(".rq-thumbs .rq-thumb").count() === 2 && (await page.locator(".rq-step-tag").allTextContents()).join() === "1,1", "DT280: the two step pictures are in the recipe's one gallery, each with its step number");
     // ---- cook mode: one after another ----
     await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(1300);
     const cm = page.locator(".cook-mode"); await cm.waitFor({ timeout: 8000 });
@@ -91,27 +91,24 @@ seed.meals = [{ id: "m-b", title: "Skyr bowl", items: [{ id: "b1", food: F(/^Sky
     ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "Make's list with a picture open fits 360 px");
     if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
     await page.setViewportSize({ width: 390, height: 1400 });
-    // ---- the recipe page again: the sheet lists them ----
+    // ---- the recipe page again: one gallery (DT280, 0.3.132) ----
     await page.goto(U + "/my-recipes/m-b"); await page.waitForTimeout(1500);
-    ok(await page.locator(".rq-on-steps button").count() === 3, "On the steps shows the three pictures (two of step 1, one of step 2)");
-    await page.locator(".rq-steps .rq-step-wide-pic").first().click(); await page.waitForTimeout(400);
-    const sheet = page.locator(".sp-sheet");
-    ok(await sheet.locator(".sp-all button").count() === 2 && /This step's photos/.test(await sheet.textContent()), "the step's sheet lists its two photos");
-    await sheet.locator(".sp-all button").nth(1).click(); await page.waitForTimeout(200);
-    await sheet.getByRole("button", { name: "Make it first" }).click(); await page.waitForTimeout(400);
-    const swapped = await picsOf(0);
-    ok(swapped[0] === now[1] && swapped.length === 2, "Make it first from the sheet");
-    await page.locator(".rq-steps .rq-step-wide-pic").first().click(); await page.waitForTimeout(400);
-    await sheet.locator(".sp-all button").nth(1).click(); await page.waitForTimeout(200);
-    await sheet.getByRole("button", { name: "Remove this picture" }).click(); await page.waitForTimeout(400);
-    const last = await picsOf(0);
-    ok(last.length === 1 && last[0] === swapped[0] && await page.locator(".rq-step-wide-next").count() === 0, "Remove this picture takes the chosen one off; the first stays, no +1");
+    ok(await page.locator(".rq-thumbs .rq-thumb").count() === 3 && (await page.locator(".rq-step-tag").allTextContents()).join() === "1,1,2", "the gallery has the three photos, with their step numbers");
+    const firstSrc = await page.locator(".rq-steps .rq-step-wide-pic img").first().getAttribute("src");
+    await page.locator(".rq-steps .rq-step-wide-pic").first().click(); await page.waitForTimeout(500);
+    ok(await page.locator(".rq-thumbs .publish-photo.on img").getAttribute("src") === firstSrc && await page.locator(".rq-gal-pick").count() === 1, "a tap on a step's photo picks it in the gallery, with its choices");
+    await page.locator(".rq-gal-pick").getByRole("button", { name: "Step 3" }).click(); await page.waitForTimeout(500);
+    ok((await picsOf(0)).length === 1 && (await picsOf(2)).length === 1 && (await page.locator(".rq-step-tag").allTextContents()).sort().join() === "1,2,3", "On step 3: it leaves step 1 and is on step 3");
+    await page.locator(".rq-gal-pick .rq-gal-del").click(); await page.waitForTimeout(200);
+    ok((await picsOf(2)).length === 1, "Delete this photo asks Sure? first");
+    await page.locator(".rq-gal-pick .rq-gal-del").click(); await page.waitForTimeout(500);
+    ok((await picsOf(2)).length === 0 && await page.locator(".rq-thumbs .rq-thumb").count() === 2, "the second tap deletes it: two photos left");
     // ---- Srpski and German ----
     for (const l of ["sr-Latn", "de"]) {
       await page.evaluate((l) => localStorage.setItem("chefmealan-lang", l), l);
       await page.setViewportSize({ width: l === "de" ? 360 : 390, height: 1400 });
       await page.goto(U + "/my-recipes/m-b"); await page.waitForTimeout(1500);
-      ok(!/On the steps/.test(await page.locator(".rq-on-steps").textContent()) && await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${l}: the recipe page in the language, fits the width: ` + (await page.locator(".rq-on-steps b").textContent()));
+      ok(!/Photos: \d+ of 12|Add photos to the steps|Make it the cover/.test(await page.locator(".rq").textContent()) && await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${l}: the recipe page in the language, fits the width: ` + (await page.locator(".rq-add-many").textContent()));
     }
     await ctx.close();
   } catch (e) { ok(false, "walkthrough crashed: " + (e && e.message)); }

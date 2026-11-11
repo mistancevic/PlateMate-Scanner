@@ -3214,3 +3214,12 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 /* the tick button is the whole step: its box sits at the top left, beside the photos; its words start under them */
 .mk-step > .mk-row .mk-check { padding: 66px 0 9px 32px; }
 .mk-step > .mk-row .mk-box { position: absolute; left: 0; top: 22px; margin: 0; }
+
+/* DT280 (0.3.132, board Stories207): one gallery; a step number on a step's photo; the picked photo's choices under the row */
+.rq-thumb { position: relative; }
+.rq-step-tag { position: absolute; right: 4px; top: 4px; width: 22px; height: 22px; border-radius: 11px; background: rgba(23, 39, 66, .85); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.rq-gal-pick { background: var(--tint); border-radius: 12px; padding: 12px; margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+.rq-gal-pick .pill { min-height: 44px; } .rq-gal-pick b { font-size: 14px; }
+.rq-gal-steps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; } .rq-gal-steps .pill { min-width: 44px; }
+.rq-gal-del { align-self: flex-start; min-height: 44px; }
+.spp-loose { margin: 0; background: #fff3d6; color: #5a3c00; border-radius: 12px; padding: 10px 12px; font-size: 14px; font-weight: 700; line-height: 1.45; }

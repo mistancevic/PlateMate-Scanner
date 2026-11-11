@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { photosOf, photosWanted, withPhotos, withoutStored, isOrphan, stepPicOf, stepPicsOf, addStepPic, removeStepPic, firstStepPic, setStepPic, alignStepPics, allStepPics, stepPicSigsOf, sig } from "./photos";
+import { photosOf, photosWanted, withPhotos, withoutStored, isOrphan, stepPicOf, stepPicsOf, galleryOf, placePhoto, makeCover, deletePhoto, addStepPic, removeStepPic, firstStepPic, setStepPic, alignStepPics, allStepPics, stepPicSigsOf, sig } from "./photos";
 import { clean } from "./records";
 import { stripPhotos } from "./cloud";
 
@@ -98,4 +98,37 @@ test("a step can have two or more pictures; the first is the one shown", () => {
   assert.deepEqual(stepPicsOf(al, steps[0]).map((x) => x.src), [A, B, C]); assert.equal(al.stepPics[1], A, "the first at the step's new place");
   const re = alignStepPics(m, ["new words", ...steps.slice(1)]) as any;
   assert.equal(re.stepPics.filter(Boolean).length, 0, "a step rewritten loses its pictures");
+});
+
+// DT280 (0.3.132): one gallery
+test("one gallery: the recipe's own photos first, then the photos only on steps; a step number on each step photo", () => {
+  const C = "data:image/jpeg;base64,CCCC", D = "data:image/jpeg;base64,DDDD";
+  let m: any = { ...meal(), photo: D, photos: [] };
+  m = { ...m, ...setStepPic(m, 0, { src: A, by: "me" }) };
+  m = { ...m, ...addStepPic(m, 0, { src: B, by: "ai" }) };
+  m = { ...m, ...setStepPic(m, 2, { src: C, by: "me" }) };
+  const g = galleryOf(m);
+  assert.deepEqual(g.map((x) => [x.src, x.steps.join(), x.own]), [[D, "", true], [A, "0", false], [B, "0", false], [C, "2", false]]);
+  // to step 1: off step 0, on step 1; who made it stays
+  const p1 = { ...m, ...placePhoto(m, B, 1) };
+  assert.deepEqual(stepPicsOf(p1, steps[0]).map((x) => x.src), [A]); assert.deepEqual(stepPicsOf(p1, steps[1]).map((x) => [x.src, x.by]), [[B, "ai"]]);
+  assert.equal(galleryOf(p1).length, 4, "nothing is copied");
+  // to no step: off its step, into the recipe's own photos
+  const p2 = { ...m, ...placePhoto(m, C, null) };
+  assert.equal(stepPicsOf(p2, steps[2]).length, 0); assert.deepEqual([p2.photo, ...p2.photos], [D, C]);
+  // an own photo to a step: out of the own photos, onto the step
+  const p3 = { ...p2, ...placePhoto(p2, C, 1) };
+  assert.deepEqual([p3.photo, ...p3.photos], [D]); assert.deepEqual(stepPicsOf(p3, steps[1]).map((x) => x.src), [C]);
+  // the cover to a step: it stays the cover and is on the step; the gallery shows it once
+  const p4 = { ...m, ...placePhoto(m, D, 1) };
+  assert.equal(p4.photo, D); assert.deepEqual(stepPicsOf(p4, steps[1]).map((x) => x.src), [D]);
+  assert.deepEqual(galleryOf(p4).map((x) => [x.src, x.steps.join(), x.own]), [[D, "1", true], [A, "0", false], [B, "0", false], [C, "2", false]]);
+  // a step photo as the cover: first among the own photos, still on its step, shown once
+  const p5 = { ...m, ...makeCover(m, B) };
+  assert.deepEqual([p5.photo, ...p5.photos], [B, D]); assert.equal(stepPicsOf(p5, steps[0]).length, 2);
+  assert.equal(galleryOf(p5).length, 4); assert.equal(galleryOf(p5)[0].src, B);
+  // delete: off its steps and out of the own photos
+  const p6 = { ...p5, ...deletePhoto(p5, B) };
+  assert.deepEqual([p6.photo, ...p6.photos], [D]); assert.deepEqual(stepPicsOf(p6, steps[0]).map((x) => x.src), [A]);
+  assert.equal(galleryOf(p6).length, 3);
 });

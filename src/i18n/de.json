@@ -22130,7 +22130,7 @@
       "checked": true
     },
     "steppics.keptInRecipePhotos": {
-      "text": "Bleiben bei den Fotos des Rezepts.",
+      "text": "Sie bleiben in der Galerie des Rezepts.",
       "checked": true
     },
     "steppics.recipePhotosFull": {
@@ -22151,6 +22151,38 @@
     },
     "recipe.addPhotosToTheStepsWhy": {
       "text": "Wähle mehrere auf einmal von deinem Handy. Dann legst du jedes zu seinem Schritt.",
+      "checked": true
+    },
+    "steppics.onNoStepCount": {
+      "text": "{n} Foto ist bei keinem Schritt. Es bleibt in der Galerie des Rezepts.|{n} Fotos sind bei keinem Schritt. Sie bleiben in der Galerie des Rezepts.",
+      "checked": true
+    },
+    "recipe.thisPhoto": {
+      "text": "Dieses Foto",
+      "checked": true
+    },
+    "recipe.makeItTheCover": {
+      "text": "Als Titelbild nehmen",
+      "checked": true
+    },
+    "recipe.thisIsTheCover": {
+      "text": "Dieses Foto ist das Titelbild. Wähle ein anderes Foto, um es zum Titelbild zu machen.",
+      "checked": true
+    },
+    "recipe.onStep": {
+      "text": "Bei Schritt",
+      "checked": true
+    },
+    "recipe.deleteThisPhoto": {
+      "text": "Dieses Foto löschen",
+      "checked": true
+    },
+    "recipe.galleryCount": {
+      "text": "Fotos: {n} von {max}. Das erste ist das Titelbild. Eine Zahl zeigt, bei welchem Schritt ein Foto ist. Tippe ein Foto an, um es zu ändern.",
+      "checked": true
+    },
+    "recipe.galleryFull": {
+      "text": "Fotos: {max} von {max}, die Galerie ist voll. Lösche eins, um ein neues hinzuzufügen.",
       "checked": true
     }
   }

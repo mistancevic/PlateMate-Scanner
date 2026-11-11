@@ -905,9 +905,10 @@
       "id": "DT280",
       "title": "One gallery for the recipe: the cover and the step photos in one place",
       "epic": "recipes",
-      "state": "next",
+      "state": "done",
+      "version": "0.3.132",
       "board": "Stories207",
-      "why": "Coach Milan 11 November 07:46 to 17:39: the cover choice was unclear and there were two galleries. To redraw as one gallery (every photo, a step number on step photos, the first is the cover, one sheet: Make it the cover, On step, Delete), 24 photos per recipe. Includes the line above Save on Photos on the steps."
+      "why": "Coach Milan 11 November 07:46 to 17:39: the cover choice was unclear and there were two galleries. Go 18:12. One gallery, every photo of the recipe, the first is the cover, a step number on step photos; the cover is chosen in the gallery (18:07): a tap picks a photo, under the row Make it the cover, On step, Delete this photo. 12 photos per recipe (17:59). The two stored lists stay; the gallery shows and changes them. The step picture sheet no longer opens, so a new picture cannot be marked Drawn by AI; pictures already marked keep the label."
     }
   ]
 }

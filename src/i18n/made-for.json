@@ -5532,11 +5532,19 @@
     "screen.steppics.alreadyOnStep": {"en":"A picture step {n} already has","area":"Recipes","where":"Recipes","release":"0.3.130"},
     "screen.steppics.noPictureYet": {"en":"No picture yet","area":"Recipes","where":"Recipes","release":"0.3.130"},
     "screen.steppics.onNoStep": {"en":"On no step","area":"Recipes","where":"Recipes","release":"0.3.130"},
-    "screen.steppics.keptInRecipePhotos": {"en":"Kept in the recipe's photos.","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.keptInRecipePhotos": {"en":"They stay in the recipe's gallery.","area":"Recipes","where":"Recipes","release":"0.3.132"},
     "screen.steppics.recipePhotosFull": {"en":"The recipe's photos have no room for all of these. Put them on a step to keep them.","area":"Recipes","where":"Recipes","release":"0.3.130"},
     "screen.steppics.saveThePhotos": {"en":"Save the photos","area":"Recipes","where":"Recipes","release":"0.3.130"},
     "screen.steppics.cancel": {"en":"Cancel","area":"Recipes","where":"Recipes","release":"0.3.130"},
     "screen.recipe.addPhotosToTheSteps": {"en":"Add photos to the steps","area":"Recipes","where":"Recipes","release":"0.3.130"},
-    "screen.recipe.addPhotosToTheStepsWhy": {"en":"Pick several at once from your phone. Then you place each one on its step.","area":"Recipes","where":"Recipes","release":"0.3.130"}
+    "screen.recipe.addPhotosToTheStepsWhy": {"en":"Pick several at once from your phone. Then you place each one on its step.","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.onNoStepCount": {"en":"{n} photo is on no step. It stays in the recipe's gallery.|{n} photos are on no step. They stay in the recipe's gallery.","area":"Recipes","where":"Recipes","release":"0.3.132"},
+    "screen.recipe.thisPhoto": {"en":"This photo","area":"Recipes","where":"Recipes","release":"0.3.132"},
+    "screen.recipe.makeItTheCover": {"en":"Make it the cover","area":"Recipes","where":"Recipes","release":"0.3.132"},
+    "screen.recipe.thisIsTheCover": {"en":"This photo is the cover. Pick another photo to make it the cover.","area":"Recipes","where":"Recipes","release":"0.3.132"},
+    "screen.recipe.onStep": {"en":"On step","area":"Recipes","where":"Recipes","release":"0.3.132"},
+    "screen.recipe.deleteThisPhoto": {"en":"Delete this photo","area":"Recipes","where":"Recipes","release":"0.3.132"},
+    "screen.recipe.galleryCount": {"en":"Photos: {n} of {max}. The first is the cover. A number shows the step a photo is on. Tap a photo to change it.","area":"Recipes","where":"Recipes","release":"0.3.132"},
+    "screen.recipe.galleryFull": {"en":"Photos: {max} of {max}, the gallery is full. Delete one to add another.","area":"Recipes","where":"Recipes","release":"0.3.132"}
   }
 }

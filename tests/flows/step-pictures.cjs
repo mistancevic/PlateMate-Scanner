@@ -22,7 +22,7 @@ const lent = [[300, food("l", "Red lentils, dry", 352, 24.6, 63, 1.1, 10.7)], [1
 seed.meals = [{ id: "m-soup", title: "Lentil soup for four", items: lent, portion: 1300, makes: { n: 4, unit: "portions" }, steps: ["Rinse [[i:l|lentils]].", "Simmer them in [[i:w|stock]] for 25 minutes."], stepsFor: lent.map((i) => i.food.name), savedAt: "2026-10-27T10:00:00Z" }, { id: "m-bowl", title: "Chicken rice bowl", items, portion: 374, steps: STEPS, stepsFor: items.map((i) => i.food.name), savedAt: "2026-10-28T10:00:00Z" }];
 // six step photos kept before 0.3.53 (since then they come from cooking): step 1 and 3 to 6 drawn by AI, step 2 yours
 const PIC = "data:image/jpeg;base64," + fs.readFileSync(path.resolve(__dirname, "front.jpg")).toString("base64");
-{ const m = seed.meals.find((x) => x.id === "m-bowl"); m.stepPics = STEPS.map(() => PIC); m.stepPicMeta = STEPS.map((t, k) => ({ by: k === 1 ? "me" : "ai", step: t })); }
+{ const m = seed.meals.find((x) => x.id === "m-bowl"); m.stepPics = STEPS.map((_, k) => PIC + "AAAA".repeat(k + 1)); /* six different pictures: DT280's gallery shows one photo once */ m.stepPicMeta = STEPS.map((t, k) => ({ by: k === 1 ? "me" : "ai", step: t })); }
 const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
@@ -66,13 +66,9 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     ok(await page.locator(".rq-step-wide img").count() === 6 && await page.getByRole("button", { name: /^Add a picture to step/ }).count() === 0, "the recipe shows the step photos; no + slots");
     // Changed by DT281 (0.3.131): the photo is wide above the words; AI · Beta stays under a drawn one, your own photo needs no label
     ok(/AI · Beta/.test(await page.locator(".rq-step-wide").first().textContent()) && !/AI · Beta/.test(await page.locator(".rq-step-wide").nth(1).textContent()), "AI · Beta under step 1's picture, no label under your photo of step 2");
-    await page.getByRole("button", { name: "Change or remove the photo of step 1" }).click(); await page.waitForTimeout(400);
-    const sh = page.locator(".sp-sheet");
-    ok(/Picture for step 1/.test(await sh.textContent()) && /Rinse 80 g rice/.test(await sh.textContent()), "a tap opens the sheet, named for the step");
-    ok(await sh.locator("img.sp-preview").count() === 1 && /Before you keep it/.test(await sh.textContent()) && await sh.getByRole("button", { name: "Remove this picture" }).count() === 1, "the picture, the checks, and Remove");
-    const sizes = await page.evaluate(() => [...document.querySelectorAll(".rq-step-wide button, .sp-sheet .pill")].map((b) => Math.round(b.getBoundingClientRect().height)));
+    // Changed by DT280 (0.3.132): a tap on a step's photo picks it in the recipe's one gallery; the step sheet is gone
+    const sizes = await page.evaluate(() => [...document.querySelectorAll(".rq-step-wide button")].map((b) => Math.round(b.getBoundingClientRect().height)));
     ok(sizes.every((h) => h >= 44), "every picture button is 44 px or more: " + sizes.join(","));
-    await sh.getByRole("button", { name: "✕ Close" }).click(); await page.waitForTimeout(300);
     const small = await page.evaluate(() => Math.min(...[...document.querySelectorAll(".rq-step-wide small")].map((x) => parseFloat(getComputedStyle(x).fontSize))));
     ok(small >= 12, "labels 12 px or more: " + small);
     if (process.env.SHOTS) await page.screenshot({ path: process.env.SHOTS + "/sp-recipe.png", fullPage: true });
@@ -118,8 +114,8 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     await cm.getByRole("button", { name: "✕ Close" }).click(); await page.waitForTimeout(300);
     // removing a picture: Watch the steps goes
     await toRecipe();
-    await page.getByRole("button", { name: "Change or remove the photo of step 3" }).click(); await page.waitForTimeout(300);
-    await page.locator(".sp-sheet").getByRole("button", { name: "Remove this picture" }).click(); await page.waitForTimeout(400);
+    await page.getByRole("button", { name: "Change or remove the photo of step 3" }).click(); await page.waitForTimeout(500);
+    await page.locator(".rq-gal-pick .rq-gal-del").click(); await page.waitForTimeout(150); await page.locator(".rq-gal-pick .rq-gal-del").click(); await page.waitForTimeout(500);
     ok(await page.locator(".rq-step-wide img").count() === 5 && await page.locator(".rq-video").count() === 0, "a picture removed: five left, the cover is a photo again until the sixth");
     // a step rewritten loses its picture; the others follow their words
     await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(400);
