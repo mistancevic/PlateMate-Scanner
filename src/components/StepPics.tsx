@@ -2,7 +2,7 @@
 // the camera or the gallery (a photo while cooking, or one made in ChatGPT or Gemini with the Step Picture Checks prompts);
 // who made it is asked, and the checks show before it is kept. Watch the steps plays them, made on the phone from the
 // pictures: no video file. Labels sit under a picture, never on it; nothing under 12 px; every button 44 px or more.
-import { w, wIn, wordV, type Val, type WordKey } from "../words";
+import { w, wn, wIn, wordV, type Val, type WordKey } from "../words";
 import { ChefLine } from "./ChefLine";
 import { say } from "../chefScript";
 import { useEffect, useRef, useState } from "react";
@@ -33,13 +33,13 @@ export function StepPicShown({ pic, k, onOpen, more = 0 }: { pic: StepPic | null
 // DT281 (0.3.131, board Stories208; Coach Milan 11 November 08:12 to 17:39, Go): photo first. On the recipe page a step's
 // photo comes before its words, wide, as in a post: see it, then read what to do. Two or more: 1 of 2 shows the next one.
 // A tap on the photo opens the step's photos. A step with no photo shows nothing here, so it reads as it always did.
-export function StepPicWide({ pics, k, onOpen }: { pics: StepPic[]; k: number; onOpen: () => void }) {
+export function StepPicWide({ pics, k, onOpen }: { pics: StepPic[]; k: number; onOpen: (src: string) => void }) {
   const [n, setN] = useState(0);
   if (!pics.length) return null;
   const i = Math.min(n, pics.length - 1), pic = pics[i];
   return (
     <div className="rq-step-wide">
-      <button type="button" className="rq-step-wide-pic" onClick={onOpen} aria-label={w("steppics.changeOrRemoveThePhoto", { n: k + 1 })}><img src={pic.src} alt="" /></button>
+      <button type="button" className="rq-step-wide-pic" onClick={() => onOpen(pic.src)} aria-label={w("steppics.changeOrRemoveThePhoto", { n: k + 1 })}><img src={pic.src} alt="" /></button>
       {pics.length > 1 && <button type="button" className="rq-step-wide-next" aria-label={w("cookmode.nextPhoto")} onClick={() => setN((i + 1) % pics.length)}>{w("cookmode.picNOf", { k: i + 1, n: pics.length })} ›</button>}
       {pic.by === "ai" && <small className="rq-step-wide-ai">{w("steppics.aiBeta")}</small>}
     </div>
@@ -167,6 +167,8 @@ export function StepPhotosPlace({ title, steps, items, has, photos, room, onSave
           {sel !== null && place[sel] === null && mover}
         </div>
       </div>
+      {/* DT280 (0.3.132): how many are on no step, so none is left there by accident */}
+      {loose.length > 0 && <p className="spp-loose">{wn("steppics.onNoStepCount", loose.length, { n: loose.length })}</p>}
       <button className="pill pill-primary pill-wide" onClick={() => onSave(place)}>{w("steppics.saveThePhotos")}</button>
       <button className="link" style={{ alignSelf: "flex-start", minHeight: 44 }} onClick={onClose}>{w("steppics.cancel")}</button>
     </div>

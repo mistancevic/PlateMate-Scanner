@@ -22130,7 +22130,7 @@
       "checked": true
     },
     "steppics.keptInRecipePhotos": {
-      "text": "Ostaju među slikama recepta.",
+      "text": "Ostaju u galeriji recepta.",
       "checked": true
     },
     "steppics.recipePhotosFull": {
@@ -22151,6 +22151,38 @@
     },
     "recipe.addPhotosToTheStepsWhy": {
       "text": "Izaberi više slika odjednom sa telefona. Zatim svaku staviš na njen korak.",
+      "checked": true
+    },
+    "steppics.onNoStepCount": {
+      "text": "{n} slika nije ni na jednom koraku. Ostaje u galeriji recepta.|{n} slike nisu ni na jednom koraku. Ostaju u galeriji recepta.|{n} slika nije ni na jednom koraku. Ostaju u galeriji recepta.",
+      "checked": true
+    },
+    "recipe.thisPhoto": {
+      "text": "Ova slika",
+      "checked": true
+    },
+    "recipe.makeItTheCover": {
+      "text": "Stavi je za naslovnu",
+      "checked": true
+    },
+    "recipe.thisIsTheCover": {
+      "text": "Ova slika je naslovna. Izaberi drugu sliku da bi ona bila naslovna.",
+      "checked": true
+    },
+    "recipe.onStep": {
+      "text": "Na koraku",
+      "checked": true
+    },
+    "recipe.deleteThisPhoto": {
+      "text": "Obriši ovu sliku",
+      "checked": true
+    },
+    "recipe.galleryCount": {
+      "text": "Slike: {n} od {max}. Prva je naslovna. Broj pokazuje na kom je koraku slika. Dodirni sliku da je promeniš.",
+      "checked": true
+    },
+    "recipe.galleryFull": {
+      "text": "Slike: {max} od {max}, galerija je puna. Obriši jednu da dodaš novu.",
       "checked": true
     }
   }

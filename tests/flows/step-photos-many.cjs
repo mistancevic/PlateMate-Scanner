@@ -48,7 +48,7 @@ seed.meals = [{ id: "m-b", title: "Skyr bowl", items: [{ id: "b1", food: F(/^Sky
     ok(/Photos on the steps/.test(await sheet.textContent()) && await steps.count() === 4, "Photos on the steps opens: the three steps and On no step");
     const counts = async () => Promise.all([0, 1, 2, 3].map((i) => steps.nth(i).locator(".publish-photo").count()));
     ok((await counts()).join() === "1,1,1,2" && await steps.nth(0).locator(".spp-has").count() === 1, "one new photo on each step from step 1, two on no step; step 1's own picture stays: " + (await counts()).join());
-    ok(/No picture yet/.test(await steps.nth(1).textContent()) === false && /Kept in the recipe's photos\./.test(await steps.nth(3).textContent()), "On no step says they are kept in the recipe's photos");
+    ok(/No picture yet/.test(await steps.nth(1).textContent()) === false && /They stay in the recipe's gallery\./.test(await steps.nth(3).textContent()), "On no step says they stay in the recipe's gallery");
     // a tap on a photo: Move this photo to, the steps and No step
     await steps.nth(3).locator(".publish-photo").first().click(); await page.waitForTimeout(200);
     const mv = sheet.locator(".spp-move");
@@ -58,19 +58,20 @@ seed.meals = [{ id: "m-b", title: "Skyr bowl", items: [{ id: "b1", food: F(/^Sky
     await steps.nth(2).locator(".publish-photo").first().click(); await sheet.locator(".spp-move").getByRole("button", { name: "No step" }).click(); await page.waitForTimeout(200);
     ok((await counts()).join() === "2,1,0,2" && /No picture yet/.test(await steps.nth(2).textContent()), "step 3's photo moved to no step; step 3 says No picture yet");
     ok(await onStep(0) === 1 && await gallery() === 0, "nothing is saved yet");
+    ok(/^2 photos are on no step\. They stay in the recipe's gallery\.$/.test(await sheet.locator(".spp-loose").textContent()), "DT280: above Save, the line says 2 photos are on no step");
     await sheet.getByRole("button", { name: "Save the photos" }).click(); await page.waitForTimeout(900);
     ok(await page.locator(".spp").count() === 0 && await onStep(0) === 3 && await onStep(1) === 1 && await onStep(2) === 0, "Save: step 1 has three pictures (its own and two new), step 2 one, step 3 none");
     ok(await gallery() === 2, "the two on no step are in the recipe's photos: " + await gallery());
-    ok(await page.locator(".rq-on-steps button").count() === 4 && /1 of 3/.test(await page.locator(".rq-step-wide-next").first().textContent()), "the recipe page shows them: four On the steps, 1 of 3 on step 1");
+    ok(await page.locator(".rq-thumbs .rq-thumb").count() === 6 && /Photos: 6 of 12\./.test(await page.locator(".rq-hint").textContent()) && /1 of 3/.test(await page.locator(".rq-step-wide-next").first().textContent()), "the recipe page shows them: one gallery of 6, 1 of 3 on step 1");
     // ---- Cancel saves nothing ----
     await pick(files(2, 20));
     await page.locator(".spp").getByRole("button", { name: "Cancel" }).click(); await page.waitForTimeout(400);
     ok(await page.locator(".spp").count() === 0 && await onStep(0) === 3 && await onStep(1) === 1 && await gallery() === 2, "Cancel saves nothing");
     // ---- more photos than the recipe's photos have room for ----
     await pick(files(12, 40));
-    ok(/The recipe's photos have no room for all of these\. Put them on a step to keep them\./.test(await page.locator(".spp .spp-step").nth(3).textContent()), "twelve picked, nine on no step, room for four: the page says so");
+    ok(await page.locator(".spp .publish-photo").count() === 6, "DT280: twelve picked, the gallery has room for six: six come in");
+    await page.locator(".spp").getByRole("button", { name: "Cancel" }).click(); await page.waitForTimeout(400);
     // ---- Srpski and German, with the page open ----
-    await page.locator(".spp").getByRole("button", { name: "Cancel" }).click();
     for (const l of ["sr-Latn", "de"]) {
       await page.evaluate((l) => localStorage.setItem("chefmealan-lang", l), l);
       await page.setViewportSize({ width: l === "de" ? 360 : 390, height: 1500 });

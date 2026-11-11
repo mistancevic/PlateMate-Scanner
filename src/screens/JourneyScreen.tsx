@@ -78,7 +78,7 @@ import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 import { cookName, cookPhrase, weighLine, aroundWord, aroundSaved, needsCooking, cookedFood, rawHint, cookTitle } from "../cookWords";
 import { PairedCookMode } from "../components/CookPair";
-import { stepPicOf, stepPicsOf, addStepPic, removeStepPic, firstStepPic } from "../photos";
+import { stepPicOf, stepPicsOf, addStepPic, removeStepPic, firstStepPic, galleryOf, MAX_GALLERY } from "../photos";
 import { kitchenName } from "../travel";
 import { SayHave } from "../components/SayHave";
 import { type CookUi, type Later, stripWords, resumeLine, cookStarted, plateSince, plateOldOf, whenWords, dayWord, dayIn, foodsLineIn, laterRow } from "../cooking";
@@ -1301,7 +1301,8 @@ export function JourneyScreen(p: AppApi) {
       // DT276 step 2 (0.3.129, board Stories205): the photo goes on the recipe's step too: its first when the step has none,
       // one more when it has. Nothing is replaced and nothing is asked.
       const m = cookRecipe, words = m?.steps?.[k];
-      if (m && words !== undefined) setState((st) => ({ ...st, meals: st.meals.map((x) => (x.id === m.id ? { ...x, ...addStepPic(x, k, { src: d, by: "me" }) } : x)) }));
+      // DT280 (0.3.132): a gallery of 12 is full; the photo then stays with this cook only
+      if (m && words !== undefined) setState((st) => ({ ...st, meals: st.meals.map((x) => (x.id === m.id && galleryOf(x).length < MAX_GALLERY ? { ...x, ...addStepPic(x, k, { src: d, by: "me" }) } : x)) }));
     }).catch(() => {});
     r.readAsDataURL(file);
   };

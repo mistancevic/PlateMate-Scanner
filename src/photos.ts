@@ -425,6 +425,47 @@ export function alignStepPics(m: { stepPics?: (string | null)[]; stepPicMeta?: (
   steps.forEach((t, k) => { if (steps.indexOf(t) !== k) { pics[k] = null; meta[k] = null; } });
   return { stepPics: pics, stepPicMeta: meta };
 }
+// DT280 (0.3.132, board Stories207; Coach Milan 11 November 07:46 to 18:12, Go): one gallery for the recipe. Every photo of
+// the recipe in one row: its own photos first (the first is the cover), then the photos that sit only on steps. A photo on
+// a step carries the step's number. The two lists stay as they are stored; the gallery is how they are shown and changed,
+// so old recipes need nothing carried over. 12 photos per recipe (Coach Milan 17:59), steps included.
+export const MAX_GALLERY = 12;
+export type GalleryPhoto = { src: string; steps: number[]; own: boolean; by: "me" | "ai" };
+type WithPhotos = Pics & { photo?: string; photos?: string[] };
+export function galleryOf(m: WithPhotos | null | undefined): GalleryPhoto[] {
+  if (!m) return [];
+  const out: GalleryPhoto[] = recipePhotosOf(m).map((src) => ({ src, steps: [], own: true, by: "me" as const }));
+  const steps = m.steps ?? [];
+  steps.forEach((t, k) => {
+    if (steps.indexOf(t) !== k) return;
+    for (const p of stepPicsOf(m, t)) { let g = out.find((x) => x.src === p.src); if (!g) { g = { src: p.src, steps: [], own: false, by: p.by }; out.push(g); } if (!g.steps.includes(k)) g.steps.push(k); }
+  });
+  return out;
+}
+// the photo on step k, or on no step (null). It leaves every step it was on. On a step it leaves the recipe's own photos,
+// unless it is the cover; on no step it is one of the recipe's own photos
+export function placePhoto(m: WithPhotos, src: string, k: number | null) {
+  const g = galleryOf(m).find((x) => x.src === src); if (!g) return {};
+  let x: WithPhotos = { ...m };
+  for (const j of g.steps) x = { ...x, ...removeStepPic(x, j, src) };
+  if (k !== null) x = { ...x, ...addStepPic(x, k, { src, by: g.by }) };
+  const own = recipePhotosOf(m), at = own.indexOf(src);
+  const next = k !== null ? (at > 0 ? own.filter((y) => y !== src) : own) : at >= 0 ? own : [...own, src];
+  return { stepPics: x.stepPics ?? [], stepPicMeta: x.stepPicMeta ?? [], ...(next.join("|") !== own.join("|") ? withRecipePhotos(next) : {}) };
+}
+// the photo first among the recipe's own photos: the cover. A photo that was only on a step stays on it too
+export function makeCover(m: WithPhotos, src: string) {
+  const own = recipePhotosOf(m);
+  return withRecipePhotos([src, ...own.filter((y) => y !== src)]);
+}
+// the photo out of the recipe: off every step and out of its own photos
+export function deletePhoto(m: WithPhotos, src: string) {
+  const g = galleryOf(m).find((x) => x.src === src); if (!g) return {};
+  let x: WithPhotos = { ...m };
+  for (const j of g.steps) x = { ...x, ...removeStepPic(x, j, src) };
+  const own = recipePhotosOf(m);
+  return { ...(g.steps.length ? { stepPics: x.stepPics ?? [], stepPicMeta: x.stepPicMeta ?? [] } : {}), ...(own.includes(src) ? withRecipePhotos(own.filter((y) => y !== src)) : {}) };
+}
 // every step has its picture: Watch the steps can play
 export const allStepPics = (m: any, steps: string[]) => steps.length > 0 && steps.every((t) => !!stepPicOf(m, t));
 

@@ -51,9 +51,11 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   ok(await wide() <= 0, "the long name never makes the page wider than the phone (360 px)");
   ok(/365/.test(await page.locator(".rq-readout").textContent()) && /43\.8/.test(await page.locator(".rq-readout").textContent()), "R8: the recipe's numbers: 365 kcal, 43.8 g protein");
   // × asks Sure? before deleting
-  await page.getByRole("button", { name: "Delete photo 1" }).click(); await page.waitForTimeout(150);
+  // Changed by DT280 (0.3.132): a tap picks the photo in the gallery; Delete this photo is under the row, Sure? first
+  await page.locator(".rq-thumbs .publish-photo:not(.add)").first().click(); await page.waitForTimeout(150);
+  await page.locator(".rq-gal-del").click(); await page.waitForTimeout(150);
   ok(await page.locator(".rq-hero img").count() === 1, "R9: × asks Sure? first; nothing is deleted on the first tap");
-  await page.getByRole("button", { name: "Delete photo 1" }).click(); await page.waitForTimeout(300);
+  await page.locator(".rq-gal-del").click(); await page.waitForTimeout(300);
   ok(await page.locator(".rq-hero-empty").count() === 1, "R9: the second tap deletes the photo");
   await page.getByRole("button", { name: "Recipes", exact: true }).first().click(); await page.waitForTimeout(300);
   await page.reload(); await page.waitForTimeout(1500);
@@ -65,8 +67,9 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   await add.setInputFiles(FRONT); await page.waitForTimeout(800);
   ok(await page.locator(".rq-thumbs .publish-photo:not(.add)").count() === 2, "R8: Add adds a photo, twice");
   const second = await page.locator(".rq-thumbs .publish-photo.on img").getAttribute("src");
-  await page.getByRole("button", { name: "Move the photo earlier" }).click(); await page.waitForTimeout(300);
-  ok(await page.locator(".rq-hero img").getAttribute("src") === second && /Cover/.test(await page.locator(".rq-hero").textContent()), "R9: ‹ moves the photo to first place: the cover");
+  // Changed by DT280 (0.3.132): the cover is chosen in the gallery: the picked photo, Make it the cover
+  await page.locator(".rq-gal-pick").getByRole("button", { name: "Make it the cover" }).click(); await page.waitForTimeout(300);
+  ok(await page.locator(".rq-hero img").getAttribute("src") === second && /Cover/.test(await page.locator(".rq-hero").textContent()), "DT280: Make it the cover: the picked photo is the cover");
   // R11: Edit recipe: chicken 80 to 100 g; the numbers follow; Cancel leaves the recipe as it was; Save changes keeps it
   await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(200);
   ok(await page.locator(".rq-editing").count() === 1, "R11: Editing the recipe");

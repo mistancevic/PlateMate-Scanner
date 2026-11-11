@@ -2,12 +2,12 @@ import { StepPicWide, StepPicSheet, StepPhotosPlace, StepPlayer, CoverVideo } fr
 import { w, wn, wIn, wordV, dateText, mealV, type Val, type WordKey } from "../words";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
-import { stepPicOf, stepPicsOf, setStepPic, addStepPic, removeStepPic, firstStepPic, alignStepPics, allStepPics } from "../photos";
+import { stepPicOf, stepPicsOf, setStepPic, addStepPic, removeStepPic, firstStepPic, alignStepPics, allStepPics, galleryOf, placePhoto, makeCover, deletePhoto, MAX_GALLERY } from "../photos";
 import { ThinkingCard } from "./ThinkingCard";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cookName, weighLine, aroundV } from "../cookWords";
 import { tempsIn } from "../units";
-import { Camera, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
+import { Camera, ChevronLeft, Plus, X } from "lucide-react";
 import type { Feedback, Food, Ingredient, Meal, StepMark } from "../pilot";
 import { aggregate, density, sizedFor } from "../pilot";
 import { findReference, referenceFood } from "../reference";
@@ -90,29 +90,32 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   useEffect(() => { try { window.scrollTo(0, 0); document.querySelector("main")?.scrollTo?.(0, 0); } catch { /* nothing to scroll */ } }, [meal.id]);
   // ---- photos (R8, R9) ----
   const list = recipePhotosOf(meal);
-  const [at, setAt] = useState(0);
-  const sel = Math.min(at, Math.max(0, list.length - 1));
+  // DT280 (0.3.132, board Stories207; Coach Milan 11 November 18:12, Go): one gallery, every photo of the recipe; the cover is
+  // chosen in it and nowhere else. A tap picks a photo; under the row: Make it the cover, On step, Delete this photo
+  const gal = galleryOf(meal);
+  const [picked, setPicked] = useState<string | null>(null);
+  const pk = picked && gal.some((g) => g.src === picked) ? picked : null;
+  const shown = pk ?? list[0] ?? null;
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
-  const setPhotos = (next: string[]) => onPatch(withRecipePhotos(next.slice(0, MAX_RECIPE_PHOTOS)));
+  const setPhotos = (next: string[]) => onPatch(withRecipePhotos(next.slice(0, MAX_GALLERY)));
   // a drawn cover (0.2.11, board CO, CO1): your own photo goes first; the drawn picture stays behind it, for members
   const drawn = coverIsDrawn(meal);
   // DT85: Change the cover: the next photo added goes first
   const coverNext = useRef(false);
   const add = (data: string) => {
-    if (list.includes(data) || list.length >= MAX_RECIPE_PHOTOS) return;
-    if (coverNext.current) { coverNext.current = false; setPhotos([data, ...list]); setAt(0); log("cover", { how: "real" }); return; }
-    if (drawn) { setPhotos([data, ...list]); setAt(0); log("cover", { how: "real" }); return; }
-    setPhotos([...list, data]); setAt(list.length);
+    if (gal.some((g) => g.src === data) || gal.length >= MAX_GALLERY) return;
+    if (coverNext.current) { coverNext.current = false; setPhotos([data, ...list]); setPicked(null); log("cover", { how: "real" }); return; }
+    if (drawn) { setPhotos([data, ...list]); setPicked(null); log("cover", { how: "real" }); return; }
+    setPhotos([...list, data]); setPicked(data);
   };
   const fromFile = async (f: File | undefined) => {
     if (!f) return;
     setBusy(true);
     try { const raw = await read(f); add(await resizeImageBase64(raw, 1080, 1080).catch(() => raw)); } finally { setBusy(false); }
   };
-  const move = (from: number, to: number) => { const next = [...list]; const [x] = next.splice(from, 1); next.splice(to, 0, x); setPhotos(next); setAt(to); };
-  const offered = cardPhotosOf(meal, cards).filter((x) => !list.includes(x));
-  const full = list.length >= MAX_RECIPE_PHOTOS;
+  const offered = cardPhotosOf(meal, cards).filter((x) => !gal.some((g) => g.src === x));
+  const full = gal.length >= MAX_GALLERY;
   // ---- the name (rename on the page) ----
   const [naming, setNaming] = useState<string | null>(null);
   const saveName = () => { if (naming !== null) { const t = naming.trim(); if (t && t !== meal.title) onRename(t); setNaming(null); } };
@@ -159,7 +162,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const manyRef = useRef<HTMLInputElement>(null);
   const [placing, setPlacing] = useState<string[] | null>(null);
   const pickMany = async (files: File[]) => {
-    const fs = files.filter((f) => f.type.startsWith("image/")).sort((x, y) => x.lastModified - y.lastModified).slice(0, MAX_STEP_PICK);
+    const fs = files.filter((f) => f.type.startsWith("image/")).sort((x, y) => x.lastModified - y.lastModified).slice(0, Math.min(MAX_STEP_PICK, MAX_GALLERY - gal.length));
     if (!fs.length) return;
     setBusy(true);
     try {
@@ -174,7 +177,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     place.forEach((k, i) => { if (k !== null) m = { ...m, ...addStepPic(m, k, { src: placing[i], by: "me" }) }; });
     const loose = placing.filter((_, i) => place[i] === null), mine = recipePhotosOf(meal);
     // a drawn cover stays behind your own photos, as with Add
-    const fresh = loose.filter((x) => !mine.includes(x)), next = (drawn ? [...fresh, ...mine] : [...mine, ...fresh]).slice(0, MAX_RECIPE_PHOTOS);
+    const fresh = loose.filter((x) => !mine.includes(x)), next = (drawn ? [...fresh, ...mine] : [...mine, ...fresh]).slice(0, MAX_GALLERY);
     onPatch({ ...(m.stepPics ? { stepPics: m.stepPics, stepPicMeta: m.stepPicMeta } : {}), ...(next.length > mine.length ? withRecipePhotos(next) : {}) });
     setPlacing(null);
   };
@@ -260,41 +263,41 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {top}
       {/* R8: the photos first */}
       {/* DT254 (0.3.105, board Stories187): a recipe whose every step has a picture: the cover is its video */}
-      {video && (drawn || sel === 0 || list.length === 0)
+      {video && (drawn || !pk || pk === list[0] || list.length === 0)
         ? <CoverVideo title={meal.title} pics={video} cover={list[0] ?? video[video.length - 1].src} coverAlt={w("recipe.coverOf", { title: meal.title })} onWords={() => setWatching(true)}
             marks={<>{list.length > 0 && !drawn && <span className="rph-cover">{w("recipe.cover")}</span>}{(drawn || (list[0] && isDrawnPhoto(meal, list[0]))) && <span className="rq-drawn">{w("recipe.drawnByChef")}</span>}</>} />
         : drawn
         ? <figure className="rq-hero"><img src={list[0]} alt={w("recipe.pictureOfBy", { title: meal.title })} /><span className="rq-drawn">{w("recipe.drawnByChef")}</span></figure>
-        : list.length > 0
-        ? <figure className="rq-hero"><img src={list[sel]} alt={sel === 0 ? w("recipe.coverOf", { title: meal.title }) : w("recipe.photoOf", { n: sel + 1, title: meal.title })} />{sel === 0 && <span className="rph-cover">{w("recipe.cover")}</span>}{isDrawnPhoto(meal, list[sel]) && <span className="rq-drawn">{w("recipe.drawnByChef")}</span>}</figure>
+        : shown
+        ? <figure className="rq-hero"><img src={shown} alt={shown === list[0] ? w("recipe.coverOf", { title: meal.title }) : w("recipe.photoOf", { n: gal.findIndex((g) => g.src === shown) + 1, title: meal.title })} />{shown === list[0] && <span className="rph-cover">{w("recipe.cover")}</span>}{isDrawnPhoto(meal, shown) && <span className="rq-drawn">{w("recipe.drawnByChef")}</span>}</figure>
         : <button className="rq-hero rq-hero-empty" onClick={() => fileRef.current?.click()}><Camera size={26} /><span>{w("recipe.addAPhoto")}</span></button>}
       {drawn && (<>
         <small className="muted rq-hint">{w("recipe.chefDrewIt")}</small>
         <div className="button-row rq-drawn-row"><button className="pill pill-small" disabled={busy} onClick={() => fileRef.current?.click()}>{w("recipe.addMyPhoto")}</button></div>
       </>)}
-      <div className="rq-thumbs" hidden={drawn}>
-        {list.map((src, i) => (
-          <div key={i} className="rq-thumb">
-            <button className={`publish-photo ${sel === i ? "on" : ""}`} onClick={() => setAt(i)} aria-label={w("recipe.photoAria", { n: i + 1, cover: i === 0 ? wordV("recipe.photoAriaCover") : "", picked: sel === i ? wordV("recipe.photoAriaPicked") : "" })}><img src={src} alt="" /></button>
-            {i === 0 && <span className="rq-cover-tag">{w("recipe.cover")}</span>}
-            <ConfirmButton className="rq-del" ariaLabel={w("recipe.deletePhoto", { n: i + 1 })} label={<X size={13} />} confirmLabel={w("recipe.sure")}
-              onConfirm={() => { setPhotos(list.filter((_, k) => k !== i)); setAt(Math.max(0, Math.min(sel, list.length - 2))); }} />
-            {sel === i && list.length > 1 && (
-              <div className="rq-move">
-                <button className="pill pill-small" disabled={i === 0} onClick={() => move(i, i - 1)} aria-label={w("recipe.moveThePhotoEarlier")}><ChevronLeft size={16} /></button>
-                <button className="pill pill-small" disabled={i === list.length - 1} onClick={() => move(i, i + 1)} aria-label={w("recipe.moveThePhotoLater")}><ChevronRight size={16} /></button>
-              </div>
-            )}
+      {/* a drawn cover hides the row, unless the recipe has step photos: they are changed here too */}
+      <div className="rq-thumbs" hidden={drawn && gal.length <= list.length}>
+        {gal.map((g, i) => (
+          <div key={g.src.slice(-24) + i} className="rq-thumb">
+            <button className={`publish-photo ${pk === g.src ? "on" : ""}`} aria-pressed={pk === g.src} onClick={() => setPicked(pk === g.src ? null : g.src)} aria-label={w("recipe.photoAria", { n: i + 1, cover: g.src === list[0] ? wordV("recipe.photoAriaCover") : "", picked: pk === g.src ? wordV("recipe.photoAriaPicked") : "" })}><img src={g.src} alt="" /></button>
+            {g.src === list[0] && <span className="rq-cover-tag">{w("recipe.cover")}</span>}
+            {g.steps.length > 0 && <span className="rq-step-tag" aria-hidden="true">{g.steps[0] + 1}</span>}
           </div>
         ))}
         {!full && <button className="publish-photo add rph-add" disabled={busy} onClick={() => fileRef.current?.click()}><Camera size={18} /><span>{w("recipe.add")}</span></button>}
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void fromFile(f); }} />
       </div>
-      {/* DT276 step 2 (0.3.129, board Stories205): the photos on the steps are this recipe's photos too; a tap opens the step */}
-      {!edit && (() => { const on = (meal.steps ?? []).flatMap((t, k) => (meal.steps!.indexOf(t) === k ? stepPicsOf(meal, t).map((x) => ({ k, src: x.src })) : [])); return on.length > 0 && (
-        <div className="rq-on-steps">
-          <b>{w("recipe.onTheSteps")}</b>
-          <div>{on.map((x, i) => <button key={i} type="button" aria-label={w("recipe.photoOfStep", { n: x.k + 1 })} onClick={() => setPicAt(x.k)}><img src={x.src} alt="" /><span>{x.k + 1}</span></button>)}</div>
+      {/* DT280: the picked photo's choices, right under the row */}
+      {pk && (() => { const g = gal.find((x) => x.src === pk)!, cover = pk === list[0]; const steps = meal.steps ?? []; return (
+        <div className="rq-gal-pick" role="group" aria-label={w("recipe.thisPhoto")}>
+          {cover ? <small className="muted">{w("recipe.thisIsTheCover")}</small>
+            : <button type="button" className="pill pill-primary" onClick={() => { onPatch(makeCover(meal, pk)); setPicked(null); log("cover", { how: "real" }); }}>{w("recipe.makeItTheCover")}</button>}
+          {steps.length > 0 && !edit && <div>
+            <b>{w("recipe.onStep")}</b>
+            <div className="rq-gal-steps">{steps.map((_, k) => <button key={k} type="button" className={`pill pill-small${g.steps[0] === k ? " pill-primary" : ""}`} aria-pressed={g.steps[0] === k} aria-label={w("steppics.stepN", { n: k + 1 })} onClick={() => onPatch(placePhoto(meal, pk, k))}>{k + 1}</button>)}
+              <button type="button" className={`pill pill-small${g.steps.length ? "" : " pill-primary"}`} aria-pressed={!g.steps.length} onClick={() => onPatch(placePhoto(meal, pk, null))}>{w("steppics.noStep")}</button></div>
+          </div>}
+          <ConfirmButton className="link link-danger rq-gal-del" label={w("recipe.deleteThisPhoto")} confirmLabel={w("recipe.sure")} onConfirm={() => { onPatch(deletePhoto(meal, pk)); setPicked(null); }} />
         </div>); })()}
       {picture && list.length === 0 && !drawn && (() => {
         const c = picture.count, out = c ? c.used >= c.limit : false;
@@ -313,10 +316,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         <small className="muted rq-hint">{w("recipe.yourPhotoFromTodayIs")}</small>
         <div className="button-row rq-drawn-row">
           <button className="pill pill-small" disabled={busy} onClick={() => { coverNext.current = true; fileRef.current?.click(); }}>{w("recipe.changeTheCover")}</button>
-          <ConfirmButton className="link" ariaLabel={w("recipe.removeTheCover")} label={w("recipe.removeIt")} confirmLabel={w("recipe.sureRemoveIt")} onConfirm={() => { setPhotos(list.slice(1)); setAt(0); }} />
+          <ConfirmButton className="link" ariaLabel={w("recipe.removeTheCover")} label={w("recipe.removeIt")} confirmLabel={w("recipe.sureRemoveIt")} onConfirm={() => { setPhotos(list.slice(1)); setPicked(null); }} />
         </div>
       </>)}
-      {!coverToday && !drawn && !(picture && list.length === 0) && <small className="muted rq-hint">{list.length === 0 ? w("recipe.aPhotoMakesItEasy") : list.length === 1 ? w("recipe.thisPhotoIsTheCover") : sel === 0 ? w("recipe.theFirstPhotoIsThe") : w("recipe.photoMovesEarlier", { n: sel + 1, of: list.length })}</small>}
+      {!coverToday && !drawn && !(picture && list.length === 0) && <small className="muted rq-hint">{gal.length === 0 ? w("recipe.aPhotoMakesItEasy") : full ? w("recipe.galleryFull", { max: MAX_GALLERY }) : w("recipe.galleryCount", { n: gal.length, max: MAX_GALLERY })}</small>}
       {offered.length > 0 && !full && (
         <div className="rq-offer">
           <small className="muted">{w("recipe.fromTheTimesYouMade")}</small>
@@ -478,11 +481,11 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               {meal.stepMarks && <small className="muted">{meal.stepsKitchen || w("recipe.chefStepsFromOriginal")}</small>}
               <ol className="rp-steps">{own.map((x, k) => [partHead(meal.stepParts, k), <li key={k}><span>{k + 1}</span>
                 {/* DT281 (0.3.131, board Stories208): the number at the top left; to its right the step's photo, wide, then its words */}
-                <div className="rp-step-col"><StepPicWide pics={stepPicsOf(meal, x)} k={k} onOpen={() => setPicAt(k)} />
+                <div className="rp-step-col"><StepPicWide pics={stepPicsOf(meal, x)} k={k} onOpen={(src) => { setPicked(src); requestAnimationFrame(() => document.querySelector(".rq-thumbs")?.scrollIntoView({ block: "center" })); }} />
                 <div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div></div></li>])}</ol>
               <small className="muted">{w("recipe.photosForTheSteps")}</small>
               {/* DT276 step 3 (0.3.130, board Stories205): several photos at once, then each on its step */}
-              <button type="button" className="pill pill-wide rq-add-many" disabled={busy} onClick={() => manyRef.current?.click()}>{w("recipe.addPhotosToTheSteps")}</button>
+              <button type="button" className="pill pill-wide rq-add-many" disabled={busy || full} onClick={() => manyRef.current?.click()}>{w("recipe.addPhotosToTheSteps")}</button>
               <input ref={manyRef} type="file" accept="image/*" multiple hidden onChange={(e) => { const fs = [...(e.target.files ?? [])]; e.target.value = ""; void pickMany(fs); }} />
               <small className="muted">{w("recipe.addPhotosToTheStepsWhy")}</small>
             </>);
@@ -578,7 +581,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         </>
       )}
       {placing && meal.steps?.length && <StepPhotosPlace title={meal.title} steps={meal.steps} items={meal.items} has={meal.steps.map((t) => stepPicsOf(meal, t))} photos={placing}
-        room={Math.max(0, MAX_RECIPE_PHOTOS - recipePhotosOf(meal).length)} onSave={savePlaced} onClose={() => setPlacing(null)} />}
+        room={placing.length} onSave={savePlaced} onClose={() => setPlacing(null)} />}
       {picAt !== null && meal.steps?.[picAt] !== undefined && <StepPicSheet k={picAt} step={meal.steps[picAt]} items={meal.items} pic={stepPicOf(meal, meal.steps[picAt])} fromCooks={cookPhotosFor(meal, cards, picAt)}
         all={stepPicsOf(meal, meal.steps[picAt])} onFirst={(src) => { onPatch(firstStepPic(meal, picAt, src)); setPicAt(null); }}
         // DT276 step 2 (0.3.129): a new picture is added to the step; the one it has stays. The first one kept again only says who made it
