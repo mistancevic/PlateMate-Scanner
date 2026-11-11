@@ -1,6 +1,6 @@
 {
-  "release": "0.3.132",
-  "at": "2026-11-11T17:24:04.748Z",
+  "release": "0.3.133",
+  "at": "2026-11-11T19:34:18.190Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -46093,6 +46093,40 @@
       "release": "0.3.132",
       "order": 900008,
       "at": "2026-11-11T17:24:04.748Z"
+    },
+    {
+      "id": "screen.plate.photoNotSaved",
+      "kind": "screen",
+      "key": "plate.photoNotSaved",
+      "en": "This photo was not saved. Retake it, or drop it.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Ova slika nije sačuvana. Slikaj ponovo ili je odbaci.",
+      "de": "Dieses Foto wurde nicht gespeichert. Nimm es neu auf oder verwirf es.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.133",
+      "order": 900000,
+      "at": "2026-11-11T19:34:18.190Z"
+    },
+    {
+      "id": "screen.photos.notSaved",
+      "kind": "screen",
+      "key": "photos.notSaved",
+      "en": "Not saved",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Nije sačuvano",
+      "de": "Nicht gespeichert",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.133",
+      "order": 900001,
+      "at": "2026-11-11T19:34:18.190Z"
     }
   ]
 }

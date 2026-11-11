@@ -3223,3 +3223,8 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .rq-gal-steps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; } .rq-gal-steps .pill { min-width: 44px; }
 .rq-gal-del { align-self: flex-start; min-height: 44px; }
 .spp-loose { margin: 0; background: #fff3d6; color: #5a3c00; border-radius: 12px; padding: 10px 12px; font-size: 14px; font-weight: 700; line-height: 1.45; }
+
+/* 0.3.133: a plate photo that was not saved */
+.mp-not-saved { background: #fff3d6; color: #5a3c00; border-radius: 12px; padding: 10px 12px; margin: 8px 0; } .mp-not-saved p { margin: 0 0 6px; font-weight: 700; line-height: 1.45; }
+.mp-not-saved .pill, .mp-not-saved .link { min-height: 44px; }
+.dev-missing li, .dev-log li { font-size: 13px; line-height: 1.45; margin: 4px 0; overflow-wrap: anywhere; }

@@ -522,3 +522,26 @@ export const looseIn = <T,>(state: T, photos: Map<string, string>): T => (photos
 export function loosePhotosOf(state: unknown): Map<string, string> { const out = new Map<string, string>(); eachLoose(state, (v) => { if (!isLooseRef(v)) out.set(`loose:${looseId(v)}`, v); }); return out; }
 // the references a state holds without the photo
 export function looseWanted(state: unknown): string[] { const out: string[] = []; eachLoose(state, (v) => { if (isLooseRef(v)) out.push(`loose:${v.slice(LOOSE_REF.length)}`); }); return out; }
+
+// ---- 0.3.133 (Coach Milan 11 November 20:29, Go): photos named on this phone that are not saved ----
+// Five photos were named in Coach Milan's data with no copy on the phone and none in the account. Where each one sits, and a
+// log of what happened to photos here (a failed save, a photo taken off the phone or the account), so the cause shows.
+export type MissingPhoto = { key: string; where: string; at?: string };
+export function looseMissing(state: any): MissingPhoto[] {
+  const out: MissingPhoto[] = [];
+  const walk = (v: any, where: string, at: string | undefined, top: boolean) => {
+    if (typeof v === "string") { if (isLooseRef(v)) out.push({ key: `loose:${v.slice(LOOSE_REF.length)}`, where, at }); return; }
+    if (!v || typeof v !== "object") return;
+    const here = typeof v.at === "string" ? v.at : typeof v.startedAt === "string" ? v.startedAt : typeof v.createdAt === "string" ? v.createdAt : at;
+    if (Array.isArray(v)) { v.forEach((x) => walk(x, where, here, false)); return; }
+    for (const k of Object.keys(v)) { if ((top && HANDLED.has(k)) || k === "food") continue; walk(v[k], top ? k : where, here, false); }
+  };
+  walk(state, "", undefined, true);
+  return out;
+}
+export type PhotoLogEntry = { at: string; key: string; what: "phone-failed" | "phone-deleted" | "account-failed" | "account-deleted" | "not-in-account"; why?: string };
+const PHOTO_LOG = "chefmealan-photo-log";
+export function photoLog(): PhotoLogEntry[] { try { const x = JSON.parse(localStorage.getItem(PHOTO_LOG) || "[]"); return Array.isArray(x) ? x : []; } catch { return []; } }
+export function logPhoto(e: Omit<PhotoLogEntry, "at">) {
+  try { localStorage.setItem(PHOTO_LOG, JSON.stringify([{ at: new Date().toISOString(), ...e }, ...photoLog()].slice(0, 40))); } catch { /* the log is a help, never a need */ }
+}

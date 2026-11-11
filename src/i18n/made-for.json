@@ -5545,6 +5545,8 @@
     "screen.recipe.onStep": {"en":"On step","area":"Recipes","where":"Recipes","release":"0.3.132"},
     "screen.recipe.deleteThisPhoto": {"en":"Delete this photo","area":"Recipes","where":"Recipes","release":"0.3.132"},
     "screen.recipe.galleryCount": {"en":"Photos: {n} of {max}. The first is the cover. A number shows the step a photo is on. Tap a photo to change it.","area":"Recipes","where":"Recipes","release":"0.3.132"},
-    "screen.recipe.galleryFull": {"en":"Photos: {max} of {max}, the gallery is full. Delete one to add another.","area":"Recipes","where":"Recipes","release":"0.3.132"}
+    "screen.recipe.galleryFull": {"en":"Photos: {max} of {max}, the gallery is full. Delete one to add another.","area":"Recipes","where":"Recipes","release":"0.3.132"},
+    "screen.plate.photoNotSaved": {"en":"This photo was not saved. Retake it, or drop it.","area":"The Plate","where":"The Plate","release":"0.3.133"},
+    "screen.photos.notSaved": {"en":"Not saved","area":"Words used across the app","where":"Across the app","release":"0.3.133"}
   }
 }
