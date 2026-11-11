@@ -13,8 +13,8 @@ const A = pic("plate.jpg"), B = pic("front.jpg");
 const F = (id) => seed.foods.find((f) => f.id === id);
 const meal = { id: "m-s", title: "Egg sandwiches", items: [{ id: "a", food: F("f-bread"), grams: 100, locked: false }, { id: "b", food: F("f-egg"), grams: 208, locked: false }], portion: 308, steps: [], savedAt: "2026-11-10T10:00:00Z", photo: A, photos: [] };
 const cards = [
-  { id: "c1", meal: { ...meal }, recipeId: "m-s", status: "eaten", taste: "Good", notes: "More pepper next time.", createdAt: "2026-11-11T19:30:00Z", photo: B, coverAsk: "kept" },
-  { id: "c2", meal: { ...meal }, recipeId: "m-s", status: "eaten", taste: "DaaM good", notes: "", createdAt: "2026-11-08T08:10:00Z", photo: A, coverAsk: "used" },
+  { id: "c1", meal: { ...meal, photo: undefined, photos: undefined }, recipeId: "m-s", status: "eaten", taste: "Good", notes: "More pepper next time.", createdAt: "2026-11-11T19:30:00Z", photo: B, coverAsk: "kept" },
+  { id: "c2", meal: { ...meal, photo: undefined, photos: undefined }, recipeId: "m-s", status: "eaten", taste: "DaaM good", notes: "", createdAt: "2026-11-08T08:10:00Z", photo: A, coverAsk: "used" },
 ];
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
