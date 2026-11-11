@@ -1,3 +1,5 @@
+import { PastMeal } from "./PastMeal";
+import { tasteWord } from "./YourCooks";
 import { StepPicWide, StepPicSheet, StepPhotosPlace, StepPlayer, CoverVideo } from "./StepPics";
 import { w, wn, wIn, wordV, dateText, mealV, type Val, type WordKey } from "../words";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
@@ -94,6 +96,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // chosen in it and nowhere else. A tap picks a photo; under the row: Make it the cover, On step, Delete this photo
   const gal = galleryOf(meal);
   const [picked, setPicked] = useState<string | null>(null);
+  const [cookAt, setCookAt] = useState<Feedback | null>(null);
+  useEffect(() => { if (cookAt) try { window.scrollTo(0, 0); } catch { /* nothing to scroll */ } }, [cookAt]);
   const pk = picked && gal.some((g) => g.src === picked) ? picked : null;
   const shown = pk ?? list[0] ?? null;
   const fileRef = useRef<HTMLInputElement>(null);
@@ -114,7 +118,6 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     setBusy(true);
     try { const raw = await read(f); add(await resizeImageBase64(raw, 1080, 1080).catch(() => raw)); } finally { setBusy(false); }
   };
-  const offered = cardPhotosOf(meal, cards).filter((x) => !gal.some((g) => g.src === x));
   const full = gal.length >= MAX_GALLERY;
   // ---- the name (rename on the page) ----
   const [naming, setNaming] = useState<string | null>(null);
@@ -244,6 +247,24 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     try { const d = await draft(); if (d.ok) { setDrafted({ steps: d.steps, marks: d.marks, kitchen: d.kitchen, parts: d.parts, moves: d.moves }); setDrafting(""); } else if ((d as { cannot?: boolean }).cannot) setDrafting((d as { why: string }).why); else setDrafting(w("recipe.draftFailedChecks", { why: (d as { why: string }).why })); }
     catch (e: any) { setDrafting(e?.message || w("recipe.chefMealanCouldNotAnswer")); }
   };
+  // DT282 (0.3.135, board Stories209; Coach Milan 11 November 21:40, Go): a cook opened from Your cooks, in place of the page
+  if (cookAt) {
+    const at = new Date(cookAt.createdAt), cookWhen = `${dateText(at, { weekday: "long", day: "numeric", month: "long" })}, ${at.toTimeString().slice(0, 5)}${cookAt.taste ? ` · ${tasteWord(cookAt.taste)}` : ""}`;
+    return (
+      <div className="rq rq-cook">
+        <PastMeal f={cookAt} day={meal.title} recipe={meal} when={cookWhen} words back={() => setCookAt(null)} actions={(shown) => {
+          if (!shown) return null;
+          const inGal = gal.some((g) => g.src === shown);
+          return <div className="pm-actions rq-cook-add">
+            {inGal ? <small className="muted">✓ {w("recipe.inRecipePhotos")}</small>
+              : full ? <small className="muted">{w("recipe.galleryFull", { max: MAX_GALLERY })}</small>
+              : <><button type="button" className="pill pill-primary pill-wide" onClick={() => { setPhotos([...list, shown]); log("cover", { how: "real" }); }}>{w("recipe.addToRecipePhotos")}</button>
+                <small className="muted">{w("recipe.addToRecipePhotosWhy")}</small></>}
+          </div>;
+        }} />
+      </div>
+    );
+  }
   return (
     <div className="rq">
       <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> {backLabel ?? w("recipe.recipes")}</button>
@@ -322,12 +343,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         </div>
       </>)}
       {!coverToday && !drawn && !(picture && list.length === 0) && <small className="muted rq-hint">{gal.length === 0 ? w("recipe.aPhotoMakesItEasy") : full ? w("recipe.galleryFull", { max: MAX_GALLERY }) : w("recipe.galleryCount", { n: gal.length, max: MAX_GALLERY })}</small>}
-      {offered.length > 0 && !full && (
-        <div className="rq-offer">
-          <small className="muted">{w("recipe.fromTheTimesYouMade")}</small>
-          <div className="rq-offer-row">{offered.slice(0, 6).map((src, i) => <button key={i} className="publish-photo rph-offer" onClick={() => add(src)} aria-label={w("recipe.addPlatePhoto", { n: i + 1 })}><img src={src} alt="" /><span className="rph-plus"><Plus size={14} /></span></button>)}</div>
-        </div>
-      )}
+      {/* DT282 (0.3.135): the row of photos offered from the cooks went; a cook opened from Your cooks adds its photo */}
       {tryPhoto && <TryPhoto meal={meal} tryPhoto={tryPhoto} use={(img) => { const list = recipePhotosOf(meal).filter((x) => x !== img); onPatch({ ...withRecipePhotos([img, ...list].slice(0, MAX_RECIPE_PHOTOS)), coverSig: sig(img) }); }} />}
       {landing}
       {/* DT175a (0.3.18, board Stories123 v2): Watch the steps, when every step has its picture */}
@@ -453,7 +469,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {!edit && <NutritionCard tableOnly items={items} serves={serves} one={oneWord} all={allWord} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} />}
       {!edit && <CarryBlock meal={meal} cards={cards} />}
       {/* DT214 v2 (0.3.53, board Stories162): a recipe collects its cooks */}
-      {!edit && <YourCooks meal={meal} cards={cards} />}
+      {!edit && <YourCooks meal={meal} cards={cards} onOpen={setCookAt} />}
       {/* DT227 (0.3.61, board Stories167): the recipe points to its draft; the draft stays on the Plate */}
       {!edit && saved && (
         <section className="card rq-saved" aria-label={w("recipe.savedForLaterOnThe")}>

@@ -22200,6 +22200,30 @@
     "steps.takeOutAria": {
       "text": "{food} aus dem Schritt nehmen",
       "checked": true
+    },
+    "yourcooks.tapToOpen": {
+      "text": "Tippe ein Foto an, um dieses Kochen zu öffnen: die Fotos, die Lebensmittel, wie es geschmeckt hat, deine Worte.",
+      "checked": true
+    },
+    "yourcooks.openCook": {
+      "text": "Das Kochen vom {date} öffnen",
+      "checked": true
+    },
+    "yourcooks.yourWords": {
+      "text": "Deine Worte:",
+      "checked": true
+    },
+    "recipe.addToRecipePhotos": {
+      "text": "Zu den Fotos des Rezepts hinzufügen",
+      "checked": true
+    },
+    "recipe.addToRecipePhotosWhy": {
+      "text": "Es kommt in die Galerie des Rezepts. Das Titelbild wählst du dort.",
+      "checked": true
+    },
+    "recipe.inRecipePhotos": {
+      "text": "Bei den Fotos des Rezepts",
+      "checked": true
     }
   }
 }

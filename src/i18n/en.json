@@ -1156,6 +1156,9 @@
   "recipein.sideOnTheSide": "on the side",
   "yourcooks.yourCooks": "Your cooks",
   "yourcooks.eachTimeYouCookIt": "Each time you cook it, the cook keeps the photos and the answers. The best photo of a step can become the step's photo here.",
+  "yourcooks.tapToOpen": "Tap a photo to open that cook: its photos, the foods, how it tasted, your words.",
+  "yourcooks.openCook": "Open the cook of {date}",
+  "yourcooks.yourWords": "Your words:",
   "yourcooks.everyTimeYouAteIt": {
     "text": "Every time you ate it",
     "gender": true
@@ -5779,6 +5782,9 @@
   "recipe.deleteThisPhoto": "Delete this photo",
   "recipe.galleryCount": "Photos: {n} of {max}. The first is the cover. A number shows the step a photo is on. Tap a photo to change it.",
   "recipe.galleryFull": "Photos: {max} of {max}, the gallery is full. Delete one to add another.",
+  "recipe.addToRecipePhotos": "Add to the recipe's photos",
+  "recipe.addToRecipePhotosWhy": "It goes into the recipe's gallery. The cover is chosen there.",
+  "recipe.inRecipePhotos": "In the recipe's photos",
   "recipe.chefS": "Chef Mealan's",
   "recipe.yours": "Yours",
   "recipe.theOriginalForTheOriginal": "The original, for the original foods:",

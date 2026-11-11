@@ -5549,6 +5549,12 @@
     "screen.plate.photoNotSaved": {"en":"This photo was not saved. Retake it, or drop it.","area":"The Plate","where":"The Plate","release":"0.3.133"},
     "screen.photos.notSaved": {"en":"Not saved","area":"Words used across the app","where":"Across the app","release":"0.3.133"},
     "screen.count.pieces": {"en":"{n} piece|{n} pieces","area":"The Plate","where":"The Plate","release":"0.3.134"},
-    "screen.steps.takeOutAria": {"en":"Take {food} out of the step","area":"Recipes","where":"Recipes","release":"0.3.134"}
+    "screen.steps.takeOutAria": {"en":"Take {food} out of the step","area":"Recipes","where":"Recipes","release":"0.3.134"},
+    "screen.yourcooks.tapToOpen": {"en":"Tap a photo to open that cook: its photos, the foods, how it tasted, your words.","area":"Recipes","where":"Recipes","release":"0.3.135"},
+    "screen.yourcooks.openCook": {"en":"Open the cook of {date}","area":"Recipes","where":"Recipes","release":"0.3.135"},
+    "screen.yourcooks.yourWords": {"en":"Your words:","area":"Recipes","where":"Recipes","release":"0.3.135"},
+    "screen.recipe.addToRecipePhotos": {"en":"Add to the recipe's photos","area":"Recipes","where":"Recipes","release":"0.3.135"},
+    "screen.recipe.addToRecipePhotosWhy": {"en":"It goes into the recipe's gallery. The cover is chosen there.","area":"Recipes","where":"Recipes","release":"0.3.135"},
+    "screen.recipe.inRecipePhotos": {"en":"In the recipe's photos","area":"Recipes","where":"Recipes","release":"0.3.135"}
   }
 }

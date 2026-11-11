@@ -7,7 +7,7 @@ import { cardsOfRecipe } from "../carry";
 import { CARRY_WORDS } from "../carry";
 // the tastes as kept on a meal (English values); each is shown in the app's language
 const TASTES = ["DaaM good", "Good", "Not really"];
-const tasteWord = (t: string) => (t === "Not really" ? w("yourcooks.notReally") : t === "Good" ? w("yourcooks.good") : t === "DaaM good" ? w("yourcooks.daamGood") : t);
+export const tasteWord = (t: string) => (t === "Not really" ? w("yourcooks.notReally") : t === "Good" ? w("yourcooks.good") : t === "DaaM good" ? w("yourcooks.daamGood") : t);
 export const cooksOf = (meal: Meal, cards: Feedback[]) => cardsOfRecipe(meal, cards).filter((f) => f.status === "eaten").sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 // the photos taken on step k while cooking this recipe, newest first
 export function cookPhotosFor(meal: Meal, cards: Feedback[], k: number): string[] {
@@ -15,11 +15,11 @@ export function cookPhotosFor(meal: Meal, cards: Feedback[], k: number): string[
   for (const f of cooksOf(meal, cards)) (f.photoSteps ?? []).forEach((s, i) => { const x = f.photos?.[i]; if (s === k && x && !out.includes(x)) out.push(x); });
   return out;
 }
-export function YourCooks({ meal, cards }: { meal: Meal; cards: Feedback[] }) {
+export function YourCooks({ meal, cards, onOpen }: { meal: Meal; cards: Feedback[]; onOpen?: (f: Feedback) => void }) {
   const cs = cooksOf(meal, cards);
   if (!cs.length) return null;
   const n = cs.length, last = dateText(new Date(cs[0].createdAt), { day: "numeric", month: "long" });
-  const photos = cs.map((f) => f.photo ?? f.photos?.[f.photos.length - 1]).filter(Boolean).slice(0, 6) as string[];
+  const photos = cs.map((f) => ({ f, src: f.photo ?? f.photos?.[f.photos.length - 1] })).filter((x) => !!x.src).slice(0, 6) as { f: Feedback; src: string }[];
   const prep = cs.filter((f) => f.prep), asSaid = prep.filter((f) => f.prep!.went === "as").length;
   const tastes = TASTES.map((t) => [t, cs.filter((f) => f.taste === t).length] as const).filter(([, k]) => k > 0);
   const carried = cs.filter((f) => f.carry);
@@ -28,13 +28,16 @@ export function YourCooks({ meal, cards }: { meal: Meal; cards: Feedback[] }) {
     <section className="card rq-cooks" aria-label={w("yourcooks.yourCooks")}>
       <b>{w("yourcooks.yourCooks")}</b>
       <small className="muted">{wn("yourcooks.timesTheLastOn", n, { date: last })}</small>
-      {photos.length > 0 && <div className="rc-photos">{photos.map((x, i) => <img key={i} src={x} alt="" />)}</div>}
+      {/* DT282 (0.3.135, board Stories209): a tap on a cook's photo opens that cook */}
+      {photos.length > 0 && <div className="rc-photos">{photos.map((x, i) => onOpen
+        ? <button key={i} type="button" className="rc-photo" aria-label={w("yourcooks.openCook", { date: dateText(new Date(x.f.createdAt), { day: "numeric", month: "long" }) })} onClick={() => onOpen(x.f)}><img src={x.src} alt="" /></button>
+        : <img key={i} src={x.src} alt="" />)}</div>}
       <div className="rc-lines">
         {prep.length > 0 && <div>{w("yourcooks.asTheStepsSay")} <b>{w("yourcooks.nOfTotal", { n: asSaid, total: prep.length })}</b></div>}
         {tastes.length > 0 && <div>{w("yourcooks.tasted")} <b>{tastes.map(([t, k]) => `${tasteWord(t)} ${k}`).join(", ")}</b></div>}
         {carried.length > 0 && top && top[1] > 0 && <div>{w("yourcooks.carriedYou")} <b>{CARRY_WORDS[top[0]].toLowerCase()} {w("yourcooks.nOfTotal", { n: top[1], total: carried.length })}</b></div>}
       </div>
-      <small className="muted">{w("yourcooks.eachTimeYouCookIt")}</small>
+      <small className="muted">{onOpen && photos.length > 0 ? w("yourcooks.tapToOpen") : w("yourcooks.eachTimeYouCookIt")}</small>
     </section>
   );
 }
