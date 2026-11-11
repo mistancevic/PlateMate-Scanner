@@ -10,7 +10,8 @@ import { potLine } from "./frying";
 export const TOKEN = /\[\[i:([^|\]]+)\|([^\]]*)\]\]/g;
 export const shortName = (food: { name: string; brand?: string | null }) => plainName(food).split(",")[0].trim().toLowerCase();
 export const tokenOf = (item: Ingredient) => `[[i:${item.id}|${shortName(item.food).replace(/[[\]|]/g, "")}]]`;
-const amountFor = (id: string, name: string, items: Ingredient[]) => {
+// exported in 0.3.134: the food buttons under the step editor say the amount as the step does (4 eggs (M), not 208 g)
+export const amountFor = (id: string, name: string, items: Ingredient[]) => {
   const it = items.find((i) => i.id === id && i.grams > 0);
   if (!it) return name;
   // R3, the fix (0.2.39): a step is for cooking, so frying oil is the whole pot, as the recipe writes it

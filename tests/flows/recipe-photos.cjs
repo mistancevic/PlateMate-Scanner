@@ -112,9 +112,8 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   await page.goto("http://127.0.0.1:3186/my-recipes"); await page.waitForTimeout(1800);
   ok(await tile("Eggs, Milk").locator("img").getAttribute("src") === second, "the photos stay after a reload, the cover first");
   await tile("Oats").click(); await page.waitForTimeout(400);
-  ok(await page.locator(".rq-offer .rph-offer").count() === 1, "R8: the plate photos from the times it was made are offered");
-  await page.locator(".rq-offer .rph-offer").first().click(); await page.waitForTimeout(300);
-  ok(await page.locator(".rq-hero img").count() === 1 && await page.locator(".rq-offer").count() === 0, "R8: a tap adds the plate photo to the recipe, as its cover");
+  // Changed by 0.3.134: a recipe with no photo takes the plate photo of the time it was made as its cover, by itself
+  ok(await page.locator(".rq-hero img").count() === 1 && /Cover/.test(await page.locator(".rq-hero").textContent()) && await page.locator(".rq-offer").count() === 0, "0.3.134: the plate photo from the time it was made is the cover by itself; nothing left to offer");
   // Delete recipe says what goes first (0.2.22, IM22): its photos go with it
   await page.getByRole("button", { name: "Delete recipe" }).click(); await page.waitForTimeout(150);
   ok((await meal("m-oats")) !== undefined && /Its photo, from this phone and from your account\./.test(await page.locator(".dl-card").textContent()), "IM22: Delete recipe says what goes first: its photo");

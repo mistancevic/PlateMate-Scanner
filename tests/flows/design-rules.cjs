@@ -64,7 +64,7 @@ const U = "http://127.0.0.1:3242";
     // DT211 v8 (0.3.53): the one filled button is Start cooking, in the Steps block; grey while the recipe has no steps
     ok((await filled(page)).length === 0 && await page.locator(".rq-start button").isDisabled(), "A: Sarma has no steps yet: Start cooking is grey, nothing else is filled: " + (await filled(page)).join(", "));
     ok(await page.getByRole("button", { name: "Write my own" }).evaluate((b) => b.classList.contains("pill")), "A, B: Write my own is a button next to the other way, not a link");
-    const rb = await page.locator("main button").filter({ hasText: /^\s*Recipes\s*$/ }).first().boundingBox(), hero = await page.locator(".rq-hero").first().boundingBox();
+    const rb = await page.locator("main button").filter({ hasText: /^\s*Recipes\s*$/ }).first().boundingBox(), hero = await page.locator(".rq-hero, .rq-nopic").first().boundingBox(); // 0.3.134: a recipe with no photo shows the card in its place
     ok(rb && hero && rb.y < hero.y && rb.x < 60, "E: the recipe page's Back, Recipes, sits top left above the photo");
     const nb2 = await page.locator(".rq-name").first().boundingBox();
     ok(nb2 && rb && hero && nb2.y > rb.y && nb2.y < hero.y, "G: the recipe's name comes first, under Back, before the photo");

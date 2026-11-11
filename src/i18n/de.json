@@ -22192,6 +22192,14 @@
     "photos.notSaved": {
       "text": "Nicht gespeichert",
       "checked": true
+    },
+    "count.pieces": {
+      "text": "{n} Stück|{n} Stück",
+      "checked": true
+    },
+    "steps.takeOutAria": {
+      "text": "{food} aus dem Schritt nehmen",
+      "checked": true
     }
   }
 }

@@ -2,6 +2,8 @@ import { countOf, gramsOfOne, KINDS } from "./counted";
 import { cleanMealNames, cleanCardNames, cleanFoodNames, cleanText1 } from "./entities";
 import { rowsFromRaw } from "./labeltable";
 import { packOf } from "./canned";
+import { getLang, locOf } from "./lang";
+import { wn } from "./words";
 /** Versioned pilot contract: numbers are unrounded; null means unknown. */
 export type Nutrient = "calories" | "protein" | "fats" | "carbs" | "fiber";
 // the order printed on European labels, so checking against the pack goes line by line
@@ -637,7 +639,16 @@ export function servingOf(x: any): { grams: number; name: string } | undefined {
 // Whole servings of a counted food that reach at least the grams asked for, never under one
 export const servingsFor = (f: Food, grams: number) => (f.serving ? Math.max(1, Math.ceil(grams / f.serving.grams - 1e-9)) : null);
 export const snapToServing = (f: Food, grams: number) => (f.serving ? servingsFor(f, grams)! * f.serving.grams : grams);
-export const servingLabel = (f: Food, grams: number) => { if (!f.serving) return null; const n = Math.round((grams / f.serving.grams) * 10) / 10; const whole = Number.isInteger(n); return `${whole ? n : n.toFixed(1)} ${f.serving.name}${n === 1 ? "" : "s"}`; };
+// 0.3.134 (Coach Milan 11 November 20:42 to 20:46, a tester's recipe showed "2 1s" and "0.7 1s"): the number in the language's
+// own form (0,7 in Srpski and German); a piece whose name has no letters (a label's "1") is a piece, in the language; the
+// English plural s only in English
+export const servingLabel = (f: Food, grams: number) => {
+  if (!f.serving) return null;
+  const n = Math.round((grams / f.serving.grams) * 10) / 10, lang = getLang();
+  const num = n.toLocaleString(locOf(lang), { maximumFractionDigits: 1 }), name = (f.serving.name ?? "").trim();
+  if (!/\p{L}/u.test(name)) return wn("count.pieces", n === 1 ? 1 : 2, { n: num });
+  return `${num} ${name}${lang === "en" && n !== 1 && !/s$/i.test(name) ? "s" : ""}`;
+};
 export function candidateFood(input: any, source: string): Food {
   return {
     id: uid(),

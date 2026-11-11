@@ -22192,6 +22192,14 @@
     "photos.notSaved": {
       "text": "Nije sačuvano",
       "checked": true
+    },
+    "count.pieces": {
+      "text": "{n} kom.|{n} kom.|{n} kom.",
+      "checked": true
+    },
+    "steps.takeOutAria": {
+      "text": "Izvadi {food} iz koraka",
+      "checked": true
     }
   }
 }
