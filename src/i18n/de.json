@@ -22096,6 +22096,62 @@
     "recipe.photoOfStep": {
       "text": "Ein Foto von Schritt {n}",
       "checked": true
+    },
+    "steppics.photosOnTheSteps": {
+      "text": "Fotos bei den Schritten",
+      "checked": true
+    },
+    "steppics.placedInOrder": {
+      "text": "Deine neuen Fotos in der Reihenfolge der Aufnahme, eins pro Schritt ab Schritt 1. Tippe ein Foto an, um es zu einem anderen Schritt oder zu keinem Schritt zu verschieben. Die Bilder, die ein Schritt schon hat, bleiben.",
+      "checked": true
+    },
+    "steppics.newPhotoN": {
+      "text": "Neues Foto {n}",
+      "checked": true
+    },
+    "steppics.moveThisPhotoTo": {
+      "text": "Dieses Foto verschieben zu",
+      "checked": true
+    },
+    "steppics.noStep": {
+      "text": "Kein Schritt",
+      "checked": true
+    },
+    "steppics.alreadyOnStep": {
+      "text": "Ein Bild, das Schritt {n} schon hat",
+      "checked": true
+    },
+    "steppics.noPictureYet": {
+      "text": "Noch kein Bild",
+      "checked": true
+    },
+    "steppics.onNoStep": {
+      "text": "Bei keinem Schritt",
+      "checked": true
+    },
+    "steppics.keptInRecipePhotos": {
+      "text": "Bleiben bei den Fotos des Rezepts.",
+      "checked": true
+    },
+    "steppics.recipePhotosFull": {
+      "text": "Bei den Fotos des Rezepts ist kein Platz für alle. Lege sie zu einem Schritt, damit sie bleiben.",
+      "checked": true
+    },
+    "steppics.saveThePhotos": {
+      "text": "Fotos speichern",
+      "checked": true
+    },
+    "steppics.cancel": {
+      "text": "Abbrechen",
+      "checked": true
+    },
+    "recipe.addPhotosToTheSteps": {
+      "text": "Fotos zu den Schritten hinzufügen",
+      "checked": true
+    },
+    "recipe.addPhotosToTheStepsWhy": {
+      "text": "Wähle mehrere auf einmal von deinem Handy. Dann legst du jedes zu seinem Schritt.",
+      "checked": true
     }
   }
 }

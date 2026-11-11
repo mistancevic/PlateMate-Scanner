@@ -5523,6 +5523,20 @@
     "screen.make.closePhoto": {"en":"Close","area":"The Plate","where":"The Plate","release":"0.3.129"},
     "screen.make.firstPhotoWhy": {"en":"The first photo is the one the recipe page and Watch the steps show.","area":"The Plate","where":"The Plate","release":"0.3.129"},
     "screen.recipe.onTheSteps": {"en":"On the steps","area":"Recipes","where":"Recipes","release":"0.3.129"},
-    "screen.recipe.photoOfStep": {"en":"A photo of step {n}","area":"Recipes","where":"Recipes","release":"0.3.129"}
+    "screen.recipe.photoOfStep": {"en":"A photo of step {n}","area":"Recipes","where":"Recipes","release":"0.3.129"},
+    "screen.steppics.photosOnTheSteps": {"en":"Photos on the steps","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.placedInOrder": {"en":"Your new photos, in the order you took them, one on each step from step 1. Tap a photo to move it to another step or to no step. The pictures a step already has stay.","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.newPhotoN": {"en":"New photo {n}","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.moveThisPhotoTo": {"en":"Move this photo to","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.noStep": {"en":"No step","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.alreadyOnStep": {"en":"A picture step {n} already has","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.noPictureYet": {"en":"No picture yet","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.onNoStep": {"en":"On no step","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.keptInRecipePhotos": {"en":"Kept in the recipe's photos.","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.recipePhotosFull": {"en":"The recipe's photos have no room for all of these. Put them on a step to keep them.","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.saveThePhotos": {"en":"Save the photos","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.steppics.cancel": {"en":"Cancel","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.recipe.addPhotosToTheSteps": {"en":"Add photos to the steps","area":"Recipes","where":"Recipes","release":"0.3.130"},
+    "screen.recipe.addPhotosToTheStepsWhy": {"en":"Pick several at once from your phone. Then you place each one on its step.","area":"Recipes","where":"Recipes","release":"0.3.130"}
   }
 }

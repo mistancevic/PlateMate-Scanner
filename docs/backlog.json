@@ -871,10 +871,10 @@
       "id": "DT276",
       "title": "Photos on the steps: one store, shown everywhere, more than one per step, several at once",
       "epic": "recipes",
-      "state": "next",
+      "state": "done",
       "board": "Stories205",
-      "why": "Coach Milan 10 November 21:24 to 22:37, Go: step photos seemed to live in three places and went in one by one. Step 1 (Make's tick list shows the recipe's step picture) is built, 0.3.127. Step 2 (a step can have two or more pictures; they show among the recipe's photos, On the steps) is built, 0.3.129. Step 3: pick several at once and place them on the steps.",
-      "version": "0.3.129"
+      "why": "Coach Milan 10 November 21:24 to 22:37, Go: step photos seemed to live in three places and went in one by one. Step 1 (Make's tick list shows the recipe's step picture) is built, 0.3.127. Step 2 (a step can have two or more pictures; they show among the recipe's photos, On the steps) is built, 0.3.129. Step 3 (pick several at once, then each on its step; the ones on no step go to the recipe's photos, which hold 6) is built, 0.3.130.",
+      "version": "0.3.130"
     },
     {
       "id": "DT277",

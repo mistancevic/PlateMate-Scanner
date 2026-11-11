@@ -1,4 +1,4 @@
-import { StepPicShown, StepPicSheet, StepPlayer, CoverVideo } from "./StepPics";
+import { StepPicShown, StepPicSheet, StepPhotosPlace, StepPlayer, CoverVideo } from "./StepPics";
 import { w, wn, wIn, wordV, dateText, mealV, type Val, type WordKey } from "../words";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
@@ -44,6 +44,8 @@ import { unitWord, unitV, partName, partLowV, ONE } from "../recipeWords";
 // is. Edit recipe changes the recipe itself, on this page. On chefmealan.com: where the recipe is, See live page and
 // Change live page. Delete recipe at the end.
 export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
+// DT276 step 3: how many photos one pick takes
+const MAX_STEP_PICK = 12;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 // a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
@@ -153,6 +155,29 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const PartPick = ({ value, onPick }: { value: string; onPick: (v: string) => void }) => <select className="pt-chip pt-select" aria-label={w("recipe.part")} value={value} onChange={(e) => onPick(e.target.value)}><option value="">{w("recipe.noPart")}</option>{[...new Set([...editParts, ...(value ? [value] : [])])].map((x) => <option key={x} value={x}>{partName(x)}</option>)}</select>;
   // DT175a (0.3.18): the step whose picture is being added or changed, and Watch the steps
   const [picAt, setPicAt] = useState<number | null>(null);
+  // DT276 step 3 (0.3.130): the photos picked at once, oldest first, waiting to be placed on the steps
+  const manyRef = useRef<HTMLInputElement>(null);
+  const [placing, setPlacing] = useState<string[] | null>(null);
+  const pickMany = async (files: File[]) => {
+    const fs = files.filter((f) => f.type.startsWith("image/")).sort((x, y) => x.lastModified - y.lastModified).slice(0, MAX_STEP_PICK);
+    if (!fs.length) return;
+    setBusy(true);
+    try {
+      const out: string[] = [];
+      for (const f of fs) { try { const raw = await read(f); const d = await resizeImageBase64(raw, 960, 960).catch(() => raw); if (!out.includes(d)) out.push(d); } catch { /* a photo that does not open is left out */ } }
+      if (out.length) setPlacing(out);
+    } finally { setBusy(false); }
+  };
+  const savePlaced = (place: (number | null)[]) => {
+    if (!placing) return;
+    let m: Meal = meal;
+    place.forEach((k, i) => { if (k !== null) m = { ...m, ...addStepPic(m, k, { src: placing[i], by: "me" }) }; });
+    const loose = placing.filter((_, i) => place[i] === null), mine = recipePhotosOf(meal);
+    // a drawn cover stays behind your own photos, as with Add
+    const fresh = loose.filter((x) => !mine.includes(x)), next = (drawn ? [...fresh, ...mine] : [...mine, ...fresh]).slice(0, MAX_RECIPE_PHOTOS);
+    onPatch({ ...(m.stepPics ? { stepPics: m.stepPics, stepPicMeta: m.stepPicMeta } : {}), ...(next.length > mine.length ? withRecipePhotos(next) : {}) });
+    setPlacing(null);
+  };
   const [watching, setWatching] = useState(false);
   // DT254: the step pictures as the cover's video, when every step has one (not while editing)
   const video = !edit && (meal.steps?.length ?? 0) > 0 && allStepPics(meal, meal.steps!) ? meal.steps!.map((x) => stepPicOf(meal, x)!) : null;
@@ -455,6 +480,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
                 {/* DT211 v8 (0.3.53): the step's photo comes from cooking; no + slot here, a tap changes or removes it */}
                 <StepPicShown pic={stepPicOf(meal, x)} k={k} more={Math.max(0, stepPicsOf(meal, x).length - 1)} onOpen={() => setPicAt(k)} /></li>])}</ol>
               <small className="muted">{w("recipe.photosForTheSteps")}</small>
+              {/* DT276 step 3 (0.3.130, board Stories205): several photos at once, then each on its step */}
+              <button type="button" className="pill pill-wide rq-add-many" disabled={busy} onClick={() => manyRef.current?.click()}>{w("recipe.addPhotosToTheSteps")}</button>
+              <input ref={manyRef} type="file" accept="image/*" multiple hidden onChange={(e) => { const fs = [...(e.target.files ?? [])]; e.target.value = ""; void pickMany(fs); }} />
+              <small className="muted">{w("recipe.addPhotosToTheStepsWhy")}</small>
             </>);
             // DT256: steps made the recipe's own from the original, word for word: one list, with the original's line
             if (own.length && orig.length && sameSteps(own, orig)) return <><small className="muted">{by}</small>{status}{ownList}</>;
@@ -547,6 +576,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           {onDelete}
         </>
       )}
+      {placing && meal.steps?.length && <StepPhotosPlace title={meal.title} steps={meal.steps} items={meal.items} has={meal.steps.map((t) => stepPicsOf(meal, t))} photos={placing}
+        room={Math.max(0, MAX_RECIPE_PHOTOS - recipePhotosOf(meal).length)} onSave={savePlaced} onClose={() => setPlacing(null)} />}
       {picAt !== null && meal.steps?.[picAt] !== undefined && <StepPicSheet k={picAt} step={meal.steps[picAt]} items={meal.items} pic={stepPicOf(meal, meal.steps[picAt])} fromCooks={cookPhotosFor(meal, cards, picAt)}
         all={stepPicsOf(meal, meal.steps[picAt])} onFirst={(src) => { onPatch(firstStepPic(meal, picAt, src)); setPicAt(null); }}
         // DT276 step 2 (0.3.129): a new picture is added to the step; the one it has stays. The first one kept again only says who made it

@@ -22096,6 +22096,62 @@
     "recipe.photoOfStep": {
       "text": "Slika koraka {n}",
       "checked": true
+    },
+    "steppics.photosOnTheSteps": {
+      "text": "Slike na koracima",
+      "checked": true
+    },
+    "steppics.placedInOrder": {
+      "text": "Tvoje nove slike, redom kako su snimljene, po jedna na svakom koraku od prvog. Dodirni sliku da je premestiš na drugi korak ili je skineš sa koraka. Slike koje korak već ima ostaju.",
+      "checked": true
+    },
+    "steppics.newPhotoN": {
+      "text": "Nova slika {n}",
+      "checked": true
+    },
+    "steppics.moveThisPhotoTo": {
+      "text": "Premesti ovu sliku na",
+      "checked": true
+    },
+    "steppics.noStep": {
+      "text": "Bez koraka",
+      "checked": true
+    },
+    "steppics.alreadyOnStep": {
+      "text": "Slika koju korak {n} već ima",
+      "checked": true
+    },
+    "steppics.noPictureYet": {
+      "text": "Još nema slike",
+      "checked": true
+    },
+    "steppics.onNoStep": {
+      "text": "Bez koraka",
+      "checked": true
+    },
+    "steppics.keptInRecipePhotos": {
+      "text": "Ostaju među slikama recepta.",
+      "checked": true
+    },
+    "steppics.recipePhotosFull": {
+      "text": "Među slikama recepta nema mesta za sve ove. Stavi ih na korak da ostanu.",
+      "checked": true
+    },
+    "steppics.saveThePhotos": {
+      "text": "Sačuvaj slike",
+      "checked": true
+    },
+    "steppics.cancel": {
+      "text": "Otkaži",
+      "checked": true
+    },
+    "recipe.addPhotosToTheSteps": {
+      "text": "Dodaj slike koracima",
+      "checked": true
+    },
+    "recipe.addPhotosToTheStepsWhy": {
+      "text": "Izaberi više slika odjednom sa telefona. Zatim svaku staviš na njen korak.",
+      "checked": true
     }
   }
 }

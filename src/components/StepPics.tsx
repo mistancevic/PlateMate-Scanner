@@ -111,6 +111,53 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, f
   );
 }
 
+// DT276 step 3 (0.3.130, board Stories205; Coach Milan 10 November 22:37, Go): several photos picked at once, each on its
+// step, to check before saving. The photos sit on the steps in the order they were taken, one per step from step 1; a tap on
+// a photo moves it to another step or to no step. A photo on no step is kept in the recipe's photos while there is room.
+// The pictures a step already has stay. Nothing is saved until Save.
+export function StepPhotosPlace({ title, steps, items, has, photos, room, onSave, onClose }: {
+  title: string; steps: string[]; items: Ingredient[]; has: StepPic[][]; photos: string[]; room: number;
+  onSave: (place: (number | null)[]) => void; onClose: () => void;
+}) {
+  const [place, setPlace] = useState<(number | null)[]>(() => photos.map((_, i) => (i < steps.length ? i : null)));
+  const [sel, setSel] = useState<number | null>(null);
+  const loose = place.map((k, i) => (k === null ? i : -1)).filter((i) => i >= 0), lost = Math.max(0, loose.length - room);
+  const thumb = (i: number) => <button key={i} type="button" className={`publish-photo${sel === i ? " on" : ""}`} aria-pressed={sel === i} aria-label={w("steppics.newPhotoN", { n: i + 1 })} onClick={() => setSel(sel === i ? null : i)}><img src={photos[i]} alt="" /></button>;
+  const mover = sel !== null && (
+    <div className="spp-move" role="group" aria-label={w("steppics.moveThisPhotoTo")}>
+      <b>{w("steppics.moveThisPhotoTo")}</b>
+      <div>{steps.map((_, k) => <button key={k} type="button" className={`pill pill-small${place[sel] === k ? " pill-primary" : ""}`} aria-pressed={place[sel] === k} aria-label={w("steppics.stepN", { n: k + 1 })} onClick={() => { setPlace((x) => x.map((y, i) => (i === sel ? k : y))); setSel(null); }}>{k + 1}</button>)}
+        <button type="button" className={`pill pill-small${place[sel] === null ? " pill-primary" : ""}`} aria-pressed={place[sel] === null} onClick={() => { setPlace((x) => x.map((y, i) => (i === sel ? null : y))); setSel(null); }}>{w("steppics.noStep")}</button></div>
+    </div>);
+  return (
+    <div className="sp-sheet spp" role="dialog" aria-label={w("steppics.photosOnTheSteps")}>
+      <div className="cook-top"><button className="pill pill-small" style={{ height: 44 }} onClick={onClose}>{w("steppics.close")}</button><b className="cook-title">{title}</b><span /></div>
+      <b className="spp-title">{w("steppics.photosOnTheSteps")}</b>
+      <small className="muted">{w("steppics.placedInOrder")}</small>
+      <div className="spp-list">
+        {steps.map((t, k) => { const mine = place.map((x, i) => (x === k ? i : -1)).filter((i) => i >= 0); return (
+          <div key={k} className="spp-step">
+            <div className="spp-head"><span>{k + 1}</span><small>{words(t, items)}</small></div>
+            <div className="spp-pics">
+              {has[k]?.map((x, i) => <img key={`h${i}`} className="spp-has" src={x.src} alt={w("steppics.alreadyOnStep", { n: k + 1 })} />)}
+              {mine.map(thumb)}
+              {!has[k]?.length && !mine.length && <small className="muted">{w("steppics.noPictureYet")}</small>}
+            </div>
+            {sel !== null && place[sel] === k && mover}
+          </div>); })}
+        <div className="spp-step">
+          <b>{w("steppics.onNoStep")}</b>
+          <small className="muted">{lost ? w("steppics.recipePhotosFull") : w("steppics.keptInRecipePhotos")}</small>
+          <div className="spp-pics">{loose.map(thumb)}</div>
+          {sel !== null && place[sel] === null && mover}
+        </div>
+      </div>
+      <button className="pill pill-primary pill-wide" onClick={() => onSave(place)}>{w("steppics.saveThePhotos")}</button>
+      <button className="link" style={{ alignSelf: "flex-start", minHeight: 44 }} onClick={onClose}>{w("steppics.cancel")}</button>
+    </div>
+  );
+}
+
 // Watch the steps: the step pictures one after another, about 5 seconds each, the words and the timer under the picture
 export function StepPlayer({ title, steps, items, pics, onClose, onCook }: {
   title: string; steps: string[]; items: Ingredient[]; pics: StepPic[];
