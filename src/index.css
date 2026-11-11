@@ -3199,3 +3199,18 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .spp-pics { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-left: 34px; } .spp-step > b + small + .spp-pics, .spp-step > .spp-move { margin-left: 0; }
 .spp-pics .publish-photo, .spp-has { width: 56px; height: 56px; border-radius: 10px; } .spp-has { object-fit: cover; opacity: .55; }
 .spp-move { background: var(--tint); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; } .spp-move > div { display: flex; flex-wrap: wrap; gap: 6px; } .spp-move .pill { min-height: 44px; min-width: 44px; }
+
+/* DT281 (0.3.131, board Stories208): photo first. The recipe page: the number at the top left, then the photo, wide, then the
+   words. Make: the tick at the top left; the photos and + Photo sit over the words, which the tick button pushes down. */
+.rp-step-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.rq-step-wide { position: relative; }
+.rq-step-wide-pic { display: block; width: 100%; padding: 0; border: 0; border-radius: 12px; overflow: hidden; background: none; cursor: pointer; }
+.rq-step-wide-pic img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.rq-step-wide-next { position: absolute; right: 8px; top: 8px; min-height: 44px; min-width: 44px; padding: 0 12px; border: 0; border-radius: 999px; background: rgba(23, 39, 66, .82); color: #fff; font: inherit; font-size: 13px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.rq-step-wide-ai { display: block; margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.mk-step { position: relative; }
+.mk-step > .mk-pics { position: absolute; left: 32px; right: 0; top: 9px; margin: 0; flex-wrap: nowrap; overflow-x: auto; z-index: 1; pointer-events: none; }
+.mk-step > .mk-pics > * { pointer-events: auto; }
+/* the tick button is the whole step: its box sits at the top left, beside the photos; its words start under them */
+.mk-step > .mk-row .mk-check { padding: 66px 0 9px 32px; }
+.mk-step > .mk-row .mk-box { position: absolute; left: 0; top: 22px; margin: 0; }

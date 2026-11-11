@@ -2462,16 +2462,18 @@ export function JourneyScreen(p: AppApi) {
               const shown = picOpen?.k === k && list.includes(picOpen.src) ? picOpen.src : null;
               const drop = (y: string) => { if (src && kept.includes(y)) setState((st) => ({ ...st, meals: st.meals.map((m) => (m.id === src.id ? { ...m, ...removeStepPic(m, k, y) } : m)) })); if (mine === y) setStepPhotos((o) => { const n = { ...o }; delete n[String(k)]; return n; }); setPicOpen(null); };
               return (
-              <PhotoPick key={k} onFile={(f) => stepPhotoFile(k, f)}>{({ toggle, open }) => <div className="mk-step"><div className="mk-row">
+              <PhotoPick key={k} onFile={(f) => stepPhotoFile(k, f)}>{({ toggle, open }) => <div className="mk-step">
+              {/* DT281 (0.3.131, board Stories208; Coach Milan 11 November 17:27): the tick at the top left; to its right, first the
+                  step's photos and + Photo, then the words. + Photo sits there on every step, with photos or without. */}
+              <div className="mk-pics">
+                {list.map((y, n) => <button key={n} type="button" className={`mk-pic${shown === y ? " on" : ""}`} aria-expanded={shown === y} aria-label={w("make.stepPhotoN", { k: n + 1, n: k + 1 })} onClick={() => setPicOpen(shown === y ? null : { k, src: y })}><img src={y} alt="" /></button>)}
+                <button type="button" className="mk-photo empty" aria-expanded={open} onClick={toggle} aria-label={w("make.addStepPhoto", { n: k + 1 })}><b>＋</b><span>{w("make.photo")}</span></button>
+              </div>
+              <div className="mk-row">
                 <button type="button" className={`mk-check ${on ? "on" : ""}`} aria-pressed={on} onClick={() => tick(k)}>
                   <span className="mk-box">{on ? "✓" : ""}</span><span>{stepParts(tempsIn(x), stepItems).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</span>
                 </button>
-                {!list.length && <button type="button" className="mk-photo empty" aria-expanded={open} onClick={toggle} aria-label={w("make.addStepPhoto", { n: k + 1 })}><b>＋</b><span>{w("make.photo")}</span></button>}
               </div>
-              {list.length > 0 && <div className="mk-pics">
-                {list.map((y, n) => <button key={n} type="button" className={`mk-pic${shown === y ? " on" : ""}`} aria-expanded={shown === y} aria-label={w("make.stepPhotoN", { k: n + 1, n: k + 1 })} onClick={() => setPicOpen(shown === y ? null : { k, src: y })}><img src={y} alt="" /></button>)}
-                <button type="button" className="mk-photo empty" aria-expanded={open} onClick={toggle} aria-label={w("make.addStepPhoto", { n: k + 1 })}><b>＋</b><span>{w("make.photo")}</span></button>
-              </div>}
               {shown && <div className="mk-pic-open">
                 <img src={shown} alt={w("make.stepPhotoN", { k: list.indexOf(shown) + 1, n: k + 1 })} />
                 <div className="button-row">

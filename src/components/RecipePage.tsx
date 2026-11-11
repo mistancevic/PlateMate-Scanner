@@ -1,4 +1,4 @@
-import { StepPicShown, StepPicSheet, StepPhotosPlace, StepPlayer, CoverVideo } from "./StepPics";
+import { StepPicWide, StepPicSheet, StepPhotosPlace, StepPlayer, CoverVideo } from "./StepPics";
 import { w, wn, wIn, wordV, dateText, mealV, type Val, type WordKey } from "../words";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
@@ -476,9 +476,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               {stale && <StepsHint tone="warn">{w("recipe.stepsForEarlierFoods", { diff: diffLine(stale) })}</StepsHint>}
               {stale && draft && <div className="button-row"><button className="pill pill-small pill-primary" disabled={drafting === "working"} onClick={askDraft}>{w("recipe.writeThemAgain")}</button></div>}
               {meal.stepMarks && <small className="muted">{meal.stepsKitchen || w("recipe.chefStepsFromOriginal")}</small>}
-              <ol className="rp-steps">{own.map((x, k) => [partHead(meal.stepParts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div>
-                {/* DT211 v8 (0.3.53): the step's photo comes from cooking; no + slot here, a tap changes or removes it */}
-                <StepPicShown pic={stepPicOf(meal, x)} k={k} more={Math.max(0, stepPicsOf(meal, x).length - 1)} onOpen={() => setPicAt(k)} /></li>])}</ol>
+              <ol className="rp-steps">{own.map((x, k) => [partHead(meal.stepParts, k), <li key={k}><span>{k + 1}</span>
+                {/* DT281 (0.3.131, board Stories208): the number at the top left; to its right the step's photo, wide, then its words */}
+                <div className="rp-step-col"><StepPicWide pics={stepPicsOf(meal, x)} k={k} onOpen={() => setPicAt(k)} />
+                <div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div></div></li>])}</ol>
               <small className="muted">{w("recipe.photosForTheSteps")}</small>
               {/* DT276 step 3 (0.3.130, board Stories205): several photos at once, then each on its step */}
               <button type="button" className="pill pill-wide rq-add-many" disabled={busy} onClick={() => manyRef.current?.click()}>{w("recipe.addPhotosToTheSteps")}</button>

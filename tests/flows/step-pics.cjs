@@ -34,7 +34,12 @@ seed.meals = [{ id: "m-b", title: "Skyr bowl", items: [{ id: "b1", food: F(/^Sky
     const slots = async () => { const m = (await st()).meals.find((x) => x.id === "m-b"); return m.stepPics || m.stepPicSigs || []; };
     await page.goto(U + "/my-recipes/m-b"); await page.waitForTimeout(1500);
     // ---- the recipe page ----
-    ok(await page.locator(".rq-steps .rq-step-pic img").count() === 1 && (await page.locator(".rq-step-pic .more").textContent()) === "+1", "the recipe page shows step 1's first picture, and +1 for its second");
+    ok(await page.locator(".rq-steps .rq-step-wide img").count() === 1 && /1 of 2/.test(await page.locator(".rq-step-wide-next").textContent()), "the recipe page shows step 1's first picture, and 1 of 2");
+    // DT281 (0.3.131): photo first. The number at the top left, the photo wide to its right, the words under the photo
+    const lay = await page.evaluate(() => { const li = document.querySelector(".rq-steps .rp-steps li"), num = li.querySelector(":scope > span"), pic = li.querySelector(".rq-step-wide-pic"), txt = li.querySelector(".rp-step-text"); const n = num.getBoundingClientRect(), a = pic.getBoundingClientRect(), t = txt.getBoundingClientRect(); return { numLeft: n.right <= a.left, top: Math.abs(n.top - a.top) < 6, under: t.top >= a.bottom - 1, wide: a.width > 250, noPic: document.querySelectorAll(".rq-steps .rp-steps li")[2].querySelector(".rq-step-wide") === null }; });
+    ok(lay.numLeft && lay.top && lay.under && lay.wide && lay.noPic, "DT281: the number at the top left, the photo wide beside it, the words under it; a step with no photo has none: " + JSON.stringify(lay));
+    await page.locator(".rq-step-wide-next").click(); await page.waitForTimeout(200);
+    ok(/2 of 2/.test(await page.locator(".rq-step-wide-next").textContent()), "DT281: 1 of 2 shows the second");
     ok(await page.locator(".rq-on-steps button").count() === 2 && /On the steps/.test(await page.locator(".rq-on-steps").textContent()), "the two step pictures show among the recipe's photos, On the steps");
     // ---- cook mode: one after another ----
     await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(1300);
@@ -52,6 +57,10 @@ seed.meals = [{ id: "m-b", title: "Skyr bowl", items: [{ id: "b1", food: F(/^Sky
     ok(await rows.count() === 3, "Make lists the three steps");
     ok(await rows.nth(0).locator(".mk-pic").count() === 2 && await rows.nth(0).locator(".mk-pic img").first().getAttribute("src") === inCook, "Make's tick list shows both pictures of step 1, the same first one");
     ok(await rows.nth(0).locator(".mk-photo.empty").count() === 1, "step 1 still has + Photo for one more");
+    // DT281 (0.3.131): in Make the photos and + Photo sit above the words, on every step; the tick at the top left
+    const mk = await rows.evaluateAll((a) => a.map((st) => { const pics = st.querySelector(".mk-pics").getBoundingClientRect(), add = st.querySelector(".mk-photo.empty").getBoundingClientRect(), words = st.querySelector(".mk-check > span:last-child").getBoundingClientRect(), box = st.querySelector(".mk-box").getBoundingClientRect();
+      return add.bottom <= words.top && pics.bottom <= words.top + 1 && box.right <= pics.left && box.top >= pics.top && box.bottom <= pics.top + 48 && add.height >= 44 && Math.abs(words.left - pics.left) < 4; }));
+    ok(mk.every(Boolean), "DT281: on every step the photos and + Photo sit above the words, aligned with them; the tick at the top left beside the photos: " + mk.join());
     ok(await rows.nth(1).locator(".mk-photo.empty").count() === 1 && await rows.nth(1).locator(".mk-pic").count() === 0 && await rows.nth(2).locator(".mk-pic").count() === 0, "steps 2 and 3 have no picture and say + Photo");
     // a third photo on step 1: added, nothing replaced, nothing asked
     const before = await picsOf(0);
@@ -85,18 +94,18 @@ seed.meals = [{ id: "m-b", title: "Skyr bowl", items: [{ id: "b1", food: F(/^Sky
     // ---- the recipe page again: the sheet lists them ----
     await page.goto(U + "/my-recipes/m-b"); await page.waitForTimeout(1500);
     ok(await page.locator(".rq-on-steps button").count() === 3, "On the steps shows the three pictures (two of step 1, one of step 2)");
-    await page.locator(".rq-steps .rq-step-pic button").first().click(); await page.waitForTimeout(400);
+    await page.locator(".rq-steps .rq-step-wide-pic").first().click(); await page.waitForTimeout(400);
     const sheet = page.locator(".sp-sheet");
     ok(await sheet.locator(".sp-all button").count() === 2 && /This step's photos/.test(await sheet.textContent()), "the step's sheet lists its two photos");
     await sheet.locator(".sp-all button").nth(1).click(); await page.waitForTimeout(200);
     await sheet.getByRole("button", { name: "Make it first" }).click(); await page.waitForTimeout(400);
     const swapped = await picsOf(0);
     ok(swapped[0] === now[1] && swapped.length === 2, "Make it first from the sheet");
-    await page.locator(".rq-steps .rq-step-pic button").first().click(); await page.waitForTimeout(400);
+    await page.locator(".rq-steps .rq-step-wide-pic").first().click(); await page.waitForTimeout(400);
     await sheet.locator(".sp-all button").nth(1).click(); await page.waitForTimeout(200);
     await sheet.getByRole("button", { name: "Remove this picture" }).click(); await page.waitForTimeout(400);
     const last = await picsOf(0);
-    ok(last.length === 1 && last[0] === swapped[0] && await page.locator(".rq-step-pic .more").count() === 0, "Remove this picture takes the chosen one off; the first stays, no +1");
+    ok(last.length === 1 && last[0] === swapped[0] && await page.locator(".rq-step-wide-next").count() === 0, "Remove this picture takes the chosen one off; the first stays, no +1");
     // ---- Srpski and German ----
     for (const l of ["sr-Latn", "de"]) {
       await page.evaluate((l) => localStorage.setItem("chefmealan-lang", l), l);
