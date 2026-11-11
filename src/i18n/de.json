@@ -22184,6 +22184,14 @@
     "recipe.galleryFull": {
       "text": "Fotos: {max} von {max}, die Galerie ist voll. Lösche eins, um ein neues hinzuzufügen.",
       "checked": true
+    },
+    "plate.photoNotSaved": {
+      "text": "Dieses Foto wurde nicht gespeichert. Nimm es neu auf oder verwirf es.",
+      "checked": true
+    },
+    "photos.notSaved": {
+      "text": "Nicht gespeichert",
+      "checked": true
     }
   }
 }

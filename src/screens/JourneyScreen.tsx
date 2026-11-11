@@ -29,7 +29,7 @@ import { fromMeal, plannedPortion } from "../planned";
 import type { Meal, Food, Ingredient, PlateOpt, StepMark, Feedback } from "../pilot";
 import { canOil, isDrained, libraryId, oilChoices, oilFood } from "../canned";
 import { ownPhotosOf } from "../covers";
-import { recipePhotosOf, withRecipePhotos } from "../photos";
+import { isLooseRef, recipePhotosOf, withRecipePhotos } from "../photos";
 import { pairItems, partsOf, optAt, optToItem, itemToOpt, canLeaveOut, leanFood } from "../parts";
 import { draftSteps } from "../draftSteps";
 import { equipmentOf } from "../personal";
@@ -1624,7 +1624,17 @@ export function JourneyScreen(p: AppApi) {
         ))}
         {/* DT212 v4 (0.3.53, gap 4): Read the photo again, after it asks: the new read replaces the foods and your corrections */}
         {/* DT212 v4 (0.3.53, gap 4): Read the photo again; DT228 v2 (0.3.63, board Stories168): more photos and your words go with it */}
-        {state.photo && p.ai.on && <HelpRead key={state.photo.at + state.photo.image.length} photo={state.photo} incoming={morePhoto}
+        {/* 0.3.133: the plate's photo was not saved: say so, with Retake and Drop the photo */}
+        {state.photo && isLooseRef(state.photo.image) && (
+          <section className="mp-not-saved" role="status">
+            <p>{w("plate.photoNotSaved")}</p>
+            <div className="mp-none-go">
+              <button type="button" className="pill pill-small" onClick={p.mealCamera}>{w("plate.retake")}</button>
+              <button type="button" className="link" onClick={() => setState((s) => ({ ...s, photo: undefined }))}>{w("plate.dropPhoto")}</button>
+            </div>
+          </section>
+        )}
+        {state.photo && p.ai.on && !state.photo.image.startsWith("pf:") && <HelpRead key={state.photo.at + state.photo.image.length} photo={state.photo} incoming={morePhoto}
           read={(more, note) => { const ph = state.photo!; void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true, more, note }); }} />}
         {/* DT228 v2: a food whose kind the read could not tell: Chef Mealan asks once; a tap changes the food, its grams stay */}
         {state.photo?.which && items.some((i) => i.food.name.toLowerCase() === state.photo!.which!.name.toLowerCase()) && (() => {

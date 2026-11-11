@@ -81,7 +81,7 @@ import { clearKept } from "./kept";
 // DT168: which account this phone's data belongs to
 const PHONE_OWNER = "chefmealan-phone-owner";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
-import { photosOf, withPhotos, withoutStored, looseIn, loosePhotosOf, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn, recipePhotosOf, withRecipePhotos, recipeHasPhotos } from "./photos";
+import { logPhoto, photosOf, withPhotos, withoutStored, looseIn, loosePhotosOf, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn, recipePhotosOf, withRecipePhotos, recipeHasPhotos } from "./photos";
 import { needsCover, cardHasPhoto } from "./covers";
 import { itemsOf as itemsOfShared, type SharedRecipe } from "./members";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
@@ -1006,25 +1006,28 @@ export default function App() {
     if (!cloudEnabled || !fr.uid || !fr.ready) return;
     if (fr.running) { fr.again = true; return; }
     fr.running = true;
-    let sent = 0, looseSent = 0;
+    let sent = 0, looseSent = 0, cur = "";
     try {
       do {
         fr.again = false;
         const st = stateRef.current, now = photosOf(st);
         for (const [k, v] of now) {
           if (fr.up.get(k) === sig(v)) continue;
-          await uploadPhoto(fr.uid, fileOf(k), v); fr.up.set(k, sig(v)); saveUp(); sent++;
+          cur = k;
+          await uploadPhoto(fr.uid, fileOf(k), v); fr.up.set(k, sig(v)); saveUp(); sent++; cur = "";
           if (k.startsWith("loose:")) looseSent++;
         }
         for (const k of [...fr.up.keys()]) {
           if (now.has(k) || !isOrphan(k, st)) continue;
           await deletePhotoFile(fr.uid, fileOf(k)); fr.up.delete(k); saveUp();
+          if (k.startsWith("loose:")) logPhoto({ key: k, what: "account-deleted" });
         }
       } while (fr.again);
       if (sent) setCloudStatus({ ok: true, text: wn("app.savedWithPhotos", sent), at: new Date().toISOString() });
       // 0.3.71: a loose photo's file is up: the next save names it in the account's copy in place of the photo
       if (looseSent) setFilesTick((t) => t + 1);
     } catch (e) {
+      if (cur) logPhoto({ key: cur, what: "account-failed", why: explainCloudError(e) });
       setCloudStatus({ ok: true, text: w("app.savedPhotosWhy", { why: explainCloudError(e) }), at: new Date().toISOString() });
     } finally { fr.running = false; }
   };
@@ -1035,14 +1038,14 @@ export default function App() {
     const put: [string, string][] = [];
     for (const [k, v] of now) if (ph.known.get(k) !== sig(v)) { put.push([k, v]); ph.known.set(k, sig(v)); ph.stored.delete(k); }
     const del = [...ph.known.keys()].filter((k) => !now.has(k) && isOrphan(k, st));
-    del.forEach((k) => { ph.known.delete(k); ph.stored.delete(k); });
+    del.forEach((k) => { ph.known.delete(k); ph.stored.delete(k); if (k.startsWith("loose:")) logPhoto({ key: k, what: "phone-deleted" }); });
     if (put.length || del.length) {
       ph.busy = ph.busy.then(async () => {
         await storePut(put); await storeDel(del);
         put.forEach(([k]) => ph.stored.add(k));
         setPhotoCount(ph.known.size);
         try { writeLocal(); } catch { /* the next save tries again */ }
-      }).catch((e) => { console.warn("photo store:", e); /* not confirmed: the photos stay in the saved data */ });
+      }).catch((e) => { console.warn("photo store:", e); put.forEach(([k]) => { if (k.startsWith("loose:")) logPhoto({ key: k, what: "phone-failed", why: String((e as Error)?.message ?? e).slice(0, 120) }); }); /* not confirmed: the photos stay in the saved data */ });
     }
     void syncFiles();
   };
@@ -1082,7 +1085,7 @@ export default function App() {
         for (let i = 0; i < keys.length; i += 6) {
           for (const k of keys.slice(i, i + 6)) {
             const t = k + need.get(k); pr.tries.set(t, (pr.tries.get(t) ?? 0) + 1);
-            try { const d = await downloadPhoto(uid, fileOf(k)); got.set(k, d); accept.add(k); fr.up.set(k, sig(d)); } catch { waiting = true; }
+            try { const d = await downloadPhoto(uid, fileOf(k)); got.set(k, d); accept.add(k); fr.up.set(k, sig(d)); } catch { waiting = true; if (k.startsWith("loose:") && (pr.tries.get(t) ?? 0) >= 3) logPhoto({ key: k, what: "not-in-account" }); }
             if (filesRef.current.uid !== uid) return;
           }
           saveUp(); mergePhotos(got, accept);

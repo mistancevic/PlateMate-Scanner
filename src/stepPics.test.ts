@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { photosOf, photosWanted, withPhotos, withoutStored, isOrphan, stepPicOf, stepPicsOf, galleryOf, placePhoto, makeCover, deletePhoto, addStepPic, removeStepPic, firstStepPic, setStepPic, alignStepPics, allStepPics, stepPicSigsOf, sig } from "./photos";
+import { looseMissing, photosOf, photosWanted, withPhotos, withoutStored, isOrphan, stepPicOf, stepPicsOf, galleryOf, placePhoto, makeCover, deletePhoto, addStepPic, removeStepPic, firstStepPic, setStepPic, alignStepPics, allStepPics, stepPicSigsOf, sig } from "./photos";
 import { clean } from "./records";
 import { stripPhotos } from "./cloud";
 
@@ -131,4 +131,11 @@ test("one gallery: the recipe's own photos first, then the photos only on steps;
   const p6 = { ...p5, ...deletePhoto(p5, B) };
   assert.deepEqual([p6.photo, ...p6.photos], [D]); assert.deepEqual(stepPicsOf(p6, steps[0]).map((x) => x.src), [A]);
   assert.equal(galleryOf(p6).length, 3);
+});
+
+// 0.3.133: a photo named on the phone but not saved here: where it sits, and the log of what happened to photos
+test("missing photos: where each sits, with its time", () => {
+  const s = { photo: { image: "pf:aaa111", more: ["pf:bbb222"], at: "2026-11-11T13:11:00" }, later: [{ id: "l1", at: "2026-11-10T09:00:00", photo: { image: "pf:ccc333" } }], cook: { startedAt: "2026-11-11T12:00:00", ui: { stepPhotos: { "1": "pf:ddd444" } } }, meals: [{ id: "m", photo: "pf:zzz" }] };
+  const m = looseMissing(s);
+  assert.deepEqual(m.map((x) => [x.where, x.key, x.at]), [["photo", "loose:aaa111", "2026-11-11T13:11:00"], ["photo", "loose:bbb222", "2026-11-11T13:11:00"], ["later", "loose:ccc333", "2026-11-10T09:00:00"], ["cook", "loose:ddd444", "2026-11-11T12:00:00"]], "recipes are not loose photos");
 });

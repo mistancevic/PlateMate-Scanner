@@ -22184,6 +22184,14 @@
     "recipe.galleryFull": {
       "text": "Slike: {max} od {max}, galerija je puna. Obriši jednu da dodaš novu.",
       "checked": true
+    },
+    "plate.photoNotSaved": {
+      "text": "Ova slika nije sačuvana. Slikaj ponovo ili je odbaci.",
+      "checked": true
+    },
+    "photos.notSaved": {
+      "text": "Nije sačuvano",
+      "checked": true
     }
   }
 }

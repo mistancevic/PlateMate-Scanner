@@ -39,7 +39,7 @@ import { DeleteCheck } from "../components/DeleteCheck";
 import { HowToRow, HowToScreen } from "../components/HowTo";
 import { openStats, savedDataKb } from "../openStats";
 import { saveStats } from "../cloud";
-import { looseWanted } from "../photos";
+import { looseWanted, looseMissing, photoLog, type MissingPhoto } from "../photos";
 import { useViewAs, setViewAs, viewWord } from "../viewAs";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
@@ -898,9 +898,12 @@ function SupportPanel(p: AppApi) {
 
 // 0.3.71 (Coach Milan 3 November 15:49 to 15:59, Go): Dev data for the account Metrics shows for (the owner), not the superadmin role
 function DevSettings({ p, open }: { p: AppApi; open: (id: "voice" | "dev" | "language") => void }) { return <SettingsList open={open} dev={useMetricsOwner(true)} />; }
-function DevGuard({ p }: { p: AppApi }) { return useMetricsOwner(true) ? <DevData missing={looseWanted(p.state).length} /> : null; }
+function DevGuard({ p }: { p: AppApi }) { return useMetricsOwner(true) ? <DevData missing={looseWanted(p.state).length} where={looseMissing(p.state)} /> : null; }
 // DT231 (0.3.70, board Stories170): what this phone measured and wrote to the account, for the owner only; About keeps the version
-function DevData({ missing }: { missing: number }) {
+const PHOTO_WHERE: Record<string, string> = { photo: "The Plate", cook: "The cook", later: "Saved for later", served: "Served", servedMenus: "A menu photo" };
+const LOGWORD: Record<string, string> = { "phone-failed": "not saved on the phone", "phone-deleted": "taken off the phone", "account-failed": "not sent to the account", "account-deleted": "taken off the account", "not-in-account": "not found in the account" };
+const devTime = (at: string) => { const d = new Date(at); return isNaN(+d) ? at : d.toLocaleString(phoneLoc(), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); };
+function DevData({ missing, where }: { missing: number; where: MissingPhoto[] }) {
   const x = saveStats();
   const at = x.lastAt ? new Date(x.lastAt).toLocaleTimeString(phoneLoc(), { hour: "2-digit", minute: "2-digit" }) : "";
   const block = (title: string, rows: [string, string][]) => (
@@ -919,6 +922,12 @@ function DevData({ missing }: { missing: number }) {
       // 0.3.71: photos the account's copy names that this phone does not hold; one that stays here is not in the account either
       ["Photos named, not on this phone", String(missing)]])}
     {missing > 0 && <p className="small">{w("menu.chefMealanFetchesThemFrom")}</p>}
+    {/* 0.3.133 (Coach Milan 11 November 20:29, Go): where each missing photo sits, and what happened to photos on this phone.
+        Dev data stays in English, as the rest of this page */}
+    {where.length > 0 && <section className="card dev-block dev-missing"><b>Where they are</b><ul>{where.map((x, i) => <li key={i}>{PHOTO_WHERE[x.where] ?? x.where}{x.at ? `, ${devTime(x.at)}` : ""} · {x.key.slice(6, 14)}</li>)}</ul></section>}
+    {(() => { const log = photoLog(); return <section className="card dev-block dev-log"><b>Photos on this phone: what happened</b>
+      {log.length ? <ul>{log.slice(0, 12).map((x, i) => <li key={i}>{devTime(x.at)} · {LOGWORD[x.what]}{x.why ? ` (${x.why})` : ""} · {x.key.slice(0, 5) === "loose" ? x.key.slice(6, 14) : x.key}</li>)}</ul>
+        : <small className="muted">Nothing went wrong since 0.3.133.</small>}</section>; })()}
     {block("The app", [["Version", (import.meta.env.VITE_VERSION as string | undefined) || "0"], ["Commit", (import.meta.env.VITE_COMMIT as string | undefined) || "preview"]])}
     <DeployBlock />
   </>);

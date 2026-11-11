@@ -109,6 +109,8 @@
   "plate.addToMine": "Add to my plate",
   "plate.startNew": "Start a new plate",
   "plate.dropPhoto": "Drop the photo",
+  "plate.photoNotSaved": "This photo was not saved. Retake it, or drop it.",
+  "photos.notSaved": "Not saved",
   "plate.keepMine": "Keep my plate",
   "plate.addOrNewHelp": "Add to my plate: the new foods join yours, and the plate keeps its name. Start a new plate: only the new foods.",
   "plate.addOrNewHelpPhoto": "Add to my plate: the new foods join yours, marked ~, and the plate keeps its name. Start a new plate: only the new foods.",
