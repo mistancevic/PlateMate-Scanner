@@ -1,6 +1,7 @@
 // 0.3.133 (Coach Milan 11 November 20:17 to 20:29, Go): a photo named on the phone but not saved here (in his data: the plate
 // from 13:11, five photos in all). Every such image shows a plain picture that says Not saved, never a broken image. The
 // Plate says "This photo was not saved. Retake it, or drop it." with both buttons, and does not offer to read it again.
+// 0.3.136: a photo from another day says its day; Drop the photo is a button.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -18,7 +19,7 @@ const PORT = "3495", U = `http://127.0.0.1:${PORT}`;
     const ctx = await b.newContext({ viewport: { width: 390, height: 1300 }, timezoneId: "Europe/Berlin" });
     const page = await ctx.newPage(); page.on("pageerror", (e) => errs.push(e.message));
     await page.clock.install({ time: new Date("2026-11-11T20:17:00+01:00") });
-    const s = { ...seed, title: "", photo: { image: "pf:8z1abcde2fgh3ijk", more: ["pf:9y2bcdef3ghi4jkl"], at: "2026-11-11T13:11:00+01:00", who: "idea", unsure: null, which: null }, pick: "exploring", plateAt: "2026-11-11T13:11:00+01:00" };
+    const s = { ...seed, title: "", photo: { image: "pf:8z1abcde2fgh3ijk", more: ["pf:9y2bcdef3ghi4jkl"], at: "2026-10-28T13:11:00+01:00", who: "now", unsure: null, which: null }, pick: "exploring", plateAt: "2026-10-28T13:11:00+01:00" };
     await page.addInitScript(({ s, lang }) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
       localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" }));
       localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z" }));
@@ -33,6 +34,9 @@ const PORT = "3495", U = `http://127.0.0.1:${PORT}`;
     ok(await card.count() === 1 && /^This photo was not saved\. Retake it, or drop it\./.test((await card.textContent()).trim()), "the Plate says: This photo was not saved. Retake it, or drop it.");
     ok(await card.getByRole("button", { name: "📷 Retake" }).count() === 1 && await card.getByRole("button", { name: "Drop the photo" }).count() === 1 && await card.locator("button").evaluateAll((a) => a.every((x) => x.getBoundingClientRect().height >= 44)), "Retake and Drop the photo, 44 px or more");
     ok(await page.getByRole("button", { name: /Help Chef Mealan read it/ }).count() === 0, "no offer to read a photo that is not there");
+    // 0.3.136: a photo from another day says its day; Drop the photo is a button like Retake
+    ok(/28 October, 13:11/.test(await page.locator("main").textContent()), "the photo from 28 October says 28 October, 13:11, not only 13:11");
+    ok(await card.getByRole("button", { name: "Drop the photo" }).evaluate((b) => b.classList.contains("pill")), "Drop the photo is a button, the same kind as Retake");
     // never a broken image: every picture of a photo not saved says Not saved
     await page.locator(".mp-line").click().catch(() => {}); await page.waitForTimeout(800);
     const imgs = await page.evaluate(() => [...document.querySelectorAll("img")].map((i) => ({ src: i.getAttribute("src") || "", ok: i.complete && i.naturalWidth > 0 })));

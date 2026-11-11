@@ -174,13 +174,18 @@ export async function saveCloud(uid: string, data: CloudDoc, opts?: { onlyChange
   const doMain = !opts?.onlyChanged || last?.main !== sigMain, doPriv = Boolean(priv) && (!opts?.onlyChanged || last?.priv !== sigPriv);
   if (!doMain && !doPriv) { noteSave(0, true); return; }
   const b = writeBatch(db());
-  if (priv && doPriv) b.set(privateRef(uid), priv, { merge: true });
+  // 0.3.136 (Coach Milan 11 November 23:28, Go; a dropped photo and an ended cook came back after every reload): each field of
+  // the private part is written whole. A merge kept every key the phone had removed (a plate's photo, a cook), and the next
+  // opening took them back from the account. Fields this save does not carry stay as they are.
+  if (priv && doPriv) b.set(privateRef(uid), priv, { mergeFields: wholeFields(priv) });
   // a part not written keeps its older time, so the part written is the newer copy and loads first (mergeLoad)
   if (doMain) b.set(doc(db(), "users", uid), { ...main, ...Object.fromEntries(drop.map((k) => [k, deleteField()])) }, { merge: true });
   await b.commit();
   saved.set(uid, { main: sigMain, priv: sigPriv });
   noteSave((doMain ? bytesOf(main) : 0) + (priv && doPriv ? bytesOf(priv) : 0), false);
 }
+// the fields a save writes whole: every field it carries a value for
+export const wholeFields = (x: Record<string, unknown>) => Object.keys(x).filter((k) => x[k] !== undefined);
 // what this phone last wrote to each account, as text without the time of the save
 const saved = new Map<string, { main: string; priv: string }>();
 export const forgetSaved = (uid?: string) => { if (uid) saved.delete(uid); else saved.clear(); };

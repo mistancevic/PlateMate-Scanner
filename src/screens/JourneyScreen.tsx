@@ -1166,7 +1166,9 @@ export function JourneyScreen(p: AppApi) {
   const [plusAsk, setPlusAsk] = useState(false);
   // DT130: Put it in my plan, for an idea: the day and the meal picked in two rows of chips
   const [ideaPlan, setIdeaPlan] = useState<{ date: string; slotId: string } | null>(null);
-  const photoTime = (iso: string) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+  // 0.3.136 (Coach Milan 11 November 23:16): a photo from another day says its day ("28 October, 13:11"), not only the time
+  const photoTime = (iso: string) => { const d = new Date(iso), hm = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    return d.toDateString() === new Date().toDateString() ? hm : `${dateText(d, { day: "numeric", month: "long" })}, ${hm}`; };
   const bigN = tooBig && share && !imported && !madeBy ? mealsOn(t.calories ?? 0, sizeRef ?? share.kcal) : 0;
   const bigPlate = bigN > 0 && bigKept !== dishSig;
   const mealsWord = mealsW;
@@ -1630,7 +1632,7 @@ export function JourneyScreen(p: AppApi) {
             <p>{w("plate.photoNotSaved")}</p>
             <div className="mp-none-go">
               <button type="button" className="pill pill-small" onClick={p.mealCamera}>{w("plate.retake")}</button>
-              <button type="button" className="link" onClick={() => setState((s) => ({ ...s, photo: undefined }))}>{w("plate.dropPhoto")}</button>
+              <button type="button" className="pill pill-small" onClick={() => setState((s) => ({ ...s, photo: undefined }))}>{w("plate.dropPhoto")}</button>
             </div>
           </section>
         )}

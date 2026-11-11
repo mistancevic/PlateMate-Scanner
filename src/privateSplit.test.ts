@@ -90,3 +90,23 @@ test("DT172: without body data shared, the coach's view has the trend in percent
   const shared = splitSave({ ...data, personal: { ...data.personal, coachShare: { on: { body: "2026-10-30T15:00:00Z" }, off: [] } } }, false).main.coachView as any;
   assert.equal(shared.weightKg, 85); assert.equal(shared.weighIns.length, 9); assert.equal(shared.weightTrend, null);
 });
+
+// 0.3.136 (Coach Milan 11 November 23:28): a dropped photo and an ended cook came back after every reload. The private part was
+// written with a merge, which keeps every key the phone removed. It is written field by field, whole, now.
+test("the private part is written whole: a key the phone removed leaves the account too", async () => {
+  const { wholeFields } = await import("./cloud");
+  // Firestore with ignoreUndefinedProperties: a merge keeps what the new data leaves out; mergeFields replaces each field named
+  const deepMerge = (a: any, b: any): any => { if (!b || typeof b !== "object" || Array.isArray(b)) return b; const out = { ...(a && typeof a === "object" && !Array.isArray(a) ? a : {}) }; for (const k of Object.keys(b)) if (b[k] !== undefined) out[k] = deepMerge(out[k], b[k]); return out; };
+  const fieldsWhole = (a: any, b: any, fields: string[]) => { const out = { ...a }; for (const f of fields) out[f] = JSON.parse(JSON.stringify(b[f])); return out; };
+  const account = { state: { items: [], photo: { image: "pf:old" }, cook: { id: "c1" } }, personal: { sex: "male" }, safety: { none: true }, updatedAt: "t1" };
+  const save = { state: { items: [], photo: undefined, cook: undefined }, personal: { sex: "male" }, updatedAt: "t2" };
+  const merged = deepMerge(account, save);
+  assert.ok(merged.state.photo && merged.state.cook, "a merge kept the dropped photo and the ended cook: the fault");
+  const whole = fieldsWhole(account, save, wholeFields(save as any));
+  assert.equal(whole.state.photo, undefined, "written whole: the photo is gone from the account");
+  assert.equal(whole.state.cook, undefined, "written whole: the cook is gone from the account");
+  assert.deepEqual(whole.safety, { none: true }, "a field this save does not carry stays as it is");
+  assert.deepEqual(wholeFields({ a: 1, b: undefined, c: null } as any), ["a", "c"], "a field without a value is not named");
+  const src = fs.readFileSync(new URL("./cloud.ts", import.meta.url), "utf8");
+  assert.ok(/b\.set\(privateRef\(uid\), priv, \{ mergeFields: wholeFields\(priv\) \}\)/.test(src) && !/b\.set\(privateRef\(uid\), priv, \{ merge: true \}\)/.test(src), "the save writes the private part with mergeFields");
+});
