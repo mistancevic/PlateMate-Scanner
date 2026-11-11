@@ -22200,6 +22200,30 @@
     "steps.takeOutAria": {
       "text": "Izvadi {food} iz koraka",
       "checked": true
+    },
+    "yourcooks.tapToOpen": {
+      "text": "Dodirni sliku da otvoriš to kuvanje: slike, namirnice, kakav je bio ukus, tvoje reči.",
+      "checked": true
+    },
+    "yourcooks.openCook": {
+      "text": "Otvori kuvanje od {date}",
+      "checked": true
+    },
+    "yourcooks.yourWords": {
+      "text": "Tvoje reči:",
+      "checked": true
+    },
+    "recipe.addToRecipePhotos": {
+      "text": "Dodaj među slike recepta",
+      "checked": true
+    },
+    "recipe.addToRecipePhotosWhy": {
+      "text": "Ide u galeriju recepta. Naslovna se bira tamo.",
+      "checked": true
+    },
+    "recipe.inRecipePhotos": {
+      "text": "Među slikama recepta",
+      "checked": true
     }
   }
 }

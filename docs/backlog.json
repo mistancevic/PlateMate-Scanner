@@ -914,7 +914,9 @@
       "id": "DT282",
       "title": "Your cooks: a tap on a cook's photo opens that cook; Add to the recipe's photos",
       "epic": "recipes",
-      "state": "next",
+      "state": "done",
+      "board": "Stories209",
+      "version": "0.3.135",
       "why": "Coach Milan 11 November 20:45 to 20:46, on a call with a tester: the Your cooks block looks clickable and leads nowhere. A tap on a cook's photo opens that cook (as a past meal from Plan); Add to the recipe's photos puts it in the gallery; the row of offered photos goes. To draw."
     }
   ]
