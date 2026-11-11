@@ -30,6 +30,21 @@ export function StepPicShown({ pic, k, onOpen, more = 0 }: { pic: StepPic | null
     </div>
   );
 }
+// DT281 (0.3.131, board Stories208; Coach Milan 11 November 08:12 to 17:39, Go): photo first. On the recipe page a step's
+// photo comes before its words, wide, as in a post: see it, then read what to do. Two or more: 1 of 2 shows the next one.
+// A tap on the photo opens the step's photos. A step with no photo shows nothing here, so it reads as it always did.
+export function StepPicWide({ pics, k, onOpen }: { pics: StepPic[]; k: number; onOpen: () => void }) {
+  const [n, setN] = useState(0);
+  if (!pics.length) return null;
+  const i = Math.min(n, pics.length - 1), pic = pics[i];
+  return (
+    <div className="rq-step-wide">
+      <button type="button" className="rq-step-wide-pic" onClick={onOpen} aria-label={w("steppics.changeOrRemoveThePhoto", { n: k + 1 })}><img src={pic.src} alt="" /></button>
+      {pics.length > 1 && <button type="button" className="rq-step-wide-next" aria-label={w("cookmode.nextPhoto")} onClick={() => setN((i + 1) % pics.length)}>{w("cookmode.picNOf", { k: i + 1, n: pics.length })} ›</button>}
+      {pic.by === "ai" && <small className="rq-step-wide-ai">{w("steppics.aiBeta")}</small>}
+    </div>
+  );
+}
 // the picture beside a step on the recipe, or the place to add one
 export function StepPicSlot({ pic, k, onOpen }: { pic: StepPic | null; k: number; onOpen: () => void }) {
   return (

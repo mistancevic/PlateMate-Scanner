@@ -891,6 +891,23 @@
       "epic": "plate",
       "state": "later",
       "why": "docs/qa/blind/2026-11-10-jelena-first-run. Finding 1 (a new plate overwrote a Served plate) is fixed, 0.3.126. Findings 2 to 4 are one problem: the app never offers someone else's plate where it asks. To draw."
+    },
+    {
+      "id": "DT281",
+      "title": "Photo first on the steps: the recipe page and Make",
+      "epic": "recipes",
+      "state": "done",
+      "board": "Stories208",
+      "why": "Coach Milan 11 November 08:12 to 17:39, Go: see the photo first, then read what to do, as on social media. The number or the tick stays at the top left; the photos, then the words. In Make, + Photo sits above the words on every step. Members do not get step photos today, so this is your own recipe page only.",
+      "version": "0.3.131"
+    },
+    {
+      "id": "DT280",
+      "title": "One gallery for the recipe: the cover and the step photos in one place",
+      "epic": "recipes",
+      "state": "next",
+      "board": "Stories207",
+      "why": "Coach Milan 11 November 07:46 to 17:39: the cover choice was unclear and there were two galleries. To redraw as one gallery (every photo, a step number on step photos, the first is the cover, one sheet: Make it the cover, On step, Delete), 24 photos per recipe. Includes the line above Save on Photos on the steps."
     }
   ]
 }

@@ -61,7 +61,7 @@ seed.meals = [{ id: "m-b", title: "Skyr bowl", items: [{ id: "b1", food: F(/^Sky
     await sheet.getByRole("button", { name: "Save the photos" }).click(); await page.waitForTimeout(900);
     ok(await page.locator(".spp").count() === 0 && await onStep(0) === 3 && await onStep(1) === 1 && await onStep(2) === 0, "Save: step 1 has three pictures (its own and two new), step 2 one, step 3 none");
     ok(await gallery() === 2, "the two on no step are in the recipe's photos: " + await gallery());
-    ok(await page.locator(".rq-on-steps button").count() === 4 && (await page.locator(".rq-step-pic .more").first().textContent()) === "+2", "the recipe page shows them: four On the steps, +2 on step 1");
+    ok(await page.locator(".rq-on-steps button").count() === 4 && /1 of 3/.test(await page.locator(".rq-step-wide-next").first().textContent()), "the recipe page shows them: four On the steps, 1 of 3 on step 1");
     // ---- Cancel saves nothing ----
     await pick(files(2, 20));
     await page.locator(".spp").getByRole("button", { name: "Cancel" }).click(); await page.waitForTimeout(400);
