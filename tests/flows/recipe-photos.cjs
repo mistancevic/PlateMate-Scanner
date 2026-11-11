@@ -60,7 +60,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   ok(await tile("Eggs, Milk").locator("img").count() === 0, "R4: a removed cover never comes back from the page");
   // Add twice; the second photo moves to first place and becomes the cover
   await tile("Eggs, Milk").click(); await page.waitForTimeout(400);
-  const add = page.locator('.rq input[type="file"]');
+  const add = page.locator('.rq input[type="file"]:not([multiple])');
   await add.setInputFiles(PLATE); await page.waitForTimeout(800);
   await add.setInputFiles(FRONT); await page.waitForTimeout(800);
   ok(await page.locator(".rq-thumbs .publish-photo:not(.add)").count() === 2, "R8: Add adds a photo, twice");
