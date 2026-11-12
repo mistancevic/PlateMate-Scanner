@@ -39,6 +39,8 @@ history = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join(
     ("Live on", "GitHub Pages: GitHub builds the page from the code in the repo and hosts it at mistancevic.github.io/platemate. It runs in the browser only, no server. Limited use, not a real app.")], "#7f8c8d"),
   stage("2", "A scanner in Google AI Studio", "21 to 28 September", [
     ("What", "Nutrition XP Scanner: Gemini reads a label and scores protein against calories. Renamed Chef Mealan on 22 September."),
+    ("Why AI Studio", "Gemini was built in, and the camera worked natively on Milan's Android phone."),
+    ("Why it was left", "Changes were not reliable: a small UI change rewrote the logic or added things nobody asked for, and worse once the Pro model was gone. The code moved to GitHub, but working in AI Studio and pulling the code back into it stayed slow, so AI Studio was dropped."),
     ("Built with", "Google AI Studio, then ChatGPT Codex (a pull request), then Claude from 23 September."),
     ("Data", "Airtable for scanned foods and the starter foods; then Firebase sign-in and Firestore, set up by AI Studio from a prompt."),
     ("Live on", "platemate.ai.studio: AI Studio took the code from GitHub, built it and ran it on Cloud Run with a server for the Gemini key. AI Studio was connected to GitHub: it saw each change pushed there and updated the app.")], "#e67e22"),
