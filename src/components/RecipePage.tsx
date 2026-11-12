@@ -711,7 +711,7 @@ function GoodFor({ meal, cards, onPatch }: { meal: Meal; cards: Feedback[]; onPa
   return (
     <section className="card rq-goodfor" aria-label={w("recipe.goodFor")}>
       <b>{w("recipe.goodFor")}</b>
-      <div className="rq-goodfor-chips">{MEAL_KINDS.map((k) => <button key={k} type="button" className={`pill pill-small${on.has(k) ? " pill-primary" : ""}`} aria-pressed={on.has(k)} onClick={() => toggle(k)}>{on.has(k) ? "✓ " : ""}{mealName(k.charAt(0).toUpperCase() + k.slice(1))}</button>)}</div>
+      <div className="rq-goodfor-chips">{MEAL_KINDS.map((k) => <button key={k} type="button" className={`choice${on.has(k) ? " on" : ""}`} aria-pressed={on.has(k)} onClick={() => toggle(k)}>{on.has(k) ? "✓ " : ""}{mealName(k.charAt(0).toUpperCase() + k.slice(1))}</button>)}</div>
       <small className="muted">{w(s?.from === "yours" ? "recipe.goodForYours" : "recipe.goodForGuess")}</small>
     </section>
   );

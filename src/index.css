@@ -3309,4 +3309,4 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 /* DT290 (0.3.144, board Stories217): Good for on the recipe */
 .rq-goodfor { display: flex; flex-direction: column; gap: 8px; }
 .rq-goodfor-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.rq-goodfor-chips .pill-small { min-height: 44px; height: auto; }
+.rq-goodfor-chips .choice { min-height: 44px; height: auto; flex-direction: row; padding: 0 14px; }
