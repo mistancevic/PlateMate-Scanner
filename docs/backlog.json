@@ -1061,8 +1061,9 @@
       "id": "DT290",
       "title": "Fill the open slots knows which dishes suit which meal",
       "epic": "chef",
-      "state": "later",
-      "why": "Found while building DT287 (12 November): the ranking looks at PD, the slot's size and the week, not at the kind of meal, so beans and rice can come for breakfast. Learn it from where a recipe was eaten or planned before, and from the starters' meal."
+      "state": "next",
+      "why": "Found while building DT287 (12 November): the ranking looks at PD, the slot's size and the week, not at the kind of meal, so beans and rice can come for breakfast. Learn it from where a recipe was eaten or planned before, and from the starters' meal. Drawn 12 November 17:10 (Stories217): learned from where it was eaten or planned, the starters and its foods; Fill keeps to it; Good for on the recipe, yours wins. Waits for Go.",
+      "board": "Stories217"
     }
   ]
 }
