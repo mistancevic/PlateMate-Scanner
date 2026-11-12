@@ -34,33 +34,32 @@ def stage(n, title, when, items, color):
             f'<div style="font-size:13px;font-weight:800;color:{color};margin-top:4px">{e(when)}</div>{rows}</div>')
 history = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join([
   stage("1", "PlateMate, the capstone", "End of August to September 2026", [
-    ("What", "Milan's project for Product Faculty's AI product management certification: the four Ds, after discovery calls on healthy and fake high-protein meals."),
+    ("What", "Milan's course project for Product Faculty's AI product management certificate."),
     ("Built with", "Claude Code."),
-    ("Live on", "GitHub Pages: GitHub builds the page from the code in the repo and hosts it at mistancevic.github.io/platemate. It runs in the browser only, no server. Limited use, not a real app.")], "#7f8c8d"),
+    ("Live on", "GitHub Pages: GitHub turns the code into a web page and hosts it. No server, so it stayed a small app.")], "#7f8c8d"),
   stage("2", "A scanner in Google AI Studio", "21 to 28 September", [
-    ("What", "Nutrition XP Scanner: Gemini reads a label and scores protein against calories. Renamed Chef Mealan on 22 September."),
-    ("The method", "The second round of PlateMate, a bigger flow for a real app: Product Faculty's four Ds, expanded with Milan's own Worth Building playbook (six decisions) as the way to implement it. So the playbook is tested on his own case."),
-    ("Why AI Studio", "Gemini was built in, and the camera worked natively on Milan's Android phone."),
-    ("Why it was left", "Changes were not reliable: a small UI change rewrote the logic or added things nobody asked for, and worse once the Pro model was gone. The code moved to GitHub, but working in AI Studio and pulling the code back into it stayed slow, so AI Studio was dropped."),
-    ("Built with", "Google AI Studio, then ChatGPT Codex (a pull request), then Claude from 23 September."),
-    ("Data", "Airtable for scanned foods and the starter foods; then Firebase sign-in and Firestore, set up by AI Studio from a prompt."),
-    ("Tested in", "A GitHub Codespace, before chefmealan.com: the app built from the code on GitHub and run on a computer in GitHub's cloud, on a temporary link only Milan could open."),
-    ("Live on", "platemate.ai.studio: AI Studio took the code from GitHub, built it and ran it on Cloud Run with a server for the Gemini key. AI Studio was connected to GitHub: it saw each change pushed there and updated the app.")], "#e67e22"),
+    ("The method", "Round two of PlateMate, now as a real app. Product Faculty's four steps plus Milan's own Worth Building playbook, so the playbook gets tested on his own case."),
+    ("Why AI Studio", "Gemini was built in, and the camera just worked on Milan's Android phone."),
+    ("Why it was left", "Small changes broke other parts or added things nobody asked for. It got worse when the Pro model went away. The code moved to GitHub, but syncing it back stayed slow, so AI Studio went."),
+    ("Built with", "AI Studio, then ChatGPT Codex, then Claude from 23 September."),
+    ("Data", "Airtable for scanned foods and starter foods, then Firebase sign-in and Firestore."),
+    ("Tested in", "A GitHub Codespace: the app running from the code on GitHub, on a private link."),
+    ("Live on", "platemate.ai.studio. AI Studio picked up each change from GitHub.")], "#e67e22"),
   stage("3", "Own production, from a terminal", "29 September to 2 November", [
-    ("Live on", "chefmealan.com from 30 September: Cloud Run in Milan's own Google project, his own Gemini key."),
-    ("Goes live by", "One command in Google Cloud Shell, the terminal in the browser. From 7 October: preview first, then promote, rollback in one command."),
-    ("Staging or preview", "Milan asked for a staging environment, as in his product teams, to test the latest work without touching the beta testers. Chosen as the quick start: a preview on the same accounts and data; a staging with its own database once the app grows beyond friends."),
-    ("To the phone", "When Cloud Shell joined the process for these releases, it would not start on the Chromebook: it never got past the sign-in that opens the terminal. On the phone the same Cloud Shell opened at once, so the releases were run from the phone from then on."),
-    ("Chat before code", "The work began in Claude Code, but it built an idea before it was talked through, and it had no copy or read aloud. So the talk moved to chats in a Claude Project, to plan first, as a planning mode does. Soon all the work ran there. This is where Brainstorm, Draw and Go come from."),
-    ("When a chat fills up", "A long chat ran out of room and drifted from what had been agreed. Milan had to start a new chat and knew it needed a handover to carry one bigger topic on. Claude suggested a handover document in the Claude Project that the next chat reads first: from 24 October, kept up to date at every step."),
-    ("Way of working", "Version numbers from 2 October; boards on the canvas before code; the five-step release rule (23 October); the Kanban (2 November).")], "#1a73e8"),
+    ("Live on", "chefmealan.com from 30 September, on Milan's own Google Cloud."),
+    ("Goes live by", "One command in Cloud Shell, Google's terminal in the browser. From 7 October: preview first, then promote."),
+    ("To the phone", "Cloud Shell wouldn't start on the Chromebook. On the phone it opened right away, so releases moved to the phone."),
+    ("Staging or preview", "Milan asked for staging, like in his product teams. We started with a preview on the same data; a real staging comes when more people join."),
+    ("Chat before code", "Claude Code started building before an idea was talked through. So the talks moved to chats in a Claude Project: plan first, then build. That's where Brainstorm, Draw and Go come from."),
+    ("When a chat fills up", "Long chats filled up and began to drift. Milan started the next chat with a handover prompt. Along the way it became a handover document in the Project, first dated 24 October. Every new chat starts from it."),
+    ("Way of working", "Version numbers from 2 October, boards before code, the release steps on 23 October, the Kanban on 2 November.")], "#1a73e8"),
   stage("4", "Green buttons on GitHub", "From 3 November", [
     ("Why", "Cloud Shell's weekly hours ran out, and the Chromebook was away."),
-    ("Goes live by", "Preview, Promote and Rollback as GitHub Actions: Run workflow, the green button on the GitHub web page, opened from a link in the chat. GitHub signs in to Google with no key.")], "#24292f"),
+    ("Goes live by", "Three buttons on GitHub: Preview, Promote and Rollback. Milan taps Run workflow on the GitHub page. No keys needed.")], "#24292f"),
   stage("5", "A phone only, today", "November 2026", [
-    ("Goes live by", "The same buttons in the GitHub app on the phone."),
-    ("Added", "Srpski and German in every release (5 November); blind runs with a scripted new member (10 November); clickable prototypes (12 November)."),
-    ("Laptop", "In repair. Nothing in the cycle needs it.")], "#c0392b"),
+    ("Goes live by", "The same buttons, in the GitHub app on the phone."),
+    ("Added", "Srpski and German in every release, test runs with a scripted new user, clickable prototypes."),
+    ("Laptop", "In repair. Nothing needs it.")], "#c0392b"),
 ]) + '</div>'
 
 legend = '<div style="display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:10px">' + "".join(tag(k) for k in WHO) + '</div>'
@@ -117,13 +116,13 @@ body = (f'<div style="width:{W}px;box-sizing:border-box;padding:22px 26px;backgr
   f'<div style="font-size:30px;font-weight:900;line-height:1.2">How Chef Mealan is built, from a phone</div>'
   f'<div style="font-size:16px;line-height:1.5;color:#3d4a63;margin-top:6px;max-width:1300px">A production app built as a product team would build it, by one product manager and Claude. Coach Milan works on his phone only. Everything else runs in the cloud: Claude, GitHub and Google. As of {F["version"]}, 12 November 2026.</div>'
   + legend + '<div style="margin-top:16px">' + factrow + '</div>'
-  + section("How we got here", "From a course project to a production app in about ten weeks. The code moved from AI Studio to Claude; going live moved from a terminal to buttons on GitHub. Milan moved from the Chromebook to the phone because Cloud Shell would not start on the Chromebook and opened at once on the phone.", history)
+  + section("How we got here", "From a course project to a live app in about ten weeks. The code moved from AI Studio to Claude. Releases moved from a terminal to buttons on GitHub. And Milan moved from the Chromebook to his phone, because Cloud Shell only worked there.", history)
   + section("One change, from idea to live, today", "Ten steps, the same for every change. Steps 1 to 5 decide what to build; steps 6 to 10 build it and put it live. Nothing is built before Go, and nothing goes live without Milan's tap.", loop1 + loop2 + loopnote)
   + section("The tools, and where each runs", "Nothing runs on a laptop. Every tool is opened from the phone, or runs in the cloud on Claude's side or Google's.", tools)
   + section("A course setup, and this project", "The Turing College course Building with AI agents teaches a laptop setup. This project does the same cycle without one.", compare)
   + section("The app, as it runs", "Four parts. The person's phone holds the app and their data first; the server holds the AI key and the rules.", app)
   + '</div>')
-H = 3450
+H = 3260
 page = f'''<!doctype html>
 <html lang="en">
 <head>
