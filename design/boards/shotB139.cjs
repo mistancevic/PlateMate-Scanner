@@ -47,9 +47,9 @@ const mark = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px", 
     const row = t.closest(".log-card"); row.style.cssText += ";" + mark; row.insertAdjacentHTML("beforeend", '<small style="display:block;margin-top:6px;font-size:14px;color:#1f5fc7;font-weight:800">Tap to change or delete it ›</small>');
     const all = [...document.querySelectorAll("body *")].filter((e) => /^Logged, as planned/.test((e.textContent || "").trim()));
     const toast = all[all.length - 1]; console.log("toast", toast && toast.outerHTML.slice(0, 200));
-    if (toast) { toast.textContent = "Logged, as planned. "; toast.insertAdjacentHTML("beforeend", '<button class="link" style="min-height:44px;font-weight:900;margin-left:8px;text-decoration:underline">Undo</button>'); toast.style.cssText += ";" + mark; } }, { mark });
-  await noteAt(p, "New, after the tap: Undo in the message, for a wrong tap. In Today's meals the ✓ shows on what is done, and the meal opens to change or delete it.", "#done0");
-  await p.evaluate(() => window.scrollTo(0, document.querySelector("#done0").getBoundingClientRect().top + window.scrollY - 420)); await p.waitForTimeout(300);
+    if (toast) { toast.textContent = "Logged, as planned. "; toast.insertAdjacentHTML("beforeend", '<button class="pill pill-small" style="min-height:44px;margin-left:10px;background:#fff;border:1.5px solid #2a72d9;color:#1f5fc7;font-weight:800;padding:0 16px">Undo</button>'); toast.style.cssText += ";" + mark + ";display:flex;align-items:center"; } }, { mark });
+  await noteAt(p, "New, after the tap: the message at the top says Logged, as planned, with an Undo button, for a wrong tap. Below, in Today's meals, the ✓ shows on what is done, and the meal opens to change or delete it.", "#done0");
+  await p.evaluate(() => window.scrollTo(0, document.querySelector("#done0").getBoundingClientRect().top + window.scrollY - 470)); await p.waitForTimeout(300);
   await p.screenshot({ path: `${R}/rb139c.png` }); console.log("shot rb139c");
   // the meal it opens: the same screen as DT284, with Change it and Delete this meal
   await p.goto(U + "/my-recipes/sarma"); await p.waitForTimeout(1500);
@@ -58,8 +58,9 @@ const mark = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px", 
   await p.evaluate(({ mark }) => { const b = document.querySelector(".past-meal .pm-back"); if (b) b.textContent = "‹ Today";
     const h = document.querySelector("header h1"); if (h) h.textContent = "Today";
     const nb = [...document.querySelectorAll(".bottom-nav button")]; const on = nb.find((x) => x.classList.contains("on") || x.getAttribute("aria-current")); const td = nb.find((x) => /Today/.test(x.textContent));
-    if (on && td && on !== td) { for (const a of ["class", "aria-current"]) { const v1 = on.getAttribute(a), v2 = td.getAttribute(a); if (v2 === null) on.removeAttribute(a); else on.setAttribute(a, v2); if (v1 === null) td.removeAttribute(a); else td.setAttribute(a, v1); } } const e = document.querySelector(".past-meal .pm-edit"); if (e) e.style.cssText += ";" + mark + ";padding:6px"; }, { mark });
-  await noteAt(p, "New: the eaten meal, opened from Today: the same screen as from the recipe (DT284). Change it, or Delete this meal with Sure? first. Back goes to Today.", ".past-meal");
+    if (on && td && on !== td) { for (const a of ["class", "aria-current"]) { const v1 = on.getAttribute(a), v2 = td.getAttribute(a); if (v2 === null) on.removeAttribute(a); else on.setAttribute(a, v2); if (v1 === null) td.removeAttribute(a); else td.setAttribute(a, v1); } } const e = document.querySelector(".past-meal .pm-edit"); if (e) e.style.cssText += ";" + mark + ";padding:6px";
+    const d = document.querySelector(".past-meal .pm-delete"); if (d) { d.className = "pill pill-wide"; d.style.cssText = "min-height:48px;background:#fff;border:1.5px solid #b3261e;color:#b3261e;font-weight:800;margin-top:10px"; } }, { mark });
+  await noteAt(p, "New: the eaten meal, opened from Today: the same screen as from the recipe (DT284). Change it, the main button. Delete this meal is a button too, white with a red border; Sure? first. Back goes to Today.", ".past-meal");
   await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(300);
   await p.screenshot({ path: `${R}/rb139d.png` }); console.log("shot rb139d"); await p.context().close();
   await b.close(); server.kill();

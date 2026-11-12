@@ -1037,15 +1037,15 @@
       "title": "A ✓ only on what is done; I ate it on the right; a wrong I ate it fixed from Today",
       "epic": "home",
       "state": "next",
-      "why": "Coach Milan 12 November 14:02, with a screenshot of Today: the blue I ate it with a ✓ reads as already done, though it is the button to tap. The ✓ sits on I ate it in Next and What's in the plan on Today and on the recipe page. Suggested: no ✓ on a button still to tap; a ✓ only once done. 14:06: draw first, to agree on the look. Drawn 12 November (Stories214): no ✓ on a button to tap; ✓ Eaten, by the plan once done. 14:22 and 14:25: the main button on the right, Undo after the tap, and the eaten meal opens from Today with Change it and Delete this meal. Redrawn. Waits for Go.",
+      "why": "Coach Milan 12 November 14:02, with a screenshot of Today: the blue I ate it with a ✓ reads as already done, though it is the button to tap. The ✓ sits on I ate it in Next and What's in the plan on Today and on the recipe page. Suggested: no ✓ on a button still to tap; a ✓ only once done. 14:06: draw first, to agree on the look. Drawn 12 November (Stories214): no ✓ on a button to tap; ✓ Eaten, by the plan once done. 14:22 and 14:25: the main button on the right, Undo after the tap, and the eaten meal opens from Today with Change it and Delete this meal. 14:34 and 14:36: actions are buttons, not text; Undo and Delete this meal drawn as buttons. Redrawn. Waits for Go.",
       "board": "Stories214"
     },
     {
       "id": "DT289",
-      "title": "The main button on the right, across the app",
+      "title": "Button rules across the app: the main button on the right; actions as buttons, text links only to go somewhere",
       "epic": "trust",
       "state": "later",
-      "why": "Coach Milan 12 November 14:22 and 14:25: the main action sits on the right, where the thumb is (DT279 Invite, B139 I ate it). One pass over every card and sheet. Open question from Milan: German apps often put the main action left of Cancel; one rule for all languages, or not."
+      "why": "Coach Milan 12 November 14:22 and 14:25: the main action sits on the right, where the thumb is (DT279 Invite, B139 I ate it). One pass over every card and sheet. Open question from Milan: German apps often put the main action left of Cancel; one rule for all languages, or not. 14:34: action links look like text, not like something to tap (Delete this meal, Mark as handled). Rule drawn on B139: main filled blue, second white with a blue border, delete white with a red border; text links only to go somewhere or back out."
     }
   ]
 }
