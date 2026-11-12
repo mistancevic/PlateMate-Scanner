@@ -101,15 +101,16 @@ def row(rid, title, parts, shots, nid=None, at=0):
     c = storyCard(B, y, rid, title, parts)
     hs = [B.screen(f"{nid or rid}{chr(97 + at + i)}", i, y, t, n, st, wd) for i, (t, n, st, wd) in enumerate(shots)]
     y = rowEnd(c, *hs)
-row("DT279", "A new beta application shows at the top of Clients", [
-  ("Coach Milan, 11 November and 12 November 13:24", "Someone applied to be a beta tester. That is great news, and today it sits at the very bottom of Clients, where it is easy to miss. Move it to the top, as a full card, for review and action right away."),
-  ("Where", "The first thing inside Waiting for you, above what clients sent. The card is the same one as today: name, where they came from, email, WhatsApp, their words, Invite and Mark as handled."),
+row("DT279", "A new beta tester application shows at the top of Clients", [
+  ("Coach Milan, 11 November and 12 November 13:24", "Someone applied to be a beta tester. That is great news, and today it sits at the very bottom of Clients, where it is easy to miss. Move it to the top, as a full card, for review and action right away. 13:44: it is a beta tester application; Invite on the right; Mark as handled protected."),
+  ("Where", "The first thing inside Waiting for you, above what clients sent. The card shows the name, where they came from, email, WhatsApp and their words. Invite sits on the right. Mark as handled sits on its own line below, away from Invite, and needs a second tap."),
   ("The count", "It counts in Waiting for you, and in the badge on Clients, so a new application shows from any page."),
-  ("Size", "Small. The same card, in a new place, with one new line: New beta application."),
+  ("Size", "Small. The same card in a new place, a new layout for its buttons, and about four new lines: New beta tester application, the second tap, Keep it, and why."),
 ], [("Now: Clients, the top", "r279a", "draft", "No sign of the new application."), ("Now: Clients, the bottom", "r279b", "draft", "Under Codes and sign-ups, after every client."), ("New: Clients, the top", "r279c", "changed", "A full card, first in Waiting for you.")])
-row("DT279", "After Invite or Mark as handled", [
-  ("What happens", "The card leaves the top, and Waiting for you and the badge drop by one. Below, under Requests for access, it stays as handled, with the date, as today."),
-], [("New: Clients, the bottom", "r279d", "changed", "Handled, kept below with the date.")], at=3)
-board("Stories213.dc.html", "DT279. A new beta application shows at the top of Clients",
-  "12 November 2026 (Coach Milan 13:24, Draw: a full card, moved from the bottom to the top). Drawn for approval.",
+row("DT279", "Mark as handled asks twice; after it", [
+  ("Second tap", "One tap on Mark as handled turns it into Sure? Tap again to mark as handled, with Keep it to go back. Invite needs one tap, as today."),
+  ("After", "The card leaves the top, and Waiting for you and the badge drop by one. Below, under Requests for access, it stays as handled, with the date, as today."),
+], [("New: Clients, Mark as handled", "r279e", "changed", "Sure? Tap again, or Keep it."), ("New: Clients, the bottom", "r279d", "changed", "Handled, kept below with the date.")], at=3)
+board("Stories213.dc.html", "DT279. A new beta tester application shows at the top of Clients",
+  "12 November 2026 (Coach Milan 13:24, Draw: a full card, moved from the bottom to the top). Redrawn 13:44: beta tester application, Invite on the right, a second tap for Mark as handled. Drawn for approval.",
   B, W, y - 100, "Stories212.dc.html")

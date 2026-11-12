@@ -5,12 +5,17 @@ const { spawn } = require("node:child_process"); const fs = require("node:fs");
 const R = "/home/claude/boards/rs", ROOT = process.env.ROOT || "/home/claude/pm284v5", PORT = "3488", U = `http://127.0.0.1:${PORT}`;
 const seed = JSON.parse(fs.readFileSync(ROOT + "/tests/flows/seed.json", "utf8")); seed.feedback = []; seed.items = []; seed.meals = [];
 const mark = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px", NOTE = `${mark};background:#fff8d6;padding:8px 10px;margin:10px 12px;font-size:14px;line-height:1.45;color:#172742;font-family:Nunito,system-ui,sans-serif`;
-const REQ = (top, done) => `<section class="card request${done ? " handled" : ""}" style="${top ? mark + ";margin:6px 0 10px" : ""}">
-  ${top ? '<small style="display:inline-block;align-self:flex-start;background:#2a72d9;color:#fff;border-radius:999px;padding:2px 10px;font-weight:800;font-size:13px;margin-bottom:4px">New beta application</small>' : ""}
+// Coach Milan 13:44: New beta tester application; Invite on the right; Mark as handled on its own line, with a second tap
+const REQ = (top, done, sure = false) => `<section class="card request${done ? " handled" : ""}" style="${top ? mark + ";margin:6px 0 10px" : ""}">
+  ${top ? '<small style="display:inline-block;align-self:flex-start;background:#2a72d9;color:#fff;border-radius:999px;padding:2px 10px;font-weight:800;font-size:13px;margin-bottom:4px">New beta tester application</small>' : ""}
   <div class="card-top"><span>Ana (example) · from the home page</span><small>12 Nov</small></div>
   <a href="#">ana@example.com</a><a href="#">WhatsApp +49 000 0000000</a>
   <p class="client-note">“I cook for two and want more protein at dinner.”</p>
-  ${done ? '<small class="muted">Invited 12 Nov, 13:40</small>' : `<div class="button-row" style="margin-top:6px"><button class="pill pill-small pill-primary" style="min-height:44px">✉ Invite</button><button class="link" style="min-height:44px">Mark as handled</button></div>`}</section>`;
+  ${done ? '<small class="muted">Invited 12 Nov, 13:40</small>' : !top ? `<div class="button-row" style="margin-top:6px"><button class="pill pill-small pill-primary" style="min-height:44px">✉ Invite</button><button class="link" style="min-height:44px">Mark as handled</button></div>`
+    : `<div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="pill pill-primary" style="min-height:48px;padding:0 22px">✉ Invite</button></div>
+  <div style="border-top:1px solid #e3eaf6;margin-top:12px;padding-top:6px;display:flex;flex-direction:column;align-items:flex-start;gap:2px">
+  ${sure ? '<button class="link" id="b-sure" style="min-height:44px;color:#b3261e;font-weight:800">Sure? Tap again to mark as handled</button><button class="link" style="min-height:44px">Keep it</button><small class="muted">It leaves Waiting for you without an invite.</small>'
+    : '<button class="link" id="b-handled" style="min-height:44px;color:#53627f">Mark as handled</button>'}</div>`}</section>`;
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
@@ -45,8 +50,15 @@ const REQ = (top, done) => `<section class="card request${done ? " handled" : ""
   await p.evaluate(({ html }) => { const wq = document.querySelector("main section.card.waiting"); const h = wq.querySelector("b"); h.textContent = h.textContent.replace(/\((\d+)\)/, (_, n) => `(${+n + 1})`);
     wq.querySelector("small.muted").insertAdjacentHTML("afterend", html);
     for (const e of document.querySelectorAll(".bottom-nav button *")) if (e.children.length === 0 && e.textContent.trim() === "7") e.textContent = "8"; }, { html: REQ(true, false) });
-  await note(p, "New: a new beta application is the first thing in Waiting for you, as a full card: who, from where, the email, WhatsApp, their words, Invite and Mark as handled. It counts in Waiting for you.", "main > section.card.waiting");
+  await note(p, "New: a new beta tester application is the first thing in Waiting for you, as a full card. Invite on the right. Mark as handled on its own line below, away from Invite. It counts in Waiting for you.", "main > section.card.waiting");
   await shot(p, "r279c");
+  // 3b. new: Mark as handled asks for a second tap
+  p = await open(); await bottom(p, false);
+  await p.evaluate(({ html }) => { const wq = document.querySelector("main section.card.waiting"); const h = wq.querySelector("b"); h.textContent = h.textContent.replace(/\((\d+)\)/, (_, n) => `(${+n + 1})`);
+    wq.querySelector("small.muted").insertAdjacentHTML("afterend", html);
+    for (const e of document.querySelectorAll(".bottom-nav button *")) if (e.children.length === 0 && e.textContent.trim() === "7") e.textContent = "8"; }, { html: REQ(true, false, true) });
+  await note(p, "New, after one tap on Mark as handled: a second tap is needed, so it can't happen by accident. Keep it goes back.", "main > section.card.waiting");
+  await shot(p, "r279e");
   // 4. new: after Invite or Mark as handled
   p = await open(); await bottom(p, true);
   await note(p, "New, after Invite or Mark as handled: the card leaves the top and the count drops by one. Below, under Requests for access, it stays as handled, with the date.", "#reqlabel");
