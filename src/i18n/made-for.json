@@ -5557,6 +5557,24 @@
     "screen.recipe.addToRecipePhotosWhy": {"en":"It goes into the recipe's gallery. The cover is chosen there.","area":"Recipes","where":"Recipes","release":"0.3.135"},
     "screen.recipe.inRecipePhotos": {"en":"In the recipe's photos","area":"Recipes","where":"Recipes","release":"0.3.135"},
     "screen.recipe.whoMadeIt": {"en":"Who made it?","area":"Recipes","where":"Recipes","release":"0.3.137"},
-    "screen.recipe.aiTag": {"en":"AI","area":"Recipes","where":"Recipes","release":"0.3.137"}
+    "screen.recipe.aiTag": {"en":"AI","area":"Recipes","where":"Recipes","release":"0.3.137"},
+    "screen.pastmeal.changeIt": {"en":"Change it","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.deleteThisMeal": {"en":"Delete this meal","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.sureDelete": {"en":"Sure? Delete this meal","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.keepIt": {"en":"Keep it","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.deleteWhy": {"en":"It leaves {date} in Plan, the recipe's lists and your coach's view. It can't be undone.","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.changeThisMeal": {"en":"Change this meal","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.sameMealSameTime": {"en":"Same meal, same time. Plan, the recipe's lists and your coach see the change.","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.howMuch": {"en":"How much did you eat?","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.halfOfIt": {"en":"Half of it, {g} g","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.asLogged": {"en":"As logged, {g} g","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.howWasIt": {"en":"How was it?","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.yourWords": {"en":"Your words","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.photo": {"en":"Photo","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.changeThePhoto": {"en":"Change the photo","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.addAPhoto": {"en":"Add a photo","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.saveChanges": {"en":"Save changes","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.pastmeal.cancel": {"en":"Cancel","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
+    "screen.yourcooks.openMeal": {"en":"Open the meal of {date}","area":"Recipes","where":"Recipes","release":"0.3.138"}
   }
 }

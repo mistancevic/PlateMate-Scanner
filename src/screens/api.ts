@@ -294,6 +294,9 @@ export interface AppApi {
   recordTalk: (q: string, reply: string, plate: string[]) => void;
   shareCard: (id: string, reason: "look" | "ok" | "help") => void;
   saveCardAsRecipe: (id: string) => void;
+  // DT284 (0.3.138): a past meal changed in place, or deleted
+  changeCard: (id: string, ch: import("../pastMeal").CardChange) => void;
+  deleteCard: (id: string) => void;
   // the photo ask on a meal card when the recipe's cover is drawn (0.2.11, board CO, CO1b, CO1c)
   setCardPhoto: (id: string, data: string) => void;
   setCoverAsk: (id: string, v: "later" | "kept" | "used") => void;

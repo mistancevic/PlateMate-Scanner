@@ -22232,6 +22232,78 @@
     "recipe.aiTag": {
       "text": "KI",
       "checked": true
+    },
+    "pastmeal.changeIt": {
+      "text": "Ändern",
+      "checked": true
+    },
+    "pastmeal.deleteThisMeal": {
+      "text": "Diese Mahlzeit löschen",
+      "checked": true
+    },
+    "pastmeal.sureDelete": {
+      "text": "Sicher? Diese Mahlzeit löschen",
+      "checked": true
+    },
+    "pastmeal.keepIt": {
+      "text": "Behalten",
+      "checked": true
+    },
+    "pastmeal.deleteWhy": {
+      "text": "Sie verschwindet am {date} aus dem Plan, aus den Listen des Rezepts und aus der Ansicht deines Coaches. Das lässt sich nicht rückgängig machen.",
+      "checked": true
+    },
+    "pastmeal.changeThisMeal": {
+      "text": "Diese Mahlzeit ändern",
+      "checked": true
+    },
+    "pastmeal.sameMealSameTime": {
+      "text": "Gleiche Mahlzeit, gleiche Zeit. Der Plan, die Listen des Rezepts und dein Coach sehen die Änderung.",
+      "checked": true
+    },
+    "pastmeal.howMuch": {
+      "text": "Wie viel hast du gegessen?",
+      "checked": true
+    },
+    "pastmeal.halfOfIt": {
+      "text": "Die Hälfte davon, {g} g",
+      "checked": true
+    },
+    "pastmeal.asLogged": {
+      "text": "Wie eingetragen, {g} g",
+      "checked": true
+    },
+    "pastmeal.howWasIt": {
+      "text": "Wie war es?",
+      "checked": true
+    },
+    "pastmeal.yourWords": {
+      "text": "Deine Worte",
+      "checked": true
+    },
+    "pastmeal.photo": {
+      "text": "Foto",
+      "checked": true
+    },
+    "pastmeal.changeThePhoto": {
+      "text": "Foto ändern",
+      "checked": true
+    },
+    "pastmeal.addAPhoto": {
+      "text": "Foto hinzufügen",
+      "checked": true
+    },
+    "pastmeal.saveChanges": {
+      "text": "Änderungen speichern",
+      "checked": true
+    },
+    "pastmeal.cancel": {
+      "text": "Abbrechen",
+      "checked": true
+    },
+    "yourcooks.openMeal": {
+      "text": "Mahlzeit öffnen: {date}",
+      "checked": true
     }
   }
 }

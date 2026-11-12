@@ -62,7 +62,8 @@ export function eatRow(meal: Meal, f: Feedback, now = new Date()) {
   }
   return { when: `${date}, ${hm} · ${how}`, amount, taste: f.taste || "", carry: f.carry ? CARRY_WORDS[f.carry.how].toLowerCase() : "", words: (f.notes || "").trim(), photo: f.photo ?? f.photos?.[f.photos.length - 1] ?? null };
 }
-export function EatLog({ meal, cards }: { meal: Meal; cards: Feedback[] }) {
+// DT284 (0.3.138, board Stories211): each row opens its meal
+export function EatLog({ meal, cards, onOpen }: { meal: Meal; cards: Feedback[]; onOpen?: (f: Feedback) => void }) {
   const all = cooksOf(meal, cards);
   const [open, setOpen] = useState(false);
   if (!all.length) return null;
@@ -71,11 +72,12 @@ export function EatLog({ meal, cards }: { meal: Meal; cards: Feedback[] }) {
     <section className="card rq-eats" aria-label={w("yourcooks.everyTimeYouAteIt")}>
       <b>{w("yourcooks.everyTimeYouAteIt")}</b>
       <small className="muted">{w("yourcooks.onlyYouSeeThisYour")}</small>
-      {rows.map((f) => { const r = eatRow(meal, f); return (
-        <div key={f.id} className="re-row">
+      {rows.map((f) => { const r = eatRow(meal, f); const inner = <>
           {r.photo ? <img src={r.photo} alt="" /> : <span className="re-none" aria-hidden="true">🍽️</span>}
-          <span className="re-words"><b>{r.when}</b><span>{[r.amount, r.taste, r.carry ? w("yourcooks.carriedYouHow", { how: r.carry }) : ""].filter(Boolean).join(" · ")}</span>{r.words && <i>“{r.words}”</i>}</span>
-        </div>); })}
+          <span className="re-words"><b>{r.when}</b><span>{[r.amount, r.taste, r.carry ? w("yourcooks.carriedYouHow", { how: r.carry }) : ""].filter(Boolean).join(" · ")}</span>{r.words && <i>“{r.words}”</i>}</span></>;
+        return onOpen
+          ? <button key={f.id} type="button" className="re-row re-open" aria-label={w("yourcooks.openMeal", { date: r.when })} onClick={() => onOpen(f)}>{inner}<span className="re-go" aria-hidden="true">›</span></button>
+          : <div key={f.id} className="re-row">{inner}</div>; })}
       {all.length > 3 && <button className="link re-more" onClick={() => setOpen(!open)}>{open ? w("yourcooks.fewer") : w("yourcooks.allN", { n: all.length })}</button>}
     </section>
   );

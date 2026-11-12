@@ -266,7 +266,8 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
   const [openId, setOpenId] = useState<string | null>(null);
   const opened = openId ? log.logged.find((f) => f.id === openId) ?? null : null;
   useEffect(() => { setOpenId(null); }, [dayKey]);
-  if (opened) return <PastMeal p={p} f={opened} day={w("plan.date", { date: (l) => (l === "en" ? `${WEEKDAY_OF(date)}, ${date.getDate()} ${MONTH(date)}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })} slot={slotName(opened.slot?.slotId)} back={() => setOpenId(null)} />;
+  if (opened) return <PastMeal p={p} f={opened} day={w("plan.date", { date: (l) => (l === "en" ? `${WEEKDAY_OF(date)}, ${date.getDate()} ${MONTH(date)}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })} slot={slotName(opened.slot?.slotId)} back={() => setOpenId(null)}
+    onChange={(ch) => p.changeCard(opened.id, ch)} onDelete={() => { p.deleteCard(opened.id); setOpenId(null); }} />;
   return (
     <section className="card plan-day plan-past">
       <div className="plan-day-head">
