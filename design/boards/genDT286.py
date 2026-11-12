@@ -105,11 +105,11 @@ row("DT286", "Chef Mealan on the Plate: on your goal, every time different", [
   ("Coach Milan and Tester 2, 12 November", "The same three every time (chicken, cottage cheese, Roggen Vollkornbrot), a general line, a second chat, and no amount. Brainstorm 15:00 to 15:35."),
   ("By default: the goal", "The sheet opens with the answer for your goal. Chef Mealan finds what the plate lacks (protein, carbs, fat or vegetables; the layers stay invisible) and gives three ways, each with the amount and what it does: PD 5.3 → 8.4, +130 kcal. Add puts that amount on the plate."),
   ("Chips choose the direction", "Better for my goal, Another protein, Other carbs, Crunchier, Something I crave, Something else entirely. More like this gives more of the same kind."),
-  ("A craving, when asked", "Only through its chip. Chef Mealan says what it costs, plainly, and the way back to the goal. The app never pushes you off the track."),
+  ("Something tasty, when asked", "Only through its chip. Chef Mealan shows how each one changes your plate, and how to stay close to your goal. The app never pushes you off the track."),
   ("Fresh every time", "He gets this meal, the time, what you ate today, what he suggested last time for this dish, and foods that fit the dish, not the first 40 of your list. Product names stay as on the pack (see DT288)."),
   ("One conversation", "Ask a follow-up in the same sheet. No second chat, no half sentence in the field."),
   ("Measured", "Every chip, More like this and Add is logged with its direction, per person and language, to test the chips and their order over time."),
-], [("Now: Plate, Chef Mealan", "r286a", "draft", "The same three, no amount."), ("New: Plate, on your goal", "r286b", "changed", "What the plate lacks, with amounts."), ("New: Plate, Something I crave", "r286c", "changed", "The cost, and the way back.")])
+], [("Now: Plate, Chef Mealan", "r286a", "draft", "The same three, no amount."), ("New: Plate, on your goal", "r286b", "changed", "What the plate lacks, with amounts."), ("New: Plate, Something I crave", "r286c", "changed", "How it changes your plate.")])
 row("DT287", "Fill the open slots: on your goal, a different week", [
   ("Coach Milan, 12 November 13:28 and 13:32", "Fill the open slots gives the same meals every day: code ranks your recipes by PD and the slot's size, and never looks at your week."),
   ("New", "Every slot on your goal, with two or three choices and why each one (Fish: none yet this week; no oats, you had them twice). The protein changes across the week, and no dish comes twice in three days. The summary says where the day lands."),
@@ -117,5 +117,5 @@ row("DT287", "Fill the open slots: on your goal, a different week", [
   ("Measured", "Which choice and which chip, logged as on the Plate."),
 ], [("Now: Plan, Fill today", "r287a", "draft", "One pick per slot, the same every day."), ("New: Plan, Fill today", "r287b", "changed", "Choices with a why, chips per slot.")], nid="DT287")
 board("Stories215.dc.html", "DT286 and DT287. Chef Mealan's suggestions: on your goal, every time different",
-  "12 November 2026 (Coach Milan with Tester 2, 13:28 to 13:55; brainstorm 15:00 to 15:35: three as the foundation, the goal first, layers invisible, chips for the direction, measured). Drawn for approval.",
+  "12 November 2026 (Coach Milan with Tester 2, 13:28 to 13:55; brainstorm 15:00 to 15:35: three as the foundation, the goal first, layers invisible, chips for the direction, measured; 15:50: plain words for Something I crave). Drawn for approval.",
   B, W, y - 100, "Stories214.dc.html")

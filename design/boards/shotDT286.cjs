@@ -54,12 +54,12 @@ const mark = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px", 
   await shot(p, "r286b", false, 1010); await p.context().close();
   // DT286c new: a craving, asked for, with its cost and the way back
   p = await openHelper();
-  await sheet(p, head + `<p class="helper-reply" style="${mark};padding:6px"><b>Something you crave, then.</b> Here is what it costs, and the way back.</p>`
+  await sheet(p, head + `<p class="helper-reply" style="${mark};padding:6px"><b>Something tasty, then.</b> Here is how each one changes your plate.</p>`
     + sug("Feta, crumbled", "50 g · PD 5.3 → 5.9 · +130 kcal", "Salty and creamy: the salad's best friend.", "50 g")
     + sug("Olive oil and toasted bread", "1 tbsp + 1 slice · PD 5.3 → 3.9 · +210 kcal", "Crunch and a rich taste.", "both")
-    + `<p class="helper-reply" style="${mark};padding:6px;background:#eef8f1">The way back: add 120 g turkey breast too, and PD is 8.0 with the feta. Or keep dinner light: about 900 kcal left after this.</p>`
+    + `<p class="helper-reply" style="${mark};padding:6px;background:#eef8f1">To stay close to your goal: add 120 g turkey breast too, and PD lands at 8.0. Or keep dinner light: about 900 kcal left after this.</p>`
     + chips("Something I crave") + field);
-  await sheetNote(p, "New: a craving only when you ask. Chef Mealan says what it costs, plainly, and the way back to your goal.");
+  await sheetNote(p, "New: something tasty only when you ask. Chef Mealan shows how it changes your plate, and how to stay close to your goal.");
   await shot(p, "r286c", false, 960); await p.context().close();
   // DT287a now: Fill the open slots
   p = await open("/plan"); await p.locator("button.plan-fill").click(); await p.waitForTimeout(1500);
