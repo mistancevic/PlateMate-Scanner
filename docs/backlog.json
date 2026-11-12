@@ -1053,6 +1053,13 @@
       "version": "0.3.141"
     },
     {
+      "id": "B140",
+      "title": "Preview builds failed: Google could not store the build log",
+      "epic": "trust",
+      "state": "done",
+      "why": "Coach Milan 12 November 20:35: the last deploys did not pass, with emails from GitHub. Every Preview since 18:16 (0.3.143 to 0.3.145) failed after the usual 3 minutes of building with: Cloud Build failed storing logs in bucket. Reproduced at 20:39. The app builds cleanly from a fresh copy of main, and the build file had not changed since October, so the fault sat in Google's log storage. Go 20:43. The build log now goes to Cloud Logging only (deploy/cloudbuild.yaml), so a build no longer depends on that storage; the full log stays in the Google Cloud console under Cloud Build."
+    },
+    {
       "id": "DT289",
       "title": "Button rules across the app: the main button on the right; actions as buttons, text links only to go somewhere",
       "epic": "trust",
