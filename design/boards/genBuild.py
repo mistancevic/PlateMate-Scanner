@@ -45,7 +45,7 @@ history = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join(
   stage("3", "Own production, from a terminal", "29 September to 2 November", [
     ("Live on", "chefmealan.com from 30 September: Cloud Run in Milan's own Google project, his own Gemini key."),
     ("Goes live by", "One command in Google Cloud Shell, the terminal in the browser. From 7 October: preview first, then promote, rollback in one command."),
-    ("To the phone", "Then Cloud Shell would not start on the Chromebook: it never got past the sign-in that opens the terminal. On the phone the same Cloud Shell opened at once, so from then on every release was run from the phone."),
+    ("To the phone", "When Cloud Shell joined the process for these releases, it would not start on the Chromebook: it never got past the sign-in that opens the terminal. On the phone the same Cloud Shell opened at once, so the releases were run from the phone from then on."),
     ("Way of working", "Version numbers from 2 October; boards on the canvas before code; the five-step release rule (23 October); the Kanban (2 November).")], "#1a73e8"),
   stage("4", "Green buttons on GitHub", "From 3 November", [
     ("Why", "Cloud Shell's weekly hours ran out, and the Chromebook was away."),
@@ -71,9 +71,9 @@ loop1 = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join([
 loop2 = '<div style="display:flex;gap:6px;align-items:stretch;margin-top:12px">' + ARROW.join([
   step(6, "Build and test", ["claude"], ["A branch in the repo. The code, the unit tests, the walkthroughs, the Srpski and German lines, a version number.", f'All {F["walkthroughs"]} walkthroughs run before it merges.']),
   step(7, "Merge", ["claude", "github"], ["Into main on GitHub, with a note of what changed and why.", "The language tables are published for Milan to confirm Srpski."]),
-  step(8, "Preview", ["github", "google"], ["Run workflow on GitHub Actions. GitHub signs in to Google Cloud with no key and puts the build on Cloud Run as a preview link."]),
+  step(8, "Preview", ["github", "google"], ["Run workflow on GitHub Actions. GitHub only runs the script; it signs in to Google Cloud with no key.", "Google builds the release and adds it to Cloud Run as a new version with no visitors and its own preview link. chefmealan.com keeps the old one. Same accounts and data."]),
   step(9, "Check on the phone", ["milan", "people"], ["Milan opens the preview link, tries the change, sends what is wrong.", "Back to 3 if the design was wrong, to 6 if the code was."]),
-  step(10, "Promote, or roll back", ["milan", "github", "google"], ["Milan taps Promote on GitHub: the preview becomes chefmealan.com. Rollback is one tap too.", "Only Milan does this step."]),
+  step(10, "Promote, or roll back", ["milan", "github", "google"], ["Milan taps Promote on GitHub: Cloud Run sends every visitor to the preview version, and it is chefmealan.com. Rollback sends them back to the version before.", "Only Milan does this step."]),
 ]) + '</div>'
 loopnote = '<div style="font-size:14px;line-height:1.5;color:#3d4a63;margin-top:10px">Each chat ends with a handover note in the Claude Project, so the next chat starts from it, not from memory. The Kanban on the canvas shows every card by its state; the running costs doc lists every service and its price.</div>'
 
@@ -116,7 +116,7 @@ body = (f'<div style="width:{W}px;box-sizing:border-box;padding:22px 26px;backgr
   + section("A course setup, and this project", "The Turing College course Building with AI agents teaches a laptop setup. This project does the same cycle without one.", compare)
   + section("The app, as it runs", "Four parts. The person's phone holds the app and their data first; the server holds the AI key and the rules.", app)
   + '</div>')
-H = 2900
+H = 2950
 page = f'''<!doctype html>
 <html lang="en">
 <head>
