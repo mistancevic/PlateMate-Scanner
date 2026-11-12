@@ -105,9 +105,9 @@ export function FoodsScreen(p: AppApi) {
               {(() => { const sh = shelfName(f, p.region); return sh ? <small className="shelf-name">{w("foods.inShopsIn", { country: sh.country, name: sh.name })}</small> : null; })()}
               <small>{f.brand ? w("foods.jobBy", { job: jobName(jobOf(f).job), brand: brandName(f.brand) }) : jobName(jobOf(f).job)}. {w("foods.per100", { kcal: fmt(f.calories, 0), protein: fmt(f.protein) })}{names.length > 1 ? w("foods.also", { names: names.slice(1).join(", ") }) : ""}</small>
               <span className="row-links">
-                <button className="link" onClick={() => add(f)}>{w("foods.addToMeal")}</button>
+                <button className="pill pill-small pill-action" onClick={() => add(f)}>{w("foods.addToMeal")}</button>
                 <button className="link" onClick={() => p.toggleFavorite(f.id)}>{f.favorite ? "★ Favourite" : "☆ Favourite"}</button>
-                <button className="link" onClick={() => { setImage(""); setEdit(f); }}>{w("foods.review")}</button>
+                <button className="pill pill-small pill-action" onClick={() => { setImage(""); setEdit(f); }}>{w("foods.review")}</button>
                 <ConfirmButton label={w("foods.remove")} confirmLabel={w("foods.tapAgainToRemove")} onConfirm={() => setState((s) => ({ ...s, foods: s.foods.filter((x) => x.id !== f.id) }))} />
               </span>
             </div>
@@ -230,7 +230,7 @@ export function FoodsScreen(p: AppApi) {
         </section>
       )}
       {state.foods.length === 0 && (
-        <div className="strip">{w("foods.noFoodsYetScanType")} <button className="link" onClick={p.addStarter}>{w("foods.addTwentyStarterFoods")}</button>.</div>
+        <div className="strip">{w("foods.noFoodsYetScanType")} <button className="pill pill-small pill-action" onClick={p.addStarter}>{w("foods.addTwentyStarterFoods")}</button>.</div>
       )}
       </>
       {mfCard && <FoodCard rates={p.rates} food={mfCard} target={p.dayPd} fit={p.fitDay(density(mfCard.protein, mfCard.calories))} close={() => setMfCard(null)} />}

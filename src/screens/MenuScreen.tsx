@@ -370,7 +370,7 @@ function GoalPanel(p: AppApi) {
             {/* a goal from the coach (canvas board CW, CW9): Reply instead of Change the date and Cancel */}
             {ng.setBy === "coach"
               ? <div className="button-row"><button className="pill pill-small" onClick={() => { const r = window.prompt(w("menu.replyTo", { coach: p.coachLabel })); if (r && r.trim()) { p.replyToCoach(r.trim()); p.notify(w("menu.sentTo", { coach: p.coachLabel })); } }}>{w("menu.replyTo", { coach: p.coachLabel })}</button></div>
-              : <div className="button-row"><button className="pill pill-small" onClick={openGoal}>{w("menu.changeTheDate")}</button><button className="link link-danger" onClick={() => { p.cancelNextGoal(); p.notify(w("menu.nextGoalCancelled")); }}>{w("menu.cancel")}</button></div>}
+              : <div className="button-row"><button className="pill pill-small" onClick={openGoal}>{w("menu.changeTheDate")}</button><button className="pill pill-small pill-danger-line" onClick={() => { p.cancelNextGoal(); p.notify(w("menu.nextGoalCancelled")); }}>{w("menu.cancel")}</button></div>}
           </section>
         );
       })()}
@@ -425,7 +425,7 @@ function GoalPanel(p: AppApi) {
       {canCalculate(p.personal) && !isMinor(p.personal) && (
         <section className="card you-card formula-line">
           <span><b>{w("menu.formula")}</b><small>{p.formula ? w("menu.formulaSetBy", { formula: FORMULA_NAME[p.formula], coach: p.coachLabel }) : p.personal.formula ? FORMULA_NAME[p.personal.formula] : w("menu.formulaAutoNow", { formula: p.personal.bodyFatPct ? w("menu.katchMcardle") : w("menu.mifflinStJeor") })}{(p.formula ?? p.personal.formula) === "data" && p.personal.measuredUse ? ` · ${w("menu.kcalToStay", { kcal: p.personal.measuredUse.kcal.toLocaleString(numLocale()) })}` : p.formulaKcal ? ` · ${w("menu.kcalToStay", { kcal: p.formulaKcal.toLocaleString(numLocale()) })}` : ""}</small></span>
-          <button className="link" onClick={() => openGoal("formula")}>{w("menu.change")}</button>
+          <button className="pill pill-small pill-action" onClick={() => openGoal("formula")}>{w("menu.change")}</button>
         </section>
       )}
       {/* the measured burn, next to the formula (0.2.7, board FT, FT3 and FT4) */}
@@ -687,8 +687,8 @@ function ShopPanel(p: AppApi) {
         <span>
           <b>{r.name}</b>
           <small>{n ? (on ? wn("menu.nFoods", n) : wn("menu.nFoodsKept", n)) : w("menu.aboutTwentyStarterFoods")}{p.trip?.place === r.id ? ` · ${w("menu.yourTrip")}` : ""}</small>
-          {!on && n > 0 && <small className="place-kept">{w("menu.logsStay")} {unused > 0 && <><button type="button" className="link" onClick={() => p.deleteUnused(r.id)}>{w("menu.deleteUnused", { n: unused })}</button> · </>}<button type="button" className="link" onClick={() => p.makeHome(r.id)}>{w("menu.makeItHome")}</button></small>}
-          {(on || n === 0) && <small><button type="button" className="link" onClick={() => p.makeHome(r.id)}>{w("menu.makeItHome")}</button></small>}
+          {!on && n > 0 && <small className="place-kept">{w("menu.logsStay")} {unused > 0 && <><button type="button" className="pill pill-small pill-danger-line" onClick={() => p.deleteUnused(r.id)}>{w("menu.deleteUnused", { n: unused })}</button> · </>}<button type="button" className="pill pill-small pill-action" onClick={() => p.makeHome(r.id)}>{w("menu.makeItHome")}</button></small>}
+          {(on || n === 0) && <small><button type="button" className="pill pill-small pill-action" onClick={() => p.makeHome(r.id)}>{w("menu.makeItHome")}</button></small>}
         </span>
         <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} aria-label={w(on ? "menu.placeOn" : "menu.placeOff", { place: r.name })} onClick={() => p.setPlaceOn(r.id, !on)}>{on ? w("voice.on") : w("voice.off")}</button>
       </div>
@@ -701,7 +701,7 @@ function ShopPanel(p: AppApi) {
       {p.region && (
         <div className="place-row">
           <span><b>{REGIONS.find((r) => r.id === p.region)?.name}</b><small>{(REGIONS.find((r) => r.id === p.region)?.tags ?? []).includes("cy") ? w("shopp.homeFoodsCy", { n: homeN }) : w("shopp.homeFoods", { n: homeN })}</small>
-            {!getStarted().includes(p.region) && <small><button type="button" className="link" onClick={p.addStarter}>{w("menu.addItsStarterFoods")}</button></small>}</span>
+            {!getStarted().includes(p.region) && <small><button type="button" className="pill pill-small pill-action" onClick={p.addStarter}>{w("menu.addItsStarterFoods")}</button></small>}</span>
           <small>{w("menu.alwaysOn")}</small>
         </div>
       )}
@@ -737,9 +737,9 @@ export function KitchensAndTools(p: AppApi) {
             <small className="kt-what">{KITCHEN[k].what}</small>
             <small className="kt-lead">{t.shown.length === 0 ? w("menu.noDishFits", { kitchen: optWord(k), diet: fits ? optWord(fits) : "null" }) : `${t.shown.length === 3 ? w("menu.threeDishes") : t.shown.length === 2 ? w("menu.twoDishes") : w("menu.oneDish")} ${fits ? w("menu.wouldCookAll", { diet: optWord(fits) }) : w("menu.wouldCook")}`}</small>
             {t.shown.map((d, i) => (
-              <div className={`kt-dish ${last?.with === d ? "kt-new" : ""}`} key={d}><b>{d}</b>{more && <button className="link" aria-label={w("shopp.anotherInstead", { dish: d })} onClick={() => set(another(t, k, i, diet))}>{w("menu.another")}</button>}</div>
+              <div className={`kt-dish ${last?.with === d ? "kt-new" : ""}`} key={d}><b>{d}</b>{more && <button className="pill pill-small pill-action" aria-label={w("shopp.anotherInstead", { dish: d })} onClick={() => set(another(t, k, i, diet))}>{w("menu.another")}</button>}</div>
             ))}
-            {t.out.length > 0 && <small className="kt-out">{w("menu.notForYou", { list: t.out.map((o) => o.dish.toLowerCase()).join(", ") })} <button className="link" onClick={() => set(undo(t))}>{w("menu.undo")}</button></small>}
+            {t.out.length > 0 && <small className="kt-out">{w("menu.notForYou", { list: t.out.map((o) => o.dish.toLowerCase()).join(", ") })} <button className="pill pill-small pill-action" onClick={() => set(undo(t))}>{w("menu.undo")}</button></small>}
             {!more && t.shown.length > 0 && <small className="kt-out">{fits ? w("menu.everyDishFits", { kitchen: optWord(k), diet: optWord(fits) }) : w("menu.everyDish")}</small>}
           </div>
         );
@@ -794,7 +794,7 @@ function CoachPanel(p: AppApi) {
           <li>{w("menu.yourPhotosAndNotesOn")}</li>
           <li>{w("menu.yourBodyDataHealthAnswers")}</li>
         </ul>
-        <ConfirmButton className="link link-danger" label={w("menu.leaveThisCoach")} confirmLabel={w("menu.tapAgainToLeave")} onConfirm={leaveCoach} />
+        <ConfirmButton className="pill pill-small pill-danger-line" label={w("menu.leaveThisCoach")} confirmLabel={w("menu.tapAgainToLeave")} onConfirm={leaveCoach} />
       </section>
       {p.coachNotes.length > 0 && (
         <>

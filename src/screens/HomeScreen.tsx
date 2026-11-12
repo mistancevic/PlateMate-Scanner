@@ -384,7 +384,7 @@ export function HomeScreen(p: AppApi) {
           if (m.skipped) return (
             <div key={sl.id} className="menu-row plan-row-link plan-slot-row plan-slot-skipped">
               <div className="menu-row-text"><small>{sl.name}, {sl.time}</small><b>{m.title}</b><small className="skipped-mark">{w("today.skippedOnPurpose")}</small></div>
-              <button type="button" className="link plan-skip on" onClick={() => p.fill(key, sl.id, { ...m, skipped: undefined })}>{w("today.undo")}</button>
+              <button type="button" className="pill pill-small pill-action plan-skip on" onClick={() => p.fill(key, sl.id, { ...m, skipped: undefined })}>{w("today.undo")}</button>
             </div>
           );
           const fit = fitOf(m, p.dayPd, unit);

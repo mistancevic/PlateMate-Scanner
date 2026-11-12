@@ -337,7 +337,7 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
             </div>
             <small className="muted">{w("steppics.drawnByAiSaysSo")}</small>
           </div>
-          <ConfirmButton className="link link-danger rq-gal-del" label={w("recipe.deleteThisPhoto")} confirmLabel={w("recipe.sure")} onConfirm={() => { onPatch(deletePhoto(meal, pk)); setPicked(null); }} />
+          <ConfirmButton className="pill pill-small pill-danger-line rq-gal-del" label={w("recipe.deleteThisPhoto")} confirmLabel={w("recipe.sure")} onConfirm={() => { onPatch(deletePhoto(meal, pk)); setPicked(null); }} />
         </div>); })()}
       {picture && list.length === 0 && !drawn && (() => {
         const c = picture.count, out = c ? c.used >= c.limit : false;
@@ -356,7 +356,7 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
         <small className="muted rq-hint">{w("recipe.yourPhotoFromTodayIs")}</small>
         <div className="button-row rq-drawn-row">
           <button className="pill pill-small" disabled={busy} onClick={() => { coverNext.current = true; fileRef.current?.click(); }}>{w("recipe.changeTheCover")}</button>
-          <ConfirmButton className="link" ariaLabel={w("recipe.removeTheCover")} label={w("recipe.removeIt")} confirmLabel={w("recipe.sureRemoveIt")} onConfirm={() => { setPhotos(list.slice(1)); setPicked(null); }} />
+          <ConfirmButton className="pill pill-small pill-danger-line" ariaLabel={w("recipe.removeTheCover")} label={w("recipe.removeIt")} confirmLabel={w("recipe.sureRemoveIt")} onConfirm={() => { setPhotos(list.slice(1)); setPicked(null); }} />
         </div>
       </>)}
       {!coverToday && !drawn && !(picture && list.length === 0) && <small className="muted rq-hint">{gal.length === 0 ? w("recipe.aPhotoMakesItEasy") : full ? w("recipe.galleryFull", { max: MAX_GALLERY }) : w("recipe.galleryCount", { n: gal.length, max: MAX_GALLERY })}</small>}
@@ -411,16 +411,16 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
             <small>{[delta.out.length ? w("recipe.deltaOut", { list: delta.out.join("; ") }) : "", delta.in.length ? w("recipe.deltaIn", { list: delta.in.join("; ") }) : "", delta.moved.length ? w("recipe.deltaChanged", { list: delta.moved.join("; ") }) : ""].filter(Boolean).join(" ")}</small>
             <small><b>{w("recipe.deltaOne", { one: oneWord, kcalFrom: whole(delta.kcal[0]), kcalTo: whole(delta.kcal[1]), proteinFrom: whole(delta.protein[0]), proteinTo: whole(delta.protein[1]), pd: delta.pd[0] !== null && delta.pd[1] !== null ? lineV("recipe.deltaPd", { from: fmt(delta.pd[0], 1), to: fmt(delta.pd[1], 1) }) : "" })}</b>{delta.big ? ` ${w("recipe.moreThanAFifthApart")}` : ""}</small>
             {followed && <small>{followed}</small>}
-            {undo.length > 0 && <button type="button" className="link" onClick={takeBack}>{w("recipe.undo")}</button>}
+            {undo.length > 0 && <button type="button" className="pill pill-small pill-action" onClick={takeBack}>{w("recipe.undo")}</button>}
           </div>
         )}
         {edit && !partsShown && <button type="button" className="link rq-parts-open" onClick={() => setPartsOpen(true)}>{w("recipe.partsAndOptionalFoods")}</button>}
-        {edit && partsShown && <div className="pt-h pt-mode"><span><small>{w("recipe.partsGiveAFoodIts")}</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>{w("recipe.newPart")}</button> : <input className="pt-new" autoFocus aria-label={w("recipe.nameOfTheNewPart")} placeholder={w("recipe.toppingPlaceholder")} value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
+        {edit && partsShown && <div className="pt-h pt-mode"><span><small>{w("recipe.partsGiveAFoodIts")}</small></span><span className="pt-acts">{newPart === null ? <button className="pill pill-small pill-action" onClick={() => setNewPart("")}>{w("recipe.newPart")}</button> : <input className="pt-new" autoFocus aria-label={w("recipe.nameOfTheNewPart")} placeholder={w("recipe.toppingPlaceholder")} value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
         {(edit || !cookN || cookN === makesN ? items : sizedFor(meal, cookN)).map((it, k) => {
           const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{partName(it.part)}</div> : null;
           return [head, (
           <div className="sheet-row rq-food" key={it.id}>
-            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="link rq-swap-link" aria-label={w("recipe.swapFood", { food: it.food.name })} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>{w("recipe.swap")}</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>{w("recipe.optional")}</button></span>}</span> : <small>{cookName(it.food.name).short}{weighLine(it.food.name) && <span className="rq-weigh"> · {weighLine(it.food.name)}</span>}{it.fry && <span className="rq-fry">{it.fry.written ? w("recipe.writtenForFrying", { written: it.fry.written }) : w("recipe.forFrying")}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
+            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="pill pill-small pill-action rq-swap-link" aria-label={w("recipe.swapFood", { food: it.food.name })} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>{w("recipe.swap")}</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>{w("recipe.optional")}</button></span>}</span> : <small>{cookName(it.food.name).short}{weighLine(it.food.name) && <span className="rq-weigh"> · {weighLine(it.food.name)}</span>}{it.fry && <span className="rq-fry">{it.fry.written ? w("recipe.writtenForFrying", { written: it.fry.written }) : w("recipe.forFrying")}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
               ? <span className="rq-grams">
                   {/* 0.3.134 (Coach Milan 11 November 20:49): in Edit, eggs and other counted foods are counted, as on the Plate */}
                   {isCounted(it) && !fresh.includes(it.id) ? <CountAmount item={it} editable onGrams={(g, c) => { setNeed(null); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g, ...(c ? { count: c } : {}) } : x)) }); }} /> : <>
@@ -503,7 +503,7 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
               <small className="rq-drafted">{drafted.marks ? (drafted.kitchen || w("recipe.chefStepsFromOriginal")) : w("recipe.draftedByChefMealanFrom")}</small>
               {drafted.marks && drafted.kitchen && <small className="muted">{w("recipe.eachStepSaysHowIt")}</small>}
               <ol className="rp-steps">{drafted.steps.map((x, k) => [partHead(drafted.parts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}<Mark m={drafted.marks?.[k]} /></div></li>])}</ol>
-              <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted.steps, stepMarks: drafted.marks, stepsKitchen: drafted.kitchen, stepParts: drafted.parts, moves: drafted.moves, stepsFor: foodNames(meal.items) }); setDrafted(null); }}>{w("recipe.keepTheseSteps")}</button><button className="pill pill-small" onClick={askDraft}>{w("recipe.draftAgain")}</button><button className="link" onClick={() => { setDrafted(null); startEdit(); }}>{w("recipe.writeMyOwn")}</button></div>
+              <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted.steps, stepMarks: drafted.marks, stepsKitchen: drafted.kitchen, stepParts: drafted.parts, moves: drafted.moves, stepsFor: foodNames(meal.items) }); setDrafted(null); }}>{w("recipe.keepTheseSteps")}</button><button className="pill pill-small" onClick={askDraft}>{w("recipe.draftAgain")}</button><button className="pill pill-small pill-action" onClick={() => { setDrafted(null); startEdit(); }}>{w("recipe.writeMyOwn")}</button></div>
             </>)
           : (() => {
             // RP1 to RP1c (0.2.25): the original is the steps; Chef Mealan's on demand, with a line for the case
@@ -646,7 +646,7 @@ function TryPhoto({ meal, tryPhoto, use }: { meal: Meal; tryPhoto: (model: strin
       {err && <small className="muted" style={{ color: "var(--low)" }}>{err}</small>}
       {shots.map((s, k) => (
         <figure key={k} className="try-shot"><img src={s.img} alt={w("recipe.realisticTestBy", { model: s.model })} /><figcaption><small>{TEST_MODELS.find((m) => m.id === s.model)?.name}</small>
-          <span className="button-row"><button className="pill pill-small pill-primary" onClick={() => { use(s.img); setShots((x) => x.filter((_, j) => j !== k)); }}>{w("recipe.useAsCover")}</button><button className="link" onClick={() => setShots((x) => x.filter((_, j) => j !== k))}>{w("recipe.discard")}</button></span></figcaption></figure>
+          <span className="button-row"><button className="pill pill-small pill-primary" onClick={() => { use(s.img); setShots((x) => x.filter((_, j) => j !== k)); }}>{w("recipe.useAsCover")}</button><button className="pill pill-small pill-danger-line" onClick={() => setShots((x) => x.filter((_, j) => j !== k))}>{w("recipe.discard")}</button></span></figcaption></figure>
       ))}
     </section>
   );

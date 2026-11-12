@@ -48,7 +48,7 @@ export function AdultOnly({ onCorrect, onDelete, email }: { onCorrect: () => voi
       <p>{w("welcome.ifYouTypedTheYear")}</p>
       <div className="actions gate-actions">
         <button className="pill pill-primary action-main" onClick={onCorrect}>{w("welcome.correctMyBirthYear")}</button>
-        {onDelete && !deleting && <button className="link action-cancel" onClick={() => setDeleting(true)}>{w("welcome.deleteMyAccount")}</button>}
+        {onDelete && !deleting && <button className="pill pill-small pill-danger-line action-cancel" onClick={() => setDeleting(true)}>{w("welcome.deleteMyAccount")}</button>}
       </div>
       {onDelete && deleting && <DeleteCheck email={email ?? ""} run={onDelete} cancel={() => setDeleting(false)} />}
     </main>

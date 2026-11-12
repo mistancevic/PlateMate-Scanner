@@ -266,7 +266,7 @@ export function JourneyScreen(p: AppApi) {
           <small>{w("plate.dishRowLine", { pd: pdText(density(t.protein, t.calories)), kcal: fmt(t.calories, 0), protein: fmt(t.protein, 0) })}</small>
           <details className="dish-fold"><summary>{w("plate.ingredientsN", { n: g.items.length })}</summary>
             <ul>{g.items.map((i) => <li key={i.id}>{fmt(i.grams, 0)} g {i.food.name}</li>)}</ul>
-            <button type="button" className="link" onClick={() => removeDish(g.id)}>{w("make.takeItOffThePlate")}</button>
+            <button type="button" className="pill pill-small pill-danger-line" onClick={() => removeDish(g.id)}>{w("make.takeItOffThePlate")}</button>
           </details>
         </div>
         <div className="dish-portions" aria-label={w("plate.nOfPortions", { n: g.n, of: g.of })}>
@@ -1417,7 +1417,7 @@ export function JourneyScreen(p: AppApi) {
       <section className="chef-ask" aria-label={w("make.beforeYouCookYourPlate")}>
         <ChefLine image={state.photo?.image} text={say("plateOldBeforeCook", since, plateIn)} />
         <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => { if (ateEarlier(true)) p.answerCookAsk("ate"); }}>{w("plate.ateIt")}</button><button type="button" className="pill" onClick={() => p.answerCookAsk("save")}>{w("plate.saveForLater")}</button></div>
-        <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk("clear")}>{w("plate.clearIt")}</button><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>{w("plate.cancel")}</button></div>
+        <div className="ca-links"><button type="button" className="pill pill-small pill-danger-line" onClick={() => p.answerCookAsk("clear")}>{w("plate.clearIt")}</button><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>{w("plate.cancel")}</button></div>
         <small>{w("plate.cookAskHelp", { dish: m.title })}</small>
       </section>) : (
       <section className="chef-ask" aria-label={w("make.beforeYouCookYourPlate2")}>
@@ -1435,7 +1435,7 @@ export function JourneyScreen(p: AppApi) {
         <section className="chef-ask pa plate-ask" aria-label={w("make.addToThisPlateOr")}>
           <ChefLine image={a.image} text={say(photo ? "plateAddPhoto" : "plateAddOrNew", items.length, state.title && state.title !== "DaaM" ? state.title : "", a.what)} />
           <div className="ca-go pa-go">{photo ? [add, fresh] : [fresh, add]}</div>
-          <div className="ca-links"><button type="button" className="link pa-keep" onClick={() => p.answerPlateAsk(null)}>{photo ? w("plate.dropPhoto") : w("plate.keepMine")}</button></div>
+          <div className="ca-links"><button type="button" className="pill pill-small pill-danger-line pa-keep" onClick={() => p.answerPlateAsk(null)}>{photo ? w("plate.dropPhoto") : w("plate.keepMine")}</button></div>
           <small>{w(photo ? "plate.addOrNewHelpPhoto" : "plate.addOrNewHelp")}</small>
         </section>
       ); })()
@@ -1444,7 +1444,7 @@ export function JourneyScreen(p: AppApi) {
       <section className="chef-ask" aria-label={w("make.yourPlateFromEarlier")}>
         <ChefLine image={state.photo?.image} text={say("plateOldAte", since, plateIn)} />
         <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => ateEarlier(false)}>{w("plate.ateIt")}</button><button type="button" className="pill" onClick={p.savePlate}>{w("plate.saveForLater")}</button></div>
-        <div className="ca-links"><button type="button" className="link" onClick={p.keepWorking}>{w("plate.keepWorking")}</button><button type="button" className="link" onClick={clearPlate}>{w("plate.clearIt")}</button></div>
+        <div className="ca-links"><button type="button" className="link" onClick={p.keepWorking}>{w("plate.keepWorking")}</button><button type="button" className="pill pill-small pill-danger-line" onClick={clearPlate}>{w("plate.clearIt")}</button></div>
         <small>{w(state.photo ? "plate.oldHelpPhoto" : "plate.oldHelp", { day: dayOfV })}</small>
       </section>)
     : null;
@@ -1578,7 +1578,7 @@ export function JourneyScreen(p: AppApi) {
             <small className="muted">{w("make.connectionLostHelp")}</small>
             <div className="mp-none-go">
               <button type="button" className="pill pill-primary" onClick={p.retryPhoto}>{w("make.tryAgain")}</button>
-              <button type="button" className="link" onClick={p.dropPhotoLost}>{w("plate.dropPhoto")}</button>
+              <button type="button" className="pill pill-small pill-danger-line" onClick={p.dropPhotoLost}>{w("plate.dropPhoto")}</button>
             </div>
           </section>
         )}
@@ -1658,7 +1658,7 @@ export function JourneyScreen(p: AppApi) {
               <small><b>{w("plate.oneThingCannotTell")}</b> {wh.question}</small>
               <div className="button-row mp-which-opts">
                 {wh.options.map((o) => <button key={o.name} type="button" className={`choice${o.name.toLowerCase() === it.food.name.toLowerCase() ? " on" : ""}`} onClick={() => pick(o)}>{o.name.split(",")[0]}</button>)}
-                <button type="button" className="link" onClick={() => pick(null)}>{w("make.skip")}</button>
+                <button type="button" className="pill pill-small pill-action" onClick={() => pick(null)}>{w("make.skip")}</button>
               </div>
               <small className="muted">{w("make.aTapChangesTheFood")}</small>
             </div>
@@ -1673,7 +1673,7 @@ export function JourneyScreen(p: AppApi) {
               <div className="button-row">
                 <button type="button" className="choice" onClick={() => pick(u.options[0])}>~{u.options[0]} g</button>
                 <button type="button" className="choice" onClick={() => pick(u.options[1])}>~{u.options[1]} g</button>
-                <button type="button" className="link" onClick={() => pick(null)}>{w("make.skip")}</button>
+                <button type="button" className="pill pill-small pill-action" onClick={() => pick(null)}>{w("make.skip")}</button>
               </div>
             </div>
           );
@@ -1806,7 +1806,7 @@ export function JourneyScreen(p: AppApi) {
             : <div className="pt-opt" key={o.id}><span className="thumb thumb-sm">{o.food.icon || iconFor(o.name)}</span><span className="pt-opt-text"><b>{o.name}</b><small>{o.note || (o.written ? w("plate.writtenOnRecipe", { written: o.written }) : w("plate.optionalLow"))}</small></span><b className="pt-opt-g">{fmt(o.grams, 0)} g</b><button className="pill pill-small" aria-label={w("plate.addName", { name: o.name })} onClick={() => addOpt(o)}>{w("plate.plusAdd")}</button></div>;
           const PartHead = ({ part }: { part: string }) => {
             const left = leftOut.find((l) => l.part === part);
-            if (left) return <div className="pt-h"><span><b>{w("plate.partLeftOut", { part })}</b><small>{wn("plate.foodsKcalLess", left.items.length, { kcal: fmt(kcalOfItems(left.items), 0) })}</small></span><span className="pt-acts"><button className="link" onClick={() => putBack(part)}>{w("make.putItBack")}</button></span></div>;
+            if (left) return <div className="pt-h"><span><b>{w("plate.partLeftOut", { part })}</b><small>{wn("plate.foodsKcalLess", left.items.length, { kcal: fmt(kcalOfItems(left.items), 0) })}</small></span><span className="pt-acts"><button className="pill pill-small pill-action" onClick={() => putBack(part)}>{w("make.putItBack")}</button></span></div>;
             if (isEmptyPart(part)) return <div className="pt-h" aria-label={w("plate.partAria", { part })}><span><b>{part}</b><small>{w("make.noFoodsLeftInThis")}</small></span></div>;
             const its = items.filter((i) => i.part === part), k = kcalOfItems(its), pdp = pdOf(its), nOpt = opts.filter((o) => o.part === part).length;
             const changed = way?.kind === "change" && way.part === part;
@@ -1814,7 +1814,7 @@ export function JourneyScreen(p: AppApi) {
               <div className="pt-h" aria-label={w("plate.partAria", { part })}>
                 <span><b>{changed ? w("plate.partChanged", { part }) : part}</b><small>{nOpt ? wn("plate.foodsOptional", its.length, { opt: nOpt }) : wn("plate.foodsN", its.length)} · {w("plate.kcalN", { kcal: fmt(k, 0) })}{pdp !== null && k > 0 ? ` · ${pdText(pdp)}` : ""}{changed ? ` · ${triedNote(way)}` : ""}</small></span>
                 <span className="pt-acts">{changed ? <button className="link" onClick={backToOriginal}>{w("make.backToTheOriginal")}</button> : <>
-                  {p.ai.on && pdRef !== null && its.length > 0 && <button className="link" disabled={!!wayBusy || !!way} onClick={() => void changePart(part)}>{wayBusy === part ? w("make.changingIt") : w("plate.change")}</button>}
+                  {p.ai.on && pdRef !== null && its.length > 0 && <button className="pill pill-small pill-action" disabled={!!wayBusy || !!way} onClick={() => void changePart(part)}>{wayBusy === part ? w("make.changingIt") : w("plate.change")}</button>}
                   {canLeaveOut(items, part) && <button className="link" onClick={() => leavePart(part)}>{w("make.leaveItOut")}</button>}
                 </>}</span>
               </div>
@@ -1843,9 +1843,9 @@ export function JourneyScreen(p: AppApi) {
             )}
             {!dishes && (partsMode
               ? <div className="pt-h pt-mode"><span><b>{w("make.parts")}</b><small>{w("make.tapAFoodSPart")}</small></span><span className="pt-acts">
-                  {naming === null ? <button className="link" onClick={() => setNaming("")}>{w("make.newPart")}</button> : <input className="pt-new" autoFocus aria-label={w("make.nameOfTheNewPart")} placeholder={w("plate.partPlaceholder")} value={naming} onChange={(e) => setNaming(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = naming.trim().slice(0, 30); if (v) setNewParts((l) => [...l, v.charAt(0).toUpperCase() + v.slice(1)]); setNaming(null); } }} onBlur={() => setNaming(null)} />}
+                  {naming === null ? <button className="pill pill-small pill-action" onClick={() => setNaming("")}>{w("make.newPart")}</button> : <input className="pt-new" autoFocus aria-label={w("make.nameOfTheNewPart")} placeholder={w("plate.partPlaceholder")} value={naming} onChange={(e) => setNaming(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = naming.trim().slice(0, 30); if (v) setNewParts((l) => [...l, v.charAt(0).toUpperCase() + v.slice(1)]); setNaming(null); } }} onBlur={() => setNaming(null)} />}
                   <button className="link" onClick={() => { if (plateParts.length) log("parts", { how: "set" }); setPartsMode(false); setNaming(null); setNewParts([]); }}>{w("make.done")}</button></span></div>
-              : items.length + opts.length >= 2 && <button className="link pt-open" onClick={() => setPartsMode(true)}>{plateParts.length ? w("plate.parts") : w("plate.groupIntoParts")}</button>)}
+              : items.length + opts.length >= 2 && <button className="pill pill-small pill-action pt-open" onClick={() => setPartsMode(true)}>{plateParts.length ? w("plate.parts") : w("plate.groupIntoParts")}</button>)}
             <div className="rows">
               {dishes ? groupsOf(items).map((g) => g.kind === "dish" ? <DishRow key={g.id} g={g} /> : itemRow(g.item))
                 : !grouped ? <>{items.map(itemRow)}{partsMode && opts.map(optRow)}</>
@@ -1853,7 +1853,7 @@ export function JourneyScreen(p: AppApi) {
                   {plateParts.map((part) => <div key={part} className="pt-group"><PartHead part={part} />
                     {way?.kind === "change" && way.part === part && way.notes.map((nt, k) => <small key={k} className="pt-note">{nt}</small>)}
                     {!leftOut.some((l) => l.part === part) && <>{items.filter((i) => i.part === part).map(itemRow)}{opts.filter((o) => o.part === part).map(optRow)}</>}
-                    {isEmptyPart(part) && <div className="pt-add"><button className="link" onClick={() => addToPart(part)}>{w("plate.addFoodTo", { part })}</button></div>}
+                    {isEmptyPart(part) && <div className="pt-add"><button className="pill pill-small pill-action" onClick={() => addToPart(part)}>{w("plate.addFoodTo", { part })}</button></div>}
                   </div>)}
                   {(noPart.length > 0 || noPartOpts.length > 0) && <div className="pt-group"><div className="pt-h"><span><b>{w("plate.other")}</b></span></div>{noPart.map(itemRow)}{noPartOpts.map(optRow)}</div>}
                 </>}
@@ -1879,7 +1879,7 @@ export function JourneyScreen(p: AppApi) {
                   </div>
                   <small className="muted">{w("make.yourFoodsFirstThenThe")}</small>
                 </div>
-              ); })() : <button type="button" className="link add-here-open" onClick={() => setAddHere(true)}>{w("plate.addHere")}</button>)}
+              ); })() : <button type="button" className="pill pill-small pill-action add-here-open" onClick={() => setAddHere(true)}>{w("plate.addHere")}</button>)}
             {/* IM12: a dish without parts: its optional foods in one list under the foods */}
             {!grouped && !partsMode && opts.length > 0 && (
               <div className="pt-optlist" aria-label={w("make.optionalNotOnThePlate")}>
@@ -1906,10 +1906,10 @@ export function JourneyScreen(p: AppApi) {
               <div className="button-row">{p.ai.on && <button className="pill pill-small pill-primary" onClick={() => startPlateSteps(true)}>{w("make.redraftForTheseFoods")}</button>}<button className="link" onClick={() => setPlateSteps({ ...plateSteps, sig: plateSig(items), foods: foodsSig(items), its: structuredClone(items) })}>{w("make.keepThem")}</button></div>
             </>) : stepsHold(items) && plateSteps ? (<>
               <ol className="rp-steps">{plateSteps.steps.slice(0, 3).map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), items).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</div></li>)}</ol>
-              <div className="button-row">{plateSteps.steps.length > 3 && <button className="link" onClick={() => setStep("make")}>{w("plate.showAllN", { n: plateSteps.steps.length })}</button>}<button className="link" onClick={() => setStep("make")}>{w("make.changeTheSteps")}</button></div>
+              <div className="button-row">{plateSteps.steps.length > 3 && <button className="link" onClick={() => setStep("make")}>{w("plate.showAllN", { n: plateSteps.steps.length })}</button>}<button className="pill pill-small pill-action" onClick={() => setStep("make")}>{w("make.changeTheSteps")}</button></div>
             </>) : (<>
               {plateDraft === "working" ? <ThinkingCard className="rq-drafting" title={w("make.writingSteps")} /> : plateDraft ? <small className="rq-drafting">{plateDraft}</small> : <small className="muted">{p.ai.on ? w("make.writesAtAmounts") : w("make.writeThemBeforeYouLock")}</small>}
-              <div className="button-row">{p.ai.on && plateDraft !== "working" && <button className="pill pill-small pill-primary" onClick={() => startPlateSteps(true)}>{plateDraft ? w("make.tryAgain") : w("make.draftWithChef")}</button>}<button className="link" onClick={() => { setStep("make"); }}>{w("make.writeMyOwn")}</button></div>
+              <div className="button-row">{p.ai.on && plateDraft !== "working" && <button className="pill pill-small pill-primary" onClick={() => startPlateSteps(true)}>{plateDraft ? w("make.tryAgain") : w("make.draftWithChef")}</button>}<button className="pill pill-small pill-action" onClick={() => { setStep("make"); }}>{w("make.writeMyOwn")}</button></div>
             </>)}
           </section>
         )}
@@ -1959,7 +1959,7 @@ export function JourneyScreen(p: AppApi) {
             {/* DT132: the plate's size on the edge, 1.3 to 1.5 portions of its meal */}
             {gateOn && sizeEdge && !bigPlate && share && <div className="gate-line-row gate-edge"><b>{w("plate.onEdge", { name: w("plate.gateSize") })}</b><small>{w("plate.sizeEdge", { n: fixed(sizeNow.portions), meal: mealV(mealSlot?.name ?? "meal", true), kcal: fmt(t.calories, 0), share: fmt(share.kcal, 0) })}</small><small className="gate-hint">{w("make.toBeClearOfIt")}</small></div>}
             {sweetSpotOf(ingredientsOn.length === 0) && <small className="gate-sweet">{w("make.daamGoodSpotADish")}</small>}
-            {fit && !imported && <small className="fit-note">{/^Fit /.test(fit.note) ? <><b>{w("make.fit")}</b> {fit.note.slice(4)}</> : fit.note}{fit.group && Object.entries(fit.group).some(([id, g]) => Math.round(items.find((i) => i.id === id)?.grams ?? -1) !== Math.round(g)) ? <> <button className="link pt-inline" onClick={() => { const g = fit.group!; setState((s) => ({ ...s, items: s.items.map((i) => (g[i.id] !== undefined ? { ...i, grams: g[i.id] } : i)), portion: null })); setFit(null); }}>{w("make.undo")}</button></> : null}{fit.id && fit.before !== undefined && fit.before !== Math.round(items.find((i) => i.id === fit.id)?.grams ?? -1) ? <> <button className="link pt-inline" onClick={() => { updateItem(fit.id!, { grams: fit.before! }); setFit(null); }}>{w("make.undo")}</button></> : null}</small>}
+            {fit && !imported && <small className="fit-note">{/^Fit /.test(fit.note) ? <><b>{w("make.fit")}</b> {fit.note.slice(4)}</> : fit.note}{fit.group && Object.entries(fit.group).some(([id, g]) => Math.round(items.find((i) => i.id === id)?.grams ?? -1) !== Math.round(g)) ? <> <button className="pill pill-small pill-action pt-inline" onClick={() => { const g = fit.group!; setState((s) => ({ ...s, items: s.items.map((i) => (g[i.id] !== undefined ? { ...i, grams: g[i.id] } : i)), portion: null })); setFit(null); }}>{w("make.undo")}</button></> : null}{fit.id && fit.before !== undefined && fit.before !== Math.round(items.find((i) => i.id === fit.id)?.grams ?? -1) ? <> <button className="pill pill-small pill-action pt-inline" onClick={() => { updateItem(fit.id!, { grams: fit.before! }); setFit(null); }}>{w("make.undo")}</button></> : null}</small>}
             {fitShort && !madeBy && (<>
               <small>{share && (t.calories ?? 0) < share.kcal * 0.6 ? w("plate.topOutHalf", { pd: pdText(pd), kcal: fmt(t.calories, 0), meal: mealW }) : w("plate.topOut", { pd: pdText(pd) })}</small>
               <div className="button-row">
@@ -2041,7 +2041,7 @@ export function JourneyScreen(p: AppApi) {
                   <button className="pill pill-small" disabled={!!wayBusy} onClick={() => void changeDish()}><ChefHat size={16} /> {wayBusy === "change" ? w("make.changingIt") : w("make.changeTheRecipe")}</button>
                   <button className="pill pill-small" disabled={!!wayBusy} onClick={() => void addSide()}><ChefHat size={16} /> {wayBusy === "side" ? w("make.looking") : w("make.addOnTheSide")}</button>
                 </div>
-                {wayBusy === "change" && waySlow && <div className="way-slow"><small className="rq-drafting in-slow" role="status">{w("plate.takesLonger")}</small><button className="link" onClick={() => wayStop.current?.abort()}>{w("make.stop")}</button></div>}
+                {wayBusy === "change" && waySlow && <div className="way-slow"><small className="rq-drafting in-slow" role="status">{w("plate.takesLonger")}</small><button className="pill pill-small pill-action" onClick={() => wayStop.current?.abort()}>{w("make.stop")}</button></div>}
                 <small className="muted ways-why">{w("plate.waysWhy", { pd: pdVal(pdRef) })}</small>
               </div>
             )}
@@ -2093,7 +2093,7 @@ export function JourneyScreen(p: AppApi) {
         })()}
         {!madeBy && chefable && share && items.length > 0 && justSkipped && (() => {
           const sk = daySlots.find((x) => x.id === justSkipped);
-          return sk ? <div className="ms-ask"><small className="ms-q">{w("plate.skippedMoved", { name: mealV(sk.name), meal: mealW })}</small><button className="link" style={{ alignSelf: "flex-start" }} onClick={() => answer(sk.id, null)}>{w("make.undo")}</button></div> : null;
+          return sk ? <div className="ms-ask"><small className="ms-q">{w("plate.skippedMoved", { name: mealV(sk.name), meal: mealW })}</small><button className="pill pill-small pill-action" style={{ alignSelf: "flex-start" }} onClick={() => answer(sk.id, null)}>{w("make.undo")}</button></div> : null;
         })()}
         {p.filling && plateWhen === "plan" && items.length > 0 && <p className="small center plan-note">{w("make.plannedNotEatenOnIts")}</p>}
         {p.filling && plateWhen === "past" && items.length > 0 && <p className="small center plan-note">{w("plate.countedOn", { day: dateV(new Date(`${p.filling.date}T12:00:00`), { weekday: "long" }), time: p.filling.time })}</p>}
@@ -2345,7 +2345,7 @@ export function JourneyScreen(p: AppApi) {
             {plateDraft === "working" ? <ThinkingCard className="rq-drafting" title={w("make.writingSteps")} /> : plateDraft ? <small className="rq-drafting">{plateDraft}</small> : null}
             {p.ai.on && plateDraft !== "working" && <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => startPlateSteps(true)}>{plateDraft ? w("make.tryAgain") : w("make.draftWithChef")}</button></div>}
             {plateDraft !== "working" && (ownSteps === null
-              ? <button className="link" style={{ alignSelf: "flex-start" }} onClick={() => setOwnSteps("")}>{w("make.writeMyOwn")}</button>
+              ? <button className="pill pill-small pill-action" style={{ alignSelf: "flex-start" }} onClick={() => setOwnSteps("")}>{w("make.writeMyOwn")}</button>
               : <>
                 <textarea aria-label={w("make.yourStepsOnePerLine")} placeholder={w("make.oneStepPerLine")} value={ownSteps} onChange={(e) => setOwnSteps(e.target.value)} />
                 <div className="button-row"><button className="pill pill-small" disabled={!ownSteps.trim()} onClick={() => { const lines = ownSteps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 12); setPlateSteps({ steps: lines, sig: plateSig(items) }); setOwnSteps(null); setPlateDraft(""); }}>{w("make.keepMySteps")}</button></div>
@@ -2364,7 +2364,7 @@ export function JourneyScreen(p: AppApi) {
             {[...parts, w("make.putItTogether")].map((pt) => { const its = items.filter((i) => i.part === pt), on = ticks.has(pt);
               return <button key={pt} type="button" className={`mk-check ${on ? "on" : ""}`} aria-pressed={on} onClick={() => setTicks((t) => { const x = new Set(t); if (x.has(pt)) x.delete(pt); else x.add(pt); return x; })}>
                 <span className="mk-box">{on ? "✓" : ""}</span><span><b>{pt}{its.length ? ":" : ""}</b> {its.map((i) => <b key={i.id} className="st-amt">{fmt(i.grams, 0)} g {i.food.name}</b>).reduce<React.ReactNode[]>((a, el, k) => (k ? [...a, ", ", el] : [el]), [])}{its.length ? "" : ` ${w("make.inABowl")}`}</span></button>; })}
-            {recipe && p.ai.on && <button className="link" style={{ alignSelf: "flex-start" }} disabled={mkDraft === "working"} onClick={() => void draftHere()}>{mkDraft === "working" ? w("make.writingStepsDot") : w("make.draftWithChef")}</button>}
+            {recipe && p.ai.on && <button className="pill pill-small pill-action" style={{ alignSelf: "flex-start" }} disabled={mkDraft === "working"} onClick={() => void draftHere()}>{mkDraft === "working" ? w("make.writingStepsDot") : w("make.draftWithChef")}</button>}
             {mkDraft && mkDraft !== "working" && <small className="rq-drafting">{mkDraft}</small>}
           </section>
         )}
@@ -2439,7 +2439,7 @@ export function JourneyScreen(p: AppApi) {
           <section className="chef-ask" aria-label={w("make.goOnWhereYouLeft")}>
             <ChefLine text={resumeLine(state.cook)} />
             <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => { setResumeAsk(false); if (madeSteps.length && p.travel?.kitchen !== "hotel") setCooking(true); }}>{w("make.goOnCooking")}</button></div>
-            <div className="ca-links"><button type="button" className="link" onClick={() => p.saveCookForLater()}>{w("make.saveForLater")}</button><button type="button" className="link" onClick={() => { setResumeAsk(false); setTicks(new Set()); setStepPhotos({}); setPlate(""); setWent("as"); setDifferent(""); }}>{w("make.startOver")}</button></div>
+            <div className="ca-links"><button type="button" className="pill pill-small pill-action" onClick={() => p.saveCookForLater()}>{w("make.saveForLater")}</button><button type="button" className="pill pill-small pill-action" onClick={() => { setResumeAsk(false); setTicks(new Set()); setStepPhotos({}); setPlate(""); setWent("as"); setDifferent(""); }}>{w("make.startOver")}</button></div>
           </section>
         )}
         {/* DT174 (0.3.16): Start cooking, above the steps: one big step at a time; each finished step is ticked here */}
@@ -2524,7 +2524,7 @@ export function JourneyScreen(p: AppApi) {
             <button className={`choice ${went === "not" ? "on" : ""}`} onClick={() => setWent("not")}>{rec ? w("make.notAsTheRecipeSays") : w("make.notAsTheStepsSay")}</button>
           </div>
           {went === "not" && <textarea placeholder={w("make.whatWasDifferent")} value={different} onChange={(e) => setDifferent(e.target.value)} />}
-          {went === "not" && <button className="link" onClick={() => p.openOut()}>{w("make.helpMeWithMakingIt")}</button>}
+          {went === "not" && <button className="pill pill-small pill-action" onClick={() => p.openOut()}>{w("make.helpMeWithMakingIt")}</button>}
         </div>
         <div className="next-step">
           <button className="pill pill-primary pill-wide" onClick={() => { log("made", { went, photos: Object.keys(stepPhotos).length + (plate ? 1 : 0) }); setStep("after"); }}>{w("make.cookedNextEat")}</button>

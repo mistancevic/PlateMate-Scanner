@@ -25,7 +25,7 @@ export function PilotGate(p: AppApi) {
         <RequestForm email={p.user?.email} name={p.user?.name} />
       </section>
       {/* not a member yet: nothing of theirs to save, the phone is cleared (DT168) */}
-      <button className="link" onClick={() => p.signOut(true)}>{w("pilot.signOut")}</button>
+      <button className="pill pill-small pill-danger-line" onClick={() => p.signOut(true)}>{w("pilot.signOut")}</button>
     </div>
   );
 }

@@ -119,7 +119,7 @@ export function ServedOnPlate({ p, items, title }: { p: AppApi; items: Ingredien
       <div className="button-row sv-acts">
         <button type="button" className="pill pill-small sv-share-it" onClick={() => setShare(true)}>{w("served.shareNumbers")}</button>
         <button type="button" className="pill pill-small sv-ate" onClick={() => setAte(true)}>{w("served.iAteThis")}</button>
-        <button type="button" className="link sv-drop" onClick={() => p.servedRemove(on.id)}>{w("served.dontKeep")}</button>
+        <button type="button" className="pill pill-small pill-danger-line sv-drop" onClick={() => p.servedRemove(on.id)}>{w("served.dontKeep")}</button>
       </div>
       <small className="sv-foot">{w("served.nothingLogged")}</small>
     </section>
@@ -152,7 +152,7 @@ function VisitCard({ p, v, open, openMenu }: { p: AppApi; v: Visit; open: (id: s
           </form>
         ) : (
           <span className="sv-visit-title"><b>{v.note || when}</b>{v.note && <small>{when}</small>}
-            <button type="button" className="link sv-note-edit" onClick={() => { setNote(v.note); setEdit(true); }}>{v.note ? w("served.changeNote") : w("served.addNote")}</button></span>
+            <button type="button" className="pill pill-small pill-action sv-note-edit" onClick={() => { setNote(v.note); setEdit(true); }}>{v.note ? w("served.changeNote") : w("served.addNote")}</button></span>
         )}
         <ServedMark />
       </div>
@@ -211,7 +211,7 @@ export function ServedOne({ p, id, back }: { p: AppApi; id: string; back: () => 
       </div>
       {sure
         ? <div className="button-row sv-sure"><button type="button" className="pill pill-small pill-danger sv-remove-yes" onClick={() => { p.servedRemove(s.id); back(); }}>{w("served.removeYes")}</button><button type="button" className="link" onClick={() => setSure(false)}>{w("served.cancel")}</button></div>
-        : <button type="button" className="link sv-remove" onClick={() => setSure(true)}>{w("served.remove")}</button>}
+        : <button type="button" className="pill pill-small pill-danger-line sv-remove" onClick={() => setSure(true)}>{w("served.remove")}</button>}
     </section>
   );
 }

@@ -120,7 +120,7 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, f
         {!by && <small className="muted">{w("steppics.sayWhoMadeItFirst")}</small>}
         <small className="muted">{w("steppics.drawnByAiSaysSo")}</small>
       </>}
-      {pic && (!all.length || all.some((x) => x.src === src)) && <button className="link" style={{ alignSelf: "flex-start", minHeight: 44 }} onClick={() => onRemove(src ?? undefined)}>{w("steppics.removeThisPicture")}</button>}
+      {pic && (!all.length || all.some((x) => x.src === src)) && <button className="pill pill-small pill-danger-line" style={{ alignSelf: "flex-start", minHeight: 44 }} onClick={() => onRemove(src ?? undefined)}>{w("steppics.removeThisPicture")}</button>}
       <small className="muted">{w("steppics.yourPicturesStayWithYour")}</small>
     </div>
   );

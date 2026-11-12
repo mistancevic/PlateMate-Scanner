@@ -313,10 +313,10 @@ function RequestCard({ r, p, top = false }: { r: Application; p: AppApi; top?: b
           <div className="request-invite"><button type="button" className="pill pill-primary" onClick={invite}><Send size={16} /> {w("coach.invite")}</button></div>
           <div className="request-handle">
             {sure ? <>
-              <button type="button" className="link link-danger request-sure" onClick={async () => { await mark(); p.notify(w("coach.markedHandled")); p.recountWaiting(); }}>{w("coach.sureMarkAsHandled")}</button>
+              <button type="button" className="pill pill-small pill-danger request-sure" onClick={async () => { await mark(); p.notify(w("coach.markedHandled")); p.recountWaiting(); }}>{w("coach.sureMarkAsHandled")}</button>
               <button type="button" className="link request-keep" onClick={() => setSure(false)}>{w("coach.keepIt")}</button>
               <small className="muted">{w("coach.leavesWithoutInvite")}</small>
-            </> : <button type="button" className="link request-mark" onClick={() => setSure(true)}>{w("coach.markAsHandled")}</button>}
+            </> : <button type="button" className="pill pill-small pill-danger-line request-mark" onClick={() => setSure(true)}>{w("coach.markAsHandled")}</button>}
           </div>
         </>
       )}
@@ -340,7 +340,7 @@ export function WaitingList(p: AppApi) {
         {list.slice(0, 100).map((x) => (
           <div className="wait-row" key={x.id}>
             <span><a href={`mailto:${x.email}`}>{x.email}</a><small>{[WHO_NAME[x.who] ? w(WHO_NAME[x.who]) : undefined, x.createdAt ? dateText(new Date(x.createdAt), { day: "numeric", month: "short" }) : ""].filter(Boolean).join(" · ")}</small></span>
-            <button type="button" className="link" onClick={async () => { await fetch(`/api/waitlist/${x.id}`, { method: "DELETE" }); p.notify(w("coach.leftWaitingList", { email: x.email })); load(); }}>{w("coach.remove")}</button>
+            <button type="button" className="pill pill-small pill-danger-line" onClick={async () => { await fetch(`/api/waitlist/${x.id}`, { method: "DELETE" }); p.notify(w("coach.leftWaitingList", { email: x.email })); load(); }}>{w("coach.remove")}</button>
           </div>
         ))}
       </section>
@@ -408,9 +408,9 @@ export function Invites(p: AppApi) {
               <div className="history-row" key={i.code}>
                 <div><b>{i.name || i.email}</b><small>{i.email} · {i.code}</small></div>
                 <div className="history-num"><b className={`inv-${i.status}`}>{wordIn(getLang(), `coach.inv.${i.status}` as WordKey) ?? i.status}</b>
-                  {i.status === "open" && <small><a href={inviteMail(i)}>{w("coach.resend")}</a> · <button className="link" onClick={async () => { await fetch(`/api/invites/${i.code}/revoke`, { method: "POST" }); load(); }}>{w("coach.revoke")}</button></small>}
+                  {i.status === "open" && <small><a href={inviteMail(i)}>{w("coach.resend")}</a> · <button className="pill pill-small pill-danger-line" onClick={async () => { await fetch(`/api/invites/${i.code}/revoke`, { method: "POST" }); load(); }}>{w("coach.revoke")}</button></small>}
                   {/* DT259: a revoked or an expired invite can go from the list; a used one stays */}
-                  {(i.status === "revoked" || i.status === "expired") && <small><button className="link inv-remove" onClick={async () => { const r = await fetch(`/api/invites/${i.code}`, { method: "DELETE" }); if (r.ok) setList(list.filter((x) => x.code !== i.code)); else p.notify(w("coach.couldNotRemove")); }}>{w("coach.remove")}</button></small>}
+                  {(i.status === "revoked" || i.status === "expired") && <small><button className="pill pill-small pill-danger-line inv-remove" onClick={async () => { const r = await fetch(`/api/invites/${i.code}`, { method: "DELETE" }); if (r.ok) setList(list.filter((x) => x.code !== i.code)); else p.notify(w("coach.couldNotRemove")); }}>{w("coach.remove")}</button></small>}
                 </div>
               </div>
             ))}
@@ -483,7 +483,7 @@ export function WaitingRecipes({ notify, setError }: { notify: (m: string) => vo
               <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={w("coach.thePhotoIsTooDark")} aria-label={w("coach.yourNote")} />
               <div className="publish-ways"><button className="pill" onClick={() => setNoteFor(null)}>{w("coach.cancel")}</button><button className="pill pill-primary" disabled={!note.trim()} onClick={() => answer(r, "back")}>{w("coach.sendBack")}</button></div>
             </div>
-          ) : <button className="link" onClick={() => { setNoteFor(r.slug); setNote(""); }}>{w("coach.sendBackWithANote")}</button>}
+          ) : <button className="pill pill-small pill-action" onClick={() => { setNoteFor(r.slug); setNote(""); }}>{w("coach.sendBackWithANote")}</button>}
         </div>
       ))}
       {viewing && (

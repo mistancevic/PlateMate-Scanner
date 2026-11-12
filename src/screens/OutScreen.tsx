@@ -51,7 +51,7 @@ const asFood = (r: Rec): Food => ({
 
 // DT153 (0.2.132): a done row is a plain tick, not a pill; Undo under it while the chat is open
 function Done({ text, undo, start }: { text: string; undo?: () => void; start?: boolean }) {
-  return <span className={`done-tick${start ? " done-start" : ""}`}><b>✓ {text}</b>{undo && <button type="button" className="link done-undo" onClick={undo}>{w("out.undo")}</button>}</span>;
+  return <span className={`done-tick${start ? " done-start" : ""}`}><b>✓ {text}</b>{undo && <button type="button" className="pill pill-small pill-action done-undo" onClick={undo}>{w("out.undo")}</button>}</span>;
 }
 
 export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void; tab: Tab; ask?: "fill" | "plate" | "around" | { q: string } | null; clearAsk: () => void }) {
@@ -465,7 +465,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
         <div ref={endRef} />
       </div>
       <div className="chat-bottom">
-      {photo && <div className="strip">{w("out.photoAttached")} <button className="link" onClick={() => setPhoto("")}>{w("out.remove")}</button></div>}
+      {photo && <div className="strip">{w("out.photoAttached")} <button className="pill pill-small pill-danger-line" onClick={() => setPhoto("")}>{w("out.remove")}</button></div>}
       <div className="chat-input">
         <button className="icon" aria-label={w("out.addAPhoto")} onClick={() => fileRef.current?.click()}><Camera size={20} /></button>
         <ClearField value={text} onClear={() => setText("")} label={w("out.clearTheQuestion")}><input value={text} placeholder={w("out.orAskInYourWords")} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" /></ClearField>

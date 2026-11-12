@@ -50,7 +50,7 @@ export function RecipeBar({ f, set, sort, setSort, kitchens, madeBy, shown, tota
         <b>{w("recipebar.sort")}</b>
         {SORTS.map((s) => <button type="button" key={s.id} className={`link rb-sort-link ${sort === s.id ? "on" : ""}`} aria-pressed={sort === s.id} onClick={() => setSort(s.id)}>{s.label}</button>)}
       </div>
-      <small className="muted rb-count">{countLine(shown, total, f, coachLabel)}{!isIdle(f) ? <> · <button type="button" className="link" onClick={() => set(EMPTY)}>{w("recipebar.clearAll")}</button></> : null}</small>
+      <small className="muted rb-count">{countLine(shown, total, f, coachLabel)}{!isIdle(f) ? <> · <button type="button" className="pill pill-small pill-danger-line" onClick={() => set(EMPTY)}>{w("recipebar.clearAll")}</button></> : null}</small>
     </section>
   );
 }

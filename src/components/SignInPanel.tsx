@@ -49,7 +49,7 @@ export function SignInPanel({ close }: { close: () => void }) {
         <p className="si-sent">{w("signin.sentTo", { email: email.trim().toLowerCase() })}</p>
         <small className="si-line">{w("signin.spam")}</small>
         <button className="pill pill-wide si-again" disabled={left > 0 || sending} onClick={send}>{left > 0 ? w("signin.sendAgainIn", { time: mmss(left) }) : w("signin.sendAgain")}</button>
-        <button className="link si-other" onClick={() => { setStage("choose"); setSentAt(null); setErr(""); }}>{w("signin.otherEmail")}</button>
+        <button className="pill pill-small pill-action si-other" onClick={() => { setStage("choose"); setSentAt(null); setErr(""); }}>{w("signin.otherEmail")}</button>
       </>}
       {stage === "which" && <>
         <h2>{w("signin.whichEmail")}</h2>

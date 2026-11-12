@@ -260,7 +260,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {consented && !editing && canCalculate(d) ? (
             <section className="card you-card">
               <span><b>{w("goal.you")}</b><small>{[d.sex === "male" ? w("goal.male") : d.sex === "female" ? w("goal.female") : null, d.birthYear, d.heightCm ? hText(d.heightCm) : null, d.weightKg ? wText(d.weightKg, Number.isInteger(wIn(d.weightKg)) ? 0 : 1) : null, LIFE.find((l) => l.id === workOf(d))!.name, (() => { const s = STEPS.find((x) => x.id === d.steps); return s ? w("goal.stepsValue", { steps: s.name }) : null; })()].filter(Boolean).join(" · ")}<br />{w("goal.bodyFatValue", { value: d.bodyFatPct ? `${d.bodyFatPct} %` : w("goal.notGiven") })}</small></span>
-              <button className="link" onClick={() => setEditing(true)}>{w("goal.edit")}</button>
+              <button className="pill pill-small pill-action" onClick={() => setEditing(true)}>{w("goal.edit")}</button>
             </section>
           ) : (
             <section className={`card form ${consented ? "" : "shut"}`} aria-disabled={!consented}>

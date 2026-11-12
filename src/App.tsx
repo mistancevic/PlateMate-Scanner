@@ -626,7 +626,7 @@ function LabelCheck({
           </div>
         </div>
       ) : (
-        <button className="link" onClick={() => { const first = KNOWN.find((k) => !k.core && !rows.some((r) => r.key === k.key)); setAddKey(first?.key ?? "other"); setAddUnit(first?.unit ?? "g"); setAdding(true); }}>{w("app.addLine")}</button>
+        <button className="pill pill-small pill-action" onClick={() => { const first = KNOWN.find((k) => !k.core && !rows.some((r) => r.key === k.key)); setAddKey(first?.key ?? "other"); setAddUnit(first?.unit ?? "g"); setAdding(true); }}>{w("app.addLine")}</button>
       )}
       <label>
         {w("app.labelNotes")}

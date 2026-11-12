@@ -86,7 +86,7 @@ export function MealScreen(p: AppApi) {
         ))}
         <div className="row row-add">
           <span className="dot dot-add" />
-          <button className="link" onClick={() => setTab("foods")}>{w("meal.addAFood")}</button>
+          <button className="pill pill-small pill-action" onClick={() => setTab("foods")}>{w("meal.addAFood")}</button>
           <span className="row-actions">
             <button className="icon" aria-label={w("meal.scanALabel")} onClick={() => { setMode("label"); setCamera(true); }}><Camera size={16} /></button>
             <button className="icon" aria-label={w("meal.enterAFoodManually")} onClick={() => blank()}><Plus size={16} /></button>

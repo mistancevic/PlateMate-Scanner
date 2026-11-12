@@ -49,7 +49,7 @@ export function CardAnswer({ row, card, coachName, send, notify, setError, onDon
           </div>
         );
       })}
-      {given.length && !again ? <button type="button" className="link ca-again" onClick={() => setAgain(true)}>{given.some((n) => n.suggest?.kind === "answer") ? w("cardanswer.answerAgain") : w("cardanswer.answer")}</button> : null}
+      {given.length && !again ? <button type="button" className="pill pill-small pill-action ca-again" onClick={() => setAgain(true)}>{given.some((n) => n.suggest?.kind === "answer") ? w("cardanswer.answerAgain") : w("cardanswer.answer")}</button> : null}
       {(!given.length || again) && (<><b className="ca-title">{w("cardanswer.answer")}</b>{form}</>)}
     </div>
   );

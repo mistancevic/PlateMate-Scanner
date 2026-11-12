@@ -124,7 +124,7 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
             data-placeholder={k === 0 ? w("steps.whiskTheEggsWithThe") : ""} />
         </div>
       ))}
-      <button type="button" className="link st-add" onClick={() => addRow(rows.length - 1)}>{w("steps.addAStep")}</button>
+      <button type="button" className="pill pill-small pill-action st-add" onClick={() => addRow(rows.length - 1)}>{w("steps.addAStep")}</button>
       {shown.length > 0 && (
         <div className="st-foods">
           <small>{w("steps.tapAFoodToPut")}</small>

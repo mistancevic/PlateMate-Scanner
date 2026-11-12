@@ -18,7 +18,7 @@ export function DeleteRecipe({ plan, slug, approver, run }: { plan: DeletePlan; 
   const [open, setOpen] = useState(false);
   const [members, setMembers] = useState(true), [page, setPage] = useState(true);
   const [busy, setBusy] = useState(false), [err, setErr] = useState("");
-  if (!open) return <button className="link link-danger rq-delete" onClick={() => setOpen(true)}>{w("delrecipe.deleteRecipe")}</button>;
+  if (!open) return <button className="pill pill-wide pill-danger-line rq-delete" onClick={() => setOpen(true)}>{w("delrecipe.deleteRecipe")}</button>;
   const Approver = approver.charAt(0).toUpperCase() + approver.slice(1);
   const pageTick = plan.page === "live" || plan.page === "live+waiting" || plan.page === "waiting";
   const others = plan.members || pageTick;
@@ -45,7 +45,7 @@ export function DeleteRecipe({ plan, slug, approver, run }: { plan: DeletePlan; 
       {plan.foods > 0 && <Li ok>{plan.foods === 1 ? w("delrecipe.theFoodItUses") : wn("delrecipe.theFoodsItUses", plan.foods)}, {w("delrecipe.inYourFoods")}</Li>}
       {err && <small className="dl-err" role="alert">{err}</small>}
       <div className="button-row">
-        <button className="pill pill-small dl-go" disabled={busy} onClick={go}>{busy ? w("delrecipe.deleting") : w("delrecipe.deleteRecipe")}</button>
+        <button className="pill pill-small pill-danger dl-go" disabled={busy} onClick={go}>{busy ? w("delrecipe.deleting") : w("delrecipe.deleteRecipe")}</button>
         <button className="pill pill-small" disabled={busy} onClick={() => { setOpen(false); setErr(""); }}>{w("delrecipe.cancel")}</button>
       </div>
     </section>

@@ -3296,3 +3296,13 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .fill-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .fill-chips .pill-small { min-height: 44px; height: auto; }
 .fill-put { justify-content: flex-end; }
+/* DT289 (0.3.143, board Stories216; Coach Milan 12 November, one rule for every language): the main action on the right; actions
+   are buttons: main filled blue, second white with a blue border, delete white with a red border, filled red on Sure?; text links
+   only go somewhere or back out */
+.button-row > .pill-primary, .button-row > .pill-danger { order: 99; margin-left: auto; }
+.button-row:has(> .pill-primary) > .pill:not(.pill-primary):not(.pill-danger):not(.pill-danger-line) { background: var(--surface, #fff); border-color: var(--brand); }
+.pill.pill-action { background: var(--surface, #fff); border: 1.5px solid var(--brand); color: var(--brand-text); font-weight: 800; }
+.pill.pill-small.pill-action, .pill.pill-small.pill-danger-line, .pill.pill-small.pill-danger { min-height: 44px; height: auto; }
+.pill.pill-danger-line { background: var(--surface, #fff); border: 1.5px solid var(--low-text); color: var(--low-text); font-weight: 800; }
+.pill.pill-danger-line:disabled, .pill.pill-action:disabled { opacity: .55; }
+.pill.pill-wide.pill-danger-line { min-height: 48px; width: 100%; }
