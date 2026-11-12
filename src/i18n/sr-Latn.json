@@ -62,7 +62,7 @@
       "checked": true
     },
     "howMuchAte": {
-      "text": "Prijatno. Koliko si pojeo?",
+      "text": "Prijatno. Koliko si pojeo?|Prijatno. Koliko si pojela?",
       "checked": true
     },
     "howManyAte": {
@@ -22367,6 +22367,10 @@
     },
     "coach.handledOn": {
       "text": "Rešeno {date}",
+      "checked": true
+    },
+    "make.aPortion": {
+      "text": "Jednu porciju",
       "checked": true
     }
   }

@@ -22368,6 +22368,10 @@
     "coach.handledOn": {
       "text": "Erledigt am {date}",
       "checked": true
+    },
+    "make.aPortion": {
+      "text": "Eine Portion",
+      "checked": true
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "release": "0.3.140",
-  "at": "2026-11-12T12:51:21.518Z",
+  "at": "2026-11-12T13:01:26.324Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -46907,6 +46907,23 @@
       "release": "0.3.140",
       "order": 900004,
       "at": "2026-11-12T12:51:21.518Z"
+    },
+    {
+      "id": "screen.make.aPortion",
+      "kind": "screen",
+      "key": "make.aPortion",
+      "en": "A portion",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Jednu porciju",
+      "de": "Eine Portion",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900000,
+      "at": "2026-11-12T13:01:26.324Z"
     }
   ]
 }

@@ -5591,6 +5591,7 @@
     "screen.coach.sureMarkAsHandled": {"en":"Sure? Tap again to mark as handled","area":"Clients","where":"Clients","release":"0.3.140"},
     "screen.coach.keepIt": {"en":"Keep it","area":"Clients","where":"Clients","release":"0.3.140"},
     "screen.coach.leavesWithoutInvite": {"en":"It leaves Waiting for you without an invite.","area":"Clients","where":"Clients","release":"0.3.140"},
-    "screen.coach.handledOn": {"en":"Handled {date}","area":"Clients","where":"Clients","release":"0.3.140"}
+    "screen.coach.handledOn": {"en":"Handled {date}","area":"Clients","where":"Clients","release":"0.3.140"},
+    "screen.make.aPortion": {"en":"A portion","area":"The Plate","where":"The Plate","release":"0.3.140"}
   }
 }

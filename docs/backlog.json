@@ -1023,6 +1023,21 @@
       "epic": "plate",
       "state": "later",
       "why": "Coach Milan with Tester 2, 12 November 13:53: a product keeps its name from the package (Roggen Vollkornbrot, bought at DM in Belgrade, no Serbian on it). A short note on the food card says what it is and where it was bought, in your language. Chef Mealan could read it too."
+    },
+    {
+      "id": "B138",
+      "title": "A portion in English and Koliko si pojeo? in one form only, on the Serbian Eat screen",
+      "epic": "lang",
+      "state": "done",
+      "version": "0.3.140",
+      "why": "Coach Milan 12 November 13:58, with a screenshot: after cooking, the chip A portion was English (a fixed string in the code), and Chef Mealan's Prijatno. Koliko si pojeo? had no second form while the title above said pojela. Go 14:00. A portion is a line now; the Chef line has both forms; a test guards Chef lines with pojeo or pojela."
+    },
+    {
+      "id": "B139",
+      "title": "I ate it shows a ✓ before it is done",
+      "epic": "home",
+      "state": "next",
+      "why": "Coach Milan 12 November 14:02, with a screenshot of Today: the blue I ate it with a ✓ reads as already done, though it is the button to tap. The ✓ sits on I ate it in Next and What's in the plan on Today and on the recipe page. Suggested: no ✓ on a button still to tap; a ✓ only once done. Waits for Go."
     }
   ]
 }
