@@ -22304,6 +22304,30 @@
     "yourcooks.openMeal": {
       "text": "Otvori obrok: {date}",
       "checked": true
+    },
+    "sameask.already": {
+      "text": "Ova slika je već upisana kao obrok ({day}).",
+      "checked": true
+    },
+    "sameask.mealLine": {
+      "text": "{title}, {g} g",
+      "checked": true
+    },
+    "sameask.update": {
+      "text": "Ažuriraj taj obrok",
+      "checked": true
+    },
+    "sameask.both": {
+      "text": "Zadrži oba",
+      "checked": true
+    },
+    "sameask.back": {
+      "text": "Nazad",
+      "checked": true
+    },
+    "sameask.help": {
+      "text": "Ažuriraj taj obrok: uzima namirnice i količine sa ovog tanjira i ostaje u {time}. Zadrži oba: dva obroka, ako je pojedeno dva puta.",
+      "checked": true
     }
   }
 }

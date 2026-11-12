@@ -40,3 +40,22 @@ export function deleteCard(s: PilotState, id: string): PilotState {
   const cook = s.cook && (s.cook as { cardId?: string }).cardId === id ? { ...s.cook, cardId: undefined } : s.cook;
   return { ...s, feedback: s.feedback.filter((f) => f.id !== id), ...(cook !== s.cook ? { cook } : {}) };
 }
+
+// DT285 (0.3.139, board Stories212; Coach Milan 12 November 09:44, Go): a meal about to be saved as eaten with a photo that a
+// meal of that same day already has. Same photo means the same picture: the same data, or the same fingerprint. The day is the
+// day of the new meal's time, on this phone's clock.
+const sigOf = (x: string) => (x.startsWith("data:") ? `${x.length}:${x.slice(-32)}` : x);
+export function samePhotoMeal(feedback: Feedback[], photos: (string | null | undefined)[], at: string): Feedback | null {
+  const want = new Set(photos.filter((x): x is string => typeof x === "string" && x.length > 0).map(sigOf));
+  if (!want.size) return null;
+  const day = new Date(at).toDateString();
+  return feedback.find((f) => f.status === "eaten" && new Date(f.createdAt).toDateString() === day
+    && [f.photo, ...(f.photos ?? [])].some((x) => typeof x === "string" && want.has(sigOf(x)))) ?? null;
+}
+// Update that meal: the earlier meal takes the new one's foods and amounts (and its taste and words when given); it keeps its
+// id, its time, its meal of the day and its photo
+export function updateWith(earlier: Feedback, next: Partial<Feedback> & { meal: Feedback["meal"] }): Feedback {
+  return { ...earlier, ...next, id: earlier.id, createdAt: earlier.createdAt, slot: earlier.slot, which: earlier.which, photo: earlier.photo ?? next.photo,
+    status: "eaten", meal: { ...next.meal, portion: Math.max(1, aggregate(next.meal.items).weight) },
+    taste: next.taste || earlier.taste, notes: (next.notes ?? "").trim() || earlier.notes };
+}

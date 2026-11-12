@@ -42,15 +42,7 @@
       "why": "One conversation between the cook and the chef: every question in his own line, written as a script that voice can read later."
     }
   },
-  "versions": [
-    "0.3.56",
-    "0.3.55",
-    "0.3.54",
-    "0.3.53",
-    "0.3.52",
-    "0.3.51",
-    "0.3.50"
-  ],
+  "versions": ["0.3.139", "0.3.138", "0.3.137", "0.3.136", "0.3.135", "0.3.134", "0.3.133"],
   "tickets": [
     {
       "id": "DT212",
@@ -623,7 +615,7 @@
     {
       "id": "DT248",
       "title": "Voice in the app's language",
-      "epic": "cooking",
+      "epic": "cook",
       "state": "done",
       "why": "Coach Milan 7 November 05:54 (test with Darinka, Srpski UI, English recipe, a loud room): voice felt English only. Check: cook mode listens in the app's language (sr-RS) and hears Srpski, English and German commands; Chef Mealan's answers are spoken in the app's language. Still English: every fixed line cook mode says (Step 1., Done. Enjoy your meal., the timer is done, Sorry, say that again?, This recipe has N steps, the how-much answers) and its English voice; the step's own words are read with an English voice whatever language the recipe is in; Say what you have on the Plate listens in English only (en-GB). Its own item, with a board (Milan 06:01). Board drawn 7 November, waits for Go. Built in 0.3.98 (Go 06:14).",
       "board": 184
@@ -639,7 +631,7 @@
     {
       "id": "DT250",
       "title": "Offer a recipe in your language",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "done",
       "why": "Coach Milan 7 November 06:14, to brainstorm: when a recipe is in another language than the app's (an English recipe, Srpski on), offer to translate it into the selected language. Brainstorm 07:58: c) both. A recipe from a link or a screenshot comes in already in the app's language, the original kept in the background; an older recipe in another language gets one line on its page, Show it in <language>?, Chef Mealan translates it once and it is kept, with a switch <language> / Original. Name, steps and foods not in the food table; amounts, temperatures and times stay; each food in a step stays linked. Cook mode reads the version chosen, in its voice. Chef Mealan's mark on a translation. 08:00 b): Start cooking asks once too (Cook it in <language>, or Cook it as written). Board drawn 7 November, waits for Go. Built in 0.3.99 (Go 08:05).",
       "board": 185
@@ -647,7 +639,7 @@
     {
       "id": "DT251",
       "title": "Get it ready: cook mode reads the foods before step 1",
-      "epic": "cooking",
+      "epic": "cook",
       "state": "done",
       "why": "Coach Milan 7 November 08:07 and 08:26: a step before step 1 that lists every food with its amount; by voice one at a time (next, repeat), ticked as you put each out; then step 1. Board to draw. Board drawn 7 November 09:07; Go 12:28; built in 0.3.104.",
       "board": 186
@@ -655,7 +647,7 @@
     {
       "id": "DT252",
       "title": "Voice through the kitchen flow",
-      "epic": "cooking",
+      "epic": "cook",
       "state": "later",
       "why": "Coach Milan 7 November 08:07, parked 08:26: in the kitchen, Chef, what should I cook for lunch? Ideas out loud, the second one on the Plate fitted, Start cooking, cook mode by voice, after eating the questions answered by voice. The kitchen flow first, not every screen."
     },
@@ -670,7 +662,7 @@
     {
       "id": "DT254",
       "title": "The cover is the recipe's video: plays once, then rests",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "done",
       "why": "Coach Milan 7 November 12:16: put the video made from the step photos and the final meal on the recipe page as the cover, like a YouTube channel of recipes. He picked C at 12:28: it plays once without sound when the page opens, then rests on the cover with Again. Board 187 drawn 12:46; 13:06 ▶ in the middle of the cover, on the tile and on the page. Go 13:24; built in 0.3.105.",
       "board": 187
@@ -678,7 +670,7 @@
     {
       "id": "DT255",
       "title": "Voice commands in Srpski and German: timers, what is left, steps, foods in any ending",
-      "epic": "cooking",
+      "epic": "cook",
       "state": "done",
       "why": "Coach Milan 7 November 22:17 to 22:20, from the DT203 gaps: cook mode in Srpski or German does not set a timer by voice, says nothing for what is left, goes to no step by number, finds a food only as written, and a step's minutes get no timer button. Board 190 drawn 22:22, Go 22:25; built in 0.3.110.",
       "board": 190
@@ -686,7 +678,7 @@
     {
       "id": "DT256",
       "title": "Cook the original's steps when they work with your foods",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "done",
       "why": "Coach Milan 7 November 23:59 to 8 November 00:01: his Chicken rice bowl from a screenshot had the six steps and the green line, and Start cooking was grey. Start cooking cooks the original's steps as written when they fit; the first cook makes them the recipe's own, so step pictures and the cover video work. Board 191 drawn 00:03, Go 00:06; built in 0.3.111.",
       "board": 191
@@ -694,7 +686,7 @@
     {
       "id": "DT257",
       "title": "Camera or Gallery for a step's photo and the meal's photo",
-      "epic": "cooking",
+      "epic": "cook",
       "state": "done",
       "why": "Coach Milan 8 November 00:04: Add a photo in step one has no upload. On Android the camera-only input opened the camera alone. Board 192 (00:08), Go 00:09; built in 0.3.111: a tap asks Camera or Gallery, in cook mode and on Make.",
       "board": 192
@@ -789,7 +781,7 @@
     {
       "id": "CR1",
       "title": "Creator: hands-free recording while cooking, then the recipe, the photos, the video, the post and a recipe book, in the creator's look",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "later",
       "why": "Coach Milan 8 November 18:53 to 18:56: recipe and meal creators and influencers are a separate niche with separate pricing, a monthly fee plus credits. Outputs: recipe, photos, video, post, a published recipe book with its own design. In the pricing paper under Creator. Brainstorm, then a board, after the gate opens."
     },
@@ -870,7 +862,7 @@
     {
       "id": "DT276",
       "title": "Photos on the steps: one store, shown everywhere, more than one per step, several at once",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "done",
       "board": "Stories205",
       "why": "Coach Milan 10 November 21:24 to 22:37, Go: step photos seemed to live in three places and went in one by one. Step 1 (Make's tick list shows the recipe's step picture) is built, 0.3.127. Step 2 (a step can have two or more pictures; they show among the recipe's photos, On the steps) is built, 0.3.129. Step 3 (pick several at once, then each on its step; the ones on no step go to the recipe's photos, which hold 6) is built, 0.3.130.",
@@ -879,7 +871,7 @@
     {
       "id": "DT277",
       "title": "Training week: a day shows it can be opened",
-      "epic": "me",
+      "epic": "setup",
       "state": "done",
       "board": "Stories206",
       "why": "Coach Milan 10 November 21:54: it is not clear what to do here. A pencil on a day with training, a plus on a day with none, from the bottom menu's icon set. Go 22:53.",
@@ -895,7 +887,7 @@
     {
       "id": "DT281",
       "title": "Photo first on the steps: the recipe page and Make",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "done",
       "board": "Stories208",
       "why": "Coach Milan 11 November 08:12 to 17:39, Go: see the photo first, then read what to do, as on social media. The number or the tick stays at the top left; the photos, then the words. In Make, + Photo sits above the words on every step. Members do not get step photos today, so this is your own recipe page only.",
@@ -904,7 +896,7 @@
     {
       "id": "DT280",
       "title": "One gallery for the recipe: the cover and the step photos in one place",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "done",
       "version": "0.3.132",
       "board": "Stories207",
@@ -913,7 +905,7 @@
     {
       "id": "DT282",
       "title": "Your cooks: a tap on a cook's photo opens that cook; Add to the recipe's photos",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "done",
       "board": "Stories209",
       "version": "0.3.135",
@@ -922,7 +914,7 @@
     {
       "id": "DT283",
       "title": "Drawn by AI, chosen in the gallery: Who made it? under a picked photo; AI tag on the thumb and the cover",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "done",
       "board": "Stories210",
       "version": "0.3.137",
@@ -931,11 +923,35 @@
     {
       "id": "DT284",
       "title": "A past meal: Change it and Delete this meal; the rows of Every time you ate it open their meal",
-      "epic": "recipes",
+      "epic": "cook",
       "state": "done",
       "board": "Stories211",
       "version": "0.3.138",
       "why": "Coach Milan 12 November 07:55, on a call with a tester: one meal recorded twice because a past meal can't be changed (Cook it again made a second one). Drawn with a clickable prototype (artifact DT284 Prototype). Go 12 November 08:24. The guard against doubles (same photo in the same day) is DT285, to draw."
+    },
+    {
+      "id": "DT285",
+      "title": "The same photo twice in one day asks first: Update that meal, Keep both, Back",
+      "epic": "cook",
+      "state": "done",
+      "board": "Stories212",
+      "version": "0.3.139",
+      "why": "Coach Milan 12 November 09:04 (draw), 09:44 (prototype for practice), 10:04 (Go). A meal about to be saved as eaten (Ate it on the Plate, Eat after cooking, I ate this) with a photo a meal of that same day already has asks first. Update that meal keeps one record at its own time and meal of the day, with the new foods and amounts; Keep both saves a second meal; Back saves nothing."
+    },
+    {
+      "id": "DT279",
+      "title": "A new beta application shows high on Clients, in Waiting for you",
+      "epic": "coach",
+      "state": "next",
+      "why": "Coach Milan 11 November: the news that someone applied to be a beta tester sits near the bottom of the Clients page; it is great news and must not be missed. To draw."
+    },
+    {
+      "id": "CR1a",
+      "title": "Creator: Make a post from a cooked meal (0.4.0)",
+      "epic": "cook",
+      "state": "now",
+      "board": "Stories199",
+      "why": "Coach Milan 9 November: the first Creator phase. Drawn; waits for Go. It starts 0.4.0. Roles and pricing go to a new chat."
     }
   ]
 }

@@ -3252,3 +3252,12 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .rc-photo img { display: block; }
 .pm-words { margin: 10px 0 0; font-size: 14px; line-height: 1.45; }
 .rq-cook-add { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; } .rq-cook-add .pill { min-height: 48px; }
+
+/* DT285 (0.3.139): the same photo already a meal of that day */
+.same-ask { display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-card); padding: 12px; }
+.same-ask .same-title { font-size: var(--fs-body); line-height: 1.4; }
+.same-ask .same-meal { display: flex; gap: 10px; align-items: center; border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 8px; }
+.same-ask .same-meal img { width: 56px; height: 56px; object-fit: cover; border-radius: var(--r-control); flex: none; }
+.same-ask .same-meal span { display: flex; flex-direction: column; line-height: 1.4; min-width: 0; }
+.same-ask .pill, .same-ask .link { min-height: 44px; }
+.same-ask .link { align-self: flex-start; }

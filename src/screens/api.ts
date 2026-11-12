@@ -3,6 +3,8 @@ import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more" | "explorer";
+// DT285 (0.3.139): the same photo already a meal of that day: Update that meal, or Keep both
+export type SameAsk = { earlier: import("../pilot").Feedback; update: () => void; both: () => void };
 export type PlateAsk = { kind: "photo" | "recipe" | "slot" | "food"; what: string; image?: string; apply: (how: "add" | "new") => void };
 export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "summary" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share" | "explorer" | "calendar" | "admin" | "settings" | "voice" | "dev" | "language" | "delete" | "howto";
 // the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
@@ -36,13 +38,13 @@ export interface AppApi {
   servedPatch: (id: string, patch: Partial<Pick<import("../served").Served, "name" | "dish" | "mine">>) => void;
   servedRemove: (id: string) => void;
   servedNote: (visit: string, note: string) => void;
-  servedAte: (ids: string[], slot: { date: string; slotId: string; name: string; time: string }, at: string) => void;
+  servedAte: (ids: string[], slot: { date: string; slotId: string; name: string; time: string }, at: string, same?: "both" | Feedback) => boolean | void;
   servedToPlate: (id: string) => void;
   // DT268 step 3 (0.3.120): the menu of a visit
   readMenu: (visit: string, image: string) => Promise<boolean>;
   pickMenuLine: (plate: string, line: number | null) => void;
   dropMenuLine: (plate: string) => void;
-  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean }) => void;
+  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback }) => boolean | void;
   // DT130 (0.2.110): Photo of my meal opens the meal camera; a photo from Your photos waits on the Plate for whose and when
   mealCamera: () => void;
   // DT175 (0.3.17): the foods you said you have, landed on the Plate as estimates; false when nothing came of it
@@ -297,6 +299,9 @@ export interface AppApi {
   // DT284 (0.3.138): a past meal changed in place, or deleted
   changeCard: (id: string, ch: import("../pastMeal").CardChange) => void;
   deleteCard: (id: string) => void;
+  sameAsk: SameAsk | null;
+  askSamePhoto: (x: SameAsk) => void;
+  answerSameAsk: (how: "update" | "both" | null) => void;
   // the photo ask on a meal card when the recipe's cover is drawn (0.2.11, board CO, CO1b, CO1c)
   setCardPhoto: (id: string, data: string) => void;
   setCoverAsk: (id: string, v: "later" | "kept" | "used") => void;

@@ -1,5 +1,5 @@
 import { numLocale } from "./words";
-import { changeCard as changeCardIn, deleteCard as deleteCardIn, type CardChange } from "./pastMeal";
+import { changeCard as changeCardIn, deleteCard as deleteCardIn, samePhotoMeal, updateWith, type CardChange } from "./pastMeal";
 import { w, wn, dateText, type WordKey } from "./words";
 import { wx } from "./wx";
 import { weekdayName } from "./weekdayWords";
@@ -878,6 +878,8 @@ export default function App() {
     [carryNow, setCarryNow] = useState<{ id: string; at: number } | null>(null),
     // DT131 (0.2.113, board Stories87; Milan 27 October 13:52): foods about to land on a plate that has foods wait for one answer
     [plateAsk, setPlateAsk] = useState<import("./screens/api").PlateAsk | null>(null),
+    // DT285 (0.3.139): the same photo already a meal of that day asks first
+    [sameAsk, setSameAsk] = useState<import("./screens/api").SameAsk | null>(null),
     // DT212 v4 and DT214 v2 (0.3.53): Start cooking on a plate with foods asks first; a food scanned while cooking asks where it goes
     [cookAsk, setCookAsk] = useState<{ meal: Meal } | null>(null),
     [pendingFood, setPendingFood] = useState<Food | null>(null),
@@ -2581,15 +2583,19 @@ export default function App() {
     },
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
     // DT133 (0.2.113): one portion of a plate of several, the rest kept on Today
-    ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean }) => {
+    ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback }) => {
       const now = x.at ?? new Date().toISOString();
+      // DT285: the same photo already a meal of that day: Update that meal, or Keep both
+      const earlier = !x.same && x.photo ? samePhotoMeal(state.feedback, [x.photo], now) : null;
+      if (earlier) { setSameAsk({ earlier, update: () => screenProps.ateNow(meal, slot, { ...x, same: earlier }), both: () => screenProps.ateNow(meal, slot, { ...x, same: "both" }) }); return false; }
+      const into = x.same && x.same !== "both" ? x.same : null;
       const n = x.portions && x.portions >= 2 ? x.portions : x.half ? 2 : 1;
       const part = (m: Meal, k: number): Meal => ({ ...m, id: uid(), items: m.items.map((i) => ({ ...i, grams: Math.round((i.grams * k) / n), est: undefined })), portion: Math.round(((m.portion ?? 0) * k) / n) });
       const eaten = n > 1 ? part(meal, 1) : { ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })) };
       setState((s) => ({ ...s,
-        feedback: [{ id: uid(), meal: structuredClone(eaten), status: "eaten" as const, taste: "", notes: "", createdAt: now, ...(slot ? { slot } : {}), ...(s.course ? { course: s.course } : {}), ...(x.photo ? { photo: x.photo, photos: [x.photo] } : {}), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined, moment } as Feedback,
+        feedback: [...(into ? [] : [{ id: uid(), meal: structuredClone(eaten), status: "eaten" as const, taste: "", notes: "", createdAt: now, ...(slot ? { slot } : {}), ...(s.course ? { course: s.course } : {}), ...(x.photo ? { photo: x.photo, photos: [x.photo] } : {}), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined, moment } as Feedback]),
           ...(n > 1 ? [{ id: uid(), meal: structuredClone({ ...part(meal, n - 1), title: x.portions ? (n - 1 === 1 ? w("app.otherPortion", { title: meal.title }) : w("app.otherPortions", { title: meal.title, n: n - 1 })) : w("app.otherHalf", { title: meal.title }) }), status: "prepared" as const, taste: "", notes: "", createdAt: now, ...(x.photo ? { photo: x.photo } : {}) } as Feedback] : []),
-          ...s.feedback],
+          ...(into ? s.feedback.map((f) => (f.id === into.id ? updateWith(f, { meal: structuredClone(eaten) }) : f)) : s.feedback)],
         items: [], portion: null, title: "", photo: undefined, course: undefined }));
       if (x.stay) { notify(w("app.loggedAt", { time: new Date(now).toTimeString().slice(0, 5) })); return; }
       setStep("in"); setTab("home");
@@ -2639,13 +2645,17 @@ export default function App() {
       return { ...s, served, ...(s.servedMenus ? { servedMenus: s.servedMenus.filter((m) => visits.has(m.visit)).map((m) => ({ ...m, asks: m.asks.filter((a) => a.plate !== id) })) } : {}), ...(s.photo?.served?.id === id ? { photo: { ...s.photo, keep: false as const } } : {}) }; }),
     servedNote: (visit: string, note: string) => setState((s) => ({ ...s, served: withNote(s.served ?? [], visit, note) })),
     // I ate this: your dishes of the visit go to the day as one meal, with their photos; the plates stay in Served
-    servedAte: (ids: string[], slot: NonNullable<Feedback["slot"]>, at: string) => {
+    servedAte: (ids: string[], slot: NonNullable<Feedback["slot"]>, at: string, same?: "both" | Feedback) => {
       const plates = (state.served ?? []).filter((x) => ids.includes(x.id));
       if (!plates.length) return;
+      // DT285: the same photo already a meal of that day
+      const earlier = !same ? samePhotoMeal(state.feedback, plates.flatMap((x) => [x.photo, ...(x.more ?? [])]), at) : null;
+      if (earlier) { setSameAsk({ earlier, update: () => screenProps.servedAte(ids, slot, at, earlier), both: () => screenProps.servedAte(ids, slot, at, "both") }); return false; }
+      const into = same && same !== "both" ? same : null;
       const items = mealItems(plates), photos = plates.flatMap((x) => [x.photo, ...(x.more ?? [])]).filter(Boolean);
       const main = plates.find((x) => x.dish === "main") ?? plates[0];
       const meal: Meal = { id: uid(), title: mealTitle(plates) || "Meal", items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: at };
-      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten", slot, taste: "", notes: "", createdAt: at, photo: main.photo, photos } as Feedback, ...s.feedback],
+      setState((s) => ({ ...s, feedback: into ? s.feedback.map((f) => (f.id === into.id ? updateWith(f, { meal }) : f)) : [{ id: uid(), meal, status: "eaten", slot, taste: "", notes: "", createdAt: at, photo: main.photo, photos } as Feedback, ...s.feedback],
         served: (s.served ?? []).map((x) => (ids.includes(x.id) ? { ...x, eatenAt: at } : x)) }));
       notify(w("app.loggedAt", { time: new Date(at).toTimeString().slice(0, 5) }));
     },
@@ -2874,6 +2884,8 @@ export default function App() {
     // a card becomes a recipe: the foods, the grams, the steps and the photo (gap C, 10 October 2026)
     // DT284 (0.3.138, board Stories211): a past meal changed in place (one record, its own time), or deleted
     changeCard: (id: string, ch: CardChange) => { setState((s) => changeCardIn(s, id, ch)); log("past_meal", { did: "change" }); },
+    sameAsk, askSamePhoto: (x: import("./screens/api").SameAsk) => setSameAsk(x),
+    answerSameAsk: (how: "update" | "both" | null) => { const x = sameAsk; setSameAsk(null); if (!x || !how) return; log("same_photo", { how }); (how === "update" ? x.update : x.both)(); },
     deleteCard: (id: string) => { setState((s) => deleteCardIn(s, id)); log("past_meal", { did: "delete" }); },
     setCardPhoto: (id: string, data: string) => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, photo: data, photos: [...(f.photos ?? []), data] } : f)) }));

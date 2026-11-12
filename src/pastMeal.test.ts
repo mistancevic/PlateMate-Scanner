@@ -29,3 +29,17 @@ test("a change stays one record, at its own time; a delete takes the record out"
   assert.deepEqual(d.feedback.map((f) => f.id), ["a"]); assert.equal((d.cook as any).cardId, undefined, "the cook no longer points to it");
   assert.equal(deleteCard(d, "zz"), d, "nothing to delete: nothing changes");
 });
+
+import { samePhotoMeal, updateWith } from "./pastMeal";
+test("the same photo in the same day is found; another day or another photo is not", () => {
+  const P = "data:image/png;base64," + "A".repeat(3000), Q = "data:image/png;base64," + "B".repeat(3000);
+  const a = card("a", [it("bread", 100)], { photo: P, createdAt: "2026-11-11T09:08:00.000Z" });
+  const old = card("o", [it("bread", 100)], { photo: Q, createdAt: "2026-11-10T09:08:00.000Z" });
+  assert.equal(samePhotoMeal([a, old], [P], "2026-11-11T20:10:00.000Z")?.id, "a");
+  assert.equal(samePhotoMeal([a, old], [Q], "2026-11-11T20:10:00.000Z"), null, "the same photo on another day");
+  assert.equal(samePhotoMeal([a], [Q], "2026-11-11T20:10:00.000Z"), null, "another photo");
+  assert.equal(samePhotoMeal([a], [], "2026-11-11T20:10:00.000Z"), null, "no photo: nothing asked");
+  assert.equal(samePhotoMeal([{ ...a, status: "prepared" }], [P], "2026-11-11T20:10:00.000Z"), null, "only eaten meals");
+  const u = updateWith({ ...a, slot: { date: "2026-11-11", slotId: "b", name: "Breakfast", time: "08:00" } }, { meal: { ...a.meal, items: [it("bread", 50)] }, taste: "Good", notes: "" });
+  assert.deepEqual([u.id, u.createdAt, u.slot?.name, u.photo, u.meal.portion, u.taste], ["a", "2026-11-11T09:08:00.000Z", "Breakfast", P, 50, "Good"]);
+});

@@ -1,4 +1,6 @@
 import { w, wn, wIn, dec, mealV, mealName, wordV, dateV, dateText, type Val, type WordKey } from "../words";
+import { samePhotoMeal, updateWith } from "../pastMeal";
+import { SamePhotoAsk } from "../components/SamePhotoAsk";
 import { ServedOnPlate } from "../components/Served";
 import { locOf, getLang, speechLang, useLang } from "../lang";
 import { shownMeal } from "../recipeLang";
@@ -1372,13 +1374,15 @@ export function JourneyScreen(p: AppApi) {
   };
   const plateMeal = (): Meal => ({ id: uid(), title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
   // Ate it: the plate to the meal it was set for, at the photo's time (or when it was started)
-  const ateEarlier = (stay: boolean) => { const at = state.photo?.at ?? since?.toISOString(); const d = at ? new Date(at) : new Date(); p.ateNow(plateMeal(), slotFor(d), { photo: state.photo?.image ?? null, at, stay }); };
+  const ateEarlier = (stay: boolean) => { const at = state.photo?.at ?? since?.toISOString(); const d = at ? new Date(at) : new Date(); return p.ateNow(plateMeal(), slotFor(d), { photo: state.photo?.image ?? null, at, stay }) !== false; };
   const clearPlate = () => { emptyPlate(); setState((s) => ({ ...s, title: "", plateAsked: undefined })); };
   // DT203 release 2 (0.3.77): the plate in words, in the language of the line it goes in
   const plateIn: PlateIn = (l) => { const base = state.title && state.title !== "DaaM" ? state.title : foodsLineIn(l, items); return base === null ? null : state.photo ? wIn(l, "plate.fromPhoto", { plate: base }) : base; };
   const dayOf = since ? dayWord(new Date(state.photo?.at ?? since.toISOString())) : "";
   const dayOfV: Val = (l) => (since ? dayIn(l, new Date(state.photo?.at ?? since.toISOString())) : "");
   const inQuestion = step !== "in" ? null
+    // DT285 (0.3.139, board Stories212): the same photo already a meal of that day asks first
+    : p.sameAsk ? (<section className="chef-ask same-ask-wrap" aria-label={w("make.yourPlateFromEarlier")}>{plateIsOld && since && <ChefLine image={state.photo?.image} text={say("plateOldAte", since, plateIn)} />}<SamePhotoAsk ask={p.sameAsk} answer={p.answerSameAsk} /></section>)
     // DT240 (0.3.96, board Stories182; Coach Milan 6 November 10:14 and 10:32, b): a new plate came in while a cook is still
     // open: Chef Mealan asks once, Go on with it or End it; the strip waits for the answer
     : p.cookOpenAsk && state.cook && items.length > 0 ? (() => { const c = state.cook!, sw = stripWords(c); return (
@@ -1409,7 +1413,7 @@ export function JourneyScreen(p: AppApi) {
     : p.cookAsk && items.length > 0 ? (() => { const m = p.cookAsk!.meal; return plateIsOld && since ? (
       <section className="chef-ask" aria-label={w("make.beforeYouCookYourPlate")}>
         <ChefLine image={state.photo?.image} text={say("plateOldBeforeCook", since, plateIn)} />
-        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => { ateEarlier(true); p.answerCookAsk("ate"); }}>{w("plate.ateIt")}</button><button type="button" className="pill" onClick={() => p.answerCookAsk("save")}>{w("plate.saveForLater")}</button></div>
+        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => { if (ateEarlier(true)) p.answerCookAsk("ate"); }}>{w("plate.ateIt")}</button><button type="button" className="pill" onClick={() => p.answerCookAsk("save")}>{w("plate.saveForLater")}</button></div>
         <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk("clear")}>{w("plate.clearIt")}</button><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>{w("plate.cancel")}</button></div>
         <small>{w("plate.cookAskHelp", { dish: m.title })}</small>
       </section>) : (
@@ -2551,7 +2555,7 @@ export function JourneyScreen(p: AppApi) {
   const cookMeal = () => ({ id: uid(), title: p.state.title || autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
   const cookPhotos = [...Object.keys(stepPhotos).map(Number).sort((x, y) => x - y).map((k) => ({ k, src: stepPhotos[String(k)] })), ...(plate ? [{ k: null as number | null, src: plate }] : [])];
   const eatLater = ate === "later" || ate === "not";
-  const saveEat = (bigOk = false) => {
+  const saveEat = (bigOk = false, same?: "both" | Feedback) => {
     if (eatLater) {
       log("made", { went, ate, photos: cookPhotos.length });
       p.keepForLater({ ...cookMeal() }, { photos: cookPhotos.map((x) => x.src), prep: { went, different: different || undefined }, status: ate === "later" ? "prepared" : "not-used" });
@@ -2560,6 +2564,12 @@ export function JourneyScreen(p: AppApi) {
       return;
     }
     if (!bigOk && ate === "all" && (eatenKcal > BIG_MEAL || (dayKcal !== null && eatenKcal > dayKcal))) { setBigAsk(true); return; }
+    // DT285 (0.3.139): a photo of this cook already a meal of the same day: Update that meal, or Keep both
+    if (!same && good !== "no") {
+      const earlier = samePhotoMeal(state.feedback, [...photos, ...cookPhotos.map((x) => x.src)], new Date().toISOString());
+      if (earlier) { p.askSamePhoto({ earlier, update: () => saveEat(true, earlier), both: () => saveEat(true, "both") }); return; }
+    }
+    const into = same && same !== "both" ? same : null;
     log("made", { went, ate, photos: cookPhotos.length });
         const name = changedFrom && recipeChoice === "new" ? (((newRecipeName ?? suggestedName).trim() && (newRecipeName ?? suggestedName).trim().toLowerCase() !== changedFrom.title.toLowerCase()) ? (newRecipeName ?? suggestedName).trim() : suggestedName) : title.trim() || plateName;
         const src = way?.kind === "change" && fromRec?.source ? { source: { name: fromRec.source.name, ...(fromRec.source.url ? { url: fromRec.source.url } : {}), from: fromRec.source.from, at: fromRec.source.at } } : {};
@@ -2602,7 +2612,8 @@ export function JourneyScreen(p: AppApi) {
         const shared = sharing && shareWhy ? { reason: shareWhy, at: new Date().toISOString() } : undefined;
         const allPhotos = [...photos, ...cookPhotos.map((x) => x.src)];
         const photoSteps = [...photos.map(() => null), ...cookPhotos.map((x) => x.k)];
-        const cardId = uid();
+        const cardId = into ? into.id : uid();
+        const placeCard = (c: Feedback, list: Feedback[]) => (into ? list.map((f) => (f.id === into.id ? updateWith(f, c) : f)) : [c, ...list]);
         const coverNow = status === "eaten" && allPhotos.length ? allPhotos[allPhotos.length - 1] : null;
         // a plate that is a recipe as it stands (0.2.3): the card points at that recipe, no second copy
         const keep = changedFrom ? recipeChoice === "new" && status === "eaten" : !origin && saveRecipe && status === "eaten";
@@ -2619,7 +2630,7 @@ export function JourneyScreen(p: AppApi) {
         setState((s) => ({ ...s, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (updateBase && m.id === updateBase.id ? { ...m, items: structuredClone(keptItems), portion: keptWeight } : m)).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m))
           // DT85 (Milan 23 October 20:58 and 24 October 09:44): the photo taken while making it is the cover of a recipe with no
           // photo of its own yet (no cover, or one Chef Mealan drew); a drawn picture stays behind it. A cover of your own stays.
-          .map((m) => (coverNow && m.id === landId && !ownPhotosOf(m).length ? { ...m, ...withRecipePhotos([coverNow, ...recipePhotosOf(m).filter((x) => x !== coverNow)].slice(0, 6)) } : m)), feedback: [{ id: cardId, meal: structuredClone(eatenMeal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, ...(cookPhotos.length ? { photoSteps } : {}), ...(coverNow && landId && !ownPhotosOf(s.meals.find((m) => m.id === landId) ?? {}).length ? { coverAsk: "used" as const } : {}), prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
+          .map((m) => (coverNow && m.id === landId && !ownPhotosOf(m).length ? { ...m, ...withRecipePhotos([coverNow, ...recipePhotosOf(m).filter((x) => x !== coverNow)].slice(0, 6)) } : m)), feedback: placeCard({ id: cardId, meal: structuredClone(eatenMeal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, ...(cookPhotos.length ? { photoSteps } : {}), ...(coverNow && landId && !ownPhotosOf(s.meals.find((m) => m.id === landId) ?? {}).length ? { coverAsk: "used" as const } : {}), prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() } as Feedback, s.feedback), items: [], portion: null, title: "" }));
         // DT81: the batch just made, counted: Plan's pieces of it are its share; or it always makes this many, the recipe's number
         if (status === "eaten" && wholeN > 1 && rec?.makes) {
           const made = wholeN, cooked = cookCount, recId = rec.id;
@@ -2766,7 +2777,8 @@ export function JourneyScreen(p: AppApi) {
         </div>
       )}
       </>}
-      {!bigAsk && <button className="pill pill-primary pill-wide" disabled={!eatLater && (good === null || (sharing && !shareWhy))} onClick={() => saveEat()}>{sharing && !eatLater ? w("make.saveShare", { coach: p.coachLabel }) : w("make.save")}</button>}
+      {p.sameAsk && <SamePhotoAsk ask={p.sameAsk} answer={p.answerSameAsk} />}
+      {!bigAsk && !p.sameAsk && <button className="pill pill-primary pill-wide" disabled={!eatLater && (good === null || (sharing && !shareWhy))} onClick={() => saveEat()}>{sharing && !eatLater ? w("make.saveShare", { coach: p.coachLabel }) : w("make.save")}</button>}
 
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>{w("make.shareWith", { coach: p.coachLabel })}</button>}
       {sharing && <button className="link" onClick={() => { setSharing(false); setShareWhy(null); }}>{w("make.keepItPrivate")}</button>}

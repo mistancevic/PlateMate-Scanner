@@ -32,6 +32,8 @@ seed.meals = [bowl("bowl", "Chicken rice bowl"), bowl("mine", "Rice bowl with a 
     await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
+    // DT285 (0.3.139): the same photo made twice in one day asks first; here it was made twice
+    if (await page.locator(".same-ask").count()) { await page.locator(".same-ask").getByRole("button", { name: "Keep both" }).click(); await page.waitForTimeout(1200); }
   };
   try {
     await require("./adult.cjs")(page);
