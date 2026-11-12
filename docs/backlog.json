@@ -952,6 +952,30 @@
       "state": "now",
       "board": "Stories199",
       "why": "Coach Milan 9 November: the first Creator phase. Drawn; waits for Go. It starts 0.4.0. Roles and pricing go to a new chat."
+    },
+    {
+      "id": "B133",
+      "title": "Photos that were not saved say so; Dev data shows where photos are and what happened",
+      "epic": "ops",
+      "state": "done",
+      "version": "0.3.133",
+      "why": "Coach Milan 11 November: five photos named in his data were on neither the phone nor the account. A Not saved picture with Retake or Drop, and a log, so the cause shows."
+    },
+    {
+      "id": "B134",
+      "title": "Fixes from a call with Tester 2: cook photo as cover, eggs counted, step foods",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.134",
+      "why": "Coach Milan 11 November, on a call with Tester 2: the photo was not the main one, eggs in grams, a food added twice to a step could not be removed."
+    },
+    {
+      "id": "B136",
+      "title": "What you remove leaves your account too",
+      "epic": "ops",
+      "state": "done",
+      "version": "0.3.136",
+      "why": "Coach Milan 11 November 23:28: a dropped photo and an ended cook came back after every reload. The private part of the account was saved with merge; now each field is written whole. Also the cause of the 3 lost photos (reproduced 12 November)."
     }
   ]
 }
