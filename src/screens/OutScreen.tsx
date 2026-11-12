@@ -19,8 +19,9 @@ import { getStore, openList, shortMeals } from "../shopping";
 import { intentOf, wantOf, plateAnswer, planAnswer, leftAnswer, moveOf, swapOk, swapFallback, swapLead, type DaySlot } from "../chatIntent";
 import { lifestyleOf, dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
-import { STARTERS, fillDay, fromMeal, sumOf, needOf, type FillRow, type FillMode, type PlannedMeal } from "../planned";
+import { STARTERS, fillDay, fromMeal, sumOf, needOf, type FillRow, type FillMode, type FillChoice, type PlannedMeal } from "../planned";
 import { weekAround, slotChoices, likedCount, proteinOf, type ProteinKind } from "../variety";
+import { suitsOf, kindOfSlot } from "../mealFit";
 import { dayRecord } from "../record";
 import { dayLog } from "../today";
 import { chatRows, type ChatRow } from "../chatFoods";
@@ -108,8 +109,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     const reads = carryReads(state.meals, state.feedback);
     // DT287 (0.3.142, board Stories215): the week around the day counts; each slot gets two or three choices with why
     const week = weekAround(planDate, state.feedback, p.planned, open.map((x) => x.id));
-    const rows = fillDay(slots, held, choices, numbers, target, (m) => (m.mealId ? reads.get(m.mealId) : null), week)
-      .map((r) => { const cs = slotChoices(r, "goal", week, liked); return { ...r, meal: cs[0]?.meal ?? r.meal, choices: cs, mode: "goal" as const }; });
+    const rows = fillDay(slots, held, choices, numbers, target, (m) => (m.mealId ? reads.get(m.mealId) : null), week, suitsFor)
+      .map((r) => { const cs = fitWhy(r, slotChoices(r, "goal", week, liked)); return { ...r, meal: cs[0]?.meal ?? r.meal, choices: cs, mode: "goal" as const }; });
     const sum = sumOf(Object.fromEntries(rows.map((r) => [r.slot.id, r.meal])));
     const heldSum = sumOf(held);
     const text = rows.length
@@ -118,6 +119,12 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     setTurns((t) => [...t, { role: "you", text: fillChip }, { role: "mealan", text, fill: rows.length ? { date: planDate, dayName, rows } : undefined }]);
   };
   const liked = (m: PlannedMeal) => likedCount(state.feedback, m);
+  // DT290 (0.3.144, board Stories217): which meals a dish suits; your usual meal, or what kind of meal it is, leads its why
+  const suitsFor = (m: PlannedMeal) => suitsOf(m, m.mealId ? state.meals.find((x) => x.id === m.mealId) : null, state.feedback, p.planned);
+  const fitWhy = (r: FillRow, cs: FillChoice[]): FillChoice[] => { const k = kindOfSlot(r.slot.name); if (!k) return cs;
+    return cs.map((c) => { const s = suitsFor(c.meal); if (!s || !s.kinds.includes(k)) return c;
+      if (s.usual === k) return { ...c, why: w("out.whyUsual", { meal: mealV(r.slot.name, true) }) };
+      return k === "breakfast" ? { ...c, why: `${w("out.whyA", { meal: mealV(r.slot.name, true) })} · ${c.why}` } : c; }); };
   // DT287: pick one of a slot's choices; a chip brings choices of another kind
   const pickChoice = (ti: number, slotId: string, k: number) => setTurns((t) => t.map((turn, i) => {
     if (i !== ti || !turn.fill) return turn;
@@ -130,7 +137,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     const week = weekAround(turn.fill.date, state.feedback, p.planned, turn.fill.rows.map((x) => x.slot.id));
     const rows = turn.fill.rows.map((r) => { if (r.slot.id !== slotId) return r;
       const shown = (r.choices ?? []).map((c) => proteinOf(c.meal)).filter((k): k is ProteinKind => Boolean(k));
-      const cs = slotChoices(r, mode, week, liked, shown);
+      const cs = fitWhy(r, slotChoices(r, mode, week, liked, shown));
       log("fill_chip", { slot: slotId, mode, n: cs.length });
       if (!cs.length) { p.notify(w("out.noChoiceFits")); return r; }
       return { ...r, choices: cs, meal: cs[0].meal, mode }; });

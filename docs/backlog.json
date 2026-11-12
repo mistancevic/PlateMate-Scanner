@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.144",
     "0.3.143",
     "0.3.142",
     "0.3.141",
@@ -894,7 +895,7 @@
       "title": "Blind run 10 November: the friend's plate, the menu, numbers, Srpski",
       "epic": "plate",
       "state": "later",
-      "why": "docs/qa/blind/2026-11-10-jelena-first-run. Finding 1 (a new plate overwrote a Served plate) is fixed, 0.3.126. Findings 2 to 4 are one problem: the app never offers someone else's plate where it asks. To draw."
+      "why": "docs/qa/blind/2026-11-10-jelena-first-run. Finding 1 (a new plate overwrote a Served plate) is fixed, 0.3.126. Findings 2 to 4 are one problem: the app never offers someone else's plate where it asks. To draw. 12 November 17:20, Coach Milan: DT278 is next."
     },
     {
       "id": "DT281",
@@ -1061,9 +1062,10 @@
       "id": "DT290",
       "title": "Fill the open slots knows which dishes suit which meal",
       "epic": "chef",
-      "state": "next",
-      "why": "Found while building DT287 (12 November): the ranking looks at PD, the slot's size and the week, not at the kind of meal, so beans and rice can come for breakfast. Learn it from where a recipe was eaten or planned before, and from the starters' meal. Drawn 12 November 17:10 (Stories217): learned from where it was eaten or planned, the starters and its foods; Fill keeps to it; Good for on the recipe, yours wins. Waits for Go.",
-      "board": "Stories217"
+      "state": "done",
+      "why": "Found while building DT287 (12 November): the ranking looks at PD, the slot's size and the week, not at the kind of meal, so beans and rice can come for breakfast. Learn it from where a recipe was eaten or planned before, and from the starters' meal. Drawn 12 November 17:10 (Stories217): learned from where it was eaten or planned, the starters and its foods; Fill keeps to it; Good for on the recipe, yours wins. Go 17:19.",
+      "board": "Stories217",
+      "version": "0.3.144"
     }
   ]
 }

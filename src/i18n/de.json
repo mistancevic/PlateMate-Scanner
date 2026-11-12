@@ -22500,6 +22500,26 @@
     "out.noChoiceFits": {
       "text": "Nichts aus deinen Rezepten passt dazu für diese Mahlzeit. Probier eine andere Auswahl.",
       "checked": true
+    },
+    "out.whyUsual": {
+      "text": "Wie üblich: {meal}",
+      "checked": true
+    },
+    "out.whyA": {
+      "text": "Zum {meal}",
+      "checked": true
+    },
+    "recipe.goodFor": {
+      "text": "Passt zu",
+      "checked": true
+    },
+    "recipe.goodForGuess": {
+      "text": "Chef Mealan hat das nach den Mahlzeiten gesetzt, in denen es war, und nach den Zutaten. Tippen zum Ändern. Beim Füllen offener Mahlzeiten hält er sich daran.",
+      "checked": true
+    },
+    "recipe.goodForYours": {
+      "text": "Das ist deine Wahl. Beim Füllen offener Mahlzeiten hält sich Chef Mealan daran.",
+      "checked": true
     }
   }
 }

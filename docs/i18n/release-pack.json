@@ -1,6 +1,6 @@
 {
-  "release": "0.3.142",
-  "at": "2026-11-12T15:16:54.850Z",
+  "release": "0.3.144",
+  "at": "2026-11-12T16:23:50.582Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -47492,6 +47492,95 @@
       "release": "0.3.142",
       "order": 900014,
       "at": "2026-11-12T15:16:54.850Z"
+    },
+    {
+      "id": "screen.out.whyUsual",
+      "kind": "screen",
+      "key": "out.whyUsual",
+      "en": "Your usual {meal}",
+      "forms": "plain",
+      "slots": [
+        "meal"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Kao i obično: {meal}",
+      "de": "Wie üblich: {meal}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.144",
+      "order": 900000,
+      "at": "2026-11-12T16:23:50.582Z"
+    },
+    {
+      "id": "screen.out.whyA",
+      "kind": "screen",
+      "key": "out.whyA",
+      "en": "A {meal}",
+      "forms": "plain",
+      "slots": [
+        "meal"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Za {meal}",
+      "de": "Zum {meal}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.144",
+      "order": 900001,
+      "at": "2026-11-12T16:23:50.582Z"
+    },
+    {
+      "id": "screen.recipe.goodFor",
+      "kind": "screen",
+      "key": "recipe.goodFor",
+      "en": "Good for",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Odgovara za",
+      "de": "Passt zu",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.144",
+      "order": 900002,
+      "at": "2026-11-12T16:23:50.582Z"
+    },
+    {
+      "id": "screen.recipe.goodForGuess",
+      "kind": "screen",
+      "key": "recipe.goodForGuess",
+      "en": "Chef Mealan set these from when you ate it and from its foods. Tap to change. Fill the open slots keeps to them.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Chef Mealan je ovo podesio prema obrocima u kojima je bio i prema namirnicama. Dodirni da promeniš. Chef Mealan se toga drži kad popunjava slobodne obroke.",
+      "de": "Chef Mealan hat das nach den Mahlzeiten gesetzt, in denen es war, und nach den Zutaten. Tippen zum Ändern. Beim Füllen offener Mahlzeiten hält er sich daran.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.144",
+      "order": 900003,
+      "at": "2026-11-12T16:23:50.582Z"
+    },
+    {
+      "id": "screen.recipe.goodForYours",
+      "kind": "screen",
+      "key": "recipe.goodForYours",
+      "en": "You set these. Fill the open slots keeps to them.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Ovo je tvoj izbor. Chef Mealan se toga drži kad popunjava slobodne obroke.",
+      "de": "Das ist deine Wahl. Beim Füllen offener Mahlzeiten hält sich Chef Mealan daran.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.144",
+      "order": 900004,
+      "at": "2026-11-12T16:23:50.582Z"
     }
   ]
 }

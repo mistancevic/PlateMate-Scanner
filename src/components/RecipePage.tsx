@@ -1,7 +1,9 @@
 import { PastMeal } from "./PastMeal";
 import { tasteWord } from "./YourCooks";
 import { StepPicWide, StepPicSheet, StepPhotosPlace, StepPlayer, CoverVideo } from "./StepPics";
-import { w, wn, wIn, wordV, dateText, mealV, type Val, type WordKey } from "../words";
+import { w, wn, wIn, wordV, dateText, mealV, mealName, type Val, type WordKey } from "../words";
+import { fromMeal, getPlanned } from "../planned";
+import { suitsOf, MEAL_KINDS, type MealKind } from "../mealFit";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
 import { stepPicOf, stepPicsOf, setStepPic, addStepPic, removeStepPic, firstStepPic, alignStepPics, allStepPics, galleryOf, placePhoto, makeCover, deletePhoto, setPhotoBy, MAX_GALLERY } from "../photos";
@@ -591,6 +593,8 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
             <button className={`pill pill-wide${makeAs ? "" : " pill-primary"}`} onClick={() => onMakeIt()}>{makeAs ? makeAs.label : w("recipe.makeIt")}</button>
             <small className="muted rq-under">{makeAs ? makeAs.hint : w("recipe.cookItNowTheRecipe")}</small>
           </>)}
+          {/* DT290 (0.3.144, board Stories217): the meals it suits; Chef Mealan's guess lit, a tap changes it, yours wins */}
+          {!edit && <GoodFor meal={meal} cards={cards} onPatch={onPatch} />}
           <button className="pill pill-wide" onClick={startEdit}>{w("recipe.editRecipe")}</button>
           <small className="muted rq-under">{w("recipe.changeTheRecipeItselfThe")}</small>
           {/* DT225 v2 (0.3.61, board Stories166): the log of every time you ate it, under the buttons: a log, not an action */}
@@ -699,3 +703,16 @@ function partHead(parts: string[] | undefined, k: number) {
   return <li key={`p${k}`} className="rp-step-part">{w("recipe.partHead", { part: partLowV(pt) })}</li>;
 }
 
+
+function GoodFor({ meal, cards, onPatch }: { meal: Meal; cards: Feedback[]; onPatch: (patch: Partial<Meal>) => void }) {
+  const s = suitsOf(fromMeal(meal, "mine"), meal, cards, getPlanned());
+  const on = new Set<MealKind>(s?.kinds ?? []);
+  const toggle = (k: MealKind) => { const next = new Set(on); if (next.has(k)) next.delete(k); else next.add(k); onPatch({ goodFor: MEAL_KINDS.filter((x) => next.has(x)) }); };
+  return (
+    <section className="card rq-goodfor" aria-label={w("recipe.goodFor")}>
+      <b>{w("recipe.goodFor")}</b>
+      <div className="rq-goodfor-chips">{MEAL_KINDS.map((k) => <button key={k} type="button" className={`pill pill-small${on.has(k) ? " pill-primary" : ""}`} aria-pressed={on.has(k)} onClick={() => toggle(k)}>{on.has(k) ? "✓ " : ""}{mealName(k.charAt(0).toUpperCase() + k.slice(1))}</button>)}</div>
+      <small className="muted">{w(s?.from === "yours" ? "recipe.goodForYours" : "recipe.goodForGuess")}</small>
+    </section>
+  );
+}

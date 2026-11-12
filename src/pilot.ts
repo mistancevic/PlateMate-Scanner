@@ -140,6 +140,8 @@ export type PublishDraft = { title?: string; lines?: string; makes?: string; ser
 export type PlateKind = "meal" | "dessert";
 export type StepMark = { kind: "same" | "adapted" | "added"; why: string };
 export type Meal = {
+  // DT290 (0.3.144): the meals it suits, set on the recipe (Good for); unset, Chef Mealan guesses (src/mealFit.ts)
+  goodFor?: ("breakfast" | "lunch" | "dinner" | "snack")[];
   // DT202 (0.3.75): marked I cooked this when published, with the day; the first eaten card counts too (src/recipeMark.ts)
   cookedAt?: string;
   id: string;

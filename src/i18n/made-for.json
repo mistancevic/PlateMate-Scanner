@@ -5624,6 +5624,11 @@
     "screen.out.chipAnotherProtein": {"en":"Another protein","area":"The Plate","where":"The Plate","release":"0.3.142"},
     "screen.out.chipLighter": {"en":"Lighter","area":"The Plate","where":"The Plate","release":"0.3.142"},
     "screen.out.chipCrave": {"en":"Something I crave","area":"The Plate","where":"The Plate","release":"0.3.142"},
-    "screen.out.noChoiceFits": {"en":"Nothing in your recipes fits that for this meal. Try another chip.","area":"The Plate","where":"The Plate","release":"0.3.142"}
+    "screen.out.noChoiceFits": {"en":"Nothing in your recipes fits that for this meal. Try another chip.","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.whyUsual": {"en":"Your usual {meal}","area":"The Plate","where":"The Plate","release":"0.3.144"},
+    "screen.out.whyA": {"en":"A {meal}","area":"The Plate","where":"The Plate","release":"0.3.144"},
+    "screen.recipe.goodFor": {"en":"Good for","area":"Recipes","where":"Recipes","release":"0.3.144"},
+    "screen.recipe.goodForGuess": {"en":"Chef Mealan set these from when you ate it and from its foods. Tap to change. Fill the open slots keeps to them.","area":"Recipes","where":"Recipes","release":"0.3.144"},
+    "screen.recipe.goodForYours": {"en":"You set these. Fill the open slots keeps to them.","area":"Recipes","where":"Recipes","release":"0.3.144"}
   }
 }
