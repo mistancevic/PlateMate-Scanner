@@ -6179,5 +6179,6 @@
   "certs.ai-mastery.name": "AI Mastery",
   "certs.ai-mastery.line": "The AI side of the builder.",
   "certs.business.name": "Certified Business Coach",
-  "certs.business.line": "Coaching coaches on the business with Chef Mealan."
+  "certs.business.line": "Coaching coaches on the business with Chef Mealan.",
+  "yourcooks.changedStillOneMeal": "✓ Changed. Still one meal, at {time}."
 }

@@ -22328,6 +22328,10 @@
     "sameask.help": {
       "text": "Diese Mahlzeit aktualisieren: Sie übernimmt die Lebensmittel und Mengen dieses Tellers und bleibt um {time}. Beide behalten: zwei Mahlzeiten, falls du es zweimal gegessen hast.",
       "checked": true
+    },
+    "yourcooks.changedStillOneMeal": {
+      "text": "✓ Geändert. Weiterhin eine Mahlzeit, um {time}.",
+      "checked": true
     }
   }
 }

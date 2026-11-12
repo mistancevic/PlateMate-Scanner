@@ -42,7 +42,16 @@
       "why": "One conversation between the cook and the chef: every question in his own line, written as a script that voice can read later."
     }
   },
-  "versions": ["0.3.139", "0.3.138", "0.3.137", "0.3.136", "0.3.135", "0.3.134", "0.3.133"],
+  "versions": [
+    "0.3.140",
+    "0.3.139",
+    "0.3.138",
+    "0.3.137",
+    "0.3.136",
+    "0.3.135",
+    "0.3.134",
+    "0.3.133"
+  ],
   "tickets": [
     {
       "id": "DT212",
@@ -926,8 +935,8 @@
       "epic": "cook",
       "state": "done",
       "board": "Stories211",
-      "version": "0.3.138",
-      "why": "Coach Milan 12 November 07:55, on a call with a tester: one meal recorded twice because a past meal can't be changed (Cook it again made a second one). Drawn with a clickable prototype (artifact DT284 Prototype). Go 12 November 08:24. The guard against doubles (same photo in the same day) is DT285, to draw."
+      "version": "0.3.138, 0.3.140",
+      "why": "Coach Milan 12 November 07:55, on a call with a tester: one meal recorded twice because a past meal can't be changed (Cook it again made a second one). Drawn with a clickable prototype (artifact DT284 Prototype). Go 12 November 08:24. The guard against doubles (same photo in the same day) is DT285, to draw. v5 (0.3.140; Go 12 November 13:24): after Save changes, back on the recipe; the row is marked ✓ Changed. Still one meal, at its time; no Change it again."
     },
     {
       "id": "DT285",
@@ -943,7 +952,8 @@
       "title": "A new beta application shows high on Clients, in Waiting for you",
       "epic": "coach",
       "state": "next",
-      "why": "Coach Milan 11 November: the news that someone applied to be a beta tester sits near the bottom of the Clients page; it is great news and must not be missed. To draw."
+      "why": "Coach Milan 11 November: the news that someone applied to be a beta tester sits near the bottom of the Clients page; it is great news and must not be missed. To draw. Drawn 12 November (Coach Milan 13:24: a full card, moved from the bottom to the top): the first thing in Waiting for you, and it counts there. Waits for Go.",
+      "board": "Stories213"
     },
     {
       "id": "CR1a",
@@ -983,6 +993,27 @@
       "epic": "ops",
       "state": "later",
       "why": "Coach Milan asked for a staging environment early on, as in his product teams, to test the latest work without touching the beta testers; the preview on the same accounts and data was chosen as the quick start. 12 November: into the backlog, not yet urgent; needed before user acquisition grows. Brainstorm first."
+    },
+    {
+      "id": "B137",
+      "title": "Chef Mealan on the Plate writes its question into the field in English",
+      "epic": "lang",
+      "state": "next",
+      "why": "Coach Milan 12 November 13:30, with a screenshot in Srpski: opened from a scanned food, the field says I scanned Orijenta salata for regular meal. You suggested... What I'd change:. The swap question I don't have X. What instead? is English too. Both are fixed English sentences in the code (App askAboutMix, PlateHelper). Reproduced in the code. Waits for Go."
+    },
+    {
+      "id": "DT286",
+      "title": "Chef Mealan on the Plate: fresh, useful suggestions, in one conversation",
+      "epic": "chef",
+      "state": "next",
+      "why": "Coach Milan and Tester 2, 12 November 13:28 and 13:30: the suggestions are always the same (chicken breast, cottage cheese, rye bread), and the answer is general. Cause in the code: the AI gets the first 40 foods of the list, always the same, is told to prefer them and to raise protein, and knows nothing of earlier answers, the meal or the time. Food names come untranslated (Roggen Vollkornbrot in Srpski). Also: the sheet already is the chat for this plate, yet it offers a second chat (Something else? Talk to Chef Mealan), and fills the field with half a sentence. To brainstorm before 0.4.0."
+    },
+    {
+      "id": "DT287",
+      "title": "Fill the open slots: the same meals every day",
+      "epic": "chef",
+      "state": "next",
+      "why": "Coach Milan 12 November 13:28 and 13:32, Plan: Fill the open slots with Chef Mealan always offers the same meals. Cause in the code: fillDay has no AI and no memory; it ranks My recipes and the starters by the day's PD target and the slot's share of the day, so the same recipes win every day. Nothing about what was eaten or planned on other days. To brainstorm with DT286 before 0.4.0."
     }
   ]
 }

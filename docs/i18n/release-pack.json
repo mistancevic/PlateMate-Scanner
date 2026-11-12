@@ -1,6 +1,6 @@
 {
-  "release": "0.3.139",
-  "at": "2026-11-12T09:19:22.092Z",
+  "release": "0.3.140",
+  "at": "2026-11-12T12:26:02.398Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -46726,6 +46726,25 @@
       "release": "0.3.139",
       "order": 900005,
       "at": "2026-11-12T09:19:22.092Z"
+    },
+    {
+      "id": "screen.yourcooks.changedStillOneMeal",
+      "kind": "screen",
+      "key": "yourcooks.changedStillOneMeal",
+      "en": "✓ Changed. Still one meal, at {time}.",
+      "forms": "plain",
+      "slots": [
+        "time"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "✓ Izmenjeno. I dalje jedan obrok, u {time}.",
+      "de": "✓ Geändert. Weiterhin eine Mahlzeit, um {time}.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900000,
+      "at": "2026-11-12T12:26:02.398Z"
     }
   ]
 }

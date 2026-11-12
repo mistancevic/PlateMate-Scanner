@@ -2,6 +2,7 @@
 // could not be changed): the rows of Every time you ate it open their meal; a past meal has Change it and Delete this meal,
 // from Recipes and from Plan. A change stays the same meal at its own time; a delete asks Sure? first and takes the meal out
 // of the recipe's lists and its day. Srpski and German fit 360 px.
+// DT284 v5 (0.3.140): after Save changes, back on the recipe with the row marked ✓ Changed; no Change it again.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -70,9 +71,15 @@ const PORT = "3501", U = `http://127.0.0.1:${PORT}`;
     cs = await cards(page);
     ok(cs.length === 1 && cs[0].id === "c1" && cs[0].createdAt === "2026-11-11T09:08:00.000Z", "Save changes: still one meal, at its own time");
     ok(cs[0].meal.portion === 162 && cs[0].meal.items.map((x) => x.grams).join() === "50,92,20" && cs[0].taste === "DaaM good" && cs[0].notes === "Half a portion, changed on the call." && cs[0].photo !== PIC, "the amount, the taste, the words and the photo changed");
-    ok(/Wholegrain bread\s*50 g/.test((await pm.locator(".pm-foods").innerText()).replace(/\n/g, " ")) && /DaaM good/.test(await pm.locator(".pm-when").innerText()), "the open meal shows the change at once");
-    await pm.locator(".pm-back").click(); await page.waitForTimeout(500);
+    // DT284 v5 (0.3.140): after Save changes, back on the recipe; the row is marked and says it; no Change it again
+    ok(await page.locator(".past-meal").count() === 0, "Save changes: back on the recipe, no Change it again");
     ok(/10:08 · logged/.test(await rows.nth(0).innerText()) && /Half a portion, 162 g · DaaM good/.test(await rows.nth(0).innerText()), "the row says it: " + (await rows.nth(0).innerText()).replace(/\n/g, " "));
+    ok(await page.locator(".rq-eats .re-changed").count() === 1 && (await page.locator(".rq-eats .re-changed-note").innerText()).trim() === "✓ Changed. Still one meal, at 10:08.", "the row is marked: ✓ Changed. Still one meal, at 10:08.");
+    ok(await page.locator(".rq-eats .re-changed-note").evaluate((x) => { const r = x.getBoundingClientRect(); return r.top >= 0 && r.bottom <= window.innerHeight; }), "the marked row is on screen");
+    await rows.nth(0).click(); await page.waitForTimeout(600);
+    ok(/Wholegrain bread\s*50 g/.test((await pm.locator(".pm-foods").innerText()).replace(/\n/g, " ")) && /DaaM good/.test(await pm.locator(".pm-when").innerText()), "opened again, the meal shows the change");
+    await pm.locator(".pm-back").click(); await page.waitForTimeout(500);
+    ok(await page.locator(".rq-eats .re-changed-note").count() === 0, "opened and back again: the mark is gone");
     await page.reload(); await page.waitForTimeout(1500);
     ok(/Half a portion, 162 g/.test(await rows.nth(0).innerText()), "opened again: still changed");
     await ctx.close();

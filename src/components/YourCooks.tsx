@@ -1,7 +1,7 @@
 // DT214 v2 (0.3.53, board Stories162): a recipe collects its cooks. Each time you cook it, the meal's card keeps the photos and
 // the answers: how often it went as the steps said, how it tasted, how it carried you.
 import { w, wn, dateText } from "../words";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Feedback, Meal } from "../pilot";
 import { cardsOfRecipe } from "../carry";
 import { CARRY_WORDS } from "../carry";
@@ -63,21 +63,26 @@ export function eatRow(meal: Meal, f: Feedback, now = new Date()) {
   return { when: `${date}, ${hm} · ${how}`, amount, taste: f.taste || "", carry: f.carry ? CARRY_WORDS[f.carry.how].toLowerCase() : "", words: (f.notes || "").trim(), photo: f.photo ?? f.photos?.[f.photos.length - 1] ?? null };
 }
 // DT284 (0.3.138, board Stories211): each row opens its meal
-export function EatLog({ meal, cards, onOpen }: { meal: Meal; cards: Feedback[]; onOpen?: (f: Feedback) => void }) {
+export function EatLog({ meal, cards, onOpen, changedId = null }: { meal: Meal; cards: Feedback[]; onOpen?: (f: Feedback) => void; changedId?: string | null }) {
   const all = cooksOf(meal, cards);
   const [open, setOpen] = useState(false);
+  // DT284 v5 (0.3.140): after Save changes, the changed row is shown, marked, and scrolled to
+  const mark = useRef<HTMLDivElement | null>(null);
+  useEffect(() => { if (changedId && mark.current) try { mark.current.scrollIntoView({ block: "center" }); } catch { /* nothing to scroll */ } }, [changedId]);
   if (!all.length) return null;
-  const rows = open ? all : all.slice(0, 3);
+  const late = changedId ? all.findIndex((f) => f.id === changedId) >= 3 : false;
+  const rows = open || late ? all : all.slice(0, 3);
   return (
     <section className="card rq-eats" aria-label={w("yourcooks.everyTimeYouAteIt")}>
       <b>{w("yourcooks.everyTimeYouAteIt")}</b>
       <small className="muted">{w("yourcooks.onlyYouSeeThisYour")}</small>
-      {rows.map((f) => { const r = eatRow(meal, f); const inner = <>
+      {rows.map((f) => { const r = eatRow(meal, f); const isNew = f.id === changedId; const inner = <>
           {r.photo ? <img src={r.photo} alt="" /> : <span className="re-none" aria-hidden="true">🍽️</span>}
           <span className="re-words"><b>{r.when}</b><span>{[r.amount, r.taste, r.carry ? w("yourcooks.carriedYouHow", { how: r.carry }) : ""].filter(Boolean).join(" · ")}</span>{r.words && <i>“{r.words}”</i>}</span></>;
-        return onOpen
-          ? <button key={f.id} type="button" className="re-row re-open" aria-label={w("yourcooks.openMeal", { date: r.when })} onClick={() => onOpen(f)}>{inner}<span className="re-go" aria-hidden="true">›</span></button>
-          : <div key={f.id} className="re-row">{inner}</div>; })}
+        const row = onOpen
+          ? <button key={f.id} type="button" className={`re-row re-open${isNew ? " re-changed" : ""}`} aria-label={w("yourcooks.openMeal", { date: r.when })} onClick={() => onOpen(f)}>{inner}<span className="re-go" aria-hidden="true">›</span></button>
+          : <div key={f.id} className="re-row">{inner}</div>;
+        return isNew ? <div key={f.id} ref={mark}>{row}<p className="re-changed-note" role="status">{w("yourcooks.changedStillOneMeal", { time: new Date(f.createdAt).toTimeString().slice(0, 5) })}</p></div> : row; })}
       {all.length > 3 && <button className="link re-more" onClick={() => setOpen(!open)}>{open ? w("yourcooks.fewer") : w("yourcooks.allN", { n: all.length })}</button>}
     </section>
   );

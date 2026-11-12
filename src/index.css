@@ -3261,3 +3261,6 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .same-ask .same-meal span { display: flex; flex-direction: column; line-height: 1.4; min-width: 0; }
 .same-ask .pill, .same-ask .link { min-height: 44px; }
 .same-ask .link { align-self: flex-start; }
+/* DT284 v5 (0.3.140): the meal just changed, marked in Every time you ate it */
+.re-row.re-changed { background: var(--tint); border-radius: 10px; padding-left: 6px; }
+.re-changed-note { margin: 4px 2px 2px; font-size: var(--fs-small, 14px); font-weight: 800; color: #13804f; }

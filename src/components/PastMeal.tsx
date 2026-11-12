@@ -44,7 +44,7 @@ export function PastMeal({ p, f, day, slot, back, recipe, when, words = false, a
         <span><b>{Math.round(a.protein ?? 0)} g</b> {w("plan.protein")}</span>
         <span><b>{pdText(density(a.protein ?? 0, a.calories ?? 0))}</b></span>
       </div>
-      {mode === "change" && onChange ? <ChangeMeal f={f} r={r} cancel={() => setMode("view")} save={(ch) => { onChange(ch); setMode("view"); }} /> : <>
+      {mode === "change" && onChange ? <ChangeMeal f={f} r={r} cancel={() => setMode("view")} save={(ch) => { onChange(ch); setMode("view"); back(); }} /> : <>
       <div className="pm-foods">{f.meal.items.map((it) => <div key={it.id} className="pm-food"><span>{it.food.name}</span><b>{Math.round(it.grams)} g</b></div>)}</div>
       {words && f.notes?.trim() && <p className="pm-words"><b>{w("yourcooks.yourWords")}</b> {f.notes.trim()}</p>}
       {actions ? actions(all[at] ?? null) : <div className="button-row pm-actions">
@@ -64,6 +64,7 @@ export function PastMeal({ p, f, day, slot, back, recipe, when, words = false, a
   );
 }
 
+// DT284 v5 (0.3.140): after Save changes, back where you came from; no Change it again on the same screen
 // DT284: Change this meal. How much, how it was, your words, the photo; saved into the same meal at its own time
 const TASTES = ["DaaM good", "Good", "Not really"];
 function ChangeMeal({ f, r, save, cancel }: { f: Feedback; r: Meal | null; save: (ch: CardChange) => void; cancel: () => void }) {
