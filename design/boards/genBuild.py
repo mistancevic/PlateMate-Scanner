@@ -45,6 +45,7 @@ history = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join(
   stage("3", "Own production, from a terminal", "29 September to 2 November", [
     ("Live on", "chefmealan.com from 30 September: Cloud Run in Milan's own Google project, his own Gemini key."),
     ("Goes live by", "One command in Google Cloud Shell, the terminal in the browser. From 7 October: preview first, then promote, rollback in one command."),
+    ("Staging or preview", "Milan asked for a staging environment, as in his product teams, to test the latest work without touching the beta testers. Chosen as the quick start: a preview on the same accounts and data; a staging with its own database once the app grows beyond friends."),
     ("To the phone", "When Cloud Shell joined the process for these releases, it would not start on the Chromebook: it never got past the sign-in that opens the terminal. On the phone the same Cloud Shell opened at once, so the releases were run from the phone from then on."),
     ("Way of working", "Version numbers from 2 October; boards on the canvas before code; the five-step release rule (23 October); the Kanban (2 November).")], "#1a73e8"),
   stage("4", "Green buttons on GitHub", "From 3 November", [
@@ -116,7 +117,7 @@ body = (f'<div style="width:{W}px;box-sizing:border-box;padding:22px 26px;backgr
   + section("A course setup, and this project", "The Turing College course Building with AI agents teaches a laptop setup. This project does the same cycle without one.", compare)
   + section("The app, as it runs", "Four parts. The person's phone holds the app and their data first; the server holds the AI key and the rules.", app)
   + '</div>')
-H = 2950
+H = 3120
 page = f'''<!doctype html>
 <html lang="en">
 <head>
