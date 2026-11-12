@@ -5609,6 +5609,21 @@
     "screen.helper.addAmount": {"en":"+ {g} g","area":"Words used across the app","where":"Across the app","release":"0.3.142"},
     "screen.helper.swapAmount": {"en":"Swap in {g} g","area":"Words used across the app","where":"Across the app","release":"0.3.142"},
     "screen.helper.setAmount": {"en":"Set {g} g","area":"Words used across the app","where":"Across the app","release":"0.3.142"},
-    "screen.helper.estimate": {"en":"values are an estimate","area":"Words used across the app","where":"Across the app","release":"0.3.142"}
+    "screen.helper.estimate": {"en":"values are an estimate","area":"Words used across the app","where":"Across the app","release":"0.3.142"},
+    "screen.out.kindPoultry": {"en":"Chicken or turkey","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.kindFish": {"en":"Fish","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.kindEggs": {"en":"Eggs","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.kindDairy": {"en":"Dairy","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.kindLegumes": {"en":"Beans and lentils","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.kindMeat": {"en":"Meat","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.whyNew": {"en":"{kind}: none yet this week","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.whyOnce": {"en":"{kind}: once this week","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.whyGoal": {"en":"On your goal: PD {pd}","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.whyLiked": {"en":"You rated it DaaM good","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.whyLighter": {"en":"Lighter: {kcal} kcal","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.chipAnotherProtein": {"en":"Another protein","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.chipLighter": {"en":"Lighter","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.chipCrave": {"en":"Something I crave","area":"The Plate","where":"The Plate","release":"0.3.142"},
+    "screen.out.noChoiceFits": {"en":"Nothing in your recipes fits that for this meal. Try another chip.","area":"The Plate","where":"The Plate","release":"0.3.142"}
   }
 }

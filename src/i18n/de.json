@@ -22440,6 +22440,66 @@
     "helper.estimate": {
       "text": "Werte sind geschätzt",
       "checked": true
+    },
+    "out.kindPoultry": {
+      "text": "Hähnchen oder Pute",
+      "checked": true
+    },
+    "out.kindFish": {
+      "text": "Fisch",
+      "checked": true
+    },
+    "out.kindEggs": {
+      "text": "Eier",
+      "checked": true
+    },
+    "out.kindDairy": {
+      "text": "Milchprodukte",
+      "checked": true
+    },
+    "out.kindLegumes": {
+      "text": "Bohnen und Linsen",
+      "checked": true
+    },
+    "out.kindMeat": {
+      "text": "Fleisch",
+      "checked": true
+    },
+    "out.whyNew": {
+      "text": "{kind}: diese Woche noch nicht",
+      "checked": true
+    },
+    "out.whyOnce": {
+      "text": "{kind}: einmal diese Woche",
+      "checked": true
+    },
+    "out.whyGoal": {
+      "text": "Auf deinem Ziel: PD {pd}",
+      "checked": true
+    },
+    "out.whyLiked": {
+      "text": "Deine Wertung: DaaM good",
+      "checked": true
+    },
+    "out.whyLighter": {
+      "text": "Leichter: {kcal} kcal",
+      "checked": true
+    },
+    "out.chipAnotherProtein": {
+      "text": "Anderes Protein",
+      "checked": true
+    },
+    "out.chipLighter": {
+      "text": "Leichter",
+      "checked": true
+    },
+    "out.chipCrave": {
+      "text": "Etwas, worauf ich Lust habe",
+      "checked": true
+    },
+    "out.noChoiceFits": {
+      "text": "Nichts aus deinen Rezepten passt dazu für diese Mahlzeit. Probier eine andere Auswahl.",
+      "checked": true
     }
   }
 }

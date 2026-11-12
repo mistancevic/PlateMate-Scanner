@@ -6207,5 +6207,20 @@
   "helper.addAmount": "+ {g} g",
   "helper.swapAmount": "Swap in {g} g",
   "helper.setAmount": "Set {g} g",
-  "helper.estimate": "values are an estimate"
+  "helper.estimate": "values are an estimate",
+  "out.kindPoultry": "Chicken or turkey",
+  "out.kindFish": "Fish",
+  "out.kindEggs": "Eggs",
+  "out.kindDairy": "Dairy",
+  "out.kindLegumes": "Beans and lentils",
+  "out.kindMeat": "Meat",
+  "out.whyNew": "{kind}: none yet this week",
+  "out.whyOnce": "{kind}: once this week",
+  "out.whyGoal": "On your goal: PD {pd}",
+  "out.whyLiked": "You rated it DaaM good",
+  "out.whyLighter": "Lighter: {kcal} kcal",
+  "out.chipAnotherProtein": "Another protein",
+  "out.chipLighter": "Lighter",
+  "out.chipCrave": "Something I crave",
+  "out.noChoiceFits": "Nothing in your recipes fits that for this meal. Try another chip."
 }
