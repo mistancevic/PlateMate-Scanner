@@ -342,7 +342,7 @@ export function HomeScreen(p: AppApi) {
             return (
               <section className="card log-card" key={f.id}>
                 <div className="card-top"><span>{f.meal.title}</span>{many && <small className="left-tag">{w("today.nLeft", { n: f.left ?? 0 })}</small>}</div>
-                <small>{many ? w("today.eachOne", { what: f.leftOf ?? w("today.portion") }) : ""}{w("today.kcalProtein", { kcal: fmt(a.kcal, 0), protein: fmt(a.protein, 0) })}{r && <> · <button className="link in-inline" onClick={() => p.openRecipePage(r.id)}>{w("today.openTheRecipe")}</button></>}</small>
+                <small>{many ? w("today.eachOne", { what: f.leftOf ?? w("today.portion") }) : ""}{w("today.kcalProtein", { kcal: fmt(a.kcal, 0), protein: fmt(a.protein, 0) })}{r && <> · <button className="link in-inline" onClick={() => p.openMeal(r.id, { tab: "home" })}>{w("today.openTheRecipe")}</button></>}</small>
                 {asking === f.id && (
                   <div className="which-meal">
                     <ChefLine text={say("whichMeal")} />
@@ -427,7 +427,7 @@ export function HomeScreen(p: AppApi) {
           <div className="log-card meal-row with-photo log-card-open" key={f.id} onClick={(e) => { if ((e.target as HTMLElement).closest("button,input,a,label,textarea")) return; setMealOpen(f.id); }}>
             <Picture src={f.photo ?? pictureOfRecipe(r)} />
             <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString(phoneLoc(), { hour: "2-digit", minute: "2-digit" })}</small></div>
-            <small className="meal-which"><b>{mealName(whichOf(f))}</b>{r && <> · <button className="link in-inline" onClick={() => p.openRecipePage(r.id)}>{w("today.openTheRecipe")}</button></>}</small>
+            <small className="meal-which"><b>{mealName(whichOf(f))}</b>{r && <> · <button className="link in-inline" onClick={() => p.openMeal(r.id, { tab: "home" })}>{w("today.openTheRecipe")}</button></>}</small>
             <small className="log-nums">{w("today.kcalProtein", { kcal: fmt(a.kcal, 0), protein: fmt(a.protein, 0) })}{a.gap ? "" : w("today.fatCarbs", { fat: fmt(a.fats, 0), carbs: fmt(a.carbs, 0) })} · {pdText(density(a.protein, a.kcal))}</small>
             {hasPlanToday && (f.slot
               ? <small className="plan-mark fit-ok">{w("today.eatenByThePlan")}</small>
