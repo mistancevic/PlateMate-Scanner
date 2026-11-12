@@ -1,6 +1,6 @@
 {
-  "release": "0.3.140",
-  "at": "2026-11-12T13:01:26.324Z",
+  "release": "0.3.141",
+  "at": "2026-11-12T13:46:56.151Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -46924,6 +46924,59 @@
       "release": "0.3.140",
       "order": 900000,
       "at": "2026-11-12T13:01:26.324Z"
+    },
+    {
+      "id": "screen.today.eatenByThePlan",
+      "kind": "screen",
+      "key": "today.eatenByThePlan",
+      "en": "✓ Eaten, by the plan",
+      "forms": "plain",
+      "slots": [],
+      "area": "Today",
+      "where": "Today",
+      "sr": "✓ Pojedeno, po planu",
+      "de": "✓ Gegessen, nach Plan",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.141",
+      "order": 900000,
+      "at": "2026-11-12T13:46:56.151Z"
+    },
+    {
+      "id": "screen.today.changeOrDelete",
+      "kind": "screen",
+      "key": "today.changeOrDelete",
+      "en": "Change or delete ›",
+      "forms": "plain",
+      "slots": [],
+      "area": "Today",
+      "where": "Today",
+      "sr": "Izmeni ili obriši ›",
+      "de": "Ändern oder löschen ›",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.141",
+      "order": 900001,
+      "at": "2026-11-12T13:46:56.151Z"
+    },
+    {
+      "id": "screen.today.undone",
+      "kind": "screen",
+      "key": "today.undone",
+      "en": "Undone: {title} is no longer logged.",
+      "forms": "plain",
+      "slots": [
+        "title"
+      ],
+      "area": "Today",
+      "where": "Today",
+      "sr": "Poništeno: {title} više nije upisano.",
+      "de": "Rückgängig gemacht: {title} ist nicht mehr eingetragen.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.141",
+      "order": 900002,
+      "at": "2026-11-12T13:46:56.151Z"
     }
   ]
 }

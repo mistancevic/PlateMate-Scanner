@@ -5592,6 +5592,9 @@
     "screen.coach.keepIt": {"en":"Keep it","area":"Clients","where":"Clients","release":"0.3.140"},
     "screen.coach.leavesWithoutInvite": {"en":"It leaves Waiting for you without an invite.","area":"Clients","where":"Clients","release":"0.3.140"},
     "screen.coach.handledOn": {"en":"Handled {date}","area":"Clients","where":"Clients","release":"0.3.140"},
-    "screen.make.aPortion": {"en":"A portion","area":"The Plate","where":"The Plate","release":"0.3.140"}
+    "screen.make.aPortion": {"en":"A portion","area":"The Plate","where":"The Plate","release":"0.3.140"},
+    "screen.today.eatenByThePlan": {"en":"✓ Eaten, by the plan","area":"Today","where":"Today","release":"0.3.141"},
+    "screen.today.changeOrDelete": {"en":"Change or delete ›","area":"Today","where":"Today","release":"0.3.141"},
+    "screen.today.undone": {"en":"Undone: {title} is no longer logged.","area":"Today","where":"Today","release":"0.3.141"}
   }
 }

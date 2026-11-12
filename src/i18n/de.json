@@ -22372,6 +22372,18 @@
     "make.aPortion": {
       "text": "Eine Portion",
       "checked": true
+    },
+    "today.eatenByThePlan": {
+      "text": "✓ Gegessen, nach Plan",
+      "checked": true
+    },
+    "today.changeOrDelete": {
+      "text": "Ändern oder löschen ›",
+      "checked": true
+    },
+    "today.undone": {
+      "text": "Rückgängig gemacht: {title} ist nicht mehr eingetragen.",
+      "checked": true
     }
   }
 }

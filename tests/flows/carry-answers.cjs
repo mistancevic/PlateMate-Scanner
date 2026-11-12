@@ -66,13 +66,14 @@ const U = "http://127.0.0.1:3237";
     ok(/Carried you: Heavy, tired/.test(await sarmaCard.textContent()) && await sarmaCard.locator(".carry-acts").count() === 0, "the answer replaces the question on the card");
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).feedback.find((f) => f.meal.title === "Sarma" && f.createdAt.startsWith("2026-10-19")).carry);
     ok(saved?.how === "heavy" && saved.moment?.meal === "Lunch" && saved.moment?.day === "training" && saved.moment?.training === "before" && typeof saved.sig === "string", "the answer keeps its moment: lunch, a training day, before training; and the recipe's foods as they were");
-    await sarmaCard.getByRole("button", { name: "Change" }).click(); await page.waitForTimeout(300);
+    await sarmaCard.getByRole("button", { name: "Change", exact: true }).click(); await page.waitForTimeout(300);
     ok(await sarmaCard.locator(".carry-acts button").count() === 3, "Change brings the three answers back");
     await sarmaCard.locator(".carry-acts").getByRole("button", { name: "Fine" }).click(); await page.waitForTimeout(400);
     ok(/Carried you: Fine/.test(await sarmaCard.textContent()), "a wrong tap is fixed: Carried you: Fine");
 
     // ---- the meal's page: every answer with its moment; the read; before the change ----
-    await sarmaCard.locator(".card-top").click(); await page.waitForTimeout(900);
+    // B139 (0.3.141): a tap on the card opens the meal eaten; the recipe is behind Open the recipe ›
+    await sarmaCard.getByRole("button", { name: "Open the recipe ›" }).click(); await page.waitForTimeout(900);
     const block = page.locator(".rq-carry");
     const bt = (await block.textContent()) ?? "";
     ok(/How it carries you/.test(bt) && /eaten 5 times/.test(bt), "the meal's page: How it carries you, eaten 5 times");

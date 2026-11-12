@@ -58,9 +58,12 @@ const U = "http://127.0.0.1:3236";
     await row.click(); await page.waitForTimeout(800);
     await page.locator(".rq-slot").getByRole("button", { name: "I ate it" }).click(); await page.waitForTimeout(800);
     ok(/1 of 2 by the plan so far/.test(await text(page, ".logged-line")), "the row shows the meal; I ate it there logs it by the plan and comes back to Today");
-    // today's meals: a tap on the card shows the recipe
+    // B139 (0.3.141): today's meals: a tap on the card opens the meal eaten; Open the recipe shows the recipe
     await page.locator(".log-card-open .card-top span").first().click(); await page.waitForTimeout(800);
-    ok(/DaaM good protein crêpes/.test(await text(page, "main")) && /Today/.test(await text(page, ".rq-back")) && await page.locator(".rq-slot").count() === 0, "a meal eaten: a tap shows its recipe, ‹ Today, no slot");
+    ok(/DaaM good protein crêpes/.test(await text(page, ".past-meal")) && /Today/.test(await text(page, ".past-meal .pm-back")) && await page.locator(".past-meal .pm-change").count() === 1, "a meal eaten: a tap opens the meal, ‹ Today, Change it");
+    await page.locator(".past-meal .pm-back").click(); await page.waitForTimeout(600);
+    await page.locator(".log-card-open").first().getByRole("button", { name: "Open the recipe ›" }).click(); await page.waitForTimeout(800);
+    ok(/DaaM good protein crêpes/.test(await text(page, "main")) && /Today/.test(await text(page, ".rq-back")) && await page.locator(".rq-slot").count() === 0, "Open the recipe shows its recipe, ‹ Today, no slot");
     await page.locator(".rq-back").click(); await page.waitForTimeout(600);
     // a swipe right skips; it never opens the meal
     await swipe(page, page.getByRole("button", { name: /Lunch at 13:45, Chocolate quark pudding/ }), "right");

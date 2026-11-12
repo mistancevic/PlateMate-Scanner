@@ -2382,11 +2382,14 @@ export default function App() {
       notify(status === "prepared" ? w("app.keptForLaterItS") : w("app.notedNotCounted"));
     },
     // DT149 (0.2.130): at, a meal of a day gone by, counted at its time
+    // B139 (0.3.141): returns the new meal's id, so Today can offer Undo on it
     logPlanned: (m: PlannedMeal, slot: NonNullable<Feedback["slot"]>, at?: string) => {
       const now = at ?? new Date().toISOString(), meal = plannedPortion(m, m.mealId ?? uid(), now);
-      if (!meal) return;
-      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten", slot, ...(m.mealId ? { recipeId: m.mealId } : {}), taste: "", notes: "", createdAt: now, dayType: !at && dayModeOf(personal) === "each" && day.type ? day.type : undefined } as Feedback, ...s.feedback] }));
+      if (!meal) return null;
+      const id = uid();
+      setState((s) => ({ ...s, feedback: [{ id, meal, status: "eaten", slot, ...(m.mealId ? { recipeId: m.mealId } : {}), taste: "", notes: "", createdAt: now, dayType: !at && dayModeOf(personal) === "each" && day.type ? day.type : undefined } as Feedback, ...s.feedback] }));
       notify(w("app.loggedAsPlanned"));
+      return id;
     },
     // DT149 (0.2.130): what you ate at a meal of a day gone by, from the Plate: counted at that meal's time, nothing to rate
     logEaten: (items: Ingredient[], title: string, slot: NonNullable<Feedback["slot"]>, at: string, recipeId?: string) => {

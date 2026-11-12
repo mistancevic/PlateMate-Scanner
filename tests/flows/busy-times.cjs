@@ -68,6 +68,8 @@ const PORT = "3199", B = `http://127.0.0.1:${PORT}`;
     const plan = async (day) => { await page.goto(B + `/plan?day=${day}`); await page.waitForTimeout(1500); };
     await me(); await page.waitForTimeout(1500);
     ok(cals.size === 1 && live().length > 40, "on, with a token: the calendar is made and filled: " + live().length);
+    // 0.3.141: under a full run the first sync can take longer than the fixed wait; wait for its time, up to 10 s
+    await page.waitForFunction(() => /Updated \d\d:\d\d/.test(document.querySelector(".cal-on")?.textContent || ""), null, { timeout: 10000 }).catch(() => {});
     ok(await page.locator(".cal-line").count() === 0 && /Updated \d\d:\d\d/.test(await page.locator(".cal-on").textContent()), "the page says the time once (no second Up to date line)");
     // DT179a: which meals
     const which = page.getByRole("radiogroup", { name: "Which meals" });
