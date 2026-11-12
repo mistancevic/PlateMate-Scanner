@@ -44,11 +44,11 @@ history = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join(
     ("Why it was left", "Changes were not reliable: a small UI change rewrote the logic or added things nobody asked for, and worse once the Pro model was gone. The code moved to GitHub, but working in AI Studio and pulling the code back into it stayed slow, so AI Studio was dropped."),
     ("Built with", "Google AI Studio, then ChatGPT Codex (a pull request), then Claude from 23 September."),
     ("Data", "Airtable for scanned foods and the starter foods; then Firebase sign-in and Firestore, set up by AI Studio from a prompt."),
+    ("Tested in", "A GitHub Codespace, before chefmealan.com: the app built from the code on GitHub and run on a computer in GitHub's cloud, on a temporary link only Milan could open."),
     ("Live on", "platemate.ai.studio: AI Studio took the code from GitHub, built it and ran it on Cloud Run with a server for the Gemini key. AI Studio was connected to GitHub: it saw each change pushed there and updated the app.")], "#e67e22"),
   stage("3", "Own production, from a terminal", "29 September to 2 November", [
     ("Live on", "chefmealan.com from 30 September: Cloud Run in Milan's own Google project, his own Gemini key."),
     ("Goes live by", "One command in Google Cloud Shell, the terminal in the browser. From 7 October: preview first, then promote, rollback in one command."),
-    ("Checking new code", "With the Google services kept and AI Studio left behind, Milan checked the newest code in a GitHub Codespace: the app running on a computer in GitHub's cloud, on a temporary link only he could open."),
     ("Staging or preview", "Milan asked for a staging environment, as in his product teams, to test the latest work without touching the beta testers. Chosen as the quick start: a preview on the same accounts and data; a staging with its own database once the app grows beyond friends."),
     ("To the phone", "When Cloud Shell joined the process for these releases, it would not start on the Chromebook: it never got past the sign-in that opens the terminal. On the phone the same Cloud Shell opened at once, so the releases were run from the phone from then on."),
     ("Chat before code", "The work began in Claude Code, but it built an idea before it was talked through, and it had no copy or read aloud. So the talk moved to chats in a Claude Project, to plan first, as a planning mode does. Soon all the work ran there. This is where Brainstorm, Draw and Go come from."),
