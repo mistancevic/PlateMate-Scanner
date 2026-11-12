@@ -5776,6 +5776,8 @@
   "recipe.addPhotosToTheSteps": "Add photos to the steps",
   "recipe.addPhotosToTheStepsWhy": "Pick several at once from your phone. Then you place each one on its step.",
   "recipe.thisPhoto": "This photo",
+  "recipe.whoMadeIt": "Who made it?",
+  "recipe.aiTag": "AI",
   "recipe.makeItTheCover": "Make it the cover",
   "recipe.thisIsTheCover": "This photo is the cover. Pick another photo to make it the cover.",
   "recipe.onStep": "On step",

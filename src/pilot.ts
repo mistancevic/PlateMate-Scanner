@@ -214,6 +214,8 @@ export type Meal = {
   // Owner-only, never shared with members or published.
   stepPics?: (string | null)[];
   stepPicMeta?: ({ by: "me" | "ai"; step: string } | null)[];
+  // DT283 (0.3.137, board Stories210): the recipe's own photos drawn by AI, by fingerprint (sig); the photos are files
+  photoAi?: string[];
   stepPicSigs?: string[];
   // how many the whole recipe makes, as read or guessed (IM3)
   makes?: { n: number; unit: string };

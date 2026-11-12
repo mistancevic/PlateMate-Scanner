@@ -22224,6 +22224,14 @@
     "recipe.inRecipePhotos": {
       "text": "Među slikama recepta",
       "checked": true
+    },
+    "recipe.whoMadeIt": {
+      "text": "Ko je napravio sliku?",
+      "checked": true
+    },
+    "recipe.aiTag": {
+      "text": "AI",
+      "checked": true
     }
   }
 }

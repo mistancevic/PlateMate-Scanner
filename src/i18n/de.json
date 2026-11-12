@@ -22224,6 +22224,14 @@
     "recipe.inRecipePhotos": {
       "text": "Bei den Fotos des Rezepts",
       "checked": true
+    },
+    "recipe.whoMadeIt": {
+      "text": "Wer hat es gemacht?",
+      "checked": true
+    },
+    "recipe.aiTag": {
+      "text": "KI",
+      "checked": true
     }
   }
 }

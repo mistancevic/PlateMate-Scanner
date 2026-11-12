@@ -4,7 +4,7 @@ import { StepPicWide, StepPicSheet, StepPhotosPlace, StepPlayer, CoverVideo } fr
 import { w, wn, wIn, wordV, dateText, mealV, type Val, type WordKey } from "../words";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
-import { stepPicOf, stepPicsOf, setStepPic, addStepPic, removeStepPic, firstStepPic, alignStepPics, allStepPics, galleryOf, placePhoto, makeCover, deletePhoto, MAX_GALLERY } from "../photos";
+import { stepPicOf, stepPicsOf, setStepPic, addStepPic, removeStepPic, firstStepPic, alignStepPics, allStepPics, galleryOf, placePhoto, makeCover, deletePhoto, setPhotoBy, MAX_GALLERY } from "../photos";
 import { ThinkingCard } from "./ThinkingCard";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cookName, weighLine, aroundV } from "../cookWords";
@@ -286,11 +286,11 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {/* DT254 (0.3.105, board Stories187): a recipe whose every step has a picture: the cover is its video */}
       {video && (drawn || !pk || pk === list[0] || list.length === 0)
         ? <CoverVideo title={meal.title} pics={video} cover={list[0] ?? video[video.length - 1].src} coverAlt={w("recipe.coverOf", { title: meal.title })} onWords={() => setWatching(true)}
-            marks={<>{list.length > 0 && !drawn && <span className="rph-cover">{w("recipe.cover")}</span>}{(drawn || (list[0] && isDrawnPhoto(meal, list[0]))) && <span className="rq-drawn">{w("recipe.drawnByChef")}</span>}</>} />
+            marks={<>{list.length > 0 && !drawn && <span className="rph-cover">{w("recipe.cover")}</span>}{(drawn || (list[0] && isDrawnPhoto(meal, list[0]))) ? <span className="rq-drawn">{w("recipe.drawnByChef")}</span> : list[0] && gal[0]?.by === "ai" && <span className="rq-drawn">{w("steppics.aiBeta")}</span>}</>} />
         : drawn
         ? <figure className="rq-hero"><img src={list[0]} alt={w("recipe.pictureOfBy", { title: meal.title })} /><span className="rq-drawn">{w("recipe.drawnByChef")}</span></figure>
         : shown
-        ? <figure className="rq-hero"><img src={shown} alt={shown === list[0] ? w("recipe.coverOf", { title: meal.title }) : w("recipe.photoOf", { n: gal.findIndex((g) => g.src === shown) + 1, title: meal.title })} />{shown === list[0] && <span className="rph-cover">{w("recipe.cover")}</span>}{isDrawnPhoto(meal, shown) && <span className="rq-drawn">{w("recipe.drawnByChef")}</span>}</figure>
+        ? <figure className="rq-hero"><img src={shown} alt={shown === list[0] ? w("recipe.coverOf", { title: meal.title }) : w("recipe.photoOf", { n: gal.findIndex((g) => g.src === shown) + 1, title: meal.title })} />{shown === list[0] && <span className="rph-cover">{w("recipe.cover")}</span>}{isDrawnPhoto(meal, shown) ? <span className="rq-drawn">{w("recipe.drawnByChef")}</span> : gal.find((g) => g.src === shown)?.by === "ai" && <span className="rq-drawn">{w("steppics.aiBeta")}</span>}</figure>
         // 0.3.134: with no photo at all, the card below (Chef Mealan draws one, Add my photo) is the one place to add it
         : picture && gal.length === 0 ? null
         : <button className="rq-hero rq-hero-empty" onClick={() => fileRef.current?.click()}><Camera size={26} /><span>{w("recipe.addAPhoto")}</span></button>}
@@ -305,6 +305,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             <button className={`publish-photo ${pk === g.src ? "on" : ""}`} aria-pressed={pk === g.src} onClick={() => setPicked(pk === g.src ? null : g.src)} aria-label={w("recipe.photoAria", { n: i + 1, cover: g.src === list[0] ? wordV("recipe.photoAriaCover") : "", picked: pk === g.src ? wordV("recipe.photoAriaPicked") : "" })}><img src={g.src} alt="" /></button>
             {g.src === list[0] && <span className="rq-cover-tag">{w("recipe.cover")}</span>}
             {g.steps.length > 0 && <span className="rq-step-tag" aria-hidden="true">{g.steps[0] + 1}</span>}
+            {g.by === "ai" && <span className="rq-ai-tag" aria-hidden="true">{w("recipe.aiTag")}</span>}
           </div>
         ))}
         {!full && <button className="publish-photo add rph-add" disabled={busy} onClick={() => fileRef.current?.click()}><Camera size={18} /><span>{w("recipe.add")}</span></button>}
@@ -320,6 +321,15 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             <div className="rq-gal-steps">{steps.map((_, k) => <button key={k} type="button" className={`pill pill-small${g.steps[0] === k ? " pill-primary" : ""}`} aria-pressed={g.steps[0] === k} aria-label={w("steppics.stepN", { n: k + 1 })} onClick={() => onPatch(placePhoto(meal, pk, k))}>{k + 1}</button>)}
               <button type="button" className={`pill pill-small${g.steps.length ? "" : " pill-primary"}`} aria-pressed={!g.steps.length} onClick={() => onPatch(placePhoto(meal, pk, null))}>{w("steppics.noStep")}</button></div>
           </div>}
+          {/* DT283 (0.3.137, board Stories210): who made it; a photo drawn by AI says so wherever it shows */}
+          <div className="rq-gal-who">
+            <b>{w("recipe.whoMadeIt")}</b>
+            <div className="sp-grid">
+              <button type="button" className={`choice ${g.by === "me" ? "on" : ""}`} aria-pressed={g.by === "me"} onClick={() => onPatch(setPhotoBy(meal, pk, "me"))}>{w("steppics.myPhoto")}</button>
+              <button type="button" className={`choice ${g.by === "ai" ? "on" : ""}`} aria-pressed={g.by === "ai"} onClick={() => onPatch(setPhotoBy(meal, pk, "ai"))}>{w("steppics.drawnByAi")}</button>
+            </div>
+            <small className="muted">{w("steppics.drawnByAiSaysSo")}</small>
+          </div>
           <ConfirmButton className="link link-danger rq-gal-del" label={w("recipe.deleteThisPhoto")} confirmLabel={w("recipe.sure")} onConfirm={() => { onPatch(deletePhoto(meal, pk)); setPicked(null); }} />
         </div>); })()}
       {picture && list.length === 0 && !drawn && (() => {

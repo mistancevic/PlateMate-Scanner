@@ -431,14 +431,19 @@ export function alignStepPics(m: { stepPics?: (string | null)[]; stepPicMeta?: (
 // so old recipes need nothing carried over. 12 photos per recipe (Coach Milan 17:59), steps included.
 export const MAX_GALLERY = 12;
 export type GalleryPhoto = { src: string; steps: number[]; own: boolean; by: "me" | "ai" };
-type WithPhotos = Pics & { photo?: string; photos?: string[] };
+type WithPhotos = Pics & { photo?: string; photos?: string[]; photoAi?: string[] };
+// DT283 (0.3.137, board Stories210; Coach Milan 12 November 07:44, Go): who made each of the recipe's own photos. A step
+// picture says so in stepPicMeta; an own photo drawn by AI is named in photoAi by its fingerprint, so the mark survives the
+// account, where the photos themselves are files
+const ownBy = (m: WithPhotos, src: string): "me" | "ai" => (Array.isArray(m.photoAi) && m.photoAi.includes(sig(src)) ? "ai" : "me");
+const withAi = (m: WithPhotos, src: string, ai: boolean) => { const s = sig(src), cur = (m.photoAi ?? []).filter((x) => x !== s); return ai ? [...cur, s] : cur; };
 export function galleryOf(m: WithPhotos | null | undefined): GalleryPhoto[] {
   if (!m) return [];
-  const out: GalleryPhoto[] = recipePhotosOf(m).map((src) => ({ src, steps: [], own: true, by: "me" as const }));
+  const out: GalleryPhoto[] = recipePhotosOf(m).map((src) => ({ src, steps: [], own: true, by: ownBy(m, src) }));
   const steps = m.steps ?? [];
   steps.forEach((t, k) => {
     if (steps.indexOf(t) !== k) return;
-    for (const p of stepPicsOf(m, t)) { let g = out.find((x) => x.src === p.src); if (!g) { g = { src: p.src, steps: [], own: false, by: p.by }; out.push(g); } if (!g.steps.includes(k)) g.steps.push(k); }
+    for (const p of stepPicsOf(m, t)) { let g = out.find((x) => x.src === p.src); if (!g) { g = { src: p.src, steps: [], own: false, by: p.by }; out.push(g); } else if (p.by === "ai") g.by = "ai"; if (!g.steps.includes(k)) g.steps.push(k); }
   });
   return out;
 }
@@ -451,12 +456,15 @@ export function placePhoto(m: WithPhotos, src: string, k: number | null) {
   if (k !== null) x = { ...x, ...addStepPic(x, k, { src, by: g.by }) };
   const own = recipePhotosOf(m), at = own.indexOf(src);
   const next = k !== null ? (at > 0 ? own.filter((y) => y !== src) : own) : at >= 0 ? own : [...own, src];
-  return { stepPics: x.stepPics ?? [], stepPicMeta: x.stepPicMeta ?? [], ...(next.join("|") !== own.join("|") ? withRecipePhotos(next) : {}) };
+  // DT283: who made it goes with the photo
+  const ai = next.includes(src) ? withAi(m, src, g.by === "ai") : withAi(m, src, false);
+  return { stepPics: x.stepPics ?? [], stepPicMeta: x.stepPicMeta ?? [], ...(next.join("|") !== own.join("|") ? withRecipePhotos(next) : {}), ...(ai.join("|") !== (m.photoAi ?? []).join("|") ? { photoAi: ai } : {}) };
 }
 // the photo first among the recipe's own photos: the cover. A photo that was only on a step stays on it too
 export function makeCover(m: WithPhotos, src: string) {
-  const own = recipePhotosOf(m);
-  return withRecipePhotos([src, ...own.filter((y) => y !== src)]);
+  const own = recipePhotosOf(m), by = galleryOf(m).find((x) => x.src === src)?.by;
+  // DT283: a step picture drawn by AI stays marked as the cover
+  return { ...withRecipePhotos([src, ...own.filter((y) => y !== src)]), ...(by === "ai" && !own.includes(src) ? { photoAi: withAi(m, src, true) } : {}) };
 }
 // the photo out of the recipe: off every step and out of its own photos
 export function deletePhoto(m: WithPhotos, src: string) {
@@ -464,7 +472,15 @@ export function deletePhoto(m: WithPhotos, src: string) {
   let x: WithPhotos = { ...m };
   for (const j of g.steps) x = { ...x, ...removeStepPic(x, j, src) };
   const own = recipePhotosOf(m);
-  return { ...(g.steps.length ? { stepPics: x.stepPics ?? [], stepPicMeta: x.stepPicMeta ?? [] } : {}), ...(own.includes(src) ? withRecipePhotos(own.filter((y) => y !== src)) : {}) };
+  return { ...(g.steps.length ? { stepPics: x.stepPics ?? [], stepPicMeta: x.stepPicMeta ?? [] } : {}), ...(own.includes(src) ? withRecipePhotos(own.filter((y) => y !== src)) : {}),
+    ...(m.photoAi?.includes(sig(src)) ? { photoAi: withAi(m, src, false) } : {}) };
+}
+// DT283: who made this photo, My photo or Drawn by AI; on every step it is on, and as one of the recipe's own photos
+export function setPhotoBy(m: WithPhotos, src: string, by: "me" | "ai") {
+  const out: { photoAi?: string[]; stepPicMeta?: ({ by: "me" | "ai"; step: string } | null)[] } = {};
+  if (recipePhotosOf(m).includes(src)) out.photoAi = withAi(m, src, by === "ai");
+  if (Array.isArray(m.stepPics) && Array.isArray(m.stepPicMeta) && m.stepPics.includes(src)) out.stepPicMeta = m.stepPicMeta.map((x, i) => (x && m.stepPics![i] === src ? { ...x, by } : x));
+  return out;
 }
 // every step has its picture: Watch the steps can play
 export const allStepPics = (m: any, steps: string[]) => steps.length > 0 && steps.every((t) => !!stepPicOf(m, t));
