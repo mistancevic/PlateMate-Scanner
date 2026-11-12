@@ -72,7 +72,9 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   const s1 = await st();
   ok(sent.length === 1 && /^data:image\/jpeg;base64,/.test(sent[0].image) && Array.isArray(sent[0].more) && sent[0].more.length === 1 && s1.photo?.more?.length === 1 && await page.locator(".camera-ui").count() === 0, "DT228: both photos go in one read; the camera closes");
   ok(s1.items.length === 3 && s1.photo && !s1.photo.who && /Your photo, 13:05\./.test(await text(".mp-big-say")), "DT130: from the camera it is the plate in front of you, as in 0.2.108");
-  await page.locator(".mp-say").getByRole("button", { name: "Not mine" }).click(); await page.waitForTimeout(400);
+  // DT278 (0.3.145): Don't count it, then Keep it ›, clears the Plate (Not mine is gone)
+  await page.locator(".mp-say").getByRole("button", { name: "Don't count it" }).click(); await page.waitForTimeout(400);
+  await page.locator(".sv-plate").getByRole("button", { name: "Keep it ›" }).click(); await page.waitForTimeout(400);
 
   // the Plate: Photo of my meal opens the same camera; a photo from Your photos asks first
   await toPlate();
@@ -83,7 +85,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   ok(sent.length === 1, "DT130: nothing is read before Read the plate");
   ok(/A photo from 12:20 today\. Whose plate is it, and when\?/.test(await text(".pa-top")) && await page.locator(".pa-top.chef-line").count() === 1, "DT130, DT213: the photo's own time, from the photo, in Chef Mealan's line: " + await text(".pa-top"));
   const c1 = await chips();
-  ok(c1.length === 3 && /^✓\s?Ate at 12:20$/.test(c1[0]) && c1[1] === "Eating now" && c1[2] === "Exploring" && await page.locator(".pa-time").inputValue() === "12:20", "DT130: three short chips, Ate at 12:20 on (45 minutes ago): " + c1.join(" | "));
+  ok(c1.length === 3 && /^✓\s?Ate at 12:20$/.test(c1[0]) && c1[1] === "Eating now" && c1[2] === "Just looking" && await page.locator(".pa-time").inputValue() === "12:20", "DT130: three short chips, Ate at 12:20 on (45 minutes ago): " + c1.join(" | "));
   ok(await page.locator(".pa-chip.on").count() === 1 && await page.locator(".pa-chip[aria-checked=true]").count() === 1, "DT130: one chip on");
   const line1 = await text(".pa small");
   ok(/^Logged at 12:20, as lunch\. Tap the time to change it\.$/.test(line1), "DT130: the line says what the chip on does: " + line1);
@@ -107,11 +109,11 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
   await pick("2026:10:24 19:10:00");
   ok(/A photo from yesterday, 19:10\./.test(await text(".pa-top")) && /^Logged at 19:10, as dinner/.test(await text(".pa small")), "DT130: a photo from yesterday: Ate at 19:10, as dinner: " + await text(".pa small"));
-  await page.locator(".pa-chip").filter({ hasText: "Exploring" }).click(); await page.waitForTimeout(200);
-  ok(await text(".pa small") === "Not your meal, not logged. Chef Mealan reads it: cook it, keep it as an idea, or plan it.", "0.3.62: Exploring (was An idea): not your meal, not logged");
+  await page.locator(".pa-chip").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(200);
+  ok(await text(".pa small") === "Not your meal, not logged. Chef Mealan reads it: cook it, keep it as an idea, or plan it.", "0.3.62: Just looking (was An idea): not your meal, not logged");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   const s4 = await st();
-  ok(sent.length === 3 && s4.photo.who === "idea" && /Exploring a photo\. 3 foods read, amounts estimated \(~\)\. Not logged/.test(await text(".mp-big-say")) && (await st()).pick === "exploring", "0.3.62: the read lands as Exploring, said in the photo line; the pencil block is on Exploring");
+  ok(sent.length === 3 && s4.photo.who === "idea" && /Just looking at a photo\. 3 foods read, amounts estimated \(~\)\. Not logged/.test(await text(".mp-big-say")) && (await st()).pick === "exploring", "0.3.62: the read lands as Just looking, said in the photo line; the pencil block is on Just looking");
   const ib = (await page.locator(".mp-say .mp-idea-row button").allTextContents()).map((x) => x.trim());
   ok(ib.length === 3 && /^Fit it to my (lunch|dinner|meal)$/.test(ib[0]) && ib[1] === "Save as an idea" && ib[2] === "Put it in my plan" && (await page.locator(".mp-say .pill-primary").textContent()).trim() === ib[0], "DT130: the buttons are for cooking it, Fit first; no Ate it: " + ib.join(" | "));
   const say = await text(".mp-say small");
@@ -135,7 +137,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await toPlate();
   await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
   await pick("2026:10:19 20:00:00");
-  ok(/^✓\s?Exploring$/.test((await chips())[2]) && /A photo from Monday 19 October, 20:00\./.test(await text(".pa-top")), "DT130: a photo from last week starts on An idea");
+  ok(/^✓\s?Just looking$/.test((await chips())[2]) && /A photo from Monday 19 October, 20:00\./.test(await text(".pa-top")), "DT130: a photo from last week starts on An idea");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   await page.getByRole("button", { name: "Save as an idea" }).click(); await page.waitForTimeout(1200);
   const s6 = await st();

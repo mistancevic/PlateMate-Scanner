@@ -30,12 +30,12 @@ seed.items = []; seed.meals = []; seed.feedback = []; seed.goals = { ...seed.goa
     ok(/^Lunch, \d\d:\d\d by the clock · Off the plan · Regular meal · A mix$/.test(await line()), "nothing picked: the line names the meal by the clock, off the plan: " + await line());
     await page.locator(".plan-line span").first().click(); await page.waitForTimeout(300);
     const chips = await page.locator(".for-row .choice").allTextContents();
-    ok(chips.join("|") === "Exploring|Breakfast|Lunch|Dinner|Snack", "the whole line opens What is it for: " + chips.join(", "));
+    ok(chips.join("|") === "Just looking|Breakfast|Lunch|Dinner|Snack", "the whole line opens What is it for: " + chips.join(", "));
     ok(/Lunch/.test(await page.locator(".for-row .choice.on").textContent()) && /by the clock: a guess/.test(await page.locator(".for-hint").textContent()), "Lunch is the guess, and the hint says so");
     ok(await page.locator(".chef-line").filter({ hasText: "What kind of moment?" }).count() === 1 && await page.locator("p.label").filter({ hasText: "When is this for?" }).count() === 0, "the moment's question reads What kind of moment?, in Chef Mealan's line (DT213)");
     ok(await page.locator(".plan-line-done").count() === 1, "Done stands where the pencil was");
-    await page.locator(".for-row .choice").filter({ hasText: "Exploring" }).click(); await page.waitForTimeout(300);
-    ok(/^Exploring · not sized for a meal/.test(await line()) && !/Make it a/.test(await page.locator("main").textContent()), "Exploring: the line says so, and nothing offers to make it a meal");
+    await page.locator(".for-row .choice").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(300);
+    ok(/^Just looking · not sized for a meal/.test(await line()) && !/Make it a/.test(await page.locator("main").textContent()), "Just looking: the line says so, and nothing offers to make it a meal");
     await page.locator(".for-row .choice").filter({ hasText: "Dinner" }).click(); await page.waitForTimeout(300);
     ok(/^Dinner, \d\d:\d\d · [\d,]+ kcal · \d+ g protein · PD [\d.]+ · By the plan$/.test(await line()), "Dinner: its numbers from the plan, by the plan: " + await line());
     ok(/It counts as your dinner\./.test(await page.locator(".for-hint").textContent()), "the hint says it counts as your dinner");

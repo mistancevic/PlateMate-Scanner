@@ -56,7 +56,7 @@ const READS = [
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(800);
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
-    await page.locator(".pa-chip").filter({ hasText: "Exploring" }).click(); await page.waitForTimeout(200);
+    await page.locator(".pa-chip").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(200);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     const sv = page.locator(".sv-plate");
     ok(await sv.count() === 1 && /Served\s*Kept in Recipes, under Served/.test(await text(".sv-head")), "the Plate says the plate is kept, marked Served");
@@ -90,7 +90,7 @@ const READS = [
     await sv.locator(".pp-gallery input[type=file]").setInputFiles(file); await page.waitForTimeout(2200);
     s = await st();
     ok(s.served.length === 2 && s.served[0].name === "Bruschetta" && s.served[0].dish === "starter" && s.served[0].mine === true && s.served[0].visit === s.served[1].visit, "the first plate stays; the second is kept as a starter of mine, in the same visit");
-    ok(await page.locator(".sv-name").inputValue() === "Bruschetta" && s.photo?.who === "idea", "the Plate now holds the second plate, still Exploring");
+    ok(await page.locator(".sv-name").inputValue() === "Bruschetta" && s.photo?.who === "idea", "the Plate now holds the second plate, still Just looking");
     // ---- 3. someone else's plate ----
     await page.locator(".sv-other").click(); await page.waitForTimeout(300);
     await page.locator(".sv-plate .pp-gallery input[type=file]").setInputFiles(file); await page.waitForTimeout(2200);
@@ -222,7 +222,7 @@ const READS = [
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
-    await page.locator(".pa-chip").filter({ hasText: "Exploring" }).click(); await page.waitForTimeout(200);
+    await page.locator(".pa-chip").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(200);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     s = await st();
     ok(s.served.length === 3 && s.served[0].name === "Apple strudel" && s.served[0].dish === "main" && s.served[0].visit === s.served[1].visit, "a dish the read cannot name is a main; a plate soon after joins the visit");
@@ -239,25 +239,25 @@ const READS = [
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
-    await page.locator(".pa-chip").filter({ hasText: "Exploring" }).click(); await page.waitForTimeout(200);
+    await page.locator(".pa-chip").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(200);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     s = await st();
     const n274 = s.served.length, fb274 = s.feedback.length;
-    ok(s.photo?.who === "idea" && !!s.photo?.served && await page.locator(".sv-plate").count() === 1, "an Exploring plate, kept");
+    ok(s.photo?.who === "idea" && !!s.photo?.served && await page.locator(".sv-plate").count() === 1, "an Just looking plate, kept");
     await page.locator(".plan-line").click(); await page.waitForTimeout(300);
     const forGroup = page.getByRole("radiogroup", { name: "What the plate is for" });
     const say = await text(".for-say");
-    ok(/Exploring: a plate you look at\. Nothing is logged\. With a photo it is kept in Recipes, under Served\./.test(say) && /A meal \(Breakfast, Lunch, Dinner\): your meal\. It counts in your day when you tap Eat or Ate it\. If it was under Served, it leaves Served\./.test(say) && await page.locator(".for-hint").count() === 0, "the pencil's sheet says what each choice does, in place of the old line on Exploring");
+    ok(/Just looking: a plate you look at\. Nothing is logged\. With a photo it is kept in Recipes, under Served\./.test(say) && /A meal \(Breakfast, Lunch, Dinner\): your meal\. It counts in your day when you tap Eat or Ate it\. If it was under Served, it leaves Served\./.test(say) && await page.locator(".for-hint").count() === 0, "the pencil's sheet says what each choice does, in place of the old line on Just looking");
     // back to a meal: your meal again, out of Served
     await forGroup.getByRole("button", { name: "Dinner", exact: true }).click(); await page.waitForTimeout(600);
     s = await st();
     ok(s.photo && s.photo.who !== "idea" && !s.photo.served && s.served.length === n274 - 1 && s.feedback.length === fb274 && s.items.length > 0, "the pencil on Dinner: your meal again, out of Served, the foods stay, nothing logged");
     ok(await page.locator(".sv-plate").count() === 0 && await page.locator(".mp-say").getByRole("button", { name: "Ate it" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 0, "the Served card is gone and the buttons are a meal's");
     // and to Exploring again: an Exploring plate, kept
-    await forGroup.getByRole("button", { name: "Exploring", exact: true }).click(); await page.waitForTimeout(600);
+    await forGroup.getByRole("button", { name: "Just looking", exact: true }).click(); await page.waitForTimeout(600);
     s = await st();
-    ok(s.photo?.who === "idea" && s.photo?.served?.byHand === true && s.served.length === n274 && s.served[0].mine === true && s.feedback.length === fb274, "the pencil on Exploring: an Exploring plate, kept as Served; nothing logged");
-    ok(await page.locator(".sv-plate").count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Ate it" }).count() === 0, "the Served card shows and the buttons are an Exploring plate's");
+    ok(s.photo?.who === "idea" && s.photo?.served?.byHand === true && s.served.length === n274 && s.served[0].mine === true && s.feedback.length === fb274, "the pencil on Just looking: an Just looking plate, kept as Served; nothing logged");
+    ok(await page.locator(".sv-plate").count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Ate it" }).count() === 0, "the Served card shows and the buttons are an Just looking plate's");
     ok(await page.locator(".sv-plate .sv-by").count() === 1, "the dish was not read for this plate, so only the name says filled by Chef Mealan");
     // 0.3.126 (blind run 10 November, finding 1): a recipe as a new plate lets go of the Served plate; the kept plate keeps its foods
     const kept126 = JSON.stringify((await st()).served[0].items.map((i) => [i.food.name, i.grams]));

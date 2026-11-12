@@ -99,6 +99,8 @@ export function RecipesScreen(p: AppApi) {
   const [openId, setOpenId] = useState<string | null>(null);
   // DT268 (0.3.118, board Stories201): Served plates: the chip shows them alone; one of them open
   const [servedOn, setServedOn] = useState(false), [servedOpen, setServedOpen] = useState<string | null>(null), [menuOpen, setMenuOpen] = useState<string | null>(null);
+  // DT278 (0.3.145): a plate opened from its day; before any return, so the hooks keep their order
+  useEffect(() => { if (p.servedGo) { setServedOpen(p.servedGo); p.servedGone(); } }, [p.servedGo]); // eslint-disable-line react-hooks/exhaustive-deps
   const servedN = (p.state.served ?? []).length;
   const patchMeal = (id: string, patch: Partial<Meal>) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === id ? { ...x, ...patch } : x)) }));
   // R4: a live recipe whose page has a photo and the app has none takes the page's photo once, as its cover

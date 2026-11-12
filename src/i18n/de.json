@@ -558,7 +558,7 @@
       "checked": true
     },
     "make.exploringAPhoto": {
-      "text": "Ich sehe mir das Foto an.",
+      "text": "Ich schaue mir das Foto nur an.",
       "checked": true
     },
     "make.skip": {
@@ -1134,7 +1134,7 @@
       "checked": true
     },
     "make.exploringNothingIsSizedFor": {
-      "text": "Entdecken: Nichts ist für eine Mahlzeit bemessen. Wähle eine Mahlzeit, um zu sehen, was dein Plan dafür vorsieht.",
+      "text": "Nur mal schauen: Nichts ist für eine Mahlzeit bemessen. Wähle eine Mahlzeit, um zu sehen, was dein Plan dafür vorsieht.",
       "checked": true
     },
     "make.snackOffThePlanNot": {
@@ -13166,7 +13166,7 @@
       "checked": true
     },
     "photoask.exploring": {
-      "text": "Entdecken",
+      "text": "Nur mal schauen",
       "checked": true
     },
     "photoask.notYourMeal": {
@@ -14022,7 +14022,7 @@
       "checked": true
     },
     "plate.exploringLine": {
-      "text": "Entdecken · nicht für eine Mahlzeit bemessen",
+      "text": "Nur mal schauen · nicht für eine Mahlzeit bemessen",
       "checked": true
     },
     "plate.snackLine": {
@@ -14422,15 +14422,15 @@
       "checked": true
     },
     "plate.exploringStays": {
-      "text": "Entdecken: {slot} bleibt, wie es war.",
+      "text": "Nur mal schauen: {slot} bleibt, wie es war.",
       "checked": true
     },
     "plate.exploring": {
-      "text": "Entdecken",
+      "text": "Nur mal schauen",
       "checked": true
     },
     "plate.exploringLeaves": {
-      "text": "Entdecken verlässt {slot}: Es bleibt, wie es war, und nichts wird eingetragen.",
+      "text": "Nur mal schauen: {slot} bleibt, wie es war, und nichts wird eingetragen.",
       "checked": true
     },
     "plate.targetForPlate": {
@@ -14442,7 +14442,7 @@
       "checked": true
     },
     "plate.photoLineIdea": {
-      "text": "Ich sehe mir das Foto an. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.|Ich sehe mir das Foto an. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.",
+      "text": "Ich schaue mir das Foto nur an. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.|Ich schaue mir das Foto nur an. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.",
       "checked": true
     },
     "plate.photoLine": {
@@ -14710,7 +14710,7 @@
       "checked": true
     },
     "plate.exploringSo": {
-      "text": "Entdecken, also bleibt {slot}, wie es war.",
+      "text": "Nur mal schauen, also bleibt {slot}, wie es war.",
       "checked": true
     },
     "plate.fitItToMy": {
@@ -21342,7 +21342,7 @@
       "checked": true
     },
     "howto.photoLog.s3": {
-      "text": "Sag, wessen Teller und wann: Gegessen um, Ich esse gerade, oder Entdecken.",
+      "text": "Sag, wessen Teller und wann: Gegessen um, Ich esse gerade, oder Nur mal schauen.",
       "checked": true
     },
     "howto.photoLog.s4": {
@@ -21974,7 +21974,7 @@
       "checked": true
     },
     "make.forExploringHead": {
-      "text": "Entdecken:",
+      "text": "Nur mal schauen:",
       "checked": true
     },
     "make.forExploring": {
@@ -22519,6 +22519,22 @@
     },
     "recipe.goodForYours": {
       "text": "Das ist deine Wahl. Beim Füllen offener Mahlzeiten hält sich Chef Mealan daran.",
+      "checked": true
+    },
+    "dish.dontCountIt": {
+      "text": "Nicht mitzählen",
+      "checked": true
+    },
+    "served.notCounted": {
+      "text": "Zählt nicht für deinen Tag",
+      "checked": true
+    },
+    "served.keepIt": {
+      "text": "Behalten ›",
+      "checked": true
+    },
+    "served.notCountedN": {
+      "text": "Nicht gezählt: {n} Teller|Nicht gezählt: {n} Teller",
       "checked": true
     }
   }

@@ -3002,7 +3002,7 @@
       "checked": true
     },
     "make.exploringAPhoto": {
-      "text": "Istražujem sliku.",
+      "text": "Samo gledam sliku.",
       "checked": true
     },
     "make.skip": {
@@ -3582,7 +3582,7 @@
       "checked": true
     },
     "make.exploringNothingIsSizedFor": {
-      "text": "Istraživanje: ništa nije odmereno za obrok. Izaberi obrok da vidiš šta tvoj plan ima za njega.",
+      "text": "Samo gledam: ništa nije odmereno za obrok. Izaberi obrok da vidiš šta tvoj plan ima za njega.",
       "checked": true
     },
     "make.snackOffThePlanNot": {
@@ -13166,7 +13166,7 @@
       "checked": true
     },
     "photoask.exploring": {
-      "text": "Istraživanje",
+      "text": "Samo gledam",
       "checked": true
     },
     "photoask.notYourMeal": {
@@ -14022,7 +14022,7 @@
       "checked": true
     },
     "plate.exploringLine": {
-      "text": "Istraživanje · nije odmereno za obrok",
+      "text": "Samo gledam · nije odmereno za obrok",
       "checked": true
     },
     "plate.snackLine": {
@@ -14422,15 +14422,15 @@
       "checked": true
     },
     "plate.exploringStays": {
-      "text": "Istraživanje: {slot} ostaje bez promene.",
+      "text": "Samo gledam: {slot} ostaje bez promene.",
       "checked": true
     },
     "plate.exploring": {
-      "text": "Istraživanje",
+      "text": "Samo gledam",
       "checked": true
     },
     "plate.exploringLeaves": {
-      "text": "Istraživanje napušta: {slot}. Ostaje bez promene, i ništa se ne upisuje.",
+      "text": "Samo gledam: {slot} ostaje bez promene, i ništa se ne upisuje.",
       "checked": true
     },
     "plate.targetForPlate": {
@@ -14442,7 +14442,7 @@
       "checked": true
     },
     "plate.photoLineIdea": {
-      "text": "Istražujem sliku. {n} namirnica pročitana, količine procenjene (~). Nije upisano: nije tvoj obrok.|Istražujem sliku. {n} namirnice pročitane, količine procenjene (~). Nije upisano: nije tvoj obrok.|Istražujem sliku. {n} namirnica pročitano, količine procenjene (~). Nije upisano: nije tvoj obrok.",
+      "text": "Samo gledam sliku. {n} namirnica pročitana, količine procenjene (~). Nije upisano: nije tvoj obrok.|Samo gledam sliku. {n} namirnice pročitane, količine procenjene (~). Nije upisano: nije tvoj obrok.|Samo gledam sliku. {n} namirnica pročitano, količine procenjene (~). Nije upisano: nije tvoj obrok.",
       "checked": true
     },
     "plate.photoLine": {
@@ -14710,7 +14710,7 @@
       "checked": true
     },
     "plate.exploringSo": {
-      "text": "Istraživanje, pa {slot} ostaje bez promene.",
+      "text": "Samo gledam, pa {slot} ostaje bez promene.",
       "checked": true
     },
     "plate.fitItToMy": {
@@ -21342,7 +21342,7 @@
       "checked": true
     },
     "howto.photoLog.s3": {
-      "text": "Reci čiji je tanjir i kada: Pojedeno u, Jedem sada, ili Istraživanje.",
+      "text": "Reci čiji je tanjir i kada: Pojedeno u, Jedem sada, ili Samo gledam.",
       "checked": true
     },
     "howto.photoLog.s4": {
@@ -21974,7 +21974,7 @@
       "checked": true
     },
     "make.forExploringHead": {
-      "text": "Istraživanje:",
+      "text": "Samo gledam:",
       "checked": true
     },
     "make.forExploring": {
@@ -22519,6 +22519,22 @@
     },
     "recipe.goodForYours": {
       "text": "Ovo je tvoj izbor. Chef Mealan se toga drži kad popunjava slobodne obroke.",
+      "checked": true
+    },
+    "dish.dontCountIt": {
+      "text": "Ne računaj",
+      "checked": true
+    },
+    "served.notCounted": {
+      "text": "Ne računa se u tvoj dan",
+      "checked": true
+    },
+    "served.keepIt": {
+      "text": "Sačuvaj ›",
+      "checked": true
+    },
+    "served.notCountedN": {
+      "text": "Ne računa se: {n} tanjir|Ne računa se: {n} tanjira|Ne računa se: {n} tanjira",
       "checked": true
     }
   }
