@@ -55,8 +55,9 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
     await shot(p, "r278a", ".dish-ask", 260);
     // b: new, a third answer
     p = await open({ ...seed, feedback: [salad(day(19, 59))] }); await photo(p);
-    await p.evaluate(({ W, BLUE }) => { const g = document.querySelector(".dish-ask .ca-go"); const bs = [...g.querySelectorAll("button")]; bs[1].style.cssText += ";" + W; g.insertAdjacentHTML("afterbegin", `<button class="pill" style="min-height:48px;${W}">Someone else's plate</button>`); g.appendChild(bs[0]); g.style.cssText += ";display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end"; }, { W, BLUE });
-    await markEl(p, ".dish-ask"); await note(p, "New: a third answer, Someone else's plate. Dessert, the main one when it comes soon after, stays on the right.", ".dish-ask");
+    await p.evaluate(({ W, BLUE }) => { const g = document.querySelector(".dish-ask .ca-go"); const bs = [...g.querySelectorAll("button")]; bs[1].style.cssText += ";" + W; g.insertAdjacentHTML("afterbegin", `<button class="pill" style="min-height:48px;${W}">Don't count it</button>`); g.appendChild(bs[0]); g.style.cssText += ";display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end";
+      for (const e of document.querySelectorAll(".dish-ask *")) if (e.children.length === 0 && /or its own snack\?$/.test(e.textContent.trim())) e.textContent = e.textContent.replace(/, or its own snack\?$/, ", its own snack, or don't count it?"); }, { W, BLUE });
+    await markEl(p, ".dish-ask"); await note(p, "New: a third answer, Don't count it: a plate that is not your meal, whoever ate it. Dessert, the main one when it comes soon after, stays on the right.", ".dish-ask");
     await shot(p, "r278b", ".dish-ask", 260);
     // c: now, the read plate: coached as hers, Not mine a small link that throws it away
     p = await open({ ...seed, feedback: [salad(day(19, 59))] }); await photo(p);
@@ -70,25 +71,29 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
     await p.evaluate(({ RED, BLUE, W, F2, mark }) => {
       const nm = [...document.querySelectorAll("button")].find((x) => x.textContent.trim() === "Not mine"); const row = nm.parentElement;
       // the coaching and Fit go: it is not your plate
-      const coach = [...document.querySelectorAll("main *")].filter((e) => /Eat it as it is/.test(e.textContent) && e.children.length <= 2).pop(); if (coach) coach.innerHTML = "<b>Chef Mealan:</b> about 420 kcal and 7 g protein on this plate. It is not yours, so nothing counts in your day.";
+      const coach = [...document.querySelectorAll("main *")].filter((e) => /Eat it as it is/.test(e.textContent) && e.children.length <= 2).pop(); if (coach) coach.innerHTML = "<b>Chef Mealan:</b> about 420 kcal and 7 g protein on this plate. Not counted in your day.";
       const fit = [...document.querySelectorAll("button")].find((x) => /Fit to my target/.test(x.textContent)); if (fit) { fit.style.display = "none"; const n = fit.nextElementSibling; if (n && n.tagName === "SMALL") n.style.display = "none"; }
       const up = [...document.querySelectorAll("main *")].find((e) => e.children.length === 0 && /^Your plate is .* under/.test(e.textContent.trim())); if (up) { let box = up.parentElement; while (box && !/Chicken breast/.test(box.innerText)) box = box.parentElement; if (box) box.style.display = "none"; }
       for (const e of document.querySelectorAll("main *")) if (e.children.length === 0 && /^One product: Chef Mealan looks/.test(e.textContent.trim())) e.style.display = "none";
-      row.id = "eatrow"; row.innerHTML = `<div style="width:100%;${F2}"><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><span style="background:#2a72d9;color:#fff;border-radius:999px;padding:2px 10px;font-weight:700;font-size:13px">Someone else's plate</span></div>
-        <label style="display:block;font-size:14px;font-weight:700;margin:6px 0 4px">Whose is it?</label><input value="Ana" style="width:100%;box-sizing:border-box;min-height:44px;border:1.5px solid #c9d6ee;border-radius:12px;padding:0 12px;font:inherit;font-size:16px">
-        <div style="display:flex;gap:10px;margin-top:12px"><button class="pill" style="flex:1;min-height:48px;${W}">Share the numbers</button><button class="pill" style="flex:1;min-height:48px;${BLUE}">Keep it ›</button></div>
+      row.id = "eatrow"; row.innerHTML = `<div style="width:100%;${F2}"><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><span style="background:#2a72d9;color:#fff;border-radius:999px;padding:2px 10px;font-weight:700;font-size:13px">Not counted in your day</span></div>
+        <div style="display:flex;gap:10px;margin-top:8px"><button class="pill" style="flex:1;min-height:48px;${W}">Share the numbers</button><button class="pill" style="flex:1;min-height:48px;${BLUE}">Keep it ›</button></div>
         <button class="pill pill-wide" style="margin-top:10px;min-height:48px;${RED}">Don't keep it</button>
-        <small style="display:block;margin-top:8px;font-size:13.5px;color:#53627f;line-height:1.45">Keep it saves it in Recipes, under Served, with the day's visit, and clears the Plate for your next one.</small></div>`;
+        <small style="display:block;margin-top:8px;font-size:13.5px;color:#53627f;line-height:1.45">Keep it saves it with the day, in Recipes under Served, and clears the Plate for your next one. A name is yours to add, never asked.</small></div>`;
       row.style.cssText += ";" + mark; }, { RED, BLUE, W, F2, mark });
-    await note(p, "New: someone else's plate shows its numbers and asks whose it is. No coaching, no Fit. Keep it saves it under Served and clears the Plate; Don't keep it is its own button.", "#eatrow");
+    await note(p, "New: after Don't count it, the plate shows its numbers and says it is not counted. No coaching, no Fit. Keep it saves it with the day and clears the Plate; Don't keep it is its own button.", "#eatrow");
     await shot(p, "r278d", "#eatrow", 560);
     // e: new, the visit is found from the day
     p = await open({ ...seed, feedback: [salad(day(19, 30))] }, { clock: day(21, 0) }); await p.goto(U + "/today"); await p.waitForTimeout(1500);
     await p.evaluate(({ W, F2, mark }) => { const c = document.querySelector(".meals-card"); const add = [...c.querySelectorAll("button")].find((x) => /Log a meal/.test(x.textContent));
-      const html = `<button id="visit" class="menu-row" style="display:flex;align-items:center;width:100%;min-height:56px;text-align:left;background:#eef4ff;border:1.5px solid #c9d6ee;border-radius:12px;padding:10px 12px;margin:8px 0;${F2}"><span style="flex:1"><b style="display:block;font-size:15px">At the table: 2 plates</b><small style="font-size:13.5px;color:#53627f">Ana: meatballs · Marko: chocolate cake</small></span><span style="font-size:22px;color:#1f5fc7">›</span></button>`;
+      const html = `<button id="visit" class="menu-row" style="display:flex;align-items:center;width:100%;min-height:56px;text-align:left;background:#eef4ff;border:1.5px solid #c9d6ee;border-radius:12px;padding:10px 12px;margin:8px 0;${F2}"><span style="flex:1"><b style="display:block;font-size:15px">Not counted: 2 plates</b><small style="font-size:13.5px;color:#53627f">Meatballs in tomato sauce · Chocolate cake</small></span><span style="font-size:22px;color:#1f5fc7">›</span></button>`;
       (add || c.lastElementChild).insertAdjacentHTML("beforebegin", html); document.querySelector("#visit").style.cssText += ";" + mark; }, { W, F2, mark });
-    await note(p, "New: the day says the visit and opens it: on Today here, and on that day in Plan and in Earlier.", "#visit");
+    await note(p, "New: the plates you kept but did not count are on their day: Today here, and that day in Plan and in Earlier. A tap opens them.", "#visit");
     await shot(p, "r278e", "#visit", 340);
+    // f: new, the Plate's own choice: Just looking, in place of Exploring
+    p = await open({ ...seed, feedback: [] }); await p.locator(".plan-line").first().click(); await p.waitForTimeout(700);
+    const ex = await p.evaluate((mark) => { const b = [...document.querySelectorAll("button")].find((x) => x.textContent.trim() === "Exploring"); if (!b) return false; b.textContent = "Just looking"; b.id = "justlooking"; b.style.cssText += ";" + mark; for (const e of document.querySelectorAll("b, strong")) if (/^Exploring:/.test(e.textContent.trim())) e.textContent = "Just looking:"; return true; }, mark);
+    console.log("exploring found", ex);
+    if (ex) { await note(p, "New: Exploring becomes Just looking (Samo gledam, Nur mal schauen): a dish you are curious about. It no longer sounds like the Explorer tab.", "#justlooking"); await shot(p, "r278f", "#justlooking", 380); } else await p.context().close();
   } catch (e) { console.log("ERR", e.message); }
   await b.close(); server.kill();
 })();

@@ -101,20 +101,20 @@ def row(rid, title, parts, shots, nid=None, at=0):
     c = storyCard(B, y, rid, title, parts)
     hs = [B.screen(f"{nid or rid}{chr(97 + at + i)}", i, y, t, n, st, wd) for i, (t, n, st, wd) in enumerate(shots)]
     y = rowEnd(c, *hs)
-row("DT278", "Someone else's plate is an answer", [
+row("DT278", "Don't count it is an answer", [
   ("Blind run, 10 November (Jelena, in Serbian)", "One minute after her lunch she photographed Ana's meatballs. The app asked Dessert or its own snack: both mean she ate it. She picked snack, as the closest to not mine."),
-  ("New", "A third answer: Someone else's plate. Also where Chef Mealan asks whose plate a photo from your gallery is."),
-], [("Now: Plate, a second photo", "r278a", "draft", "Dessert or its own snack."), ("New: Plate, a second photo", "r278b", "changed", "Someone else's plate as a third answer.")])
-row("DT278", "Kept as someone else's, never coached", [
+  ("New", "A third answer: Don't count it. An action, not whose it is (Coach Milan 19:05): your wife's, a neighbour's or a friend's plate, the same."),
+], [("Now: Plate, a second photo", "r278a", "draft", "Dessert or its own snack."), ("New: Plate, a second photo", "r278b", "changed", "Don't count it as a third answer.")])
+row("DT278", "Not counted, never coached", [
   ("Now", "Not mine is a 20 px link that empties the plate and says nothing; she had to photograph Ana's plate again. The plate is coached as hers (Your plate is 5.0 under, Fit to my target), and a friend's cake stayed on the Plate for two days."),
-  ("New", "Someone else's plate shows its numbers and asks whose it is. No coaching, no Fit, nothing counts in your day. Keep it › saves it in Recipes under Served, with the visit, and clears the Plate. Share the numbers stays. Don't keep it is its own red-border button."),
-], [("Now: Plate, the read plate", "r278c", "draft", "Not mine, a small link."), ("New: Plate, someone else's", "r278d", "changed", "Whose, Keep it, Don't keep it.")], at=2)
-row("DT278", "Found again from the day", [
-  ("Now", "Ana's and Marko's plates were only under Recipes, below a line that says nothing is there. The day on Today and Plan did not mention the visit."),
-  ("New", "The day says the visit and opens it: At the table: 2 plates, with whose and what. On Today, on that day in Plan, and in Earlier. Recipes shows Served first while it holds the only plates."),
+  ("New", "The plate shows its numbers and Not counted in your day. No coaching, no Fit. Keep it › saves it with the day, in Recipes under Served, and clears the Plate. Share the numbers stays. Don't keep it is its own red-border button. Nothing asks whose it is; a name is yours to add."),
+], [("Now: Plate, the read plate", "r278c", "draft", "Not mine, a small link."), ("New: Plate, not counted", "r278d", "changed", "Keep it, Don't keep it, Share.")], at=2)
+row("DT278", "Found on its day; Just looking", [
+  ("Found on its day", "Now the kept plates are only under Recipes, below a line that says nothing is there. New: the day shows Not counted: 2 plates, with what they were; on Today, that day in Plan and in Earlier. A tap opens them."),
+  ("Just looking", "The Plate's choice Exploring becomes Just looking (Samo gledam, Nur mal schauen): a dish you are curious about, before you eat. It no longer sounds like the Explorer tab (Istraživanje and Istraživač)."),
   ("Not in this card", "The menu changing numbers already sent, energy shown three ways, Plan and Today's numbers, the setup's training line, English names on Serbian screens, the chef button covering text: their own cards."),
-  ("Size", "Medium. One answer more, the plate's own mode, the day's row; about ten new lines in three languages."),
-], [("New: Today, the day", "r278e", "changed", "At the table: 2 plates ›.")], at=4)
-board("Stories218.dc.html", "DT278. Someone else's plate, from the photo to the day",
-  "12 November 2026 (blind run 10 November, findings 2 to 4 and 6 to 7; Coach Milan 17:20 and 17:48: draw it, someone else's plate end to end). Drawn for approval.",
+  ("Size", "Medium. One answer more, the plate's not-counted state, the day's row, a renamed choice; about fifteen lines in three languages."),
+], [("New: Today, the day", "r278e", "changed", "Not counted: 2 plates ›."), ("New: Plate, what is it for", "r278f", "changed", "Just looking, not Exploring.")], at=4)
+board("Stories218.dc.html", "DT278. Don't count it: a plate that is not your meal",
+  "12 November 2026 (blind run 10 November, findings 2 to 4 and 6 to 7; Coach Milan 17:20 and 17:48: draw it; 19:02 to 19:06: Don't count it, an action; Just looking for Exploring). Drawn for approval.",
   B, W, y - 100, "Stories217.dc.html")

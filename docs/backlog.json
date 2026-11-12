@@ -892,10 +892,10 @@
     },
     {
       "id": "DT278",
-      "title": "Someone else's plate, from the photo to the day (blind run 10 November)",
+      "title": "Don't count it: a plate that is not your meal (blind run 10 November)",
       "epic": "plate",
       "state": "next",
-      "why": "docs/qa/blind/2026-11-10-jelena-first-run. Finding 1 (a new plate overwrote a Served plate) is fixed, 0.3.126. Findings 2 to 4 are one problem: the app never offers someone else's plate where it asks. To draw. 12 November 17:20, Coach Milan: DT278 is next. Drawn 12 November 17:48 (Stories218): Someone else's plate as an answer; kept under Served, never coached, Don't keep it its own button; the day links the visit. Waits for Go.",
+      "why": "docs/qa/blind/2026-11-10-jelena-first-run. Finding 1 (a new plate overwrote a Served plate) is fixed, 0.3.126. Findings 2 to 4 are one problem: the app never offers someone else's plate where it asks. To draw. 12 November 17:20, Coach Milan: DT278 is next. Drawn 12 November 17:48 (Stories218): Someone else's plate as an answer; kept under Served, never coached, Don't keep it its own button; the day links the visit. Waits for Go. Redrawn 19:06: Don't count it, an action, not whose; no name asked; Just looking in place of Exploring. Waits for Go.",
       "board": "Stories218"
     },
     {
