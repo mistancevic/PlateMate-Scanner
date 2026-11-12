@@ -104,14 +104,14 @@ def row(rid, title, parts, shots, nid=None, at=0):
 row("B139", "A ✓ only on what is done; the main button on the right", [
   ("Coach Milan, 12 November 14:02, 14:06, 14:22 and 14:25", "The blue I ate it has a ✓, so it looks done, though it is the button to tap first. The main button sits on the left. And a wrong I ate it is hard to fix from Today."),
   ("The rule", "A button still to tap gets no ✓; a ✓ shows only on what is done. On this card the main button sits on the right: Change it on the left, I ate it on the right. One pass over the whole app is its own card."),
-  ("After the tap", "The message at the top says Logged, as planned, with an Undo button for a wrong tap. In Today's meals the tag says ✓ Eaten, by the plan."),
+  ("After the tap", "The meal lands in Today's meals with ✓ Eaten, by the plan, and its buttons on the card itself: Undo, for a wrong tap, while you are still on Today; Change or delete ›, which opens the meal. The message at the top only says Logged, as planned."),
   ("Buttons, not text", "An action is a button: the main one filled blue, a second one white with a blue border, Delete white with a red border (filled red on Sure?). Text links only go somewhere (Open the recipe ›, ‹ Today) or back out (Keep it)."),
   ("Where", "I ate it in Next and What's in the plan on Today, on a past day and on the recipe page."),
-], [("Now: Today, Next", "rb139a", "draft", "✓ I ate it, on the left, looks done."), ("New: Today, Next", "rb139b", "changed", "Change it left, I ate it right, no ✓."), ("New: Today, after the tap", "rb139c", "changed", "Undo; ✓ Eaten, by the plan.")])
+], [("Now: Today, Next", "rb139a", "draft", "✓ I ate it, on the left, looks done."), ("New: Today, Next", "rb139b", "changed", "Change it left, I ate it right, no ✓."), ("New: Today, after the tap", "rb139c", "changed", "Undo and Change or delete, on the card.")])
 row("B139", "A wrong I ate it, fixed from Today", [
-  ("Tap the eaten meal", "In Today's meals, tapping the meal opens that meal, not the recipe: the same screen as from the recipe (DT284), with Change it, and Delete this meal as a red-border button, Sure? first. Back goes to Today. Open the recipe stays as a link on the row."),
+  ("Tap the eaten meal", "In Today's meals, Change or delete › (and a tap on the meal) opens that meal, not the recipe: the same screen as from the recipe (DT284), with Change it, and Delete this meal as a red-border button, Sure? first. Back goes to Today. Open the recipe stays as a link on the row."),
   ("Size", "Small to medium. The ✓ and the order on four buttons, Undo in one message, and Today's meals opening the meal. A few new lines in three languages."),
 ], [("New: the eaten meal, from Today", "rb139d", "changed", "Change it, or Delete this meal.")], at=3)
 board("Stories214.dc.html", "B139. A ✓ only on what is done; the main button on the right",
-  "12 November 2026 (Coach Milan 14:02, a screenshot of Today; 14:06: draw first; 14:25: redraw with the main button on the right, Undo, and the meal opened from Today; 14:36: Undo and Delete as buttons). Drawn for approval.",
+  "12 November 2026 (Coach Milan 14:02, a screenshot of Today; 14:06: draw first; 14:25: redraw with the main button on the right, Undo, and the meal opened from Today; 14:36: Undo and Delete as buttons; 14:41: Undo on the meal's card, not in the message). Drawn for approval.",
   B, W, y - 100, "Stories213.dc.html")

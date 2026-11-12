@@ -44,11 +44,9 @@ const mark = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px", 
   p = await open(); await btns(p); await p.locator("#ate0").click(); await p.waitForTimeout(1200);
   await p.evaluate(({ mark }) => { const t = [...document.querySelectorAll("main *")].find((e) => e.children.length === 0 && e.textContent.trim() === "By the plan");
     t.textContent = "✓ Eaten, by the plan"; t.id = "done0"; t.style.cssText += ";" + mark;
-    const row = t.closest(".log-card"); row.style.cssText += ";" + mark; row.insertAdjacentHTML("beforeend", '<small style="display:block;margin-top:6px;font-size:14px;color:#1f5fc7;font-weight:800">Tap to change or delete it ›</small>');
-    const all = [...document.querySelectorAll("body *")].filter((e) => /^Logged, as planned/.test((e.textContent || "").trim()));
-    const toast = all[all.length - 1]; console.log("toast", toast && toast.outerHTML.slice(0, 200));
-    if (toast) { toast.textContent = "Logged, as planned. "; toast.insertAdjacentHTML("beforeend", '<button class="pill pill-small" style="min-height:44px;margin-left:10px;background:#fff;border:1.5px solid #2a72d9;color:#1f5fc7;font-weight:800;padding:0 16px">Undo</button>'); toast.style.cssText += ";" + mark + ";display:flex;align-items:center"; } }, { mark });
-  await noteAt(p, "New, after the tap: the message at the top says Logged, as planned, with an Undo button, for a wrong tap. Below, in Today's meals, the ✓ shows on what is done, and the meal opens to change or delete it.", "#done0");
+    const row = t.closest(".log-card"); row.style.cssText += ";" + mark;
+    row.insertAdjacentHTML("beforeend", '<div id="rowbtns" style="grid-column:1/-1;display:flex;gap:10px;margin-top:10px;width:100%"><button class="pill" style="flex:1;min-height:48px;background:#fff;border:1.5px solid #2a72d9;color:#1f5fc7;font-weight:800">Undo</button><button class="pill" style="flex:1;min-height:48px;background:#fff;border:1.5px solid #2a72d9;color:#1f5fc7;font-weight:800">Change or delete ›</button></div>'); }, { mark });
+  await noteAt(p, "New, after the tap: the meal lands in Today's meals with ✓ Eaten, by the plan, and its own buttons, right on the card: Undo, for a wrong tap, while you are still on Today; Change or delete, which opens the meal.", "#done0");
   await p.evaluate(() => window.scrollTo(0, document.querySelector("#done0").getBoundingClientRect().top + window.scrollY - 470)); await p.waitForTimeout(300);
   await p.screenshot({ path: `${R}/rb139c.png` }); console.log("shot rb139c");
   // the meal it opens: the same screen as DT284, with Change it and Delete this meal
