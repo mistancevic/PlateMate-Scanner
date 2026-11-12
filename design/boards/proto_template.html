@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DT284 prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap">
+<style>
+:root{--bg:#e6ecf6;--ink:#172742;--muted:#53627f;--brand:#1f5fc7;--card:#fff;--line:#d1dcf0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1726;--ink:#e8eefb;--muted:#a9b6cf;--brand:#7fb0ff;--card:#18233a;--line:#2c3b5c}}
+:root[data-theme="dark"]{--bg:#0f1726;--ink:#e8eefb;--muted:#a9b6cf;--brand:#7fb0ff;--card:#18233a;--line:#2c3b5c}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;overflow:hidden}
+.bar{width:100%;max-width:420px;display:flex;align-items:center;gap:8px;padding:8px 16px}
+.bar .t{flex:1;min-width:0;font-size:14px;line-height:1.3}
+.bar .t b{display:block;font-size:15px;font-weight:900}
+.bar .t span{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button.ctl{min-height:44px;min-width:44px;padding:0 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--brand);font:inherit;font-weight:800;font-size:14px;cursor:pointer;flex:none}
+button.ctl[aria-pressed="true"]{background:var(--brand);color:var(--card);border-color:var(--brand)}
+.phone{position:relative;display:flex;flex-direction:column;background:#eef3fb;border-radius:22px;overflow:hidden;box-shadow:0 0 0 1.5px var(--line),0 10px 30px rgba(0,0,0,.18)}
+.phone>img{display:block;width:100%;height:auto;flex:none;position:relative;z-index:2}
+.scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;position:relative}
+.screen{position:relative}
+.screen img{display:block;width:100%;height:auto}
+.spot{position:absolute;border:0;padding:0;background:transparent;cursor:pointer;border-radius:12px}
+.show .spot{background:rgba(42,114,217,.16);outline:2px solid #2a72d9;outline-offset:1px}
+.flash .spot{animation:fl .9s ease 1}
+@keyframes fl{0%,100%{background:transparent}40%{background:rgba(42,114,217,.38);outline:2px solid #2a72d9}}
+.nav{display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 16px 8px;width:100%;max-width:420px}
+.nav .step{min-height:44px;min-width:64px;padding:0 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--brand);font:inherit;font-weight:800;font-size:15px;cursor:pointer}
+.nav .step:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:0;justify-content:center;flex:1}
+.dots button{width:28px;height:44px;border:0;background:none;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.dots button span{width:8px;height:8px;border-radius:4px;background:var(--line);display:block}
+.dots button[aria-current="step"] span{background:var(--brand);width:10px;height:10px;border-radius:5px}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"><div class="t"><b>DT284 prototype</b><span id="where"></span></div>
+  <button class="ctl" id="taps" aria-pressed="true">Taps</button><button class="ctl" id="restart">Restart</button></div>
+<div class="phone show" id="phone">
+  <img id="top" alt="">
+  <div class="scroll" id="scroll"><div class="screen" id="screen"><img id="shot" alt=""></div></div>
+  <img id="menu" alt="">
+</div>
+<div class="nav"><button class="step" id="prev" aria-label="Previous screen">‹</button><div class="dots" id="dots"></div><button class="step" id="next" aria-label="Next screen">›</button></div>
+<script>
+const S = {"p1-two": {"top": 2377, "h": 3318, "spots": [{"x": 35, "y": 2460, "w": 320, "h": 73, "to": "p2-meal2113"}, {"x": 35, "y": 2537, "w": 320, "h": 73, "to": "p5-meal1008"}], "title": "Recipes: two records of one meal"}, "p2-meal2113": {"top": 0, "h": 1151, "spots": [{"x": 43, "y": 890, "w": 99, "h": 44, "to": "p3-sure"}, {"x": 43, "y": 822, "w": 304, "h": 48, "to": "p6-form"}, {"x": 35, "y": 35, "w": 105, "h": 44, "to": "p1-two"}], "title": "The meal at 21:13, the double"}, "p3-sure": {"top": 508, "h": 1285, "spots": [{"x": 43, "y": 890, "w": 304, "h": 48, "to": "p4-one"}, {"x": 43, "y": 958, "w": 42, "h": 44, "to": "p2-meal2113"}], "title": "Sure? Delete this meal"}, "p4-one": {"top": 2329, "h": 3193, "spots": [{"x": 35, "y": 2412, "w": 320, "h": 73, "to": "p5-meal1008"}], "title": "Recipes: one record left"}, "p5-meal1008": {"top": 0, "h": 1151, "spots": [{"x": 43, "y": 822, "w": 304, "h": 48, "to": "p6-form"}, {"x": 35, "y": 35, "w": 105, "h": 44, "to": "p4-one"}], "title": "The meal at 10:08"}, "p6-form": {"top": 548, "h": 1673, "spots": [{"x": 45, "y": 1203, "w": 300, "h": 48, "to": "p7-saved"}, {"x": 45, "y": 1273, "w": 41, "h": 44, "to": "p5-meal1008"}], "title": "Change this meal"}, "p7-saved": {"top": 562, "h": 1189, "spots": [{"x": 35, "y": 35, "w": 105, "h": 44, "to": "p8-list"}, {"x": 43, "y": 860, "w": 304, "h": 48, "to": "p6-form"}], "title": "Changed: still one record, at 10:08"}, "p8-list": {"top": 2353, "h": 3247, "spots": [{"x": 35, "y": 2436, "w": 320, "h": 103, "to": "p7-saved"}], "title": "Recipes: one record, changed"}};
+const order = Object.keys(S);
+const phone = document.getElementById("phone"), scroll = document.getElementById("scroll"), screen = document.getElementById("screen"), img = document.getElementById("shot"), where = document.getElementById("where"), dots = document.getElementById("dots");
+function fit() {
+  const avail = window.innerHeight - document.getElementById("bar").offsetHeight - 30;
+  // on a phone: the full width and the height there is, so the words stay their size; on a larger screen: a phone's shape
+  if (window.innerWidth < 520) { const w = Math.min(390, window.innerWidth - 32); phone.style.width = w + "px"; phone.style.height = Math.max(320, avail) + "px"; return; }
+  const w = Math.max(240, Math.min(390, avail * 390 / 844));
+  phone.style.width = w + "px"; phone.style.height = (w * 844 / 390) + "px";
+}
+let cur = order[0];
+// every screen loaded at the start, so a tap shows the next one at once
+const cache = {}; order.forEach((k) => { const im = new Image(); im.src = "screens/" + k + ".webp"; cache[k] = im; for (const c of ["_top", "_nav"]) new Image().src = "screens/" + k + c + ".webp"; });
+const ready = (k) => { const im = cache[k]; const loaded = im.complete ? Promise.resolve() : new Promise((r) => { im.onload = r; im.onerror = r; }); return loaded.then(() => (im.decode ? im.decode().catch(() => {}) : null)); };
+function go(k) {
+  if (!S[k]) return;
+  cur = k; const s = S[k];
+  // the places to tap leave with the screen; the new ones come only once the new screen is shown
+  screen.querySelectorAll(".spot").forEach((x) => x.remove());
+  where.textContent = (order.indexOf(k) + 1) + " of " + order.length + " · " + s.title;
+  dots.innerHTML = order.map((o, i) => '<button data-k="' + o + '" aria-label="Screen ' + (i + 1) + ': ' + S[o].title + '"' + (o === k ? ' aria-current="step"' : "") + '><span></span></button>').join("");
+  document.getElementById("prev").disabled = order.indexOf(k) === 0;
+  document.getElementById("next").disabled = order.indexOf(k) === order.length - 1;
+  ready(k).then(() => {
+    if (cur !== k) return;
+    img.src = cache[k].src; img.alt = s.title;
+    document.getElementById("top").src = "screens/" + k + "_top.webp"; document.getElementById("menu").src = "screens/" + k + "_nav.webp";
+    scroll.scrollTop = s.top * phone.clientWidth / 390;
+    requestAnimationFrame(() => { if (cur !== k) return;
+      s.spots.forEach((p) => {
+        const b = document.createElement("button"); b.className = "spot"; b.setAttribute("aria-label", "Go to: " + S[p.to].title);
+        b.style.left = (p.x / 390 * 100) + "%"; b.style.width = (p.w / 390 * 100) + "%";
+        b.style.top = (p.y / s.h * 100) + "%"; b.style.height = (p.h / s.h * 100) + "%";
+        b.addEventListener("click", (e) => { e.stopPropagation(); go(p.to); });
+        screen.appendChild(b);
+      }); });
+  });
+}
+const step = (d) => { const i = order.indexOf(cur) + d; if (i >= 0 && i < order.length) go(order[i]); };
+document.getElementById("prev").addEventListener("click", () => step(-1));
+document.getElementById("next").addEventListener("click", () => step(1));
+dots.addEventListener("click", (e) => { const b = e.target.closest("button[data-k]"); if (b) go(b.dataset.k); });
+// a swipe left or right goes to the next or the previous screen; scrolling up and down stays scrolling
+let t0 = null;
+scroll.addEventListener("touchstart", (e) => { const t = e.touches[0]; t0 = { x: t.clientX, y: t.clientY }; }, { passive: true });
+scroll.addEventListener("touchend", (e) => { if (!t0) return; const t = e.changedTouches[0], dx = t.clientX - t0.x, dy = t.clientY - t0.y; t0 = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > 1.5 * Math.abs(dy)) step(dx < 0 ? 1 : -1); }, { passive: true });
+document.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") step(1); if (e.key === "ArrowLeft") step(-1); });
+screen.addEventListener("click", () => { phone.classList.remove("flash"); void phone.offsetWidth; phone.classList.add("flash"); });
+document.getElementById("restart").addEventListener("click", () => go(order[0]));
+document.getElementById("taps").addEventListener("click", (e) => { const on = phone.classList.toggle("show"); e.currentTarget.setAttribute("aria-pressed", String(on)); });
+window.addEventListener("resize", () => { fit(); scroll.scrollTop = S[cur].top * phone.clientWidth / 390; });
+fit(); go(order[0]);
+</script>
+</body>
+</html>
