@@ -6179,5 +6179,16 @@
   "certs.ai-mastery.name": "AI Mastery",
   "certs.ai-mastery.line": "The AI side of the builder.",
   "certs.business.name": "Certified Business Coach",
-  "certs.business.line": "Coaching coaches on the business with Chef Mealan."
+  "certs.business.line": "Coaching coaches on the business with Chef Mealan.",
+  "yourcooks.changedStillOneMeal": "✓ Changed. Still one meal, at {time}.",
+  "app.askScanned": "I scanned {food} for {meal}.",
+  "app.askYouSuggested": "You suggested {mixes}.",
+  "app.askWhatIdChange": "What I'd change:",
+  "helper.iDontHave": "I don't have {food}. What instead?",
+  "coach.newBetaTesterApplication": "New beta tester application",
+  "coach.sureMarkAsHandled": "Sure? Tap again to mark as handled",
+  "coach.keepIt": "Keep it",
+  "coach.leavesWithoutInvite": "It leaves Waiting for you without an invite.",
+  "coach.handledOn": "Handled {date}",
+  "make.aPortion": "A portion"
 }

@@ -42,7 +42,16 @@
       "why": "One conversation between the cook and the chef: every question in his own line, written as a script that voice can read later."
     }
   },
-  "versions": ["0.3.139", "0.3.138", "0.3.137", "0.3.136", "0.3.135", "0.3.134", "0.3.133"],
+  "versions": [
+    "0.3.140",
+    "0.3.139",
+    "0.3.138",
+    "0.3.137",
+    "0.3.136",
+    "0.3.135",
+    "0.3.134",
+    "0.3.133"
+  ],
   "tickets": [
     {
       "id": "DT212",
@@ -926,8 +935,8 @@
       "epic": "cook",
       "state": "done",
       "board": "Stories211",
-      "version": "0.3.138",
-      "why": "Coach Milan 12 November 07:55, on a call with a tester: one meal recorded twice because a past meal can't be changed (Cook it again made a second one). Drawn with a clickable prototype (artifact DT284 Prototype). Go 12 November 08:24. The guard against doubles (same photo in the same day) is DT285, to draw."
+      "version": "0.3.138, 0.3.140",
+      "why": "Coach Milan 12 November 07:55, on a call with a tester: one meal recorded twice because a past meal can't be changed (Cook it again made a second one). Drawn with a clickable prototype (artifact DT284 Prototype). Go 12 November 08:24. The guard against doubles (same photo in the same day) is DT285, to draw. v5 (0.3.140; Go 12 November 13:24): after Save changes, back on the recipe; the row is marked ✓ Changed. Still one meal, at its time; no Change it again."
     },
     {
       "id": "DT285",
@@ -940,10 +949,12 @@
     },
     {
       "id": "DT279",
-      "title": "A new beta application shows high on Clients, in Waiting for you",
+      "title": "A new beta tester application shows at the top of Clients, in Waiting for you",
       "epic": "coach",
-      "state": "next",
-      "why": "Coach Milan 11 November: the news that someone applied to be a beta tester sits near the bottom of the Clients page; it is great news and must not be missed. To draw."
+      "state": "done",
+      "why": "Coach Milan 11 November: the news that someone applied to be a beta tester sits near the bottom of the Clients page; it is great news and must not be missed. To draw. Drawn 12 November (Coach Milan 13:24: a full card, moved from the bottom to the top): the first thing in Waiting for you, and it counts there. Redrawn 13:44 (beta tester application; Invite on the right; Mark as handled on its own line with a second tap). Go 13:49.",
+      "board": "Stories213",
+      "version": "0.3.140"
     },
     {
       "id": "CR1a",
@@ -983,6 +994,51 @@
       "epic": "ops",
       "state": "later",
       "why": "Coach Milan asked for a staging environment early on, as in his product teams, to test the latest work without touching the beta testers; the preview on the same accounts and data was chosen as the quick start. 12 November: into the backlog, not yet urgent; needed before user acquisition grows. Brainstorm first."
+    },
+    {
+      "id": "B137",
+      "title": "Chef Mealan on the Plate writes its question into the field in English",
+      "epic": "lang",
+      "state": "done",
+      "why": "Coach Milan 12 November 13:30, with a screenshot in Srpski: opened from a scanned food, the field says I scanned Orijenta salata for regular meal. You suggested... What I'd change:. The swap question I don't have X. What instead? is English too. Both are fixed English sentences in the code (App askAboutMix, PlateHelper). Reproduced in the code. Go 12 November 13:33. Both questions are now lines in Srpski, German and English. Food names inside them stay as the food list has them: that part is DT286.",
+      "version": "0.3.140"
+    },
+    {
+      "id": "DT286",
+      "title": "Chef Mealan on the Plate: fresh, useful suggestions, in one conversation",
+      "epic": "chef",
+      "state": "next",
+      "why": "Coach Milan and Tester 2, 12 November 13:28 and 13:30: the suggestions are always the same (chicken breast, cottage cheese, rye bread), and the answer is general. Cause in the code: the AI gets the first 40 foods of the list, always the same, is told to prefer them and to raise protein, and knows nothing of earlier answers, the meal or the time. Food names come untranslated (Roggen Vollkornbrot in Srpski). Also: the sheet already is the chat for this plate, yet it offers a second chat (Something else? Talk to Chef Mealan), and fills the field with half a sentence. To brainstorm before 0.4.0. 13:53, Coach Milan with Tester 2: Roggen Vollkornbrot is a real product from DM in Belgrade, with no Serbian on the package; a product's name stays as it is (see DT288)."
+    },
+    {
+      "id": "DT287",
+      "title": "Fill the open slots: the same meals every day",
+      "epic": "chef",
+      "state": "next",
+      "why": "Coach Milan 12 November 13:28 and 13:32, Plan: Fill the open slots with Chef Mealan always offers the same meals. Cause in the code: fillDay has no AI and no memory; it ranks My recipes and the starters by the day's PD target and the slot's share of the day, so the same recipes win every day. Nothing about what was eaten or planned on other days. To brainstorm with DT286 before 0.4.0."
+    },
+    {
+      "id": "DT288",
+      "title": "A note on a food card, in your words: kupljeno u DM-u, ražani hleb",
+      "epic": "plate",
+      "state": "later",
+      "why": "Coach Milan with Tester 2, 12 November 13:53: a product keeps its name from the package (Roggen Vollkornbrot, bought at DM in Belgrade, no Serbian on it). A short note on the food card says what it is and where it was bought, in your language. Chef Mealan could read it too."
+    },
+    {
+      "id": "B138",
+      "title": "A portion in English and Koliko si pojeo? in one form only, on the Serbian Eat screen",
+      "epic": "lang",
+      "state": "done",
+      "version": "0.3.140",
+      "why": "Coach Milan 12 November 13:58, with a screenshot: after cooking, the chip A portion was English (a fixed string in the code), and Chef Mealan's Prijatno. Koliko si pojeo? had no second form while the title above said pojela. Go 14:00. A portion is a line now; the Chef line has both forms; a test guards Chef lines with pojeo or pojela."
+    },
+    {
+      "id": "B139",
+      "title": "I ate it shows a ✓ before it is done",
+      "epic": "home",
+      "state": "next",
+      "why": "Coach Milan 12 November 14:02, with a screenshot of Today: the blue I ate it with a ✓ reads as already done, though it is the button to tap. The ✓ sits on I ate it in Next and What's in the plan on Today and on the recipe page. Suggested: no ✓ on a button still to tap; a ✓ only once done. 14:06: draw first, to agree on the look. Drawn 12 November (Stories214): no ✓ on a button to tap; ✓ Eaten, by the plan once done. Waits for Go.",
+      "board": "Stories214"
     }
   ]
 }

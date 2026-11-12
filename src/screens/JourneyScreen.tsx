@@ -2683,7 +2683,8 @@ export function JourneyScreen(p: AppApi) {
         </div>
       </> : <>
         <div className="reasons">
-          {([["all", w("make.allOfIt")], ["portion", "A portion"], ["later", w("make.laterToday")], ["not", w("make.notAfterAll")]] as const).map(([k, l]) => (
+          {/* B138 (0.3.140; Coach Milan 12 November 13:58, Go 14:00): A portion is a line, so it speaks the app's language */}
+          {([["all", w("make.allOfIt")], ["portion", w("make.aPortion")], ["later", w("make.laterToday")], ["not", w("make.notAfterAll")]] as const).map(([k, l]) => (
             <button key={k} className={`choice ${ate === k ? "on" : ""}`} onClick={() => { setAte(k); setBigAsk(false); }}>{l}</button>
           ))}
         </div>

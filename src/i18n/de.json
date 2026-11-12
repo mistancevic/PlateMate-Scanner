@@ -22328,6 +22328,50 @@
     "sameask.help": {
       "text": "Diese Mahlzeit aktualisieren: Sie übernimmt die Lebensmittel und Mengen dieses Tellers und bleibt um {time}. Beide behalten: zwei Mahlzeiten, falls du es zweimal gegessen hast.",
       "checked": true
+    },
+    "yourcooks.changedStillOneMeal": {
+      "text": "✓ Geändert. Weiterhin eine Mahlzeit, um {time}.",
+      "checked": true
+    },
+    "app.askScanned": {
+      "text": "Gescannt: {food} ({meal}).",
+      "checked": true
+    },
+    "app.askYouSuggested": {
+      "text": "Dein Vorschlag: {mixes}.",
+      "checked": true
+    },
+    "app.askWhatIdChange": {
+      "text": "Was ich ändern würde:",
+      "checked": true
+    },
+    "helper.iDontHave": {
+      "text": "{food} habe ich nicht da. Was stattdessen?",
+      "checked": true
+    },
+    "coach.newBetaTesterApplication": {
+      "text": "Neue Bewerbung für den Betatest",
+      "checked": true
+    },
+    "coach.sureMarkAsHandled": {
+      "text": "Sicher? Noch einmal tippen, um als erledigt zu markieren",
+      "checked": true
+    },
+    "coach.keepIt": {
+      "text": "Behalten",
+      "checked": true
+    },
+    "coach.leavesWithoutInvite": {
+      "text": "Sie verschwindet aus Wartet auf dich, ohne Einladung.",
+      "checked": true
+    },
+    "coach.handledOn": {
+      "text": "Erledigt am {date}",
+      "checked": true
+    },
+    "make.aPortion": {
+      "text": "Eine Portion",
+      "checked": true
     }
   }
 }

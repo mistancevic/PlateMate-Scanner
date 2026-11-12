@@ -62,7 +62,7 @@
       "checked": true
     },
     "howMuchAte": {
-      "text": "Prijatno. Koliko si pojeo?",
+      "text": "Prijatno. Koliko si pojeo?|Prijatno. Koliko si pojela?",
       "checked": true
     },
     "howManyAte": {
@@ -22327,6 +22327,50 @@
     },
     "sameask.help": {
       "text": "Ažuriraj taj obrok: uzima namirnice i količine sa ovog tanjira i ostaje u {time}. Zadrži oba: dva obroka, ako je pojedeno dva puta.",
+      "checked": true
+    },
+    "yourcooks.changedStillOneMeal": {
+      "text": "✓ Izmenjeno. I dalje jedan obrok, u {time}.",
+      "checked": true
+    },
+    "app.askScanned": {
+      "text": "Skenirano: {food} ({meal}).",
+      "checked": true
+    },
+    "app.askYouSuggested": {
+      "text": "Tvoj predlog: {mixes}.",
+      "checked": true
+    },
+    "app.askWhatIdChange": {
+      "text": "Moja izmena:",
+      "checked": true
+    },
+    "helper.iDontHave": {
+      "text": "Nemam {food}. Šta umesto toga?",
+      "checked": true
+    },
+    "coach.newBetaTesterApplication": {
+      "text": "Nova prijava za beta testiranje",
+      "checked": true
+    },
+    "coach.sureMarkAsHandled": {
+      "text": "Sigurno? Dodirni ponovo da označiš kao rešeno",
+      "checked": true
+    },
+    "coach.keepIt": {
+      "text": "Zadrži",
+      "checked": true
+    },
+    "coach.leavesWithoutInvite": {
+      "text": "Nestaje iz liste Čeka te, bez pozivnice.",
+      "checked": true
+    },
+    "coach.handledOn": {
+      "text": "Rešeno {date}",
+      "checked": true
+    },
+    "make.aPortion": {
+      "text": "Jednu porciju",
       "checked": true
     }
   }

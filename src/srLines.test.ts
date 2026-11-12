@@ -134,3 +134,10 @@ test("screens: a ticked line shows in Srpski; a value without its Serbian keeps 
   }
   assert.equal(dec(5.53, 1), "5.5", "English: a point");
 });
+
+// B138 (0.3.140; Coach Milan 12 November 13:58): a line that speaks to you in the past tense has both forms, so one screen
+// never says pojela above and pojeo below
+test("B138: Chef Mealan's lines with pojeo or pojela have both forms", () => {
+  const one = Object.entries(sr.chef).filter(([, v]) => /\bpoje(o|la)\b/.test(v.text) && !v.text.includes("|")).map(([k]) => k);
+  assert.deepEqual(one, []);
+});

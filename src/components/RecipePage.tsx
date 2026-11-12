@@ -99,6 +99,8 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
   const gal = galleryOf(meal);
   const [picked, setPicked] = useState<string | null>(null);
   const [cookAtId, setCookAt] = useState<Feedback | null>(null);
+  // DT284 v5: the meal just changed, marked in Every time you ate it
+  const [changedId, setChangedId] = useState<string | null>(null);
   // DT284: the cook as it is now, so a change shows at once; gone when deleted
   const cookAt = cookAtId ? cards.find((c) => c.id === cookAtId.id) ?? null : null;
   useEffect(() => { if (cookAtId) try { window.scrollTo(0, 0); } catch { /* nothing to scroll */ } }, [cookAtId?.id]);
@@ -257,7 +259,7 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
     return (
       <div className="rq rq-cook">
         <PastMeal f={cookAt} day={meal.title} recipe={meal} when={cookWhen} words back={() => setCookAt(null)}
-          onChange={onCardChange ? (ch) => onCardChange(cookAt.id, ch) : undefined} onDelete={onCardDelete ? () => { onCardDelete(cookAt.id); setCookAt(null); } : undefined} actions={(shown) => {
+          onChange={onCardChange ? (ch) => { onCardChange(cookAt.id, ch); setChangedId(cookAt.id); } : undefined} onDelete={onCardDelete ? () => { onCardDelete(cookAt.id); setCookAt(null); } : undefined} actions={(shown) => {
           if (!shown) return null;
           const inGal = gal.some((g) => g.src === shown);
           return <div className="pm-actions rq-cook-add">
@@ -484,7 +486,7 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
       {!edit && <NutritionCard tableOnly items={items} serves={serves} one={oneWord} all={allWord} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} />}
       {!edit && <CarryBlock meal={meal} cards={cards} />}
       {/* DT214 v2 (0.3.53, board Stories162): a recipe collects its cooks */}
-      {!edit && <YourCooks meal={meal} cards={cards} onOpen={setCookAt} />}
+      {!edit && <YourCooks meal={meal} cards={cards} onOpen={(f) => { setChangedId(null); setCookAt(f); }} />}
       {/* DT227 (0.3.61, board Stories167): the recipe points to its draft; the draft stays on the Plate */}
       {!edit && saved && (
         <section className="card rq-saved" aria-label={w("recipe.savedForLaterOnThe")}>
@@ -592,7 +594,7 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
           <button className="pill pill-wide" onClick={startEdit}>{w("recipe.editRecipe")}</button>
           <small className="muted rq-under">{w("recipe.changeTheRecipeItselfThe")}</small>
           {/* DT225 v2 (0.3.61, board Stories166): the log of every time you ate it, under the buttons: a log, not an action */}
-          {!edit && <EatLog meal={meal} cards={cards} onOpen={setCookAt} />}
+          {!edit && <EatLog meal={meal} cards={cards} onOpen={(f) => { setChangedId(null); setCookAt(f); }} changedId={changedId} />}
           {cook && (
             <section className="card rq-pub">
               <div className="card-top"><b>{w("recipe.onChefmealanCom")}</b>{state && <small className={`pub-state ${state}`}>{state === "live" ? w("recipe.live") : state === "down" ? w("recipe.takenDown") : state === "waiting" ? w("recipe.waitingFor", { who: approver }) : state === "back" ? w("recipe.sentBack") : w("recipe.draft")}</small>}</div>
