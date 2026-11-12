@@ -976,6 +976,13 @@
       "state": "done",
       "version": "0.3.136",
       "why": "Coach Milan 11 November 23:28: a dropped photo and an ended cook came back after every reload. The private part of the account was saved with merge; now each field is written whole. Also the cause of the 3 lost photos (reproduced 12 November)."
+    },
+    {
+      "id": "OP3",
+      "title": "Staging: its own database, its own address and test accounts, in the same Google project",
+      "epic": "ops",
+      "state": "later",
+      "why": "Coach Milan asked for a staging environment early on, as in his product teams, to test the latest work without touching the beta testers; the preview on the same accounts and data was chosen as the quick start. 12 November: into the backlog, not yet urgent; needed before user acquisition grows. Brainstorm first."
     }
   ]
 }
