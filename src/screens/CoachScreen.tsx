@@ -4,6 +4,7 @@ import { getLang } from "../lang";
 import { w, wn, numLocale, phoneLoc, dateText, wIn as wordIn, type WordKey } from "../words";
 import { weekdayName } from "../weekdayWords";
 import { waLink } from "../phone";
+import { peopleOf, openOf, handledAt, type Application } from "../applications";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
 import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
@@ -97,13 +98,16 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
     p.setFocusCard(wq.cardId ?? null); setOpenId(wq.uid);
   };
   const weekKey = ymd(isoWeek(new Date()).monday);
+  const apps = openOf(p.requests);
   const toSend = due.filter((r) => !r.notes.some((n) => n.by === "coach" && n.week === weekKey)).length;
   return (
     <>
-      {p.waiting.length > 0 && (
+      {(p.waiting.length > 0 || apps.length > 0) && (
         <section className="card waiting" aria-label={w("coach.waitingForYou")}>
-          <b>{w("coach.waitingForYouN", { n: p.waiting.length })}</b>
+          <b>{w("coach.waitingForYouN", { n: p.waiting.length + apps.length })}</b>
           <small className="muted">{w("coach.everythingAClientSentOr")}</small>
+          {/* DT279 (0.3.140, board Stories213): a new beta tester application first, as a full card */}
+          {apps.map((r) => <RequestCard key={r.id} r={r} p={p} top />)}
           {p.waiting.slice(0, 12).map((wq) => (
             <button key={wq.key} type="button" className="menu-row" onClick={() => openWaiting(wq)}><span className="menu-row-text"><b>{wq.name} · {wq.what}</b><small>{wq.when}</small></span><span aria-hidden="true">›</span></button>
           ))}
@@ -272,39 +276,51 @@ export function SendSheet(p: AppApi & { card: any; close: () => void }) {
 
 // People who asked for a code on the landing page.
 export function AccessRequests(p: AppApi) {
-  const [list, setList] = useKept<any[] | null>(`requests-${p.user?.uid ?? "local"}`, null);
-  const load = () => fetch("/api/access-requests").then((r) => r.json()).then((d) => setList(d.requests ?? [])).catch(() => setList([]));
-  useEffect(() => { load(); }, []);
+  const list = p.requests;
   if (!list || list.length === 0) return null;
-  // one line per person: the latest request for an email, with how many came before it
-  const byEmail = new Map<string, any>();
-  for (const r of list) { const k = String(r.email || "").toLowerCase(); const prev = byEmail.get(k); if (!prev) byEmail.set(k, { ...r, count: 1 }); else { prev.count += 1; if ((r.createdAt ?? "") > (prev.createdAt ?? "")) byEmail.set(k, { ...r, count: prev.count }); } }
-  const people = [...byEmail.values()].sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
+  const people = peopleOf(list);
   const open = people.filter((r) => r.status !== "handled");
+  // DT279 (0.3.140): the open ones wait at the top, in Waiting for you; here the handled ones stay, with their date
   return (
     <>
       <p className="label">{w("coach.accessRequests", { n: open.length })}</p>
       <BetaSpots />
-      {people.slice(0, 20).map((r) => (
-        <section className={`card request ${r.status === "handled" ? "handled" : ""}`} key={r.id}>
-          <div className="card-top"><span>{r.name}{r.coach ? ` · ${w("coach.reqCoach")}` : ""}{BOOK_PAGES[r.from] ? ` · ${BOOK_SOURCES[r.src] ? w("coach.reqFromSrc", { page: BOOK_PAGES[r.from], src: BOOK_SOURCES[r.src] }) : w("coach.reqFrom", { page: BOOK_PAGES[r.from] })}` : ""}{r.count > 1 ? ` · ${w("coach.reqCount", { n: r.count })}` : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
-          <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
-          {r.phone && <a href={waLink(String(r.phone))} target="_blank" rel="noreferrer">WhatsApp {r.phone}</a>}
-          {r.note && <p className="client-note">“{r.note}”</p>}
-          {r.status !== "handled" && (
-            <div className="button-row" style={{ marginTop: 6 }}>
-              <button className="pill pill-small pill-primary" onClick={async () => {
-                const res = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: r.name, email: r.email }) });
-                const d = await res.json(); if (!res.ok) { p.setError(d.error || w("coach.couldnTCreateTheInvite")); return; }
-                await fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) });
-                location.href = inviteMail(d); load();
-              }}><Send size={14} /> {w("coach.invite")}</button>
-              <button className="link" onClick={async () => { await fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) }); p.notify(w("coach.markedHandled")); load(); }}>{w("coach.markAsHandled")}</button>
-            </div>
-          )}
-        </section>
-      ))}
+      {people.filter((r) => r.status === "handled").slice(0, 20).map((r) => <RequestCard key={r.id} r={r} p={p} />)}
     </>
+  );
+}
+
+// DT279 (0.3.140, board Stories213; Coach Milan 13:44): New beta tester application; Invite on the right; Mark as handled on its
+// own line, away from Invite, with a second tap. A handled one shows its date.
+function RequestCard({ r, p, top = false }: { r: Application; p: AppApi; top?: boolean }) {
+  const [sure, setSure] = useState(false);
+  const handled = r.status === "handled", at = handledAt(r);
+  const mark = () => fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) });
+  const invite = async () => {
+    const res = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: r.name, email: r.email }) });
+    const d = await res.json(); if (!res.ok) { p.setError(d.error || w("coach.couldnTCreateTheInvite")); return; }
+    await mark(); p.recountWaiting(); location.href = inviteMail(d);
+  };
+  return (
+    <section className={`card request${handled ? " handled" : ""}${top ? " request-top" : ""}`}>
+      {top && <small className="request-chip">{w("coach.newBetaTesterApplication")}</small>}
+      <div className="card-top"><span>{r.name}{r.coach ? ` · ${w("coach.reqCoach")}` : ""}{BOOK_PAGES[r.from as string] ? ` · ${BOOK_SOURCES[r.src as string] ? w("coach.reqFromSrc", { page: BOOK_PAGES[r.from as string], src: BOOK_SOURCES[r.src as string] }) : w("coach.reqFrom", { page: BOOK_PAGES[r.from as string] })}` : ""}{r.count > 1 ? ` · ${w("coach.reqCount", { n: r.count })}` : ""}</span><small>{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ""}</small></div>
+      <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
+      {r.phone ? <a href={waLink(String(r.phone))} target="_blank" rel="noreferrer">WhatsApp {String(r.phone)}</a> : null}
+      {r.note ? <p className="client-note">“{String(r.note)}”</p> : null}
+      {handled ? (at && <small className="muted">{w("coach.handledOn", { date: dateText(at, { day: "numeric", month: "short" }) })}</small>) : (
+        <>
+          <div className="request-invite"><button type="button" className="pill pill-primary" onClick={invite}><Send size={16} /> {w("coach.invite")}</button></div>
+          <div className="request-handle">
+            {sure ? <>
+              <button type="button" className="link link-danger request-sure" onClick={async () => { await mark(); p.notify(w("coach.markedHandled")); p.recountWaiting(); }}>{w("coach.sureMarkAsHandled")}</button>
+              <button type="button" className="link request-keep" onClick={() => setSure(false)}>{w("coach.keepIt")}</button>
+              <small className="muted">{w("coach.leavesWithoutInvite")}</small>
+            </> : <button type="button" className="link request-mark" onClick={() => setSure(true)}>{w("coach.markAsHandled")}</button>}
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 

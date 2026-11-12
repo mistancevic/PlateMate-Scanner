@@ -1,6 +1,6 @@
 {
   "release": "0.3.140",
-  "at": "2026-11-12T12:34:44.428Z",
+  "at": "2026-11-12T12:51:21.518Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -46820,6 +46820,93 @@
       "release": "0.3.140",
       "order": 900003,
       "at": "2026-11-12T12:34:44.428Z"
+    },
+    {
+      "id": "screen.coach.newBetaTesterApplication",
+      "kind": "screen",
+      "key": "coach.newBetaTesterApplication",
+      "en": "New beta tester application",
+      "forms": "plain",
+      "slots": [],
+      "area": "Clients",
+      "where": "Clients",
+      "sr": "Nova prijava za beta testiranje",
+      "de": "Neue Bewerbung für den Betatest",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900000,
+      "at": "2026-11-12T12:51:21.518Z"
+    },
+    {
+      "id": "screen.coach.sureMarkAsHandled",
+      "kind": "screen",
+      "key": "coach.sureMarkAsHandled",
+      "en": "Sure? Tap again to mark as handled",
+      "forms": "plain",
+      "slots": [],
+      "area": "Clients",
+      "where": "Clients",
+      "sr": "Sigurno? Dodirni ponovo da označiš kao rešeno",
+      "de": "Sicher? Noch einmal tippen, um als erledigt zu markieren",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900001,
+      "at": "2026-11-12T12:51:21.518Z"
+    },
+    {
+      "id": "screen.coach.keepIt",
+      "kind": "screen",
+      "key": "coach.keepIt",
+      "en": "Keep it",
+      "forms": "plain",
+      "slots": [],
+      "area": "Clients",
+      "where": "Clients",
+      "sr": "Zadrži",
+      "de": "Behalten",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900002,
+      "at": "2026-11-12T12:51:21.518Z"
+    },
+    {
+      "id": "screen.coach.leavesWithoutInvite",
+      "kind": "screen",
+      "key": "coach.leavesWithoutInvite",
+      "en": "It leaves Waiting for you without an invite.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Clients",
+      "where": "Clients",
+      "sr": "Nestaje iz liste Čeka te, bez pozivnice.",
+      "de": "Sie verschwindet aus Wartet auf dich, ohne Einladung.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900003,
+      "at": "2026-11-12T12:51:21.518Z"
+    },
+    {
+      "id": "screen.coach.handledOn",
+      "kind": "screen",
+      "key": "coach.handledOn",
+      "en": "Handled {date}",
+      "forms": "plain",
+      "slots": [
+        "date"
+      ],
+      "area": "Clients",
+      "where": "Clients",
+      "sr": "Rešeno {date}",
+      "de": "Erledigt am {date}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900004,
+      "at": "2026-11-12T12:51:21.518Z"
     }
   ]
 }

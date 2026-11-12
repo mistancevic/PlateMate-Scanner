@@ -22348,6 +22348,26 @@
     "helper.iDontHave": {
       "text": "Nemam {food}. Šta umesto toga?",
       "checked": true
+    },
+    "coach.newBetaTesterApplication": {
+      "text": "Nova prijava za beta testiranje",
+      "checked": true
+    },
+    "coach.sureMarkAsHandled": {
+      "text": "Sigurno? Dodirni ponovo da označiš kao rešeno",
+      "checked": true
+    },
+    "coach.keepIt": {
+      "text": "Zadrži",
+      "checked": true
+    },
+    "coach.leavesWithoutInvite": {
+      "text": "Nestaje iz liste Čeka te, bez pozivnice.",
+      "checked": true
+    },
+    "coach.handledOn": {
+      "text": "Rešeno {date}",
+      "checked": true
     }
   }
 }

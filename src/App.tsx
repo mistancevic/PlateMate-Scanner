@@ -1,6 +1,7 @@
 import { numLocale } from "./words";
 import { changeCard as changeCardIn, deleteCard as deleteCardIn, samePhotoMeal, updateWith, type CardChange } from "./pastMeal";
 import { w, wn, dateText, type WordKey } from "./words";
+import { openOf } from "./applications";
 import { wx } from "./wx";
 import { weekdayName } from "./weekdayWords";
 import { eatsForReq, installEats, type Eats } from "./eats";
@@ -1408,12 +1409,20 @@ export default function App() {
   // before anything was reached. Now the badge is the Waiting for you list's count, and a row leaves it only when handled.
   const [waiting, setWaiting] = useState<import("./coachNotes").Waiting[]>([]);
   const [focusCard, setFocusCard] = useState<string | null>(null);
+  // DT279 (0.3.140, board Stories213): beta tester applications wait at the top of Clients and count in its badge
+  const [requests, setRequests] = useState<any[] | null>(null);
+  const loadRequests = async (): Promise<number> => {
+    if (!coachDemoOn() && !(user && profile.role === "coach")) { setRequests(null); return 0; }
+    try { const r = await fetch("/api/access-requests"); const d = r.ok ? await r.json() : {}; const list = Array.isArray(d.requests) ? d.requests : []; setRequests(list); return openOf(list).length; }
+    catch { setRequests([]); return 0; }
+  };
   const recountWaiting = async () => {
+    const apps = await loadRequests();
     const rows = coachDemoOn() ? (await import("./coachDemo")).demoRows() : user && profile.role === "coach" ? await listClients(user.uid).catch(() => null) : null;
-    if (!rows) { setWaiting([]); return; }
+    if (!rows) { setWaiting([]); setNewShared(apps); return; }
     const seen = seenWaiting(user?.uid ?? "local");
     const list = waitingFor(rows.map((r) => ({ uid: r.uid, name: r.name, notes: r.notes ?? [], feedback: r.feedback ?? [], review: (r as any).review ?? null, checkinDay: r.checkinDay })), seen, todayIndex(), ymd(isoWeek(new Date()).monday));
-    setWaiting(list); setNewShared(list.length);
+    setWaiting(list); setNewShared(list.length + apps);
   };
   const countNewShared = async () => {
     // the count is the waiting list's (DT189). 0.3.68 (Coach Milan 3 November 10:32, Go): the second reading of every client,
@@ -2835,7 +2844,7 @@ export default function App() {
     },
     dismissRecipe: async (item: InboxItem) => { if (user) { try { await clearInboxItem(user.uid, item.id); } catch {} } setInbox((x) => x.filter((i) => i.id !== item.id)); },
     newShared, markSharedSeen: () => { if (user) { try { localStorage.setItem(`chefmealan-coach-seen-${user.uid}`, new Date().toISOString()); } catch {} } },
-    waiting, waitingSeen: (key) => { markWaitingSeen(user?.uid ?? "local", key); void recountWaiting(); }, recountWaiting: () => { void recountWaiting(); }, focusCard, setFocusCard,
+    waiting, waitingSeen: (key) => { markWaitingSeen(user?.uid ?? "local", key); void recountWaiting(); }, recountWaiting: () => { void recountWaiting(); }, requests, focusCard, setFocusCard,
     matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,

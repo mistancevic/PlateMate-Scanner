@@ -264,6 +264,8 @@ export interface AppApi {
   // DT189 (0.3.31): Waiting for you, the coach's list; the badge on Clients is its count
   waiting: import("../coachNotes").Waiting[];
   waitingSeen: (key: string) => void;
+  // DT279: beta tester applications from the home page (the owner's only; null for everyone else)
+  requests: any[] | null;
   recountWaiting: () => void;
   focusCard: string | null;
   setFocusCard: (id: string | null) => void;

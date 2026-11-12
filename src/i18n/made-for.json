@@ -5586,6 +5586,11 @@
     "screen.app.askScanned": {"en":"I scanned {food} for {meal}.","area":"Words used across the app","where":"Across the app","release":"0.3.140"},
     "screen.app.askYouSuggested": {"en":"You suggested {mixes}.","area":"Words used across the app","where":"Across the app","release":"0.3.140"},
     "screen.app.askWhatIdChange": {"en":"What I'd change:","area":"Words used across the app","where":"Across the app","release":"0.3.140"},
-    "screen.helper.iDontHave": {"en":"I don't have {food}. What instead?","area":"Words used across the app","where":"Across the app","release":"0.3.140"}
+    "screen.helper.iDontHave": {"en":"I don't have {food}. What instead?","area":"Words used across the app","where":"Across the app","release":"0.3.140"},
+    "screen.coach.newBetaTesterApplication": {"en":"New beta tester application","area":"Clients","where":"Clients","release":"0.3.140"},
+    "screen.coach.sureMarkAsHandled": {"en":"Sure? Tap again to mark as handled","area":"Clients","where":"Clients","release":"0.3.140"},
+    "screen.coach.keepIt": {"en":"Keep it","area":"Clients","where":"Clients","release":"0.3.140"},
+    "screen.coach.leavesWithoutInvite": {"en":"It leaves Waiting for you without an invite.","area":"Clients","where":"Clients","release":"0.3.140"},
+    "screen.coach.handledOn": {"en":"Handled {date}","area":"Clients","where":"Clients","release":"0.3.140"}
   }
 }

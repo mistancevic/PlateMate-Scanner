@@ -22348,6 +22348,26 @@
     "helper.iDontHave": {
       "text": "{food} habe ich nicht da. Was stattdessen?",
       "checked": true
+    },
+    "coach.newBetaTesterApplication": {
+      "text": "Neue Bewerbung für den Betatest",
+      "checked": true
+    },
+    "coach.sureMarkAsHandled": {
+      "text": "Sicher? Noch einmal tippen, um als erledigt zu markieren",
+      "checked": true
+    },
+    "coach.keepIt": {
+      "text": "Behalten",
+      "checked": true
+    },
+    "coach.leavesWithoutInvite": {
+      "text": "Sie verschwindet aus Wartet auf dich, ohne Einladung.",
+      "checked": true
+    },
+    "coach.handledOn": {
+      "text": "Erledigt am {date}",
+      "checked": true
     }
   }
 }
