@@ -22384,6 +22384,122 @@
     "today.undone": {
       "text": "Poništeno: {title} više nije upisano.",
       "checked": true
+    },
+    "helper.dirGoal": {
+      "text": "Bolje za moj cilj",
+      "checked": true
+    },
+    "helper.dirProtein": {
+      "text": "Drugi protein",
+      "checked": true
+    },
+    "helper.dirCarbs": {
+      "text": "Drugi ugljeni hidrati",
+      "checked": true
+    },
+    "helper.dirCrunchy": {
+      "text": "Hrskavije",
+      "checked": true
+    },
+    "helper.dirCrave": {
+      "text": "Nešto što mi se jede",
+      "checked": true
+    },
+    "helper.dirOther": {
+      "text": "Nešto sasvim drugo",
+      "checked": true
+    },
+    "helper.moreLikeThis": {
+      "text": "Još ovakvih",
+      "checked": true
+    },
+    "helper.askAboutThisPlate": {
+      "text": "Pitaj o ovom tanjiru…",
+      "checked": true
+    },
+    "helper.leftToday": {
+      "text": "još {kcal} kcal i {protein} g proteina danas",
+      "checked": true
+    },
+    "helper.nums": {
+      "text": "{g} g · PD {from} → {to} · {kcal} kcal",
+      "checked": true
+    },
+    "helper.addAmount": {
+      "text": "+ {g} g",
+      "checked": true
+    },
+    "helper.swapAmount": {
+      "text": "Zameni, {g} g",
+      "checked": true
+    },
+    "helper.setAmount": {
+      "text": "Postavi {g} g",
+      "checked": true
+    },
+    "helper.estimate": {
+      "text": "vrednosti su procena",
+      "checked": true
+    },
+    "out.kindPoultry": {
+      "text": "Piletina ili ćuretina",
+      "checked": true
+    },
+    "out.kindFish": {
+      "text": "Riba",
+      "checked": true
+    },
+    "out.kindEggs": {
+      "text": "Jaja",
+      "checked": true
+    },
+    "out.kindDairy": {
+      "text": "Mlečni proizvodi",
+      "checked": true
+    },
+    "out.kindLegumes": {
+      "text": "Pasulj i sočivo",
+      "checked": true
+    },
+    "out.kindMeat": {
+      "text": "Meso",
+      "checked": true
+    },
+    "out.whyNew": {
+      "text": "{kind}: nijednom ove nedelje",
+      "checked": true
+    },
+    "out.whyOnce": {
+      "text": "{kind}: jednom ove nedelje",
+      "checked": true
+    },
+    "out.whyGoal": {
+      "text": "Po tvom cilju: PD {pd}",
+      "checked": true
+    },
+    "out.whyLiked": {
+      "text": "Tvoja ocena: DaaM dobro",
+      "checked": true
+    },
+    "out.whyLighter": {
+      "text": "Lakše: {kcal} kcal",
+      "checked": true
+    },
+    "out.chipAnotherProtein": {
+      "text": "Drugi protein",
+      "checked": true
+    },
+    "out.chipLighter": {
+      "text": "Lakše",
+      "checked": true
+    },
+    "out.chipCrave": {
+      "text": "Nešto što mi se jede",
+      "checked": true
+    },
+    "out.noChoiceFits": {
+      "text": "Ništa iz tvojih recepata ne odgovara tome za ovaj obrok. Probaj drugi izbor.",
+      "checked": true
     }
   }
 }

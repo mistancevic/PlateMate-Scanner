@@ -5,6 +5,7 @@ import { aggregate, density, servingsOf, sizedFor, type Ingredient, type Meal } 
 import type { Slot } from "./slots";
 import { REFERENCE, referenceFood } from "./reference";
 import { kindOf, countOf, howMany, gramsOfOne } from "./counted";
+import { proteinOf, weekPenalty, type ProteinKind, type Week } from "./variety";
 
 export type Source = "mine" | "coach" | "starter" | "plate";
 export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number; servings?: number;
@@ -320,14 +321,18 @@ export function sumOf(day: Record<string, PlannedMeal> | undefined): { kcal: num
 // Fill a day (0.2.4, canvas S "Chef Mealan, about this screen", H5 and H6): the open slots filled from My recipes and the
 // starters, each with the meal that fits the slot best. The same way of picking as the tip: closest to the day's PD target
 // first, then closest to the slot's share of the day. No AI call; the chat only wraps it in words. A meal is used once a day.
-export type FillRow = { slot: Slot; meal: PlannedMeal; alternatives: PlannedMeal[]; why?: string };
+export type FillRow = { slot: Slot; meal: PlannedMeal; alternatives: PlannedMeal[]; why?: string; ranked?: PlannedMeal[]; choices?: FillChoice[]; mode?: FillMode };
+export type FillMode = "goal" | "protein" | "lighter" | "crave";
+// DT287 (0.3.142): two or three choices per slot, each with why; the first is the pick
+export type FillChoice = { meal: PlannedMeal; why: string };
 // R20 (0.2.48, board RS19, R20e): how a meal carries you. Among meals that fit about as well, a light one comes first and a
 // heavy one second; one sentence says so when it changed the pick. A heavy meal is never left out.
 export type FillRead = (m: PlannedMeal) => { read: "light" | "heavy" | null; heavy: number } | null | undefined;
 export const CARRY_NUDGE = { light: -0.1, heavy: 0.25 };
-export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undefined, choices: PlannedMeal[], day: { kcal: number; protein: number } | null, target: number | null, read?: FillRead): FillRow[] {
+export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undefined, choices: PlannedMeal[], day: { kcal: number; protein: number } | null, target: number | null, read?: FillRead, week?: Week): FillRow[] {
   const open = slots.filter((s) => !held?.[s.id]);
   const used = new Set(Object.values(held ?? {}).map((m) => m.title));
+  const todayKinds = Object.values(held ?? {}).map((m) => proteinOf(m)).filter((k): k is ProteinKind => Boolean(k));
   const rows: FillRow[] = [];
   for (const slot of open) {
     const need = needOf(slots, slot, day);
@@ -335,7 +340,7 @@ export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undef
       const pd = density(m.protein, m.kcal) ?? 0;
       const pdGap = target === null ? 0 : Math.max(0, target - pd) * 2 + Math.max(0, pd - target - 3) * 0.5;
       const kcalGap = need ? Math.abs(m.kcal - need.kcal) / need.kcal : 0;
-      return pdGap + kcalGap;
+      return pdGap + kcalGap + weekPenalty(m, week, todayKinds);
     };
     const nudge = (m: PlannedMeal) => { const r = read?.(m)?.read; return r ? CARRY_NUDGE[r] : 0; };
     // DT79: a batch recipe comes in the pieces that fit this slot
@@ -352,8 +357,8 @@ export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undef
         ranked = [ranked[0], passed, ...ranked.slice(1).filter((m) => m !== passed)];
       } else if (read?.(ranked[0])?.read === "light") why = w("plan.fillLight", { title: ranked[0].title, meal: mealV(slot.name, true) });
     }
-    used.add(ranked[0].title);
-    rows.push({ slot, meal: ranked[0], alternatives: ranked.slice(1, 4), ...(why ? { why } : {}) });
+    used.add(ranked[0].title); { const k = proteinOf(ranked[0]); if (k) todayKinds.push(k); }
+    rows.push({ slot, meal: ranked[0], alternatives: ranked.slice(1, 4), ranked: ranked.slice(0, 12), ...(why ? { why } : {}) });
   }
   return rows;
 }

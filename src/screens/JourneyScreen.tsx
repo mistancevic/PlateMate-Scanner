@@ -437,7 +437,10 @@ export function JourneyScreen(p: AppApi) {
   const foodCard = cardItem && <FoodCard rates={p.rates} places={{ set: (x) => p.setFoodPlaces(cardItem.food.id, x), home: p.region }} food={state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food} addPhoto={(d) => p.addFoodPhoto(cardItem.food.id, d)} toggleFavorite={() => p.toggleFavorite(cardItem.food.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardItem.food.id), setJob: (j) => p.setFoodJob(cardItem.food.id, j) }} removePhoto={(i) => p.removeFoodPhoto(cardItem.food.id, i)} setMain={(i) => p.setMainPhoto(cardItem.food.id, i)} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} mix={mixProps(state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food)} />;
   const helperSheet = helper && (
     <PlateHelper tastes={tasteForReq(p.personal.tasteChips, state.preferences)} safety={p.safety} ai={p.ai} onFlag={p.flagFromModel} items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null} prefill={helper.prefill}
-      setError={setError} close={() => setHelper(null)} openTalk={() => { setHelper(null); p.openOut(); }} record={p.recordTalk}
+      setError={setError} close={() => setHelper(null)} record={p.recordTalk}
+      context={() => { const d = dayLog(state.feedback, new Date()), a = aggregate(items), dayK = p.todayKcal ?? state.goals.calories ?? null, dayP = state.goals.protein ?? null;
+        return { meal: mealSlot ? mealName(mealSlot.name) : null, time: mealSlot?.time ?? null, eatenKcal: d.kcal, eatenProtein: d.protein,
+          leftKcal: dayK !== null ? dayK - d.kcal - (a.calories ?? 0) : null, leftProtein: dayP !== null ? dayP - d.protein - (a.protein ?? 0) : null }; }}
       apply={(next, note) => { setState((s) => ({ ...s, items: next, portion: null })); p.notify(note); if (step === "recipe") recalc(next); }} />
   );
   const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;

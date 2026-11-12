@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.142",
     "0.3.141",
     "0.3.140",
     "0.3.139",
@@ -1008,17 +1009,19 @@
       "id": "DT286",
       "title": "Chef Mealan on the Plate: fresh, useful suggestions, in one conversation",
       "epic": "chef",
-      "state": "next",
-      "why": "Coach Milan and Tester 2, 12 November 13:28 and 13:30: the suggestions are always the same (chicken breast, cottage cheese, rye bread), and the answer is general. Cause in the code: the AI gets the first 40 foods of the list, always the same, is told to prefer them and to raise protein, and knows nothing of earlier answers, the meal or the time. Food names come untranslated (Roggen Vollkornbrot in Srpski). Also: the sheet already is the chat for this plate, yet it offers a second chat (Something else? Talk to Chef Mealan), and fills the field with half a sentence. To brainstorm before 0.4.0. 13:53, Coach Milan with Tester 2: Roggen Vollkornbrot is a real product from DM in Belgrade, with no Serbian on the package; a product's name stays as it is (see DT288). Brainstorm 12 November 15:00 to 15:35 (Coach Milan): the goal is the ultimate one, and nutrition lives inside it. By default every suggestion stays on the goal, on the plate's weak layer (protein, carbs, fat, vegetables; the layers stay invisible), with the amount and what it changes (PD before and after, kcal). Chips choose the direction: Better for my goal, Another protein, Other carbs, Crunchier, Something I crave, Something else entirely. A craving comes only when asked, with its cost said plainly and the way back. One conversation in the sheet, no second chat. Every chip and Add is logged by direction, per person and language, to test over time. Order and chips to be tested. Drawn 12 November (Stories215). Waits for Go.",
-      "board": "Stories215"
+      "state": "done",
+      "why": "Coach Milan and Tester 2, 12 November 13:28 and 13:30: the suggestions are always the same (chicken breast, cottage cheese, rye bread), and the answer is general. Cause in the code: the AI gets the first 40 foods of the list, always the same, is told to prefer them and to raise protein, and knows nothing of earlier answers, the meal or the time. Food names come untranslated (Roggen Vollkornbrot in Srpski). Also: the sheet already is the chat for this plate, yet it offers a second chat (Something else? Talk to Chef Mealan), and fills the field with half a sentence. To brainstorm before 0.4.0. 13:53, Coach Milan with Tester 2: Roggen Vollkornbrot is a real product from DM in Belgrade, with no Serbian on the package; a product's name stays as it is (see DT288). Brainstorm 12 November 15:00 to 15:35 (Coach Milan): the goal is the ultimate one, and nutrition lives inside it. By default every suggestion stays on the goal, on the plate's weak layer (protein, carbs, fat, vegetables; the layers stay invisible), with the amount and what it changes (PD before and after, kcal). Chips choose the direction: Better for my goal, Another protein, Other carbs, Crunchier, Something I crave, Something else entirely. A craving comes only when asked, with its cost said plainly and the way back. One conversation in the sheet, no second chat. Every chip and Add is logged by direction, per person and language, to test over time. Order and chips to be tested. Drawn 12 November (Stories215). Go 15:50 (after the plain words for Something I crave).",
+      "board": "Stories215",
+      "version": "0.3.142"
     },
     {
       "id": "DT287",
       "title": "Fill the open slots: the same meals every day",
       "epic": "chef",
-      "state": "next",
-      "why": "Coach Milan 12 November 13:28 and 13:32, Plan: Fill the open slots with Chef Mealan always offers the same meals. Cause in the code: fillDay has no AI and no memory; it ranks My recipes and the starters by the day's PD target and the slot's share of the day, so the same recipes win every day. Nothing about what was eaten or planned on other days. To brainstorm with DT286 before 0.4.0. Brainstorm 12 November: the same rule for the day. By default meals on the goal, the protein source rotating across the week (no dish twice in three days); per slot two or three choices with a why, and chips: Another protein, Lighter, Something I crave. Drawn 12 November (Stories215). Waits for Go.",
-      "board": "Stories215"
+      "state": "done",
+      "why": "Coach Milan 12 November 13:28 and 13:32, Plan: Fill the open slots with Chef Mealan always offers the same meals. Cause in the code: fillDay has no AI and no memory; it ranks My recipes and the starters by the day's PD target and the slot's share of the day, so the same recipes win every day. Nothing about what was eaten or planned on other days. To brainstorm with DT286 before 0.4.0. Brainstorm 12 November: the same rule for the day. By default meals on the goal, the protein source rotating across the week (no dish twice in three days); per slot two or three choices with a why, and chips: Another protein, Lighter, Something I crave. Drawn 12 November (Stories215). Go 15:50 (after the plain words for Something I crave).",
+      "board": "Stories215",
+      "version": "0.3.142"
     },
     {
       "id": "DT288",

@@ -55,7 +55,7 @@ seed.items = [];
 
   // Not quite? Tell Mealan: the helper opens with the tip as the start of the question
   await page.getByRole("button", { name: /Not quite/ }).click(); await page.waitForTimeout(500);
-  const q = await page.locator("input[placeholder^=\"What goes with\"]").first().inputValue().catch(() => "");
+  const q = await page.locator(".helper input").first().inputValue().catch(() => "");
   ok(/I scanned Nutella for before training/.test(q) && /You suggested with/.test(q), "the helper carries the tip: " + q.slice(0, 60));
   const asked = await logOf("mix_ask");
   ok(asked.length === 1, "the ask is logged");
@@ -92,7 +92,7 @@ seed.items = [];
   ok(/Under your/.test(fit[0]) && !/fit-line ok/.test(await sheet2.locator(".fit-line").first().getAttribute("class")), "on its own: under the target, said plainly and never green");
   // Tell Mealan needs no reviewed tick: name, energy and protein are enough
   await sheet2.getByRole("button", { name: /Not quite/ }).click(); await page.waitForTimeout(800);
-  const q2 = await page.locator("input[placeholder^=\"What goes with\"]").first().inputValue().catch(() => "");
+  const q2 = await page.locator(".helper input").first().inputValue().catch(() => "");
   ok(/I scanned Shop wafer/.test(q2), "Tell Mealan on the sheet saves the food and opens the helper with the tip: " + q2.slice(0, 40));
   ok((await state()).foods.some((f) => f.name === "Shop wafer"), "the wafer was saved on the way");
 

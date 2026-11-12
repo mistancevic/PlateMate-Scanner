@@ -1,5 +1,5 @@
 import { carryReads } from "../carry";
-import { w, wn, wordV, dateV, mealV, type Val } from "../words";
+import { w, wn, wordV, dateV, mealV, mealName, type Val } from "../words";
 import type { Lang } from "../lang";
 import { useEffect, useRef, useState } from "react";
 import { useChefContext } from "../chefContext";
@@ -19,7 +19,8 @@ import { getStore, openList, shortMeals } from "../shopping";
 import { intentOf, wantOf, plateAnswer, planAnswer, leftAnswer, moveOf, swapOk, swapFallback, swapLead, type DaySlot } from "../chatIntent";
 import { lifestyleOf, dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
-import { STARTERS, fillDay, fromMeal, sumOf, needOf, type FillRow, type PlannedMeal } from "../planned";
+import { STARTERS, fillDay, fromMeal, sumOf, needOf, type FillRow, type FillMode, type PlannedMeal } from "../planned";
+import { weekAround, slotChoices, likedCount, proteinOf, type ProteinKind } from "../variety";
 import { dayRecord } from "../record";
 import { dayLog } from "../today";
 import { chatRows, type ChatRow } from "../chatFoods";
@@ -105,7 +106,10 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   const target = numbers ? density(numbers.protein, numbers.kcal) : pdRef;
   const fillNow = () => {
     const reads = carryReads(state.meals, state.feedback);
-    const rows = fillDay(slots, held, choices, numbers, target, (m) => (m.mealId ? reads.get(m.mealId) : null));
+    // DT287 (0.3.142, board Stories215): the week around the day counts; each slot gets two or three choices with why
+    const week = weekAround(planDate, state.feedback, p.planned, open.map((x) => x.id));
+    const rows = fillDay(slots, held, choices, numbers, target, (m) => (m.mealId ? reads.get(m.mealId) : null), week)
+      .map((r) => { const cs = slotChoices(r, "goal", week, liked); return { ...r, meal: cs[0]?.meal ?? r.meal, choices: cs, mode: "goal" as const }; });
     const sum = sumOf(Object.fromEntries(rows.map((r) => [r.slot.id, r.meal])));
     const heldSum = sumOf(held);
     const text = rows.length
@@ -113,9 +117,23 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       : w("out.everySlotIsSetAlready");
     setTurns((t) => [...t, { role: "you", text: fillChip }, { role: "mealan", text, fill: rows.length ? { date: planDate, dayName, rows } : undefined }]);
   };
-  const changeOne = (ti: number, slotId: string) => setTurns((t) => t.map((turn, i) => {
+  const liked = (m: PlannedMeal) => likedCount(state.feedback, m);
+  // DT287: pick one of a slot's choices; a chip brings choices of another kind
+  const pickChoice = (ti: number, slotId: string, k: number) => setTurns((t) => t.map((turn, i) => {
     if (i !== ti || !turn.fill) return turn;
-    const rows = turn.fill.rows.map((r) => r.slot.id === slotId && r.alternatives.length ? { ...r, meal: r.alternatives[0], alternatives: [...r.alternatives.slice(1), r.meal] } : r);
+    const rows = turn.fill.rows.map((r) => (r.slot.id === slotId && r.choices?.[k] ? { ...r, meal: r.choices[k].meal } : r));
+    const r = rows.find((x) => x.slot.id === slotId); if (r) log("fill_choice", { slot: slotId, title: r.meal.title, k, mode: r.mode });
+    return { ...turn, fill: { ...turn.fill, rows } };
+  }));
+  const chipFor = (ti: number, slotId: string, mode: FillMode) => setTurns((t) => t.map((turn, i) => {
+    if (i !== ti || !turn.fill) return turn;
+    const week = weekAround(turn.fill.date, state.feedback, p.planned, turn.fill.rows.map((x) => x.slot.id));
+    const rows = turn.fill.rows.map((r) => { if (r.slot.id !== slotId) return r;
+      const shown = (r.choices ?? []).map((c) => proteinOf(c.meal)).filter((k): k is ProteinKind => Boolean(k));
+      const cs = slotChoices(r, mode, week, liked, shown);
+      log("fill_chip", { slot: slotId, mode, n: cs.length });
+      if (!cs.length) { p.notify(w("out.noChoiceFits")); return r; }
+      return { ...r, choices: cs, meal: cs[0].meal, mode }; });
     return { ...turn, fill: { ...turn.fill, rows } };
   }));
   const putThemIn = (ti: number) => {
@@ -382,13 +400,24 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
             )}
             {t.fill && (
               <div className="picks fill-rows">
-                {t.fill.rows.map((r) => (
-                  <div key={r.slot.id} className="fill-row">
-                    <div className="fill-text"><small>{r.slot.name}, {r.slot.time}</small><b>{r.meal.title}</b><small>{fmt(r.meal.kcal, 0)} kcal · {fmt(r.meal.protein, 0)} g · {pdText(density(r.meal.protein, r.meal.kcal))}</small></div>
-                    {!t.fill!.done && r.alternatives.length > 0 && <button className="pill pill-small" onClick={() => changeOne(i, r.slot.id)}>{w("out.change")}</button>}
+                {t.fill.rows.map((r) => (r.choices && r.choices.length && !t.fill!.done ? (
+                  <div key={r.slot.id} className="fill-slot">
+                    <small className="fill-slot-name">{mealName(r.slot.name)}, {r.slot.time}</small>
+                    {r.choices.map((c, k) => { const on = c.meal.title === r.meal.title; return (
+                      <button key={c.meal.title} type="button" className={`fill-choice${on ? " on" : ""}`} aria-pressed={on} onClick={() => pickChoice(i, r.slot.id, k)}>
+                        <span className="fill-dot" aria-hidden="true">{on ? "●" : "○"}</span>
+                        <span className="fill-text"><b>{c.meal.title}</b><small>{fmt(c.meal.kcal, 0)} kcal · {fmt(c.meal.protein, 0)} g · {pdText(density(c.meal.protein, c.meal.kcal))}</small><small className="fill-why">{c.why}</small></span>
+                      </button>); })}
+                    <div className="fill-chips">
+                      {(["protein", "lighter", "crave"] as const).map((m) => <button key={m} type="button" className={`pill pill-small${r.mode === m ? " pill-primary" : ""}`} aria-pressed={r.mode === m} onClick={() => chipFor(i, r.slot.id, m)}>{w(m === "protein" ? "out.chipAnotherProtein" : m === "lighter" ? "out.chipLighter" : "out.chipCrave")}</button>)}
+                    </div>
                   </div>
-                ))}
-                <div className="button-row">
+                ) : (
+                  <div key={r.slot.id} className="fill-row">
+                    <div className="fill-text"><small>{mealName(r.slot.name)}, {r.slot.time}</small><b>{r.meal.title}</b><small>{fmt(r.meal.kcal, 0)} kcal · {fmt(r.meal.protein, 0)} g · {pdText(density(r.meal.protein, r.meal.kcal))}</small></div>
+                  </div>
+                )))}
+                <div className="button-row fill-put">
                   {t.fill.done
                     ? <><Done start text={w("out.inThePlan")} undo={undoOf(`${i}:fill`)} />{p.tab === "plan" && <button className="pill pill-small pill-primary back-after" onClick={close}>{w("out.backToThePlan")}</button>}</>
                     : <button className="pill pill-small pill-primary" onClick={() => putThemIn(i)}>{w("out.putThemInThePlan")}</button>}
