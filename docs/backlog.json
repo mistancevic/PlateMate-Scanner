@@ -1069,6 +1069,48 @@
       "why": "Found while building DT287 (12 November): the ranking looks at PD, the slot's size and the week, not at the kind of meal, so beans and rice can come for breakfast. Learn it from where a recipe was eaten or planned before, and from the starters' meal. Drawn 12 November 17:10 (Stories217): learned from where it was eaten or planned, the starters and its foods; Fill keeps to it; Good for on the recipe, yours wins. Go 17:19.",
       "board": "Stories217",
       "version": "0.3.144"
+    },
+    {
+      "id": "DT291",
+      "title": "The menu photo changes numbers already sent, and says why only on the plate's page",
+      "epic": "plate",
+      "state": "later",
+      "why": "From the blind run of 10 November (docs/qa/blind/2026-11-10-jelena-first-run), split out of DT278 on 12 November."
+    },
+    {
+      "id": "DT292",
+      "title": "The read plate is long, and energy shows three ways (643 kcal, 520 to 850, 517 of 1,550)",
+      "epic": "plate",
+      "state": "later",
+      "why": "From the blind run of 10 November (docs/qa/blind/2026-11-10-jelena-first-run), split out of DT278 on 12 November."
+    },
+    {
+      "id": "DT293",
+      "title": "Plan and Today use the same words for planned and eaten numbers",
+      "epic": "home",
+      "state": "later",
+      "why": "From the blind run of 10 November (docs/qa/blind/2026-11-10-jelena-first-run), split out of DT278 on 12 November."
+    },
+    {
+      "id": "DT294",
+      "title": "Setup says she doesn't train; pilates becomes Mobility, light; the summary shows what she never entered",
+      "epic": "setup",
+      "state": "later",
+      "why": "From the blind run of 10 November (docs/qa/blind/2026-11-10-jelena-first-run), split out of DT278 on 12 November."
+    },
+    {
+      "id": "DT295",
+      "title": "English dish names and the Explorer in English on Serbian screens",
+      "epic": "lang",
+      "state": "later",
+      "why": "From the blind run of 10 November (docs/qa/blind/2026-11-10-jelena-first-run), split out of DT278 on 12 November."
+    },
+    {
+      "id": "DT296",
+      "title": "The round chef button covers text and buttons",
+      "epic": "trust",
+      "state": "later",
+      "why": "From the blind run of 10 November (docs/qa/blind/2026-11-10-jelena-first-run), split out of DT278 on 12 November."
     }
   ]
 }
