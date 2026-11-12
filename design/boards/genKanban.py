@@ -66,7 +66,7 @@ page = f'''<!doctype html>
 <div style="display:flex;gap:{G}px;align-items:flex-start;margin-top:18px">{"".join(column(*c) for c in cols)}</div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{W},"height":2000}}}}'>
+<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{W},"height":6400}}}}'>
 class Component extends DCLogic {{
   renderVals() {{
     return {{}};
