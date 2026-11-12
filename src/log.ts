@@ -28,6 +28,7 @@ export type LogEvent =
   | "plate_direction" // DT286: a direction chip on the Plate (or the goal on open); data.dir, data.plate
   | "plate_more" // DT286: More like this; data.dir
   | "plate_add" // DT286: a suggestion put on the plate; data.dir, data.action, data.food, data.grams
+  | "not_counted" // DT278: Don't count it; data.from (second_photo or plate)
   | "fill_choice" // DT287: a choice picked in Fill the open slots; data.slot, data.title, data.k, data.mode
   | "fill_chip" // DT287: a chip in Fill the open slots; data.slot, data.mode, data.n
   | "mix_tip"        // a mix tip shown on a food card; data.food, data.moment, data.case, data.offered

@@ -1401,7 +1401,8 @@ export function JourneyScreen(p: AppApi) {
       return (
       <section className="chef-ask dish-ask" aria-label={w("dish.askAria")}>
         <ChefLine image={state.photo?.image} text={say("secondDish", dish, a.minutes, a.prev, a.meal)} />
-        <div className="ca-go">{a.dessertFirst ? [dessert, snack] : [snack, dessert]}</div>
+        {/* DT278 (0.3.145, board Stories218): a third answer, Don't count it; the main answer on the right (DT289) */}
+        <div className="ca-go ca-go-right"><button key="n" type="button" className="pill dish-not-counted" onClick={() => p.answerDishAsk("notCounted")}>{w("dish.dontCountIt")}</button>{a.dessertFirst ? [snack, dessert] : [dessert, snack]}</div>
         <small>{w("dish.askHelp", { meal })}</small>
       </section>); })()
     // a food scanned while a cook runs
@@ -1972,7 +1973,7 @@ export function JourneyScreen(p: AppApi) {
         )}
         {/* DT127: under the gates, one line what to do with the plate in front of you, by code, and the buttons, the advice first */}
         {/* DT268 (0.3.118, board Stories201): an Exploring plate is kept as Served; its name, its dish, the next plate */}
-        {state.photo && state.photo.who === "idea" && state.photo.served && items.length > 0 && <ServedOnPlate p={p} items={items} title={state.title && state.title !== "DaaM" ? state.title : autoTitle(items)} />}
+        {state.photo && state.photo.who === "idea" && state.photo.served && items.length > 0 && <ServedOnPlate p={p} items={items} title={state.title && state.title !== "DaaM" ? state.title : autoTitle(items)} done={clearPlate} />}
         {state.photo && state.photo.who === "idea" && items.length > 0 && (() => {
           // DT130 (0.2.110, board Stories78, DT130d): an idea: the same read and gates; the buttons are for cooking it, not logging it
           const line = ideaAdvice({ items, protein: t.protein ?? 0, mealWord, big: bigN, nutrition: nutri });
@@ -2017,7 +2018,7 @@ export function JourneyScreen(p: AppApi) {
           return (
             <section className="card mp-say" aria-label={w("plate.chefOnMeal")}>
               <small><b>{CHEF_NAME}:</b> {adv.line}</small>
-              <div className="button-row">{order}<button className="link" onClick={emptyPlate}>{w("make.notMine")}</button></div>
+              <div className="button-row">{order}<button type="button" className="pill pill-small pill-action mp-not-counted" onClick={() => p.notCounted()}>{w("dish.dontCountIt")}</button></div>
             </section>
           );
         })()}
@@ -2101,7 +2102,7 @@ export function JourneyScreen(p: AppApi) {
         {p.filling?.mode === "eat" && items.length > 0 && <p className="small center">{w("plate.fitSetsAmounts", { slot: slotV(p.filling) })}</p>}
         {!imported && !chefable && !p.filling && items.length === 1 && <p className="small center">{w("plate.oneProduct")}</p>}
         {!imported && !chefable && !p.filling && items.length >= 2 && <p className="small center">{w("make.fitCalculatesTheAmountsWithout")}</p>}
-        {!imported && <Tip list={items} refit={false} />}
+        {!imported && !(state.photo?.who === "idea" && state.photo.served && !state.photo.served.mine) && <Tip list={items} refit={false} />}
         </section>)}
         {swapPanel}
         {foodCard}

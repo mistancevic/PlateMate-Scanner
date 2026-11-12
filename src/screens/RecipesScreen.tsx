@@ -307,6 +307,8 @@ export function RecipesScreen(p: AppApi) {
       let done = false; const put = () => { if (done) return; done = true; window.removeEventListener("popstate", put); toUrl(n); };
       window.addEventListener("popstate", put); window.setTimeout(put, 900); }}
     takeDown={() => { fetch(`/api/members/${encodeURIComponent(member.id)}`, { method: "DELETE" }).then(() => { setMemberOpen(null); loadMembers(true); p.notify(w("recipes.takenDownForEveryMember")); }).catch(() => {}); }} />;
+  // DT278: a plate opened from its day
+  useEffect(() => { if (p.servedGo) { setServedOpen(p.servedGo); p.servedGone(); } }, [p.servedGo]); // eslint-disable-line react-hooks/exhaustive-deps
   if (servedOpen && !opened) return <ServedOne p={p} id={servedOpen} back={() => setServedOpen(null)} />;
   if (menuOpen && !opened && (p.state.servedMenus ?? []).some((m) => m.visit === menuOpen)) return <ServedMenu p={p} visit={menuOpen} back={() => setMenuOpen(null)} />;
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it

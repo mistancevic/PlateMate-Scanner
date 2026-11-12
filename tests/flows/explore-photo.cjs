@@ -60,14 +60,14 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles({ name: "plate.jpg", mimeType: "image/jpeg", buffer: withExif("2026:10:29 19:40:00") }); await page.waitForTimeout(1200);
     const chips = (await page.locator(".pa-chip").allTextContents()).map((x) => x.replace(/\s+/g, " ").trim());
-    ok(chips.length === 3 && /Exploring$/.test(chips[2]) && !chips.some((c) => /An idea/.test(c)), "the third chip is Exploring: " + chips.join(", "));
-    await page.locator(".pa-chip").filter({ hasText: "Exploring" }).click(); await page.waitForTimeout(200);
+    ok(chips.length === 3 && /Just looking$/.test(chips[2]) && !chips.some((c) => /An idea/.test(c)), "the third chip is Just looking: " + chips.join(", "));
+    await page.locator(".pa-chip").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(200);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     const s1 = await st();
-    ok(s1.photo?.who === "idea" && s1.pick === "exploring" && !/Adding Wednesday's lunch/.test(await text(".step-head")) && /Exploring/.test(await text(".plan-line")), "the plate leaves Wednesday's lunch; the pencil block says Exploring");
-    ok(/Exploring a photo\. 2 foods read/.test(await text(".mp-big-say")), "the photo line says Exploring");
+    ok(s1.photo?.who === "idea" && s1.pick === "exploring" && !/Adding Wednesday's lunch/.test(await text(".step-head")) && /Just looking/.test(await text(".plan-line")), "the plate leaves Wednesday's lunch; the pencil block says Just looking");
+    const pl = await text(".mp-big-say"); ok(/Just looking at a photo\. 2 foods read/.test(pl), "the photo line says Just looking: " + pl.slice(0, 80));
     const say = await text(".mp-say");
-    ok(/Exploring, so wednesday's lunch stays as it was\./i.test(say) && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Put it in my plan" }).count() === 1, "Chef Mealan says the lunch stays as it was; the idea's buttons show: " + say.slice(0, 160));
+    ok(/Just looking, so wednesday's lunch stays as it was\./i.test(say) && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Put it in my plan" }).count() === 1, "Chef Mealan says the lunch stays as it was; the idea's buttons show: " + say.slice(0, 160));
     // DT268 (0.3.118): the Served block says "Your day stays as it was"; the check is about the gates, so it reads the Plate without that block
     const noServed = (await page.evaluate(() => { const m = document.querySelector("main").cloneNode(true); m.querySelectorAll(".sv-plate").forEach((x) => x.remove()); return m.textContent; })).replace(/\s+/g, " ");
     ok(!/Your day/.test(noServed) && !/eating window/.test(noServed), "no eating-window check while exploring");
@@ -75,20 +75,20 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
     // ---- the pencil block on Exploring first: a camera photo is Exploring too ----
     await page.locator(".plan-line").click(); await page.waitForTimeout(300);
-    await page.getByRole("button", { name: "Exploring", exact: true }).click(); await page.waitForTimeout(300);
+    await page.getByRole("button", { name: "Just looking", exact: true }).click(); await page.waitForTimeout(300);
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(2200);
     const s2 = await st();
-    ok(s2.photo?.who === "idea" && s2.pick === "exploring" && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1, "Exploring first: the camera's photo is Exploring, with the idea's buttons");
+    ok(s2.photo?.who === "idea" && s2.pick === "exploring" && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1, "Just looking first: the camera's photo is Just looking, with the idea's buttons");
     // ---- 0.3.65: Exploring in the pencil box on a meal of the plan too ----
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(400);
     await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(900);
     await page.getByRole("tab").filter({ hasText: /28/ }).first().click(); await page.waitForTimeout(600);
     await page.locator(".past-add .past-plate").filter({ hasText: "Lunch" }).getByRole("button", { name: "Add what you ate" }).click(); await page.waitForTimeout(1000);
     await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300);
-    ok(await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Exploring" }).count() === 1, "0.3.65: on Adding Wednesday's lunch the pencil box has Exploring");
-    await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Exploring" }).click(); await page.waitForTimeout(500);
-    ok(!/Adding Wednesday's lunch/.test(await text(".step-head")) && (await st()).pick === "exploring" && /Exploring/.test(await text(".plan-line")), "0.3.65: Exploring leaves Wednesday's lunch");
+    ok(await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).count() === 1, "0.3.65: on Adding Wednesday's lunch the pencil box has Just looking");
+    await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(500);
+    ok(!/Adding Wednesday's lunch/.test(await text(".step-head")) && (await st()).pick === "exploring" && /Just looking/.test(await text(".plan-line")), "0.3.65: Just looking leaves Wednesday's lunch");
     await ctx.close();
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
   } catch (e) { ok(false, "walkthrough crashed: " + (e && e.message)); }

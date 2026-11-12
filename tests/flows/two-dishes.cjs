@@ -46,7 +46,7 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
     let p = await open({ ...seed, feedback: [salad(day(19, 30))] }); await photo(p);
     const ask = p.locator(".dish-ask");
     ok(/Brownie cheesecake, 30 minutes after your Chicken salad with feta\. Dessert to your dinner, or its own snack\?/.test(await text(ask)), "Chef Mealan asks once: " + await text(ask));
-    const first = ask.locator(".ca-go button").first();
+    const first = ask.locator(".ca-go button.pill-primary").first();
     ok((await first.innerText()).trim() === "Dessert to your dinner" && /pill-primary/.test(await first.getAttribute("class")), "within an hour, Dessert to your dinner is the main button");
     const box = await first.boundingBox(); ok(box && box.height >= 44, "the buttons are 44 px");
     await first.click(); await p.waitForTimeout(1000);
@@ -83,7 +83,7 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
 
     // later than an hour: its own snack is the main button, and it stays a snack
     p = await open({ ...seed, feedback: [salad(day(18, 20))] }); await photo(p);
-    const first2 = p.locator(".dish-ask .ca-go button").first();
+    const first2 = p.locator(".dish-ask .ca-go button.pill-primary").first();
     ok((await first2.innerText()).trim() === "Its own snack" && /pill-primary/.test(await first2.getAttribute("class")), "after an hour, Its own snack is the main button");
     await first2.click(); await p.waitForTimeout(800);
     ok(await p.locator(".meal-dishes").count() === 0, "its own snack: no dinner of two dishes");

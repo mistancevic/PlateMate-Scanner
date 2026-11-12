@@ -78,7 +78,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   const say = await text(".mp-say");
   ok(/^Chef Mealan: Eat it as it is\. About [\d,]+( to [\d,]+)? kcal and \d+ g protein, a full lunch for your day/.test(say), "DT127: the line by code: eat it as it is, the energy as a range, the protein: " + say);
   const btns = await page.locator(".mp-say .button-row button").allTextContents();
-  ok(btns.join() === "Ate it,Ate half,Add a food,Not mine" && await page.locator(".mp-say .pill-primary").textContent() === "Ate it", "DT127: the buttons, the advice first: " + btns.join());
+  ok(btns.join() === "Ate it,Ate half,Add a food,Don't count it" && await page.locator(".mp-say .pill-primary").textContent() === "Ate it", "DT127: the buttons, the advice first: " + btns.join());
   // Ate it logs it now, with the photo, at the meal of the moment
   await page.getByRole("button", { name: "Ate it", exact: true }).click(); await page.waitForTimeout(600);
   const s3 = await st();
@@ -110,9 +110,14 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   await snap(".mp-button");
   // DT247: again minutes after a meal: it asks once; its own snack this time
   await page.locator(".dish-ask .ca-go button").filter({ hasText: "Its own snack" }).click(); await page.waitForTimeout(400);
-  await page.getByRole("button", { name: "Not mine" }).click(); await page.waitForTimeout(400);
+  // DT278 (0.3.145, board Stories218): Don't count it in place of Not mine: the plate stays, not counted, kept with its day
+  await page.getByRole("button", { name: "Don't count it" }).click(); await page.waitForTimeout(500);
   const s5 = await st();
-  ok(s5.items.length === 0 && !s5.photo, "DT127: Not mine empties the plate and drops the photo");
+  ok(s5.items.length > 0 && s5.photo?.who === "idea" && s5.photo.served && s5.photo.served.mine === false && /Not counted in your day/.test(await page.locator(".sv-plate").innerText()), "DT278: Don't count it keeps the plate, not counted in your day");
+  ok(!/Add one of these from your foods/.test(await page.locator("main").innerText()), "DT278: no coaching on a plate that is not counted");
+  await page.locator(".sv-plate").getByRole("button", { name: "Keep it ›" }).click(); await page.waitForTimeout(500);
+  const s6 = await st();
+  ok(s6.items.length === 0 && !s6.photo && (s6.served ?? []).some((x) => x.mine === false), "DT278: Keep it clears the Plate; the plate stays under Served");
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");

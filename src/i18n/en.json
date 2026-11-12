@@ -1304,7 +1304,7 @@
     "gender": true
   },
   "make.yourPlateStaysAsIt": "Your plate stays as it was; the photo is not kept.",
-  "make.exploringAPhoto": "Exploring a photo.",
+  "make.exploringAPhoto": "Just looking at a photo.",
   "make.skip": "Skip",
   "make.aTapChangesTheFood": "A tap changes the food; its grams stay.",
   "make.theWholeRecipe": "The whole recipe",
@@ -1475,8 +1475,8 @@
   "make.ofWhat": "Of what",
   "make.nothingInYourFoodsLifts": "Nothing in your foods lifts it on its own.",
   "make.everyFoodIsKeptSo": "Every food is kept, so nothing moves. Free one with its dot.",
-  "make.exploringNothingIsSizedFor": "Exploring: nothing is sized for a meal. Pick a meal to see what your plan has for it.",
-  "make.forExploringHead": "Exploring:",
+  "make.exploringNothingIsSizedFor": "Just looking: nothing is sized for a meal. Pick a meal to see what your plan has for it.",
+  "make.forExploringHead": "Just looking:",
   "make.forExploring": "a plate you look at. Nothing is logged. With a photo it is kept in Recipes, under Served.",
   "make.forMealHead": "A meal (Breakfast, Lunch, Dinner):",
   "make.forMeal": "your meal. It counts in your day when you tap Eat or Ate it. If it was under Served, it leaves Served.",
@@ -1708,7 +1708,7 @@
   },
   "photoask.ateAtTime": "Ate at {time}",
   "photoask.eatingNow": "Eating now",
-  "photoask.exploring": "Exploring",
+  "photoask.exploring": "Just looking",
   "photoask.notYourMeal": "Not your meal, not logged. Chef Mealan reads it: cook it, keep it as an idea, or plan it.",
   "photoask.nowAs": "As from the camera: the plate in front of you, as {meal}.",
   "photoask.now": "As from the camera: the plate in front of you.",
@@ -5146,7 +5146,7 @@
   "plate.numsOf": "{kcal} kcal · {protein} g protein · {pd}",
   "plate.planLineNums": "{meal}, {time} · {nums} · By the plan",
   "plate.planLine": "{meal}, {time} · By the plan",
-  "plate.exploringLine": "Exploring · not sized for a meal",
+  "plate.exploringLine": "Just looking · not sized for a meal",
   "plate.snackLine": "Snack · off the plan",
   "plate.forHintNums": "{meal}, {time}: {nums}, from your plan for today. It counts as your {mealLow}.",
   "plate.forHint": "{meal}, {time}: It counts as your {mealLow}.",
@@ -5246,14 +5246,14 @@
   "plate.dayPlansPick": "{day}: plans what you will eat. Pick the meal.",
   "plate.dayWhichMeal": "{day}, which meal",
   "plate.mealAtTime": "{meal}, {time}",
-  "plate.exploringStays": "Exploring: {slot} stays as it was.",
-  "plate.exploring": "Exploring",
-  "plate.exploringLeaves": "Exploring leaves {slot}: it stays as it was, and nothing is logged.",
+  "plate.exploringStays": "Just looking: {slot} stays as it was.",
+  "plate.exploring": "Just looking",
+  "plate.exploringLeaves": "Just looking leaves {slot}: it stays as it was, and nothing is logged.",
   "plate.targetForPlate": "Target for this plate: {pd}.",
   "plate.travelPlans": "Chef Mealan plans with what's sold in {place}. Use the chat to shop and cook there.",
   "plate.photoLineIdea": {
-    "one": "Exploring a photo. {n} food read, amounts estimated (~). Not logged: it is not your meal.",
-    "other": "Exploring a photo. {n} foods read, amounts estimated (~). Not logged: it is not your meal."
+    "one": "Just looking at a photo. {n} food read, amounts estimated (~). Not logged: it is not your meal.",
+    "other": "Just looking at a photo. {n} foods read, amounts estimated (~). Not logged: it is not your meal."
   },
   "plate.photoLine": {
     "one": "Your photo, {time}. {n} food read, amounts estimated (~). Tap an amount to correct it.",
@@ -5344,7 +5344,7 @@
   "plate.askChef": "Ask Chef Mealan",
   "plate.tomorrowLow": "tomorrow",
   "plate.chefOnIdea": "Chef Mealan on the idea",
-  "plate.exploringSo": "Exploring, so {slot} stays as it was.",
+  "plate.exploringSo": "Just looking, so {slot} stays as it was.",
   "plate.fitItToMy": "Fit it to my {meal}",
   "plate.putInDays": "Put it in {day}'s {meal}",
   "plate.chefOnMeal": "Chef Mealan on your meal",
@@ -6115,7 +6115,7 @@
   "howto.photoLog.what": "You ate something and want it counted, with no typing. A photo is enough.",
   "howto.photoLog.s1": "On the Plate, tap Photo of my meal.",
   "howto.photoLog.s2": "Take the whole plate from above, then Read it. Or pick a photo you took.",
-  "howto.photoLog.s3": "Say whose plate and when: Ate at, Eating now, or Exploring.",
+  "howto.photoLog.s3": "Say whose plate and when: Ate at, Eating now, or Just looking.",
   "howto.photoLog.s4": "Check the foods he read, then tap Ate it, or Ate half.",
   "howto.bigBatch.title": "I cooked a big batch",
   "howto.bigBatch.line": "Say how many you made and ate; Plan holds the rest.",
@@ -6227,5 +6227,12 @@
   "out.whyA": "A {meal}",
   "recipe.goodFor": "Good for",
   "recipe.goodForGuess": "Chef Mealan set these from when you ate it and from its foods. Tap to change. Fill the open slots keeps to them.",
-  "recipe.goodForYours": "You set these. Fill the open slots keeps to them."
+  "recipe.goodForYours": "You set these. Fill the open slots keeps to them.",
+  "dish.dontCountIt": "Don't count it",
+  "served.notCounted": "Not counted in your day",
+  "served.keepIt": "Keep it ›",
+  "served.notCountedN": {
+    "one": "Not counted: {n} plate",
+    "other": "Not counted: {n} plates"
+  }
 }

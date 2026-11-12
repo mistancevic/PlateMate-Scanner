@@ -83,7 +83,7 @@ export function ServedShare({ p, s, back }: { p: AppApi; s: Pick<Served, "name" 
 }
 
 // ---- the Plate, after a photo read as Exploring ----
-export function ServedOnPlate({ p, items, title }: { p: AppApi; items: Ingredient[]; title: string }) {
+export function ServedOnPlate({ p, items, title, done }: { p: AppApi; items: Ingredient[]; title: string; done?: () => void }) {
   const photo = p.state.photo!, on = photo.served!;
   const [named, setNamed] = useState(false), [picked, setPicked] = useState(false);
   const [ate, setAte] = useState(false), [share, setShare] = useState(false);
@@ -103,6 +103,8 @@ export function ServedOnPlate({ p, items, title }: { p: AppApi; items: Ingredien
   return (
     <section className="card sv-plate" aria-label={w("served.keptHead")}>
       <div className="sv-head"><ServedMark /><b>{w("served.keptHead")}</b></div>
+      {/* DT278 (0.3.145, board Stories218): not your meal, so not counted; Keep it clears the Plate, the plate stays with its day */}
+      {!on.mine && <span className="sv-not-counted">{w("served.notCounted")}</span>}
       <Whose mine={on.mine} set={(mine) => p.servedPatch(on.id, { mine })} />
       <label className="sv-label">{w("served.name")}{!named && on.name === undefined && <span className="sv-by">{w("served.filledBy")}</span>}
         <input className="search sv-name" value={name} maxLength={60} onChange={(e) => { setNamed(true); p.servedPatch(on.id, { name: e.target.value }); }} />
@@ -120,6 +122,7 @@ export function ServedOnPlate({ p, items, title }: { p: AppApi; items: Ingredien
         <button type="button" className="pill pill-small sv-share-it" onClick={() => setShare(true)}>{w("served.shareNumbers")}</button>
         <button type="button" className="pill pill-small sv-ate" onClick={() => setAte(true)}>{w("served.iAteThis")}</button>
         <button type="button" className="pill pill-small pill-danger-line sv-drop" onClick={() => p.servedRemove(on.id)}>{w("served.dontKeep")}</button>
+        {done && <button type="button" className="pill pill-small pill-primary sv-keep-it" onClick={done}>{w("served.keepIt")}</button>}
       </div>
       <small className="sv-foot">{w("served.nothingLogged")}</small>
     </section>
@@ -299,5 +302,18 @@ export function ServedMenu({ p, visit, back }: { p: AppApi; visit: string; back:
       <PhotoPick onFile={(f) => void again(f)}>{({ toggle, open }) => <button type="button" className="link sv-menu-again" aria-expanded={open} onClick={toggle}>{w("served.menuAgain")}</button>}</PhotoPick>
       <small className="sv-foot">{w("served.menuLimit")}</small>
     </section>
+  );
+}
+
+// DT278 (0.3.145, board Stories218): the plates kept but not counted, on their day; a tap opens them in Recipes
+export function NotCountedRow({ p, day }: { p: AppApi; day: Date }) {
+  const k = day.toDateString();
+  const list = (p.state.served ?? []).filter((s) => !s.mine && new Date(s.at).toDateString() === k);
+  if (!list.length) return null;
+  return (
+    <button type="button" className="menu-row not-counted-row" onClick={() => p.openServed(list[0].id)}>
+      <span className="menu-row-text"><b>{wn("served.notCountedN", list.length, { n: list.length })}</b><small>{list.map((s) => s.name).join(" · ")}</small></span>
+      <span aria-hidden="true">›</span>
+    </button>
   );
 }

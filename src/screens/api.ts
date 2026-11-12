@@ -72,7 +72,9 @@ export interface AppApi {
   answerCookOpen: (how: "go" | "end") => void;
   // DT247 (0.3.96): a second photo soon after a meal, and a dish of the meal onto the Plate
   dishAsk: DishAsk | null;
-  answerDishAsk: (how: "dessert" | "snack" | null) => void;
+  answerDishAsk: (how: "dessert" | "snack" | "notCounted" | null) => void;
+  // DT278 (0.3.145): Don't count it, and the plates kept that way, opened from their day
+  notCounted: () => void; servedGo: string | null; servedGone: () => void; openServed: (id: string) => void;
   openDish: (cardId: string) => void;
   // DT218 (0.3.58): the meal card whose last question Go on opened
   carryNow: { id: string; at: number } | null;

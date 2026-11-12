@@ -21,6 +21,7 @@ import { PlanRow } from "../components/PlanRow";
 import { ShortHelp } from "../components/ShortHelp";
 import { Picture, pictureOfRecipe } from "../components/MealPicture";
 import { PastMeal, recipeOfEaten } from "../components/PastMeal";
+import { NotCountedRow } from "../components/Served";
 import { DayEditor } from "../components/DayEditor";
 import { dayLog } from "../today";
 import { dayRecord } from "../record";
@@ -274,6 +275,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
         <b>{w("plan.date", { date: (l) => (l === "en" ? `${WEEKDAY_OF(date)}, ${date.getDate()} ${MONTH(date)}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}</b>
         <small>{line}</small>
       </div>
+      <NotCountedRow p={p} day={date} />
       {log.logged.length ? (
         <>
           <div className="past-nums">

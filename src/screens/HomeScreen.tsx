@@ -37,6 +37,7 @@ import { closeDays, openedToday } from "../metrics";
 import { coverIsDrawn, ownPhotosOf } from "../covers";
 import { recipePhotosOf } from "../photos";
 import { PastMeal } from "../components/PastMeal";
+import { NotCountedRow } from "../components/Served";
 import { CARRY_WORDS, momentOf } from "../carry";
 import { resizeImageBase64 } from "../utils/image";
 import type { Feedback, Meal } from "../pilot";
@@ -467,6 +468,7 @@ export function HomeScreen(p: AppApi) {
           </div>,
         ];
       })}
+      <NotCountedRow p={p} day={new Date()} />
       <div className="button-row meals-acts"><button type="button" className="pill pill-small" onClick={logMeal}><Plus size={14} /> {w("today.logAMeal")}</button></div>
       </section>}
       {/* R5: Getting to know you is about logging; R24: it stays with today */}
@@ -514,6 +516,7 @@ export function HomeScreen(p: AppApi) {
               <button type="button" className="menu-row plan-row-link" onClick={() => { showPlanOn(dk); setTab("plan"); }}>
                 <div className="menu-row-text"><small>{d.dayType ? dayNameAny(d.dayType) : w("today.noKindOfDayWas")}</small><b>{dRec ? planDayLine({ ...dRec, done: true }, p.numbersFor(d.day)?.kcal ?? null) : loggedLine(d, false)}</b><small>{w("today.seeTheDayAgainstIts")}</small></div><ChevronRight size={18} />
               </button>
+              <NotCountedRow p={p} day={d.day} />
             </section>
           );
         })}

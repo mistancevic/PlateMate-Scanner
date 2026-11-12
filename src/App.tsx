@@ -861,6 +861,8 @@ export default function App() {
     [loadTry, setLoadTry] = useState(0),
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
     [mealanAsk, setMealanAsk] = useState(0),
+    // DT278: a served plate to open in Recipes, from its day
+    [servedGo, setServedGo] = useState<string | null>(null),
     [mixQuestion, setMixQuestion] = useState<string | null>(null),
     [camera, setCamera] = useState(false),
     // DT130 (0.2.110): a photo picked from Your photos in the meal camera, waiting on the Plate for whose plate and when
@@ -1731,13 +1733,16 @@ export default function App() {
   // A plate with a photo set to Exploring is an Exploring plate: kept as Served, with an Exploring plate's buttons. Set to a
   // meal, it is your meal again and leaves Served. Only a choice you make does this: emptying the Plate (null) changes nothing
   // of it, and nothing here touches a day.
-  const setPick = (x: string | null) => { setPickState(x); setState((s) => {
+  // DT278 (0.3.145, board Stories218): Don't count it is Exploring with mine false: kept with its day, never in your day
+  const setPick = (x: string | null, opt?: { mine?: boolean }) => { setPickState(x); setState((s) => {
     let n = s.pick === x ? s : { ...s, pick: x };
     const ph = n.photo;
     if (!ph || !n.items.length || !x) return n;
     if (x === "exploring" && ph.who !== "idea") {
       const { keep: _k, ...rest } = ph;
-      n = { ...n, photo: { ...rest, who: "idea", served: ph.served ?? { id: uid(), mine: true, visit: visitFor(n.served ?? [], ph.at) ?? uid(), dish: "main", byHand: true } } };
+      n = { ...n, photo: { ...rest, who: "idea", served: ph.served ? { ...ph.served, ...(opt?.mine !== undefined ? { mine: opt.mine } : {}) } : { id: uid(), mine: opt?.mine ?? true, visit: visitFor(n.served ?? [], ph.at) ?? uid(), dish: "main", byHand: true } } };
+    } else if (x === "exploring" && ph.who === "idea" && ph.served && opt?.mine !== undefined && ph.served.mine !== opt.mine) {
+      n = { ...n, photo: { ...ph, served: { ...ph.served, mine: opt.mine } }, served: (n.served ?? []).map((y) => (y.id === ph.served!.id ? { ...y, mine: opt.mine! } : y)) };
     } else if (x !== "exploring" && ph.who === "idea") {
       const { served, keep: _k, who: _w, ...rest } = ph;
       n = { ...n, photo: rest, ...(served ? { served: (n.served ?? []).filter((y) => y.id !== served.id) } : {}) };
@@ -2621,8 +2626,9 @@ export default function App() {
     recordNow: recordNow ? { cardId: recordNow.id, at: recordNow.createdAt, slot: recordNow.slot ?? null } : null,
     cookOpenAsk: cookOpenAsk && !!state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat"),
     answerCookOpen: (how: "go" | "end") => { setCookOpenAsk(false); if (how === "end") { setState((s) => cooking.closeCook(s)); setCarryNow(null); } else screenProps.goOnCook(); },
-    dishAsk, answerDishAsk: (how: "dessert" | "snack" | null) => {
+    dishAsk, answerDishAsk: (how: "dessert" | "snack" | "notCounted" | null) => {
       const a = dishAsk; setDishAsk(null); if (!a || !how) return;
+      if (how === "notCounted") { setPick("exploring", { mine: false }); log("not_counted", { from: "second_photo" }); return; }
       if (how === "dessert") { setPick(`meal:${a.slotId}`); setState((s) => ({ ...s, course: "dessert" })); }
       else { setPick("snack"); setState((s) => ({ ...s, course: undefined })); }
     },
@@ -2650,6 +2656,8 @@ export default function App() {
     },
     // DT268 (0.3.118, board Stories201): Served plates. The Plate keeps the one it is exploring in step (keepServed); the rest
     // is what Recipes does with them
+    notCounted: () => { setPick("exploring", { mine: false }); log("not_counted", { from: "plate" }); },
+    servedGo, servedGone: () => setServedGo(null), openServed: (id: string) => { setServedGo(id); setMenuSection(null); setTalkOpen(false); setTab("recipes"); },
     keepServed: (next: Served) => setState((s) => { const list = upsertServed(s.served ?? [], next); return list === (s.served ?? []) && s.served ? s : { ...s, served: list }; }),
     servedPatch: (id: string, patch: Partial<Pick<Served, "name" | "dish" | "mine">>) => setState((s) => ({ ...s, served: (s.served ?? []).map((x) => (x.id === id ? { ...x, ...patch } : x)),
       ...(s.photo?.served?.id === id ? { photo: { ...s.photo, served: { ...s.photo.served, ...patch } } } : {}) })),
