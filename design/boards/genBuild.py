@@ -51,6 +51,7 @@ history = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join(
     ("Checking new code", "With the Google services kept and AI Studio left behind, Milan checked the newest code in a GitHub Codespace: the app running on a computer in GitHub's cloud, on a temporary link only he could open."),
     ("Staging or preview", "Milan asked for a staging environment, as in his product teams, to test the latest work without touching the beta testers. Chosen as the quick start: a preview on the same accounts and data; a staging with its own database once the app grows beyond friends."),
     ("To the phone", "When Cloud Shell joined the process for these releases, it would not start on the Chromebook: it never got past the sign-in that opens the terminal. On the phone the same Cloud Shell opened at once, so the releases were run from the phone from then on."),
+    ("Chat before code", "The work began in Claude Code, but it built an idea before it was talked through, and it had no copy or read aloud. So the talk moved to chats in a Claude Project, to plan first, as a planning mode does. Soon all the work ran there. This is where Brainstorm, Draw and Go come from."),
     ("Way of working", "Version numbers from 2 October; boards on the canvas before code; the five-step release rule (23 October); the Kanban (2 November).")], "#1a73e8"),
   stage("4", "Green buttons on GitHub", "From 3 November", [
     ("Why", "Cloud Shell's weekly hours ran out, and the Chromebook was away."),
@@ -121,7 +122,7 @@ body = (f'<div style="width:{W}px;box-sizing:border-box;padding:22px 26px;backgr
   + section("A course setup, and this project", "The Turing College course Building with AI agents teaches a laptop setup. This project does the same cycle without one.", compare)
   + section("The app, as it runs", "Four parts. The person's phone holds the app and their data first; the server holds the AI key and the rules.", app)
   + '</div>')
-H = 3340
+H = 3430
 page = f'''<!doctype html>
 <html lang="en">
 <head>
