@@ -36,6 +36,7 @@ import { log } from "../log";
 import { closeDays, openedToday } from "../metrics";
 import { coverIsDrawn, ownPhotosOf } from "../covers";
 import { recipePhotosOf } from "../photos";
+import { PastMeal } from "../components/PastMeal";
 import { CARRY_WORDS, momentOf } from "../carry";
 import { resizeImageBase64 } from "../utils/image";
 import type { Feedback, Meal } from "../pilot";
@@ -44,6 +45,10 @@ export function HomeScreen(p: AppApi) {
   // to the measured burn's card on Me, Goal (FT3, FT4)
   const toBurn = () => { p.openMenu("goal"); setTimeout(() => document.querySelector(".ft-burn")?.scrollIntoView({ block: "center" }), 350); };
   const [shareFor, setShareFor] = useState<string | null>(null);
+  // B139 (0.3.141, board Stories214): a meal logged here keeps Undo while you stay on Today; Change or delete opens the meal
+  const [justLogged, setJustLogged] = useState<string[]>([]);
+  const logged = (id: string | null | void) => { if (id) setJustLogged((xs) => [...xs, id]); };
+  const [mealOpen, setMealOpen] = useState<string | null>(null);
   // the 30 minute check (Y1 column 13): the card shows once Today is open 30 minutes or more after the meal
   const [now, setNow] = useState(Date.now());
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 60_000); return () => clearInterval(t); }, []);
@@ -169,6 +174,11 @@ export function HomeScreen(p: AppApi) {
   // Release B: a study day says so; the editor offers the kinds of day Lifestyle allows
   const ls = lifestyleOf(p.personal), wkd = weekdaysOf(ls), peOn = !!ls.peWeek && ls.peWeek !== "none";
   const todayLine = (d: PlanDay) => (minor ? schoolLine(d) : dayKindOf(d, ls) === "study" ? studyLine({ ...d, study: true }) : planLine(d));
+  const openedMeal = mealOpen ? p.state.feedback.find((f) => f.id === mealOpen) ?? null : null;
+  if (openedMeal) {
+    return <PastMeal p={p} f={openedMeal} day={w("tab.today")} slot={openedMeal.slot?.name ? mealName(openedMeal.slot.name) : undefined} back={() => setMealOpen(null)}
+      onChange={(ch) => p.changeCard(openedMeal.id, ch)} onDelete={() => { p.deleteCard(openedMeal.id); setMealOpen(null); }} />;
+  }
   return (
     <>
       {/* R24 (0.2.51, board RS24): the day stays in sight while you scroll: Today, Tomorrow, Earlier */}
@@ -282,8 +292,9 @@ export function HomeScreen(p: AppApi) {
               <small className="next-line">{leftLine}</small>
               <div className="button-row next-planned-acts">
                 {nextHeld.items?.length
-                  ? <><button type="button" className="pill pill-small pill-primary" onClick={() => p.logPlanned(nextHeld, { date: key, slotId: next.id, name: next.name, time: next.time })}><Check size={14} /> {w("today.iAteIt")}</button>
-                    <button type="button" className="pill pill-small" onClick={() => eatFrom(next.id)}>{w("today.changeIt")}</button></>
+                  ? <>{/* B139 (0.3.141, board Stories214): Change it on the left, I ate it on the right; no ✓ on a button still to tap */}
+                    <button type="button" className="pill pill-small" onClick={() => eatFrom(next.id)}>{w("today.changeIt")}</button>
+                    <button type="button" className="pill pill-small pill-primary" onClick={() => logged(p.logPlanned(nextHeld, { date: key, slotId: next.id, name: next.name, time: next.time }))}>{w("today.iAteIt")}</button></>
                   : <button type="button" className="pill pill-small pill-primary" onClick={makeNext}>{w("today.makeItOnThePlate")}</button>}
               </div>
             </div>
@@ -344,8 +355,8 @@ export function HomeScreen(p: AppApi) {
                 )}
                 <div className="button-row" style={{ marginTop: 8 }}>
                   {asking === f.id
-                    ? <button className="pill pill-small pill-primary" onClick={() => { p.settleCard(f.id, "eaten", asSlot ? { slot: { date: key, slotId: asSlot.id, name: asSlot.name, time: asSlot.time } } : { which: "Snack" }); setAsking(null); }}><Check size={14} /> {w("today.logIt")}</button>
-                    : <button className="pill pill-small pill-primary" onClick={() => askFor(f.id)}><Check size={14} /> {many ? w("today.iAteOne") : w("today.iAteIt")}</button>}
+                    ? <button className="pill pill-small pill-primary" onClick={() => { p.settleCard(f.id, "eaten", asSlot ? { slot: { date: key, slotId: asSlot.id, name: asSlot.name, time: asSlot.time } } : { which: "Snack" }); setAsking(null); }}>{w("today.logIt")}</button>
+                    : <button className="pill pill-small pill-primary" onClick={() => askFor(f.id)}>{many ? w("today.iAteOne") : w("today.iAteIt")}</button>}
                   <button className="pill pill-small" onClick={() => { setAsking(null); p.settleCard(f.id, "not-used"); }}><X size={14} /> {many ? w("today.remove") : w("today.notToday")}</button>
                 </div>
               </section>
@@ -390,7 +401,7 @@ export function HomeScreen(p: AppApi) {
                 <small>{w("today.timePassed", { time: sl.time })}</small>
                 <div className="button-row">
                   {m.items?.length
-                    ? <button type="button" className="pill pill-small pill-primary" onClick={() => p.logPlanned(m, { date: key, slotId: sl.id, name: sl.name, time: sl.time })}><Check size={14} /> {w("today.iAteIt")}</button>
+                    ? <button type="button" className="pill pill-small pill-primary" onClick={() => logged(p.logPlanned(m, { date: key, slotId: sl.id, name: sl.name, time: sl.time }))}>{w("today.iAteIt")}</button>
                     : null}
                   <button type="button" className="pill pill-small" onClick={() => eatFrom(sl.id)}>{m.items?.length ? w("today.changeIt") : w("today.makeItOnThePlate")}</button>
                   <button type="button" className="pill pill-small" onClick={() => p.fill(key, sl.id, { ...m, skipped: true })}>{w("today.skippedIt")}</button>
@@ -413,14 +424,18 @@ export function HomeScreen(p: AppApi) {
       {newest.map((f) => {
         const a = sumOf(f.meal.items), r = recipeOfCard(f, state.meals);
         return [
-          <div className={`log-card meal-row with-photo ${r ? "log-card-open" : ""}`} key={f.id} onClick={(e) => { if (!r || (e.target as HTMLElement).closest("button,input,a,label,textarea")) return; p.openMeal(r.id, { tab: "home" }); }}>
+          <div className="log-card meal-row with-photo log-card-open" key={f.id} onClick={(e) => { if ((e.target as HTMLElement).closest("button,input,a,label,textarea")) return; setMealOpen(f.id); }}>
             <Picture src={f.photo ?? pictureOfRecipe(r)} />
             <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString(phoneLoc(), { hour: "2-digit", minute: "2-digit" })}</small></div>
             <small className="meal-which"><b>{mealName(whichOf(f))}</b>{r && <> · <button className="link in-inline" onClick={() => p.openRecipePage(r.id)}>{w("today.openTheRecipe")}</button></>}</small>
             <small className="log-nums">{w("today.kcalProtein", { kcal: fmt(a.kcal, 0), protein: fmt(a.protein, 0) })}{a.gap ? "" : w("today.fatCarbs", { fat: fmt(a.fats, 0), carbs: fmt(a.carbs, 0) })} · {pdText(density(a.protein, a.kcal))}</small>
             {hasPlanToday && (f.slot
-              ? <small className="plan-mark fit-ok">{w("today.byThePlan")}</small>
+              ? <small className="plan-mark fit-ok">{w("today.eatenByThePlan")}</small>
               : <small className="plan-mark fit-under">{rec.open.length && f.id === today.logged[today.logged.length - 1]?.id ? w("today.offPlanLean") : w("today.offPlan")}</small>)}
+            <div className="button-row meal-row-acts">
+              {justLogged.includes(f.id) && <button type="button" className="pill pill-small meal-undo" onClick={() => { p.deleteCard(f.id); setJustLogged((xs) => xs.filter((x) => x !== f.id)); p.notify(w("today.undone", { title: f.meal.title })); }}>{w("today.undo")}</button>}
+              <button type="button" className="pill pill-small meal-change" onClick={() => setMealOpen(f.id)}>{w("today.changeOrDelete")}</button>
+            </div>
             {(!r || p.profile.coachId) && (
               <div className="button-row log-actions">
                 {!r && <button className="pill pill-small" onClick={() => p.saveCardAsRecipe(f.id)}>{w("today.saveInMyRecipes")}</button>}

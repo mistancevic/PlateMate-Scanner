@@ -6190,5 +6190,8 @@
   "coach.keepIt": "Keep it",
   "coach.leavesWithoutInvite": "It leaves Waiting for you without an invite.",
   "coach.handledOn": "Handled {date}",
-  "make.aPortion": "A portion"
+  "make.aPortion": "A portion",
+  "today.eatenByThePlan": "✓ Eaten, by the plan",
+  "today.changeOrDelete": "Change or delete ›",
+  "today.undone": "Undone: {title} is no longer logged."
 }

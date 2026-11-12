@@ -3273,3 +3273,7 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .request-handle .link { min-height: 44px; }
 .request-handle .request-mark { color: var(--muted, #53627f); }
 .request-handle .request-sure { font-weight: 800; }
+/* B139 (0.3.141, board Stories214): an action is a button; delete is white with a red border, filled red on Sure? */
+.pill.pill-danger-line { background: #fff; border: 1.5px solid var(--low-text); color: var(--low-text); font-weight: 800; }
+.meal-row-acts { grid-column: 1 / -1; margin-top: 8px; }
+.log-card .meal-row-acts .pill.pill-small { flex: 1; min-height: 48px; height: auto; }

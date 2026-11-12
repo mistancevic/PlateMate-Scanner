@@ -57,7 +57,7 @@ export function PastMeal({ p, f, day, slot, back, recipe, when, words = false, a
           ? <><button type="button" className="pill pill-wide pill-danger pm-sure" onClick={onDelete}>{w("pastmeal.sureDelete")}</button>
               <button type="button" className="link pm-keep" onClick={() => setMode("view")}>{w("pastmeal.keepIt")}</button>
               <small className="muted">{w("pastmeal.deleteWhy", { date: dateText(new Date(f.createdAt), { weekday: "long", day: "numeric", month: "long" }) })}</small></>
-          : <button type="button" className="link link-danger pm-delete" onClick={() => setMode("sure")}>{w("pastmeal.deleteThisMeal")}</button>)}
+          : <button type="button" className="pill pill-wide pill-danger-line pm-delete" onClick={() => setMode("sure")}>{w("pastmeal.deleteThisMeal")}</button>)}
       </div>}
       </>}
     </section>

@@ -84,7 +84,7 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     ok(await page.locator(".next-planned").getByRole("button", { name: "Change it", exact: true }).count() === 1, "R16: Change it, the Plate, is a tap away, on the card");
     await page.getByRole("button", { name: "I ate it", exact: true }).click(); await page.waitForTimeout(600);
     const first = (await page.locator(".log-card").filter({ has: page.locator(".meal-which") }).first().textContent()).replace(/\s+/g, " ");
-    ok(new RegExp(nextName, "i").test(await page.locator(".log-card .meal-which").first().textContent()) && /By the plan/.test(first), "the newest meal comes first and says which meal: " + first.slice(0, 80));
+    ok(new RegExp(nextName, "i").test(await page.locator(".log-card .meal-which").first().textContent()) && /[Bb]y the plan/.test(first), "the newest meal comes first and says which meal: " + first.slice(0, 80));
     await page.locator(".log-card .meal-which").first().getByRole("button", { name: /Open the recipe/ }).click(); await page.waitForTimeout(800);
     ok(/Protein cheesecake/.test(await text(".rq")) && await page.locator(".rq-landed").count() === 0, "Open the recipe opens its page, with no saved line");
     await at("2026-10-18T23:30:00");

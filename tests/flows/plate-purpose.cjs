@@ -50,7 +50,7 @@ seed.items = []; seed.meals = []; seed.feedback = []; seed.goals = { ...seed.goa
     if (!/today/.test(page.url())) { await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(600); }
     // R5 (Milan 17:23 to 19:00, board RS13): which meal it was is its own line; By the plan is its mark
     const nums = (await page.locator(".log-card .meal-which").first().textContent()).trim() + " · " + (await page.locator(".log-card .plan-mark").first().textContent()).trim();
-    ok(/^Dinner\b/.test(nums) && /By the plan$/.test(nums), "Today counts it as dinner, by the plan: " + nums);
+    ok(/^Dinner\b/.test(nums) && /[Bb]y the plan$/.test(nums), "Today counts it as dinner, by the plan: " + nums);
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
     ok(/by the clock · Off the plan/.test(await line()), "after saving, a new plate starts from the clock again: " + await line());
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));

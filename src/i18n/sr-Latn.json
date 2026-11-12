@@ -22372,6 +22372,18 @@
     "make.aPortion": {
       "text": "Jednu porciju",
       "checked": true
+    },
+    "today.eatenByThePlan": {
+      "text": "✓ Pojedeno, po planu",
+      "checked": true
+    },
+    "today.changeOrDelete": {
+      "text": "Izmeni ili obriši ›",
+      "checked": true
+    },
+    "today.undone": {
+      "text": "Poništeno: {title} više nije upisano.",
+      "checked": true
     }
   }
 }

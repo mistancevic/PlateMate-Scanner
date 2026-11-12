@@ -418,7 +418,7 @@ function SlotBar({ p, from, back }: { p: AppApi; from: MealFrom; back: () => voi
     <section className="card rq-slot" aria-label={w("recipes.inTodaySPlan")}>
       <small className="rq-slot-line">{w("recipes.slotByThePlanToday", { meal: slotV(sl.name), time: sl.time })}</small>
       <div className="button-row">
-        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl); back(); }}><Check size={14} /> {w("recipes.iAteIt")}</button> : null}
+        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl); back(); }}>{w("recipes.iAteIt")}</button> : null}
         <button type="button" className="pill pill-small" onClick={() => p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: "today", mealId: m.mealId, mode: "eat" }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title)}>{w("recipes.changeItOnThePlate")}</button>
       </div>
       <small><button type="button" className="link in-inline" onClick={swap}>{w("recipes.swapIt")}</button> · <button type="button" className="link in-inline" onClick={() => { p.fill(sl.date, sl.slotId, { ...m, skipped: true }); back(); }}>{w("recipes.skipItToday")}</button></small>
@@ -430,7 +430,7 @@ function SlotBar({ p, from, back }: { p: AppApi; from: MealFrom; back: () => voi
     <section className="card rq-slot" aria-label={w("recipes.aMealGoneBy")}>
       <small className="rq-slot-line">{w("recipes.slotPlannedNotAdded", { day, meal: mealV(sl.name, true), time: sl.time })}</small>
       <div className="button-row">
-        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl, atMeal(sl.date, sl.time)); back(); }}><Check size={14} /> {w("recipes.iAteIt")}</button> : null}
+        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl, atMeal(sl.date, sl.time)); back(); }}>{w("recipes.iAteIt")}</button> : null}
         <button type="button" className="pill pill-small" onClick={() => { p.fill(sl.date, sl.slotId, { ...m, skipped: true }); back(); }}>{w("recipes.iSkippedIt")}</button>
       </div>
     </section>
