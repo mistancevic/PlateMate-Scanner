@@ -3277,3 +3277,11 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .pill.pill-danger-line { background: #fff; border: 1.5px solid var(--low-text); color: var(--low-text); font-weight: 800; }
 .meal-row-acts { grid-column: 1 / -1; margin-top: 8px; }
 .log-card .meal-row-acts .pill.pill-small { flex: 1; min-height: 48px; height: auto; }
+/* DT286 (0.3.142, board Stories215): Chef Mealan on the Plate */
+.helper-context { display: block; color: var(--muted); font-size: var(--fs-small, 14px); line-height: 1.4; margin: 0 0 8px; }
+.helper .helper-nums { display: block; color: #13804f; font-weight: 800; }
+.helper .helper-take { min-height: 48px; white-space: nowrap; }
+.helper-close { background: #eef8f1; border-radius: 12px; padding: 10px 12px; margin: 8px 0; line-height: 1.45; }
+.helper .helper-more { min-height: 44px; margin: 8px 0; }
+.helper-dirs { margin-top: 8px; }
+.helper-dirs .pill-small { min-height: 44px; height: auto; }

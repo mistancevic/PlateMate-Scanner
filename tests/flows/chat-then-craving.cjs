@@ -25,10 +25,9 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   expect("the Plate tab opens the plate", String(await page.locator(".plate-card").count()), "1");
   expect("the amounts button is code, not chat", String(await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count()), "1");
   await fab(); expect("Mealan on a plate with food is about the plate", (await page.locator(".sheet .card-top span").first().textContent()).trim(), "Chef Mealan, about this plate");
-  await page.getByRole("button", { name: /Talk to Chef Mealan/ }).click(); await page.waitForTimeout(300);
-  expect("and can hand over to the conversation", await page.locator(".talk-overlay h2").textContent(), "Chef Mealan");
-  // Changed by story DT153 (0.2.132, board Stories105): from the Plate the chat's head says Back to the plate
-  await page.locator(".talk-overlay .chat-head").getByRole("button", { name: "Back to the plate" }).click(); await page.waitForTimeout(300);
+  // DT286 (0.3.142, board Stories215): one conversation; the sheet sends nowhere else
+  expect("the sheet has no second chat", String(await page.getByRole("button", { name: /Talk to Chef Mealan/ }).count()), "0");
+  await page.locator(".sheet").getByRole("button", { name: "Close" }).first().click(); await page.waitForTimeout(300);
   await require("./foods.cjs")(page); await nav("Plate"); expect("Plate tab after talking", String(await page.locator(".plate-card").count()), "1");
   if (errs.length) { console.log("page errors:", errs); process.exitCode = 1; }
   await b.close(); server.kill();

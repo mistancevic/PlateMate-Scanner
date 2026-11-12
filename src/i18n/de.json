@@ -22384,6 +22384,62 @@
     "today.undone": {
       "text": "Rückgängig gemacht: {title} ist nicht mehr eingetragen.",
       "checked": true
+    },
+    "helper.dirGoal": {
+      "text": "Besser für mein Ziel",
+      "checked": true
+    },
+    "helper.dirProtein": {
+      "text": "Anderes Protein",
+      "checked": true
+    },
+    "helper.dirCarbs": {
+      "text": "Andere Kohlenhydrate",
+      "checked": true
+    },
+    "helper.dirCrunchy": {
+      "text": "Knuspriger",
+      "checked": true
+    },
+    "helper.dirCrave": {
+      "text": "Etwas, worauf ich Lust habe",
+      "checked": true
+    },
+    "helper.dirOther": {
+      "text": "Etwas ganz anderes",
+      "checked": true
+    },
+    "helper.moreLikeThis": {
+      "text": "Mehr davon",
+      "checked": true
+    },
+    "helper.askAboutThisPlate": {
+      "text": "Frag zu diesem Teller…",
+      "checked": true
+    },
+    "helper.leftToday": {
+      "text": "heute noch {kcal} kcal und {protein} g Protein",
+      "checked": true
+    },
+    "helper.nums": {
+      "text": "{g} g · PD {from} → {to} · {kcal} kcal",
+      "checked": true
+    },
+    "helper.addAmount": {
+      "text": "+ {g} g",
+      "checked": true
+    },
+    "helper.swapAmount": {
+      "text": "Tauschen, {g} g",
+      "checked": true
+    },
+    "helper.setAmount": {
+      "text": "{g} g setzen",
+      "checked": true
+    },
+    "helper.estimate": {
+      "text": "Werte sind geschätzt",
+      "checked": true
     }
   }
 }

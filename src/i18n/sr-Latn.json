@@ -22384,6 +22384,62 @@
     "today.undone": {
       "text": "Poništeno: {title} više nije upisano.",
       "checked": true
+    },
+    "helper.dirGoal": {
+      "text": "Bolje za moj cilj",
+      "checked": true
+    },
+    "helper.dirProtein": {
+      "text": "Drugi protein",
+      "checked": true
+    },
+    "helper.dirCarbs": {
+      "text": "Drugi ugljeni hidrati",
+      "checked": true
+    },
+    "helper.dirCrunchy": {
+      "text": "Hrskavije",
+      "checked": true
+    },
+    "helper.dirCrave": {
+      "text": "Nešto što mi se jede",
+      "checked": true
+    },
+    "helper.dirOther": {
+      "text": "Nešto sasvim drugo",
+      "checked": true
+    },
+    "helper.moreLikeThis": {
+      "text": "Još ovakvih",
+      "checked": true
+    },
+    "helper.askAboutThisPlate": {
+      "text": "Pitaj o ovom tanjiru…",
+      "checked": true
+    },
+    "helper.leftToday": {
+      "text": "još {kcal} kcal i {protein} g proteina danas",
+      "checked": true
+    },
+    "helper.nums": {
+      "text": "{g} g · PD {from} → {to} · {kcal} kcal",
+      "checked": true
+    },
+    "helper.addAmount": {
+      "text": "+ {g} g",
+      "checked": true
+    },
+    "helper.swapAmount": {
+      "text": "Zameni, {g} g",
+      "checked": true
+    },
+    "helper.setAmount": {
+      "text": "Postavi {g} g",
+      "checked": true
+    },
+    "helper.estimate": {
+      "text": "vrednosti su procena",
+      "checked": true
     }
   }
 }
