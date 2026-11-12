@@ -38,6 +38,7 @@ export type LogEvent =
   | "fit_used"       // Fit to my target tapped on the Plate
   | "label_read"     // an AI label read saved: data.kept = saved without a change
   // covers and Members (0.2.15, Milan 16 October 2026, 19:23): the numbers that decide drawn or realistic, later
+  | "same_photo"     // DT285: the same photo already a meal of that day: data.how = update | both
   | "past_meal"      // DT284: a past meal changed or deleted: data.did = change | delete
   | "cover"          // data.how = drawn (Chef Mealan drew a cover) | real (a real photo replaced a drawn cover)
   | "members"        // data.how = open | make | keep | share

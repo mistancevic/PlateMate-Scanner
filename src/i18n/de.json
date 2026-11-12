@@ -22304,6 +22304,30 @@
     "yourcooks.openMeal": {
       "text": "Mahlzeit öffnen: {date}",
       "checked": true
+    },
+    "sameask.already": {
+      "text": "Dieses Foto ist schon eine Mahlzeit am {day}.",
+      "checked": true
+    },
+    "sameask.mealLine": {
+      "text": "{title}, {g} g",
+      "checked": true
+    },
+    "sameask.update": {
+      "text": "Diese Mahlzeit aktualisieren",
+      "checked": true
+    },
+    "sameask.both": {
+      "text": "Beide behalten",
+      "checked": true
+    },
+    "sameask.back": {
+      "text": "Zurück",
+      "checked": true
+    },
+    "sameask.help": {
+      "text": "Diese Mahlzeit aktualisieren: Sie übernimmt die Lebensmittel und Mengen dieses Tellers und bleibt um {time}. Beide behalten: zwei Mahlzeiten, falls du es zweimal gegessen hast.",
+      "checked": true
     }
   }
 }

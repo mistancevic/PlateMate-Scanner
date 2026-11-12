@@ -99,6 +99,8 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   ok(/^Chef Mealan: Be aware: this plate is about 2 portions of your (lunch|dinner), about [\d,]+ to [\d,]+ kcal for a (lunch|dinner) of about [\d,]+\. Eat one portion and keep the rest\./.test(big), "DT133: the big plate in portions, by code from the size line: " + big);
   ok((await page.locator(".mp-say .button-row button").allTextContents()).slice(0, 2).join() === "Ate one portion,Ate it all", "DT133: Ate one portion first, then Ate it all");
   await page.getByRole("button", { name: "Ate one portion" }).click(); await page.waitForTimeout(600);
+  // DT285 (0.3.139): the test camera gives the same picture twice, so the same photo is already the lunch; it was eaten twice
+  if (await page.locator(".same-ask").count()) { await page.locator(".same-ask").getByRole("button", { name: "Keep both" }).click(); await page.waitForTimeout(600); }
   const s4 = await st();
   const half = s4.feedback.filter((f) => f.meal.title.startsWith("Schnitzel"));
   ok(half.length === 2 && half.some((f) => f.status === "eaten" && f.meal.items[0].grams === 150) && half.some((f) => f.status === "prepared" && /the other portion$/.test(f.meal.title)), "DT133: one portion logged as eaten, the other portion kept on Today");

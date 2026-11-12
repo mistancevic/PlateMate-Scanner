@@ -5575,6 +5575,12 @@
     "screen.pastmeal.addAPhoto": {"en":"Add a photo","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
     "screen.pastmeal.saveChanges": {"en":"Save changes","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
     "screen.pastmeal.cancel": {"en":"Cancel","area":"Words used across the app","where":"Across the app","release":"0.3.138"},
-    "screen.yourcooks.openMeal": {"en":"Open the meal of {date}","area":"Recipes","where":"Recipes","release":"0.3.138"}
+    "screen.yourcooks.openMeal": {"en":"Open the meal of {date}","area":"Recipes","where":"Recipes","release":"0.3.138"},
+    "screen.sameask.already": {"en":"This photo is already a meal of {day}.","area":"Words used across the app","where":"Across the app","release":"0.3.139"},
+    "screen.sameask.mealLine": {"en":"{title}, {g} g","area":"Words used across the app","where":"Across the app","release":"0.3.139"},
+    "screen.sameask.update": {"en":"Update that meal","area":"Words used across the app","where":"Across the app","release":"0.3.139"},
+    "screen.sameask.both": {"en":"Keep both","area":"Words used across the app","where":"Across the app","release":"0.3.139"},
+    "screen.sameask.back": {"en":"Back","area":"Words used across the app","where":"Across the app","release":"0.3.139"},
+    "screen.sameask.help": {"en":"Update that meal: it takes this plate's foods and amounts, and stays at {time}. Keep both: two meals, if you ate it twice.","area":"Words used across the app","where":"Across the app","release":"0.3.139"}
   }
 }

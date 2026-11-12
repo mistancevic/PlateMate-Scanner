@@ -1,6 +1,6 @@
 {
-  "release": "0.3.138",
-  "at": "2026-11-12T07:30:36.282Z",
+  "release": "0.3.139",
+  "at": "2026-11-12T09:19:22.092Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -46617,6 +46617,115 @@
       "release": "0.3.138",
       "order": 900017,
       "at": "2026-11-12T07:30:36.282Z"
+    },
+    {
+      "id": "screen.sameask.already",
+      "kind": "screen",
+      "key": "sameask.already",
+      "en": "This photo is already a meal of {day}.",
+      "forms": "plain",
+      "slots": [
+        "day"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Ova slika je već upisana kao obrok ({day}).",
+      "de": "Dieses Foto ist schon eine Mahlzeit am {day}.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.139",
+      "order": 900000,
+      "at": "2026-11-12T09:19:22.092Z"
+    },
+    {
+      "id": "screen.sameask.mealLine",
+      "kind": "screen",
+      "key": "sameask.mealLine",
+      "en": "{title}, {g} g",
+      "forms": "plain",
+      "slots": [
+        "g",
+        "title"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "{title}, {g} g",
+      "de": "{title}, {g} g",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.139",
+      "order": 900001,
+      "at": "2026-11-12T09:19:22.092Z"
+    },
+    {
+      "id": "screen.sameask.update",
+      "kind": "screen",
+      "key": "sameask.update",
+      "en": "Update that meal",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Ažuriraj taj obrok",
+      "de": "Diese Mahlzeit aktualisieren",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.139",
+      "order": 900002,
+      "at": "2026-11-12T09:19:22.092Z"
+    },
+    {
+      "id": "screen.sameask.both",
+      "kind": "screen",
+      "key": "sameask.both",
+      "en": "Keep both",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Zadrži oba",
+      "de": "Beide behalten",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.139",
+      "order": 900003,
+      "at": "2026-11-12T09:19:22.092Z"
+    },
+    {
+      "id": "screen.sameask.back",
+      "kind": "screen",
+      "key": "sameask.back",
+      "en": "Back",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Nazad",
+      "de": "Zurück",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.139",
+      "order": 900004,
+      "at": "2026-11-12T09:19:22.092Z"
+    },
+    {
+      "id": "screen.sameask.help",
+      "kind": "screen",
+      "key": "sameask.help",
+      "en": "Update that meal: it takes this plate's foods and amounts, and stays at {time}. Keep both: two meals, if you ate it twice.",
+      "forms": "plain",
+      "slots": [
+        "time"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Ažuriraj taj obrok: uzima namirnice i količine sa ovog tanjira i ostaje u {time}. Zadrži oba: dva obroka, ako je pojedeno dva puta.",
+      "de": "Diese Mahlzeit aktualisieren: Sie übernimmt die Lebensmittel und Mengen dieses Tellers und bleibt um {time}. Beide behalten: zwei Mahlzeiten, falls du es zweimal gegessen hast.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.139",
+      "order": 900005,
+      "at": "2026-11-12T09:19:22.092Z"
     }
   ]
 }

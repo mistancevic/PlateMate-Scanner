@@ -1,6 +1,7 @@
 // DT268 steps 1 to 3 (0.3.118 to 0.3.120, board Stories201; Coach Milan 9 November 21:46 to 23:44, Go): Served on the screens. The Plate's block
 // for an Exploring plate (kept, its name and dish filled by Chef Mealan, Scan another plate: mine or someone else's); in Recipes
 // the visits, each one card; a Served plate open; and I ate this, which asks the day and the meal out loud.
+import { SamePhotoAsk } from "./SamePhotoAsk";
 import { useEffect, useState } from "react";
 import { aggregate, density, type Ingredient } from "../pilot";
 import { DISHES, visitsOf, type Dish, type Served, type Visit, type VisitMenu } from "../served";
@@ -229,8 +230,8 @@ export function ServedAte({ p, plates, title, close }: { p: AppApi; plates: Serv
     if (!sl) return;
     // on the photo's day it counts at the photo's time; on another day at that meal's time
     const at = date === photoDay ? first.at : new Date(`${date}T${sl.time}:00`).toISOString();
-    p.servedAte(plates.map((s) => s.id), { date, slotId: sl.id, name: sl.name, time: sl.time }, at);
-    close();
+    // DT285: the same photo already a meal of that day asks first, here
+    if (p.servedAte(plates.map((s) => s.id), { date, slotId: sl.id, name: sl.name, time: sl.time }, at) !== false) close();
   };
   return (
     <section className="card sv-ate-card" aria-label={w("served.whenAte")}>
@@ -252,7 +253,8 @@ export function ServedAte({ p, plates, title, close }: { p: AppApi; plates: Serv
       <div className="sv-chips" role="radiogroup" aria-label={w("served.meal")}>
         {slots.map((s) => <button key={s.id} type="button" role="radio" aria-checked={s.id === sl?.id} className={`pill pill-small${s.id === sl?.id ? " on" : ""}`} onClick={() => setSlotId(s.id)}>{mealName(s.name)}</button>)}
       </div>
-      {sl && <button type="button" className="pill pill-primary pill-wide sv-put" onClick={put}>{w("served.putIn", { day: dateV(day, { weekday: "long" }), meal: mealV(sl.name, true) })}</button>}
+      {p.sameAsk && <SamePhotoAsk ask={p.sameAsk} answer={(how) => { p.answerSameAsk(how); if (how) close(); }} />}
+      {sl && !p.sameAsk && <button type="button" className="pill pill-primary pill-wide sv-put" onClick={put}>{w("served.putIn", { day: dateV(day, { weekday: "long" }), meal: mealV(sl.name, true) })}</button>}
       <button type="button" className="link sv-cancel" onClick={close}>{w("served.cancel")}</button>
       <small className="sv-foot">{plates.length > 1 ? w("served.ateFootMany") : w("served.ateFoot")}</small>
     </section>
