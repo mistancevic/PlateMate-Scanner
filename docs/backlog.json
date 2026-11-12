@@ -1053,6 +1053,13 @@
       "epic": "trust",
       "state": "later",
       "why": "Coach Milan 12 November 14:22 and 14:25: the main action sits on the right, where the thumb is (DT279 Invite, B139 I ate it). One pass over every card and sheet. Open question from Milan: German apps often put the main action left of Cancel; one rule for all languages, or not. 14:34: action links look like text, not like something to tap (Delete this meal, Mark as handled). Rule drawn on B139: main filled blue, second white with a blue border, delete white with a red border; text links only to go somewhere or back out. 15:00: one rule for every language."
+    },
+    {
+      "id": "DT290",
+      "title": "Fill the open slots knows which dishes suit which meal",
+      "epic": "chef",
+      "state": "later",
+      "why": "Found while building DT287 (12 November): the ranking looks at PD, the slot's size and the week, not at the kind of meal, so beans and rice can come for breakfast. Learn it from where a recipe was eaten or planned before, and from the starters' meal."
     }
   ]
 }
