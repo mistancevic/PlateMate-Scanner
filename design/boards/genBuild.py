@@ -36,12 +36,12 @@ history = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join(
   stage("1", "PlateMate, the capstone", "End of August to September 2026", [
     ("What", "Milan's project for Product Faculty's AI product management certification: the four Ds, after discovery calls on healthy and fake high-protein meals."),
     ("Built with", "Claude Code."),
-    ("Live on", "A GitHub Pages site, mistancevic.github.io/platemate. Limited use, not a real app.")], "#7f8c8d"),
+    ("Live on", "GitHub Pages: GitHub builds the page from the code in the repo and hosts it at mistancevic.github.io/platemate. It runs in the browser only, no server. Limited use, not a real app.")], "#7f8c8d"),
   stage("2", "A scanner in Google AI Studio", "21 to 28 September", [
     ("What", "Nutrition XP Scanner: Gemini reads a label and scores protein against calories. Renamed Chef Mealan on 22 September."),
     ("Built with", "Google AI Studio, then ChatGPT Codex (a pull request), then Claude from 23 September."),
     ("Data", "Airtable for scanned foods and the starter foods; then Firebase sign-in and Firestore, set up by AI Studio from a prompt."),
-    ("Live on", "platemate.ai.studio, republished from AI Studio after each GitHub sync.")], "#e67e22"),
+    ("Live on", "platemate.ai.studio: AI Studio took the code from GitHub, built it and ran it on Cloud Run with a server for the Gemini key. Republished from AI Studio after each GitHub sync.")], "#e67e22"),
   stage("3", "Own production, from a terminal", "29 September to 2 November", [
     ("Live on", "chefmealan.com from 30 September: Cloud Run in Milan's own Google project, his own Gemini key."),
     ("Goes live by", "One command in Google Cloud Shell, the terminal in the browser. From 7 October: preview first, then promote, rollback in one command."),
