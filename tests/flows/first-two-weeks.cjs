@@ -73,7 +73,7 @@ const personal = (w) => ({ sex: "male", birthYear: 1981, heightCm: 182, weightKg
     const burn = await page.locator(".ft-burn").textContent();
     ok(/DAY 6 OF 14/.test(burn) && /Not enough data yet/.test(burn) && /4 of 10 needed/.test(burn) && /2 of 7 needed/.test(burn) && /Ready on Friday 23 October at the earliest/.test(burn), "FT3: measuring, 4 of 10 full days, 2 of 7 weigh-ins from day 4, ready on 23 October");
     ok(/Automatic: Mifflin St Jeor now · 2,650 kcal a day to stay the same/.test(await page.locator(".formula-line").textContent()), "FT3: the formula line with its number");
-    const fl = await page.locator(".formula-line").evaluate((e) => { const s = e.querySelector("span").getBoundingClientRect(), c = e.querySelector(".link").getBoundingClientRect(), r = e.getBoundingClientRect(); return { left: Math.round(s.left - r.left), same: Math.abs(c.top - s.top) < 30 }; });
+    const fl = await page.locator(".formula-line").evaluate((e) => { const s = e.querySelector("span").getBoundingClientRect(), c = e.querySelector("button").getBoundingClientRect(), r = e.getBoundingClientRect(); return { left: Math.round(s.left - r.left), same: Math.abs(c.top - s.top) < 30 }; });
     ok(fl.left <= 20 && fl.same, "FT0 fixed: the formula text starts at the left, Change on the same line " + JSON.stringify(fl));
     await page.setViewportSize({ width: 390, height: 3000 });
     await go(page, "/me/goal"); await page.getByRole("button", { name: /Change the goal/ }).first().click(); await page.waitForTimeout(800);

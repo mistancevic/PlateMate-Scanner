@@ -55,7 +55,9 @@ const U = "http://127.0.0.1:3242";
     const nb = await row(card.locator(".next-planned-acts button"));
     ok(nb.length === 2 && nb[0][1] === nb[1][1] && Math.abs(nb[0][2] - nb[1][2]) <= 2 && nb[0][0] - cb.x <= 16 && cb.x + cb.width - (nb[1][0] + nb[1][2]) <= 16, "B: I ate it and Change it share one row, the card's full width, equal widths");
     const ask = page.locator(".missed-ask").first(), ab = await ask.boundingBox(), mb = await row(ask.getByRole("button"));
-    ok(mb.length === 3 && new Set(mb.map((x) => x[1])).size === 1 && mb[0][0] - ab.x <= 4 && ab.x + ab.width - (mb[2][0] + mb[2][2]) <= 4, "B: Did you have it? I ate it, Change it, Skipped it, one row, edge to edge");
+    // DT289 (0.3.143): the main one on the right; the row still runs edge to edge
+    const mx = [...mb].sort((a, b) => a[0] - b[0]);
+    ok(mb.length === 3 && new Set(mb.map((x) => x[1])).size === 1 && mx[0][0] - ab.x <= 4 && ab.x + ab.width - (mx[2][0] + mx[2][2]) <= 4, "B: Did you have it? I ate it, Change it, Skipped it, one row, edge to edge");
     const carry = page.locator(".carry-acts button");
     ok(await carry.count() === 3 && (await carry.evaluateAll((bs) => bs.every((b) => b.classList.contains("choice") && !b.classList.contains("pill")))), "C: How did it carry you? answers are chips");
     // ---- A: the recipe page has one filled button, Make it; the Plate's food list adds are outlined ----

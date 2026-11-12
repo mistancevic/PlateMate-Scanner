@@ -52,7 +52,8 @@ const cut = () => [...document.querySelectorAll("button, .pill")].filter((e) => 
     if (await acts.count() === 3) {
       const r = await acts.evaluateAll((es) => es.map((e) => { const q = e.getBoundingClientRect(); const rg = document.createRange(); rg.selectNodeContents(e); const tops = new Set([...rg.getClientRects()].filter((x) => x.width > 1).map((x) => Math.round(x.top))); return { top: Math.round(q.top), w: Math.round(q.width), lines: tops.size, t: e.textContent.trim() }; }));
       ok(r.every((x) => x.lines === 1), "each Today button stays on one line: " + r.map((x) => `${x.t} (${x.lines})`).join(", "));
-      ok(r[0].top < r[1].top && r[1].top === r[2].top, "the main button takes its own row, the other two share the next");
+      // DT289 (0.3.143): the main button comes last, on its own row; the other two share the row above
+      ok(r[0].top > r[1].top && r[1].top === r[2].top, "the main button takes its own row, after the other two");
       ok(/Mittagessen|Frühstück|Abendessen|Snack/.test(r[0].t), "the meal keeps its capital: " + r[0].t);
     } else ok(false, "Today shows the three buttons of an empty day");
     ok((await page.evaluate(cut)).length === 0, "no button is cut on Today");
