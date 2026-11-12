@@ -5555,6 +5555,8 @@
     "screen.yourcooks.yourWords": {"en":"Your words:","area":"Recipes","where":"Recipes","release":"0.3.135"},
     "screen.recipe.addToRecipePhotos": {"en":"Add to the recipe's photos","area":"Recipes","where":"Recipes","release":"0.3.135"},
     "screen.recipe.addToRecipePhotosWhy": {"en":"It goes into the recipe's gallery. The cover is chosen there.","area":"Recipes","where":"Recipes","release":"0.3.135"},
-    "screen.recipe.inRecipePhotos": {"en":"In the recipe's photos","area":"Recipes","where":"Recipes","release":"0.3.135"}
+    "screen.recipe.inRecipePhotos": {"en":"In the recipe's photos","area":"Recipes","where":"Recipes","release":"0.3.135"},
+    "screen.recipe.whoMadeIt": {"en":"Who made it?","area":"Recipes","where":"Recipes","release":"0.3.137"},
+    "screen.recipe.aiTag": {"en":"AI","area":"Recipes","where":"Recipes","release":"0.3.137"}
   }
 }

@@ -2,7 +2,8 @@
 // of the recipe in one row, the cover first; a step number on a step's photo. The cover is chosen in the gallery: a tap
 // picks a photo, and under the row come Make it the cover, On step (or No step) and Delete this photo. 12 photos per recipe,
 // steps included: when 12 are in, Add goes and the line says the gallery is full; a photo taken while cooking then stays
-// with the cook. Srpski and German fit 360 px.
+// with the cook. Srpski and German fit 360 px. DT283 (0.3.137): a picked photo asks Who made it?; Drawn by AI shows as an
+// AI tag in the gallery, AI · Beta on the cover and on its step.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path"), zlib = require("node:zlib");
@@ -97,12 +98,34 @@ const me = (k) => ({ by: "me", step: STEPS[k] });
     const x = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals[0]);
     ok(!(x.stepPicMeta || []).some((y) => y && y.step === "Serve.") && await page.locator(".mk-step").nth(2).locator(".mk-pic").count() === 1, "a full gallery: a photo taken while cooking shows on its step in Make, and stays with the cook");
     await ctx.close();
+    // ---- DT283 (0.3.137, board Stories210): Who made it?, chosen in the gallery ----
+    ({ ctx, page } = await open(base({ photo: D(1), photos: [D(2)], stepPics: [D(3), null, null], stepPicMeta: [me(0), null, null] })));
+    const gp = page.locator(".rq-gal-pick"), tags = page.locator(".rq-thumbs .rq-ai-tag");
+    await page.locator(".rq-thumbs .rq-thumb").nth(1).locator("button").click(); await page.waitForTimeout(300);
+    ok(await gp.getByText("Who made it?").count() === 1 && await gp.getByRole("button", { name: "My photo" }).getAttribute("aria-pressed") === "true" && await tags.count() === 0, "a picked photo asks Who made it?; My photo is chosen; no AI tags");
+    await gp.getByRole("button", { name: "Drawn by AI" }).click(); await page.waitForTimeout(500);
+    ok(await gp.getByRole("button", { name: "Drawn by AI" }).getAttribute("aria-pressed") === "true" && await page.locator(".rq-thumbs .rq-thumb").nth(1).locator(".rq-ai-tag").textContent() === "AI", "Drawn by AI: the photo carries the AI tag in the gallery");
+    let mm = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals[0]);
+    ok(Array.isArray(mm.photoAi) && mm.photoAi.length === 1, "the recipe keeps which own photo was drawn by AI");
+    await gp.getByRole("button", { name: "Make it the cover" }).click(); await page.waitForTimeout(500);
+    ok(/AI · Beta/.test(await page.locator(".rq-hero").first().textContent()), "as the cover, the big photo says AI · Beta");
+    await page.reload(); await page.waitForTimeout(1500);
+    ok(await page.locator(".rq-thumbs .rq-thumb").nth(0).locator(".rq-ai-tag").count() === 1, "opened again: still marked");
+    // a step photo: marked on its step, where cook mode reads it
+    await page.locator(".rq-thumbs .rq-thumb").nth(2).locator("button").click(); await page.waitForTimeout(300);
+    await gp.getByRole("button", { name: "Drawn by AI" }).click(); await page.waitForTimeout(500);
+    mm = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals[0]);
+    ok(mm.stepPicMeta[0].by === "ai" && /AI · Beta/.test(await page.locator(".rq-steps .rp-steps li").nth(0).textContent()), "a step photo marked Drawn by AI: its step says AI · Beta");
+    await gp.getByRole("button", { name: "My photo" }).click(); await page.waitForTimeout(500);
+    mm = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals[0]);
+    ok(mm.stepPicMeta[0].by === "me" && await tags.count() === 1, "back to My photo: the mark goes");
+    await ctx.close();
     // ---- Srpski and German, the choices open ----
     for (const [lang, width] of [["sr-Latn", 390], ["de", 360]]) {
       ({ ctx, page } = await open(base({ photo: D(1), photos: [D(2)], stepPics: [D(3), null, D(5)], stepPicMeta: [me(0), null, me(2)] }), width, lang));
       await page.locator(".rq-thumbs .rq-thumb").nth(2).locator("button").click(); await page.waitForTimeout(300);
       const t = await page.locator(".rq-gal-pick").textContent() + (await page.locator(".rq-hint").textContent());
-      ok(!/Make it the cover|On step|No step|Delete this photo|Photos: \d/.test(t) && await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${lang}: the gallery and its choices in the language, fit ${width} px: ` + t.slice(0, 80));
+      ok(!/Make it the cover|On step|No step|Delete this photo|Who made it|My photo|Drawn by AI|Photos: \d/.test(t) && await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${lang}: the gallery and its choices in the language, fit ${width} px: ` + t.slice(0, 80));
       if (process.env.SHOT && lang === "de") await page.screenshot({ path: process.env.SHOT });
       await ctx.close();
     }

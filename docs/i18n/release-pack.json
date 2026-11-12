@@ -1,6 +1,6 @@
 {
-  "release": "0.3.135",
-  "at": "2026-11-11T20:44:30.516Z",
+  "release": "0.3.137",
+  "at": "2026-11-12T06:53:01.235Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -46269,6 +46269,40 @@
       "release": "0.3.135",
       "order": 900005,
       "at": "2026-11-11T20:44:30.516Z"
+    },
+    {
+      "id": "screen.recipe.whoMadeIt",
+      "kind": "screen",
+      "key": "recipe.whoMadeIt",
+      "en": "Who made it?",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Ko je napravio sliku?",
+      "de": "Wer hat es gemacht?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.137",
+      "order": 900000,
+      "at": "2026-11-12T06:53:01.235Z"
+    },
+    {
+      "id": "screen.recipe.aiTag",
+      "kind": "screen",
+      "key": "recipe.aiTag",
+      "en": "AI",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "AI",
+      "de": "KI",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.137",
+      "order": 900001,
+      "at": "2026-11-12T06:53:01.235Z"
     }
   ]
 }

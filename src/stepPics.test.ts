@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { looseMissing, photosOf, photosWanted, withPhotos, withoutStored, isOrphan, stepPicOf, stepPicsOf, galleryOf, placePhoto, makeCover, deletePhoto, addStepPic, removeStepPic, firstStepPic, setStepPic, alignStepPics, allStepPics, stepPicSigsOf, sig } from "./photos";
+import { looseMissing, photosOf, photosWanted, withPhotos, withoutStored, isOrphan, stepPicOf, stepPicsOf, galleryOf, placePhoto, makeCover, deletePhoto, setPhotoBy, addStepPic, removeStepPic, firstStepPic, setStepPic, alignStepPics, allStepPics, stepPicSigsOf, sig } from "./photos";
 import { clean } from "./records";
 import { stripPhotos } from "./cloud";
 
@@ -138,4 +138,29 @@ test("missing photos: where each sits, with its time", () => {
   const s = { photo: { image: "pf:aaa111", more: ["pf:bbb222"], at: "2026-11-11T13:11:00" }, later: [{ id: "l1", at: "2026-11-10T09:00:00", photo: { image: "pf:ccc333" } }], cook: { startedAt: "2026-11-11T12:00:00", ui: { stepPhotos: { "1": "pf:ddd444" } } }, meals: [{ id: "m", photo: "pf:zzz" }] };
   const m = looseMissing(s);
   assert.deepEqual(m.map((x) => [x.where, x.key, x.at]), [["photo", "loose:aaa111", "2026-11-11T13:11:00"], ["photo", "loose:bbb222", "2026-11-11T13:11:00"], ["later", "loose:ccc333", "2026-11-10T09:00:00"], ["cook", "loose:ddd444", "2026-11-11T12:00:00"]], "recipes are not loose photos");
+});
+
+// DT283 (0.3.137): who made a photo, chosen in the gallery
+test("Drawn by AI in the gallery: marked on its steps and as an own photo, kept when it moves, gone when it goes", () => {
+  const D = "data:image/jpeg;base64,DDDD";
+  let m: any = { ...meal(), photo: D, photos: [] };
+  m = { ...m, ...setStepPic(m, 0, { src: A, by: "me" }) };
+  assert.equal(galleryOf(m)[0].by, "me", "a photo added to the recipe is yours");
+  const a1 = { ...m, ...setPhotoBy(m, D, "ai") };
+  assert.deepEqual(a1.photoAi, [sig(D)]); assert.equal(galleryOf(a1)[0].by, "ai");
+  assert.equal({ ...a1, ...setPhotoBy(a1, D, "me") }.photoAi.length, 0, "back to My photo");
+  // a step photo: marked on the step, the label cook mode reads
+  const a2 = { ...m, ...setPhotoBy(m, A, "ai") };
+  assert.equal(stepPicOf(a2, steps[0])!.by, "ai"); assert.equal(a2.photoAi, undefined);
+  // moved off its step into the own photos: still drawn by AI
+  const a3 = { ...a2, ...placePhoto(a2, A, null) };
+  assert.equal(galleryOf(a3).find((x) => x.src === A)!.by, "ai"); assert.deepEqual(a3.photoAi, [sig(A)]);
+  // an own photo onto a step: the step says so
+  const a4 = { ...a1, ...placePhoto(a1, D, 1) };
+  assert.equal(stepPicOf(a4, steps[1])!.by, "ai");
+  // a step picture drawn by AI made the cover: still marked
+  const a5 = { ...a2, ...makeCover(a2, A) };
+  assert.equal(a5.photo, A); assert.equal(galleryOf(a5)[0].by, "ai"); assert.deepEqual(a5.photoAi, [sig(A)]);
+  // deleted: the mark goes too
+  assert.equal({ ...a1, ...deletePhoto(a1, D) }.photoAi.length, 0);
 });

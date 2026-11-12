@@ -918,6 +918,23 @@
       "board": "Stories209",
       "version": "0.3.135",
       "why": "Coach Milan 11 November 20:45 to 20:46, on a call with a tester: the Your cooks block looks clickable and leads nowhere. A tap on a cook's photo opens that cook (as a past meal from Plan); Add to the recipe's photos puts it in the gallery; the row of offered photos goes. To draw."
+    },
+    {
+      "id": "DT283",
+      "title": "Drawn by AI, chosen in the gallery: Who made it? under a picked photo; AI tag on the thumb and the cover",
+      "epic": "recipes",
+      "state": "done",
+      "board": "Stories210",
+      "version": "0.3.137",
+      "why": "Coach Milan 12 November 07:08 (draw) and 07:44 (Go). Only a step's own sheet asked who made a picture; a photo added in the gallery counted as yours and the gallery never showed which were drawn by AI. The recipe's own photos keep who made them in photoAi, by fingerprint."
+    },
+    {
+      "id": "DT284",
+      "title": "A past meal: Change it and Delete this meal; the rows of Every time you ate it open their meal",
+      "epic": "recipes",
+      "state": "drawn",
+      "board": "Stories211",
+      "why": "Coach Milan 12 November 07:55, on a call with a tester: one meal recorded twice because a past meal can't be changed (Cook it again made a second one). Drawn with a clickable prototype (artifact DT284 Prototype). Waits for Go."
     }
   ]
 }
