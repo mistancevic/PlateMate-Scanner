@@ -101,13 +101,16 @@ def row(rid, title, parts, shots, nid=None, at=0):
     c = storyCard(B, y, rid, title, parts)
     hs = [B.screen(f"{nid or rid}{chr(97 + at + i)}", i, y, t, n, st, wd) for i, (t, n, st, wd) in enumerate(shots)]
     y = rowEnd(c, *hs)
-row("B139", "A ✓ only on what is done", [
-  ("Coach Milan, 12 November 14:02 and 14:06", "The blue I ate it has a ✓, so it looks checked and done, though it is the button to tap first. Draw it first, to agree on the look."),
-  ("The rule", "A button still to tap gets no ✓. The blue fill already says it is the main thing to tap. A ✓ shows only on what is done."),
-  ("Where", "I ate it in Next and in What's in the plan on Today, on a past day, and on the recipe page. Plan and the Plate get the same check, so no other button to tap carries a ✓."),
-  ("After the tap", "The meal moves to Today's meals, as today. Its tag says it with the ✓: ✓ Eaten, by the plan."),
-  ("Size", "Small. The ✓ comes off four buttons; one tag gets it. One line changes in three languages."),
-], [("Now: Today, Next", "rb139a", "draft", "✓ I ate it looks done."), ("New: Today, Next", "rb139b", "changed", "I ate it, no ✓."), ("New: Today, after the tap", "rb139c", "changed", "✓ Eaten, by the plan.")])
-board("Stories214.dc.html", "B139. A ✓ only on what is done",
-  "12 November 2026 (Coach Milan 14:02, a screenshot of Today; 14:06: draw first). Drawn for approval.",
+row("B139", "A ✓ only on what is done; the main button on the right", [
+  ("Coach Milan, 12 November 14:02, 14:06, 14:22 and 14:25", "The blue I ate it has a ✓, so it looks done, though it is the button to tap first. The main button sits on the left. And a wrong I ate it is hard to fix from Today."),
+  ("The rule", "A button still to tap gets no ✓; a ✓ shows only on what is done. On this card the main button sits on the right: Change it on the left, I ate it on the right. One pass over the whole app is its own card."),
+  ("After the tap", "The message says Logged, as planned, with Undo for a wrong tap. In Today's meals the tag says ✓ Eaten, by the plan."),
+  ("Where", "I ate it in Next and What's in the plan on Today, on a past day and on the recipe page."),
+], [("Now: Today, Next", "rb139a", "draft", "✓ I ate it, on the left, looks done."), ("New: Today, Next", "rb139b", "changed", "Change it left, I ate it right, no ✓."), ("New: Today, after the tap", "rb139c", "changed", "Undo; ✓ Eaten, by the plan.")])
+row("B139", "A wrong I ate it, fixed from Today", [
+  ("Tap the eaten meal", "In Today's meals, tapping the meal opens that meal, not the recipe: the same screen as from the recipe (DT284), with Change it, and Delete this meal with Sure? first. Back goes to Today. Open the recipe stays as a link on the row."),
+  ("Size", "Small to medium. The ✓ and the order on four buttons, Undo in one message, and Today's meals opening the meal. A few new lines in three languages."),
+], [("New: the eaten meal, from Today", "rb139d", "changed", "Change it, or Delete this meal.")], at=3)
+board("Stories214.dc.html", "B139. A ✓ only on what is done; the main button on the right",
+  "12 November 2026 (Coach Milan 14:02, a screenshot of Today; 14:06: draw first; 14:25: redraw with the main button on the right, Undo, and the meal opened from Today). Drawn for approval.",
   B, W, y - 100, "Stories213.dc.html")

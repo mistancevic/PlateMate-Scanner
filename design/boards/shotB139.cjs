@@ -35,20 +35,32 @@ const mark = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px", 
   console.log(await p.evaluate(() => [...document.querySelectorAll("button")].filter((x) => /I ate it|Change it/.test(x.textContent)).map((x) => x.id + ":" + x.textContent).join(" | ")));
   await markIt(p, "#ate0"); await noteAt(p, "Now (0.3.140): the blue I ate it has a ✓, so it reads as done, though it is the button to tap.", "#ate0");
   await shot(p, "rb139a", "#ate0", 520);
-  p = await open(); await btns(p); await noCheck(p); await markIt(p, "#ate0");
-  await noteAt(p, "New: no ✓ on a button still to tap. The blue fill says it is the main thing to tap.", "#ate0");
+  p = await open(); await btns(p); await noCheck(p);
+  await p.evaluate(() => { const a = document.querySelector("#ate0"); a.parentElement.appendChild(a); });
+  await markIt(p, "#ate0");
+  await noteAt(p, "New: Change it on the left, I ate it on the right, where the thumb is. No ✓ on a button still to tap: the blue fill says it is the main thing.", "#ate0");
   await shot(p, "rb139b", "#ate0", 520);
-  // after the tap: the meal is in Today's meals; the ✓ belongs there, on what is done
+  // after the tap: Undo in the message; the ✓ on what is done; the meal opens to be changed
   p = await open(); await btns(p); await p.locator("#ate0").click(); await p.waitForTimeout(1200);
   await p.evaluate(({ mark }) => { const t = [...document.querySelectorAll("main *")].find((e) => e.children.length === 0 && e.textContent.trim() === "By the plan");
-    t.textContent = "✓ Eaten, by the plan"; t.id = "done0"; t.style.cssText += ";" + mark; }, { mark });
-  await noteAt(p, "New, after the tap: the meal moves to Today's meals, and the ✓ shows there: ✓ Eaten, by the plan. A ✓ means done, never to do.", "#done0");
-  await shot(p, "rb139c", "#done0", 420);
-  // the recipe page: the same I ate it, the same rule
-  p = await open(); await p.goto(U + "/my-recipes/sarma"); await p.waitForTimeout(1500);
+    t.textContent = "✓ Eaten, by the plan"; t.id = "done0"; t.style.cssText += ";" + mark;
+    const row = t.closest(".log-card"); row.style.cssText += ";" + mark; row.insertAdjacentHTML("beforeend", '<small style="display:block;margin-top:6px;font-size:14px;color:#1f5fc7;font-weight:800">Tap to change or delete it ›</small>');
+    const all = [...document.querySelectorAll("body *")].filter((e) => /^Logged, as planned/.test((e.textContent || "").trim()));
+    const toast = all[all.length - 1]; console.log("toast", toast && toast.outerHTML.slice(0, 200));
+    if (toast) { toast.textContent = "Logged, as planned. "; toast.insertAdjacentHTML("beforeend", '<button class="link" style="min-height:44px;font-weight:900;margin-left:8px;text-decoration:underline">Undo</button>'); toast.style.cssText += ";" + mark; } }, { mark });
+  await noteAt(p, "New, after the tap: Undo in the message, for a wrong tap. In Today's meals the ✓ shows on what is done, and the meal opens to change or delete it.", "#done0");
+  await p.evaluate(() => window.scrollTo(0, document.querySelector("#done0").getBoundingClientRect().top + window.scrollY - 420)); await p.waitForTimeout(300);
+  await p.screenshot({ path: `${R}/rb139c.png` }); console.log("shot rb139c");
+  // the meal it opens: the same screen as DT284, with Change it and Delete this meal
+  await p.goto(U + "/my-recipes/sarma"); await p.waitForTimeout(1500);
   await p.evaluate(() => { const f = document.querySelector(".chat-fab"); if (f) f.style.visibility = "hidden"; });
-  const n = await p.evaluate(() => [...document.querySelectorAll("button")].filter((x) => /I ate it/.test(x.textContent)).length);
-  console.log("recipe I ate it buttons", n);
-  if (n) { await btns(p); await noCheck(p); await markIt(p, "#ate0"); await noteAt(p, "New: the recipe page's I ate it, the same: no ✓ until it is done.", "#ate0"); await shot(p, "rb139d", "#ate0", 420); } else await p.context().close();
+  await p.locator(".rq-eats .re-open").first().click(); await p.waitForTimeout(800);
+  await p.evaluate(({ mark }) => { const b = document.querySelector(".past-meal .pm-back"); if (b) b.textContent = "‹ Today";
+    const h = document.querySelector("header h1"); if (h) h.textContent = "Today";
+    const nb = [...document.querySelectorAll(".bottom-nav button")]; const on = nb.find((x) => x.classList.contains("on") || x.getAttribute("aria-current")); const td = nb.find((x) => /Today/.test(x.textContent));
+    if (on && td && on !== td) { for (const a of ["class", "aria-current"]) { const v1 = on.getAttribute(a), v2 = td.getAttribute(a); if (v2 === null) on.removeAttribute(a); else on.setAttribute(a, v2); if (v1 === null) td.removeAttribute(a); else td.setAttribute(a, v1); } } const e = document.querySelector(".past-meal .pm-edit"); if (e) e.style.cssText += ";" + mark + ";padding:6px"; }, { mark });
+  await noteAt(p, "New: the eaten meal, opened from Today: the same screen as from the recipe (DT284). Change it, or Delete this meal with Sure? first. Back goes to Today.", ".past-meal");
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(300);
+  await p.screenshot({ path: `${R}/rb139d.png` }); console.log("shot rb139d"); await p.context().close();
   await b.close(); server.kill();
 })();
