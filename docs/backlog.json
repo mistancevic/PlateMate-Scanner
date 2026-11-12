@@ -1037,7 +1037,8 @@
       "title": "I ate it shows a ✓ before it is done",
       "epic": "home",
       "state": "next",
-      "why": "Coach Milan 12 November 14:02, with a screenshot of Today: the blue I ate it with a ✓ reads as already done, though it is the button to tap. The ✓ sits on I ate it in Next and What's in the plan on Today and on the recipe page. Suggested: no ✓ on a button still to tap; a ✓ only once done. Waits for Go."
+      "why": "Coach Milan 12 November 14:02, with a screenshot of Today: the blue I ate it with a ✓ reads as already done, though it is the button to tap. The ✓ sits on I ate it in Next and What's in the plan on Today and on the recipe page. Suggested: no ✓ on a button still to tap; a ✓ only once done. 14:06: draw first, to agree on the look. Drawn 12 November (Stories214): no ✓ on a button to tap; ✓ Eaten, by the plan once done. Waits for Go.",
+      "board": "Stories214"
     }
   ]
 }
