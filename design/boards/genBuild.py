@@ -27,6 +27,34 @@ def box(title, color, lines, w=360):
     return (f'<div style="width:{w}px;flex:none;box-sizing:border-box;border:2px solid {color};border-radius:12px;padding:10px 12px;background:#fff">'
             f'<b style="font-size:15px;color:{color}">{e(title)}</b>' + "".join(f'<div style="font-size:13.5px;line-height:1.45;color:#172742;margin-top:4px">{l}</div>' for l in lines) + "</div>")
 
+def stage(n, title, when, items, color):
+    rows = "".join(f'<div style="margin-top:6px"><div style="font-size:11.5px;font-weight:900;color:#5b6b8a;text-transform:uppercase;letter-spacing:.04em">{e(k)}</div><div style="font-size:13.5px;line-height:1.42;color:#172742">{v}</div></div>' for k, v in items)
+    return (f'<div style="width:272px;flex:none;box-sizing:border-box;border:2px solid {color};border-radius:14px;padding:10px 12px;background:#fff">'
+            f'<div style="display:flex;gap:8px;align-items:center"><span style="flex:none;background:{color};color:#fff;border-radius:8px;padding:2px 8px;font-weight:900;font-size:13px">{e(n)}</span><b style="font-size:15.5px;line-height:1.25">{e(title)}</b></div>'
+            f'<div style="font-size:13px;font-weight:800;color:{color};margin-top:4px">{e(when)}</div>{rows}</div>')
+history = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join([
+  stage("1", "PlateMate, the capstone", "End of August to September 2026", [
+    ("What", "Milan's project for Product Faculty's AI product management certification: the four Ds, after discovery calls on healthy and fake high-protein meals."),
+    ("Built with", "Claude Code."),
+    ("Live on", "A GitHub Pages site, mistancevic.github.io/platemate. Limited use, not a real app.")], "#7f8c8d"),
+  stage("2", "A scanner in Google AI Studio", "21 to 28 September", [
+    ("What", "Nutrition XP Scanner: Gemini reads a label and scores protein against calories. Renamed Chef Mealan on 22 September."),
+    ("Built with", "Google AI Studio, then ChatGPT Codex (a pull request), then Claude from 23 September."),
+    ("Data", "Airtable for scanned foods and the starter foods; then Firebase sign-in and Firestore, set up by AI Studio from a prompt."),
+    ("Live on", "platemate.ai.studio, republished from AI Studio after each GitHub sync.")], "#e67e22"),
+  stage("3", "Own production, from a terminal", "29 September to 2 November", [
+    ("Live on", "chefmealan.com from 30 September: Cloud Run in Milan's own Google project, his own Gemini key."),
+    ("Goes live by", "One command in Google Cloud Shell, the terminal in the browser. From 7 October: preview first, then promote, rollback in one command."),
+    ("Way of working", "Version numbers from 2 October; boards on the canvas before code; the five-step release rule (23 October); the Kanban (2 November).")], "#1a73e8"),
+  stage("4", "Green buttons on GitHub", "From 3 November", [
+    ("Why", "Cloud Shell's weekly hours ran out and the Chromebook went away."),
+    ("Goes live by", "Preview, Promote and Rollback as GitHub Actions: Run workflow, the green button on the GitHub web page, opened from a link in the chat. GitHub signs in to Google with no key.")], "#24292f"),
+  stage("5", "A phone only, today", "November 2026", [
+    ("Goes live by", "The same buttons in the GitHub app on the phone."),
+    ("Added", "Srpski and German in every release (5 November); blind runs with a scripted new member (10 November); clickable prototypes (12 November)."),
+    ("Laptop", "In repair. Nothing in the cycle needs it.")], "#c0392b"),
+]) + '</div>'
+
 legend = '<div style="display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:10px">' + "".join(tag(k) for k in WHO) + '</div>'
 facts = [("Version", F["version"]), ("Releases", f'{F["releases"]} since 2 October, about {F["perDay"]} a day'), ("Walkthroughs", f'{F["walkthroughs"]}, each one a person in a real browser, before every release'),
          ("Unit tests", str(F["unitTests"])), ("Evals", f'{F["evalCases"]} cases in {F["evalSets"]} sets, for the AI'), ("Languages", "English, Srpski, German in every release"), ("Live since", "30 September 2026, chefmealan.com"), ("Testers", "4 in the beta, by number in the public repo")]
@@ -81,12 +109,13 @@ body = (f'<div style="width:{W}px;box-sizing:border-box;padding:22px 26px;backgr
   f'<div style="font-size:30px;font-weight:900;line-height:1.2">How Chef Mealan is built, from a phone</div>'
   f'<div style="font-size:16px;line-height:1.5;color:#3d4a63;margin-top:6px;max-width:1300px">A production app built as a product team would build it, by one product manager and Claude. Coach Milan works on his phone only. Everything else runs in the cloud: Claude, GitHub and Google. As of {F["version"]}, 12 November 2026.</div>'
   + legend + '<div style="margin-top:16px">' + factrow + '</div>'
-  + section("One change, from idea to live", "Ten steps, the same for every change. Steps 1 to 5 decide what to build; steps 6 to 10 build it and put it live. Nothing is built before Go, and nothing goes live without Milan's tap.", loop1 + loop2 + loopnote)
+  + section("How we got here", "From a course project to a production app in about ten weeks. The code moved from AI Studio to Claude; going live moved from a terminal to buttons on GitHub; Milan moved from a Chromebook to a phone.", history)
+  + section("One change, from idea to live, today", "Ten steps, the same for every change. Steps 1 to 5 decide what to build; steps 6 to 10 build it and put it live. Nothing is built before Go, and nothing goes live without Milan's tap.", loop1 + loop2 + loopnote)
   + section("The tools, and where each runs", "Nothing runs on a laptop. Every tool is opened from the phone, or runs in the cloud on Claude's side or Google's.", tools)
   + section("A course setup, and this project", "The Turing College course Building with AI agents teaches a laptop setup. This project does the same cycle without one.", compare)
   + section("The app, as it runs", "Four parts. The person's phone holds the app and their data first; the server holds the AI key and the rules.", app)
   + '</div>')
-H = 2290
+H = 2900
 page = f'''<!doctype html>
 <html lang="en">
 <head>
