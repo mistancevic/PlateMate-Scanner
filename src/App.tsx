@@ -123,7 +123,7 @@ import { asMine, travels, toShare } from "./memberFoods";
 import { cleanRead, itemsOfRead } from "./mealPhoto";
 import { dishOf, visitFor, upsertServed, withNote, mealItems, mealTitle, cleanMenu, applyMenu, withMenuLine, withoutMenuLine, type Served, type OnPlate, type VisitMenu } from "./served";
 import { identityTwins } from "./foodId";
-import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
+import { findReference, referenceFood, localName, otherNames, marketFoods, foodV } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
 import { fitnessFor, SOURCES, dayName } from "./fitness";
@@ -2874,8 +2874,9 @@ export default function App() {
     },
     askAboutMix: (food: Food, tip: MixTip) => {
       log("mix_ask", { food: food.name, moment, case: tip.case, offered: tip.mixes.map(mixLabel) });
-      const offered = tip.mixes.length ? ` You suggested ${tip.mixes.map(mixLabel).join("; ")}.` : "";
-      setMixQuestion(`I scanned ${food.name} for ${momentOf(moment).name.toLowerCase()}.${offered} What I'd change: `);
+      // B137 (0.3.140; Coach Milan 12 November 13:30, Go 13:33): the question written into the field speaks the app's language
+      const offered = tip.mixes.length ? ` ${w("app.askYouSuggested", { mixes: tip.mixes.map(mixLabel).join("; ") })}` : "";
+      setMixQuestion(`${w("app.askScanned", { food: foodV(food), meal: (l) => (l === "de" ? momentOf(moment).name : momentOf(moment).name.toLowerCase()) })}${offered} ${w("app.askWhatIdChange")} `);
       setState((s) => (s.items.some((i) => i.food.id === food.id) ? s : { ...s, items: [...s.items, { id: uid(), food, grams: PORTION[jobOf(food).job], locked: true } as Ingredient], portion: null }));
       setStep("in"); setTab("journey");
     },

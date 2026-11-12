@@ -6180,5 +6180,9 @@
   "certs.ai-mastery.line": "The AI side of the builder.",
   "certs.business.name": "Certified Business Coach",
   "certs.business.line": "Coaching coaches on the business with Chef Mealan.",
-  "yourcooks.changedStillOneMeal": "✓ Changed. Still one meal, at {time}."
+  "yourcooks.changedStillOneMeal": "✓ Changed. Still one meal, at {time}.",
+  "app.askScanned": "I scanned {food} for {meal}.",
+  "app.askYouSuggested": "You suggested {mixes}.",
+  "app.askWhatIdChange": "What I'd change:",
+  "helper.iDontHave": "I don't have {food}. What instead?"
 }

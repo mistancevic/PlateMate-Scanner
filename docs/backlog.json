@@ -998,8 +998,9 @@
       "id": "B137",
       "title": "Chef Mealan on the Plate writes its question into the field in English",
       "epic": "lang",
-      "state": "next",
-      "why": "Coach Milan 12 November 13:30, with a screenshot in Srpski: opened from a scanned food, the field says I scanned Orijenta salata for regular meal. You suggested... What I'd change:. The swap question I don't have X. What instead? is English too. Both are fixed English sentences in the code (App askAboutMix, PlateHelper). Reproduced in the code. Waits for Go."
+      "state": "done",
+      "why": "Coach Milan 12 November 13:30, with a screenshot in Srpski: opened from a scanned food, the field says I scanned Orijenta salata for regular meal. You suggested... What I'd change:. The swap question I don't have X. What instead? is English too. Both are fixed English sentences in the code (App askAboutMix, PlateHelper). Reproduced in the code. Go 12 November 13:33. Both questions are now lines in Srpski, German and English. Food names inside them stay as the food list has them: that part is DT286.",
+      "version": "0.3.140"
     },
     {
       "id": "DT286",

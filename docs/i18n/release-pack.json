@@ -1,6 +1,6 @@
 {
   "release": "0.3.140",
-  "at": "2026-11-12T12:26:02.398Z",
+  "at": "2026-11-12T12:34:44.428Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -46745,6 +46745,81 @@
       "release": "0.3.140",
       "order": 900000,
       "at": "2026-11-12T12:26:02.398Z"
+    },
+    {
+      "id": "screen.app.askScanned",
+      "kind": "screen",
+      "key": "app.askScanned",
+      "en": "I scanned {food} for {meal}.",
+      "forms": "plain",
+      "slots": [
+        "food",
+        "meal"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Skenirano: {food} ({meal}).",
+      "de": "Gescannt: {food} ({meal}).",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900000,
+      "at": "2026-11-12T12:34:44.428Z"
+    },
+    {
+      "id": "screen.app.askYouSuggested",
+      "kind": "screen",
+      "key": "app.askYouSuggested",
+      "en": "You suggested {mixes}.",
+      "forms": "plain",
+      "slots": [
+        "mixes"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Tvoj predlog: {mixes}.",
+      "de": "Dein Vorschlag: {mixes}.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900001,
+      "at": "2026-11-12T12:34:44.428Z"
+    },
+    {
+      "id": "screen.app.askWhatIdChange",
+      "kind": "screen",
+      "key": "app.askWhatIdChange",
+      "en": "What I'd change:",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Moja izmena:",
+      "de": "Was ich ändern würde:",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900002,
+      "at": "2026-11-12T12:34:44.428Z"
+    },
+    {
+      "id": "screen.helper.iDontHave",
+      "kind": "screen",
+      "key": "helper.iDontHave",
+      "en": "I don't have {food}. What instead?",
+      "forms": "plain",
+      "slots": [
+        "food"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Nemam {food}. Šta umesto toga?",
+      "de": "{food} habe ich nicht da. Was stattdessen?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.140",
+      "order": 900003,
+      "at": "2026-11-12T12:34:44.428Z"
     }
   ]
 }

@@ -22332,6 +22332,22 @@
     "yourcooks.changedStillOneMeal": {
       "text": "✓ Izmenjeno. I dalje jedan obrok, u {time}.",
       "checked": true
+    },
+    "app.askScanned": {
+      "text": "Skenirano: {food} ({meal}).",
+      "checked": true
+    },
+    "app.askYouSuggested": {
+      "text": "Tvoj predlog: {mixes}.",
+      "checked": true
+    },
+    "app.askWhatIdChange": {
+      "text": "Moja izmena:",
+      "checked": true
+    },
+    "helper.iDontHave": {
+      "text": "Nemam {food}. Šta umesto toga?",
+      "checked": true
     }
   }
 }

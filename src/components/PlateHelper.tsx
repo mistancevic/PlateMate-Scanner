@@ -21,7 +21,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
   apply: (next: Ingredient[], note: string) => void; close: () => void; setError: (m: string) => void; openTalk?: () => void; record?: (q: string, reply: string, plate: string[]) => void;
   safety: Safety; ai: AiState; onFlag: (s: SituationId) => void;
 }) {
-  const [q, setQ] = useState(prefill ?? (missing ? `I don't have ${missing.food.name}. What instead?` : ""));
+  const [q, setQ] = useState(prefill ?? (missing ? w("helper.iDontHave", { food: foodV(missing.food) }) : ""));
   // suggestions taken in this conversation: the helper stays open, so a second one can be added
   const [taken, setTaken] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);

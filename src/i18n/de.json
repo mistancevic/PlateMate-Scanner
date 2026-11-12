@@ -22332,6 +22332,22 @@
     "yourcooks.changedStillOneMeal": {
       "text": "✓ Geändert. Weiterhin eine Mahlzeit, um {time}.",
       "checked": true
+    },
+    "app.askScanned": {
+      "text": "Gescannt: {food} ({meal}).",
+      "checked": true
+    },
+    "app.askYouSuggested": {
+      "text": "Dein Vorschlag: {mixes}.",
+      "checked": true
+    },
+    "app.askWhatIdChange": {
+      "text": "Was ich ändern würde:",
+      "checked": true
+    },
+    "helper.iDontHave": {
+      "text": "{food} habe ich nicht da. Was stattdessen?",
+      "checked": true
     }
   }
 }

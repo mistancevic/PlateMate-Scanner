@@ -5582,6 +5582,10 @@
     "screen.sameask.both": {"en":"Keep both","area":"Words used across the app","where":"Across the app","release":"0.3.139"},
     "screen.sameask.back": {"en":"Back","area":"Words used across the app","where":"Across the app","release":"0.3.139"},
     "screen.sameask.help": {"en":"Update that meal: it takes this plate's foods and amounts, and stays at {time}. Keep both: two meals, if you ate it twice.","area":"Words used across the app","where":"Across the app","release":"0.3.139"},
-    "screen.yourcooks.changedStillOneMeal": {"en":"✓ Changed. Still one meal, at {time}.","area":"Recipes","where":"Recipes","release":"0.3.140"}
+    "screen.yourcooks.changedStillOneMeal": {"en":"✓ Changed. Still one meal, at {time}.","area":"Recipes","where":"Recipes","release":"0.3.140"},
+    "screen.app.askScanned": {"en":"I scanned {food} for {meal}.","area":"Words used across the app","where":"Across the app","release":"0.3.140"},
+    "screen.app.askYouSuggested": {"en":"You suggested {mixes}.","area":"Words used across the app","where":"Across the app","release":"0.3.140"},
+    "screen.app.askWhatIdChange": {"en":"What I'd change:","area":"Words used across the app","where":"Across the app","release":"0.3.140"},
+    "screen.helper.iDontHave": {"en":"I don't have {food}. What instead?","area":"Words used across the app","where":"Across the app","release":"0.3.140"}
   }
 }
