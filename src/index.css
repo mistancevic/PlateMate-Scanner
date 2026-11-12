@@ -3263,23 +3263,23 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .same-ask .link { align-self: flex-start; }
 /* DT284 v5 (0.3.140): the meal just changed, marked in Every time you ate it */
 .re-row.re-changed { background: var(--tint); border-radius: 10px; padding-left: 6px; }
-.re-changed-note { margin: 4px 2px 2px; font-size: var(--fs-small, 14px); font-weight: 800; color: #13804f; }
+.re-changed-note { margin: 4px 2px 2px; font-size: var(--fs-small, 14px); font-weight: 700; color: #13804f; }
 /* DT279 (0.3.140, board Stories213): a new beta tester application at the top of Clients; Invite on the right, Mark as handled apart */
 .card.request.request-top { border: 2px solid var(--brand, #2a72d9); margin: 6px 0 10px; }
-.request-chip { align-self: flex-start; background: var(--brand, #2a72d9); color: #fff; border-radius: 999px; padding: 2px 10px; font-weight: 800; font-size: 13px; margin-bottom: 4px; }
+.request-chip { align-self: flex-start; background: var(--brand, #2a72d9); color: #fff; border-radius: 999px; padding: 2px 10px; font-weight: 700; font-size: 13px; margin-bottom: 4px; }
 .request-invite { display: flex; justify-content: flex-end; margin-top: 8px; }
 .request-invite .pill { min-height: 48px; padding: 0 22px; }
 .request-handle { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 6px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
 .request-handle .link { min-height: 44px; }
 .request-handle .request-mark { color: var(--muted, #53627f); }
-.request-handle .request-sure { font-weight: 800; }
+.request-handle .request-sure { font-weight: 700; }
 /* B139 (0.3.141, board Stories214): an action is a button; delete is white with a red border, filled red on Sure? */
-.pill.pill-danger-line { background: #fff; border: 1.5px solid var(--low-text); color: var(--low-text); font-weight: 800; }
+.pill.pill-danger-line { background: #fff; border: 1.5px solid var(--low-text); color: var(--low-text); font-weight: 700; }
 .meal-row-acts { grid-column: 1 / -1; margin-top: 8px; }
 .log-card .meal-row-acts .pill.pill-small { flex: 1; min-height: 48px; height: auto; }
 /* DT286 (0.3.142, board Stories215): Chef Mealan on the Plate */
 .helper-context { display: block; color: var(--muted); font-size: var(--fs-small, 14px); line-height: 1.4; margin: 0 0 8px; }
-.helper .helper-nums { display: block; color: #13804f; font-weight: 800; }
+.helper .helper-nums { display: block; color: #13804f; font-weight: 700; }
 .helper .helper-take { min-height: 48px; white-space: nowrap; }
 .helper-close { background: #eef8f1; border-radius: 12px; padding: 10px 12px; margin: 8px 0; line-height: 1.45; }
 .helper .helper-more { min-height: 44px; margin: 8px 0; }
@@ -3296,3 +3296,17 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .fill-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .fill-chips .pill-small { min-height: 44px; height: auto; }
 .fill-put { justify-content: flex-end; }
+/* DT289 (0.3.143, board Stories216; Coach Milan 12 November, one rule for every language): the main action on the right; actions
+   are buttons: main filled blue, second white with a blue border, delete white with a red border, filled red on Sure?; text links
+   only go somewhere or back out */
+.button-row > .pill-primary, .button-row > .pill-danger { order: 99; margin-left: auto; }
+.button-row:has(> .pill-primary) > .pill:not(.pill-primary):not(.pill-danger):not(.pill-danger-line) { background: var(--surface, #fff); border-color: var(--brand); }
+.pill.pill-action { background: var(--surface, #fff); border: 1.5px solid var(--brand); color: var(--brand-text); font-weight: 700; }
+.pill.pill-small.pill-action, .pill.pill-small.pill-danger-line, .pill.pill-small.pill-danger { min-height: 44px; height: auto; }
+.pill.pill-danger-line { background: var(--surface, #fff); border: 1.5px solid var(--low-text); color: var(--low-text); font-weight: 700; }
+.pill.pill-danger-line:disabled, .pill.pill-action:disabled { opacity: .55; }
+.pill.pill-wide.pill-danger-line { min-height: 48px; width: 100%; }
+/* DT290 (0.3.144, board Stories217): Good for on the recipe */
+.rq-goodfor { display: flex; flex-direction: column; gap: 8px; }
+.rq-goodfor-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.rq-goodfor-chips .choice { min-height: 44px; height: auto; flex-direction: row; padding: 0 14px; }

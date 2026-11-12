@@ -311,7 +311,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
           {toAdd.map((sl) => {
             const m = p.planned[dayKey]?.[sl.id], f = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time, dayName: WEEKDAY_OF(date) };
             const slot = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time };
-            if (m?.skipped) return <div className="past-plate" key={sl.id}><span><small>{mealName(sl.name)}, {sl.time}</small><b>{w("plan.skipped")}</b></span><button type="button" className="link" onClick={() => p.fill(dayKey, sl.id, { ...m, skipped: false })}>{w("plan.undo")}</button></div>;
+            if (m?.skipped) return <div className="past-plate" key={sl.id}><span><small>{mealName(sl.name)}, {sl.time}</small><b>{w("plan.skipped")}</b></span><button type="button" className="pill pill-small pill-action" onClick={() => p.fill(dayKey, sl.id, { ...m, skipped: false })}>{w("plan.undo")}</button></div>;
             if (m) return (
               <div className="past-plate past-planned" key={sl.id}>
                 <span><small>{w("plan.slotPlanned", { meal: mealV(sl.name), time: sl.time })}</small><b>{m.title}</b></span>
@@ -581,7 +581,7 @@ function TripCard({ p }: { p: AppApi }) {
   const on = tripOn(t, today);
   return (
     <section className="card trip-card" aria-label={w("plan.yourTrip")}>
-      <div className="card-top"><span>{w("plan.tripHead", { place: placeName(t!.place), from: longDay(t!.from), to: longDay(t!.to) })}</span><span><button type="button" className="link" onClick={() => { setDraft(t!); setEdit(true); }}>{w("plan.change")}</button> · <button type="button" className="link link-danger" onClick={() => { p.setTrip(null); p.notify(w("plan.theTripIsOff")); }}>{w("plan.endIt")}</button></span></div>
+      <div className="card-top"><span>{w("plan.tripHead", { place: placeName(t!.place), from: longDay(t!.from), to: longDay(t!.to) })}</span><span><button type="button" className="pill pill-small pill-action" onClick={() => { setDraft(t!); setEdit(true); }}>{w("plan.change")}</button> · <button type="button" className="pill pill-small pill-danger-line" onClick={() => { p.setTrip(null); p.notify(w("plan.theTripIsOff")); }}>{w("plan.endIt")}</button></span></div>
       <div className="trip-switch">
         <span><b>{w("plan.placeFoodsInSearch", { place: placeName(t!.place) })}</b><small>{t!.on === undefined || t!.on === null ? w("plan.onByItself", { from: longDay(t!.from), to: longDay(t!.to) }) : on ? w("plan.onByYou") : w("plan.offByYou")} {w("plan.foodsYouAddTagged", { place: placeName(t!.place) })}</small></span>
         <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} aria-label={w(on ? "plan.placeFoodsOn" : "plan.placeFoodsOff", { place: placeName(t!.place) })} onClick={() => p.setTrip({ ...t!, on: !on })}>{on ? w("plan.on") : w("plan.off")}</button>

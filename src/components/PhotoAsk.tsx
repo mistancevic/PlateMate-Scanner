@@ -34,7 +34,7 @@ export function PhotoAsk({ image, at, mealAt, read, drop, exploring = false }: {
       <label className="pa-note"><span>{w("photoask.tellChefMealanWhatIt")}</span><input className="search" value={note} placeholder={w("photoask.notePlaceholder")} onChange={(e) => setNote(e.target.value)} maxLength={200} /></label>
       <div className="pa-go">
         <button type="button" className="pill pill-primary" onClick={() => read({ at: atTime(taken, time).toISOString(), who, ...(note.trim() ? { note: note.trim() } : {}) })}>{w("photoask.readThePlate")}</button>
-        <button type="button" className="link" onClick={drop}>{w("photoask.dropThePhoto")}</button>
+        <button type="button" className="pill pill-small pill-danger-line" onClick={drop}>{w("photoask.dropThePhoto")}</button>
       </div>
     </section>
   );

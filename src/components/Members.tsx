@@ -108,7 +108,7 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown, toCook }: { r:
       <small className="muted rq-under">{w("members.yourPortionGoesOn", { grams: fmt(x.grams, 0), kcal: fmt(x.kcal, 0) })}</small>
       {!r.mine && <><button className="pill pill-wide" onClick={() => { close(); p.takeMember(r, "keep"); }}>{w("members.keepInMine")}</button>
         <small className="muted rq-under">{w("members.aCopyInMine", { whose: r.name ? lineV("members.nameS", { name: r.name }) : wordV("members.theMemberS") })}</small></>}
-      {owner && !r.mine && <ConfirmButton className="link link-danger rq-delete" label={w("members.takeItDownOwner")} confirmLabel={w("members.sureItGoesForEvery")} onConfirm={takeDown} />}
+      {owner && !r.mine && <ConfirmButton className="pill pill-small pill-danger-line rq-delete" label={w("members.takeItDownOwner")} confirmLabel={w("members.sureItGoesForEvery")} onConfirm={takeDown} />}
     </div>
   );
 }

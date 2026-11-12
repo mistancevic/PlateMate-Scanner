@@ -22500,6 +22500,26 @@
     "out.noChoiceFits": {
       "text": "Ništa iz tvojih recepata ne odgovara tome za ovaj obrok. Probaj drugi izbor.",
       "checked": true
+    },
+    "out.whyUsual": {
+      "text": "Kao i obično: {meal}",
+      "checked": true
+    },
+    "out.whyA": {
+      "text": "Za {meal}",
+      "checked": true
+    },
+    "recipe.goodFor": {
+      "text": "Odgovara za",
+      "checked": true
+    },
+    "recipe.goodForGuess": {
+      "text": "Chef Mealan je ovo podesio prema obrocima u kojima je bio i prema namirnicama. Dodirni da promeniš. Chef Mealan se toga drži kad popunjava slobodne obroke.",
+      "checked": true
+    },
+    "recipe.goodForYours": {
+      "text": "Ovo je tvoj izbor. Chef Mealan se toga drži kad popunjava slobodne obroke.",
+      "checked": true
     }
   }
 }

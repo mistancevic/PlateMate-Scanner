@@ -6222,5 +6222,10 @@
   "out.chipAnotherProtein": "Another protein",
   "out.chipLighter": "Lighter",
   "out.chipCrave": "Something I crave",
-  "out.noChoiceFits": "Nothing in your recipes fits that for this meal. Try another chip."
+  "out.noChoiceFits": "Nothing in your recipes fits that for this meal. Try another chip.",
+  "out.whyUsual": "Your usual {meal}",
+  "out.whyA": "A {meal}",
+  "recipe.goodFor": "Good for",
+  "recipe.goodForGuess": "Chef Mealan set these from when you ate it and from its foods. Tap to change. Fill the open slots keeps to them.",
+  "recipe.goodForYours": "You set these. Fill the open slots keeps to them."
 }

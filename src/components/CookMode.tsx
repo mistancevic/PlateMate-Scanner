@@ -295,7 +295,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
             {/* DT222 (0.3.60, board Stories165): the next step is the meal's photo, then Eat; Make is a small link */}
             {link.mealPhoto && (link.mealPhoto.src
               ? <div className="cook-meal-shot"><img src={link.mealPhoto.src} alt={w("cookmode.yourMeal")} />
-                  <PhotoPick onFile={(f) => link.mealPhoto!.take(f)}>{({ toggle, open }) => <button type="button" className="link cook-meal-again" aria-expanded={open} onClick={toggle}>{w("cookmode.takeItAgain")}</button>}</PhotoPick></div>
+                  <PhotoPick onFile={(f) => link.mealPhoto!.take(f)}>{({ toggle, open }) => <button type="button" className="pill pill-small pill-action cook-meal-again" aria-expanded={open} onClick={toggle}>{w("cookmode.takeItAgain")}</button>}</PhotoPick></div>
               : <PhotoPick onFile={(f) => link.mealPhoto!.take(f)}>{({ toggle, open }) => <button type="button" className="pill pill-wide cook-meal-take" aria-expanded={open} onClick={toggle}><span aria-hidden="true">📷</span>{w("cookmode.photoOfYourMeal")}<small>{w("cookmode.itGoesOnTheMeal")}</small></button>}</PhotoPick>)}
             <button className="pill pill-wide pill-primary cook-to-eat" onClick={() => link.eat!()}>{w("cookmode.cookedNextEat")}</button>
             <div className="cook-done-links"><button className="link" onClick={back}>{w("cookmode.lastStepBack")}</button><button className="link" onClick={close}>{w("cookmode.makeStepPhotosAndNotes")}</button></div>
@@ -329,7 +329,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
                 {list.length > 1 && <button type="button" className="cook-pic-next" aria-label={w("cookmode.nextPhoto")} onClick={() => setPicN((n + 1) % list.length)}>{w("cookmode.picNOf", { k: n + 1, n: list.length })} ›</button>}</div>
               <small className="cook-pic-label">{pic.by === "ai" ? w("cookmode.pictureDrawnByAiBeta") : link.stepPhoto?.kept ? w("cookmode.yourPhotoKeptWithThe") : w("cookmode.yourPhoto")}
               {/* DT276 step 2: one more photo of the step; nothing is replaced */}
-              {link.stepPhoto && <PhotoPick key={`again-${k}`} onFile={(f) => link.stepPhoto!.take(k, f)}>{({ toggle, open }) => <button type="button" className="link cook-pic-again" aria-expanded={open} onClick={toggle}>{w("cookmode.addAnotherPhoto")}</button>}</PhotoPick>}</small></>; })()}
+              {link.stepPhoto && <PhotoPick key={`again-${k}`} onFile={(f) => link.stepPhoto!.take(k, f)}>{({ toggle, open }) => <button type="button" className="pill pill-small pill-action cook-pic-again" aria-expanded={open} onClick={toggle}>{w("cookmode.addAnotherPhoto")}</button>}</PhotoPick>}</small></>; })()}
             <small>{w("cookmode.stepCaps", { n: k + 1 })}</small>
             <div className={`cook-text${mvs.length > 1 ? " cook-text-whole" : ""}`}>{stepParts(tempsIn(steps[k]), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}</div>
             {/* DT223 (0.3.60, board Stories165): a step without a picture: a small button to add your photo of it */}

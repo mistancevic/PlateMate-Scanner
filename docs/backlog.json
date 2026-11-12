@@ -43,6 +43,8 @@
     }
   },
   "versions": [
+    "0.3.144",
+    "0.3.143",
     "0.3.142",
     "0.3.141",
     "0.3.140",
@@ -890,10 +892,11 @@
     },
     {
       "id": "DT278",
-      "title": "Blind run 10 November: the friend's plate, the menu, numbers, Srpski",
+      "title": "Someone else's plate, from the photo to the day (blind run 10 November)",
       "epic": "plate",
-      "state": "later",
-      "why": "docs/qa/blind/2026-11-10-jelena-first-run. Finding 1 (a new plate overwrote a Served plate) is fixed, 0.3.126. Findings 2 to 4 are one problem: the app never offers someone else's plate where it asks. To draw."
+      "state": "next",
+      "why": "docs/qa/blind/2026-11-10-jelena-first-run. Finding 1 (a new plate overwrote a Served plate) is fixed, 0.3.126. Findings 2 to 4 are one problem: the app never offers someone else's plate where it asks. To draw. 12 November 17:20, Coach Milan: DT278 is next. Drawn 12 November 17:48 (Stories218): Someone else's plate as an answer; kept under Served, never coached, Don't keep it its own button; the day links the visit. Waits for Go.",
+      "board": "Stories218"
     },
     {
       "id": "DT281",
@@ -1051,16 +1054,19 @@
       "id": "DT289",
       "title": "Button rules across the app: the main button on the right; actions as buttons, text links only to go somewhere",
       "epic": "trust",
-      "state": "next",
-      "why": "Coach Milan 12 November 14:22 and 14:25: the main action sits on the right, where the thumb is (DT279 Invite, B139 I ate it). One pass over every card and sheet. Open question from Milan: German apps often put the main action left of Cancel; one rule for all languages, or not. 14:34: action links look like text, not like something to tap (Delete this meal, Mark as handled). Rule drawn on B139: main filled blue, second white with a blue border, delete white with a red border; text links only to go somewhere or back out. 15:00: one rule for every language. Drawn 12 November 16:58 (Stories216). Waits for Go.",
-      "board": "Stories216"
+      "state": "done",
+      "why": "Coach Milan 12 November 14:22 and 14:25: the main action sits on the right, where the thumb is (DT279 Invite, B139 I ate it). One pass over every card and sheet. Open question from Milan: German apps often put the main action left of Cancel; one rule for all languages, or not. 14:34: action links look like text, not like something to tap (Delete this meal, Mark as handled). Rule drawn on B139: main filled blue, second white with a blue border, delete white with a red border; text links only to go somewhere or back out. 15:00: one rule for every language. Drawn 12 November 16:58 (Stories216). Go 17:10. The main button (and a filled red one) on the right in every button row; 76 acting text links became buttons (white with a blue border, or a red border to delete or leave); the two-tap confirm is red-border, filled red on Sure?.",
+      "board": "Stories216",
+      "version": "0.3.143"
     },
     {
       "id": "DT290",
       "title": "Fill the open slots knows which dishes suit which meal",
       "epic": "chef",
-      "state": "later",
-      "why": "Found while building DT287 (12 November): the ranking looks at PD, the slot's size and the week, not at the kind of meal, so beans and rice can come for breakfast. Learn it from where a recipe was eaten or planned before, and from the starters' meal."
+      "state": "done",
+      "why": "Found while building DT287 (12 November): the ranking looks at PD, the slot's size and the week, not at the kind of meal, so beans and rice can come for breakfast. Learn it from where a recipe was eaten or planned before, and from the starters' meal. Drawn 12 November 17:10 (Stories217): learned from where it was eaten or planned, the starters and its foods; Fill keeps to it; Good for on the recipe, yours wins. Go 17:19.",
+      "board": "Stories217",
+      "version": "0.3.144"
     }
   ]
 }

@@ -124,7 +124,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         {picking && insight && (
           <div className="moments job-pick">
             {JOBS.map((j) => <button key={j} className={`choice ${job.job === j ? "on" : ""}`} onClick={() => { insight.setJob(j); setPicking(false); }}>{jobName(j)}</button>)}
-            {job.mine && <button className="link" onClick={() => { insight.setJob(null); setPicking(false); }}>{w("foodcard.useChefMealanSLabel")}</button>}
+            {job.mine && <button className="pill pill-small pill-action" onClick={() => { insight.setJob(null); setPicking(false); }}>{w("foodcard.useChefMealanSLabel")}</button>}
           </div>
         )}
         <section className={`readout readout-fit-${fit}`}>
@@ -154,7 +154,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         {insight && (
           <section className="pro-tip">
             <span className="pro-badge">{w("foodcard.proTip")}</span>
-            {tipFresh ? <p>{food.tip!.text}</p> : tipState === "busy" ? <p className="muted">{w("foodcard.writingTip")}</p> : tipState === "failed" ? <p className="muted">{w("foodcard.noTipJustNow")} <button className="link" onClick={() => { setTipState("busy"); insight.requestTip().then(() => setTipState("idle")).catch(() => setTipState("failed")); }}>{w("foodcard.tryAgain")}</button></p> : null}
+            {tipFresh ? <p>{food.tip!.text}</p> : tipState === "busy" ? <p className="muted">{w("foodcard.writingTip")}</p> : tipState === "failed" ? <p className="muted">{w("foodcard.noTipJustNow")} <button className="pill pill-small pill-action" onClick={() => { setTipState("busy"); insight.requestTip().then(() => setTipState("idle")).catch(() => setTipState("failed")); }}>{w("foodcard.tryAgain")}</button></p> : null}
           </section>
         )}
         <div className="label-table label-table-read" aria-label={w("foodcard.nutritionTablePerG")}>
@@ -209,7 +209,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
       {pending && (
         <div className="undo-note" role="status">
           <span>{w("foodcard.photoRemoved")}</span>
-          <button className="link" onClick={(e) => { e.stopPropagation(); setPending(null); }}>{w("foodcard.undo")}</button>
+          <button className="pill pill-small pill-action" onClick={(e) => { e.stopPropagation(); setPending(null); }}>{w("foodcard.undo")}</button>
         </div>
       )}
     </div>

@@ -22,7 +22,7 @@ export function Starting({ onLocal }: { onLocal: (() => void) | null }) {
             <p>{w("starting.thisIsTakingLongerThan")}</p>
             {startLine() && <small className="muted starting-steps">{startLine()}</small>}
             {onLocal && <button className="pill pill-primary action-main" onClick={onLocal}>{w("starting.openWithWhatSOn")}</button>}
-            <button className="link" onClick={() => location.reload()}>{w("starting.tryAgain")}</button>
+            <button className="pill pill-small pill-action" onClick={() => location.reload()}>{w("starting.tryAgain")}</button>
             {onLocal && <small>{w("starting.chefMealanKeepsTryingYour")}</small>}
           </div>
         )}

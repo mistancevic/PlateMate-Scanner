@@ -6,6 +6,7 @@ import type { Slot } from "./slots";
 import { REFERENCE, referenceFood } from "./reference";
 import { kindOf, countOf, howMany, gramsOfOne } from "./counted";
 import { proteinOf, weekPenalty, type ProteinKind, type Week } from "./variety";
+import { kindOfSlot, suitPenalty, type Suits } from "./mealFit";
 
 export type Source = "mine" | "coach" | "starter" | "plate";
 export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number; servings?: number;
@@ -329,18 +330,20 @@ export type FillChoice = { meal: PlannedMeal; why: string };
 // heavy one second; one sentence says so when it changed the pick. A heavy meal is never left out.
 export type FillRead = (m: PlannedMeal) => { read: "light" | "heavy" | null; heavy: number } | null | undefined;
 export const CARRY_NUDGE = { light: -0.1, heavy: 0.25 };
-export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undefined, choices: PlannedMeal[], day: { kcal: number; protein: number } | null, target: number | null, read?: FillRead, week?: Week): FillRow[] {
+export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undefined, choices: PlannedMeal[], day: { kcal: number; protein: number } | null, target: number | null, read?: FillRead, week?: Week, suits?: (m: PlannedMeal) => Suits | null): FillRow[] {
   const open = slots.filter((s) => !held?.[s.id]);
   const used = new Set(Object.values(held ?? {}).map((m) => m.title));
   const todayKinds = Object.values(held ?? {}).map((m) => proteinOf(m)).filter((k): k is ProteinKind => Boolean(k));
   const rows: FillRow[] = [];
   for (const slot of open) {
     const need = needOf(slots, slot, day);
+    // DT290 (0.3.144): a dish that does not suit this meal drops far back, and is left out while two or more do
+    const slotKind = kindOfSlot(slot.name);
     const score = (m: PlannedMeal) => {
       const pd = density(m.protein, m.kcal) ?? 0;
       const pdGap = target === null ? 0 : Math.max(0, target - pd) * 2 + Math.max(0, pd - target - 3) * 0.5;
       const kcalGap = need ? Math.abs(m.kcal - need.kcal) / need.kcal : 0;
-      return pdGap + kcalGap + weekPenalty(m, week, todayKinds);
+      return pdGap + kcalGap + weekPenalty(m, week, todayKinds) + suitPenalty(suits?.(m) ?? null, slotKind);
     };
     const nudge = (m: PlannedMeal) => { const r = read?.(m)?.read; return r ? CARRY_NUDGE[r] : 0; };
     // DT79: a batch recipe comes in the pieces that fit this slot
@@ -358,7 +361,8 @@ export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undef
       } else if (read?.(ranked[0])?.read === "light") why = w("plan.fillLight", { title: ranked[0].title, meal: mealV(slot.name, true) });
     }
     used.add(ranked[0].title); { const k = proteinOf(ranked[0]); if (k) todayKinds.push(k); }
-    rows.push({ slot, meal: ranked[0], alternatives: ranked.slice(1, 4), ranked: ranked.slice(0, 12), ...(why ? { why } : {}) });
+    const fits = suits && slotKind ? ranked.filter((m) => !suitPenalty(suits(m), slotKind)) : ranked;
+    rows.push({ slot, meal: ranked[0], alternatives: ranked.slice(1, 4), ranked: (fits.length >= 2 ? fits : ranked).slice(0, 12), ...(why ? { why } : {}) });
   }
   return rows;
 }

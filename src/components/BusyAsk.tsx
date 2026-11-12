@@ -106,7 +106,7 @@ export function SlotNotes({ p, date, slot }: { p: AppApi; date: string; slot: Sl
   return (
     <div className="slot-notes">
       {own && usual && own !== usual && <div><small>{from ? w("busy.movedInGoogle", { time: from }) : w("busy.atOnThisDate", { time: own })}</small><button type="button" className="link" onClick={back}>{w("busy.backTo", { time: usual })}</button></div>}
-      {ahead && <div><small>{w("busy.cookedAheadOn", { day: WDV(ahead) })}</small><button type="button" className="link" onClick={notAhead}>{w("busy.cookItOnTheDay")}</button></div>}
+      {ahead && <div><small>{w("busy.cookedAheadOn", { day: WDV(ahead) })}</small><button type="button" className="pill pill-small pill-action" onClick={notAhead}>{w("busy.cookItOnTheDay")}</button></div>}
     </div>
   );
 }

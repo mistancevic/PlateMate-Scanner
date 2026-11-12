@@ -47,11 +47,13 @@ const PORT = "3507", U = `http://127.0.0.1:${PORT}`;
     ok(whys.length >= 2 * n && whys.every((x) => x.trim().length > 3) && whys.some((x) => /none yet this week/.test(x)), "each choice says why; a new kind says none yet this week: " + whys.slice(0, 3).join(" | "));
     const picks = await fill.locator(".fill-choice.on b").allInnerTexts();
     ok(picks[0] !== "Chicken and rice" && new Set(picks).size === picks.length, "chicken, twice this week, is not the first pick; no meal twice: " + picks.join(", "));
-    const first = slots.first();
+    // DT290 (0.3.144): breakfast keeps to breakfasts; the protein chip is tried on dinner, where more dishes fit
+    const first = slots.filter({ hasText: /Dinner/ }).first();
     const kindsBefore = await first.locator(".fill-choice b").allInnerTexts();
     await first.getByRole("button", { name: "Another protein" }).click(); await page.waitForTimeout(400);
     const kindsAfter = await first.locator(".fill-choice b").allInnerTexts();
-    ok(kindsAfter.length >= 1 && kindsAfter.every((x) => !kindsBefore.includes(x)) && await first.getByRole("button", { name: "Another protein" }).getAttribute("aria-pressed") === "true", "Another protein: other choices, the chip lit: " + kindsAfter.join(", "));
+    const toast = await page.locator("body").innerText();
+    ok(await first.getByRole("button", { name: "Another protein" }).getAttribute("aria-pressed") === "true" ? kindsAfter.every((x) => !kindsBefore.includes(x)) : /Nothing in your recipes fits that/.test(toast), "Another protein: other choices, or says nothing else fits: " + kindsAfter.join(", "));
     await first.locator(".fill-choice").nth(kindsAfter.length > 1 ? 1 : 0).click(); await page.waitForTimeout(300);
     const picked = (await first.locator(".fill-choice.on b").innerText()).trim();
     ok(await fill.locator(".fill-choice, .fill-chips button").evaluateAll((xs) => xs.every((x) => x.getBoundingClientRect().height >= 44)), "every choice and chip is 44 px or more");

@@ -157,7 +157,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
           <small className="muted">{w("craving.numbersFrom")}</small>
           <small className="crave-kept">{w("craving.keptInMyRecipesAs")}</small>
           <button type="button" className="pill pill-primary pill-wide" onClick={() => { const m = idea.meal; setIdea(null); setQ(""); p.openOnPlate(m); keepTaste(); }}>{w("craving.putItOnMyPlate")}</button>
-          <button type="button" className="link crave-again" disabled={Boolean(asking)} onClick={() => void askChef(crave)}>{asking ? w("craving.chefThinking") : w("craving.anotherIdea")}</button>
+          <button type="button" className="pill pill-small pill-action crave-again" disabled={Boolean(asking)} onClick={() => void askChef(crave)}>{asking ? w("craving.chefThinking") : w("craving.anotherIdea")}</button>
           {err && <small className="crave-err" role="alert">{err}</small>}
         </div>
       </>)}

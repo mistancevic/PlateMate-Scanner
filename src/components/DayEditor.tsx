@@ -114,7 +114,7 @@ export function DayEditor({ value, onChange, workHint, minor = false, weekdays =
             <small className="setting-name">{w("dayedit.startsAt")}</small>
             <div className="starts-at-row">
               <input type="time" step={300} value={value.at ?? ""} aria-label={w("dayedit.startsAt")} onChange={(e) => set({ at: e.target.value || undefined })} />
-              {value.at && <button type="button" className="link" onClick={() => set({ at: undefined })}>{w("dayedit.clear")}</button>}
+              {value.at && <button type="button" className="pill pill-small pill-danger-line" onClick={() => set({ at: undefined })}>{w("dayedit.clear")}</button>}
             </div>
             <small className="setting-hint">{w("dayedit.optionalPlanShowsAClock")}</small>
           </div>
