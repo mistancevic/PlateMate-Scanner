@@ -53,9 +53,11 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 // a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
 const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, beforeSteps = null, atStart = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null }: {
+export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, beforeSteps = null, atStart = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null }: {
   // DT227 (0.3.61, board Stories167): a draft of this recipe saved for later on the Plate
   saved?: { sub: string; go: () => void } | null;
+  // DT284 (0.3.138): a past meal of this recipe changed in place, or deleted
+  onCardChange?: (id: string, ch: import("../pastMeal").CardChange) => void; onCardDelete?: (id: string) => void;
   // DT81: how many of its pieces the plan takes from today, for Cook it's suggestion
   plannedCount?: number;
   // DT79: what the plan takes of this batch, 8 sarmas: 3 on Monday lunch, 1 left
@@ -96,8 +98,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // chosen in it and nowhere else. A tap picks a photo; under the row: Make it the cover, On step, Delete this photo
   const gal = galleryOf(meal);
   const [picked, setPicked] = useState<string | null>(null);
-  const [cookAt, setCookAt] = useState<Feedback | null>(null);
-  useEffect(() => { if (cookAt) try { window.scrollTo(0, 0); } catch { /* nothing to scroll */ } }, [cookAt]);
+  const [cookAtId, setCookAt] = useState<Feedback | null>(null);
+  // DT284: the cook as it is now, so a change shows at once; gone when deleted
+  const cookAt = cookAtId ? cards.find((c) => c.id === cookAtId.id) ?? null : null;
+  useEffect(() => { if (cookAtId) try { window.scrollTo(0, 0); } catch { /* nothing to scroll */ } }, [cookAtId?.id]);
   const pk = picked && gal.some((g) => g.src === picked) ? picked : null;
   const shown = pk ?? list[0] ?? null;
   const fileRef = useRef<HTMLInputElement>(null);
@@ -252,7 +256,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     const at = new Date(cookAt.createdAt), cookWhen = `${dateText(at, { weekday: "long", day: "numeric", month: "long" })}, ${at.toTimeString().slice(0, 5)}${cookAt.taste ? ` · ${tasteWord(cookAt.taste)}` : ""}`;
     return (
       <div className="rq rq-cook">
-        <PastMeal f={cookAt} day={meal.title} recipe={meal} when={cookWhen} words back={() => setCookAt(null)} actions={(shown) => {
+        <PastMeal f={cookAt} day={meal.title} recipe={meal} when={cookWhen} words back={() => setCookAt(null)}
+          onChange={onCardChange ? (ch) => onCardChange(cookAt.id, ch) : undefined} onDelete={onCardDelete ? () => { onCardDelete(cookAt.id); setCookAt(null); } : undefined} actions={(shown) => {
           if (!shown) return null;
           const inGal = gal.some((g) => g.src === shown);
           return <div className="pm-actions rq-cook-add">
@@ -587,7 +592,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <button className="pill pill-wide" onClick={startEdit}>{w("recipe.editRecipe")}</button>
           <small className="muted rq-under">{w("recipe.changeTheRecipeItselfThe")}</small>
           {/* DT225 v2 (0.3.61, board Stories166): the log of every time you ate it, under the buttons: a log, not an action */}
-          {!edit && <EatLog meal={meal} cards={cards} />}
+          {!edit && <EatLog meal={meal} cards={cards} onOpen={setCookAt} />}
           {cook && (
             <section className="card rq-pub">
               <div className="card-top"><b>{w("recipe.onChefmealanCom")}</b>{state && <small className={`pub-state ${state}`}>{state === "live" ? w("recipe.live") : state === "down" ? w("recipe.takenDown") : state === "waiting" ? w("recipe.waitingFor", { who: approver }) : state === "back" ? w("recipe.sentBack") : w("recipe.draft")}</small>}</div>

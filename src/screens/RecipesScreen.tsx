@@ -312,7 +312,7 @@ export function RecipesScreen(p: AppApi) {
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
-      <LangRecipePage aiOn={p.ai.on} translate={(id) => p.translateRecipe(id)} key={opened.id} meal={opened} saved={savedOf(opened.id)} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
+      <LangRecipePage onCardChange={(id, ch) => p.changeCard(id, ch)} onCardDelete={(id) => p.deleteCard(id)} aiOn={p.ai.on} translate={(id) => p.translateRecipe(id)} key={opened.id} meal={opened} saved={savedOf(opened.id)} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         landing={landed && landed.id === opened.id ? (() => {

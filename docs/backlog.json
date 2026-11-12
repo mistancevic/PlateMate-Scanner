@@ -932,9 +932,10 @@
       "id": "DT284",
       "title": "A past meal: Change it and Delete this meal; the rows of Every time you ate it open their meal",
       "epic": "recipes",
-      "state": "drawn",
+      "state": "done",
       "board": "Stories211",
-      "why": "Coach Milan 12 November 07:55, on a call with a tester: one meal recorded twice because a past meal can't be changed (Cook it again made a second one). Drawn with a clickable prototype (artifact DT284 Prototype). Waits for Go."
+      "version": "0.3.138",
+      "why": "Coach Milan 12 November 07:55, on a call with a tester: one meal recorded twice because a past meal can't be changed (Cook it again made a second one). Drawn with a clickable prototype (artifact DT284 Prototype). Go 12 November 08:24. The guard against doubles (same photo in the same day) is DT285, to draw."
     }
   ]
 }

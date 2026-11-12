@@ -1486,6 +1486,19 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .past-meal .pm-nums { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; } .past-meal .pm-nums b { font-size: 1.25rem; }
 .past-meal .pm-foods { border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--surface); padding: 2px 12px; }
 .past-meal .pm-food { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); } .past-meal .pm-food:last-child { border-bottom: 0; }
+/* DT284 (0.3.138): Change it, Delete this meal, and the change form */
+.past-meal .pm-edit { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.past-meal .pm-edit .pill, .past-meal .pm-edit .link, .past-meal .pm-form .link, .past-meal .pm-form .pill { min-height: 44px; }
+.past-meal .pm-edit .link { align-self: flex-start; }
+.past-meal .pm-form { display: flex; flex-direction: column; gap: 10px; border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--surface); padding: 12px; }
+.past-meal .pm-form-title { font-size: 1.1rem; }
+.past-meal .pm-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.past-meal .pm-chips .choice { height: auto; min-height: 44px; white-space: normal; }
+.past-meal .pm-notes { display: flex; flex-direction: column; gap: 6px; }
+.past-meal .pm-notes textarea { font: inherit; font-size: 16px; border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 8px 10px; background: var(--bg, #fff); color: var(--ink); resize: vertical; }
+.past-meal .pm-photo-row { display: flex; align-items: center; gap: 10px; }
+.past-meal .pm-photo-row img { width: 64px; height: 64px; object-fit: cover; border-radius: var(--r-control); }
+.past-meal .pm-form .link { align-self: flex-start; }
 section.past-meal .button-row.pm-actions > .pill.pill-small { min-height: 44px; }
 .plan-past .past-lived { display: block; margin-top: 8px; color: var(--good-text); font-weight: 900; }
 .plan-past .past-none { padding: 4px 16px 14px; }
@@ -2864,6 +2877,8 @@ html:has(.l-photo) { overflow-x: hidden; }
 /* DT225 v2 (0.3.61): every time you ate it, at the end of the recipe */
 .rq-eats { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; margin: 16px 0 12px; } .rq-eats > b { font-size: 17px; } .rq-eats > small { font-size: 13px; }
 .re-row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
+.re-row.re-open { width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; align-items: center; min-height: 44px; }
+.re-row .re-go { margin-left: auto; font-size: 24px; font-weight: 800; color: var(--brand-text); padding: 0 4px; }
 .re-row img, .re-none { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex: none; } .re-none { background: var(--tint); display: inline-flex; align-items: center; justify-content: center; font-size: 22px; }
 .re-words { display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 1.4; } .re-words i { color: var(--ink); }
 .re-more { align-self: flex-start; min-height: 44px; }

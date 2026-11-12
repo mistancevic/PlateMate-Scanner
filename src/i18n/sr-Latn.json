@@ -22232,6 +22232,78 @@
     "recipe.aiTag": {
       "text": "AI",
       "checked": true
+    },
+    "pastmeal.changeIt": {
+      "text": "Izmeni",
+      "checked": true
+    },
+    "pastmeal.deleteThisMeal": {
+      "text": "Obriši ovaj obrok",
+      "checked": true
+    },
+    "pastmeal.sureDelete": {
+      "text": "Sigurno? Obriši ovaj obrok",
+      "checked": true
+    },
+    "pastmeal.keepIt": {
+      "text": "Zadrži ga",
+      "checked": true
+    },
+    "pastmeal.deleteWhy": {
+      "text": "Nestaje iz dana {date} u Planu, iz spiskova recepta i iz prikaza tvog trenera. Ne može da se vrati.",
+      "checked": true
+    },
+    "pastmeal.changeThisMeal": {
+      "text": "Izmeni ovaj obrok",
+      "checked": true
+    },
+    "pastmeal.sameMealSameTime": {
+      "text": "Isti obrok, isto vreme. Plan, spiskovi recepta i tvoj trener vide izmenu.",
+      "checked": true
+    },
+    "pastmeal.howMuch": {
+      "text": "Koliko je pojedeno?",
+      "checked": true
+    },
+    "pastmeal.halfOfIt": {
+      "text": "Pola od toga, {g} g",
+      "checked": true
+    },
+    "pastmeal.asLogged": {
+      "text": "Kako je upisano, {g} g",
+      "checked": true
+    },
+    "pastmeal.howWasIt": {
+      "text": "Kakav je bio?",
+      "checked": true
+    },
+    "pastmeal.yourWords": {
+      "text": "Tvoje reči",
+      "checked": true
+    },
+    "pastmeal.photo": {
+      "text": "Slika",
+      "checked": true
+    },
+    "pastmeal.changeThePhoto": {
+      "text": "Promeni sliku",
+      "checked": true
+    },
+    "pastmeal.addAPhoto": {
+      "text": "Dodaj sliku",
+      "checked": true
+    },
+    "pastmeal.saveChanges": {
+      "text": "Sačuvaj izmene",
+      "checked": true
+    },
+    "pastmeal.cancel": {
+      "text": "Otkaži",
+      "checked": true
+    },
+    "yourcooks.openMeal": {
+      "text": "Otvori obrok: {date}",
+      "checked": true
     }
   }
 }

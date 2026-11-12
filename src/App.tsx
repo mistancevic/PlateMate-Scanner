@@ -1,4 +1,5 @@
 import { numLocale } from "./words";
+import { changeCard as changeCardIn, deleteCard as deleteCardIn, type CardChange } from "./pastMeal";
 import { w, wn, dateText, type WordKey } from "./words";
 import { wx } from "./wx";
 import { weekdayName } from "./weekdayWords";
@@ -2871,6 +2872,9 @@ export default function App() {
     mixQuestion, mixQuestionTaken: () => setMixQuestion(null),
     recordTalk: (q: string, reply: string, plate: string[]) => setTalkTurns((t) => [...t, { role: "you", text: q, plate }, { role: "mealan", text: reply }]),
     // a card becomes a recipe: the foods, the grams, the steps and the photo (gap C, 10 October 2026)
+    // DT284 (0.3.138, board Stories211): a past meal changed in place (one record, its own time), or deleted
+    changeCard: (id: string, ch: CardChange) => { setState((s) => changeCardIn(s, id, ch)); log("past_meal", { did: "change" }); },
+    deleteCard: (id: string) => { setState((s) => deleteCardIn(s, id)); log("past_meal", { did: "delete" }); },
     setCardPhoto: (id: string, data: string) => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, photo: data, photos: [...(f.photos ?? []), data] } : f)) }));
     },
