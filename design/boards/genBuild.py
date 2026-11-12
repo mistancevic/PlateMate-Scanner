@@ -41,10 +41,11 @@ history = '<div style="display:flex;gap:6px;align-items:stretch">' + ARROW.join(
     ("What", "Nutrition XP Scanner: Gemini reads a label and scores protein against calories. Renamed Chef Mealan on 22 September."),
     ("Built with", "Google AI Studio, then ChatGPT Codex (a pull request), then Claude from 23 September."),
     ("Data", "Airtable for scanned foods and the starter foods; then Firebase sign-in and Firestore, set up by AI Studio from a prompt."),
-    ("Live on", "platemate.ai.studio: AI Studio took the code from GitHub, built it and ran it on Cloud Run with a server for the Gemini key. Republished from AI Studio after each GitHub sync.")], "#e67e22"),
+    ("Live on", "platemate.ai.studio: AI Studio took the code from GitHub, built it and ran it on Cloud Run with a server for the Gemini key. AI Studio was connected to GitHub: it saw each change pushed there and updated the app.")], "#e67e22"),
   stage("3", "Own production, from a terminal", "29 September to 2 November", [
     ("Live on", "chefmealan.com from 30 September: Cloud Run in Milan's own Google project, his own Gemini key."),
     ("Goes live by", "One command in Google Cloud Shell, the terminal in the browser. From 7 October: preview first, then promote, rollback in one command."),
+    ("Checking new code", "With the Google services kept and AI Studio left behind, Milan checked the newest code in a GitHub Codespace: the app running on a computer in GitHub's cloud, on a temporary link only he could open."),
     ("Staging or preview", "Milan asked for a staging environment, as in his product teams, to test the latest work without touching the beta testers. Chosen as the quick start: a preview on the same accounts and data; a staging with its own database once the app grows beyond friends."),
     ("To the phone", "When Cloud Shell joined the process for these releases, it would not start on the Chromebook: it never got past the sign-in that opens the terminal. On the phone the same Cloud Shell opened at once, so the releases were run from the phone from then on."),
     ("Way of working", "Version numbers from 2 October; boards on the canvas before code; the five-step release rule (23 October); the Kanban (2 November).")], "#1a73e8"),
@@ -117,7 +118,7 @@ body = (f'<div style="width:{W}px;box-sizing:border-box;padding:22px 26px;backgr
   + section("A course setup, and this project", "The Turing College course Building with AI agents teaches a laptop setup. This project does the same cycle without one.", compare)
   + section("The app, as it runs", "Four parts. The person's phone holds the app and their data first; the server holds the AI key and the rules.", app)
   + '</div>')
-H = 3120
+H = 3260
 page = f'''<!doctype html>
 <html lang="en">
 <head>
