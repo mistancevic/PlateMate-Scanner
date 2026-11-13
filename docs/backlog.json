@@ -1060,6 +1060,13 @@
       "why": "Coach Milan 12 November 20:35: the last deploys did not pass, with emails from GitHub. Every Preview since 18:16 (0.3.143 to 0.3.145) failed after the usual 3 minutes of building with: Cloud Build failed storing logs in bucket. Reproduced at 20:39. The app builds cleanly from a fresh copy of main, and the build file had not changed since October, so the fault sat in Google's log storage. Go 20:43. The build log now goes to Cloud Logging only (deploy/cloudbuild.yaml), so a build no longer depends on that storage; the full log stays in the Google Cloud console under Cloud Build."
     },
     {
+      "id": "OP2",
+      "title": "Nothing lives only in the build workspace",
+      "epic": "trust",
+      "state": "done",
+      "why": "Coach Milan 13 November 17:21: another chat lost its working files when its workspace was reset. Checked here: the code, backlog and walkthrough results are on GitHub; the handovers are in the Project; the canvas, tables and Worth Building doc are artifacts. Only in the workspace were the release tags (they can't be pushed from there) and 81 board scripts. Go 17:23. docs/versions.md lists every version with its commit and rebuilds the tags; the missing board scripts are in design/boards. Both are kept up on every release."
+    },
+    {
       "id": "DT289",
       "title": "Button rules across the app: the main button on the right; actions as buttons, text links only to go somewhere",
       "epic": "trust",
