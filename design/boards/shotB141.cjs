@@ -11,6 +11,11 @@ const INVITE = (name, email, on, hint) => `<p class="label">Codes and sign-ups</
   <div class="l-form" style="margin-top:8px"><input placeholder="Name" value="${name}" style="${hint ? "border-color:#2a72d9" : ""}"><input placeholder="Email they sign in with" value="${email}">
   ${hint ? `<small style="color:#1f5fc7;font-weight:700">${hint}</small>` : ""}
   <div style="display:flex;justify-content:flex-end"><button class="pill pill-primary" style="min-height:48px;padding:0 22px" ${on ? "" : "disabled"}>Create invite</button></div></div></section>`;
+const REQC = (src) => `<section class="card request request-top" style="${mark};margin:6px 0 10px"><small style="display:inline-block;align-self:flex-start;background:#2a72d9;color:#fff;border-radius:999px;padding:2px 10px;font-weight:800;font-size:13px;margin-bottom:4px">New beta tester application</small>
+  <div class="card-top"><span>Ana · ${src}</span><small>13 Nov</small></div><a href="#">ana.k@example.com</a><a href="#">WhatsApp +49 000 0000000</a>
+  <p class="client-note">“Met Milan at the meetup. I train three times a week.”</p>
+  <div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="pill pill-primary" style="min-height:48px;padding:0 22px">✉ Invite</button></div>
+  <div style="border-top:1px solid #e3eaf6;margin-top:12px;padding-top:6px"><button class="link" style="min-height:44px;color:#53627f">Mark as handled</button></div></section>`;
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
@@ -64,5 +69,39 @@ const INVITE = (name, email, on, hint) => `<p class="label">Codes and sign-ups</
     p = await open(); await review(p, "ana.k@example.com", false); await rename(p, "ana.k@example.com", "A", "", `<div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="pill pill-small" style="min-height:44px;background:#fff;border:1.5px solid #2a72d9;color:#1f5fc7;font-weight:700">Add a note</button></div>`);
     await note(p, "New: no name on the invite and none in Profile: the email it was sent to, as at the earlier tester. Never unnamed, and no Client in front.", "main > section.card.waiting");
     await shot(p, "r141e", null);
+    // routes into the beta, each to the client's card
+    const EM = `<small style="display:block;color:#3d4a63">ana.k@example.com</small>`, FROM = (t) => `<small style="display:block;color:#3d4a63">${t}</small>`;
+    const ADD = `<div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="pill pill-small" style="min-height:44px;background:#fff;border:1.5px solid #2a72d9;color:#1f5fc7;font-weight:700">Add a note</button></div>`;
+    const card = async (name, from, txt, file) => { const p = await open(); await rename(p, "Ana", "A", EM + FROM(from), ADD); await note(p, txt, "#crow"); await shot(p, file, "#crow", 260); };
+    const page = async (url) => { const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 }); const p = await ctx.newPage(); await p.goto(U + url); await p.waitForTimeout(1500); return p; };
+    const fill = (p, sel) => p.evaluate((sel) => { const f = document.querySelector(sel); const ins = [...f.querySelectorAll("input, textarea")]; const v = ["Ana", "ana.k@example.com", "+49 000 0000000", "Met Milan at the meetup. I train three times a week."]; let i = 0; for (const x of ins) { if (x.type === "checkbox" || x.type === "hidden" || x.name === "website" || x.offsetParent === null) continue; if (i < v.length) x.value = v[i++]; } }, sel);
+    // A: the home page form
+    p = await page("/?home"); await fill(p, ".l-request:not(.l-wait)"); await p.evaluate((mark) => { document.querySelector(".l-request:not(.l-wait)").style.cssText += ";" + mark; }, mark);
+    await note(p, "1. The home page: Join the beta. Name, email, a mobile number if they like, a note, which fits them.", ".l-request:not(.l-wait)");
+    await shot(p, "r141h1", ".l-request:not(.l-wait)", 150);
+    p = await open(); await p.evaluate(({ html }) => { document.querySelector("main section.card.waiting small.muted").insertAdjacentHTML("afterend", html); }, { html: REQC("from the home page") });
+    await note(p, "2. Clients, first in Waiting for you. Invite makes the code with the name from the form and opens the email to send. They sign in and type the code.", "main > section.card.waiting");
+    await shot(p, "r141h2", null);
+    await card("Ana", "From the home page form · 13 November", "3. New: their card. The name from the form stays (an empty Profile name no longer wipes it), the email, and where they came from.", "r141h3");
+    // B: a book page form
+    p = await page("/worthy-numbers?from=qr");
+    await p.evaluate(() => { const h = document.querySelector(".bk-read"); if (h) h.outerHTML = `<div class="l-request bk-join" id="bkform"><h2>Get your personal code</h2><p class="l-book-line">Chef Mealan is free while it is in beta, and spots are limited. Leave your name and email, and you get your code within a day.</p><div class="l-form"><input value="Ana"><input value="ana.k@example.com"><input placeholder="Mobile (optional)"><textarea placeholder="Anything we should know?"></textarea><button class="pill pill-primary" style="min-height:48px">Send</button></div></div>`; });
+    await p.evaluate((mark) => { document.querySelector("#bkform").style.cssText += ";" + mark; }, mark);
+    await note(p, "1. A book page, Worthy Numbers, here opened from the QR code in the book (?from=qr). The same form, signed out.", "#bkform");
+    await shot(p, "r141b1", "#bkform", 150);
+    p = await open(); await p.evaluate(({ html }) => { document.querySelector("main section.card.waiting small.muted").insertAdjacentHTML("afterend", html); }, { html: REQC("from Worthy Numbers · QR") });
+    await note(p, "2. Clients, the same application card, with the page and the link it came from. Invite, as above.", "main > section.card.waiting");
+    await shot(p, "r141b2", null);
+    await card("Ana", "From Worthy Numbers · QR · 13 November", "3. New: their card says the book page and the link.", "r141b3");
+    // C: your own invite
+    await card("Ana", "From your invite · 14 November", "2. New: their card. The name you gave the invite, the email, From your invite.", "r141i2");
+    // D: the waiting list
+    p = await page("/?home"); await p.evaluate(() => { const f = document.querySelector("#wait"); const i = f.querySelector("input[type=email], input"); if (i) i.value = "ana.k@example.com"; }); await p.evaluate((mark) => { document.querySelector("#wait").style.cssText += ";" + mark; }, mark);
+    await note(p, "1. The home page: the waiting list. An email only, for when Chef Mealan opens to everyone. No code, no beta.", "#wait");
+    await shot(p, "r141w1", "#wait", 150);
+    p = await open(); await bottom(p, `<p class="label" id="wl">Waiting list (1)</p><section class="card waitlist" style="${mark}"><div class="wait-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span><a href="#">ana.k@example.com</a><small style="display:block">I train on my own · 2 Nov</small></span><button class="pill pill-small pill-danger-line" style="min-height:44px">Remove</button></div></section>`);
+    await note(p, "2. Clients, Waiting list. To bring someone into the beta, you make an invite by hand: Invite a client, with their name and this email.", "#wl");
+    await shot(p, "r141w2", "#wl", 200);
+    await card("Ana", "From the waiting list · 2 November", "3. New: their card. On the waiting list first, so it says so, with the day they joined it.", "r141w3");
   } finally { await b.close(); server.kill(); }
 })();

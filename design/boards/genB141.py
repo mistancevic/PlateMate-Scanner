@@ -103,21 +103,32 @@ def row(rid, title, parts, shots, nid=None, at=0):
     y = rowEnd(c, *hs)
 row("B141", "A client is never unnamed", [
   ("Found", "Coach Milan 14 November: two new beta testers from the Munich meetup applied on the home page form. One shows as Client unnamed, like an earlier tester."),
-  ("Why", "The form asks for a name, and Invite on the application puts it on the invite. Joining writes it to the account. Then the client's own app saves its Profile name, still empty, over it. Clients reads that field, finds nothing, and says unnamed. An invite made by hand can also have no name."),
-], [("Now: Clients, a review", "r141a", "draft", "Client unnamed set new numbers."), ("Now: Clients, Invite a client", "r141b", "draft", "An email alone is enough.")])
-row("B141", "The name: Profile, then the invite, then its email", [
-  ("New invites", "Create invite needs a name and an email. The button stays off until both are there, with one line saying why."),
-  ("The name", "What is there: the name they typed in Profile; else the name on the invite they joined with; else that invite's email. Never unnamed, and no Client in front. One name for Waiting for you, the review, the card, their week."),
+  ("Why", "The form asks for a name, and Invite on the application puts it on the invite. Joining writes it to the account. Then the client's own app saves its Profile name, still empty, over it. Clients finds nothing and says unnamed."),
   ("The fix underneath", "An empty Profile name never replaces a name already there."),
-  ("Name, email, where from", "Coach Milan 11:46 and 11:52: the card shows the name, the email under it (the invite's, the one they sign in with), and where they came from: the home page form and its date, a book page, or your invite."),
-  ("Your note", "Coach Milan 11:46: you don't type their name. You keep a note of your own: Met at the High Performers meetup, Friday 13 November. Only you see it; it is kept with your account."),
-], [("New: Invite a client", "r141c", "changed", "A name and an email, then Create invite."), ("New: Clients, the client's card", "r141d", "changed", "Name, email, where from, your note.")], at=2)
+], [("Now: Clients, a review", "r141a", "draft", "Client unnamed set new numbers."), ("Now: Clients, Invite a client", "r141b", "draft", "An email alone is enough.")])
+row("Way in 1", "The home page form", [
+  ("Flow", "Join the beta on chefmealan.com. The application lands first in Waiting for you. Invite makes the code with the form's name and opens the email. They sign in and type the code."),
+  ("New", "Their card keeps the name, shows the email and says From the home page form, with the day."),
+], [("Home page: Join the beta", "r141h1", "now", "Name, email, mobile, a note."), ("Clients: the application", "r141h2", "draft", "Invite, as today."), ("New: Clients, their card", "r141h3", "changed", "From the home page form.")], nid="B141", at=2)
+row("Way in 2", "A book page form", [
+  ("Flow", "The same form on a book page (Worthy Numbers), with the link it came from: QR, PDF, LinkedIn and so on. The application says the page and the link."),
+  ("New", "Their card says From Worthy Numbers · QR, with the day."),
+], [("Book page: Get your personal code", "r141b1", "now", "Opened from the book's QR code."), ("Clients: the application", "r141b2", "draft", "The page and the link."), ("New: Clients, their card", "r141b3", "changed", "From Worthy Numbers · QR.")], nid="B141", at=5)
+row("Way in 3", "Your own invite", [
+  ("Flow", "Invite a client on Clients. You send the code by email; they sign in and type it."),
+  ("New", "Create invite needs a name and an email. Their card says From your invite, with the day."),
+], [("New: Clients, Invite a client", "r141c", "changed", "A name and an email."), ("New: Clients, their card", "r141i2", "changed", "From your invite.")], nid="B141", at=8)
+row("Way in 4", "The waiting list", [
+  ("Flow", "The waiting list on the home page takes an email only, for when Chef Mealan opens to everyone. No code. It shows on Clients as Waiting list. To bring someone into the beta, you make an invite by hand with their name and that email."),
+  ("New", "Their card says From the waiting list, with the day they joined it."),
+  ("Not in this card", "An Invite button on a waiting list row: later, if you want it."),
+], [("Home page: the waiting list", "r141w1", "now", "An email only."), ("Clients: Waiting list", "r141w2", "draft", "Invite by hand."), ("New: Clients, their card", "r141w3", "changed", "From the waiting list.")], nid="B141", at=10)
 row("B141", "Your note, and no name yet", [
-  ("Write it", "Add a note on the card opens a box. Save on the right, Cancel to back out. Edit note when one is there."),
-  ("No name yet", "The email takes the name's place, and the card offers Add a note."),
+  ("The name", "What is there: the name they typed in Profile; else the name from the form or the invite; else the email. Never unnamed, and no Client in front. One name for Waiting for you, the review, the card, their week."),
+  ("Your note", "Coach Milan 11:46: you don't type their name. You keep a note of your own: Met at the High Performers meetup, Friday 13 November. Only you see it; it is kept with your account."),
   ("Not in this card", "The two Kept on purpose carb boxes that read like a duplicate: their own card."),
-  ("Size", "Small to medium. The empty-name save, the invite form, the name order when Clients loads, the email and where-from lines, the coach's note with its own place in your account; about eight lines in three languages."),
-], [("New: Clients, writing the note", "r141f", "changed", "Only you see it."), ("New: Clients, a review", "r141e", "changed", "No name yet: the email.")], at=4)
-board("Stories219.dc.html", "B141. A client is never unnamed",
-  "14 November 2026 (Coach Milan 11:30: the new testers from the Munich meetup show as unnamed; 11:35 Draw; 11:46: name and email on Clients, and a note of your own; 11:52: where they came from). Drawn for approval.",
+  ("Size", "Medium. The empty-name save, the invite form, the name order, the email and where-from lines for four ways in, the coach's note; about ten lines in three languages."),
+], [("New: Clients, writing the note", "r141f", "changed", "Only you see it."), ("New: Clients, the card with a note", "r141d", "changed", "Name, email, where from, your note."), ("New: Clients, no name yet", "r141e", "changed", "The email in the name's place.")], at=13)
+board("Stories219.dc.html", "B141. A client is never unnamed, and you see how they came in",
+  "14 November 2026 (Coach Milan 11:30: the new testers from the Munich meetup show as unnamed; 11:35 Draw; 11:46: name and email on Clients, and a note of your own; 11:52 and 12:11: where they came from, each way in shown as its flow). Drawn for approval.",
   B, W, y - 100, "Stories218.dc.html")
