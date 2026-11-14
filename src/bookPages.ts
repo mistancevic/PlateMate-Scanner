@@ -55,6 +55,8 @@ export function bookOfPath(path: string): string | null {
 // list: anything else counts as the plain address. Only the short word is kept, never the link itself.
 export const BOOK_SOURCES: Record<string, string> = { qr: "QR", pdf: "PDF", li: "LinkedIn", ig: "Instagram", wa: "WhatsApp", gh: "GitHub", hp: "Home page", ex: "Explorer" };  // ex: DT151, Read the book on the Explorer page
 export const sourceOf = (search: string): string | null => { const s = new URLSearchParams(search).get("from"); return s && BOOK_SOURCES[s] ? s : null; };
+// B141 (0.3.146): the link the app was opened from, read once at the start, before the address is tidied (chefmealan.com/?from=qr)
+export const landedFrom: string | null = typeof window !== "undefined" ? sourceOf(window.location.search) : null;
 // the daily count for a book, book_worthy_numbers, and per source, book_worthy_numbers__qr
 export const bookHit = (slug: string, src?: string | null) => `book_${slug.replace(/-/g, "_")}${src ? `__${src}` : ""}`;
 export const BOOK_HITS = Object.keys(BOOKS).flatMap((slug) => [bookHit(slug), ...Object.keys(BOOK_SOURCES).map((s) => bookHit(slug, s))]);

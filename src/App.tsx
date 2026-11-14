@@ -2968,7 +2968,7 @@ export default function App() {
       notify(w("app.sharedWith", { coach: coachLabel(profile.coachName) }));
     },
     user, cloudEnabled, cloudStatus, profile: shownProf,
-    joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(w("app.youreWith", { coach: r.coachName })); } catch (e: any) { setError(e.message); } },
+    joinCoach: async (code: string) => { if (!user) return; try { const { clientName: given, ...r } = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); /* B141: the name from the invite, when this phone has none */ if (given && !clientName.trim()) { storeClientName(given); setClientNameState(given); } notify(w("app.youreWith", { coach: r.coachName })); } catch (e: any) { setError(e.message); } },
     leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined, coachEmail: undefined, coachPhoto: undefined, joinedAt: undefined })); } catch (e: any) { setError(e.message); } },
     // DT168 (0.3.10): sign-out clears the phone, so nothing of this person stays for the next one to sign in. First everything
     // is saved: the record, the foods, recipes and cards, the photos. If anything isn't, the phone is not cleared unless the

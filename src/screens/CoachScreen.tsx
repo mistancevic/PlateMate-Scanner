@@ -10,7 +10,7 @@ import { useKept } from "../kept";
 import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { dayNameAny, type Formula } from "../personal";
-import { listClients, setClientGoal, setClientGoalFrom, sendCoachNote, setCheckinDay, sendRecipe, pinFormula, type ClientRow } from "../cloud";
+import { loadClientNotes, saveClientNote, type ClientNotes, listClients, setClientGoal, setClientGoalFrom, sendCoachNote, setCheckinDay, sendRecipe, pinFormula, type ClientRow } from "../cloud";
 import { ClientPage, ClientRowCard, coachNumbers, todayIndex, type CoachOps } from "./ClientWeek";
 import { DAY_NAMES, type CoachNote } from "../coachNotes";
 import { CardAnswer } from "./CardAnswer";
@@ -47,6 +47,13 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   const openId = p.coachClient, setOpenId = p.setCoachClient;
   const open = rows.find((r) => r.uid === openId) ?? null;
   const coachName = user?.name?.split(" ")[0] || (p.demo ? "Milan" : "Coach");
+  // B141: the coach's own notes on the clients; in the demo they live on the page only
+  const [notesOwn, setNotesOwn] = useState<ClientNotes>({});
+  useEffect(() => { if (user && !p.demo) loadClientNotes(user.uid).then(setNotesOwn).catch(() => {}); }, [user?.uid]);
+  const saveNoteFor = (uid: string) => async (text: string) => {
+    try { if (user && !p.demo) await saveClientNote(user.uid, uid, text); setNotesOwn((n) => { const next = { ...n }; if (text.trim()) next[uid] = { text: text.trim(), at: new Date().toISOString() }; else delete next[uid]; return next; }); notify(w("coach.noteSaved")); }
+    catch (e: any) { setError(e.message || w("coach.noteNotSaved")); }
+  };
   async function refresh() {
     if (!user || p.demo) return;
     try { setRows(await listClients(user.uid)); }
@@ -133,7 +140,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
           the codes and sign-ups below, under one label */}
       <p className="label">{w("coach.clientsN", { n: rows.length })}</p>
       {rows.length === 0 && <div className="strip">{w("coach.noClientsYetShareThe")}</div>}
-      {rows.map((r) => <ClientRowCard key={r.uid} row={r} today={false} open={() => setOpenId(r.uid)} />)}
+      {rows.map((r) => <ClientRowCard key={r.uid} row={r} today={false} open={() => setOpenId(r.uid)} note={notesOwn[r.uid]?.text} saveNote={saveNoteFor(r.uid)} />)}
       {!p.demo && <WaitingRecipes notify={notify} setError={setError} />}
       {!p.demo && <p className="label coach-static">{w("coach.codesAndSignUps")}</p>}
       {!p.demo && <Invites {...p} />}
@@ -297,14 +304,14 @@ function RequestCard({ r, p, top = false }: { r: Application; p: AppApi; top?: b
   const handled = r.status === "handled", at = handledAt(r);
   const mark = () => fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) });
   const invite = async () => {
-    const res = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: r.name, email: r.email }) });
+    const res = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: r.name, email: r.email, via: { kind: "form", from: r.from ?? "", src: r.src ?? "", at: r.createdAt ?? "" } }) });
     const d = await res.json(); if (!res.ok) { p.setError(d.error || w("coach.couldnTCreateTheInvite")); return; }
     await mark(); p.recountWaiting(); location.href = inviteMail(d);
   };
   return (
     <section className={`card request${handled ? " handled" : ""}${top ? " request-top" : ""}`}>
       {top && <small className="request-chip">{w("coach.newBetaTesterApplication")}</small>}
-      <div className="card-top"><span>{r.name}{r.coach ? ` · ${w("coach.reqCoach")}` : ""}{BOOK_PAGES[r.from as string] ? ` · ${BOOK_SOURCES[r.src as string] ? w("coach.reqFromSrc", { page: BOOK_PAGES[r.from as string], src: BOOK_SOURCES[r.src as string] }) : w("coach.reqFrom", { page: BOOK_PAGES[r.from as string] })}` : ""}{r.count > 1 ? ` · ${w("coach.reqCount", { n: r.count })}` : ""}</span><small>{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ""}</small></div>
+      <div className="card-top"><span>{r.name}{r.coach ? ` · ${w("coach.reqCoach")}` : ""}{` · ${[w("coach.reqFrom", { page: BOOK_PAGES[r.from as string] ?? w("coach.theHomePage") }), BOOK_SOURCES[r.src as string]].filter(Boolean).join(" · ")}`}{r.count > 1 ? ` · ${w("coach.reqCount", { n: r.count })}` : ""}</span><small>{r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ""}</small></div>
       <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
       {r.phone ? <a href={waLink(String(r.phone))} target="_blank" rel="noreferrer">WhatsApp {String(r.phone)}</a> : null}
       {r.note ? <p className="client-note">“{String(r.note)}”</p> : null}
@@ -388,7 +395,9 @@ export function Invites(p: AppApi) {
         <div className="l-form" style={{ marginTop: 8 }}>
           <input placeholder={w("coach.name")} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
           <input placeholder={w("coach.emailTheySignInWith")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <button className="pill pill-primary" disabled={busy || !email.includes("@")} onClick={() => create(name, email)}>{w("coach.createInvite")}</button>
+          {/* B141: a name and an email; the button stays off until both are there, and says why */}
+          {email.includes("@") && !name.trim() && <small className="invite-need">{w("coach.addTheirName")}</small>}
+          <div className="button-row"><button className="pill pill-primary" disabled={busy || !email.includes("@") || !name.trim()} onClick={() => create(name.trim(), email)}>{w("coach.createInvite")}</button></div>
         </div>
         {made && (
           <div className="invite-made">

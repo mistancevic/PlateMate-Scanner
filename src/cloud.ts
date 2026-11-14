@@ -7,6 +7,7 @@ import { getAuth, GoogleAuthProvider, EmailAuthProvider, signInWithPopup, signIn
 import { getLang } from "./lang";
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, deleteField, type Firestore } from "firebase/firestore";
 import { splitSave, mergeLoad, coachFieldsOf } from "./privateSplit";
+import { clientIdentity, keepName, type Joined, type Via } from "./clientName";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
 import { looseOut, photoSigsOf, sig, stripStepPics } from "./photos";
 
@@ -166,7 +167,8 @@ export async function saveCloud(uid: string, data: CloudDoc, opts?: { onlyChange
   // there while the live app could not read the private part (before 0.3.10); the live app reads it since, so the copy only
   // doubled every save
   const keepOld = false;
-  const { priv, main, drop } = splitSave(data as any, keepOld);
+  // B141: an empty Profile name never replaces the name the invite wrote
+  const { priv, main, drop } = splitSave(keepName(data as any), keepOld);
   // 0.3.67 (Coach Milan 3 November 07:55): the autosave writes only the part that changed since this phone last wrote it,
   // and nothing when neither did. Every other save (the phone's newer copy, signing out) writes both.
   const sigMain = partSig({ ...main, drop }), sigPriv = priv ? partSig(priv) : "";
@@ -219,7 +221,7 @@ export async function joinCoach(_uid: string, code: string) {
   const r = await fetch("/api/join", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(d.error || w("cloud.joinFailed"));
-  return { coachId: d.coachId as string, coachName: (d.coachName as string) || "your coach", coachEmail: (d.coachEmail as string | null) ?? undefined, coachPhoto: (d.coachPhoto as string | null) ?? undefined, joinedAt: (d.joinedAt as string) ?? undefined };
+  return { clientName: typeof d.clientName === "string" ? d.clientName : "", coachId: d.coachId as string, coachName: (d.coachName as string) || "your coach", coachEmail: (d.coachEmail as string | null) ?? undefined, coachPhoto: (d.coachPhoto as string | null) ?? undefined, joinedAt: (d.joinedAt as string) ?? undefined };
 }
 export async function leaveCoach(uid: string) {
   await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null, coachEmail: null, coachPhoto: null, joinedAt: null });
@@ -233,11 +235,26 @@ export async function loadSharedProfile(uid: string): Promise<import("./summary"
   return d.exists() ? (d.data() as any) : null;
 }
 export async function saveSharedProfile(uid: string, sp: import("./summary").SharedProfile) { notPaused(); await setDoc(doc(db(), "users", uid, "shared", "profile"), sp); }
-export type ClientRow = { days: Record<string, import("./dayLines").DayLine>; notes: import("./coachNotes").CoachNote[]; checkinDay: number; nextGoal: import("./personal").NextGoal | null; coachGoal: any; goalsNow: { calories?: number | null; protein?: number | null } | null; uid: string; name: string; review: NumbersReview | null; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: import("./personal").Formula | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null; weightKg?: number; trainingAge?: any; weighIns?: any[]; weightTrend?: import("./weight").Trend | null; weighDates?: string[]; weightAt?: string | null; profileShare?: import("./summary").SharedProfile | null; measured?: (import("./measured").Measured & { formulaKcal: number | null }) | null };
+export type ClientRow = { days: Record<string, import("./dayLines").DayLine>; notes: import("./coachNotes").CoachNote[]; checkinDay: number; nextGoal: import("./personal").NextGoal | null; coachGoal: any; goalsNow: { calories?: number | null; protein?: number | null } | null; uid: string; name: string; email?: string; named?: boolean; via?: Via | null; review: NumbersReview | null; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: import("./personal").Formula | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null; weightKg?: number; trainingAge?: any; weighIns?: any[]; weightTrend?: import("./weight").Trend | null; weighDates?: string[]; weightAt?: string | null; profileShare?: import("./summary").SharedProfile | null; measured?: (import("./measured").Measured & { formulaKcal: number | null }) | null };
 export async function pinFormula(clientUid: string, formula: import("./personal").Formula | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
+// B141: the coach's own note on a client ("Met at the High Performers meetup, Friday 13 November"). Kept in the coach's
+// private part, which only the coach reads; never in the client's account.
+export type ClientNotes = Record<string, { text: string; at: string }>;
+const clientNotesRef = (uid: string) => doc(db(), "users", uid, "private", "clientNotes");
+export async function loadClientNotes(coachUid: string): Promise<ClientNotes> {
+  const snap = await getDoc(clientNotesRef(coachUid)); const x = snap.exists() ? (snap.data() as any) : {};
+  return Object.fromEntries(Object.entries(x).filter(([, v]: any) => v && typeof v.text === "string" && v.text.trim()).map(([k, v]: any) => [k, { text: String(v.text), at: String(v.at ?? "") }]));
+}
+export async function saveClientNote(coachUid: string, clientUid: string, text: string) {
+  notPaused();
+  await setDoc(clientNotesRef(coachUid), { [clientUid]: text.trim() ? { text: text.trim().slice(0, 600), at: new Date().toISOString() } : deleteField() }, { merge: true });
+}
 export async function listClients(coachUid: string): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
   const snap = await getDocs(q);
+  // B141: who joined with which invite: the name and email on it, and where they came from
+  const joined = new Map<string, Joined>();
+  try { const r = await fetch("/api/invites"); const d = await r.json(); for (const j of (d.joined ?? []) as Joined[]) joined.set(j.uid, j); } catch { /* the Profile names alone, then */ }
   const rows = await Promise.all(snap.docs.map(async (d) => {
     const x = d.data() as any;
     let feedback: any[] = [];
@@ -246,7 +263,7 @@ export async function listClients(coachUid: string): Promise<ClientRow[]> {
     try { profileShare = await loadSharedProfile(d.id); } catch { /* none shared yet */ }
     // the coach sees situation and date only, never the person's words (coachView; DT168)
     const cf = coachFieldsOf(x);
-    return { days: x.days && typeof x.days === "object" ? x.days : {}, notes: notesOf(x.coachNotes), checkinDay: checkinOf(x.checkinDay), nextGoal: cf.nextGoal as any, coachGoal: x.coachGoal ?? null, goalsNow: cf.goalsNow, uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: cf.foods, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: cf.pdUnit, flags: cf.flags, birthYear: null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: cf.consentBy, weightKg: cf.weightKg, trainingAge: cf.trainingAge, weighIns: cf.weighIns, weightTrend: cf.weightTrend, weighDates: cf.weighDates, weightAt: cf.weightAt, profileShare, measured: x.measured && typeof x.measured === "object" ? x.measured : null };
+    return { days: x.days && typeof x.days === "object" ? x.days : {}, notes: notesOf(x.coachNotes), checkinDay: checkinOf(x.checkinDay), nextGoal: cf.nextGoal as any, coachGoal: x.coachGoal ?? null, goalsNow: cf.goalsNow, uid: d.id, ...clientIdentity(x.clientName, joined.get(d.id)), review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: cf.foods, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: cf.pdUnit, flags: cf.flags, birthYear: null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: cf.consentBy, weightKg: cf.weightKg, trainingAge: cf.trainingAge, weighIns: cf.weighIns, weightTrend: cf.weightTrend, weighDates: cf.weighDates, weightAt: cf.weightAt, profileShare, measured: x.measured && typeof x.measured === "object" ? x.measured : null };
   }));
   return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 }

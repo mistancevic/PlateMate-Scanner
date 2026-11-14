@@ -3316,3 +3316,17 @@ section.sv-menu .sv-menu-ask .sv-chips > .pill.pill-small { min-height: 44px; wh
 .sv-not-counted { align-self: flex-start; background: var(--brand); color: #fff; border-radius: 999px; padding: 2px 10px; font-weight: 700; font-size: 13px; }
 .not-counted-row { width: 100%; background: var(--tint); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; margin: 8px 0; min-height: 56px; display: flex; align-items: center; gap: 8px; text-align: left; font: inherit; color: inherit; }
 .not-counted-row .menu-row-text { flex: 1; display: flex; flex-direction: column; }
+
+/* B141 (0.3.146, board Stories219): the client's card is a card that holds the open button and the coach's own note */
+div.client-row { cursor: pointer; }
+.client-open { all: unset; display: flex; flex-direction: column; gap: 8px; width: 100%; box-sizing: border-box; cursor: pointer; text-align: left; }
+.client-open:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: 10px; }
+.client-head small.client-email, .client-head small.client-from { display: block; overflow-wrap: anywhere; }
+.client-note-own { border-top: 1px solid var(--line, #e3eaf6); margin-top: 2px; padding-top: 8px; width: 100%; display: flex; flex-direction: column; gap: 6px; cursor: default; }
+.client-note-own textarea { width: 100%; box-sizing: border-box; min-height: 72px; border: 1.5px solid var(--brand); border-radius: 10px; padding: 8px; font: inherit; font-size: 15px; }
+.client-note-text { color: var(--ink, #172742); font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.client-note-go { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.client-note-go.end { justify-content: flex-end; }
+.client-note-go .link, .client-note-go .pill { min-height: 44px; }
+.invite-need { color: var(--brand-text); font-weight: 700; }
+.client-open .cw-bars-row { flex-wrap: wrap; } .client-open .cw-bars-row small { margin-left: auto; }

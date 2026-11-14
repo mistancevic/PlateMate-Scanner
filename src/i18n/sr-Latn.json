@@ -12106,7 +12106,7 @@
       "checked": true
     },
     "home.after": {
-      "text": "Šta želiš da postigneš? (nije obavezno)",
+      "text": "Kratka poruka za trenera Milana (nije obavezno). Na primer: tvoj cilj i nekoliko reči o tebi.",
       "checked": true
     },
     "home.language": {
@@ -19314,7 +19314,7 @@
       "checked": true
     },
     "goal.stepAfter": {
-      "text": "{n}. Šta želiš da postigneš?",
+      "text": "{n}. Tvoj cilj",
       "checked": true
     },
     "goal.stepDays": {
@@ -19806,7 +19806,7 @@
       "checked": true
     },
     "coach.reviewSet": {
-      "text": "Klijent {name}: postavljeni su novi brojevi",
+      "text": "{name}: postavljeni su novi brojevi",
       "checked": true
     },
     "coach.reviewReplied": {
@@ -22535,6 +22535,58 @@
     },
     "served.notCountedN": {
       "text": "Ne računa se: {n} tanjir|Ne računa se: {n} tanjira|Ne računa se: {n} tanjira",
+      "checked": true
+    },
+    "coach.noNameYet": {
+      "text": "Još nema imena",
+      "checked": true
+    },
+    "coach.fromHomeForm": {
+      "text": "Preko prijave na početnoj stranici",
+      "checked": true
+    },
+    "coach.fromPage": {
+      "text": "Preko stranice: {page}",
+      "checked": true
+    },
+    "coach.fromInvite": {
+      "text": "Preko tvoje pozivnice",
+      "checked": true
+    },
+    "coach.fromWaitlist": {
+      "text": "Sa liste čekanja",
+      "checked": true
+    },
+    "coach.theHomePage": {
+      "text": "početna stranica",
+      "checked": true
+    },
+    "coach.addNote": {
+      "text": "Dodaj belešku",
+      "checked": true
+    },
+    "coach.editNote": {
+      "text": "Izmeni belešku",
+      "checked": true
+    },
+    "coach.saveNote": {
+      "text": "Sačuvaj",
+      "checked": true
+    },
+    "coach.noteOnlyYou": {
+      "text": "Ovu belešku vidiš samo ti. {name} je ne vidi.",
+      "checked": true
+    },
+    "coach.noteSaved": {
+      "text": "Beleška je sačuvana.",
+      "checked": true
+    },
+    "coach.noteNotSaved": {
+      "text": "Beleška nije sačuvana. Pokušaj ponovo.",
+      "checked": true
+    },
+    "coach.addTheirName": {
+      "text": "Dodaj ime, da znaš ko je to.",
       "checked": true
     }
   }

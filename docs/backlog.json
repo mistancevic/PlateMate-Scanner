@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.146",
     "0.3.145",
     "0.3.144",
     "0.3.143",
@@ -54,8 +55,7 @@
     "0.3.137",
     "0.3.136",
     "0.3.135",
-    "0.3.134",
-    "0.3.133"
+    "0.3.134"
   ],
   "tickets": [
     {
@@ -193,9 +193,32 @@
       "id": "B141",
       "title": "A client is never unnamed: name and email on Clients, and a note of the coach's own",
       "epic": "trust",
-      "state": "now",
+      "state": "done",
       "board": "Stories219",
-      "why": "Coach Milan 14 November 11:30, with a screenshot: two new beta testers from the Munich meetup; one shows as Client unnamed, like an earlier tester. Clients takes a name only from the invite's name and the client's Profile name; both optional, and an email-link sign-in brings none. 11:35: Draw. Drawn 14 November (Stories219): Create invite needs a name; Clients falls back to the invite's name, then its email, and says where the name came from; never unnamed, no Client in front. 11:46: no typing the client's name by the coach; the card shows name and email, always; a private note of the coach's own (Met at the High Performers meetup, Friday 13 November), kept with the coach's account. Redrawn. 11:52: they applied on the home page form, so the card also shows where they came from. Found: the form's name goes onto the invite and the account, then the client's app saves its empty Profile name over it; an empty Profile name must never replace a name already there. 12:11: each way in drawn as its flow to the client's card: the home page form, a book page form, your invite, the waiting list. 12:28: one flow, now then new. 12:45 and 12:47: the note box on the home page form reads A short note to Coach Milan (optional). For example: your goal, and a few words about you; the goal setup step What are you after? becomes Your goal; a link carries its source (chefmealan.com/?from=qr), shown on the application and the card. Redrawn."
+      "why": "Coach Milan 14 November 11:30, with a screenshot: two new beta testers from the Munich meetup; one shows as Client unnamed, like an earlier tester. Clients takes a name only from the invite's name and the client's Profile name; both optional, and an email-link sign-in brings none. 11:35: Draw. Drawn 14 November (Stories219): Create invite needs a name; Clients falls back to the invite's name, then its email, and says where the name came from; never unnamed, no Client in front. 11:46: no typing the client's name by the coach; the card shows name and email, always; a private note of the coach's own (Met at the High Performers meetup, Friday 13 November), kept with the coach's account. Redrawn. 11:52: they applied on the home page form, so the card also shows where they came from. Found: the form's name goes onto the invite and the account, then the client's app saves its empty Profile name over it; an empty Profile name must never replace a name already there. 12:11: each way in drawn as its flow to the client's card: the home page form, a book page form, your invite, the waiting list. 12:28: one flow, now then new. 12:45 and 12:47: the note box on the home page form reads A short note to Coach Milan (optional). For example: your goal, and a few words about you; the goal setup step What are you after? becomes Your goal; a link carries its source (chefmealan.com/?from=qr), shown on the application and the card. Redrawn. Go 13:08. Built: an empty Profile name is never saved over a name (src/clientName.ts keepName), and joining hands the invite's name to the phone; Clients takes the Profile name, then the invite's name, then its email; the card shows name, email and where from (the invite keeps it: form with its page and link, invite, waiting list; older invites are looked up by email); the coach's own note in the coach's private part; Create invite and Share's Make a code need a name; the home page form remembers ?from=; the note box and Your goal.",
+      "version": "0.3.146"
+    },
+    {
+      "id": "DT297",
+      "title": "Certificates: the AI ones first, then nutrition and the rest",
+      "epic": "home",
+      "state": "done",
+      "version": "0.3.146",
+      "why": "Coach Milan 14 November 13:06: reorder the certificates, AI first, for recruiters. Go 13:08. Order on the home page and /about: AI Product Management Certificate, AI Mastery, Certified Nutrition Coach, 10X Fitness Coaching Certification, Certified Holobody Coach, Certified Business Coach."
+    },
+    {
+      "id": "B142",
+      "title": "Two Kept on purpose boxes for carbs on one review",
+      "epic": "trust",
+      "state": "later",
+      "why": "Seen on Coach Milan's screenshot of 14 November: a client's review shows carbs are low for a training day twice, with 5 to 7 and 6 to 10 g per kg. Reads like a duplicate. To reproduce."
+    },
+    {
+      "id": "DT298",
+      "title": "Invite from a waiting list row; a label per QR code",
+      "epic": "trust",
+      "state": "later",
+      "why": "Left out of B141 on 14 November. An Invite button on a waiting list row, so the email is not typed again. A short label in the link per QR code (a meetup, a flyer), once there is a second place for one."
     },
     {
       "id": "R1",
