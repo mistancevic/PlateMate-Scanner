@@ -48,7 +48,7 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
     await page.locator(".ht-screenshot").click(); await page.waitForTimeout(400);
     ok(await text(".howto-one h3") === "A recipe from a screenshot", "the situation opens");
     ok(await page.locator(".ht-steps li").count() === 4, "four steps");
-    ok(/Screenshot/.test(await text(".ht-steps li")), "step 1 names the button: " + await text(".ht-steps li"));
+    ok(/Use a screenshot/.test(await text(".ht-steps li")), "step 1 names the button, by its words since DT301 (0.3.149): " + await text(".ht-steps li"));
     const small = await page.locator(".howto-one button").evaluateAll((xs) => xs.filter((x) => x.getBoundingClientRect().height < 44).map((x) => x.className + " " + x.getBoundingClientRect().height + " " + getComputedStyle(x).minHeight + " " + getComputedStyle(x).height));
     ok(small.length === 0, "every button at least 44 px: " + small.join(", "));
     const posted = []; page.on("request", (r) => { if (r.url().endsWith("/api/howto") && r.method() === "POST") posted.push(JSON.parse(r.postData() || "{}")); });

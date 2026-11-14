@@ -2,6 +2,8 @@
 // row in the chat is a plain green tick, not a pill: ✓ On the plate, ✓ Out, ✓ In the plan. Undo sits under the tick while the
 // chat is open and puts things back as they were. Back to the plate becomes the main button after the first Add. The chat's
 // head stays at the top and says where you came from: Back to the plate, Back to the plan, or Close. Swap and Move: chat-kinds.
+// Changed by story B143 (0.3.149, board Stories222; Coach Milan 14 November 17:46 and 17:54 Go): after Put them in the plan, ✓ In the
+// plan stands on its own line, and under it one row: Undo on the left, Back to the plan on the right, both 44 px.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -81,7 +83,7 @@ const ANSWER = { reply: "Low-fat quark and an apple go well with your protein ba
   await fb.getByRole("button", { name: "Put them in the plan" }).click(); await page.waitForTimeout(500);
   const filled = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned") || "{}"));
   const n = Object.values(filled).reduce((k, d) => k + Object.keys(d).length, 0);
-  ok(n >= 2 && await text(fb.locator(".done-tick")) === "✓ In the planUndo" && await fb.getByRole("button", { name: "Back to the plan" }).evaluate((el) => el.classList.contains("pill-primary")), "DT153: ✓ In the plan with Undo, and Back to the plan as the main button: " + n + " slots");
+  ok(n >= 2 && await text(fb.locator(".fill-done-line")) === "✓ In the plan" && await fb.locator(".fill-done-row").getByRole("button", { name: "Undo" }).count() === 1 && await fb.getByRole("button", { name: "Back to the plan" }).evaluate((el) => el.classList.contains("pill-primary")), "DT153, B143: ✓ In the plan, under it Undo, and Back to the plan as the main button: " + n + " slots");
   const ub = await fb.getByRole("button", { name: "Undo" }).boundingBox(), bb = await fb.getByRole("button", { name: "Back to the plan" }).boundingBox();
   ok(bb.x - (ub.x + ub.width) > 40, "DT153: Undo sits away from Back to the plan");
   await fb.getByRole("button", { name: "Undo" }).click(); await page.waitForTimeout(500);

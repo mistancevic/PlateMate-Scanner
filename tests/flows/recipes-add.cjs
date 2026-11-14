@@ -39,7 +39,7 @@ const U = "http://127.0.0.1:3232";
     await page.goto(U + "/"); await page.waitForTimeout(900);
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(600);
     const add = page.locator(".recipe-add");
-    ok(await add.count() === 1 && await add.getByRole("button", { name: "Link" }).count() === 1 && /Screenshot/.test(await add.textContent()), "Recipes, Mine: Add a recipe with Screenshot and Link");
+    ok(await add.count() === 1 && await add.getByRole("button", { name: "Link" }).count() === 1 && /Use a screenshot/.test(await add.textContent()) && /Paste a link/.test(await add.textContent()), "Recipes, Mine: Add a recipe with Use a screenshot and Paste a link (DT301)");
     await add.getByRole("button", { name: "Link" }).click(); await page.waitForTimeout(300);
     await page.getByLabel("Link to a recipe").fill(fritters.url); await page.getByRole("button", { name: /^Read/ }).first().click(); await page.waitForTimeout(1200);
     const card = page.locator(".in-card");

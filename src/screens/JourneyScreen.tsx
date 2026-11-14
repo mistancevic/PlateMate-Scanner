@@ -1465,8 +1465,6 @@ export function JourneyScreen(p: AppApi) {
         {inHead}
         {!p.cookOpenAsk && <CookStrip p={p} />}
         {laterBlock}
-        {/* R17 (0.2.45, board RS16): an empty plate asks what you crave, and finds it */}
-        {!p.filling && !imported && items.length === 0 && !inFlow && <CravingSearch p={p} need={mealNeed} target={pdRef} onFood={add} />}
         {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
         {/* R11: a tap anywhere on the line opens its section; the pencil (or Done) stays the button for keyboards and readers */}
@@ -1547,6 +1545,9 @@ export function JourneyScreen(p: AppApi) {
             <p className="small moment-hint">{p.travelTo ? w("plate.travelPlans", { place: REGIONS.some((r) => r.id === p.travelTo) ? regionV(p.travelTo!) : "" }) : w("make.pickThePlaceAndChef")}</p>
           </>
         )}
+        {/* R17 (0.2.45, board RS16): an empty plate asks what you crave, and finds it. DT301 (0.3.149, board Stories223): under
+            the meal line, which now comes first and says what this plate is for */}
+        {!p.filling && !imported && items.length === 0 && !inFlow && <CravingSearch p={p} need={mealNeed} target={pdRef} onFood={add} />}
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
         {/* DT246 (0.3.96, board Stories182): a plate already recorded says where it went; its changes go there too */}
         {p.recordNow && items.length > 0 && (() => { const r = p.recordNow!, d = new Date(r.at); return (
@@ -1682,7 +1683,6 @@ export function JourneyScreen(p: AppApi) {
         <div className="card-top"><span>{w("plate.onThePlate")}</span>{/* DT219 (0.3.58): Empty plate whenever the Plate has foods or a photo */}{(items.length > 0 || !!state.photo) && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> {w("plate.empty")}</>} confirmLabel={w("plate.emptyConfirm")} onConfirm={emptyPlate} />}</div>
         {/* DT176 (0.3.19, board Stories124): Travel mode on: the Plate says where it serves you, and what the kitchen there allows */}
         {p.travel && <small className="travel-plate-note">{placeName(p.travel.place)}, {kitchenName(p.travel.kitchen).toLowerCase()}: {p.travel.kitchen === "hotel" ? w("make.chefMealanSuggestsWhatYou") : p.travel.kitchen === "flat" ? w("make.chefMealanCooksWithA") : w("make.chefMealanCooksAsAt")} {w("plate.searchFindsThere")}</small>}
-        {items.length === 0 && <small className="plate-empty">{w("plate.nothingYet")}</small>}
         {imported && rec && !way && rec.makes && (
           <div className="in-portion">
             <div className="moments">
@@ -1726,20 +1726,29 @@ export function JourneyScreen(p: AppApi) {
           </section>
         )}
         {items.length > 0 && numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
-        {items.length === 0 && <small className="ways-label">{w("plate.addAFood")}</small>}
-        <div className="ways">
+        {/* DT301 (0.3.149, board Stories223): an empty plate shows a plate with Nothing on the plate yet, and the four ways as
+            tiles in two rows, icon above the word, under the heading Add a food. With foods on the plate the ways stay as they were. */}
+        {items.length === 0 && (
+          <div className="plate-empty-pic">
+            <svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="62" fill="#fff" stroke="#c9d6ee" strokeWidth="3" /><circle cx="66" cy="66" r="44" fill="#f4f7fd" stroke="#dbe4f4" strokeWidth="2" /></svg>
+            <span className="plate-empty">{w("plate.nothingYet")}</span>
+          </div>
+        )}
+        {items.length === 0 && <b className="ways-head">{w("plate.addAFood")}</b>}
+        <div className={`ways${items.length === 0 ? " ways-tiles" : ""}`}>
           {/* RP5b (0.2.25, Milan 17:42): Manual on the left, Scan on the right, where the thumb is */}
-          <button className="pill pill-small" onClick={() => blank()}><Pencil size={15} /> {w("plate.manual")}</button>
-          <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> {w("plate.scan")}</button>
+          <button className="pill pill-small" onClick={() => blank()}><Pencil size={items.length === 0 ? 24 : 15} /> {w("plate.manual")}</button>
+          <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={items.length === 0 ? 24 : 15} /> {w("plate.scan")}</button>
           {/* DT127: a photo of the meal in front of you, read onto the plate as estimates */}
-          {p.ai.on && <button type="button" className="pill pill-small mp-button" onClick={p.mealCamera}><Camera size={15} /> {w("plate.photoOfMeal")}</button>}
+          {p.ai.on && <button type="button" className="pill pill-small mp-button" onClick={p.mealCamera}><Camera size={items.length === 0 ? 24 : 15} /> {w("plate.photoOfMeal")}</button>}
           {/* DT175 (0.3.17, board Stories122): the foods you have, said or typed, landed as estimates */}
-          {p.ai.on && !saying && <button type="button" className="pill pill-small say-button" onClick={() => setSaying(true)}><Mic size={15} /> {w("plate.sayWhatYouHave")}</button>}
+          {p.ai.on && !saying && <button type="button" className="pill pill-small say-button" onClick={() => setSaying(true)}><Mic size={items.length === 0 ? 24 : 15} /> {w("plate.sayWhatYouHave")}</button>}
         </div>
         {saying && <SayHave busy={!!p.busy} onCancel={() => setSaying(false)} onDone={(text) => { void p.plateFromWords(text).then((ok) => { if (ok) setSaying(false); }); }} />}
         {/* Start from a recipe (0.2.16, board IM, IM1): only on an empty plate, because a recipe fills the plate */}
         {items.length === 0 && <>
-          <small className="ways-label">{w("plate.startFromRecipe")}</small>
+          {/* DT301 (0.3.149): the second part of an empty plate, after a line, as a heading: Have a recipe? Start from it */}
+          <b className="ways-head ways-head-second">{w("plate.startFromRecipe")}</b>
           <StartWays flow={recipeIn} />
         </>}
         {items.length + opts.length > 0 && (() => {
@@ -2058,7 +2067,9 @@ export function JourneyScreen(p: AppApi) {
             {items.length > 0 && <button className="pill pill-primary pill-wide put-in" onClick={keepAsIs}>{w("plate.putItIn", { slot: slotV(p.filling) })}</button>}
             <button className="pill pill-wide" disabled={items.length < 1} onClick={makeAMeal}><ChefHat size={18} className="hat" /> {fit ? w("plate.fitAgain") : w("plate.fit")}</button>
           </>) : (<>
-          <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={makeAMeal}>
+          {/* DT301 (0.3.149, Coach Milan 23:30 Go): on an empty plate Find ideas is the one filled button; Fit to my target is white
+              with a blue border until a food is on the plate, then filled, as before */}
+          <button className={`pill pill-wide${items.length < 1 ? " pill-action" : " pill-primary"}`} disabled={items.length < 1} onClick={makeAMeal}>
             {/* DT87 (0.2.87, Milan 11:43): Fit to my target, with the chef hat at full size: the AI is behind it */}
             <ChefHat size={18} className="hat" /> {fit ? w("plate.fitAgain") : w("plate.fit")}
           </button>

@@ -66,7 +66,8 @@ const U = "http://127.0.0.1:3209";
   // IM1: an empty plate: two rows, by job
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
   let t = await card();
-  ok(/Add a food/.test(t) && /Start from a recipe/.test(t) && await page.locator(".plate-card").getByText("Screenshot").count() === 1 && await page.locator(".plate-card").getByRole("button", { name: "Link" }).count() === 1, "IM1: an empty plate: Add a food (Scan, Type) and Start from a recipe (Screenshot, Link)");
+  // Changed by story DT301 (0.3.149, board Stories223): the second part reads Have a recipe? Start from it; the buttons Use a screenshot, Paste a link
+  ok(/Add a food/.test(t) && /Have a recipe\? Start from it/.test(t) && await page.locator(".plate-card").getByText("Use a screenshot").count() === 1 && await page.locator(".plate-card").getByRole("button", { name: "Paste a link" }).count() === 1, "IM1: an empty plate: Add a food and Have a recipe? Start from it (Use a screenshot, Paste a link)");
   ok(!/Empty plate/.test(t), "IM1: no Empty plate on an empty plate");
 
   // IM2: two screenshots, read in order
@@ -156,9 +157,9 @@ const U = "http://127.0.0.1:3209";
   await page.locator(".in-card input").fill("https://www.instagram.com/p/abc123/");
   await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
   t = await card();
-  ok(/This link didn't open for us\./.test(t) && /Instagram, TikTok and some sites need a login/.test(t) && await page.getByRole("button", { name: "Use Screenshot" }).count() === 1, "IM7: an Instagram link: didn't open, use Screenshot");
-  await page.getByRole("button", { name: "Use Screenshot" }).click(); await page.waitForTimeout(300);
-  ok(/A recipe from screenshots/.test(await card()), "IM7: Use Screenshot goes to the pictures");
+  ok(/This link didn't open for us\./.test(t) && /Instagram, TikTok and some sites need a login/.test(t) && await page.getByRole("button", { name: "Use a screenshot" }).count() === 1, "IM7: an Instagram link: didn't open, Use a screenshot (DT301)");
+  await page.getByRole("button", { name: "Use a screenshot" }).click(); await page.waitForTimeout(300);
+  ok(/A recipe from screenshots/.test(await card()), "IM7: Use a screenshot goes to the pictures");
   ok(errs.length === 0, "no page errors " + errs.join(" | "));
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");

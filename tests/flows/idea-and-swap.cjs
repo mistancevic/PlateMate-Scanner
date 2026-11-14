@@ -4,6 +4,8 @@
 // card. Chef Mealan is told where you shop. On the Plate, one line says swipe left to swap, right to remove; + Add a food sits
 // right under the last food and opens the search there. Swap (rule C51) lists the same kind first, your foods before the basic
 // foods sold where you shop, never the food swapped away under another name; other kinds wait behind one line. One word: + Add.
+// Changed by story DT301 (0.3.149, board Stories223; Coach Milan 14 November 21:02 and 21:08 Go): Find ideas asks Chef Mealan;
+// an idea is kept with its steps when it goes on the plate (or on Save in My recipes), not by itself.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -37,7 +39,7 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
     const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
     await page.goto(U + "/plate"); await page.waitForTimeout(1500);
     await page.getByLabel("What are you craving?").fill("cheesecake"); await page.waitForTimeout(500);
-    await page.getByRole("button", { name: /Ask Chef Mealan/ }).first().click(); await page.waitForTimeout(2300);
+    await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(2300);
     // the wait moves and counts
     const card = page.locator(".thinking-card");
     ok(await card.count() === 1 && await card.locator(".thinking-hat img").count() === 1 && await card.locator(".thinking-bar i").count() === 1, "a thinking card: the hat, the bar");
@@ -52,8 +54,8 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
     ok(await idea.locator(".crave-how li").count() === 4 && /Toast the oats/.test(await idea.locator(".crave-how").textContent()), "How to make it, in steps");
     ok(await idea.getByRole("button", { name: /Swap|Add/ }).count() === 0, "nothing to edit on the card");
     ok(/To change a food, put it on your plate: swap, remove, add and the amounts are all there\./.test(await idea.textContent()), "the card says where changes happen");
-    ok((await st()).meals.find((m) => m.title === "Cheesecake cup")?.idea?.how?.length === 4, "the steps are kept with the idea");
     await idea.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200);
+    ok((await st()).meals.find((m) => m.title === "Cheesecake cup")?.idea?.how?.length === 4, "on the plate, the idea is kept with its steps");
     // the Plate: the swipe line and + Add a food under the foods
     ok(/Swipe a food left to swap it, right to remove it\./.test(await page.locator(".plate-card").textContent()), "one line says how to swap and remove");
     const under = await page.evaluate(() => { const rows = document.querySelector(".plate-card .rows"); const add = document.querySelector(".add-here-open"); return !!rows && !!add && rows.compareDocumentPosition(add) & 4 && add.getBoundingClientRect().top - rows.getBoundingClientRect().bottom < 80; });

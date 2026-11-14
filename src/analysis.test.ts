@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { analyse, addsUp, isOpen } from "./analysis";
+import { analyse, addsUp, isOpen, keptLine } from "./analysis";
 import { calculate, ownDayNumbers } from "./personal";
 
 const me: any = { sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, life: "desk", week: { passive: 2, active: 1, easy: 2, hard: 2 }, easyMin: 60, hardMin: 75 };
@@ -35,4 +35,13 @@ test("without body data only the arithmetic and the shape of the week run", () =
   const a = analyse({ days: o.days, avg: o.avg, bandId: "maintain", personal: p, burn: null });
   assert.deepEqual(a.findings.map((f) => f.id).filter((x) => ["energy", "protein", "carbs-easy", "carbs-hard"].includes(x)), []);
   assert.ok(a.findings.some((f) => f.id === "shape-rest"));
+});
+
+test("B142: two carbs lines kept on purpose say their day on the coach's card; a week's line does not", () => {
+  const p = { ...me, dayMode: "each", ownDays: { passive: { kcal: 2350, protein: 185, fats: 80, carbs: 222 }, active: { kcal: 2400, protein: 190, fats: 80, carbs: 230 }, easy: { kcal: 2500, protein: 190, fats: 80, carbs: 255 }, hard: { kcal: 2600, protein: 190, fats: 80, carbs: 280 } } };
+  const o = ownDayNumbers(p, "maintain", null)!;
+  const a = analyse({ days: o.days, avg: o.avg, bandId: "maintain", personal: p, burn: calculate(me, "maintain", null)!.kcal });
+  const lines = a.findings.filter((f) => f.field === "carbs").map(keptLine);
+  assert.deepEqual(lines, ["Moderate day, kept on purpose: carbs are low for a training day", "Hard day, kept on purpose: carbs are low for a training day"]);
+  assert.equal(keptLine({ title: "Protein is low", day: null }), "Kept on purpose: protein is low");
 });
