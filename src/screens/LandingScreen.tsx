@@ -505,6 +505,7 @@ export function WaitForm({ who: presetWho }: { who?: "client" | "coach" | "self"
   const [who, setWho] = useState<"client" | "coach" | "self" | "">(presetWho ?? "");
   useEffect(() => { if (presetWho) setWho(presetWho); }, [presetWho]);
   const [consent, setConsent] = useState(false);
+  const [tried, setTried] = useState(false); const formRef = useRef<HTMLDivElement>(null);
   const [trap, setTrap] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
   const [err, setErr] = useState("");
@@ -518,15 +519,20 @@ export function WaitForm({ who: presetWho }: { who?: "client" | "coach" | "self"
     } catch (e: any) { setErr(e.message); setState("idle"); }
   }
   if (state === "sent") return <div className="l-sent"><Check size={22} /> {w("home.onWait", { email })}</div>;
+  // DT299 (0.3.147, board Stories220): Email * and the tick *; the button can always be tapped, and what is missing says so
+  const bad = tried ? { email: !email.trim() ? w("home.addEmail") : !email.includes("@") ? w("home.checkEmail") : "", tick: consent ? "" : w("home.tickBox") } : { email: "", tick: "" };
+  const go = () => { setTried(true); if (!email.includes("@") || !consent) { firstBad(formRef.current); return; } void send(); };
   return (
-    <div className="l-form">
-      <input placeholder={w("home.email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" aria-label={w("home.emailWait")} />
-      <div className="setting"><small className="setting-name">{w("home.whichFits")}</small>
+    <div className="l-form" ref={formRef}>
+      <Field label={w("home.emailLabel")} error={bad.email}><input placeholder={w("home.waitEmail")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" aria-label={w("home.emailWait")} aria-invalid={Boolean(bad.email)} /></Field>
+      <div className="setting"><small className="setting-name">{w("home.whichFits")} <span className="l-opt">{w("home.optional")}</span></small>
         <div className="chip-row">{WHO_CHOICES.map((k) => <button key={k} type="button" className={`choice ${who === k ? "on" : ""}`} aria-pressed={who === k} onClick={() => setWho(k)}>{w(`home.who.${k}` as WordKey)}</button>)}</div>
       </div>
-      <label className="l-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} /> <span>{w("home.consent")}</span></label>
+      <label className={`l-consent ${bad.tick ? "l-bad" : ""}`}><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} aria-invalid={Boolean(bad.tick)} /> <span>{w("home.consent")} <b className="l-star" aria-hidden="true">*</b></span></label>
+      {bad.tick && <small className="l-err">{bad.tick}</small>}
       <input className="l-trap" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} name="website" />
-      <button className="pill pill-primary pill-wide" disabled={state === "sending" || !email.includes("@") || !consent} onClick={send}>{state === "sending" ? w("home.sending") : w("home.joinWait")}</button>
+      <small className="l-req"><b className="l-star" aria-hidden="true">*</b> {w("home.required")}</small>
+      <button className="pill pill-primary pill-wide" disabled={state === "sending"} onClick={go}>{state === "sending" ? w("home.sending") : w("home.joinWait")}</button>
       {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
     </div>
   );
@@ -543,6 +549,7 @@ export function RequestForm({ email: presetEmail, name: presetName, from, src, w
   const [trap, setTrap] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
   const [err, setErr] = useState("");
+  const [tried, setTried] = useState(false); const formRef = useRef<HTMLDivElement>(null);
   async function send() {
     setErr(""); setState("sending");
     try {
@@ -553,23 +560,37 @@ export function RequestForm({ email: presetEmail, name: presetName, from, src, w
     } catch (e: any) { setErr(e.message); setState("idle"); }
   }
   if (state === "sent") return <div className="l-sent"><Check size={22} /> {name.split(" ")[0] ? w("home.thanks", { name: name.split(" ")[0], email }) : w("home.thanksList", { email })}</div>;
+  // DT299 (0.3.147, board Stories220): a label above each box, * on the required ones, grey text inside that says what to do;
+  // Send can always be tapped, and a missing or wrong required box turns red and says what to do
+  const bad = tried ? { name: name.trim() ? "" : w("home.addName"), email: !email.trim() ? w("home.addEmail") : !email.includes("@") ? w("home.checkEmail") : "" } : { name: "", email: "" };
+  const go = () => { setTried(true); if (!name.trim() || !email.includes("@")) { firstBad(formRef.current); return; } void send(); };
   return (
-    <div className="l-form">
-      <input placeholder={w("home.yourName")} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} autoComplete="name" />
-      <input placeholder={w("home.email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" />
+    <div className="l-form" ref={formRef}>
+      <Field label={w("home.nameLabel")} error={bad.name}><input placeholder={w("home.yourName")} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} autoComplete="name" aria-invalid={Boolean(bad.name)} /></Field>
+      <Field label={w("home.emailLabel")} error={bad.email}><input placeholder={w("home.email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" aria-invalid={Boolean(bad.email)} /></Field>
       {/* HP12: optional, for a WhatsApp message or a text about joining */}
-      <label className="l-mobile">
-        <input placeholder={w("home.mobile")} type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={30} autoComplete="tel" />
-        <small>{w("home.mobileLine")}</small>
-      </label>
-      <textarea placeholder={w("home.after")} value={note} onChange={(e) => setNote(e.target.value)} maxLength={600} />
-      <div className="setting"><small className="setting-name">{w("home.whichFits")}</small>
+      <Field label={w("home.mobileLabel")} optional sub={w("home.mobileLine")}><input placeholder={w("home.mobile")} type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={30} autoComplete="tel" /></Field>
+      <Field label={w("home.noteLabel")} optional><textarea placeholder={w("home.after")} value={note} onChange={(e) => setNote(e.target.value)} maxLength={600} /></Field>
+      <div className="setting"><small className="setting-name">{w("home.whichFits")} <span className="l-opt">{w("home.optional")}</span></small>
         <div className="chip-row">{WHO_CHOICES.map((k) => <button key={k} type="button" className={`choice ${who === k ? "on" : ""}`} aria-pressed={who === k} onClick={() => setWho(k)}>{w(`home.who.${k}` as WordKey)}</button>)}</div>
       </div>
       {/* only bots fill this */}
       <input className="l-trap" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} name="website" />
-      <button className="pill pill-primary pill-wide" disabled={state === "sending" || !name.trim() || !email.includes("@")} onClick={send}>{state === "sending" ? w("home.sending") : w("home.send")}</button>
+      <small className="l-req"><b className="l-star" aria-hidden="true">*</b> {w("home.required")}</small>
+      <button className="pill pill-primary pill-wide" disabled={state === "sending"} onClick={go}>{state === "sending" ? w("home.sending") : w("home.send")}</button>
       {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
     </div>
   );
 }
+// DT299: one box of a home page form: its label above, * when required or (optional), the line under it, what is missing
+function Field({ label, optional, error, sub, children }: { label: string; optional?: boolean; error?: string; sub?: string; children: React.ReactNode }) {
+  return (
+    <label className={`l-field ${error ? "l-bad" : ""}`}>
+      <span className="l-label">{label} {optional ? <span className="l-opt">{w("home.optional")}</span> : <b className="l-star" aria-hidden="true">*</b>}</span>
+      {children}
+      {error && <small className="l-err" role="alert">{error}</small>}
+      {sub && <small className="l-sub">{sub}</small>}
+    </label>
+  );
+}
+const firstBad = (form: HTMLElement | null) => { setTimeout(() => { const e = form?.querySelector<HTMLElement>(".l-bad"); e?.scrollIntoView({ block: "center", behavior: "smooth" }); e?.querySelector<HTMLElement>("input, textarea")?.focus({ preventScroll: true }); }, 0); };

@@ -60,7 +60,7 @@ const PORT = "3511", U = `http://127.0.0.1:${PORT}`;
     let sent = null; await hp.route("**/api/access-request", (r) => { sent = JSON.parse(r.request().postData() || "{}"); r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }); });
     await hp.goto(U + "/?home&from=qr"); await hp.waitForTimeout(1500);
     const form = hp.locator(".l-request:not(.l-wait)");
-    ok(await form.locator("textarea").getAttribute("placeholder") === "A short note to Coach Milan (optional). For example: your goal, and a few words about you.", "the note box says who reads it and what to write");
+    ok(await form.locator("textarea").getAttribute("placeholder") === "Write your goal, and a few words about you", "the note box says what to write (DT299)");
     await form.locator('input[autocomplete="name"]').fill("Ana"); await form.locator('input[type="email"]').fill("ana.k@example.com");
     await hp.waitForTimeout(4200); await form.getByRole("button", { name: "Send" }).click(); await hp.waitForTimeout(600);
     ok(sent && sent.name === "Ana" && sent.src === "qr", "the form sends the name and the link it was opened from: " + JSON.stringify(sent && { name: sent.name, src: sent.src }));

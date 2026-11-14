@@ -3330,3 +3330,15 @@ div.client-row { cursor: pointer; }
 .client-note-go .link, .client-note-go .pill { min-height: 44px; }
 .invite-need { color: var(--brand-text); font-weight: 700; }
 .client-open .cw-bars-row { flex-wrap: wrap; } .client-open .cw-bars-row small { margin-left: auto; }
+
+/* DT299 (0.3.147, board Stories220): the home page forms: a label above each box, * on the required ones, what is missing in red */
+.l-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+.l-label { font-weight: 700; font-size: 15px; color: var(--ink); }
+.l-opt { font-weight: 400; color: var(--muted); }
+.l-star { color: var(--low-text); font-weight: 700; }
+.l-sub { color: var(--muted, var(--ink)); font-weight: 600; font-size: 13px; line-height: 1.4; }
+.l-err { color: var(--low-text); font-weight: 700; font-size: 14px; }
+.l-field.l-bad input, .l-field.l-bad textarea { border: 2px solid var(--low-text); }
+.l-consent.l-bad { outline: 2px solid var(--low-text); outline-offset: 4px; border-radius: 8px; }
+.l-req { color: var(--muted); font-size: 14px; }
+.l-form input::placeholder, .l-form textarea::placeholder { color: var(--muted); opacity: .8; }
