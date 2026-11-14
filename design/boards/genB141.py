@@ -108,12 +108,14 @@ row("Now", "The flow as it is today", [
   ("What goes wrong", "At step 3 their name is in their account. Then their own app saves its empty Profile name over it. From then on Clients says unnamed, on their card and on everything they send."),
 ], [("1. Home page: Join the beta", "r141h1", "draft", "They type their name and email."), ("2. Clients: the application", "r141h2", "draft", "You tap Invite. The code goes out by email."), ("3. Clients: they joined", "r141n3", "draft", "Their card: unnamed."), ("4. Clients: they send something", "r141a", "draft", "Client unnamed set new numbers.")], nid="B141")
 row("New", "The same flow, with the name kept", [
-  ("Steps 1 and 2", "No change."),
+  ("Step 1", "The note box changes from What are you after? to: A short note to Coach Milan (optional). For example: your goal, and a few words about you. (Coach Milan 12:45)"),
+  ("Where they found it", "A link can carry its source: chefmealan.com/?from=qr for a QR code you show, also LinkedIn, Instagram, WhatsApp. The application and the card say it. The book pages do this already."),
+  ("Step 2", "No change, apart from the source."),
   ("Step 3", "The name from the form stays: an empty Profile name never replaces it. The card shows the name, the email, and where they came from."),
   ("Step 4", "New: a note of your own on the card (Coach Milan 11:46): Met at the High Performers meetup, Friday 13 November. Only you see it."),
   ("Step 5", "Everything they send carries the name."),
   ("Later", "When they type a name in Profile, that one shows."),
-], [("1. Home page: Join the beta", "r141h1", "same", "They type their name and email."), ("2. Clients: the application", "r141h2", "same", "You tap Invite."), ("3. Clients: they joined", "r141h3", "changed", "Name, email, From the home page form."), ("4. Clients: your note", "r141d", "changed", "Add a note, Save. Then it stays on the card."), ("5. Clients: they send something", "r141n5", "changed", "Ana set new numbers.")], nid="B141", at=4)
+], [("1. Home page: Join the beta", "r141h1n", "changed", "A short note to Coach Milan. The QR code is remembered."), ("2. Clients: the application", "r141h2n", "changed", "from the home page · QR."), ("3. Clients: they joined", "r141h3", "changed", "Name, email, From the home page form · QR."), ("4. Clients: your note", "r141d", "changed", "Add a note, Save. Then it stays on the card."), ("5. Clients: they send something", "r141n5", "changed", "Ana set new numbers.")], nid="B141", at=4)
 row("New", "The other ways in end on the same card", [
   ("A book page", "The same form on Worthy Numbers. The card says the page and the link: From Worthy Numbers · QR."),
   ("Your own invite", "Create invite now needs a name and an email. The card says From your invite."),
@@ -121,6 +123,10 @@ row("New", "The other ways in end on the same card", [
   ("No name anywhere", "An older invite with no name: the email shows in the name's place. Never unnamed."),
   ("Size", "Medium. The empty-name save, the invite form, the email and where-from lines, your note; about ten lines in three languages."),
 ], [("A book page: their card", "r141b3", "changed", "From Worthy Numbers · QR."), ("Your invite: the form", "r141c", "changed", "A name and an email."), ("Your invite: their card", "r141i2", "changed", "From your invite."), ("The waiting list: their card", "r141w3", "changed", "From the waiting list."), ("No name anywhere", "r141e", "changed", "The email, never unnamed.")], nid="B141", at=9, arrows=False)
+row("New", "The same question inside the app", [
+  ("Now", "Goal setup has a step titled What are you after? The steps around it are plain titles: You, Your days."),
+  ("New", "Your goal. (Tvoj cilj, Dein Ziel.)"),
+], [("Now: Goal, the step", "r141g1", "draft", "What are you after?"), ("New: Goal, the step", "r141g2", "changed", "Your goal.")], nid="B141", at=14, arrows=False)
 board("Stories219.dc.html", "B141. A client is never unnamed, and you see how they came in",
   "14 November 2026 (Coach Milan 11:30: the new testers from the Munich meetup show as unnamed; 11:35 Draw; 11:46 to 12:28: name and email, your own note, where they came from, one flow: now, then new). Drawn for approval.",
   B, W, y - 100, "Stories218.dc.html")

@@ -82,7 +82,7 @@ const REQC = (src) => `<section class="card request request-top" style="${mark};
     p = await open(); await p.evaluate(({ html }) => { document.querySelector("main section.card.waiting small.muted").insertAdjacentHTML("afterend", html); }, { html: REQC("from the home page") });
     await note(p, "2. Clients, first in Waiting for you. Invite makes the code with the name from the form and opens the email to send. They sign in and type the code.", "main > section.card.waiting");
     await shot(p, "r141h2", null);
-    await card("Ana", "From the home page form · 13 November", "3. New: they joined, and their card keeps the name from the form. Under it the email, and where they came from. Add a note is yours.", "r141h3");
+    await card("Ana", "From the home page form · QR · 13 November", "3. New: they joined, and their card keeps the name from the form. Under it the email, and where they came from. Add a note is yours.", "r141h3");
     // B: a book page form
     p = await page("/worthy-numbers?from=qr");
     await p.evaluate(() => { const h = document.querySelector(".bk-read"); if (h) h.outerHTML = `<div class="l-request bk-join" id="bkform"><h2>Get your personal code</h2><p class="l-book-line">Chef Mealan is free while it is in beta, and spots are limited. Leave your name and email, and you get your code within a day.</p><div class="l-form"><input value="Ana"><input value="ana.k@example.com"><input placeholder="Mobile (optional)"><textarea placeholder="Anything we should know?"></textarea><button class="pill pill-primary" style="min-height:48px">Send</button></div></div>`; });
@@ -110,5 +110,23 @@ const REQC = (src) => `<section class="card request request-top" style="${mark};
     p = await open(); await review(p, "Ana", true); await rename(p, "Ana", "A");
     await note(p, "5. New: everything they send carries the name: Ana set new numbers.", "main > section.card.waiting");
     await shot(p, "r141n5", null);
+    // the home page form, new: the note box says what to write; a QR code is remembered
+    p = await page("/?home&from=qr");
+    await p.evaluate(() => { const f = document.querySelector(".l-request:not(.l-wait)"); const ins = [...f.querySelectorAll("input")].filter((x) => x.type !== "checkbox" && x.type !== "hidden" && x.offsetParent !== null); const v = ["Ana", "ana.k@example.com", "+49 000 0000000"]; ins.slice(0, 3).forEach((x, i) => (x.value = v[i])); const t = f.querySelector("textarea"); t.value = ""; t.placeholder = "A short note to Coach Milan (optional). For example: your goal, and a few words about you."; t.id = "notebox"; t.style.cssText += ";outline:3px solid #2a72d9;outline-offset:3px;min-height:96px"; });
+    await note(p, "1. New: the note box says who reads it and what to write. Opened from a QR code (chefmealan.com/?from=qr), the form remembers that.", ".l-request:not(.l-wait)");
+    await shot(p, "r141h1n", ".l-request:not(.l-wait)", 150);
+    p = await open(); await p.evaluate(({ html }) => { document.querySelector("main section.card.waiting small.muted").insertAdjacentHTML("afterend", html); }, { html: REQC("from the home page · QR") });
+    await note(p, "2. New: the application says how they found the page: from the home page · QR. Invite, as today.", "main > section.card.waiting");
+    await shot(p, "r141h2n", null);
+    // the goal setup step: now and new
+    const goal = async (title, txt, file) => { const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, timezoneId: "Europe/Berlin" }); const p = await ctx.newPage();
+      await p.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+        localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "female", birthYear: 1990, heightCm: 170, weightKg: 66, plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
+        localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-28T16:00:00Z", consentBodyAt: "2026-10-28T16:00:00Z", declaredAt: "2026-10-28T16:00:00Z", aiConfirmedAt: "2026-10-28T16:00:00Z" })); localStorage.setItem("seeded", "1"); }, seed);
+      await require(ROOT + "/tests/flows/adult.cjs")(p); await p.goto(U + "/"); await p.waitForTimeout(1500);
+      await p.evaluate(({ title, mark }) => { const b = [...document.querySelectorAll(".section-title")].find((x) => /What are you after\?/.test(x.textContent)); b.id = "gstep"; if (title) b.textContent = b.textContent.replace("What are you after?", title); b.style.cssText += ";display:inline-block;" + mark; document.querySelectorAll(".chat-fab").forEach((x) => (x.style.visibility = "hidden")); }, { title, mark });
+      await note(p, txt, "#gstep"); await shot(p, file, "#gstep", 260); };
+    await goal("", "Now: the step asks What are you after? The steps around it are plain titles: You, Your days.", "r141g1");
+    await goal("Your goal", "New: Your goal, like the other steps. The goals below say the rest.", "r141g2");
   } finally { await b.close(); server.kill(); }
 })();
