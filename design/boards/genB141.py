@@ -8,7 +8,7 @@ SW, GAP, SX = 240, 150, 400
 K = SW / 390
 TT, CH, DH = 44, 24, 92
 TOP = TT + 8 + CH + 8 + DH + 8
-CHIP = {"now": ("#5b6b8a", "#fff", "Your phone"), "draft": ("#53627f", "#fff", "As it is today"), "changed": ("#2a72d9", "#fff", "New, drawn for your approval")}
+CHIP = {"same": ("#8a97b0", "#fff", "No change"), "now": ("#5b6b8a", "#fff", "Your phone"), "draft": ("#53627f", "#fff", "As it is today"), "changed": ("#2a72d9", "#fff", "New, drawn for your approval")}
 MARK = ""
 
 def ih(name): w, h = Image.open(f"{R}/{name}.png").size; return int(h * SW / w)
@@ -94,41 +94,33 @@ class Component extends DCLogic {{
     cj = json.load(open(f"{D}/canvas.json"))
 
 
-W = SX + 3 * (SW + GAP) - GAP + 70
+W = SX + 5 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-def row(rid, title, parts, shots, nid=None, at=0):
+def row(rid, title, parts, shots, nid=None, at=0, arrows=True):
     global y
     c = storyCard(B, y, rid, title, parts)
     hs = [B.screen(f"{nid or rid}{chr(97 + at + i)}", i, y, t, n, st, wd) for i, (t, n, st, wd) in enumerate(shots)]
+    if arrows:
+        for i in range(1, len(shots)): B.html.append(f'<div style="position:absolute;left:{B.x(i) - GAP}px;top:{y + TOP + 220}px;width:{GAP}px;text-align:center;font-size:44px;font-weight:900;color:#2a72d9">→</div>')
     y = rowEnd(c, *hs)
-row("B141", "A client is never unnamed", [
-  ("Found", "Coach Milan 14 November: two new beta testers from the Munich meetup applied on the home page form. One shows as Client unnamed, like an earlier tester."),
-  ("Why", "The form asks for a name, and Invite on the application puts it on the invite. Joining writes it to the account. Then the client's own app saves its Profile name, still empty, over it. Clients finds nothing and says unnamed."),
-  ("The fix underneath", "An empty Profile name never replaces a name already there."),
-], [("Now: Clients, a review", "r141a", "draft", "Client unnamed set new numbers."), ("Now: Clients, Invite a client", "r141b", "draft", "An email alone is enough.")])
-row("Way in 1", "The home page form", [
-  ("Flow", "Join the beta on chefmealan.com. The application lands first in Waiting for you. Invite makes the code with the form's name and opens the email. They sign in and type the code."),
-  ("New", "Their card keeps the name, shows the email and says From the home page form, with the day."),
-], [("Home page: Join the beta", "r141h1", "now", "Name, email, mobile, a note."), ("Clients: the application", "r141h2", "draft", "Invite, as today."), ("New: Clients, their card", "r141h3", "changed", "From the home page form.")], nid="B141", at=2)
-row("Way in 2", "A book page form", [
-  ("Flow", "The same form on a book page (Worthy Numbers), with the link it came from: QR, PDF, LinkedIn and so on. The application says the page and the link."),
-  ("New", "Their card says From Worthy Numbers · QR, with the day."),
-], [("Book page: Get your personal code", "r141b1", "now", "Opened from the book's QR code."), ("Clients: the application", "r141b2", "draft", "The page and the link."), ("New: Clients, their card", "r141b3", "changed", "From Worthy Numbers · QR.")], nid="B141", at=5)
-row("Way in 3", "Your own invite", [
-  ("Flow", "Invite a client on Clients. You send the code by email; they sign in and type it."),
-  ("New", "Create invite needs a name and an email. Their card says From your invite, with the day."),
-], [("New: Clients, Invite a client", "r141c", "changed", "A name and an email."), ("New: Clients, their card", "r141i2", "changed", "From your invite.")], nid="B141", at=8)
-row("Way in 4", "The waiting list", [
-  ("Flow", "The waiting list on the home page takes an email only, for when Chef Mealan opens to everyone. No code. It shows on Clients as Waiting list. To bring someone into the beta, you make an invite by hand with their name and that email."),
-  ("New", "Their card says From the waiting list, with the day they joined it."),
-  ("Not in this card", "An Invite button on a waiting list row: later, if you want it."),
-], [("Home page: the waiting list", "r141w1", "now", "An email only."), ("Clients: Waiting list", "r141w2", "draft", "Invite by hand."), ("New: Clients, their card", "r141w3", "changed", "From the waiting list.")], nid="B141", at=10)
-row("B141", "Your note, and no name yet", [
-  ("The name", "What is there: the name they typed in Profile; else the name from the form or the invite; else the email. Never unnamed, and no Client in front. One name for Waiting for you, the review, the card, their week."),
-  ("Your note", "Coach Milan 11:46: you don't type their name. You keep a note of your own: Met at the High Performers meetup, Friday 13 November. Only you see it; it is kept with your account."),
-  ("Not in this card", "The two Kept on purpose carb boxes that read like a duplicate: their own card."),
-  ("Size", "Medium. The empty-name save, the invite form, the name order, the email and where-from lines for four ways in, the coach's note; about ten lines in three languages."),
-], [("New: Clients, writing the note", "r141f", "changed", "Only you see it."), ("New: Clients, the card with a note", "r141d", "changed", "Name, email, where from, your note."), ("New: Clients, no name yet", "r141e", "changed", "The email in the name's place.")], at=13)
+row("Now", "The flow as it is today", [
+  ("The flow", "1. They fill the form on the home page, with their name. 2. Their application is first on Clients; you tap Invite. 3. They sign in and type the code. 4. They use the app."),
+  ("What goes wrong", "At step 3 their name is in their account. Then their own app saves its empty Profile name over it. From then on Clients says unnamed, on their card and on everything they send."),
+], [("1. Home page: Join the beta", "r141h1", "draft", "They type their name and email."), ("2. Clients: the application", "r141h2", "draft", "You tap Invite. The code goes out by email."), ("3. Clients: they joined", "r141n3", "draft", "Their card: unnamed."), ("4. Clients: they send something", "r141a", "draft", "Client unnamed set new numbers.")], nid="B141")
+row("New", "The same flow, with the name kept", [
+  ("Steps 1 and 2", "No change."),
+  ("Step 3", "The name from the form stays: an empty Profile name never replaces it. The card shows the name, the email, and where they came from."),
+  ("Step 4", "New: a note of your own on the card (Coach Milan 11:46): Met at the High Performers meetup, Friday 13 November. Only you see it."),
+  ("Step 5", "Everything they send carries the name."),
+  ("Later", "When they type a name in Profile, that one shows."),
+], [("1. Home page: Join the beta", "r141h1", "same", "They type their name and email."), ("2. Clients: the application", "r141h2", "same", "You tap Invite."), ("3. Clients: they joined", "r141h3", "changed", "Name, email, From the home page form."), ("4. Clients: your note", "r141d", "changed", "Add a note, Save. Then it stays on the card."), ("5. Clients: they send something", "r141n5", "changed", "Ana set new numbers.")], nid="B141", at=4)
+row("New", "The other ways in end on the same card", [
+  ("A book page", "The same form on Worthy Numbers. The card says the page and the link: From Worthy Numbers · QR."),
+  ("Your own invite", "Create invite now needs a name and an email. The card says From your invite."),
+  ("The waiting list", "An email only, no code. You invite them by hand. The card says From the waiting list."),
+  ("No name anywhere", "An older invite with no name: the email shows in the name's place. Never unnamed."),
+  ("Size", "Medium. The empty-name save, the invite form, the email and where-from lines, your note; about ten lines in three languages."),
+], [("A book page: their card", "r141b3", "changed", "From Worthy Numbers · QR."), ("Your invite: the form", "r141c", "changed", "A name and an email."), ("Your invite: their card", "r141i2", "changed", "From your invite."), ("The waiting list: their card", "r141w3", "changed", "From the waiting list."), ("No name anywhere", "r141e", "changed", "The email, never unnamed.")], nid="B141", at=9, arrows=False)
 board("Stories219.dc.html", "B141. A client is never unnamed, and you see how they came in",
-  "14 November 2026 (Coach Milan 11:30: the new testers from the Munich meetup show as unnamed; 11:35 Draw; 11:46: name and email on Clients, and a note of your own; 11:52 and 12:11: where they came from, each way in shown as its flow). Drawn for approval.",
+  "14 November 2026 (Coach Milan 11:30: the new testers from the Munich meetup show as unnamed; 11:35 Draw; 11:46 to 12:28: name and email, your own note, where they came from, one flow: now, then new). Drawn for approval.",
   B, W, y - 100, "Stories218.dc.html")

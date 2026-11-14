@@ -45,7 +45,7 @@ const REQC = (src) => `<section class="card request request-top" style="${mark};
   try {
     // a: now, unnamed everywhere
     let p = await open(); await review(p, "Client unnamed", true); await rename(p, "unnamed", "U");
-    await note(p, "Now (0.3.145): no name on the invite and none in their Profile, so Clients says unnamed: in the review, in Waiting for you, on their card.", "main > section.card.waiting");
+    await note(p, "4. Now: everything they send says unnamed too: Client unnamed set new numbers.", "main > section.card.waiting");
     await shot(p, "r141a", null);
     // b: now, the invite takes an email alone
     p = await open(); await bottom(p, INVITE("", "new.tester@example.com", true, ""));
@@ -59,7 +59,7 @@ const REQC = (src) => `<section class="card request request-top" style="${mark};
     await shot(p, "r141c", "#inv", 200);
     // d: new, name and email on the card, with the coach's own note
     p = await open(); await rename(p, "Ana", "A", `<small style="display:block;color:#3d4a63">ana.k@example.com</small><small style="display:block;color:#3d4a63">From the home page form · 13 November</small>`, `<small style="display:block;color:#172742;margin-top:2px"><b>Your note:</b> Met at the High Performers meetup, Friday 13 November.</small><div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="pill pill-small" style="min-height:44px;background:#fff;border:1.5px solid #2a72d9;color:#1f5fc7;font-weight:700">Edit note</button></div>`);
-    await note(p, "New: the card shows the name, the email and where they came from, always. Below, your own note, for later. A name the client types in Profile takes the name's place.", "#crow");
+    await note(p, "4. New: your note on the card, for later. Only you see it.", "#crow");
     await shot(p, "r141d", "#crow", 260);
     // f: new, writing the note
     p = await open(); await rename(p, "Ana", "A", `<small style="display:block;color:#3d4a63">ana.k@example.com</small>`, `<div style="margin-top:8px"><textarea style="width:100%;box-sizing:border-box;min-height:70px;border:1.5px solid #2a72d9;border-radius:10px;padding:8px;font:inherit;font-size:14px">Met at the High Performers meetup, Friday 13 November.</textarea><small style="display:block;color:#3d4a63">Only you see this note. Ana doesn't.</small><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><button class="link" style="min-height:44px">Cancel</button><button class="pill pill-primary" style="min-height:44px;padding:0 20px">Save</button></div></div>`);
@@ -82,7 +82,7 @@ const REQC = (src) => `<section class="card request request-top" style="${mark};
     p = await open(); await p.evaluate(({ html }) => { document.querySelector("main section.card.waiting small.muted").insertAdjacentHTML("afterend", html); }, { html: REQC("from the home page") });
     await note(p, "2. Clients, first in Waiting for you. Invite makes the code with the name from the form and opens the email to send. They sign in and type the code.", "main > section.card.waiting");
     await shot(p, "r141h2", null);
-    await card("Ana", "From the home page form · 13 November", "3. New: their card. The name from the form stays (an empty Profile name no longer wipes it), the email, and where they came from.", "r141h3");
+    await card("Ana", "From the home page form · 13 November", "3. New: they joined, and their card keeps the name from the form. Under it the email, and where they came from. Add a note is yours.", "r141h3");
     // B: a book page form
     p = await page("/worthy-numbers?from=qr");
     await p.evaluate(() => { const h = document.querySelector(".bk-read"); if (h) h.outerHTML = `<div class="l-request bk-join" id="bkform"><h2>Get your personal code</h2><p class="l-book-line">Chef Mealan is free while it is in beta, and spots are limited. Leave your name and email, and you get your code within a day.</p><div class="l-form"><input value="Ana"><input value="ana.k@example.com"><input placeholder="Mobile (optional)"><textarea placeholder="Anything we should know?"></textarea><button class="pill pill-primary" style="min-height:48px">Send</button></div></div>`; });
@@ -92,9 +92,9 @@ const REQC = (src) => `<section class="card request request-top" style="${mark};
     p = await open(); await p.evaluate(({ html }) => { document.querySelector("main section.card.waiting small.muted").insertAdjacentHTML("afterend", html); }, { html: REQC("from Worthy Numbers · QR") });
     await note(p, "2. Clients, the same application card, with the page and the link it came from. Invite, as above.", "main > section.card.waiting");
     await shot(p, "r141b2", null);
-    await card("Ana", "From Worthy Numbers · QR · 13 November", "3. New: their card says the book page and the link.", "r141b3");
+    await card("Ana", "From Worthy Numbers · QR · 13 November", "New: their card says the book page and the link.", "r141b3");
     // C: your own invite
-    await card("Ana", "From your invite · 14 November", "2. New: their card. The name you gave the invite, the email, From your invite.", "r141i2");
+    await card("Ana", "From your invite · 14 November", "New: their card. The name you gave the invite, the email, From your invite.", "r141i2");
     // D: the waiting list
     p = await page("/?home"); await p.evaluate(() => { const f = document.querySelector("#wait"); const i = f.querySelector("input[type=email], input"); if (i) i.value = "ana.k@example.com"; }); await p.evaluate((mark) => { document.querySelector("#wait").style.cssText += ";" + mark; }, mark);
     await note(p, "1. The home page: the waiting list. An email only, for when Chef Mealan opens to everyone. No code, no beta.", "#wait");
@@ -102,6 +102,13 @@ const REQC = (src) => `<section class="card request request-top" style="${mark};
     p = await open(); await bottom(p, `<p class="label" id="wl">Waiting list (1)</p><section class="card waitlist" style="${mark}"><div class="wait-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span><a href="#">ana.k@example.com</a><small style="display:block">I train on my own · 2 Nov</small></span><button class="pill pill-small pill-danger-line" style="min-height:44px">Remove</button></div></section>`);
     await note(p, "2. Clients, Waiting list. To bring someone into the beta, you make an invite by hand: Invite a client, with their name and this email.", "#wl");
     await shot(p, "r141w2", "#wl", 200);
-    await card("Ana", "From the waiting list · 2 November", "3. New: their card. On the waiting list first, so it says so, with the day they joined it.", "r141w3");
+    await card("Ana", "From the waiting list · 2 November", "New: their card. On the waiting list first, so it says so, with the day they joined it.", "r141w3");
+    // the flow's missing frames: now, the card says unnamed; new, the review says the name
+    p = await open(); await rename(p, "unnamed", "U", " ");
+    await note(p, "3. Now: they joined, and their card says unnamed. The name from the form was wiped by their empty Profile name.", "#crow");
+    await shot(p, "r141n3", "#crow", 260);
+    p = await open(); await review(p, "Ana", true); await rename(p, "Ana", "A");
+    await note(p, "5. New: everything they send carries the name: Ana set new numbers.", "main > section.card.waiting");
+    await shot(p, "r141n5", null);
   } finally { await b.close(); server.kill(); }
 })();
