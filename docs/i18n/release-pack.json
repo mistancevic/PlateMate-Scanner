@@ -1,6 +1,6 @@
 {
-  "release": "0.3.147",
-  "at": "2026-11-14T13:28:07.163Z",
+  "release": "0.3.148",
+  "at": "2026-11-14T13:54:27.530Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -48218,6 +48218,65 @@
       "release": "0.3.147",
       "order": 900016,
       "at": "2026-11-14T13:28:07.163Z"
+    },
+    {
+      "id": "screen.home.fullForm",
+      "kind": "screen",
+      "key": "home.fullForm",
+      "en": "This round is full. Leave your name and email, and you get a message when the next round starts.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Home page",
+      "where": "The home page",
+      "enBefore": "This round is full. Leave your name and email, and Coach Milan writes to you when the next round starts.",
+      "sr": "Ovaj krug je popunjen. Ostavi ime i imejl, i stiže ti poruka kad počne sledeći krug.",
+      "de": "Diese Runde ist voll. Hinterlass deinen Namen und deine E-Mail-Adresse, und du bekommst eine Nachricht, wenn die nächste Runde startet.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.148",
+      "order": 900000,
+      "at": "2026-11-14T13:54:27.530Z"
+    },
+    {
+      "id": "screen.home.thanks",
+      "kind": "screen",
+      "key": "home.thanks",
+      "en": "Thanks, {name}. You'll get a reply at {email}.",
+      "forms": "plain",
+      "slots": [
+        "email",
+        "name"
+      ],
+      "area": "Home page",
+      "where": "The home page",
+      "enBefore": "Thanks, {name}. Coach Milan will get back to you at {email}.",
+      "sr": "Hvala, {name}. Odgovor ti stiže na {email}.",
+      "de": "Danke, {name}. Du bekommst eine Antwort an {email}.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.148",
+      "order": 900001,
+      "at": "2026-11-14T13:54:27.530Z"
+    },
+    {
+      "id": "screen.home.thanksList",
+      "kind": "screen",
+      "key": "home.thanksList",
+      "en": "Thanks, you're on the list. You'll get a reply at {email}.",
+      "forms": "plain",
+      "slots": [
+        "email"
+      ],
+      "area": "Home page",
+      "where": "The home page",
+      "enBefore": "Thanks, you're on the list. Coach Milan will get back to you at {email}.",
+      "sr": "Hvala, na listi si. Odgovor ti stiže na {email}.",
+      "de": "Danke, du bist auf der Liste. Du bekommst eine Antwort an {email}.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.148",
+      "order": 900002,
+      "at": "2026-11-14T13:54:27.530Z"
     }
   ]
 }

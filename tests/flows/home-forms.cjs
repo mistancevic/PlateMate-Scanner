@@ -43,7 +43,7 @@ const PORT = "3512", U = `http://127.0.0.1:${PORT}`;
     await send.click(); await page.waitForTimeout(300); ok(sent.length === 0, "still nothing sent");
     await form.locator('input[type="email"]').fill("ana.k@example.com"); await page.waitForTimeout(4200);
     await send.click(); await page.waitForTimeout(600);
-    ok(sent.length === 1 && sent[0].name === "Ana" && sent[0].email === "ana.k@example.com" && /Thanks, Ana/.test(await t(form)), "filled: sent once, with the thanks");
+    ok(sent.length === 1 && sent[0].name === "Ana" && sent[0].email === "ana.k@example.com" && /Thanks, Ana\. You'll get a reply at ana\.k@example\.com\./.test(await t(form)) && !/Coach Milan/.test(await t(form)), "filled: sent once, with a neutral thanks (0.3.148)");
     await ctx.close();
     // 5. the waiting list
     ({ ctx, page } = await open("/?home"));
