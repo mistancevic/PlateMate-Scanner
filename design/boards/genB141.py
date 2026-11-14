@@ -107,11 +107,16 @@ row("B141", "A client is never unnamed", [
 ], [("Now: Clients, a review", "r141a", "draft", "Client unnamed set new numbers."), ("Now: Clients, Invite a client", "r141b", "draft", "An email alone is enough.")])
 row("B141", "The name: Profile, then the invite, then its email", [
   ("New invites", "Create invite needs a name and an email. The button stays off until both are there, with one line saying why."),
-  ("Clients already in", "No new data. The order: the name they typed in Profile; else the name on the invite they joined with; else that invite's email. The card says Name from your invite or Email from your invite, so you know to ask. Never unnamed, and no Client in front."),
-  ("Everywhere", "One name for Waiting for you, the review, the client's card, their week and Members."),
-  ("Not in this card", "Renaming a client yourself from their card: later, if still needed. The two Kept on purpose carb boxes that read like a duplicate: their own card."),
-  ("Size", "Small. The invite form, one fallback when Clients loads, three lines in three languages."),
-], [("New: Invite a client", "r141c", "changed", "A name and an email, then Create invite."), ("New: Clients, the client's card", "r141d", "changed", "The name from the invite."), ("New: Clients, a review", "r141e", "changed", "No name on the invite: its email.")], at=2)
+  ("The name", "What is there: the name they typed in Profile; else the name on the invite they joined with; else that invite's email. Never unnamed, and no Client in front. One name for Waiting for you, the review, the card, their week."),
+  ("Name and email", "Coach Milan 11:46: the card shows both, always: the name, and the email under it. The email is the invite's, which is the one they sign in with."),
+  ("Your note", "Coach Milan 11:46: you don't type their name. You keep a note of your own: Met at the High Performers meetup, Friday 13 November. Only you see it; it is kept with your account."),
+], [("New: Invite a client", "r141c", "changed", "A name and an email, then Create invite."), ("New: Clients, the client's card", "r141d", "changed", "Name, email and your note.")], at=2)
+row("B141", "Your note, and no name yet", [
+  ("Write it", "Add a note on the card opens a box. Save on the right, Cancel to back out. Edit note when one is there."),
+  ("No name yet", "The email takes the name's place, and the card offers Add a note."),
+  ("Not in this card", "The two Kept on purpose carb boxes that read like a duplicate: their own card."),
+  ("Size", "Small to medium. The invite form, the name order when Clients loads, the email line, the coach's note with its own place in your account; about six lines in three languages."),
+], [("New: Clients, writing the note", "r141f", "changed", "Only you see it."), ("New: Clients, a review", "r141e", "changed", "No name yet: the email.")], at=4)
 board("Stories219.dc.html", "B141. A client is never unnamed",
-  "14 November 2026 (Coach Milan 11:30: the new testers from the Munich meetup show as unnamed; 11:35 Draw). Drawn for approval.",
+  "14 November 2026 (Coach Milan 11:30: the new testers from the Munich meetup show as unnamed; 11:35 Draw; 11:46: name and email on Clients, and a note of your own). Drawn for approval.",
   B, W, y - 100, "Stories218.dc.html")

@@ -26,13 +26,13 @@ const INVITE = (name, email, on, hint) => `<p class="label">Codes and sign-ups</
     return p;
   };
   // Nina becomes the client with no name: "unnamed" now; a name or an email in the new frames
-  const rename = (p, to, letter, sub) => p.evaluate(({ to, letter, sub, mark }) => {
+  const rename = (p, to, letter, sub, tail = "") => p.evaluate(({ to, letter, sub, tail, mark }) => {
     for (const e of document.querySelectorAll("main *")) { if (e.children.length) continue; const t = e.textContent;
       if (t.trim() === "N" && e.classList.contains("avatar")) e.textContent = letter;
       else if (/Nina/.test(t)) e.textContent = t.replace(/Nina/g, to); }
     const heads = [...document.querySelectorAll("main b")].filter((x) => x.textContent.trim() === to);
-    const last = heads.pop(); if (last && sub) { last.parentElement.insertAdjacentHTML("beforeend", `<small style="color:#1f5fc7;font-weight:700;display:block">${sub}</small>`); const c = last.closest(".card") || last.parentElement; c.style.cssText += ";" + mark; c.id = "crow"; }
-  }, { to, letter, sub, mark });
+    const last = heads.pop(); if (last && sub) { last.insertAdjacentHTML("afterend", sub); const c = last.closest(".card") || last.parentElement; if (tail) c.insertAdjacentHTML("beforeend", `<div style="border-top:1px solid #e3eaf6;margin-top:10px;padding-top:8px;width:100%">${tail}</div>`); c.style.cssText += ";" + mark; c.id = "crow"; }
+  }, { to, letter, sub, tail, mark });
   const review = (p, who, marked) => p.evaluate(({ html, mark, marked }) => { const wq = document.querySelector("main section.card.waiting"); wq.querySelector("small.muted").insertAdjacentHTML("afterend", html); if (marked) wq.querySelector(".review-card").style.cssText += ";" + mark; }, { html: REVIEW(who), mark, marked });
   const note = (p, t, sel, where = "beforebegin") => p.evaluate(({ t, NOTE, sel, where }) => { const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = t; document.querySelector(sel).insertAdjacentElement(where, d); }, { t, NOTE, sel, where });
   const shot = async (p, name, sel, off = 120) => { await p.evaluate(({ sel, off }) => { const e = sel && document.querySelector(sel); window.scrollTo(0, e ? e.getBoundingClientRect().top + window.scrollY - off : 0); }, { sel, off }); await p.waitForTimeout(300); await p.screenshot({ path: `${R}/${name}.png` }); console.log("shot", name); await p.context().close(); };
@@ -52,13 +52,17 @@ const INVITE = (name, email, on, hint) => `<p class="label">Codes and sign-ups</
     await p.evaluate((mark) => { document.querySelector("#inv").style.cssText += ";" + mark; }, mark);
     await note(p, "New: Create invite needs a name and an email. Until both are there, the button stays off and says why. The name is yours; they can change theirs in Profile.", "#inv");
     await shot(p, "r141c", "#inv", 200);
-    // d: new, the name from the invite
-    p = await open(); await review(p, "Ana", false); await rename(p, "Ana", "A", "Name from your invite");
-    await note(p, "New: no name in their Profile, so Clients takes the name from the invite they joined with. Everywhere: Waiting for you, the review, their card, their week. The card says where the name came from.", "#crow");
+    // d: new, name and email on the card, with the coach's own note
+    p = await open(); await rename(p, "Ana", "A", `<small style="display:block;color:#3d4a63">ana.k@example.com</small>`, `<small style="display:block;color:#172742;margin-top:2px"><b>Your note:</b> Met at the High Performers meetup, Friday 13 November.</small><div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="pill pill-small" style="min-height:44px;background:#fff;border:1.5px solid #2a72d9;color:#1f5fc7;font-weight:700">Edit note</button></div>`);
+    await note(p, "New: the card shows the name and the email, always. Below, your own note, for later: where you met, who sent them. A name the client types in Profile takes the name's place.", "#crow");
     await shot(p, "r141d", "#crow", 260);
-    // e: new, the invite had no name either: its email
-    p = await open(); await review(p, "ana.k@example.com", false); await rename(p, "ana.k@example.com", "A", "Email from your invite. No name yet");
-    await note(p, "New: an older invite with no name: the email it was sent to, as at the earlier tester. Never unnamed, and no Client in front. When they type a name in Profile, that name wins.", "main > section.card.waiting");
+    // f: new, writing the note
+    p = await open(); await rename(p, "Ana", "A", `<small style="display:block;color:#3d4a63">ana.k@example.com</small>`, `<div style="margin-top:8px"><textarea style="width:100%;box-sizing:border-box;min-height:70px;border:1.5px solid #2a72d9;border-radius:10px;padding:8px;font:inherit;font-size:14px">Met at the High Performers meetup, Friday 13 November.</textarea><small style="display:block;color:#3d4a63">Only you see this note. Ana doesn't.</small><div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px"><button class="link" style="min-height:44px">Cancel</button><button class="pill pill-primary" style="min-height:44px;padding:0 20px">Save</button></div></div>`);
+    await note(p, "New: Add a note opens a box on the card. Save on the right. Only you see it: it is kept with your account, never in the client's.", "#crow");
+    await shot(p, "r141f", "#crow", 260);
+    // e: new, no name anywhere yet: the email, and room for a note
+    p = await open(); await review(p, "ana.k@example.com", false); await rename(p, "ana.k@example.com", "A", "", `<div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="pill pill-small" style="min-height:44px;background:#fff;border:1.5px solid #2a72d9;color:#1f5fc7;font-weight:700">Add a note</button></div>`);
+    await note(p, "New: no name on the invite and none in Profile: the email it was sent to, as at the earlier tester. Never unnamed, and no Client in front.", "main > section.card.waiting");
     await shot(p, "r141e", null);
   } finally { await b.close(); server.kill(); }
 })();

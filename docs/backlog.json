@@ -191,11 +191,11 @@
     },
     {
       "id": "B141",
-      "title": "A client is never unnamed: Profile name, then the invite's name, then its email",
+      "title": "A client is never unnamed: name and email on Clients, and a note of the coach's own",
       "epic": "trust",
       "state": "now",
       "board": "Stories219",
-      "why": "Coach Milan 14 November 11:30, with a screenshot: two new beta testers from the Munich meetup; one shows as Client unnamed, like an earlier tester. Clients takes a name only from the invite's name and the client's Profile name; both optional, and an email-link sign-in brings none. 11:35: Draw. Drawn 14 November (Stories219): Create invite needs a name; Clients falls back to the invite's name, then its email, and says where the name came from; never unnamed, no Client in front."
+      "why": "Coach Milan 14 November 11:30, with a screenshot: two new beta testers from the Munich meetup; one shows as Client unnamed, like an earlier tester. Clients takes a name only from the invite's name and the client's Profile name; both optional, and an email-link sign-in brings none. 11:35: Draw. Drawn 14 November (Stories219): Create invite needs a name; Clients falls back to the invite's name, then its email, and says where the name came from; never unnamed, no Client in front. 11:46: no typing the client's name by the coach; the card shows name and email, always; a private note of the coach's own (Met at the High Performers meetup, Friday 13 November), kept with the coach's account. Redrawn."
     },
     {
       "id": "R1",
