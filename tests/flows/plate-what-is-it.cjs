@@ -80,13 +80,14 @@ const U = "http://127.0.0.1:3239";
 
     // ---- a craving sets it; Chef Mealan gets the chips ----
     await page.locator(".plate-empty-link").click(); await page.waitForTimeout(200); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(600);
-    await page.getByLabel("What are you craving?").fill("chocolate daam"); await page.waitForTimeout(500);
+    // Changed by story DT301 (0.3.149, board Stories223): the dishes and foods show on Find ideas, which asks Chef Mealan too
+    await page.getByLabel("What are you craving?").fill("chocolate daam"); await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(700);
     await page.getByRole("button", { name: "Add Nutella" }).first().click(); await page.waitForTimeout(700);
     ok(/ · Sweet, a DaaM/.test(await page.locator(".plan-line").textContent()), "chocolate daam, Nutella taken: the plate is a DaaM");
     await page.locator(".plate-empty-link").click(); await page.waitForTimeout(200); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(600);
     await page.getByLabel("What are you craving?").fill("tiramisu"); await page.waitForTimeout(400);
-    await page.getByRole("button", { name: "Ask Chef Mealan for one" }).click(); await page.waitForTimeout(700);
-    const t = asked[0]?.tastes;
+    await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(700);
+    const t = asked[asked.length - 1]?.tastes;
     ok(t && JSON.stringify(t.likes) === JSON.stringify(["Vanilla", "Chocolate"]) && JSON.stringify(t.rather_not) === JSON.stringify(["Sour", "Spicy"]) && t.own_words === "keep the chocolate flavour", "Chef Mealan is asked with the chips and your words: " + JSON.stringify(t));
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
   } catch (e) { ok(false, "ran to the end: " + e.message.split("\n")[0]); }

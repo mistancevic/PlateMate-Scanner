@@ -9,7 +9,8 @@ import { useEffect, useState } from "react";
 import { useKept } from "../kept";
 import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
-import { dayNameAny, type Formula } from "../personal";
+import { type Formula } from "../personal";
+import { keptLine } from "../analysis";
 import { loadClientNotes, saveClientNote, type ClientNotes, listClients, setClientGoal, setClientGoalFrom, sendCoachNote, setCheckinDay, sendRecipe, pinFormula, type ClientRow } from "../cloud";
 import { ClientPage, ClientRowCard, coachNumbers, todayIndex, type CoachOps } from "./ClientWeek";
 import { DAY_NAMES, type CoachNote } from "../coachNotes";
@@ -432,6 +433,7 @@ export function Invites(p: AppApi) {
 
 
 // What a client kept on purpose, as Coach Milan sees it: the same findings, the client's choice, a note, Approve or Ask to change.
+// B142 (0.3.149, board Stories221): a line kept for one day starts with that day (Moderate day, kept on purpose: ...); a week's line stays as it was.
 function ReviewCard({ row, answer, open }: { row: ClientRow; answer: (status: "approved" | "change", note: string) => Promise<void>; open: () => void }) {
   const [note, setNote] = useState("");
   const r = row.review!, first = row.name.split(" ")[0];
@@ -441,7 +443,7 @@ function ReviewCard({ row, answer, open }: { row: ClientRow; answer: (status: "a
       <small className="muted">{r.summary ?? ""}{r.summary ? " · " : ""}{dateText(new Date(r.at), { day: "numeric", month: "long" }, "en")}</small>
       {r.reply && <p className="review-reply">{w("coach.reviewReplied", { name: first, reply: r.reply })}</p>}
       {(r.kept ?? []).map((k) => (
-        <div className="finding" key={k.id}><b>{w("coach.keptOnPurpose", { title: k.title.toLowerCase() })}</b><span>{k.body}</span><small>{k.source}</small></div>
+        <div className="finding" key={k.id}><b>{keptLine(k)}</b><span>{k.body}</span><small>{k.source}</small></div>
       ))}
       <label className="field"><span>{w("coach.noteToClient", { name: first })}</span><textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder={w("coach.addGOfCarbsOn")} /></label>
       <div className="button-row">

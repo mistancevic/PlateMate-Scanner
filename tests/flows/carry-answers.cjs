@@ -92,7 +92,7 @@ const U = "http://127.0.0.1:3237";
     // ---- Chef Mealan's ideas get the two lists ----
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(800);
     await page.getByLabel("What are you craving?").fill("tiramisu"); await page.waitForTimeout(400);
-    await page.getByRole("button", { name: "Ask Chef Mealan for one" }).click(); await page.waitForTimeout(800);
+    await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(800); // DT301 (0.3.149, board Stories223): Find ideas asks Chef Mealan
     ok(asked.length === 1 && JSON.stringify(asked[0].carried) === JSON.stringify({ light: ["DaaM good protein crêpes"], heavy: ["Sarma"] }), "the craving's idea is asked with the lists: light, the crêpes; heavy, Sarma");
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
   } catch (e) { ok(false, "ran to the end: " + e.message.split("\n")[0]); }

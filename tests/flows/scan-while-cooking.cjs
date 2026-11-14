@@ -40,7 +40,7 @@ const PORT = "3395", U = `http://127.0.0.1:${PORT}`;
   const main = (page) => page.locator("main").textContent();
   const scanSkyr = async (page) => {
     await nav(page, "Plate"); await page.waitForTimeout(700);
-    await page.locator("main input").first().fill("Skyr"); await page.waitForTimeout(700);
+    await page.locator("main input").first().fill("Skyr"); await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(700); // DT301 (0.3.149, board Stories223): what you typed shows on Find ideas
     await page.locator("main button").filter({ hasText: /^Skyr, natural/ }).first().click(); await page.waitForTimeout(700);
   };
   try {

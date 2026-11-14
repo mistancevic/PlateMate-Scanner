@@ -81,7 +81,7 @@ const U = "http://127.0.0.1:3240";
     await p2.locator("nav button").filter({ hasText: "Today" }).click(); await p2.waitForTimeout(700);
     // ---- a one-portion recipe presets What is it? ----
     await p2.locator("nav button").filter({ hasText: "Plate" }).click(); await p2.waitForTimeout(700);
-    await p2.getByLabel("What are you craving?").fill("pudding"); await p2.waitForTimeout(500);
+    await p2.getByLabel("What are you craving?").fill("pudding"); await p2.getByRole("button", { name: "Find ideas" }).click(); await p2.waitForTimeout(500); // DT301 (0.3.149, board Stories223): what you typed shows on Find ideas
     await p2.locator(".pick-row").filter({ hasText: "pudding" }).first().click(); await p2.waitForTimeout(900);
     ok(/ · Sweet, a DaaM/.test(await p2.locator(".plan-line").textContent()), "the quark pudding on the Plate: Sweet, a DaaM, preset from its foods");
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);

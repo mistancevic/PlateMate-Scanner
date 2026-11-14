@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.149",
     "0.3.148",
     "0.3.147",
     "0.3.146",
@@ -208,10 +209,12 @@
     },
     {
       "id": "B142",
-      "title": "Two Kept on purpose boxes for carbs on one review",
+      "title": "Your review card says which day a kept line is for",
       "epic": "trust",
-      "state": "later",
-      "why": "Seen on Coach Milan's screenshot of 14 November: a client's review shows carbs are low for a training day twice, with 5 to 7 and 6 to 10 g per kg. Reads like a duplicate. To reproduce."
+      "state": "done",
+      "why": "Seen on Coach Milan's screenshot of 14 November: a client's review shows carbs are low for a training day twice, with 5 to 7 and 6 to 10 g per kg. Reads like a duplicate. To reproduce. Reproduced 14 November 17:14: not a duplicate; a client's own numbers with low carbs on the Moderate and the Hard day; the coach's review card dropped the day. 17:16 Draw (Stories221); 17:54 Go. Each kept line for a day starts with it: Moderate day, kept on purpose: ...; a week's line as before (keptLine in src/analysis.ts).",
+      "board": "Stories221",
+      "version": "0.3.149"
     },
     {
       "id": "DT298",
@@ -1172,6 +1175,32 @@
       "epic": "trust",
       "state": "later",
       "why": "From the blind run of 10 November (docs/qa/blind/2026-11-10-jelena-first-run), split out of DT278 on 12 November."
+    },
+    {
+      "id": "B143",
+      "title": "Fill with Chef Mealan: the page stays where you are, and a proper Undo",
+      "epic": "trust",
+      "state": "done",
+      "board": "Stories222",
+      "version": "0.3.149",
+      "why": "Coach Milan 14 November 17:20, on live: on Plan, Fill with Chef Mealan scrolled to the bottom on first load, on a tap on a meal and on the chips; after Put them in the plan, Undo looked wrong. Reproduced: the chat moved to the very bottom on every change; Undo kept a text link's padding and underline (33 px wide). 17:26: first the drawing; 17:46: message and buttons lined up; 17:54 Go. The page moves only when a new message arrives, to its top; In the plan on its own line, Undo and Back to the plan in one row, both 44 px. Walkthrough fill-stays.cjs."
+    },
+    {
+      "id": "DT301",
+      "title": "The Plate: Find ideas, a plate, and a recipe to start from",
+      "epic": "trust",
+      "state": "done",
+      "board": "Stories223",
+      "version": "0.3.149",
+      "why": "Coach Milan 14 November 17:25 to 23:30: make the Plate more prominent. The line under the title (Get an idea for what you crave, or build your own plate); the meal line under it; the ideas block as one card, the box and Find ideas, the one button, which looks in your recipes, Coach's, the members' and the starters and asks Chef Mealan for three ideas at the same time, each short with View more; Save in My recipes (an idea is not saved by itself); the chef's hat on his ideas; On the plate in two parts, Add a food over four tiles and Have a recipe? Start from it over Use a screenshot and Paste a link; Fit to my target outlined on an empty plate; How to's steps. The board follows each scenario from its first screen. Walkthroughs craving-search.cjs (changed), plate-parts.cjs (new)."
+    },
+    {
+      "id": "DT302",
+      "title": "The days on a Clients card: one picture, with a key",
+      "epic": "trust",
+      "state": "now",
+      "board": "Stories224",
+      "why": "Coach Milan 14 November 17:29: it is not clear what the marks on a Clients card mean. Agreed 17:42 to 17:53: one bar shape; the first two weeks as two rows of seven from the client's first day, then one row Monday to Sunday; weekend days shaded, wherever they fall (18:53); green the day went as meant, amber worth a look, outline today, grey still to come; a dot under a bar is a weigh-in; a key line names what green and amber mean in that phase. 17:54 Draw (Stories224); 19:25 all good. Waits for Go."
     }
   ]
 }

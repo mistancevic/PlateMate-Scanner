@@ -174,9 +174,25 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   const photoNow = photo;
   const { turns, setTurns, close } = p;
   const fileRef = useRef<HTMLInputElement>(null);
-  const endRef = useRef<HTMLDivElement>(null);
   const [thinking, setThinking] = useState(false);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [turns, thinking]);
+  // B143 (0.3.149, board Stories222): the page moves only when a new message arrives, and then to the top of that message,
+  // under the sticky heads. A tap on a choice, a chip or Put them in changes a message in place and leaves the page where it is.
+  // On opening with messages already there (Fill), the page shows the top of the newest one.
+  const seen = useRef(-1);
+  useEffect(() => {
+    const n = turns.length, before = seen.current; seen.current = n;
+    if (n === 0 || (before >= 0 && n <= before)) return;
+    const id = requestAnimationFrame(() => {
+      try {
+        const el = document.querySelectorAll<HTMLElement>(".chat-screen .chat > .bubble")[n - 1];
+        const head = document.querySelector<HTMLElement>(".chat-screen .chat-head");
+        if (!el) return;
+        const off = head ? (parseFloat(getComputedStyle(head).top) || 0) + head.offsetHeight + 12 : 12;
+        window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - off), behavior: before < 0 ? "auto" : "smooth" });
+      } catch { /* nothing to scroll */ }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [turns]);
   const history = turns.filter((t) => !t.failed).slice(-6).map((t) => ({ role: t.role === "you" ? "user" : "assistant", content: t.text }));
 
   const say = (...t: Turn[]) => setTurns((x) => [...x, ...t]);
@@ -424,11 +440,17 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
                     <div className="fill-text"><small>{mealName(r.slot.name)}, {r.slot.time}</small><b>{r.meal.title}</b><small>{fmt(r.meal.kcal, 0)} kcal · {fmt(r.meal.protein, 0)} g · {pdText(density(r.meal.protein, r.meal.kcal))}</small></div>
                   </div>
                 )))}
-                <div className="button-row fill-put">
-                  {t.fill.done
-                    ? <><Done start text={w("out.inThePlan")} undo={undoOf(`${i}:fill`)} />{p.tab === "plan" && <button className="pill pill-small pill-primary back-after" onClick={close}>{w("out.backToThePlan")}</button>}</>
-                    : <button className="pill pill-small pill-primary" onClick={() => putThemIn(i)}>{w("out.putThemInThePlan")}</button>}
-                </div>
+                {/* B143 (0.3.149, board Stories222, B143h): In the plan on its own line, in line with the meal names; under it one row,
+                    Undo on the left and Back to the plan on the right, both 44 px and level */}
+                {t.fill.done ? (() => { const undo = undoOf(`${i}:fill`), back = p.tab === "plan"; return (
+                  <div className="fill-done">
+                    <b className="fill-done-line">✓ {w("out.inThePlan")}</b>
+                    {(undo || back) && <div className="button-row fill-done-row">
+                      {undo && <button type="button" className="pill pill-small pill-action" onClick={undo}>{w("out.undo")}</button>}
+                      {back && <button type="button" className="pill pill-small pill-primary back-after" onClick={close}>{w("out.backToThePlan")}</button>}
+                    </div>}
+                  </div>); })()
+                  : <div className="button-row fill-put"><button className="pill pill-small pill-primary" onClick={() => putThemIn(i)}>{w("out.putThemInThePlan")}</button></div>}
               </div>
             )}
             {t.rows && t.rows.length > 0 && (
@@ -469,7 +491,6 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
         )}
         {/* DT111 (0.2.94): the wait shows its steps, collapsed, above the field */}
         {thinking && <WaitSteps steps={[{ key: "ask", text: w("out.askedChefMealan") }, { key: "match", text: w("out.matchingTheFoodsHeNames") }]} at={chatStage} done={chatStage === "match" ? ["ask"] : []} />}
-        <div ref={endRef} />
       </div>
       <div className="chat-bottom">
       {photo && <div className="strip">{w("out.photoAttached")} <button className="pill pill-small pill-danger-line" onClick={() => setPhoto("")}>{w("out.remove")}</button></div>}

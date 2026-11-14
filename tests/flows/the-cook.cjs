@@ -84,7 +84,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     ok(st.items.length === 0 && st.cook.plate.items.length === 4, "the Plate is free; the dish waits with the cook");
     ok(/What are you craving\?/.test(await main()) && await page.locator(".cook-strip").count() === 1, "the Plate: the strip under What are you craving?");
     // ---- 4. a food while cooking asks where it goes ----
-    await page.locator("main input").first().fill("Skyr"); await page.waitForTimeout(700);
+    await page.locator("main input").first().fill("Skyr"); await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(700); // DT301 (0.3.149, board Stories223): what you typed shows on Find ideas
     await page.locator("main button").filter({ hasText: /^Skyr, natural/ }).first().click(); await page.waitForTimeout(700);
     ok(/You are cooking Chicken rice bowl\. Shall I use this skyr in it, put it on the Plate, or keep it in your foods\?/.test(await main()), "Chef Mealan asks: use it in the dish, put it on the Plate, or keep it in your foods");
     await page.getByRole("button", { name: "Use it in Chicken rice bowl" }).click(); await page.waitForTimeout(900);

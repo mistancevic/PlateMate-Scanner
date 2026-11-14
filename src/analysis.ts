@@ -1,7 +1,7 @@
 // Target analysis: the person's own numbers checked against their goal and body, by code, never by the model.
 // Every finding has a number and a source, and belongs either to one day (shown under that day's row) or to the week
 // (shown under the week's line). Nothing is blocked; a finding kept on purpose is remembered with the value it was kept at.
-import { ADJ, DAY_TYPES, type DayNumbers, type DayType, type Personal } from "./personal";
+import { ADJ, DAY_TYPES, dayNameAny, type DayNumbers, type DayType, type Personal } from "./personal";
 import { goalName } from "./goal";
 import { w, dec, numText } from "./words";
 import { lengthOf } from "./plan";
@@ -82,3 +82,7 @@ export function addsUp(r: { kcal: number; protein: number; fats: number; carbs: 
 }
 // open = not kept, or kept at a different value
 export const isOpen = (f: Finding, p: Personal) => p.kept?.[f.id]?.sig !== f.sig;
+
+// B142 (0.3.149, board Stories221): on the coach's review card a line kept for one day starts with that day; a week's line as it was
+export const keptLine = (k: { title: string; day: string | null }) =>
+  k.day ? w("coach.keptOnPurposeDay", { day: dayNameAny(k.day), title: k.title.toLowerCase() }) : w("coach.keptOnPurpose", { title: k.title.toLowerCase() });

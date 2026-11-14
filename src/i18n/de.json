@@ -182,11 +182,11 @@
       "checked": true
     },
     "plate.cravingSub": {
-      "text": "Füge deine Lebensmittel hinzu. Chef Mealan legt die Mengen fest.",
+      "text": "Hol dir eine Idee für das, worauf du Lust hast, oder stell deinen eigenen Teller zusammen. Chef Mealan legt die Mengen fest.",
       "checked": true
     },
     "plate.cravingBox": {
-      "text": "Crêpes, Sarma, Schokolade PD 7+…",
+      "text": "Schreib, worauf du Lust hast oder was du kochen willst",
       "checked": true
     },
     "plate.cravingHint": {
@@ -250,7 +250,7 @@
       "checked": true
     },
     "plate.startFromRecipe": {
-      "text": "Mit einem Rezept beginnen",
+      "text": "Hast du ein Rezept? Fang damit an",
       "checked": true
     },
     "plate.asItStands": {
@@ -5854,7 +5854,7 @@
       "checked": true
     },
     "recipein.aRecipePageFromA": {
-      "text": "Eine Rezeptseite von einer Website. Links von Instagram und TikTok brauchen eine Anmeldung, deshalb öffnen sie sich bei uns nicht: Nimm dort Screenshot.",
+      "text": "Eine Rezeptseite von einer Website. Links von Instagram und TikTok brauchen eine Anmeldung, deshalb öffnen sie sich bei uns nicht: Tipp dort auf Screenshot nutzen.",
       "checked": true
     },
     "recipein.theLinkStaysWithThe": {
@@ -10642,11 +10642,11 @@
       "checked": true
     },
     "plate.screenshot": {
-      "text": "Screenshot",
+      "text": "Screenshot nutzen",
       "checked": true
     },
     "plate.link": {
-      "text": "Link",
+      "text": "Link einfügen",
       "checked": true
     },
     "plate.foodsCount": {
@@ -21310,11 +21310,11 @@
       "checked": true
     },
     "howto.eatNow.s2": {
-      "text": "Tipp ein Gericht oder eine Lust ein, etwa Sarma oder Schokolade.",
+      "text": "Tipp ein Gericht oder eine Lust ein, etwa Sarma oder Schokolade, und tipp auf Ideen finden.",
       "checked": true
     },
     "howto.eatNow.s3": {
-      "text": "Tipp auf eins unter Deine Rezepte, oder auf Chef Mealan nach einem fragen.",
+      "text": "Tipp auf eins deiner Gerichte, oder auf Mehr anzeigen bei einer Idee von Chef Mealan, dann auf Auf meinen Teller legen.",
       "checked": true
     },
     "howto.eatNow.s4": {
@@ -21394,7 +21394,7 @@
       "checked": true
     },
     "howto.screenshot.s1": {
-      "text": "Öffne Rezepte. Unter Rezept hinzufügen tipp auf Screenshot.",
+      "text": "Öffne Rezepte. Unter Rezept hinzufügen tipp auf Screenshot nutzen.",
       "checked": true
     },
     "howto.screenshot.s2": {
@@ -22631,6 +22631,34 @@
     },
     "home.tickBox": {
       "text": "Setze das Häkchen, damit wir dir schreiben dürfen, wenn es losgeht",
+      "checked": true
+    },
+    "coach.keptOnPurposeDay": {
+      "text": "Tag: {day}, bewusst behalten: {title}",
+      "checked": true
+    },
+    "craving.chefsIdeas": {
+      "text": "Ideen von Chef Mealan",
+      "checked": true
+    },
+    "craving.findIdeas": {
+      "text": "Ideen finden",
+      "checked": true
+    },
+    "craving.viewMore": {
+      "text": "Mehr anzeigen",
+      "checked": true
+    },
+    "craving.viewLess": {
+      "text": "Weniger anzeigen",
+      "checked": true
+    },
+    "craving.saveInMyRecipes": {
+      "text": "In Meine Rezepte speichern",
+      "checked": true
+    },
+    "craving.savedInMyRecipes": {
+      "text": "In Meine Rezepte gespeichert",
       "checked": true
     }
   }

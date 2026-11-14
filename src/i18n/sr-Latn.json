@@ -278,11 +278,11 @@
       "checked": true
     },
     "plate.cravingSub": {
-      "text": "Dodaj svoje namirnice. Chef Mealan određuje količine.",
+      "text": "Uzmi ideju za ono što ti se jede ili složi svoj tanjir. Chef Mealan određuje količine.",
       "checked": true
     },
     "plate.cravingBox": {
-      "text": "Palačinke, sarma, čokolada PD 7+…",
+      "text": "Upiši šta ti se jede ili šta želiš da kuvaš",
       "checked": true
     },
     "plate.cravingHint": {
@@ -346,15 +346,15 @@
       "checked": true
     },
     "plate.startFromRecipe": {
-      "text": "Počni od recepta",
+      "text": "Imaš recept? Počni od njega",
       "checked": true
     },
     "plate.screenshot": {
-      "text": "Snimak ekrana",
+      "text": "Koristi snimak ekrana",
       "checked": true
     },
     "plate.link": {
-      "text": "Link",
+      "text": "Nalepi link",
       "checked": true
     },
     "plate.asItStands": {
@@ -2578,7 +2578,7 @@
       "checked": true
     },
     "recipein.aRecipePageFromA": {
-      "text": "Strana s receptom sa sajta. Linkovi sa Instagrama i TikToka traže prijavu, pa nam se ne otvaraju: tamo koristi Snimak ekrana.",
+      "text": "Strana s receptom sa sajta. Linkovi sa Instagrama i TikToka traže prijavu, pa nam se ne otvaraju: tamo dodirni Koristi snimak ekrana.",
       "checked": true
     },
     "recipein.theLinkStaysWithThe": {
@@ -2662,7 +2662,7 @@
       "checked": true
     },
     "recipein.useScreenshot": {
-      "text": "Koristi Snimak ekrana",
+      "text": "Koristi snimak ekrana",
       "checked": true
     },
     "recipein.tryAScreenshot": {
@@ -21310,11 +21310,11 @@
       "checked": true
     },
     "howto.eatNow.s2": {
-      "text": "Upiši jelo ili želju, npr. sarma ili čokolada.",
+      "text": "Upiši jelo ili želju, npr. sarma ili čokolada, i dodirni Nađi ideje.",
       "checked": true
     },
     "howto.eatNow.s3": {
-      "text": "Dodirni neki od Tvoji recepti, ili Pitaj Chef Mealana za jedno.",
+      "text": "Dodirni neko od svojih jela, ili Prikaži više na nekoj od ideja Chef Mealana, pa Stavi na moj tanjir.",
       "checked": true
     },
     "howto.eatNow.s4": {
@@ -21394,7 +21394,7 @@
       "checked": true
     },
     "howto.screenshot.s1": {
-      "text": "Otvori Recepte. Pod Dodaj recept dodirni Snimak ekrana.",
+      "text": "Otvori Recepte. Pod Dodaj recept dodirni Koristi snimak ekrana.",
       "checked": true
     },
     "howto.screenshot.s2": {
@@ -22631,6 +22631,34 @@
     },
     "home.tickBox": {
       "text": "Označi polje, da bismo smeli da ti pišemo kad se otvori",
+      "checked": true
+    },
+    "coach.keptOnPurposeDay": {
+      "text": "Dan: {day}, namerno zadržano: {title}",
+      "checked": true
+    },
+    "craving.chefsIdeas": {
+      "text": "Ideje od Chef Mealana",
+      "checked": true
+    },
+    "craving.findIdeas": {
+      "text": "Nađi ideje",
+      "checked": true
+    },
+    "craving.viewMore": {
+      "text": "Prikaži više",
+      "checked": true
+    },
+    "craving.viewLess": {
+      "text": "Prikaži manje",
+      "checked": true
+    },
+    "craving.saveInMyRecipes": {
+      "text": "Sačuvaj u Mojim receptima",
+      "checked": true
+    },
+    "craving.savedInMyRecipes": {
+      "text": "Sačuvano u Mojim receptima",
       "checked": true
     }
   }

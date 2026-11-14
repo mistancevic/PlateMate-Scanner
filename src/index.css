@@ -431,6 +431,8 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .chat-input { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 4px 6px; }
 .chat-input input { flex: 1; border: 0; background: none; font: inherit; font-size: var(--fs-body); padding: 10px 6px; min-width: 0; }
 .chat-input .icon { width: 40px; height: 40px; }
+/* DT301 (0.3.149): the Plate's box in the chat bar's look; Send at 44 px */
+.chat-input.crave-bar { margin: 4px 0 2px; } .chat-input.crave-bar .icon { width: 44px; height: 44px; }
 .avatar-img { object-fit: cover; }
 .sync { margin: 6px 2px 2px; color: var(--muted); } .sync-bad { color: var(--low); font-weight: 700; }
 
@@ -1104,6 +1106,26 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .plate-card { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 14px; }
 .plate-card .card-top { font-size: var(--fs-body); color: var(--ink); }
 .plate-card .plate-empty { color: var(--muted); font-weight: 600; }
+/* DT301 (0.3.149, board Stories223): the empty plate drawn, then the four ways as tiles, two in a row, icon above the word */
+.plate-empty-pic { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 6px 0 14px; }
+.plate-card .plate-empty-pic .plate-empty { font-weight: 400; }
+.plate-card .ways-head { display: block; font-size: var(--fs-body); font-weight: 700; color: var(--ink); margin: 4px 0 8px; }
+.plate-card .ways-head-second { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 16px; }
+/* DT301: the ideas block, one card: the box, Find ideas, the dishes, Chef Mealan's ideas under the chef's hat */
+.crave.crave-card { display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+.crave-card .chat-input.crave-bar { margin: 0; }
+.crave-card .crave-find { min-height: 44px; }
+.crave-card .crave-none { display: block; }
+.crave-card .crave-chef { display: inline-flex; align-items: center; gap: 6px; }
+.crave-card .crave-idea { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding: 12px 0 4px; margin-top: 0; }
+.crave-card .crave-idea-top { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.crave-card .crave-more { justify-content: flex-end; margin: 0; }
+.crave-card .crave-save { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0; }
+.crave-card .crave-save .pill { height: 44px; min-height: 44px; padding: 0 18px; }
+.crave-card .crave-saved { color: var(--top); font-weight: 900; }
+.crave-card .crave-more .pill { height: 44px; min-height: 44px; }
+.ways.ways-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.ways.ways-tiles .pill { flex-direction: column; justify-content: center; gap: 6px; height: auto; min-height: 88px; padding: 10px 8px; border-radius: 16px; font-weight: 700; text-align: center; }
 .plate-card .readout { margin-bottom: 0; } .plate-card .ways { margin-bottom: 0; }
 .plate-card .ways .pill-small:not(.ways-empty) { flex: 1; justify-content: center; height: 44px; }
 .plate-card .pill-wide { margin: 0; }
@@ -2414,7 +2436,12 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .done-tick > b { color: var(--top); font-weight: 900; font-size: var(--fs-body); white-space: nowrap; }
 .done-tick.done-start { align-items: flex-start; }
 .done-tick.done-quiet > b { color: var(--muted); font-weight: 700; }
-.done-undo { font-size: var(--fs-small); text-decoration: underline; padding: 2px 0; }
+/* B143 (0.3.149): Undo is a normal white button with a blue border, 44 px, no underline (it kept a text link's padding and line) */
+.done-undo { height: 44px; min-height: 44px; padding: 0 18px; text-decoration: none; }
+.fill-done { display: flex; flex-direction: column; gap: 10px; padding-top: 10px; }
+.fill-done-line { color: var(--top); font-weight: 900; font-size: var(--fs-body); }
+.fill-done-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0; }
+.fill-done-row .pill { height: 44px; min-height: 44px; padding: 0 18px; margin: 0; }
 .button-row .back-after { margin-left: auto; }
 .bubble-greyed { opacity: .6; }
 .chat-screen .chat-head { position: sticky; top: calc(58px + env(safe-area-inset-top, 0px)); z-index: 25; background: var(--base); margin: 0 -18px; padding: 6px 18px 8px; }
