@@ -190,6 +190,14 @@
       "why": "Milan 2 November: wanted, late. The facts on /built are already counted (scripts/built-facts.cjs)."
     },
     {
+      "id": "B141",
+      "title": "A client is never unnamed: Profile name, then the invite's name, then its email",
+      "epic": "trust",
+      "state": "now",
+      "board": "Stories219",
+      "why": "Coach Milan 14 November 11:30, with a screenshot: two new beta testers from the Munich meetup; one shows as Client unnamed, like an earlier tester. Clients takes a name only from the invite's name and the client's Profile name; both optional, and an email-link sign-in brings none. 11:35: Draw. Drawn 14 November (Stories219): Create invite needs a name; Clients falls back to the invite's name, then its email, and says where the name came from; never unnamed, no Client in front."
+    },
+    {
       "id": "R1",
       "title": "Two old recipes with the same name show their date",
       "epic": "cook",
