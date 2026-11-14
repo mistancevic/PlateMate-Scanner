@@ -11794,7 +11794,7 @@
       "checked": true
     },
     "home.fullForm": {
-      "text": "Diese Runde ist voll. Hinterlass deinen Namen und deine E-Mail-Adresse, und Coach Milan schreibt dir, wenn die nächste Runde startet.",
+      "text": "Diese Runde ist voll. Hinterlass deinen Namen und deine E-Mail-Adresse, und du bekommst eine Nachricht, wenn die nächste Runde startet.",
       "checked": true
     },
     "home.betaForm": {
@@ -12086,11 +12086,11 @@
       "checked": true
     },
     "home.thanks": {
-      "text": "Danke, {name}. Coach Milan meldet sich bei dir unter {email}.",
+      "text": "Danke, {name}. Du bekommst eine Antwort an {email}.",
       "checked": true
     },
     "home.thanksList": {
-      "text": "Danke, du bist auf der Liste. Coach Milan meldet sich bei dir unter {email}.",
+      "text": "Danke, du bist auf der Liste. Du bekommst eine Antwort an {email}.",
       "checked": true
     },
     "home.yourName": {

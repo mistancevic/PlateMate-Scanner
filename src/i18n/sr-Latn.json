@@ -11794,7 +11794,7 @@
       "checked": true
     },
     "home.fullForm": {
-      "text": "Ovaj krug je popunjen. Ostavi ime i imejl, i trener Milan će ti pisati kad počne sledeći krug.",
+      "text": "Ovaj krug je popunjen. Ostavi ime i imejl, i stiže ti poruka kad počne sledeći krug.",
       "checked": true
     },
     "home.betaForm": {
@@ -12086,11 +12086,11 @@
       "checked": true
     },
     "home.thanks": {
-      "text": "Hvala, {name}. Trener Milan će ti se javiti na {email}.",
+      "text": "Hvala, {name}. Odgovor ti stiže na {email}.",
       "checked": true
     },
     "home.thanksList": {
-      "text": "Hvala, na listi si. Trener Milan će ti se javiti na {email}.",
+      "text": "Hvala, na listi si. Odgovor ti stiže na {email}.",
       "checked": true
     },
     "home.yourName": {

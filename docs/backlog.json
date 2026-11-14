@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.148",
     "0.3.147",
     "0.3.146",
     "0.3.145",
@@ -54,8 +55,7 @@
     "0.3.139",
     "0.3.138",
     "0.3.137",
-    "0.3.136",
-    "0.3.135"
+    "0.3.136"
   ],
   "tickets": [
     {
@@ -226,7 +226,7 @@
       "epic": "home",
       "state": "done",
       "board": "Stories220",
-      "why": "Coach Milan 14 November 14:05, with a screenshot: the note box's text is cut; (Optional) first; neutral wording, no Coach Milan in the lines (recruiters); required fields marked, with the logic. 14:10 to 14:16: a label above each box with * on the required ones; the grey text inside stays and says what to do, never like typed information; a box with a set format enforces it. Drawn 14 November (Stories220): Join the beta, the waiting list and the same form on a book page; Send always tappable, a missing required box turns red and says what to do. Go 14:25. Built in RequestForm and WaitForm (LandingScreen): Field with its label, * or (optional), the line under it and what is missing; Send always on.",
+      "why": "Coach Milan 14 November 14:05, with a screenshot: the note box's text is cut; (Optional) first; neutral wording, no Coach Milan in the lines (recruiters); required fields marked, with the logic. 14:10 to 14:16: a label above each box with * on the required ones; the grey text inside stays and says what to do, never like typed information; a box with a set format enforces it. Drawn 14 November (Stories220): Join the beta, the waiting list and the same form on a book page; Send always tappable, a missing required box turns red and says what to do. Go 14:25. Built in RequestForm and WaitForm (LandingScreen): Field with its label, * or (optional), the line under it and what is missing; Send always on. 0.3.148 (Coach Milan 14:53: neutral means every line of the forms): the round-is-full line and the two thank-you lines lost Coach Milan too.",
       "version": "0.3.147"
     },
     {
