@@ -11798,7 +11798,7 @@
       "checked": true
     },
     "home.betaForm": {
-      "text": "Nutze Chef Mealan vier Wochen lang an den meisten Tagen und sag uns, was nicht funktioniert. Die meisten steigen mit einem Code von ihrem Coach ein. Wenn du keinen hast, hinterlass deinen Namen und deine E-Mail-Adresse, und Coach Milan schickt dir einen persönlichen Code.",
+      "text": "Nutze Chef Mealan vier Wochen lang an den meisten Tagen und sag uns, was nicht funktioniert. Die meisten steigen mit einem Code von ihrem Coach ein. Wenn du keinen hast, hinterlass deinen Namen und deine E-Mail-Adresse, und du bekommst einen persönlichen Code per E-Mail.",
       "checked": true
     },
     "home.waitTitle": {
@@ -12062,7 +12062,7 @@
       "checked": true
     },
     "home.email": {
-      "text": "E-Mail",
+      "text": "Gib die E-Mail-Adresse ein, mit der du dich anmeldest",
       "checked": true
     },
     "home.emailWait": {
@@ -12094,19 +12094,19 @@
       "checked": true
     },
     "home.yourName": {
-      "text": "Dein Name",
+      "text": "Gib deinen Namen ein",
       "checked": true
     },
     "home.mobile": {
-      "text": "Handynummer, optional",
+      "text": "Beginne mit + und deiner Ländervorwahl",
       "checked": true
     },
     "home.mobileLine": {
-      "text": "Coach Milan schreibt dir eventuell per WhatsApp oder SMS wegen der Teilnahme. Die Nummer wird für nichts anderes genutzt.",
+      "text": "Du bekommst eventuell eine Nachricht per WhatsApp oder SMS wegen der Teilnahme. Die Nummer wird für nichts anderes genutzt.",
       "checked": true
     },
     "home.after": {
-      "text": "Eine kurze Nachricht an Coach Milan (optional). Zum Beispiel: dein Ziel und ein paar Worte über dich.",
+      "text": "Schreib dein Ziel und ein paar Worte über dich",
       "checked": true
     },
     "home.language": {
@@ -22587,6 +22587,50 @@
     },
     "coach.addTheirName": {
       "text": "Füge den Namen hinzu, damit du weißt, wer es ist.",
+      "checked": true
+    },
+    "home.nameLabel": {
+      "text": "Name",
+      "checked": true
+    },
+    "home.emailLabel": {
+      "text": "E-Mail",
+      "checked": true
+    },
+    "home.mobileLabel": {
+      "text": "Handynummer",
+      "checked": true
+    },
+    "home.noteLabel": {
+      "text": "Eine kurze Nachricht",
+      "checked": true
+    },
+    "home.optional": {
+      "text": "(optional)",
+      "checked": true
+    },
+    "home.required": {
+      "text": "Pflichtfeld",
+      "checked": true
+    },
+    "home.waitEmail": {
+      "text": "Gib deine E-Mail-Adresse ein",
+      "checked": true
+    },
+    "home.addName": {
+      "text": "Füge deinen Namen hinzu",
+      "checked": true
+    },
+    "home.addEmail": {
+      "text": "Füge deine E-Mail-Adresse hinzu",
+      "checked": true
+    },
+    "home.checkEmail": {
+      "text": "Prüfe die E-Mail-Adresse: Sie braucht ein @",
+      "checked": true
+    },
+    "home.tickBox": {
+      "text": "Setze das Häkchen, damit wir dir schreiben dürfen, wenn es losgeht",
       "checked": true
     }
   }

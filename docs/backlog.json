@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.147",
     "0.3.146",
     "0.3.145",
     "0.3.144",
@@ -54,8 +55,7 @@
     "0.3.138",
     "0.3.137",
     "0.3.136",
-    "0.3.135",
-    "0.3.134"
+    "0.3.135"
   ],
   "tickets": [
     {
@@ -224,9 +224,10 @@
       "id": "DT299",
       "title": "The home page forms say what is required",
       "epic": "home",
-      "state": "now",
+      "state": "done",
       "board": "Stories220",
-      "why": "Coach Milan 14 November 14:05, with a screenshot: the note box's text is cut; (Optional) first; neutral wording, no Coach Milan in the lines (recruiters); required fields marked, with the logic. 14:10 to 14:16: a label above each box with * on the required ones; the grey text inside stays and says what to do, never like typed information; a box with a set format enforces it. Drawn 14 November (Stories220): Join the beta, the waiting list and the same form on a book page; Send always tappable, a missing required box turns red and says what to do."
+      "why": "Coach Milan 14 November 14:05, with a screenshot: the note box's text is cut; (Optional) first; neutral wording, no Coach Milan in the lines (recruiters); required fields marked, with the logic. 14:10 to 14:16: a label above each box with * on the required ones; the grey text inside stays and says what to do, never like typed information; a box with a set format enforces it. Drawn 14 November (Stories220): Join the beta, the waiting list and the same form on a book page; Send always tappable, a missing required box turns red and says what to do. Go 14:25. Built in RequestForm and WaitForm (LandingScreen): Field with its label, * or (optional), the line under it and what is missing; Send always on.",
+      "version": "0.3.147"
     },
     {
       "id": "DT300",

@@ -11798,7 +11798,7 @@
       "checked": true
     },
     "home.betaForm": {
-      "text": "Koristi Chef Mealan većinu dana četiri nedelje i javi nam šta ne radi. Većina se pridružuje kodom od svog trenera. Ako ga nemaš, ostavi ime i imejl, i trener Milan će ti poslati lični kod.",
+      "text": "Koristi Chef Mealan većinu dana četiri nedelje i javi nam šta ne radi. Većina se pridružuje kodom od svog trenera. Ako ga nemaš, ostavi ime i imejl, i lični kod ti stiže imejlom.",
       "checked": true
     },
     "home.waitTitle": {
@@ -12062,7 +12062,7 @@
       "checked": true
     },
     "home.email": {
-      "text": "Imejl",
+      "text": "Upiši imejl kojim ćeš se prijavljivati",
       "checked": true
     },
     "home.emailWait": {
@@ -12094,19 +12094,19 @@
       "checked": true
     },
     "home.yourName": {
-      "text": "Tvoje ime",
+      "text": "Upiši svoje ime",
       "checked": true
     },
     "home.mobile": {
-      "text": "Broj mobilnog, nije obavezno",
+      "text": "Počni sa + i pozivnim brojem zemlje",
       "checked": true
     },
     "home.mobileLine": {
-      "text": "Trener Milan može da ti se javi preko WhatsAppa ili SMS-om u vezi sa pridruživanjem. Broj se ne koristi ni za šta drugo.",
+      "text": "Može ti stići poruka preko WhatsAppa ili SMS-om u vezi sa pridruživanjem. Broj se ne koristi ni za šta drugo.",
       "checked": true
     },
     "home.after": {
-      "text": "Kratka poruka za trenera Milana (nije obavezno). Na primer: tvoj cilj i nekoliko reči o tebi.",
+      "text": "Napiši svoj cilj i nekoliko reči o sebi",
       "checked": true
     },
     "home.language": {
@@ -22587,6 +22587,50 @@
     },
     "coach.addTheirName": {
       "text": "Dodaj ime, da znaš ko je to.",
+      "checked": true
+    },
+    "home.nameLabel": {
+      "text": "Ime",
+      "checked": true
+    },
+    "home.emailLabel": {
+      "text": "Imejl",
+      "checked": true
+    },
+    "home.mobileLabel": {
+      "text": "Broj mobilnog",
+      "checked": true
+    },
+    "home.noteLabel": {
+      "text": "Kratka poruka",
+      "checked": true
+    },
+    "home.optional": {
+      "text": "(nije obavezno)",
+      "checked": true
+    },
+    "home.required": {
+      "text": "obavezno",
+      "checked": true
+    },
+    "home.waitEmail": {
+      "text": "Upiši svoju imejl adresu",
+      "checked": true
+    },
+    "home.addName": {
+      "text": "Dodaj svoje ime",
+      "checked": true
+    },
+    "home.addEmail": {
+      "text": "Dodaj svoj imejl",
+      "checked": true
+    },
+    "home.checkEmail": {
+      "text": "Proveri imejl: treba mu @",
+      "checked": true
+    },
+    "home.tickBox": {
+      "text": "Označi polje, da bismo smeli da ti pišemo kad se otvori",
       "checked": true
     }
   }

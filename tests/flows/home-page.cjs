@@ -79,7 +79,9 @@ const PORT = "3319", U = `http://127.0.0.1:${PORT}`;
     // the waiting list: the tick is needed; one email, kept once
     const wait = page.locator("#wait");
     await wait.getByRole("textbox", { name: "Email for the waiting list" }).fill("lena@example.com");
-    ok(await wait.getByRole("button", { name: "Join the waiting list" }).isDisabled(), "the waiting list needs the tick");
+    // DT299 (0.3.147): the button can always be tapped; without the tick nothing is sent, and the form says so
+    await wait.getByRole("button", { name: "Join the waiting list" }).click(); await page.waitForTimeout(300);
+    ok(/Tick the box, so we may write to you when it opens/.test(await txt("#wait")) && !/You're on the waiting list/.test(await txt("#wait")), "the waiting list needs the tick, and says so");
     await wait.getByRole("button", { name: "I train on my own" }).click();
     await wait.locator("input[type=checkbox]").check(); await page.waitForTimeout(3200);
     await wait.getByRole("button", { name: "Join the waiting list" }).click(); await page.waitForTimeout(800);
