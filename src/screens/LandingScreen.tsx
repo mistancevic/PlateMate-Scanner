@@ -1,4 +1,4 @@
-import { BOOKS } from "../bookPages";
+import { BOOKS, landedFrom } from "../bookPages";
 import { CertRow } from "../components/Certs";
 import { useEffect, useRef, useState } from "react";
 import { tabOfPath } from "../back";
@@ -329,7 +329,7 @@ export function LandingScreen() {
             {full
               ? <p>{w("home.fullForm")}</p>
               : <p>{spotsLine && <b className="l-spots">{spotsLine}. </b>}{w("home.betaForm")}</p>}
-            <RequestForm who={askAs ?? undefined} />
+            <RequestForm who={askAs ?? undefined} src={landedFrom ?? undefined} />
           </section>
         );
         const wait = (

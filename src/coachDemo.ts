@@ -65,8 +65,8 @@ export function demoRows(): ClientRow[] {
   const sp0 = nextShared(null, m0.en, share, since, { rowsSr: m0.sr, lang: "sr-Latn" })!;
   const profileShare: SharedProfile = nextShared(sp0, m1.en, share, new Date(now.getTime() - 2 * 864e5), { rowsSr: m1.sr, lang: "sr-Latn" }) ?? sp0;
   return [
-    { ...base, uid: "demo-nina", measured: dMeasured, profileShare, name: "Nina", goal: { band: "fatloss", setBy: "coach", coachName: "Milan", setAt: since.toISOString(), source: "coach" }, goalsNow: { calories: 2200, protein: 180 }, days, feedback: shared, notes, checkinDay: (now.getDay() + 6) % 7, weightKg: 78, weighIns },
-    { ...base, uid: "demo-lena", measured: lMeasured, name: "Lena", goal: { band: "gainsteady", setBy: "you", setAt: new Date(now.getTime() - 5 * 864e5).toISOString(), source: "profile" }, goalsNow: { calories: 2700, protein: 150 }, days: {}, feedback: [], notes: [], checkinDay: 0, weightKg: undefined, weighIns: [],
+    { ...base, uid: "demo-nina", measured: dMeasured, profileShare, name: "Nina", email: "nina@example.com", named: true, via: { kind: "form" as const, from: "", src: "qr", at: new Date(since.getTime() - 2 * 864e5).toISOString() }, goal: { band: "fatloss", setBy: "coach", coachName: "Milan", setAt: since.toISOString(), source: "coach" }, goalsNow: { calories: 2200, protein: 180 }, days, feedback: shared, notes, checkinDay: (now.getDay() + 6) % 7, weightKg: 78, weighIns },
+    { ...base, uid: "demo-lena", measured: lMeasured, name: "Lena", email: "lena@example.com", named: true, via: { kind: "invite" as const, at: new Date(now.getTime() - 6 * 864e5).toISOString() }, goal: { band: "gainsteady", setBy: "you", setAt: new Date(now.getTime() - 5 * 864e5).toISOString(), source: "profile" }, goalsNow: { calories: 2700, protein: 150 }, days: {}, feedback: [], notes: [], checkinDay: 0, weightKg: undefined, weighIns: [],
       // DT172: Lena shares no body data: her coach sees the trend in percent and the days weighed, no kilogram
       weightTrend: pctTrend(trendOf(lWeighIns, "gainsteady", 64), 64), weighDates: lWeighIns.map((w) => w.date), weightAt: today },
   ];

@@ -4493,7 +4493,7 @@
   "goal.enterYear": "enter year",
   "goal.under18Here": "This birth year means you're under 18, so you can't use Chef Mealan yet. If you typed it wrong, correct it here.",
   "goal.yourWeekdays": "Your weekdays: {what}, counted as mostly sitting. You can change it in Lifestyle.",
-  "goal.stepAfter": "{n}. What are you after?",
+  "goal.stepAfter": "{n}. Your goal",
   "goal.stepDays": "{n}. Your days",
   "goal.fillIn": "To calculate your numbers, fill in {missing} above. Or use My own numbers.",
   "goal.enterKcal": "enter kcal",
@@ -4762,7 +4762,7 @@
   "coach.bookSignups": "Book sign-ups: Worth Eating {eating}, Worth Living {living}",
   "coach.forEmail": "for {email}",
   "coach.codeCopied": "Code copied.",
-  "coach.reviewSet": "Client {name} set new numbers",
+  "coach.reviewSet": "{name} set new numbers",
   "coach.reviewReplied": "Client {name} replied: {reply}",
   "coach.keptOnPurpose": "Kept on purpose: {title}",
   "coach.noteToClient": "A note to Client {name}, if you ask for a change",
@@ -5087,7 +5087,7 @@
   "home.yourName": "Your name",
   "home.mobile": "Mobile number, optional",
   "home.mobileLine": "Coach Milan may message you on WhatsApp or by text about joining. The number is used for nothing else.",
-  "home.after": "What are you after? (optional)",
+  "home.after": "A short note to Coach Milan (optional). For example: your goal, and a few words about you.",
   "home.language": "Language",
   "home.metaTitle": "Chef Mealan: live your nutrition plan, day by day",
   "home.metaDesc": "Chef Mealan plans your meals with you. When the day surprises you or a craving comes, Chef Mealan finds the meal that still fits your numbers. For adults with a nutrition plan.",
@@ -6234,5 +6234,18 @@
   "served.notCountedN": {
     "one": "Not counted: {n} plate",
     "other": "Not counted: {n} plates"
-  }
+  },
+  "coach.noNameYet": "No name yet",
+  "coach.fromHomeForm": "From the home page form",
+  "coach.fromPage": "From {page}",
+  "coach.fromInvite": "From your invite",
+  "coach.fromWaitlist": "From the waiting list",
+  "coach.theHomePage": "the home page",
+  "coach.addNote": "Add a note",
+  "coach.editNote": "Edit note",
+  "coach.saveNote": "Save",
+  "coach.noteOnlyYou": "Only you see this note. {name} doesn't.",
+  "coach.noteSaved": "Note saved.",
+  "coach.noteNotSaved": "The note was not saved. Try again.",
+  "coach.addTheirName": "Add their name, so you know who joined."
 }

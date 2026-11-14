@@ -2390,16 +2390,41 @@ app.get("/api/howto", requireUser, requireMember, requireCoach, async (req, res)
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const newCode = () => Array.from(createHash("sha256").update(String(Math.random()) + Date.now() + process.hrtime.bigint()).digest()).slice(0, 8).map((b) => ALPHABET[b % ALPHABET.length]).join("");
 const joinTries = new Map<string, number[]>();
+// B141: where a client came from. An application's Invite sends it (the form, its page and link, its day); an invite made by
+// hand is "invite", or "waitlist" when that email is on the waiting list. Kept on the invite; shown on the client's card.
+type Via = { kind: "form" | "invite" | "waitlist"; from: string; src: string; at: string };
+const isoDay = (v: unknown) => (typeof v === "string" && /^\d{4}-\d{2}-\d{2}T/.test(v) ? v.slice(0, 24) : "");
+async function viaOf(sent: any, email: string): Promise<Via> {
+  const now = new Date().toISOString();
+  if (sent && sent.kind === "form") return { kind: "form", from: typeof sent.from === "string" && BOOK_PAGES[sent.from] ? sent.from : "", src: typeof sent.src === "string" && BOOK_SOURCES[sent.src] ? sent.src : "", at: isoDay(sent.at) || now };
+  try { const wl = await db().collection("waitlist").where("email", "==", email).limit(1).get(); if (!wl.empty) return { kind: "waitlist", from: "", src: "", at: isoDay(wl.docs[0].data()?.createdAt) || now }; } catch { /* an invite, then */ }
+  return { kind: "invite", from: "", src: "", at: now };
+}
+// an invite from before 0.3.146 has no "via": the application or the waiting list with that email says it
+async function viaOfOld(inv: any, owner: boolean): Promise<Via> {
+  const at = isoDay(inv.createdAt) || "";
+  try {
+    // the applications are the owner's to read
+    const ar = owner ? await db().collection("accessRequests").where("email", "==", inv.email).limit(5).get() : null;
+    if (ar && !ar.empty) { const x = ar.docs.map((d) => d.data() as any).sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))[0]; return { kind: "form", from: BOOK_PAGES[x.from] ? x.from : "", src: BOOK_SOURCES[x.src] ? x.src : "", at: isoDay(x.createdAt) || at }; }
+    const wl = await db().collection("waitlist").where("email", "==", inv.email).limit(1).get();
+    if (!wl.empty) return { kind: "waitlist", from: "", src: "", at: isoDay(wl.docs[0].data()?.createdAt) || at };
+  } catch { /* an invite, then */ }
+  return { kind: "invite", from: "", src: "", at };
+}
 app.post("/api/invites", requireUser, requireMember, requireCoach, async (req, res) => {
   try {
     const email = String(req.body?.email ?? "").trim().toLowerCase(), name = String(req.body?.name ?? "").trim().slice(0, 80);
     if (!/^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i.test(email)) return res.status(400).json({ error: "Check the email." });
+    // B141 (0.3.146, board Stories219): an invite carries a name, so a client is never unnamed, and where the person came from
+    if (!name) return res.status(400).json({ error: "Add their name, so you know who joined." });
+    const via = await viaOf(req.body?.via, email);
     const me = await db().collection("users").doc((req as any).uid).get();
     const coachName = String(me.data()?.clientName || "").split(" ")[0] || "your coach";
     let code = newCode();
     for (let i = 0; i < 5 && (await db().collection("invites").doc(code).get()).exists; i++) code = newCode();
     const now = Date.now();
-    await db().collection("invites").doc(code).set({ code, email, name, coachId: (req as any).uid, coachName, status: "open", createdAt: new Date(now).toISOString(), expiresAt: new Date(now + 30 * 86_400_000).toISOString() });
+    await db().collection("invites").doc(code).set({ code, email, name, coachId: (req as any).uid, coachName, via, status: "open", createdAt: new Date(now).toISOString(), expiresAt: new Date(now + 30 * 86_400_000).toISOString() });
     // SH73 (Milan 23:42): a code Milan makes lowers Beta spots left by one; no number set stays unset
     let spots: number | null = null;
     if (metricsOwner(req)) {
@@ -2418,8 +2443,11 @@ app.get("/api/invites", requireUser, requireMember, requireCoach, async (req, re
   try {
     const snap = await db().collection("invites").where("coachId", "==", (req as any).uid).get();
     const now = new Date().toISOString();
-    const invites = snap.docs.map((d) => d.data() as any).map((x) => ({ ...x, status: x.status === "open" && x.expiresAt < now ? "expired" : x.status })).sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1)).slice(0, 60);
-    res.json({ invites });
+    const all = snap.docs.map((d) => d.data() as any);
+    const invites = all.map((x) => ({ ...x, status: x.status === "open" && x.expiresAt < now ? "expired" : x.status })).sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1)).slice(0, 60);
+    // B141: everyone who joined with one of this coach's invites: the invite's name and email, and where they came from
+    const joined = await Promise.all(all.filter((x) => x.status === "used" && x.usedBy).map(async (x) => ({ uid: String(x.usedBy), name: String(x.name || ""), email: String(x.email || ""), via: x.via?.kind ? x.via : await viaOfOld(x, ownerOnly(req)) })));
+    res.json({ invites, joined });
   } catch (e) { fail(res, e); }
 });
 app.post("/api/invites/:code/revoke", requireUser, requireMember, requireCoach, async (req, res) => {
@@ -2464,7 +2492,7 @@ app.post("/api/join", requireUser, async (req, res) => {
       if (!email || email !== inv.email) return { error: `This code was sent to another email. You're signed in as ${email || "an account without a confirmed email"}.` };
       t.update(ref, { status: "used", usedBy: uid, usedAt: new Date().toISOString() });
       t.set(db().collection("users").doc(uid), { coachId: inv.coachId, coachName: inv.coachName, clientName: inv.name || null, joinedAt: new Date().toISOString() }, { merge: true });
-      return { coachId: inv.coachId, coachName: inv.coachName };
+      return { coachId: inv.coachId, coachName: inv.coachName, clientName: String(inv.name || "") };
     });
     if ("error" in result) return res.status(400).json(result);
     joinTries.delete(uid);

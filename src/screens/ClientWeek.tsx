@@ -14,6 +14,7 @@ import { pdRange, pdVal } from "../ui";
 import { density } from "../pilot";
 import { trendOf, VERDICT_WORDS, avg7, fmtPct } from "../weight";
 import { ProfileChanges, SharedProfileCard, newProfileChanges } from "./SummaryPanel";
+import { fromLine } from "../clientName";
 
 // The coach's week (0.2.6, canvas board CW, CW1 to CW4 and CW8, Milan 13 and 15 October 2026). Clients puts the clients
 // whose check-in is today first, each with the week as seven bars. A client opens on a page of their own: the week planned
@@ -67,17 +68,43 @@ export function clientLine(row: ClientRow, today: boolean) {
   const wk = weekNo(row), pd = phaseDay(row);
   return [row.goal?.band ? goalName(row.goal.band) : w("clientweek.noGoalYet"), pd ? (pd <= 14 ? w("clientweek.firstTwoWeeks", { pd }) : w("clientweek.dayNotMeasured", { pd })) : wk ? w("clientweek.weekN", { n: wk }) : null, today ? w("clientweek.checkinToday") : w("clientweek.checkinOn", { day: weekdayName(row.checkinDay) })].filter(Boolean).join(" · ");
 }
-export function ClientRowCard({ row, today, open }: { row: ClientRow; today: boolean; open: () => void }) {
+// B141 (0.3.146, board Stories219): the card shows the name, the email and where the client came from; below, the coach's own
+// note, which only the coach sees. The card opens the client; the note's buttons don't.
+export function ClientRowCard({ row, today, open, note, saveNote }: { row: ClientRow; today: boolean; open: () => void; note?: string; saveNote?: (text: string) => Promise<void> | void }) {
+  const [edit, setEdit] = useState(false), [text, setText] = useState(note ?? "");
+  const from = fromLine(row.via), stop = (e: { stopPropagation: () => void }) => e.stopPropagation();
   return (
-    <button className={`card client-row cw-row ${today ? "cw-today" : ""}`} onClick={open}>
-      <div className="client-head"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span><div><b>{first(row.name)}</b><small>{clientLine(row, today)}</small>{newProfileChanges(row) > 0 && <small className="profile-new">{wn("clientweek.profileChanges", newProfileChanges(row))}</small>}</div></div>
-      {phaseDay(row) && row.measured ? (
-        <div style={{ width: "100%" }}>
-          <Squares m={row.measured} ends={false} />
-          <small className="ft-rowfoot">{wn("clientweek.fullDays", row.measured.fullDays)} · {w("clientweek.weighInsN", { n: row.measured.squares.filter((x) => x.weighed).length })} · {row.measured.readyOn ? w("clientweek.readyOn", { date: shortDate(row.measured.readyOn).slice(4) }) : w("clientweek.notReadyYet")}</small>
+    <div className={`card client-row cw-row ${today ? "cw-today" : ""}`} onClick={open}>
+      <button type="button" className="client-open" onClick={(e) => { stop(e); open(); }}>
+        <div className="client-head"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span><div><b>{first(row.name)}</b>
+          {row.email && row.email !== row.name && <small className="client-email">{row.email}</small>}
+          {from && <small className="client-from">{from}</small>}
+          <small>{clientLine(row, today)}</small>{newProfileChanges(row) > 0 && <small className="profile-new">{wn("clientweek.profileChanges", newProfileChanges(row))}</small>}</div></div>
+        {phaseDay(row) && row.measured ? (
+          <div style={{ width: "100%" }}>
+            <Squares m={row.measured} ends={false} />
+            <small className="ft-rowfoot">{wn("clientweek.fullDays", row.measured.fullDays)} · {w("clientweek.weighInsN", { n: row.measured.squares.filter((x) => x.weighed).length })} · {row.measured.readyOn ? w("clientweek.readyOn", { date: shortDate(row.measured.readyOn).slice(4) }) : w("clientweek.notReadyYet")}</small>
+          </div>
+        ) : <WeekBars row={row} />}
+      </button>
+      {saveNote && !today && (
+        <div className="client-note-own" onClick={stop}>
+          {edit ? (
+            <>
+              <textarea aria-label={w("coach.yourNote")} value={text} maxLength={600} onChange={(e) => setText(e.target.value)} />
+              <small className="muted">{w("coach.noteOnlyYou", { name: first(row.name) })}</small>
+              <div className="client-note-go"><button type="button" className="link" onClick={() => { setText(note ?? ""); setEdit(false); }}>{w("coach.cancel")}</button>
+                <button type="button" className="pill pill-primary" onClick={async () => { await saveNote(text); setEdit(false); }}>{w("coach.saveNote")}</button></div>
+            </>
+          ) : (
+            <>
+              {note && <small className="client-note-text"><b>{w("coach.yourNote")}:</b> {note}</small>}
+              <div className="client-note-go end"><button type="button" className="pill pill-small pill-action" onClick={() => { setText(note ?? ""); setEdit(true); }}>{note ? w("coach.editNote") : w("coach.addNote")}</button></div>
+            </>
+          )}
         </div>
-      ) : <WeekBars row={row} />}
-    </button>
+      )}
+    </div>
   );
 }
 

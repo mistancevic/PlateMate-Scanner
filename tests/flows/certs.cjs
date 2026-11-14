@@ -17,7 +17,8 @@ const PORT = "3491", U = `http://127.0.0.1:${PORT}`;
     await page.goto(U + "/?home"); await page.waitForTimeout(1200);
     ok(await page.locator(".l-behind .cert-card").count() === 6, "six certificates under Who's behind it");
     const names = await page.locator(".cert-card b").allInnerTexts();
-    ok(names[0] === "Certified Nutrition Coach" && names[1] === "10X Fitness Coaching Certification" && names[5] === "Certified Business Coach", "nutrition first, business last: " + names.join(" | "));
+    // DT297 (0.3.146): the AI certificates first, then nutrition and the rest
+    ok(names[0] === "AI Product Management Certificate" && names[1] === "AI Mastery" && names[2] === "Certified Nutrition Coach" && names[3] === "10X Fitness Coaching Certification" && names[5] === "Certified Business Coach", "AI first, then nutrition, business last: " + names.join(" | "));
     const vis = await page.evaluate(() => { const s = document.querySelector(".cert-strip").getBoundingClientRect(); const c = [...document.querySelectorAll(".cert-card")].map((x) => x.getBoundingClientRect()); return { first: c[0].right <= s.right + 1, secondCut: c[1].left < s.right && c[1].right > s.right }; });
     ok(vis.first && vis.secondCut, "one whole and a half: the second is cut by the edge");
     ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "the carousel does not widen the page");
@@ -25,10 +26,10 @@ const PORT = "3491", U = `http://127.0.0.1:${PORT}`;
     ok(srcs.every((s) => /\/landing\/certs\/[a-z-]+-s\.webp$/.test(s)), "thumbnails are the small files: " + srcs[0]);
     for (const s of srcs.slice(0, 2)) { const r = await fetch(U + s); ok(r.ok, `${s} is served`); }
     // a tap opens the whole certificate
-    await page.locator(".cert-card").nth(1).click(); await page.waitForTimeout(400);
+    await page.locator(".cert-card").nth(3).click(); await page.waitForTimeout(400);
     ok(await page.locator(".cert-view").count() === 1 && /10X Fitness Coaching Certification · 2023/.test(await text(".cert-view-top")), "a tap opens the whole certificate: " + await text(".cert-view-top"));
     ok(/\/landing\/certs\/fitness\.webp$/.test(await page.locator(".cert-view img").getAttribute("src")), "full size, not the thumbnail");
-    ok(await text(".cert-view-nav small") === "2 of 6", "2 of 6");
+    ok(await text(".cert-view-nav small") === "4 of 6", "4 of 6");
     await page.locator(".cert-view-nav .link").nth(1).click(); await page.waitForTimeout(300);
     ok(/Holobody/.test(await text(".cert-view-top")), "› goes to the next");
     const small = await page.locator(".cert-view button").evaluateAll((xs) => xs.filter((x) => x.getBoundingClientRect().height > 0 && x.getBoundingClientRect().height < 44).map((x) => x.className));

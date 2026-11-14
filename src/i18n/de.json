@@ -12106,7 +12106,7 @@
       "checked": true
     },
     "home.after": {
-      "text": "Worum geht es dir? (optional)",
+      "text": "Eine kurze Nachricht an Coach Milan (optional). Zum Beispiel: dein Ziel und ein paar Worte über dich.",
       "checked": true
     },
     "home.language": {
@@ -19314,7 +19314,7 @@
       "checked": true
     },
     "goal.stepAfter": {
-      "text": "{n}. Was willst du erreichen?",
+      "text": "{n}. Dein Ziel",
       "checked": true
     },
     "goal.stepDays": {
@@ -19806,7 +19806,7 @@
       "checked": true
     },
     "coach.reviewSet": {
-      "text": "Klient {name} hat neue Zahlen festgelegt",
+      "text": "{name} hat neue Zahlen gesetzt",
       "checked": true
     },
     "coach.reviewReplied": {
@@ -22535,6 +22535,58 @@
     },
     "served.notCountedN": {
       "text": "Nicht gezählt: {n} Teller|Nicht gezählt: {n} Teller",
+      "checked": true
+    },
+    "coach.noNameYet": {
+      "text": "Noch kein Name",
+      "checked": true
+    },
+    "coach.fromHomeForm": {
+      "text": "Über das Formular auf der Startseite",
+      "checked": true
+    },
+    "coach.fromPage": {
+      "text": "Über {page}",
+      "checked": true
+    },
+    "coach.fromInvite": {
+      "text": "Über deine Einladung",
+      "checked": true
+    },
+    "coach.fromWaitlist": {
+      "text": "Von der Warteliste",
+      "checked": true
+    },
+    "coach.theHomePage": {
+      "text": "der Startseite",
+      "checked": true
+    },
+    "coach.addNote": {
+      "text": "Notiz hinzufügen",
+      "checked": true
+    },
+    "coach.editNote": {
+      "text": "Notiz bearbeiten",
+      "checked": true
+    },
+    "coach.saveNote": {
+      "text": "Speichern",
+      "checked": true
+    },
+    "coach.noteOnlyYou": {
+      "text": "Diese Notiz siehst nur du. {name} sieht sie nicht.",
+      "checked": true
+    },
+    "coach.noteSaved": {
+      "text": "Notiz gespeichert.",
+      "checked": true
+    },
+    "coach.noteNotSaved": {
+      "text": "Die Notiz wurde nicht gespeichert. Versuch es noch einmal.",
+      "checked": true
+    },
+    "coach.addTheirName": {
+      "text": "Füge den Namen hinzu, damit du weißt, wer es ist.",
       "checked": true
     }
   }

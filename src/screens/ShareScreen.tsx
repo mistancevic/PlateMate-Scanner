@@ -81,9 +81,9 @@ function InviteNow(p: AppApi) {
       <b>{w("share.inviteSomeoneNow")}</b>
       <small className="muted">{w("share.aPersonalCodeForOne")}</small>
       <div className="l-form" style={{ marginTop: 8 }}>
-        <input aria-label={w("share.name")} placeholder={w("share.nameOptional")} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
+        <input aria-label={w("share.name")} placeholder={w("share.name")} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
         <input aria-label={w("share.theirGoogleEmail")} placeholder={w("share.theirGoogleEmail")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <button className="pill pill-primary" disabled={busy || !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email.trim())} onClick={make}>{w("share.makeACode")}</button>
+        <button className="pill pill-primary" disabled={busy || !name.trim() || !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email.trim())} onClick={make}>{w("share.makeACode")}</button>
       </div>
     </section>
   );

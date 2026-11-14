@@ -7,11 +7,12 @@ import { w, type WordKey } from "../words";
 
 export type Cert = { id: string; issuer: string; year: string; verify?: string };
 export const CERTS: Cert[] = [
+  // DT297 (0.3.146; Coach Milan 14 November 13:06): the AI certificates first, then nutrition and the rest, for recruiters
+  { id: "ai-pm", issuer: "Product Faculty", year: "2026" },
+  { id: "ai-mastery", issuer: "Mindvalley", year: "2026" },
   { id: "nutrition", issuer: "Mindvalley with Viome", year: "2024" },
   { id: "fitness", issuer: "Mindvalley", year: "2023" },
   { id: "holobody", issuer: "Mindvalley", year: "2023" },
-  { id: "ai-pm", issuer: "Product Faculty", year: "2026" },
-  { id: "ai-mastery", issuer: "Mindvalley", year: "2026" },
   { id: "business", issuer: "Mindvalley, ICF credits", year: "2022" },
 ];
 const k = (s: string) => s as WordKey;
