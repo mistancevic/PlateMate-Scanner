@@ -139,7 +139,10 @@ const personal = (w) => ({ sex: "male", birthYear: 1981, heightCm: 182, weightKg
     await go(page, "/today?coachdemo"); await page.locator(".bottom-nav button").filter({ hasText: "Clients" }).click(); await page.waitForTimeout(800);
     const lena = page.locator(".cw-row").filter({ hasText: "Lena" });
     const lt = await lena.textContent();
-    ok(/first two weeks, day 6 of 14/.test(lt) && /4 full days · 2 weigh-ins · ready 23 Oct/.test(lt) && await lena.locator(".ft-sq").count() === 14 && await lena.locator(".cw-bar").count() === 0, "FT6: Lena in her first two weeks: squares, not bars");
+    ok(/first two weeks, day 6 of 14/.test(lt) && /4 full days · 2 weigh-ins · ready 23 Oct/.test(lt) && await lena.locator(".db-cell").count() === 14 && await lena.locator(".db-row").count() === 2, "FT6: Lena in her first two weeks: her fourteen days, in two rows of seven (DT302, 0.3.150, board Stories224)");
+    { const key = await lena.locator(".db-key").textContent(); const wk = await lena.locator(".db-cell").evaluateAll((xs) => xs.map((x) => x.classList.contains("weekend")));
+      ok(/Green: full day/.test(key) && /Outline: today/.test(key) && /Dot: weigh-in/.test(key) && /Shaded: weekend/.test(key) && !/lived by the plan/.test(key), "DT302: the key line in the first two weeks' words: " + key);
+      ok(wk.filter(Boolean).length === 4 && wk.slice(0, 7).join() === wk.slice(7).join(), "DT302: four weekend days shaded, in the same places in both rows: " + wk.map((x) => (x ? "w" : "-")).join("")); }
     await page.evaluate(() => document.querySelectorAll(".chat-fab").forEach((x) => (x.style.display = "none")));
     await page.setViewportSize({ width: 390, height: 4600 });
     await page.locator(".cw-row").first().click(); await page.waitForTimeout(700); await hide(page);

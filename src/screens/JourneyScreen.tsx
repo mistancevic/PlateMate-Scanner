@@ -13,8 +13,8 @@ import { tasteForReq } from "../tasteChips";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon, Mic } from "lucide-react";
-import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn, foodOfRead } from "../mealPhoto";
-import { PhotoAsk } from "../components/PhotoAsk";
+import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn, foodOfRead, holdsMore } from "../mealPhoto";
+import { PhotoAsk, PotRows, dishWord } from "../components/PhotoAsk";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADish, isDrink, type Mix } from "../mixtip";
 import { lettersOf } from "../letters";
@@ -842,7 +842,9 @@ export function JourneyScreen(p: AppApi) {
     if (!m) { setState((s) => ({ ...s, openRecipe: undefined })); return; }
     const mode = modeFor(m);
     setPmode(mode); setWay(null); setPartsMode(false);
-    setState((s) => ({ ...s, ...recipePlate(m, mode), title: m.title, portion: null, fromRecipe: m.id, recipeFoods: m.items.filter((i) => !i.optional).map((i) => i.food.id), openRecipe: undefined }));
+    setState((s) => ({ ...s, ...recipePlate(m, mode), title: m.title, portion: null, fromRecipe: m.id, recipeFoods: m.items.filter((i) => !i.optional).map((i) => i.food.id), openRecipe: undefined,
+      // B144 (0.3.150): a pot read from a photo names its cooking foods; they stay named on the plate, not counted
+      ...(m.cooking?.length && s.photo?.pot === m.id ? { cooking: m.cooking, cookingFor: m.items.filter((i) => !i.optional).map((i) => i.food.id) } : {}) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.openRecipe]);
   // + Add (IM12b): sized for the meal, the meal keeps its size and every food moves by the same factor; else it goes on top
@@ -1109,7 +1111,11 @@ export function JourneyScreen(p: AppApi) {
   // DT116 (0.2.98, boards G3 and Stories69): the three gates. Culinary is Chef Mealan's read (dishNow) with the code lines in
   // front; nutrition and your day are arithmetic (src/gates.ts). Each answers for itself; all three green is the sweet spot.
   const gateOn = items.length >= 1 && !imported && !madeBy && !partsMode && (t.calories ?? 0) >= 100;
-  const nutri = gateOn ? nutritionGate({ items, kind: p.kind === "dessert" ? "dessert" : p.pick === "snack" || mealWord === "snack" ? "snack" : "meal", beforeTraining: p.moment === "before", mealWord }) : { ok: true as const };
+  // B144 (0.3.150, board Stories225): a dish of a meal is judged with the meal's other dishes, never alone: a starter, a side,
+  // a dessert or a drink with no other dish yet waits for the main
+  const dishOfMeal = Boolean(state.course && state.course !== "main" && mealWord !== "snack");
+  const mealItems = dishOfMeal ? [...otherDishes.flatMap((f) => f.meal.items), ...items] : items;
+  const nutri = gateOn && !(dishOfMeal && otherDishes.length === 0) ? nutritionGate({ items: mealItems, kind: p.kind === "dessert" ? "dessert" : p.pick === "snack" || mealWord === "snack" ? "snack" : "meal", beforeTraining: p.moment === "before", mealWord }) : { ok: true as const };
   // 0.3.62: Exploring (the pencil block, or an Exploring photo) eats nothing now: no eating-window check
   const exploringNow = p.pick === "exploring" || state.photo?.who === "idea";
   const dayLine = gateOn && !exploringNow ? dayGate({ items, moment: p.moment, now: new Date(), window: windowOf(lifestyleOf(p.personal)), kind: p.kind, mealWord, needsCooking }) : { ok: true as const };
@@ -1359,7 +1365,7 @@ export function JourneyScreen(p: AppApi) {
           : imported && rec
             ? Head({ name: true, title: "", sub: way?.kind === "change" ? w("plate.changedSub", { title: rec.title, meal: mealW })
               : way?.kind === "side" ? w("plate.sideSub", { title: rec.title, pct: Math.round((kcalOfItems(way.options[way.pick].dish) / Math.max(1, kcalOfItems(rec.items) / (rec.makes?.n ?? 1))) * 100), one: oneOf(rec), side: way.options[way.pick].name, where: sideWord(way.options[way.pick].kind) })
-              : w("plate.fromSub", { source: rec.source?.name || wordV(rec.source?.from === "link" ? "plate.theLink" : "plate.yourScreenshot"), how: pmode === "whole" ? w("make.theWholeRecipeAsYou") : pmode === "sized" && mealNeed ? w("plate.mixSized", { meal: mealW }) : w("plate.oneAsMakes", { one: oneOf(rec) }) }) })
+              : w("plate.fromSub", { source: rec.source?.name || wordV(state.photo?.pot === rec.id ? "plate.yourPhoto" : rec.source?.from === "link" ? "plate.theLink" : "plate.yourScreenshot"), how: pmode === "whole" ? w("make.theWholeRecipeAsYou") : pmode === "sized" && mealNeed ? w("plate.mixSized", { meal: mealW }) : w("plate.oneAsMakes", { one: oneOf(rec) }) }) })
           : state.photo && items.length > 0
             ? Head({ name: true, title: "", sub: w("plate.readFromPhoto") })
           : state.title && state.title !== "DaaM" && items.length > 0
@@ -1557,7 +1563,7 @@ export function JourneyScreen(p: AppApi) {
           const cur = { id: ownRecord ?? "plate", meal: { title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items }, createdAt: hereDishes.find((f) => f.id === ownRecord)?.createdAt ?? new Date().toISOString(), course: state.course };
           const all = [...otherDishes.map((f) => ({ id: f.id, meal: f.meal, createdAt: f.createdAt, course: f.course })), cur].sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
           const bar = mealBar(wholeMeal.kcal, [...otherNums, dishNums(items)]);
-          const word = (k: number, f: { course?: "dessert" }) => { const c = courseOf(k, f); return c === "main" ? w("dish.main") : c === "dessert" ? w("dish.dessert") : w("dish.dish"); };
+          const word = (k: number, f: { course?: import("../served").Dish }) => { const c = courseOf(k, f); return c === "main" ? w("dish.main") : c === "dessert" ? w("dish.dessert") : c === "dish" ? w("dish.dish") : dishWord(c); };
           return (
             <section className="card meal-dishes" aria-label={w("dish.barAria")}>
               <b>{wn("dish.mealDishes", all.length, { meal: mealV(mealSlot.name), kcal: fmt(bar.kcal, 0), pd: bar.pd === null ? "0" : dec(bar.pd, 1) })}</b>
@@ -1572,7 +1578,7 @@ export function JourneyScreen(p: AppApi) {
         {/* DT130 (0.2.110, board Stories78, DT130c): a photo from Your photos asks whose plate, and when, before the read */}
         {p.photoAsk && <PhotoAsk key={p.photoAsk.at + p.photoAsk.image.length} image={p.photoAsk.image} at={p.photoAsk.at} drop={p.dropPhotoAsk} exploring={p.pick === "exploring"}
           mealAt={(d) => { const s = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return s ? s.name.toLowerCase() : null; }}
-          read={(x) => { void p.readMealPhoto(p.photoAsk!.image, x); }} />}
+          look={p.lookAtPhoto} read={(x) => { void p.readMealPhoto(p.photoAsk!.image, x); }} />}
         {/* DT242 (0.3.96, board Stories182): the answer was lost twice (read again once by itself): the photo is kept, Try again */}
         {p.photoLost && (
           <section className="mp-none mp-lost" aria-label={say("photoLost")}>
@@ -1645,8 +1651,9 @@ export function JourneyScreen(p: AppApi) {
             </div>
           </section>
         )}
-        {state.photo && p.ai.on && !state.photo.image.startsWith("pf:") && <HelpRead key={state.photo.at + state.photo.image.length} photo={state.photo} incoming={morePhoto}
-          read={(more, note) => { const ph = state.photo!; void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true, more, note }); }} />}
+        {state.photo && p.ai.on && !state.photo.image.startsWith("pf:") && <PhotoSaid photo={state.photo} meal={state.photo.who !== "idea" && mealSlot ? mealSlot.name : null} />}
+        {state.photo && p.ai.on && !state.photo.image.startsWith("pf:") && <HelpRead key={state.photo.at + state.photo.image.length} photo={state.photo} incoming={morePhoto} meal={state.photo.who !== "idea" && mealSlot ? mealSlot.name : null}
+          read={(more, note, pot) => { const ph = state.photo!; void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true, more, note, ...pot }); }} />}
         {/* DT228 v2: a food whose kind the read could not tell: Chef Mealan asks once; a tap changes the food, its grams stay */}
         {state.photo?.which && items.some((i) => i.food.name.toLowerCase() === state.photo!.which!.name.toLowerCase()) && (() => {
           const wh = state.photo!.which!, it = items.find((i) => i.food.name.toLowerCase() === wh.name.toLowerCase())!;
@@ -2010,7 +2017,7 @@ export function JourneyScreen(p: AppApi) {
           );
         })()}
         {state.photo && state.photo.who !== "idea" && items.length > 0 && !p.filling && !p.recordNow && (() => {
-          const adv = photoAdvice({ items, protein: t.protein ?? 0, mealWord, mealKcal: sizeRef ?? null, big: bigN, nutrition: nutri, day: dayLine, culinaryOk: dishNow?.status === "done" ? Boolean(dishNow.makesIt) : null });
+          const adv = photoAdvice({ items, protein: t.protein ?? 0, mealWord, mealKcal: sizeRef ?? null, big: bigN, nutrition: nutri, day: dayLine, culinaryOk: dishNow?.status === "done" ? Boolean(dishNow.makesIt) : null, dish: dishOfMeal ? state.course : undefined });
           const mealOf = (): Meal => ({ id: uid(), title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
           // DT130: a photo you ate earlier logs at its time, in the meal that time belongs to
           const slot = p.pick === "snack" ? null : pickSlot && mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : photoMeal ? { date: photoMeal.date, slotId: photoMeal.slot.id, name: photoMeal.slot.name, time: photoMeal.slot.time } : mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : null;
@@ -2825,10 +2832,27 @@ function LaterRow({ x, onContinue, onRemove }: { x: Later; onContinue: () => voi
   );
 }
 
+// B144 (0.3.150, board Stories225): under the photo, what you chose and what you said stay in view
+function PhotoSaid({ photo, meal }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; meal: string | null }) {
+  const how = holdsMore(photo.vessel) && photo.share ? w(photo.share === "portion" ? "photoask.myPortion" : photo.vessel === "tray" ? "photoask.wholeTray" : "photoask.wholePot") : "";
+  const what = photo.dish && meal ? w("photo.dishOfMeal", { dish: photo.dish === "main" ? w("photoask.dishMain") : dishWord(photo.dish), meal: mealV(meal, true) }) : "";
+  if (!how && !what && !photo.note) return null;
+  return (
+    <div className="mp-said">
+      {(how || what) && <small className="mp-said-top">{[how, what].filter(Boolean).join(" · ")}</small>}
+      {photo.note && <small className="muted">{w("photo.youSaid", { words: photo.note })}</small>}
+    </div>
+  );
+}
+
 // DT228 v2 (0.3.63, board Stories168; Coach Milan 2 November 19:50 to 22:00): help Chef Mealan read the meal. The photos (the
 // first is the plate's), ＋ Photo for the inside, another side or the menu, and a line in the person's words, typed or said.
 // Read it again sends them all; the new read replaces the foods and the corrections, as Read the photo again did.
-function HelpRead({ photo, read, incoming }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; read: (more: string[], note: string) => void; incoming?: { file: File; at: number } | null }) {
+// B144 (0.3.150, board Stories225): the same form as before the read: how much of a pot is yours, which dish of the meal,
+// and what is in it, with the answers given before.
+function HelpRead({ photo, read, incoming, meal }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; read: (more: string[], note: string, pot: { share?: "whole" | "portion"; dish?: import("../served").Dish }) => void; incoming?: { file: File; at: number } | null; meal: string | null }) {
+  const [share, setShare] = useState<"whole" | "portion">(() => photo.share ?? "whole");
+  const [dish, setDish] = useState<import("../served").Dish>(() => photo.dish ?? "main");
   // 0.3.65 (Coach Milan 22:53, Go): after a read it folds into one link and opens on a tap
   const [open, setOpen] = useState(false);
   const [more, setMore] = useState<string[]>(() => photo.more ?? []);
@@ -2836,7 +2860,7 @@ function HelpRead({ photo, read, incoming }: { photo: NonNullable<import("../pil
   const [hearing, setHearing] = useState(false);
   const S = typeof window !== "undefined" ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
   const add = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 640).then((d) => setMore((m) => (m.length < 3 ? [...m, d] : m))).catch(() => {}); r.readAsDataURL(file); };
-  const listen = () => { if (!S || hearing) return; try { const r = new S(); r.lang = speechLang(getLang()); r.interimResults = false; r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript ?? "").trim(); if (t) setNote((n) => (n ? `${n} ${t}` : t).slice(0, 200)); }; r.onend = () => setHearing(false); r.onerror = () => setHearing(false); setHearing(true); r.start(); } catch { setHearing(false); } };
+  const listen = () => { if (!S || hearing) return; try { const r = new S(); r.lang = speechLang(getLang()); r.interimResults = false; r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript ?? "").trim(); if (t) setNote((n) => (n ? `${n} ${t}` : t).slice(0, 300)); }; r.onend = () => setHearing(false); r.onerror = () => setHearing(false); setHearing(true); r.start(); } catch { setHearing(false); } };
   // DT230: ＋ Photo under the large photo opens this with that photo in it
   useEffect(() => { if (incoming) { setOpen(true); add(incoming.file); } }, [incoming?.at]); // eslint-disable-line react-hooks/exhaustive-deps
   const n = 1 + more.length, words = note.trim();
@@ -2850,9 +2874,10 @@ function HelpRead({ photo, read, incoming }: { photo: NonNullable<import("../pil
         {more.map((m, i) => <button key={i} type="button" className="mp-help-more" aria-label={w("make.removePhotoN", { n: i + 2 })} onClick={() => setMore((x) => x.filter((_, j) => j !== i))}><img src={m} alt="" /><span aria-hidden="true">✕</span></button>)}
         {more.length < 3 && <label className="pill pill-small mp-help-add">{w("plate.addPhoto")}<input type="file" accept="image/*" capture="environment" onChange={(e) => { add(e.target.files?.[0]); e.target.value = ""; }} /></label>}
       </div>
-      <label className="mp-help-note"><span>{w("make.tellChefMealanWhatIt")}</span><input className="search" value={note} maxLength={200} placeholder={w("photoask.notePlaceholder")} onChange={(e) => setNote(e.target.value)} /></label>
+      <PotRows vessel={photo.vessel} share={share} setShare={setShare} dish={dish} setDish={setDish} meal={meal} />
+      <label className="mp-help-note"><span>{w("photoask.whatIsInIt")}</span><textarea className="search pa-words" rows={3} value={note} maxLength={300} placeholder={w("photoask.wordsPlaceholder")} onChange={(e) => setNote(e.target.value)} /></label>
       <div className="button-row">
-        <button type="button" className="pill pill-small pill-primary" onClick={() => read(more, words)}>{label}</button>
+        <button type="button" className="pill pill-small pill-primary" onClick={() => read(more, words, { ...(holdsMore(photo.vessel) ? { share } : {}), ...(meal ? { dish } : {}) })}>{label}</button>
         {S && <button type="button" className="pill pill-small" aria-pressed={hearing} onClick={listen}>{hearing ? w("make.listening") : w("make.sayIt")}</button>}
       </div>
       <small className="muted">{w("make.thePhotosAndYourWords")}</small>

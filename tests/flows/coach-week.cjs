@@ -49,7 +49,12 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   await page.locator(".bottom-nav button").filter({ hasText: "Clients" }).click(); await page.waitForTimeout(800);
   ok(/Check-ins today/.test(await page.locator("main").textContent()), "Clients starts with Check-ins today");
   const row = page.locator(".cw-row").first();
-  ok(await row.locator(".cw-bar").count() === 7 && /lived by the plan/.test(await row.textContent()) && /check-in today/.test(await row.textContent()), "a client row: seven bars and the days lived by the plan");
+  // Changed by story DT302 (0.3.150, board Stories224; Coach Milan 14 November 17:29 to 19:25, Go 15 November 19:22): the bars are
+  // one row Monday to Sunday with the weekend shaded, a dot for a weigh-in, and a key line that names what shows
+  ok(await row.locator(".db-row").count() === 1 && await row.locator(".db-cell").count() === 7 && /lived by the plan/.test(await row.textContent()) && /check-in today/.test(await row.textContent()), "a client row: seven bars in one row and the days lived by the plan");
+  ok(await row.locator(".db-cell.weekend").count() === 2 && await row.locator(".db-row .db-cell").nth(5).evaluate((e) => e.classList.contains("weekend")) && await row.locator(".db-row .db-cell").nth(6).evaluate((e) => e.classList.contains("weekend")), "DT302: Saturday and Sunday are shaded");
+  { const key = await row.locator(".db-key").textContent(); const has = async (c) => (await row.locator(`.db-cell.${c}`).count()) > 0;
+    ok(/Outline: today/.test(key) && /Shaded: weekend/.test(key) && (/Green: lived by the plan/.test(key)) === (await has("good")) && (/Amber: changed from the plan/.test(key)) === (await has("look")) && (/Dot: weigh-in/.test(key)) === (await has("weighed")), "DT302: the key line names what shows, in a week's words: " + key); }
   // CW2: Nina's page
   await row.click(); await page.waitForTimeout(500);
   ok(await page.getByRole("button", { name: "‹ Clients" }).count() === 1 && /Planned against eaten/.test(await page.locator(".cw-week").textContent()), "the client opens on a page of her own, with the week");

@@ -121,8 +121,8 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
 import { ratesOf } from "./letters";
 import { asMine, travels, toShare } from "./memberFoods";
-import { cleanRead, itemsOfRead } from "./mealPhoto";
-import { dishOf, visitFor, upsertServed, withNote, mealItems, mealTitle, cleanMenu, applyMenu, withMenuLine, withoutMenuLine, type Served, type OnPlate, type VisitMenu } from "./served";
+import { cleanRead, itemsOfRead, holdsMore, type Vessel } from "./mealPhoto";
+import { dishOf, visitFor, upsertServed, withNote, mealItems, mealTitle, cleanMenu, applyMenu, withMenuLine, withoutMenuLine, type Served, type OnPlate, type VisitMenu, type Dish } from "./served";
 import { identityTwins } from "./foodId";
 import { findReference, referenceFood, localName, otherNames, marketFoods, foodV } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
@@ -2507,14 +2507,18 @@ export default function App() {
     addFromDatabase: (code: string) => { setEditTitle(w("app.addToMyFoods")); lookup(code); },
     searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (shopRegion ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
     // DT127 (0.2.108, board Stories75): a photo of the meal in front of you, read onto the Plate as estimates
-    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string } }) => {
-      const more0 = (x?.more ?? []).slice(0, 3), note = (x?.note ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
+    // B144 (0.3.150, board Stories225): a first look at a photo, for the form: what the food is in, which dish it looks like
+    lookAtPhoto: async (image: string) => {
+      try { const d: any = await api("/api/plate-look", { image: await resizeImageBase64(image, 640, 640) }); return d && typeof d.vessel === "string" ? { vessel: d.vessel as Vessel, course: dishOf(d.course) } : null; } catch { return null; }
+    },
+    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: Dish }) => {
+      const more0 = (x?.more ?? []).slice(0, 3), note = (x?.note ?? "").replace(/\s+/g, " ").trim().slice(0, 300);
       setBusy(more0.length ? w("app.readingPhotos", { n: more0.length + 1 }) : w("app.readingYourPlate"));
       try {
         // DT228 v2 (0.3.63, board Stories168): the other photos of the meal and the person's words go with the photo, in one read
         const [sent, thumb, moreSent, moreThumbs] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640),
           Promise.all(more0.map((m) => resizeImageBase64(m, 1280, 1280))), Promise.all(more0.map((m) => thumbnailBase64(m, 480)))]);
-        const ask = () => api("/api/plate-photo", { image: sent, ...(moreSent.length ? { more: moreSent } : {}), ...(note ? { note } : {}), region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
+        const ask = () => api("/api/plate-photo", { image: sent, ...(moreSent.length ? { more: moreSent } : {}), ...(note ? { note } : {}), ...(x?.share ? { share: x.share } : {}), ...(x?.dish ? { course: x.dish } : {}), region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
         // DT242 (0.3.96, board Stories182; Coach Milan 6 November 10:16 and 10:35): the answer lost on the way (another app, no
         // signal) is asked for again once, by itself, when the app is back in front and online; only then the card, never the
         // browser's own words
@@ -2552,7 +2556,13 @@ export default function App() {
         const served: OnPlate | undefined = who !== "idea" ? undefined : kept ? { ...kept, dish: kept.dish ?? dishOf(read.course) }
           : again ? undefined
           : { id: uid(), mine: x?.served?.mine ?? true, visit: x?.served?.visit ?? visitFor(state.served ?? [], at) ?? uid(), dish: dishOf(read.course) };
-        const photo = { image: thumb, at, unsure: read.unsure, ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}) };
+        // B144: your answers stay with the photo. A whole pot or tray for a meal becomes a recipe with portions, as a whole
+        // recipe does: the Plate opens it whole, sized for the meal, or one portion. Read again changes that same recipe.
+        const share = holdsMore(read.vessel) ? x?.share : undefined;
+        const potNow = share === "whole" && who !== "idea";
+        const potId = potNow ? (again && state.photo?.pot && state.meals.some((m) => m.id === state.photo!.pot) ? state.photo.pot : uid()) : undefined;
+        const course = x?.dish && x.dish !== "main" && who !== "idea" ? x.dish : undefined;
+        const photo = { image: thumb, at, unsure: potNow ? null : read.unsure, ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}) };
         const land = (how: "add" | "new") => {
           // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
           // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
@@ -2564,7 +2574,14 @@ export default function App() {
           const second = who !== "idea" && how === "new" && !filling ? secondDish(state.feedback, new Date(at)) : null;
           setDishAsk(second && second.prev.slot && second.prev.slot.date === ymd(new Date()) ? { dish: read.dish || "", prev: second.prev.meal.title, minutes: second.minutes, dessertFirst: second.dessertFirst, slotId: second.prev.slot.slotId, meal: second.prev.slot.name } : null);
           if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null, photo }));
-          else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dishLocal || read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo, recorded: undefined, course: undefined }));
+          else if (potId) {
+            const whole = items.map((i) => ({ ...i, locked: true, est: undefined })), total = whole.reduce((n, i) => n + i.grams, 0), n = Math.max(2, read.serves ?? Math.round(total / 350));
+            const title = read.dishLocal || read.dish || w("app.aPot");
+            const pot: Meal = { id: potId, title, items: whole, portion: Math.round(total / n), savedAt: new Date().toISOString(), steps: [], makes: { n, unit: "portions" }, ...(read.cooking?.length ? { cooking: read.cooking } : {}) };
+            setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, meals: s.meals.some((m) => m.id === potId) ? s.meals.map((m) => (m.id === potId ? { ...m, ...pot, savedAt: m.savedAt } : m)) : [pot, ...s.meals],
+              items: [], portion: null, title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo, recorded: undefined, course, openRecipe: potId }));
+          }
+          else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dishLocal || read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: read.cooking?.length ? read.cooking : undefined, cookingFor: read.cooking?.length ? items.map((i) => i.food.id) : undefined, photo, recorded: undefined, course }));
           setKind("meal"); setStep("in");
         };
         setPhotoAsk(null);

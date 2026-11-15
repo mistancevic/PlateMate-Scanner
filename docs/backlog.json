@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.150",
     "0.3.149",
     "0.3.148",
     "0.3.147",
@@ -1198,9 +1199,26 @@
       "id": "DT302",
       "title": "The days on a Clients card: one picture, with a key",
       "epic": "trust",
-      "state": "now",
+      "state": "done",
       "board": "Stories224",
-      "why": "Coach Milan 14 November 17:29: it is not clear what the marks on a Clients card mean. Agreed 17:42 to 17:53: one bar shape; the first two weeks as two rows of seven from the client's first day, then one row Monday to Sunday; weekend days shaded, wherever they fall (18:53); green the day went as meant, amber worth a look, outline today, grey still to come; a dot under a bar is a weigh-in; a key line names what green and amber mean in that phase. 17:54 Draw (Stories224); 19:25 all good. Waits for Go."
+      "why": "Coach Milan 14 November 17:29: it is not clear what the marks on a Clients card mean. Agreed 17:42 to 17:53: one bar shape; the first two weeks as two rows of seven from the client's first day, then one row Monday to Sunday; weekend days shaded, wherever they fall (18:53); green the day went as meant, amber worth a look, outline today, grey still to come; a dot under a bar is a weigh-in; a key line names what green and amber mean in that phase. 17:54 Draw (Stories224); 19:25 all good. Waits for Go. Go 15 November 19:22. Built: src/dayBars.ts, DayBars in ClientWeek; the client's own Today and the burn card keep their squares.",
+      "version": "0.3.150"
+    },
+    {
+      "id": "B144",
+      "title": "A pot in a photo: the form adapts, and your words become the foods",
+      "epic": "trust",
+      "state": "done",
+      "board": "Stories225",
+      "version": "0.3.150",
+      "why": "Coach Milan 15 November 19:04, on live: a photo of a pot of soup read as one food, 1,400 g, as his dinner; the ingredients he typed made no list. Found: the read names foods as they lie on a plate, takes 8 at most, and his words only renamed the soup. 19:10: the same form, with choices that adapt, since the app cannot know which dish of a meal it is before it is told. 19:12 Draw (Stories225); 19:22 Go. Built: a first look (/api/plate-look) for the form; How much of it is yours (The whole pot, My portion) for a pot or a tray; Which dish of your meal; a words box; the read gives the dish in the foods named (up to 12) and the cooking foods, not counted; what you chose and said stay under the photo; the whole pot becomes a recipe with portions; a starter, side, dessert or drink is one dish of the meal, judged with the meal's other dishes. Walkthrough pot-photo.cjs. Still open, its own card: the Plate after a photo is crowded (Chef Mealan says the same thing three times, about 14 buttons)."
+    },
+    {
+      "id": "DT303",
+      "title": "The Plate after a photo: say each thing once, fewer buttons",
+      "epic": "trust",
+      "state": "later",
+      "why": "Coach Milan 15 November 19:04: in general the whole page is a bit messy with what can be done here. Seen on his screenshot: Chef Mealan says the same thing about fat three times, and about 14 buttons (Retake, Photo, four ways to add, Add a food, five in the checks card, four under his line, Fit to my target). To brainstorm."
     }
   ]
 }

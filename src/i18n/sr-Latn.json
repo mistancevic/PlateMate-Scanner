@@ -22660,6 +22660,86 @@
     "craving.savedInMyRecipes": {
       "text": "Sačuvano u Mojim receptima",
       "checked": true
+    },
+    "photoask.looksPot": {
+      "text": "Izgleda kao šerpa. Koliko od toga je tvoje?",
+      "checked": true
+    },
+    "photoask.looksTray": {
+      "text": "Izgleda kao pleh. Koliko od toga je tvoje?",
+      "checked": true
+    },
+    "photoask.wholePot": {
+      "text": "Cela šerpa",
+      "checked": true
+    },
+    "photoask.wholeTray": {
+      "text": "Ceo pleh",
+      "checked": true
+    },
+    "photoask.myPortion": {
+      "text": "Moja porcija",
+      "checked": true
+    },
+    "photoask.whichDish": {
+      "text": "Koje je ovo jelo u obroku ({meal})?",
+      "checked": true
+    },
+    "photoask.dishMain": {
+      "text": "Glavno jelo",
+      "checked": true
+    },
+    "photoask.whatIsInIt": {
+      "text": "Reci Chef Mealanu šta je unutra, ako želiš",
+      "checked": true
+    },
+    "photoask.wordsPlaceholder": {
+      "text": "Upiši šta je to, ili namirnice u njemu",
+      "checked": true
+    },
+    "photo.dishOfMeal": {
+      "text": "{dish}, obrok: {meal}",
+      "checked": true
+    },
+    "photo.youSaid": {
+      "text": "Tvoje reči: {words}",
+      "checked": true
+    },
+    "plate.yourPhoto": {
+      "text": "tvoja fotografija",
+      "checked": true
+    },
+    "app.aPot": {
+      "text": "Šerpa",
+      "checked": true
+    },
+    "clientweek.keyLived": {
+      "text": "Zeleno: dan po planu",
+      "checked": true
+    },
+    "clientweek.keyChanged": {
+      "text": "Žuto: drugačije od plana",
+      "checked": true
+    },
+    "clientweek.keyFull": {
+      "text": "Zeleno: pun dan",
+      "checked": true
+    },
+    "clientweek.keyPart": {
+      "text": "Žuto: nije sve zapisano",
+      "checked": true
+    },
+    "clientweek.keyToday": {
+      "text": "Okvir: danas",
+      "checked": true
+    },
+    "clientweek.keyDot": {
+      "text": "Tačka: merenje",
+      "checked": true
+    },
+    "clientweek.keyWeekend": {
+      "text": "Osenčeno: vikend",
+      "checked": true
     }
   }
 }

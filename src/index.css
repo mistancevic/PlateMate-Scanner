@@ -428,6 +428,11 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .picks { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; font-size: var(--fs-body); }
 .picks small { display: block; color: var(--muted); font-size: var(--fs-small); }
 .picks-total { font-weight: 900; color: var(--brand-text); margin-top: 2px; }
+/* B144 (0.3.150, board Stories225): the form's rows that adapt, the words box, and what you said under the photo */
+.pa-row { margin: 10px 0; } .pa-row .pa-opt { height: auto; min-height: 44px; box-sizing: border-box; cursor: pointer; } .pa-row-q { display: block; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+textarea.pa-words { width: 100%; box-sizing: border-box; font: inherit; padding: 10px 12px; line-height: 1.4; min-height: 84px; resize: vertical; }
+.mp-said { margin: 8px 0; padding: 8px 10px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 4px; }
+.mp-said-top { font-weight: 700; color: var(--ink); }
 .chat-input { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 4px 6px; }
 .chat-input input { flex: 1; border: 0; background: none; font: inherit; font-size: var(--fs-body); padding: 10px 6px; min-width: 0; }
 .chat-input .icon { width: 40px; height: 40px; }
@@ -1553,6 +1558,17 @@ section.past-meal .button-row.pm-actions > .pill.pill-small { min-height: 44px; 
 /* The coach's week (canvas board CW, 0.2.6) */
 .cw-row { display: flex; flex-direction: column; gap: 8px; text-align: left; width: 100%; }
 .cw-row.cw-today { border: 1.5px solid var(--brand); }
+/* DT302 (0.3.150, board Stories224): the days on a Clients card as bars, rows of seven; weekend shaded; a dot for a weigh-in */
+.db { width: 100%; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.db-rows { display: flex; flex-direction: column; gap: 4px; }
+.db-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.db-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 5px 3px; border-radius: 8px; }
+.db-cell.weekend { background: #e7edf8; }
+.db-cell > span { display: block; width: 100%; height: 12px; border-radius: var(--r-tag); background: var(--line); }
+.db-cell.good > span { background: var(--high); } .db-cell.look > span { background: var(--mid); } .db-cell.today > span { background: var(--surface); box-shadow: 0 0 0 2px var(--brand) inset; }
+.db-cell > i { display: block; width: 6px; height: 6px; border-radius: 50%; background: transparent; } .db-cell.weighed > i { background: var(--brand); }
+.db-key { display: block; color: var(--muted); font-size: var(--fs-small); line-height: 1.4; margin-top: 2px; text-align: left; }
+.db-foot { display: block; font-weight: 900; color: var(--muted); font-size: var(--fs-small); text-align: right; }
 .cw-bars-row { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px; }
 .cw-bars { display: flex; gap: 4px; }
 .cw-bar { width: 22px; height: 8px; border-radius: var(--r-tag); background: var(--line); display: block; }
@@ -2309,8 +2325,8 @@ button.mp-card { width: 100%; text-align: left; font: inherit; color: inherit; }
 .pa-top { display: flex; gap: 10px; align-items: center; } .pa-top img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex: none; }
 .pa-top span { font-size: var(--fs-body); line-height: 1.4; }
 .pa-chips { display: flex; gap: 8px; }
-.pa-chip { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 34px; padding: 0 10px; white-space: nowrap; border-radius: var(--r-chip); font: inherit; font-size: var(--fs-label); font-weight: 700; border: 1.5px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
-.pa-chip.on { border-color: var(--brand); background: var(--tint); color: var(--brand-text); }
+.pa-chip, .pa-opt { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 34px; padding: 0 10px; white-space: nowrap; border-radius: var(--r-chip); font: inherit; font-size: var(--fs-label); font-weight: 700; border: 1.5px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.pa-chip.on, .pa-opt.on { border-color: var(--brand); background: var(--tint); color: var(--brand-text); }
 .pa-time { font: inherit; font-weight: 700; color: inherit; background: transparent; border: 0; border-bottom: 1.5px dashed currentColor; padding: 0; width: 5.2ch; }
 .pa-time::-webkit-calendar-picker-indicator { display: none; }
 .pa small { color: var(--muted); font-size: var(--fs-small); line-height: 1.4; }

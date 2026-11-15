@@ -22660,6 +22660,86 @@
     "craving.savedInMyRecipes": {
       "text": "In Meine Rezepte gespeichert",
       "checked": true
+    },
+    "photoask.looksPot": {
+      "text": "Das sieht nach einem Topf aus. Wie viel davon ist deins?",
+      "checked": true
+    },
+    "photoask.looksTray": {
+      "text": "Das sieht nach einem Blech aus. Wie viel davon ist deins?",
+      "checked": true
+    },
+    "photoask.wholePot": {
+      "text": "Der ganze Topf",
+      "checked": true
+    },
+    "photoask.wholeTray": {
+      "text": "Das ganze Blech",
+      "checked": true
+    },
+    "photoask.myPortion": {
+      "text": "Meine Portion",
+      "checked": true
+    },
+    "photoask.whichDish": {
+      "text": "Welcher Gang ist das bei der Mahlzeit ({meal})?",
+      "checked": true
+    },
+    "photoask.dishMain": {
+      "text": "Hauptgang",
+      "checked": true
+    },
+    "photoask.whatIsInIt": {
+      "text": "Sag Chef Mealan, was drin ist, wenn du magst",
+      "checked": true
+    },
+    "photoask.wordsPlaceholder": {
+      "text": "Schreib, was es ist, oder die Lebensmittel darin",
+      "checked": true
+    },
+    "photo.dishOfMeal": {
+      "text": "{dish}, Mahlzeit: {meal}",
+      "checked": true
+    },
+    "photo.youSaid": {
+      "text": "Deine Worte: {words}",
+      "checked": true
+    },
+    "plate.yourPhoto": {
+      "text": "deinem Foto",
+      "checked": true
+    },
+    "app.aPot": {
+      "text": "Ein Topf",
+      "checked": true
+    },
+    "clientweek.keyLived": {
+      "text": "Grün: nach Plan gelebt",
+      "checked": true
+    },
+    "clientweek.keyChanged": {
+      "text": "Gelb: anders als geplant",
+      "checked": true
+    },
+    "clientweek.keyFull": {
+      "text": "Grün: voller Tag",
+      "checked": true
+    },
+    "clientweek.keyPart": {
+      "text": "Gelb: nicht ganz eingetragen",
+      "checked": true
+    },
+    "clientweek.keyToday": {
+      "text": "Rahmen: heute",
+      "checked": true
+    },
+    "clientweek.keyDot": {
+      "text": "Punkt: Gewichtseintrag",
+      "checked": true
+    },
+    "clientweek.keyWeekend": {
+      "text": "Schattiert: Wochenende",
+      "checked": true
     }
   }
 }

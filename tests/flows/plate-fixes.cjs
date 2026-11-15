@@ -133,7 +133,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     await p.goto(U + "/plate"); await p.waitForTimeout(1200);
     ok(await p.locator(".cook-open-ask").count() === 0 && await p.locator(".cook-strip").count() === 1 && await p.locator(".sv-plate").count() === 0, "an Exploring plate from before, a cook open: the strip shows, no question, no Served block");
     await p.locator(".mp-again-link").click(); await p.waitForTimeout(300);
-    await p.locator(".mp-help").getByLabel("Tell Chef Mealan what it is").fill("egg whites with hazelnut cream and cocoa");
+    await p.locator(".mp-help").getByLabel("Tell Chef Mealan what is in it") /* B144 (0.3.150): the words box asks what is in it */.fill("egg whites with hazelnut cream and cocoa");
     await p.locator(".mp-help .pill-primary").click(); await p.waitForTimeout(2000);
     const reread = await saved(p);
     ok(/Chicken breast/.test(await main(p)) && reread.items.length === 5, "Read it again replaces the foods with the new read");

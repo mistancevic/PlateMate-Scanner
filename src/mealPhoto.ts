@@ -14,14 +14,20 @@ import { DISHES } from "./served";
 export type PhotoFood = { name: string; local?: string; grams: number; low: number; high: number; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; confidence: "high" | "medium" | "low" };
 // DT228 v2 (0.3.63): a food whose kind the read cannot tell, with two to four kinds it could be and Chef Mealan's question
 export type Which = { name: string; question: string; options: { name: string; calories: number; protein: number; fats: number | null; carbs: number | null; fiber: number | null }[] };
-export type PhotoRead = { course?: import("./served").Dish; dish: string; dishLocal?: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null; which?: Which | null };
+export type PhotoRead = { course?: import("./served").Dish; dish: string; dishLocal?: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null; which?: Which | null;
+  // B144 (0.3.150): what the food is in, how many portions a pot or a tray holds, and the cooking foods named, not counted
+  vessel?: Vessel; serves?: number; cooking?: string[] };
+export const VESSELS = ["plate", "bowl", "pot", "tray", "other"] as const;
+export type Vessel = (typeof VESSELS)[number];
+// a pot or a tray holds more than one portion: the form asks how much of it is yours
+export const holdsMore = (v: Vessel | undefined | null) => v === "pot" || v === "tray";
 export type Estimate = { low: number; high: number };
 
-// what the server returns, checked: names, numbers, at most eight foods, grams in sense
+// what the server returns, checked: names, numbers, at most twelve foods (B144: a dish in the foods the person named), grams in sense
 export function cleanRead(d: any): PhotoRead | null {
   if (!d || !Array.isArray(d.foods)) return null;
   const num = (x: unknown, lo = 0, hi = 5000) => (typeof x === "number" && Number.isFinite(x) && x >= lo && x <= hi ? Math.round(x * 10) / 10 : null);
-  const foods: PhotoFood[] = d.foods.slice(0, 8).map((f: any) => {
+  const foods: PhotoFood[] = d.foods.slice(0, 12).map((f: any) => {
     const grams = num(f?.grams, 1) ?? 100;
     const low = Math.min(grams, num(f?.low, 1) ?? Math.round(grams * 0.7)), high = Math.max(grams, num(f?.high, 1) ?? Math.round(grams * 1.3));
     const local = typeof f?.local === "string" ? f.local.replace(/\s+/g, " ").trim().slice(0, 60) : "";
@@ -34,7 +40,10 @@ export function cleanRead(d: any): PhotoRead | null {
   const dishLocal = typeof d.dishLocal === "string" ? d.dishLocal.replace(/\s+/g, " ").trim().slice(0, 60) : "";
   // DT268 (0.3.118): which dish of a meal it is, as the read guessed; anything else is no guess
   const course = (DISHES as readonly string[]).includes(String(d.course)) ? (d.course as PhotoRead["course"]) : undefined;
-  return { dish: String(d.dish ?? "").trim().slice(0, 60), ...(dishLocal ? { dishLocal } : {}), ...(course ? { course } : {}), foods, unsure, which: whichOf(d.which, foods, num) };
+  const vessel = (VESSELS as readonly string[]).includes(String(d.vessel)) ? (d.vessel as Vessel) : undefined;
+  const serves = Number.isFinite(Number(d.serves)) && Number(d.serves) >= 1 ? Math.min(24, Math.round(Number(d.serves))) : undefined;
+  const cooking = Array.isArray(d.cooking) ? d.cooking.map((x: unknown) => String(x ?? "").replace(/\s+/g, " ").trim().slice(0, 40)).filter(Boolean).slice(0, 8) : [];
+  return { dish: String(d.dish ?? "").trim().slice(0, 60), ...(dishLocal ? { dishLocal } : {}), ...(course ? { course } : {}), ...(vessel ? { vessel } : {}), ...(serves ? { serves } : {}), ...(cooking.length ? { cooking } : {}), foods, unsure, which: whichOf(d.which, foods, num) };
 }
 // DT228 v2: the question about a food's kind, checked: it names a food of the read; two to four kinds, each with its values
 function whichOf(wh: any, foods: PhotoFood[], num: (x: unknown, lo?: number, hi?: number) => number | null): Which | null {
@@ -86,7 +95,7 @@ export const mealsOn = (kcal: number, mealKcal: number | null | undefined): numb
 
 // Chef Mealan's one line, by code, from what the gates and the size said; the first button is the advice
 export type Advice = { line: string; first: "all" | "half" | "add" | "portion" };
-export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord: string; mealKcal: number | null; big: number; nutrition: GateLine; day: GateLine; culinaryOk: boolean | null; snackKcal?: number }): Advice {
+export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord: string; mealKcal: number | null; big: number; nutrition: GateLine; day: GateLine; culinaryOk: boolean | null; snackKcal?: number; dish?: import("./served").Dish }): Advice {
   const k = kcalRange(x.items), kcal = aboutKcal(k), prot = w("photo.gProtein", { n: Math.round(x.protein) }), meal = mealV(x.mealWord, true);
   // the gates' lines, read without relying on narrowing (this project builds without strictNullChecks)
   type No = { ok: false; why: string; ways: string[] };
@@ -95,6 +104,9 @@ export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord:
   // DT133 (0.2.113, board Stories88; Milan 27 October 14:12: let's call them portions): a plate of several meals in portions
   // of this meal, counted against the plan (the meal's share of what is left of the day), never a fixed number
   if (x.big >= 2) return { line: w(n.ok ? "photo.portions" : "photo.portionsWhy", { big: x.big, meal, kcal, mealKcal: r10(x.mealKcal ?? 0), why: nWhy }), first: "portion" };
+  // B144 (0.3.150, board Stories225): a starter, a side, a dessert or a drink is one dish of the meal, never judged as the whole
+  // meal: it is not a snack for being small, and not a full meal either; the card only asks
+  if (x.dish && x.dish !== "main") return { line: w("photo.didYouEat", { kcal: cap(kcal), prot }), first: "all" };
   if (x.mealKcal && k.kcal < Math.max(150, x.mealKcal * 0.4)) return { line: w("photo.snack", { meal, kcal, prot }), first: "all" };
   if (!n.ok && nWays.includes("protein")) return { line: w("photo.addProtein", { why: nWhy, meal, kcal, prot }), first: "add" };
   if (!n.ok) return { line: w("photo.asItStands", { why: nWhy, kcal, prot }), first: "all" };

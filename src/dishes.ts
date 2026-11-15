@@ -60,7 +60,8 @@ export const roomFor = (need: number, others: { kcal: number; protein: number }[
 });
 
 // a dish's name in the meal: the first is the main; one you said is a dessert says so; any other is a dish
-export const courseOf = (k: number, f: { course?: "dessert" }): "main" | "dessert" | "dish" => (f.course === "dessert" ? "dessert" : k === 0 ? "main" : "dish");
+// B144 (0.3.150): a dish that says what it is (starter, side, dessert, drink) is that; else the first is the main, the rest a dish
+export const courseOf = (k: number, f: { course?: import("./served").Dish }): import("./served").Dish | "dish" => (f.course && f.course !== "main" ? f.course : f.course === "main" || k === 0 ? "main" : "dish");
 
 // DT247: a second photo after a meal of today asks once. The meal eaten last, within 3 hours before the photo, of a meal of the
 // day (not a snack off the plan). Within an hour of it, Dessert to that meal is the main button; later, its own snack is.

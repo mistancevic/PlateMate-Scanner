@@ -265,7 +265,8 @@ export type Feedback = {
   // eaten for a slot of the plan (0.2.3, canvas S Today through the day): by the plan; a card without a slot is extra
   slot?: { date: string; slotId: string; name: string; time: string };
   // DT247 (0.3.96): a dish you said is the dessert of its meal
-  course?: "dessert";
+  // B144 (0.3.150): any dish of a meal (it was dessert alone); main is left out
+  course?: import("./served").Dish;
 };
 export type PilotState = {
   version: 1;
@@ -304,13 +305,17 @@ export type PilotState = {
     // DT228 v2 (0.3.63): the other photos of the meal (thumbnails, at most 3), the person's words, and the kind the read could not tell
     more?: string[]; note?: string; which?: import("./mealPhoto").Which | null;
     // DT268 (0.3.118): an Exploring plate is kept as Served: its id there, whose it is, its visit, which dish; keep false: Don't keep it
-    served?: import("./served").OnPlate; keep?: false };
+    served?: import("./served").OnPlate; keep?: false;
+    // B144 (0.3.150, board Stories225): what the food is in, as read; the person's answers from the form: how much of a pot
+    // or a tray is theirs, and which dish of the meal it is; the recipe a whole pot became
+    vessel?: import("./mealPhoto").Vessel; share?: "whole" | "portion"; dish?: import("./served").Dish; pot?: string };
   // DT212 (0.3.53): a plate from an earlier meal you chose to keep working on is not asked about again (its plateAt)
   plateAsked?: string;
   // DT246 (0.3.96): the meal this plate is recorded in; while it is the same plate, its changes go there too
   recorded?: import("./dishes").Recorded;
   // DT247 (0.3.96): this plate is the dessert of its meal
-  course?: "dessert";
+  // B144 (0.3.150): any dish of a meal (it was dessert alone); main is left out
+  course?: import("./served").Dish;
   // DT214 (0.3.53, board Stories162): the cook that runs, and the plates and cooks saved for later (see cooking.ts)
   cook?: import("./cooking").Cook;
   later?: import("./cooking").Later[];
