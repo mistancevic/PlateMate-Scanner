@@ -231,7 +231,7 @@ const READS = [
     ok(s.served.length === 2 && s.items.length === 1 && /Not kept/.test(await text(".sv-off")), "Don't keep it: off the list, the Plate keeps its foods and says so");
     // 0.3.121: reading the same photo again keeps what the plate was: not kept stays not kept
     await page.locator(".mp-again-link").click(); await page.waitForTimeout(300);
-    await page.locator(".mp-help").getByLabel("Tell Chef Mealan what it is").fill("apple strudel with cream");
+    await page.locator(".mp-help").getByLabel("Tell Chef Mealan what is in it") /* B144 (0.3.150): the words box asks what is in it */.fill("apple strudel with cream");
     await page.locator(".mp-help .pill-primary").click(); await page.waitForTimeout(2000);
     s = await st();
     ok(s.served.length === 2 && s.photo?.keep === false && /Not kept/.test(await text(".sv-off")), "Read it again on a plate you did not keep: still not kept");

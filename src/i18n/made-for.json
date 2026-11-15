@@ -5664,6 +5664,26 @@
     "screen.craving.viewMore": {"en":"View more","area":"The Plate","where":"The Plate","release":"0.3.149"},
     "screen.craving.viewLess": {"en":"View less","area":"The Plate","where":"The Plate","release":"0.3.149"},
     "screen.craving.saveInMyRecipes": {"en":"Save in My recipes","area":"The Plate","where":"The Plate","release":"0.3.149"},
-    "screen.craving.savedInMyRecipes": {"en":"Saved in My recipes","area":"The Plate","where":"The Plate","release":"0.3.149"}
+    "screen.craving.savedInMyRecipes": {"en":"Saved in My recipes","area":"The Plate","where":"The Plate","release":"0.3.149"},
+    "screen.photoask.looksPot": {"en":"It looks like a pot. How much of it is yours?","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photoask.looksTray": {"en":"It looks like a tray. How much of it is yours?","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photoask.wholePot": {"en":"The whole pot","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photoask.wholeTray": {"en":"The whole tray","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photoask.myPortion": {"en":"My portion","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photoask.whichDish": {"en":"Which dish of your {meal} is it?","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photoask.dishMain": {"en":"Main dish","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photoask.whatIsInIt": {"en":"Tell Chef Mealan what is in it, if you like","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photoask.wordsPlaceholder": {"en":"Type what it is, or the foods in it","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photo.dishOfMeal": {"en":"{dish} of your {meal}","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photo.youSaid": {"en":"You said: {words}","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.plate.yourPhoto": {"en":"your photo","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.app.aPot": {"en":"A pot","area":"Words used across the app","where":"Across the app","release":"0.3.150"},
+    "screen.clientweek.keyLived": {"en":"Green: lived by the plan","area":"Clients","where":"Clients","release":"0.3.150"},
+    "screen.clientweek.keyChanged": {"en":"Amber: changed from the plan","area":"Clients","where":"Clients","release":"0.3.150"},
+    "screen.clientweek.keyFull": {"en":"Green: full day","area":"Clients","where":"Clients","release":"0.3.150"},
+    "screen.clientweek.keyPart": {"en":"Amber: not fully logged","area":"Clients","where":"Clients","release":"0.3.150"},
+    "screen.clientweek.keyToday": {"en":"Outline: today","area":"Clients","where":"Clients","release":"0.3.150"},
+    "screen.clientweek.keyDot": {"en":"Dot: weigh-in","area":"Clients","where":"Clients","release":"0.3.150"},
+    "screen.clientweek.keyWeekend": {"en":"Shaded: weekend","area":"Clients","where":"Clients","release":"0.3.150"}
   }
 }
