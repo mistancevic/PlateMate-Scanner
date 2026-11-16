@@ -5,6 +5,9 @@
 // above the step bar, and says where it goes. Never rewrite these lines to fit a change.
 // Added by stories DS4 G and DS5 H (Milan 08:49 to 09:30, boards DS4 and DS5): a page's title comes first, under Back: a
 // recipe's name before its photo. On /built a link inside a sentence is underlined, and each part has one filled button.
+// Added by story DT305 (Coach Milan 16 November 2026, 10:04 to 10:49, boards Stories230 and Stories231; written down in
+// docs/rules/design.md as D6 and D7): an answer to tick sits under its question in its own block; the buttons of a section sit
+// under the whole section in one row. Guarded on the read of a photo, in photo-read.cjs.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");

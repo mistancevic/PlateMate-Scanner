@@ -6,6 +6,9 @@
 // DT245: Fit on a plate that already fills its meal says so first; Ideas anyway asks for small additions; an idea that does
 // not fit gets Put it on the plate.
 // DT246: a plate already recorded says where it went, and a change on the Plate goes to that meal too.
+// Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo waits on
+// the photo screen, which has no chips, and Read the plate reads it. Just looking is chosen behind the pencil of the meal
+// line. After a read of your own meal the read shows alone; Change the foods opens the plate.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -47,7 +50,8 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     if (/could not be read/.test(await p.locator("body").innerText())) throw new Error("the seed is not a valid state");
     return p;
   };
-  const photo = async (p) => { await p.locator(".mp-button").first().click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(2500); };
+  const photo = async (p) => { await p.locator(".mp-button").first().click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(1500); if (await p.locator(".pa-screen").count()) { await p.locator(".pa-screen .pa-go .pill").click(); await p.waitForTimeout(2500); } };
+  const toPlate = async (p) => { if (await p.locator(".rv-change .pill").count()) { await p.locator(".rv-change .pill").click(); await p.waitForTimeout(600); } };
   const saved = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1") || "{}"));
   const main = (p) => p.locator("main").innerText();
   try {
@@ -56,7 +60,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     ok(p.reads === 2, `the photo was read again once by itself (${p.reads} reads)`);
     ok(await p.getByText("The connection was lost. Your photo is kept.").count() === 1, "one card: the connection was lost, the photo is kept");
     ok(!/failed to fetch/i.test(await p.locator("body").innerText()), "never Failed to fetch");
-    await p.getByRole("button", { name: "Try again" }).click(); await p.waitForTimeout(2500);
+    await p.getByRole("button", { name: "Try again" }).click(); await p.waitForTimeout(2500); await toPlate(p);
     ok(/Chicken breast/.test(await main(p)) && await p.locator(".mp-lost").count() === 0, "Try again: the foods are on the Plate, the card is gone");
     // DT241: a finished dish from a photo: no Prepare it, Fit stays
     const ways = await p.locator(".ways-out button").allInnerTexts();
@@ -74,7 +78,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     await p.context().close();
 
     // DT273 (0.3.123, board Stories202; Coach Milan 10 November, Go): ＋ Photo asks first what the photo is
-    p = await open(seed); await photo(p);
+    p = await open(seed); await photo(p); await toPlate(p);
     ok(await p.locator(".mp-plus-ask").count() === 0 && await p.locator("button.mp-add-photo").count() === 1, "under the photo: ＋ Photo, a button");
     await p.locator(".mp-add-photo").click(); await p.waitForTimeout(300);
     const plusAsk = p.locator(".mp-plus-ask");
@@ -92,7 +96,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     let d273 = await saved(p);
     ok((d273.later || []).length === 1 && d273.later[0].kind === "plate" && d273.items.length === 0 && !d273.photo, "A different meal: the plate that was there is saved for later, the Plate is free");
     ok(await p.locator("#camera-shutter-button").count() === 1, "and the camera opens for the new plate");
-    await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(2500);
+    await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(2500); if (await p.locator(".pa-screen").count()) { await p.getByRole("button", { name: "Read the plate" }).click(); await p.waitForTimeout(2500); }
     d273 = await saved(p);
     ok(d273.items.length === 5 && !!d273.photo && !d273.photo.more && (d273.later || []).length === 1, "the new photo is read as a new plate, one photo; the other still waits");
     await p.context().close();
@@ -133,7 +137,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     await p.goto(U + "/plate"); await p.waitForTimeout(1200);
     ok(await p.locator(".cook-open-ask").count() === 0 && await p.locator(".cook-strip").count() === 1 && await p.locator(".sv-plate").count() === 0, "an Exploring plate from before, a cook open: the strip shows, no question, no Served block");
     await p.locator(".mp-again-link").click(); await p.waitForTimeout(300);
-    await p.locator(".mp-help").getByLabel("Tell Chef Mealan what is in it") /* B144 (0.3.150): the words box asks what is in it */.fill("egg whites with hazelnut cream and cocoa");
+    await p.locator(".mp-help").getByLabel("Anything Chef Mealan should know?") /* B144 (0.3.150): the words box asks what is in it */.fill("egg whites with hazelnut cream and cocoa");
     await p.locator(".mp-help .pill-primary").click(); await p.waitForTimeout(2000);
     const reread = await saved(p);
     ok(/Chicken breast/.test(await main(p)) && reread.items.length === 5, "Read it again replaces the foods with the new read");
@@ -148,7 +152,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     // DT245: breakfast and lunch eaten, so the dinner is about 680 kcal (612 to 748) and the tava (639) already fills it
     const ate = (id, at, slot, kcal) => ({ id, meal: { id: "m" + id, title: slot.name, items: [{ id: "i" + id, food: F("f" + id, "Meal " + id, 100, 8, 3, 10), grams: kcal, locked: false }], portion: kcal, savedAt: at }, status: "eaten", taste: "", notes: "", createdAt: at, slot });
     const fed = [ate("b", day(8, 0), { date: "2026-11-06", slotId: "breakfast", name: "Breakfast", time: "07:30" }, 1035), ate("l", day(13, 0), { date: "2026-11-06", slotId: "lunch", name: "Lunch", time: "13:45" }, 1035)];
-    p = await open({ ...seed, feedback: fed }); await photo(p);
+    p = await open({ ...seed, feedback: fed }); await photo(p); await toPlate(p);
     await p.locator(".ways-out button").filter({ hasText: "Fit to my target" }).click(); await p.waitForTimeout(800);
     const fills = p.locator(".fills-ask");
     ok(await fills.count() === 1 && /Your plate already fills this dinner: 639 kcal, in its range\./.test(await fills.innerText()), "Fit says first that the plate fills the dinner: " + (await fills.count() ? (await fills.innerText()).replace(/\s+/g, " ") : "none"));

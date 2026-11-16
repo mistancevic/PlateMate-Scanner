@@ -57,6 +57,10 @@
       "text": "Ich finde auf diesem Foto keine Lebensmittel. Mach es noch einmal, von oben und mit dem ganzen Teller, oder füge die Lebensmittel selbst hinzu.",
       "checked": true
     },
+    "photoHere": {
+      "text": "{from}",
+      "checked": true
+    },
     "photoWhose": {
       "text": "{from}. Wessen Teller ist das, und wann?",
       "checked": true
@@ -430,7 +434,7 @@
       "checked": true
     },
     "plate.dropPhoto": {
-      "text": "Foto verwerfen",
+      "text": "Foto entfernen",
       "checked": true
     },
     "plate.keepMine": {
@@ -1530,11 +1534,11 @@
       "checked": true
     },
     "camera.readIt": {
-      "text": "Auslesen",
+      "text": "Dieses Foto verwenden",
       "checked": true
     },
     "camera.theShutterAddsAPhoto": {
-      "text": "Der Auslöser fügt ein Foto hinzu. Lies sie aus, wenn du hast, was du willst.",
+      "text": "Der Auslöser fügt ein Foto hinzu. Verwende sie, wenn du hast, was du willst.",
       "checked": true
     },
     "camera.tapToTakeItOr": {
@@ -1594,7 +1598,7 @@
       "checked": true
     },
     "photoask.dropThePhoto": {
-      "text": "Foto verwerfen",
+      "text": "Foto entfernen",
       "checked": true
     },
     "photoask.whosePlateAndWhen": {
@@ -1906,7 +1910,7 @@
       "checked": true
     },
     "camera.readPhotos": {
-      "text": "{n} Foto auslesen|{n} Fotos auslesen",
+      "text": "{n} Foto verwenden|{n} Fotos verwenden",
       "checked": true
     },
     "camera.analyzePhotos": {
@@ -21326,7 +21330,7 @@
       "checked": true
     },
     "howto.photoLog.line": {
-      "text": "Ein Foto, er liest die Lebensmittel; du sagst, wessen Teller und wann.",
+      "text": "Ein Foto, er liest die Lebensmittel; du sagst, wie viel du gegessen hast.",
       "checked": true
     },
     "howto.photoLog.what": {
@@ -21338,15 +21342,15 @@
       "checked": true
     },
     "howto.photoLog.s2": {
-      "text": "Fotografier den ganzen Teller von oben, dann Lesen. Oder wähl ein Foto, das du schon gemacht hast.",
+      "text": "Fotografier den ganzen Teller von oben, dann Dieses Foto verwenden. Oder wähl ein Foto, das du schon gemacht hast.",
       "checked": true
     },
     "howto.photoLog.s3": {
-      "text": "Sag, wessen Teller und wann: Gegessen um, Ich esse gerade, oder Nur mal schauen.",
+      "text": "Schreib, was Chef Mealan wissen sollte, wenn du magst, dann tipp auf Teller lesen.",
       "checked": true
     },
     "howto.photoLog.s4": {
-      "text": "Prüf die gelesenen Lebensmittel, dann tipp auf Gegessen oder Halb gegessen.",
+      "text": "Prüf die gelesenen Lebensmittel. Wähl unter Hast du es gegessen? Alles, Die Hälfte oder Einen Teil, dann Fertig.",
       "checked": true
     },
     "howto.bigBatch.title": {
@@ -22186,7 +22190,7 @@
       "checked": true
     },
     "plate.photoNotSaved": {
-      "text": "Dieses Foto wurde nicht gespeichert. Nimm es neu auf oder verwirf es.",
+      "text": "Dieses Foto wurde nicht gespeichert. Nimm es neu auf oder entferne es.",
       "checked": true
     },
     "photos.notSaved": {
@@ -22690,11 +22694,11 @@
       "checked": true
     },
     "photoask.whatIsInIt": {
-      "text": "Sag Chef Mealan, was drin ist, wenn du magst",
+      "text": "Etwas, das Chef Mealan wissen sollte?",
       "checked": true
     },
     "photoask.wordsPlaceholder": {
-      "text": "Schreib, was es ist, oder die Lebensmittel darin",
+      "text": "Was drin ist, wie es zubereitet wurde. Du kannst es leer lassen.",
       "checked": true
     },
     "photo.dishOfMeal": {
@@ -22739,6 +22743,102 @@
     },
     "clientweek.keyWeekend": {
       "text": "Schattiert: Wochenende",
+      "checked": true
+    },
+    "photoask.namesIt": {
+      "text": "Chef Mealan gibt den Namen",
+      "checked": true
+    },
+    "photoask.takenNow": {
+      "text": "Ein Foto von gerade eben.",
+      "checked": true
+    },
+    "photoask.fromTodayYours": {
+      "text": "Ein Foto von heute um {time}, aus Deine Fotos.",
+      "checked": true
+    },
+    "photoask.fromYesterdayYours": {
+      "text": "Ein Foto von gestern, {time}, aus Deine Fotos.",
+      "checked": true
+    },
+    "photoask.fromDayYours": {
+      "text": "Ein Foto vom {day}, {time}, aus Deine Fotos.",
+      "checked": true
+    },
+    "photoask.yourPhoto": {
+      "text": "Dein Foto",
+      "checked": true
+    },
+    "plate.photoMealLine": {
+      "text": "{meal}, {day} um {time} Uhr",
+      "checked": true
+    },
+    "plate.yesterdayLow": {
+      "text": "gestern",
+      "checked": true
+    },
+    "plate.readSub": {
+      "text": "Aus deinem Foto gelesen. Tippe auf eine Menge, um sie zu korrigieren.",
+      "checked": true
+    },
+    "plate.changeTheFoods": {
+      "text": "Lebensmittel ändern",
+      "checked": true
+    },
+    "plate.didYouEatIt": {
+      "text": "Hast du es gegessen?",
+      "checked": true
+    },
+    "plate.allOfIt": {
+      "text": "Alles",
+      "checked": true
+    },
+    "plate.half": {
+      "text": "Die Hälfte",
+      "checked": true
+    },
+    "plate.partOfIt": {
+      "text": "Einen Teil",
+      "checked": true
+    },
+    "plate.gramsEaten": {
+      "text": "Gegessene Gramm",
+      "checked": true
+    },
+    "plate.gOfTotal": {
+      "text": "g von {total} g. Tippe, um es zu korrigieren.",
+      "checked": true
+    },
+    "plate.gramsOfFood": {
+      "text": "Gramm: {food}",
+      "checked": true
+    },
+    "plate.isItForPlan": {
+      "text": "Ist es für den Plan?",
+      "checked": true
+    },
+    "plate.planItFor": {
+      "text": "Für {slot} planen",
+      "checked": true
+    },
+    "plate.plannedForChip": {
+      "text": "Für {slot} geplant",
+      "checked": true
+    },
+    "plate.plannedFor": {
+      "text": "Für {slot} geplant. Es steht im Plan.",
+      "checked": true
+    },
+    "photo.kcalProt": {
+      "text": "{kcal} und {prot}.",
+      "checked": true
+    },
+    "app.loggedForYesterday": {
+      "text": "Für gestern eingetragen, {time}.",
+      "checked": true
+    },
+    "app.loggedForDay": {
+      "text": "Eingetragen für {day}, {time}.",
       "checked": true
     }
   }

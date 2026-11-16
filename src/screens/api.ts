@@ -45,7 +45,7 @@ export interface AppApi {
   readMenu: (visit: string, image: string) => Promise<boolean>;
   pickMenuLine: (plate: string, line: number | null) => void;
   dropMenuLine: (plate: string) => void;
-  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback }) => boolean | void;
+  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback; part?: number }) => boolean | void;
   // DT130 (0.2.110): Photo of my meal opens the meal camera; a photo from Your photos waits on the Plate for whose and when
   mealCamera: () => void;
   // DT175 (0.3.17): the foods you said you have, landed on the Plate as estimates; false when nothing came of it
@@ -53,7 +53,7 @@ export interface AppApi {
   // DT131 (0.2.113): foods waiting to land on a plate that has foods; null when nothing waits
   plateAsk: PlateAsk | null;
   answerPlateAsk: (how: "add" | "new" | null) => void;
-  photoAsk: { image: string; at: string } | null;
+  photoAsk: { image: string; at: string; taken?: boolean; more?: string[] } | null;
   dropPhotoAsk: () => void;
   // DT219 (0.3.58, board Stories164): a read that found no foods; the Plate stays as it was and Chef Mealan says so
   photoNoFoods: boolean;
@@ -81,6 +81,8 @@ export interface AppApi {
   carryNow: { id: string; at: number } | null;
   // DT130: An idea kept: in Mine with the photo as its picture, at the top until made once; a slot in the plan when given
   saveIdea: (meal: Meal, photo: string | null, slot?: { date: string; slotId: string } | null) => void;
+  // DT305 (0.3.151): Save in My recipes on the read: the plate as a recipe from your photo; the plate stays
+  saveRead: (meal: Meal, photo: string | null) => void;
   memberFoods: (q: string) => Promise<import("../memberFoods").MemberFood[]>;
   addMemberFood: (m: import("../memberFoods").MemberFood, to?: "foods" | "plate") => void;
   add: (f: Food) => void;

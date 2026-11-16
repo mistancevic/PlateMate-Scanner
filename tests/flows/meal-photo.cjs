@@ -4,6 +4,9 @@
 // the line, large with the foods over it), the three gates read it, Chef Mealan's line says what to do by code, and the
 // buttons log it now: Ate it, Ate half (the other half kept on Today), Not mine. A food read from the photo gets no
 // ingredient line (the olive oil in the dressing). The read is a stand-in (no AI here).
+// Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo you take
+// waits on the photo screen, and Read the plate reads it; the read shows alone, and Change the foods opens the plate this
+// walkthrough is about.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -46,7 +49,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   const text = async (sel = "main") => (await page.locator(sel).first().textContent()).replace(/\s+/g, " ");
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   // 0.2.110 (DT130): Photo of my meal opens the meal camera; the shutter reads at once
-  const snap = async (sel) => { await page.locator(sel).click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); if (await page.locator(".cam-analyze").count()) await page.locator(".cam-analyze").click(); await page.waitForTimeout(2000); };
+  const snap = async (sel) => { await page.locator(sel).click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); if (await page.locator(".cam-analyze").count()) await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500); if (await page.locator(".pa-screen").count()) { await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200); } if (await page.locator(".rv-change .pill").count()) { await page.locator(".rv-change .pill").click(); await page.waitForTimeout(600); } };
 
   // DT138 (0.2.122): Today has no Photo of my meal; the Plate has it
   await page.goto(U + "/"); await page.waitForTimeout(1500);
@@ -94,7 +97,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   await snap(".mp-button");
   // DT247 (0.3.96, board Stories183): a second photo minutes after the lunch asks once; here it is more of that lunch
   ok(await page.locator(".dish-ask").count() === 1, "DT247: the second photo asks once: dessert to your lunch, or its own snack");
-  await page.locator(".dish-ask .ca-go button").filter({ hasText: /^Dessert to your/ }).click(); await page.waitForTimeout(600);
+  await page.locator(".dish-ask .ca-go button").filter({ hasText: /^Dessert to your/ }).click(); await page.waitForTimeout(600); if (await page.locator(".rv-change .pill").count()) { await page.locator(".rv-change .pill").click(); await page.waitForTimeout(600); }
   const big = await text(".mp-say");
   ok(/^Chef Mealan: Be aware: this plate is about 2 portions of your (lunch|dinner), about [\d,]+ to [\d,]+ kcal for a (lunch|dinner) of about [\d,]+\. Eat one portion and keep the rest\./.test(big), "DT133: the big plate in portions, by code from the size line: " + big);
   ok((await page.locator(".mp-say .button-row button").allTextContents()).slice(0, 2).join() === "Ate one portion,Ate it all", "DT133: Ate one portion first, then Ate it all");
@@ -109,7 +112,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
   await snap(".mp-button");
   // DT247: again minutes after a meal: it asks once; its own snack this time
-  await page.locator(".dish-ask .ca-go button").filter({ hasText: "Its own snack" }).click(); await page.waitForTimeout(400);
+  await page.locator(".dish-ask .ca-go button").filter({ hasText: "Its own snack" }).click(); await page.waitForTimeout(400); if (await page.locator(".rv-change .pill").count()) { await page.locator(".rv-change .pill").click(); await page.waitForTimeout(600); }
   // DT278 (0.3.145, board Stories218): Don't count it in place of Not mine: the plate stays, not counted, kept with its day
   await page.getByRole("button", { name: "Don't count it" }).click(); await page.waitForTimeout(500);
   const s5 = await st();

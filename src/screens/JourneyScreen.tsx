@@ -15,6 +15,7 @@ import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon, Mic } from "lucide-react";
 import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn, foodOfRead, holdsMore } from "../mealPhoto";
 import { PhotoAsk, PotRows, dishWord } from "../components/PhotoAsk";
+import { photoWho, photoMealLine } from "../photoAsk";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADish, isDrink, type Mix } from "../mixtip";
 import { lettersOf } from "../letters";
@@ -660,6 +661,11 @@ export function JourneyScreen(p: AppApi) {
     : p.pick === "exploring" ? `${w("plate.exploringLine")}${momentPart}${kindPart}`
     : p.pick === "snack" ? `${w("plate.snackLine")}${momentPart}${kindPart}`
     : `${mealSlot ? `${w("plate.byClock", { meal: mealV(mealSlot.name), time: mealSlot.time })} · ` : ""}${w("plate.offPlan")} · ${w(`moment.${p.moment}` as WordKey)} · ${w(items.some((i) => i.dish) ? "plate.aDish" : "plate.aMix")}`;
+  // DT305: the photo fills in the meal line. A photo you ate earlier says its meal, its day and its time; the pencil changes it
+  const linePhotoAt = p.photoAsk ? (photoWho(new Date(p.photoAsk.at), new Date(), !!p.photoAsk.taken, p.pick === "exploring") === "ate" ? new Date(p.photoAsk.at) : null) : state.photo?.view === "read" && state.photo.who === "ate" ? new Date(state.photo.at) : null;
+  const linePhoto = linePhotoAt && !pickSlot && !p.filling && !unsized ? (() => {
+    const sl = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(linePhotoAt)), `${String(linePhotoAt.getHours()).padStart(2, "0")}:${String(linePhotoAt.getMinutes()).padStart(2, "0")}`);
+    return sl ? `${photoMealLine(mealV(sl.name), linePhotoAt, new Date())} · ${w("plate.offPlan")} · ${w(`moment.${p.moment}` as WordKey)} · ${w("plate.aMix")}` : null; })() : null;
   const forKey = p.pick ?? (mealSlot ? `meal:${mealSlot.id}` : "exploring");
   const forHint = pickSlot ? (numsOf ? w("plate.forHintNums", { meal: mealV(pickSlot.name), time: pickSlot.time, nums: numsOf, mealLow: mealV(pickSlot.name, true) }) : w("plate.forHint", { meal: mealV(pickSlot.name), time: pickSlot.time, mealLow: mealV(pickSlot.name, true) }))
     : p.pick === "exploring" ? w("make.exploringNothingIsSizedFor")
@@ -1170,6 +1176,13 @@ export function JourneyScreen(p: AppApi) {
   // DT127: the meal photo, small in the line or large with the foods over it
   // DT230 (0.3.70): a photo plate opens with the photo large, its own buttons under it
   const [photoBig, setPhotoBig] = useState(true);
+  // DT305 (0.3.151, boards Stories230 and Stories231): the read alone. What you chose under Did you eat it?, the grams, the
+  // plan chip, and the food whose amount you are correcting
+  const [rvEat, setRvEat] = useState<null | "all" | "half" | "part">(null);
+  const [rvGrams, setRvGrams] = useState("");
+  const [rvPlan, setRvPlan] = useState(false);
+  const [rvEdit, setRvEdit] = useState<string | null>(null);
+  useEffect(() => { setRvEat(null); setRvGrams(""); setRvPlan(false); setRvEdit(null); }, [state.photo?.at, state.photo?.image]);
   // DT249 (0.3.98, board Stories184; Coach Milan 7 November 06:01 to 06:14, Go): which photo of the meal is the big one
   const [shotAt, setShotAt] = useState(0);
   useEffect(() => { setShotAt(0); }, [state.photo?.at, state.photo?.image]);
@@ -1358,7 +1371,14 @@ export function JourneyScreen(p: AppApi) {
     );
   }
   // the Plate's title: the name, for a slot or a recipe; an empty plate asks what you are craving
-  const inHead = step === "in" ? (p.filling
+  // DT305: the photo screen and the read. Once the plate starts being filled the meal's title takes the question's place
+  const photoScreen = step === "in" && !!p.photoAsk;
+  // a plate that became Just looking or Don't count it is no longer the read: it is kept as Served, as before
+  const readView = step === "in" && !p.photoAsk && state.photo?.view === "read" && state.photo.who !== "idea" && p.pick !== "exploring" && items.length > 0;
+  const titleField = (placeholder: string) => ({ value: state.title === "DaaM" ? "" : state.title, placeholder, onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) });
+  const inHead = step === "in" ? (photoScreen ? stepHead({ n, title: "", bare: true, nameField: titleField(w("photoask.namesIt")) })
+          : readView ? stepHead({ n, title: "", bare: true, sub: w("plate.readSub"), nameField: titleField(autoTitle(items)) })
+          : p.filling
           ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? w("make.asPlannedChangeWhatYou") : plateWhen === "past" ? w("plate.addingSub", { slot: slotV(p.filling) }) : plateWhen === "plan" ? w("plate.planningSub", { slot: slotV(p.filling) }) : w("make.nameItOrKeepThe") })
           : madeBy && items.length > 0
             ? Head({ name: true, title: "", sub: w("plate.madeBySub", { kitchen: madeBy.kitchen, meal: mealW, foods: aroundWord(madeBy.from.filter((i) => !isDrink(i.food)).map((i) => i.food.name)) }) })
@@ -1447,7 +1467,7 @@ export function JourneyScreen(p: AppApi) {
         </section>
       ); })()
     // a plate from an earlier meal: Did you eat it?
-    : plateIsOld && since && !p.filling && !inCook && !p.recordNow ? (
+    : plateIsOld && since && !p.filling && !inCook && !p.recordNow && !readView && !photoScreen ? (
       <section className="chef-ask" aria-label={w("make.yourPlateFromEarlier")}>
         <ChefLine image={state.photo?.image} text={say("plateOldAte", since, plateIn)} />
         <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => ateEarlier(false)}>{w("plate.ateIt")}</button><button type="button" className="pill" onClick={p.savePlate}>{w("plate.saveForLater")}</button></div>
@@ -1457,12 +1477,94 @@ export function JourneyScreen(p: AppApi) {
     : null;
   // DT212 v4: plates and cooks saved for later wait under the title, with Continue; swipe left to remove
   // DT227 (0.3.61, board Stories167): only on the Plate's start screen, the empty What are you craving?
-  const laterBlock = step === "in" && (state.later ?? []).length > 0 && items.length === 0 && !state.photo && !state.fromRecipe && !p.filling ? (
+  const laterBlock = step === "in" && (state.later ?? []).length > 0 && items.length === 0 && !state.photo && !state.fromRecipe && !p.filling && !photoScreen ? (
     <section className="card later-card" aria-label={w("make.savedForLater")}>
       <b>{w("make.savedForLater")}</b>
       <div className="later-list">{state.later!.map((x) => <LaterRow key={x.id} x={x} onContinue={() => p.continueLater(x.id)} onRemove={() => p.removeLater(x.id)} />)}</div>
       <small>{w("make.continuePutsItBackOn")}</small>
     </section>) : null;
+  const readoutEl = items.length > 0 ? (
+    <section className={`readout readout-fit-${p.fitPd(pd)}`}>
+      <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? w("make.theWholeRecipe") : mealSlot ? mealName(mealSlot.name) : madeBy || (imported && mealNeed) ? w("plate.thisMeal", { meal: mealW }) : w("plate.asItStands")}</span><span>{pdTag()}</span></div>
+      <div className="readout-mid">
+        <b>{pdVal(pd)}</b>
+        {/* DT93, rule 3: a plate far over the meal says so, instead of going to the maths */}
+        <div><span>{tooBig ? w("plate.notYet", { meal: mealW }) : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? w("plate.fitsPlan") : w("plate.underYour", { gap: fixed(pdRef - pd), target: fixed(pdRef) })) : w("plate.noTarget")}</span><small className="rd-rows"><span>{w("plate.energy")}</span><b>{fmt(t.calories, 0)}</b> <span>{w("plate.kcal")}</span><span>{w("plate.weight")}</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>{w("plate.protein")}</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
+      </div>
+      {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
+      {/* DT116 (0.2.98) and 0.2.99: the letters with their grams, one block; sugars, saturates and salt in the tap */}
+      {p.rates ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who={w("letters.thePlate")} extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)}
+    </section>
+  ) : null;
+  // DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November, Go 11:35): the read alone. The photo and its
+  // foods with Change the foods under them, always the result, what you said, Chef Mealan's word. One question in its own
+  // block, with chips that are white until chosen: Did you eat it? All of it, Half, Part of it, and the weight below; for a
+  // coming day, Is it for the plan? Under everything the two buttons of the read: Save in My recipes, Done. Done carries out
+  // what is chosen; nothing chosen, nothing is kept.
+  const readCard = readView ? (() => {
+    const ph = state.photo!;
+    const total = Math.max(1, Math.round(items.reduce((k, i) => k + i.grams, 0)));
+    const planning = !!p.filling && plateWhen === "plan", past = !!p.filling && plateWhen === "past";
+    const today = !p.filling && new Date(ph.at).toDateString() === new Date().toDateString();
+    const adv = today ? photoAdvice({ items, protein: t.protein ?? 0, mealWord, mealKcal: sizeRef ?? null, big: bigN, nutrition: nutri, day: dayLine, culinaryOk: dishNow?.status === "done" ? Boolean(dishNow.makesIt) : null, dish: dishOfMeal ? state.course : undefined, asked: true }) : null;
+    const slot = p.pick === "snack" ? null : pickSlot && mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : photoMeal ? { date: photoMeal.date, slotId: photoMeal.slot.id, name: photoMeal.slot.name, time: photoMeal.slot.time } : mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : null;
+    const pick = (x: "all" | "half" | "part") => { setRvEat(x); setRvGrams(x === "all" ? String(total) : x === "half" ? String(Math.round(total / 2)) : ""); if (x === "part") window.setTimeout(() => document.querySelector<HTMLInputElement>("input.rv-grams")?.focus(), 0); };
+    const chip = (on: boolean, text: string, tap: () => void, cls = "") => (
+      <div key={text} role="radio" tabIndex={0} aria-checked={on} className={`pa-opt${on ? " on" : ""}${cls}`} onClick={tap} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } }}>{on && <span aria-hidden="true">✓</span>}{text}</div>);
+    const saved = !!ph.saved && state.meals.some((m) => m.id === ph.saved);
+    const done = () => {
+      if (planning) { if (!rvPlan) { clearPlate(); return; } const f = p.filling!; putInSlot(items); notify(w("plate.plannedFor", { slot: slotV(f) })); return; }
+      if (!rvEat) { clearPlate(); return; }
+      const g = Math.min(total, Math.round(Number(rvGrams) || 0));
+      if (g <= 0) { document.querySelector<HTMLInputElement>("input.rv-grams")?.focus(); return; }
+      const frac = g / total;
+      if (past) {
+        const f = p.filling!, title = (state.title || "").trim() && state.title !== "DaaM" ? state.title.trim() : autoTitle(items);
+        p.logEaten(frac < 1 ? items.map((i) => ({ ...i, grams: Math.max(1, Math.round(i.grams * frac)) })) : items, title, { date: f.date, slotId: f.slotId, name: f.name, time: f.time }, atMeal(f.date, f.time), f.mealId);
+        setState((s) => ({ ...s, items: [], portion: null, title: "", photo: undefined }));
+        p.setFilling(null); setStep("in"); setTab("plan"); notify(w("plate.isInEaten", { title, slot: slotV(f) })); return;
+      }
+      p.ateNow(plateMeal(), slot, { photo: ph.image, at: ph.who === "ate" ? ph.at : undefined, ...(frac < 1 ? { part: frac } : {}) });
+    };
+    const shots = [ph.image, ...(ph.more ?? [])], at = Math.min(shotAt, shots.length - 1);
+    return (
+      <section className="card plate-card read-view">
+        <div className="mp-big">
+          <div className="mp-big-img"><img src={shots[at]} alt={w("make.photoOfTheMeal")} /></div>
+          {shots.length > 1 && <div className="mp-shots" role="group" aria-label={w("make.photosOfTheMeal")}>{shots.map((src, k) => (
+            <button key={k} type="button" className={`mp-shot${k === at ? " on" : ""}`} aria-pressed={k === at} aria-label={w("make.photoN", { n: k + 1 })} onClick={() => setShotAt(k)}><img src={src} alt="" /></button>))}</div>}
+          {/* an amount is corrected here, by a tap on it */}
+          <div className="mp-tags">{items.map((i) => rvEdit === i.id
+            ? <span key={i.id} className="mp-tag-edit">{foodName(i.food).split(",")[0]} <input className="rv-amount" type="number" inputMode="numeric" min={1} autoFocus aria-label={w("plate.gramsOfFood", { food: foodName(i.food).split(",")[0] })} defaultValue={Math.round(i.grams)} onChange={(e) => { const g = Math.round(Number(e.target.value)); if (g > 0) updateItem(i.id, { grams: g }); }} onBlur={() => setRvEdit(null)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /> g</span>
+            : <button key={i.id} type="button" className="mp-tag" onClick={() => setRvEdit(i.id)}>{foodName(i.food).split(",")[0]} {i.est ? "~" : ""}{Math.round(i.grams)} g</button>)}</div>
+          <div className="mp-big-row"><small className="muted mp-big-say">{wn("plate.photoLine", items.length, { time: photoTime(ph.at) })}</small></div>
+          <div className="rv-change"><button type="button" className="pill pill-small pill-action" onClick={() => setState((s) => (s.photo ? { ...s, photo: { ...s.photo, view: undefined } } : s))}>{w("plate.changeTheFoods")}</button></div>
+        </div>
+        {readoutEl}
+        {numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
+        {p.ai.on && <PhotoSaid photo={ph} meal={mealSlot ? mealSlot.name : null} />}
+        {state.cooking?.length ? <small className="pt-cook"><b>{w("plate.forCooking")}</b> {state.cooking.join(", ")}</small> : null}
+        {adv && <div className="bubble mealan chef-line rv-chef"><p><b>{CHEF_NAME}:</b> {adv.line}</p></div>}
+        {planning ? (
+          <div className="pa-row rv-q rv-plan">
+            <small className="pa-row-q">{w("plate.isItForPlan")}</small>
+            <div className="pa-chips" role="group" aria-label={w("plate.isItForPlan")}>{chip(rvPlan, rvPlan ? w("plate.plannedForChip", { slot: slotV(p.filling!) }) : w("plate.planItFor", { slot: slotV(p.filling!) }), () => setRvPlan((x) => !x), " rv-plan-chip")}</div>
+          </div>
+        ) : (
+          <div className="pa-row rv-q rv-eat">
+            <small className="pa-row-q">{w("plate.didYouEatIt")}</small>
+            <div className="pa-chips" role="radiogroup" aria-label={w("plate.didYouEatIt")}>
+              {chip(rvEat === "all", w("plate.allOfIt"), () => pick("all"))}{chip(rvEat === "half", w("plate.half"), () => pick("half"))}{chip(rvEat === "part", w("plate.partOfIt"), () => pick("part"))}
+            </div>
+            {rvEat && <div className="rv-weight"><input className="search rv-grams" type="number" inputMode="numeric" min={1} max={total} aria-label={w("plate.gramsEaten")} value={rvGrams} onChange={(e) => { setRvGrams(e.target.value); const g = Math.round(Number(e.target.value)); setRvEat(g === total ? "all" : "part"); }} /><small className="muted">{w("plate.gOfTotal", { total })}</small></div>}
+          </div>
+        )}
+        <div className="button-row rv-go">
+          <button type="button" className="pill pill-small pill-action rv-save" disabled={saved} onClick={() => p.saveRead(plateMeal(), ph.image)}>{saved ? w("recipes.savedInMyRecipes") : w("make.saveInMyRecipes")}</button>
+          <button type="button" className="pill pill-small pill-primary rv-done" onClick={done}>{w("make.done")}</button>
+        </div>
+      </section>);
+  })() : null;
   if (step === "in" && inQuestion) return (<>{inHead}{!p.cookOpenAsk && <CookStrip p={p} />}{inQuestion}</>);
   if (step === "in")
     return (
@@ -1475,9 +1577,9 @@ export function JourneyScreen(p: AppApi) {
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
         {/* R11: a tap anywhere on the line opens its section; the pencil (or Done) stays the button for keyboards and readers */}
         <div className="plan-line" onClick={() => setLineOpen((v) => !v)}>
-          <span>{p.filling ? (p.filling.mode === "eat" ? w("plate.planLine", { meal: mealV(p.filling.name), time: p.filling.time }) : w(plateWhen === "past" ? "plate.slotLineEaten" : plateWhen === "plan" ? "plate.slotLinePlanning" : "plate.slotLineByPlan", { slot: slotTitleV(p.filling), time: p.filling.time })) + (items.some((i) => i.dish) ? ` · ${w("plate.aDish")}` : "") : lineNow}{shownTaste && <b className="plate-taste-line"> · {PLATE_TASTE_LINE[shownTaste]}</b>}</span>
+          <span>{p.filling ? (p.filling.mode === "eat" ? w("plate.planLine", { meal: mealV(p.filling.name), time: p.filling.time }) : w(plateWhen === "past" ? "plate.slotLineEaten" : plateWhen === "plan" ? "plate.slotLinePlanning" : "plate.slotLineByPlan", { slot: slotTitleV(p.filling), time: p.filling.time })) + (items.some((i) => i.dish) ? ` · ${w("plate.aDish")}` : "") : (linePhoto ?? lineNow)}{shownTaste && <b className="plate-taste-line"> · {PLATE_TASTE_LINE[shownTaste]}</b>}</span>
           {lineOpen
-            ? <button className="link plan-line-done" onClick={(e) => { e.stopPropagation(); setLineOpen(false); }}>{w("make.done")}</button>
+            ? <button className="pill pill-small pill-primary plan-line-done" onClick={(e) => { e.stopPropagation(); setLineOpen(false); }}>{w("make.done")}</button>
             : <button className="icon plan-line-pen" aria-label={w("make.changeWhatThisPlateIs")} aria-expanded={lineOpen} onClick={(e) => { e.stopPropagation(); setLineOpen(true); }}><Pencil size={16} /></button>}
         </div>
         {lineOpen && (<>
@@ -1551,6 +1653,13 @@ export function JourneyScreen(p: AppApi) {
             <p className="small moment-hint">{p.travelTo ? w("plate.travelPlans", { place: REGIONS.some((r) => r.id === p.travelTo) ? regionV(p.travelTo!) : "" }) : w("make.pickThePlaceAndChef")}</p>
           </>
         )}
+        {photoScreen ? (
+        <section className="card plate-card photo-screen">
+          <PhotoAsk key={p.photoAsk!.at + p.photoAsk!.image.length} image={p.photoAsk!.image} at={p.photoAsk!.at} taken={p.photoAsk!.taken} drop={p.dropPhotoAsk} exploring={p.pick === "exploring"}
+            mealAt={(d) => { const sl = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return sl ? sl.name.toLowerCase() : null; }}
+            look={p.lookAtPhoto} read={(x) => { void p.readMealPhoto(p.photoAsk!.image, { ...x, ...(p.photoAsk!.more?.length ? { more: p.photoAsk!.more } : {}) }); }} />
+        </section>
+        ) : readView ? readCard : (<>
         {/* R17 (0.2.45, board RS16): an empty plate asks what you crave, and finds it. DT301 (0.3.149, board Stories223): under
             the meal line, which now comes first and says what this plate is for */}
         {!p.filling && !imported && items.length === 0 && !inFlow && <CravingSearch p={p} need={mealNeed} target={pdRef} onFood={add} />}
@@ -1574,11 +1683,7 @@ export function JourneyScreen(p: AppApi) {
             </section>); })()}
         {inFlow ? <RecipeInFlow flow={recipeIn} put={(f) => void putRead(f)} /> : (
         <section className="card plate-card">
-        {/* DT131: the question about foods landing on this plate shows alone now, above (DT212 v4, gap 5) */}
-        {/* DT130 (0.2.110, board Stories78, DT130c): a photo from Your photos asks whose plate, and when, before the read */}
-        {p.photoAsk && <PhotoAsk key={p.photoAsk.at + p.photoAsk.image.length} image={p.photoAsk.image} at={p.photoAsk.at} drop={p.dropPhotoAsk} exploring={p.pick === "exploring"}
-          mealAt={(d) => { const s = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return s ? s.name.toLowerCase() : null; }}
-          look={p.lookAtPhoto} read={(x) => { void p.readMealPhoto(p.photoAsk!.image, x); }} />}
+        {/* DT305 (0.3.151): the photo screen stands alone now, above */}
         {/* DT242 (0.3.96, board Stories182): the answer was lost twice (read again once by itself): the photo is kept, Try again */}
         {p.photoLost && (
           <section className="mp-none mp-lost" aria-label={say("photoLost")}>
@@ -1719,19 +1824,7 @@ export function JourneyScreen(p: AppApi) {
             <span className="in-cooked">{triedNote(way)}</span>
           </div>
         )}
-        {items.length > 0 && (
-          <section className={`readout readout-fit-${p.fitPd(pd)}`}>
-            <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? w("make.theWholeRecipe") : mealSlot ? mealName(mealSlot.name) : madeBy || (imported && mealNeed) ? w("plate.thisMeal", { meal: mealW }) : w("plate.asItStands")}</span><span>{pdTag()}</span></div>
-            <div className="readout-mid">
-              <b>{pdVal(pd)}</b>
-              {/* DT93, rule 3: a plate far over the meal says so, instead of going to the maths */}
-              <div><span>{tooBig ? w("plate.notYet", { meal: mealW }) : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? w("plate.fitsPlan") : w("plate.underYour", { gap: fixed(pdRef - pd), target: fixed(pdRef) })) : w("plate.noTarget")}</span><small className="rd-rows"><span>{w("plate.energy")}</span><b>{fmt(t.calories, 0)}</b> <span>{w("plate.kcal")}</span><span>{w("plate.weight")}</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>{w("plate.protein")}</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
-            </div>
-            {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
-            {/* DT116 (0.2.98) and 0.2.99: the letters with their grams, one block; sugars, saturates and salt in the tap */}
-            {p.rates ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who={w("letters.thePlate")} extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)}
-          </section>
-        )}
+        {readoutEl}
         {items.length > 0 && numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
         {/* DT301 (0.3.149, board Stories223): an empty plate shows a plate with Nothing on the plate yet, and the four ways as
             tiles in two rows, icon above the word, under the heading Add a food. With foods on the plate the ways stay as they were. */}
@@ -2158,6 +2251,7 @@ export function JourneyScreen(p: AppApi) {
           <button className="link all-foods" onClick={() => setTab("foods")}>{wn("plate.seeAll", state.foods.length)}</button>
         )}
 
+        </>)}
       </>
     );
 

@@ -95,7 +95,7 @@ export const mealsOn = (kcal: number, mealKcal: number | null | undefined): numb
 
 // Chef Mealan's one line, by code, from what the gates and the size said; the first button is the advice
 export type Advice = { line: string; first: "all" | "half" | "add" | "portion" };
-export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord: string; mealKcal: number | null; big: number; nutrition: GateLine; day: GateLine; culinaryOk: boolean | null; snackKcal?: number; dish?: import("./served").Dish }): Advice {
+export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord: string; mealKcal: number | null; big: number; nutrition: GateLine; day: GateLine; culinaryOk: boolean | null; snackKcal?: number; dish?: import("./served").Dish; asked?: boolean }): Advice {
   const k = kcalRange(x.items), kcal = aboutKcal(k), prot = w("photo.gProtein", { n: Math.round(x.protein) }), meal = mealV(x.mealWord, true);
   // the gates' lines, read without relying on narrowing (this project builds without strictNullChecks)
   type No = { ok: false; why: string; ways: string[] };
@@ -106,13 +106,14 @@ export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord:
   if (x.big >= 2) return { line: w(n.ok ? "photo.portions" : "photo.portionsWhy", { big: x.big, meal, kcal, mealKcal: r10(x.mealKcal ?? 0), why: nWhy }), first: "portion" };
   // B144 (0.3.150, board Stories225): a starter, a side, a dessert or a drink is one dish of the meal, never judged as the whole
   // meal: it is not a snack for being small, and not a full meal either; the card only asks
-  if (x.dish && x.dish !== "main") return { line: w("photo.didYouEat", { kcal: cap(kcal), prot }), first: "all" };
+  // DT305 (0.3.151): on the read the question stands in its own block (asked), so his word does not ask it again
+  if (x.dish && x.dish !== "main") return { line: w(x.asked ? "photo.kcalProt" : "photo.didYouEat", { kcal: cap(kcal), prot }), first: "all" };
   if (x.mealKcal && k.kcal < Math.max(150, x.mealKcal * 0.4)) return { line: w("photo.snack", { meal, kcal, prot }), first: "all" };
   if (!n.ok && nWays.includes("protein")) return { line: w("photo.addProtein", { why: nWhy, meal, kcal, prot }), first: "add" };
   if (!n.ok) return { line: w("photo.asItStands", { why: nWhy, kcal, prot }), first: "all" };
   // DT212 v4 (0.3.53): the eating window is said once, by Chef Mealan's checks above (Your day); the card only asks
   // DT243: the window's line is known by its way ("window"), not its English words, so it holds in every language
-  if (!d.ok && dWays.includes("window")) return { line: w("photo.didYouEat", { kcal: cap(kcal), prot }), first: "all" };
+  if (!d.ok && dWays.includes("window")) return { line: w(x.asked ? "photo.kcalProt" : "photo.didYouEat", { kcal: cap(kcal), prot }), first: "all" };
   if (!d.ok) return { line: w("photo.dayWhy", { why: dWhy, kcal: cap(kcal), prot }), first: "all" };
   return { line: w(x.culinaryOk ? "photo.eatAsIsDish" : "photo.eatAsIs", { kcal: cap(kcal), prot, meal }), first: "all" };
 }

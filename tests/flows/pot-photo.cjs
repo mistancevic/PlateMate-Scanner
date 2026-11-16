@@ -5,6 +5,10 @@
 // dish, the plate gets those foods as its rows; the cooking foods are named and not counted. Under the photo, what you chose and
 // what you said stay in view. The whole pot becomes a recipe with portions, opened as a whole recipe is. A starter is one dish of
 // the meal and is not judged as the whole meal. Wrong foods? opens the same form again, with your answers. The reads are stand-ins.
+// Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 15 November 22:43 "one step less", 16 November
+// Go 11:35): the dish row left the photo screen: Chef Mealan's guess of the dish goes with the read and shows under the photo.
+// The box asks Anything Chef Mealan should know?. After a read of your own portion the read shows alone; Change the foods
+// opens the plate, where Wrong foods? still has both rows.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -48,10 +52,10 @@ const READ = (portion) => ({ dish: "Creamy mushroom vegetable soup", foods: [f("
     let { ctx, page } = await open();
     const pa = page.locator(".pa");
     ok(/It looks like a pot\. How much of it is yours\?/.test(await pa.locator(".pa-share").innerText()) && (await on(pa.locator(".pa-share"))).join() === "The whole pot", "a pot: the form asks how much of it is yours, The whole pot ticked");
-    ok(/Which dish of your dinner is it\?/.test(await pa.locator(".pa-dish").innerText()) && (await pa.locator(".pa-dish .pa-opt").allInnerTexts()).map((t) => t.replace("✓", "").trim()).join("|") === "Starter|Main dish|Side|Dessert" && (await on(pa.locator(".pa-dish"))).join() === "Starter", "which dish of your dinner: Starter, Main dish, Side, Dessert, Chef Mealan's guess ticked");
-    ok(await pa.locator(".pa-note textarea").count() === 1 && /Tell Chef Mealan what is in it, if you like/.test(await pa.innerText()), "your words have a box with room for a list");
+    ok(await pa.locator(".pa-dish").count() === 0, "DT305: the photo screen does not ask which dish it is");
+    ok(await pa.locator("textarea").count() === 1 && /Anything Chef Mealan should know\?/.test(await pa.innerText()), "your words have a box with room for a list");
     ok(await pa.locator(".pa-row .pa-opt").evaluateAll((xs) => xs.every((x) => x.getBoundingClientRect().height >= 44)), "every chip of the new rows is 44 px or more");
-    await pa.locator(".pa-note textarea").fill(WORDS);
+    await pa.locator("textarea").fill(WORDS);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     ok(sent.length === 1 && sent[0].share === "whole" && sent[0].course === "starter" && sent[0].note === WORDS, "the read gets your answers and your words: " + JSON.stringify(sent[0]).slice(0, 80));
     let st = await store(page);
@@ -64,14 +68,15 @@ const READ = (portion) => ({ dish: "Creamy mushroom vegetable soup", foods: [f("
     await ctx.close();
     // ---- my portion ----
     ({ ctx, page } = await open());
-    await page.locator(".pa-share .pa-opt").nth(1).click(); await page.locator(".pa-note textarea").fill(WORDS);
+    await page.locator(".pa-share .pa-opt").nth(1).click(); await page.locator(".pa-screen textarea").fill(WORDS);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     st = await store(page);
     ok(sent[sent.length - 1].share === "portion" && st.items.length === 6 && !st.photo.pot && !st.fromRecipe && st.items[0].grams === 100 && st.course === "starter", "My portion: the six foods at one portion's amounts, no recipe made");
     t = (await page.locator("main").innerText()).replace(/\s+/g, " ");
     ok(/My portion · Starter of your dinner/.test(t) && /For cooking, not counted:/.test(t), "My portion · Starter of your dinner, and the cooking foods");
     ok(!/This is a snack, not your dinner/.test(t) && !/More than half of this dinner's energy is fat/.test(t) && /Did you eat it\?/.test(t), "a starter is one dish of the dinner: not called a snack, not judged as the whole dinner; the card only asks");
-    // Wrong foods? opens the same form, with your answers
+    // Wrong foods? opens the same form, with your answers (DT305: on the plate, behind Change the foods)
+    await page.locator(".rv-change .pill").click(); await page.waitForTimeout(600);
     await page.locator(".mp-again-link").click(); await page.waitForTimeout(300);
     const help = page.locator(".mp-help");
     ok((await on(help.locator(".pa-share"))).join() === "My portion" && (await on(help.locator(".pa-dish"))).join() === "Starter" && await help.locator("textarea").inputValue() === WORDS, "Wrong foods? opens the same form again, with your answers in it");
@@ -81,10 +86,10 @@ const READ = (portion) => ({ dish: "Creamy mushroom vegetable soup", foods: [f("
     await ctx.close();
     // ---- a plate, and a look that did not answer: no pot row; Main dish ticked ----
     ({ ctx, page } = await open({ vessel: "plate", course: "main" }));
-    ok(await page.locator(".pa .pa-share").count() === 0 && (await on(page.locator(".pa .pa-dish"))).join() === "Main dish", "a plate: no pot row; Main dish ticked");
+    ok(await page.locator(".pa .pa-share").count() === 0 && await page.locator(".pa .pa-dish").count() === 0, "a plate: no pot row, no dish row");
     await ctx.close();
     ({ ctx, page } = await open(null));
-    ok(await page.locator(".pa .pa-share").count() === 0 && (await on(page.locator(".pa .pa-dish"))).join() === "Main dish" && await page.getByRole("button", { name: "Read the plate" }).count() === 1, "the first look did not answer: the form still works, Main dish ticked");
+    ok(await page.locator(".pa .pa-share").count() === 0 && await page.locator(".pa .pa-dish").count() === 0 && await page.getByRole("button", { name: "Read the plate" }).count() === 1, "the first look did not answer: the photo screen still works");
     await ctx.close();
   } catch (e) { ok(false, "walkthrough crashed: " + (e && e.message)); }
   ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
