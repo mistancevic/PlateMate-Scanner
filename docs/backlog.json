@@ -1254,7 +1254,8 @@
       "title": "The meal line of a photo from between meals falls back to the clock",
       "epic": "trust",
       "state": "next",
-      "why": "Coach Milan 16 November, his test of 0.3.151 (first drawn as bug 2 of B146; 17:39: unrelated, its own card, to be discussed separately, with every step connected to the next). A photo from yesterday 15:57, between lunch and dinner, shows Dinner, 20:00 by the clock; with a snack in the day it says Snack. Proposed rule, not approved: inside a meal's time, that meal; between meals with the meal before it not eaten, that meal, later than planned; that meal already eaten, Snack. Drawing in work; no Go."
+      "why": "Coach Milan 16 November, his test of 0.3.151 (first drawn as bug 2 of B146; 17:39: unrelated, its own card, to be discussed separately, with every step connected to the next). A photo from yesterday 15:57, between lunch and dinner, shows Dinner, 20:00 by the clock; with a snack in the day it says Snack. Proposed rule, not approved: inside a meal's time, that meal; between meals with the meal before it not eaten, that meal, later than planned; that meal already eaten, Snack. Drawn on its own board, one row per case from the Plate to the read: lunch not eaten yet, lunch already eaten, inside a meal's time (no change). Not approved; no Go.",
+      "board": "Stories236"
     },
     {
       "id": "DT307",

@@ -121,18 +121,6 @@ row("1 new", "The same steps, fixed", [
   ("The order", "The question stays after the read, where it can name what the photo holds (Coach Milan 17:26: before reading, a warning that a decision will come)."),
   ("Languages", "Six new lines, in English, Serbian and German."),
 ], [("The Plate", "u_a", "same", "Your Plate holds the soup."), ("The camera", "u_b", "same", "Tap: Photo of my meal."), ("The photo screen", "p1c", "changed", "Tap: Your photos, the photo."), ("The decision, 0.3.151", "p1d", "now", "Tap: Read the plate."), ("The decision, fixed", "p1g", "changed", "The same step, fixed."), ("The read", "p1e", "same", "Tap: Start a new plate.")], nid="B146.1", at=3)
-row("2 now", "B146, bug 2: the meal line, in 0.3.151", [
-  ("Path", "Plate. Photo of my meal. Your photos, a photo from yesterday, 15:57. The photo screen."),
-  ("What goes wrong", "15:57 is between that day's meals (breakfast, lunch, dinner). The line falls back to the clock and says Dinner, 20:00 by the clock. Red: the meal line. With a snack in your day, as on your phone, it says Snack."),
-], [PL, ("The camera", "y_b", "same", "Tap: Photo of my meal."), ("The photo screen", "u_e", "now", "Tap: Your photos, the photo.")], nid="B146.2")
-row("2 new", "The same steps, fixed: the meal line follows that day", [
-  ("The rule", "The photo's time is checked against that day's meals and against what you already ate that day."),
-  ("Inside a meal's time", "That meal, as in 0.3.151: Dinner, yesterday at 19:40."),
-  ("Between meals, the meal before it still open", "That meal, later than planned: Lunch, yesterday at 15:57, later than planned. Frame g."),
-  ("Between meals, that meal already eaten", "Snack: Snack, yesterday at 15:57. Frame h."),
-  ("The pencil", "It changes the day and the meal, as today."),
-  ("Languages", "One new line (later than planned), in English, Serbian and German."),
-], [PL, ("The camera", "y_b", "same", "Tap: Photo of my meal."), ("The photo screen, lunch still open", "u_f", "changed", "Tap: Your photos, the photo."), ("The photo screen, lunch eaten", "u_g", "changed", "The same photo, with yesterday's lunch eaten.")], nid="B146.2", at=3)
-board("Stories235.dc.html", "After the test of 0.3.151: the one board. Point 1: B146, the two bugs",
-  "16 November 2026 (Coach Milan 17:04: we have a mess; point by point, each resolved onto one separate board). 17:11: a plate that is already there must be asked about; 17:16: that belongs to B146. Each point changes one thing; everything else in its frames is 0.3.151 as it is. Points still to come: a way back and Cancel, fewer boxes and the photo's size, the pot question, Save in My recipes as a tick. Drawn for approval.",
+board("Stories235.dc.html", "After the test of 0.3.151: the one board. Point 1: B146, built in 0.3.152",
+  "16 November 2026 (Coach Milan 17:04: we have a mess; point by point, each resolved onto one separate board). Point 1 is B146: a photo onto a plate that has foods. Go 17:39; built as drawn in version 0.3.152. The meal line bug that stood here as bug 2 is its own card, B147, on its own board (17:39). Points still to come, each to be drawn here and approved: a way back and Cancel, fewer boxes and the photo's size, the pot question, Save in My recipes as a tick.",
   B, W, y - 100, "Stories234.dc.html")
