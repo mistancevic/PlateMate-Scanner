@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.152",
     "0.3.151",
     "0.3.150",
     "0.3.149",
@@ -1238,6 +1239,30 @@
       "state": "now",
       "board": "Stories226",
       "why": "Coach Milan 15 November 20:57, his test of 0.3.150: a photo read with no words showed For cooking, not counted: simmered, pureed. Those are methods, not foods he named. Drawn on Stories226; no Go yet. The board's other bug (the form asks a snack which dish it is) is gone with DT305: the dish row left the photo screen."
+    },
+    {
+      "id": "B146",
+      "title": "A photo onto a plate that has foods: the title of the old plate over the new photo, and a decision that read as the Plate",
+      "epic": "trust",
+      "state": "done",
+      "board": "Stories235, row 1 new",
+      "version": "0.3.152",
+      "why": "Coach Milan 16 November, his test of 0.3.151: the photo screen showed the name of the plate that was there (a soup) over a photo of pancakes. 17:11: a plate that is already there must be asked about. 17:21 to 17:31: the decision after the read misread as the Plate after the read; Remove the photo belongs beside the photo; say the issue and why the question, with a warning sign. Go 17:39. Built: with foods on the plate, the photo screen has an empty title (Chef Mealan names it; a name you type is kept for a new plate) and an amber warning with a warning sign: your plate is not empty, it has that plate, after the read you choose. After the read the decision is a screen of its own: Your plate is not empty with the sign and why you are asked, then The photo holds ... with Remove the photo beside the photo, then Add them to your plate, or start a new plate? with Add to my plate and Start a new plate. Six new lines in English, Serbian and German. Open, flagged: Start a new plate keeps only the new foods; the plate that was there is gone, not kept."
+    },
+    {
+      "id": "B147",
+      "title": "The meal line of a photo from between meals falls back to the clock",
+      "epic": "trust",
+      "state": "next",
+      "why": "Coach Milan 16 November, his test of 0.3.151 (first drawn as bug 2 of B146; 17:39: unrelated, its own card, to be discussed separately, with every step connected to the next). A photo from yesterday 15:57, between lunch and dinner, shows Dinner, 20:00 by the clock; with a snack in the day it says Snack. Proposed rule, not approved: inside a meal's time, that meal; between meals with the meal before it not eaten, that meal, later than planned; that meal already eaten, Snack. Drawing in work; no Go."
+    },
+    {
+      "id": "DT307",
+      "title": "After the test of 0.3.151, point by point on the one board: a way back and Cancel, fewer boxes, the pot question, Save in My recipes as a tick",
+      "epic": "trust",
+      "state": "next",
+      "board": "Stories235",
+      "why": "Coach Milan 16 November 15:49 to 17:04: Back at the top left stays, a second Back at the bottom when there is a scroll, Cancel goes back to the default with nothing changed; buttons on top must not push the content down (a light top row); fewer boxes, the photo not smaller; the pot question (How much of it do you eat? All of it, A part of it, with grams); Save in My recipes as a tick. 17:04: we have a mess; point by point, each resolved on one board. Earlier drawings Stories232 to 234. Also noted for later cards: the automatic photo in the camera's Meal mode and Group not firing (to reproduce); using what the app knows about a photo and asking if it is correct. No Go on any point."
     },
     {
       "id": "DT304",

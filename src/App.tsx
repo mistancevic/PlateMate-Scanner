@@ -5,7 +5,7 @@ import { openOf } from "./applications";
 import { wx } from "./wx";
 import { weekdayName } from "./weekdayWords";
 import { eatsForReq, installEats, type Eats } from "./eats";
-import { useLang, getLang } from "./lang";
+import { useLang, getLang, locOf } from "./lang";
 import { TravelBanner } from "./components/Travel";
 import { CalendarSync } from "./components/Calendar";
 import { askToken, dropCalendar } from "./calendarSync";
@@ -2514,7 +2514,7 @@ export default function App() {
     lookAtPhoto: async (image: string) => {
       try { const d: any = await api("/api/plate-look", { image: await resizeImageBase64(image, 640, 640) }); return d && typeof d.vessel === "string" ? { vessel: d.vessel as Vessel, course: dishOf(d.course) } : null; } catch { return null; }
     },
-    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: Dish }) => {
+    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: Dish; title?: string }) => {
       const more0 = (x?.more ?? []).slice(0, 3), note = (x?.note ?? "").replace(/\s+/g, " ").trim().slice(0, 300);
       setBusy(more0.length ? w("app.readingPhotos", { n: more0.length + 1 }) : w("app.readingYourPlate"));
       try {
@@ -2566,6 +2566,8 @@ export default function App() {
         const potId = potNow ? (again && state.photo?.pot && state.meals.some((m) => m.id === state.photo!.pot) ? state.photo.pot : uid()) : undefined;
         const course = x?.dish && x.dish !== "main" && who !== "idea" ? x.dish : undefined;
         const photo: NonNullable<PilotState["photo"]> = { image: thumb, at, unsure: potNow ? null : read.unsure, ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}) };
+        // B146 (0.3.152): a name typed on the photo screen is kept for a new plate
+        const named = (x?.title ?? "").trim();
         const land = (how: "add" | "new") => {
           // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
           // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
@@ -2588,12 +2590,15 @@ export default function App() {
             setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, meals: s.meals.some((m) => m.id === potId) ? s.meals.map((m) => (m.id === potId ? { ...m, ...pot, savedAt: m.savedAt } : m)) : [pot, ...s.meals],
               items: [], portion: null, title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo, recorded: undefined, course, openRecipe: potId }));
           }
-          else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dishLocal || read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: read.cooking?.length ? read.cooking : undefined, cookingFor: read.cooking?.length ? items.map((i) => i.food.id) : undefined, photo, recorded: undefined, course }));
+          else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: named || read.dishLocal || read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: read.cooking?.length ? read.cooking : undefined, cookingFor: read.cooking?.length ? items.map((i) => i.food.id) : undefined, photo, recorded: undefined, course }));
           setKind("meal"); setStep("in");
         };
         setPhotoAsk(null);
         if (x?.replace) { land("new"); setTab("journey"); log("meal_photo", { foods: items.length, again: true }); return true; }
-        askPlate({ kind: "photo", what: wn("app.photoRead", items.length, { list: items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ") }), image: thumb, apply: land });
+        { const parts = items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`);
+          // B146: what the photo holds, as a list in words (pancakes ~180 g and raspberries ~30 g), for the decision screen
+          let holds = parts.join(", "); try { holds = new (Intl as any).ListFormat(locOf(getLang()), { style: "long", type: "conjunction" }).format(parts); } catch { /* an old phone: the commas */ }
+          askPlate({ kind: "photo", what: wn("app.photoRead", items.length, { list: parts.join(", ") }), image: thumb, holds, apply: land }); }
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
         log("meal_photo", { foods: items.length, unsure: Boolean(read.unsure), who: x?.who ?? "camera" });
         return true;

@@ -5,7 +5,8 @@ import type { ScannerMode } from "../types";
 export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more" | "explorer";
 // DT285 (0.3.139): the same photo already a meal of that day: Update that meal, or Keep both
 export type SameAsk = { earlier: import("../pilot").Feedback; update: () => void; both: () => void };
-export type PlateAsk = { kind: "photo" | "recipe" | "slot" | "food"; what: string; image?: string; apply: (how: "add" | "new") => void };
+// B146 (0.3.152): holds is what a photo read, as a list in words; with it the question shows as a screen of its own
+export type PlateAsk = { kind: "photo" | "recipe" | "slot" | "food"; what: string; image?: string; holds?: string; apply: (how: "add" | "new") => void };
 export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "summary" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share" | "explorer" | "calendar" | "admin" | "settings" | "voice" | "dev" | "language" | "delete" | "howto";
 // the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
 // mode: "plan" fills the slot on Put it in; "eat" (from Today) records the meal for the slot on Save
@@ -33,7 +34,7 @@ export interface AppApi {
   peekBarcode: (code: string) => Promise<DbProduct | null>;
   // DT115 (0.2.97): the members' catalogue
   lookAtPhoto: (image: string) => Promise<{ vessel: import("../mealPhoto").Vessel; course: import("../served").Dish } | null>;
-  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: import("../served").Dish }) => Promise<boolean>;
+  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: import("../served").Dish; title?: string }) => Promise<boolean>;
   // DT268 (0.3.118): Served plates
   keepServed: (next: import("../served").Served) => void;
   servedPatch: (id: string, patch: Partial<Pick<import("../served").Served, "name" | "dish" | "mine">>) => void;

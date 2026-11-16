@@ -21,6 +21,8 @@ export const CHEF = {
   plateSaveOrClear: (foods: number, since: Date | null, dish: string) => `Your plate has ${n(foods, "food")}, from ${since ? agoWords(since) : "now"}. ${dish} starts on its own plate. Shall I save yours for later, or clear it?`,
   plateAddOrNew: (foods: number, title: string, what: string) => `Your plate already has ${n(foods, "food")}${title ? `: ${title}` : ""}. ${what} Start a new plate with it, or add it to yours?`,
   // DT258 (0.3.112, board Stories193): the same with a photo's foods, its own line, so each language says the whole sentence
+  // B146 (0.3.152, board Stories235, frame h): on the decision screen he says what the photo holds; the issue stands above him
+  plateHolds: (list: string) => `The photo holds ${list}.`,
   plateAddPhoto: (foods: number, title: string, what: string) => `Your plate already has ${n(foods, "food")}${title ? `: ${title}` : ""}. ${what} Add them to yours, or start a new plate with them?`,
   whereGoes: () => "Where does this go?",
   // ---- cooking ----
@@ -91,6 +93,7 @@ export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
   photoHere: (from: string) => ({ from }),
   plateAddOrNew: addOrNew,
   plateAddPhoto: addOrNew,
+  plateHolds: (list: string) => ({ list }),
   busyMeal: (meal: string, time: string, block: string, day: string) => ({ meal: mealIn(meal), time, block, day: dayIn(local(), day) }),
   busyLate: late,
   busyLateAhead: (until: string, meal: string, time: string, free: number, quick: string, day: string) => ({ ...late(until, meal, time, free, quick), day: dayIn(local(), day) }),
@@ -116,7 +119,7 @@ export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
 // the slots each line takes, by name: the Serbian line names each of them once or more, and no other (the release check, the table)
 export const SR_ALLOWED: Partial<Record<ChefLineName, string[]>> = {
   photoWhose: ["from"], photoHere: ["from"], plateOldAte: ["when", "plate"], plateOldBeforeCook: ["when", "plate"], plateSaveOrClear: ["foods", "ago", "dish"],
-  plateAddOrNew: ["foods", "title", "what"], plateAddPhoto: ["foods", "title", "what"], scanWhileCooking: ["dish", "food"], useInCook: ["food", "dish"], resume: ["dish", "done"],
+  plateAddOrNew: ["foods", "title", "what"], plateAddPhoto: ["foods", "title", "what"], plateHolds: ["list"], scanWhileCooking: ["dish", "food"], useInCook: ["food", "dish"], resume: ["dish", "done"],
   howManyAte: ["made"], carryNow: ["minutes"], busyMeal: ["meal", "time", "block", "day"], busyLate: ["until", "meal", "time", "free", "quick"], busyLateAhead: ["until", "meal", "time", "free", "quick", "day"],
   busyCarry: ["block", "meal"], busyTraining: ["time", "block", "day"],
   cookOpen: ["cook", "dish"], plateFills: ["meal", "kcal"], secondDish: ["dish", "minutes", "prev", "meal"], recipeOther: ["from", "to"], cookOther: ["from", "to"],

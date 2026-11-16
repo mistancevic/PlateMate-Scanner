@@ -3405,3 +3405,13 @@ div.client-row { cursor: pointer; }
 .rv-weight { display: flex; align-items: center; gap: 10px; margin-top: 10px; } .rv-grams { width: 84px; min-height: 44px; text-align: center; font-weight: 800; }
 .rv-go { display: flex; gap: 8px; margin-top: 16px; } section.read-view .button-row.rv-go > .pill.pill-small { flex: 1; height: 44px; min-height: 44px; padding: 0 8px; }
 section.read-view .rv-change > .pill.pill-small, section.photo-screen .pa-remove.pill.pill-small, section.photo-screen .pa-say.pill.pill-small { height: 44px; min-height: 44px; }
+
+/* B146 (0.3.152, board Stories235): your plate is not empty: the warning before the read, and the decision after it */
+.warn-box { background: var(--close-soft); border: 1.5px solid var(--mid); color: var(--close-text); border-radius: 14px; padding: 10px 12px; font-size: 14px; line-height: 1.45; }
+.warn-box b { color: var(--close-text); }
+.plate-waits { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 12px; } .plate-waits svg { flex: none; margin-top: 1px; } .plate-waits b { display: block; margin-bottom: 2px; }
+.warn-title { display: flex; gap: 10px; align-items: center; } .warn-title svg { flex: none; color: var(--close-text); }
+.plate-ask-head .warn-box { margin-top: 8px; }
+.plate-ask-photo .chef-line-row { align-items: stretch; gap: 12px; } .plate-ask-photo .bubble .chef-line-img { width: 104px; height: 104px; border-radius: 14px; }
+section.plate-ask-photo .pa-keep.pill.pill-small { height: 44px; min-height: 44px; padding: 0 12px; white-space: nowrap; }
+.pa-ask-q { display: block; font-size: 16px; margin: 14px 0 4px; }
