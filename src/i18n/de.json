@@ -148,6 +148,10 @@
     "busyLateAhead": {
       "text": "Verplant bis {until}. {meal} um {time} lässt dir {free} zum Kochen. Etwas Schnelles zum {quick}, oder am {day} kochen und aufwärmen?",
       "checked": true
+    },
+    "plateHolds": {
+      "text": "Auf dem Foto: {list}.",
+      "checked": true
     }
   },
   "safety": {
@@ -22839,6 +22843,26 @@
     },
     "app.loggedForDay": {
       "text": "Eingetragen für {day}, {time}.",
+      "checked": true
+    },
+    "plate.notEmpty": {
+      "text": "Dein Teller ist nicht leer",
+      "checked": true
+    },
+    "plate.notEmptyLine": {
+      "text": "Dein Teller ist nicht leer.",
+      "checked": true
+    },
+    "plate.notEmptyAfter": {
+      "text": "Darauf ist: {plate}. Nach dem Lesen wählst du: die Lebensmittel vom Foto dazulegen oder einen neuen Teller beginnen.",
+      "checked": true
+    },
+    "plate.notEmptyWhy": {
+      "text": "Darauf ist schon: {plate}, und dein Foto bringt neue Lebensmittel. Sie kommen nicht von selbst auf den Teller: du entscheidest, wohin sie gehen.",
+      "checked": true
+    },
+    "plate.addOrNewQ": {
+      "text": "Zu deinem Teller dazulegen oder einen neuen Teller beginnen?",
       "checked": true
     }
   }

@@ -12,7 +12,7 @@ import { carriedLists } from "../carry";
 import { tasteForReq } from "../tasteChips";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { tempsIn } from "../units";
-import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon, Mic } from "lucide-react";
+import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon, Mic, TriangleAlert } from "lucide-react";
 import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn, foodOfRead, holdsMore } from "../mealPhoto";
 import { PhotoAsk, PotRows, dishWord } from "../components/PhotoAsk";
 import { photoWho, photoMealLine } from "../photoAsk";
@@ -1182,6 +1182,10 @@ export function JourneyScreen(p: AppApi) {
   const [rvGrams, setRvGrams] = useState("");
   const [rvPlan, setRvPlan] = useState(false);
   const [rvEdit, setRvEdit] = useState<string | null>(null);
+  // B146 (0.3.152, board Stories235, row 1 new; Coach Milan 16 November 17:39 Go): a photo you bring in starts with an empty
+  // title, whatever was on the Plate; a name typed there is kept for the read
+  const [photoTitle, setPhotoTitle] = useState("");
+  useEffect(() => { setPhotoTitle(""); }, [p.photoAsk?.at, p.photoAsk?.image]);
   useEffect(() => { setRvEat(null); setRvGrams(""); setRvPlan(false); setRvEdit(null); }, [state.photo?.at, state.photo?.image]);
   // DT249 (0.3.98, board Stories184; Coach Milan 7 November 06:01 to 06:14, Go): which photo of the meal is the big one
   const [shotAt, setShotAt] = useState(0);
@@ -1376,7 +1380,7 @@ export function JourneyScreen(p: AppApi) {
   // a plate that became Just looking or Don't count it is no longer the read: it is kept as Served, as before
   const readView = step === "in" && !p.photoAsk && state.photo?.view === "read" && state.photo.who !== "idea" && p.pick !== "exploring" && items.length > 0;
   const titleField = (placeholder: string) => ({ value: state.title === "DaaM" ? "" : state.title, placeholder, onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) });
-  const inHead = step === "in" ? (photoScreen ? stepHead({ n, title: "", bare: true, nameField: titleField(w("photoask.namesIt")) })
+  const inHead = step === "in" ? (photoScreen ? stepHead({ n, title: "", bare: true, nameField: { value: photoTitle, placeholder: w("photoask.namesIt"), onChange: (v: string) => setPhotoTitle(v) } })
           : readView ? stepHead({ n, title: "", bare: true, sub: w("plate.readSub"), nameField: titleField(autoTitle(items)) })
           : p.filling
           ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? w("make.asPlannedChangeWhatYou") : plateWhen === "past" ? w("plate.addingSub", { slot: slotV(p.filling) }) : plateWhen === "plan" ? w("plate.planningSub", { slot: slotV(p.filling) }) : w("make.nameItOrKeepThe") })
@@ -1409,6 +1413,10 @@ export function JourneyScreen(p: AppApi) {
   const plateIn: PlateIn = (l) => { const base = state.title && state.title !== "DaaM" ? state.title : foodsLineIn(l, items); return base === null ? null : state.photo ? wIn(l, "plate.fromPhoto", { plate: base }) : base; };
   const dayOf = since ? dayWord(new Date(state.photo?.at ?? since.toISOString())) : "";
   const dayOfV: Val = (l) => (since ? dayIn(l, new Date(state.photo?.at ?? since.toISOString())) : "");
+  // the plate that is there, by its name or its foods
+  const plateHas = state.title && state.title !== "DaaM" ? state.title : autoTitle(items);
+  // set when a question brings its own head (B146): the plate's title does not stand over it
+  let ownHead = false;
   const inQuestion = step !== "in" ? null
     // DT285 (0.3.139, board Stories212): the same photo already a meal of that day asks first
     : p.sameAsk ? (<section className="chef-ask same-ask-wrap" aria-label={w("make.yourPlateFromEarlier")}>{plateIsOld && since && <ChefLine image={state.photo?.image} text={say("plateOldAte", since, plateIn)} />}<SamePhotoAsk ask={p.sameAsk} answer={p.answerSameAsk} /></section>)
@@ -1456,6 +1464,17 @@ export function JourneyScreen(p: AppApi) {
     // foods about to land on a plate that has foods (DT131): add, or a new plate
     : p.plateAsk && items.length > 0 ? (() => {
       const a = p.plateAsk!, photo = a.kind === "photo";
+      // B146 (0.3.152, board Stories235, frame h): a photo onto a plate that has foods is a screen of its own. First the issue,
+      // with a warning sign: your plate is not empty, and why you are asked. Then what the photo holds, with Remove the photo
+      // beside the photo. Then the question and its two answers.
+      if (photo && a.holds && a.image) { ownHead = true; const why = w("plate.notEmptyWhy", { plate: "\u0001" }).split("\u0001"); return (<>
+        <div className="step-head plate-ask-head"><h2 className="warn-title"><TriangleAlert size={26} aria-hidden="true" />{w("plate.notEmpty")}</h2><div className="warn-box">{why[0]}<b>{plateHas}</b>{why[1] ?? ""}</div></div>
+        <section className="chef-ask pa plate-ask plate-ask-photo" aria-label={w("make.addToThisPlateOr")}>
+          <ChefLine image={a.image} text={say("plateHolds", a.holds)} side={<button type="button" className="pill pill-small pill-danger-line pa-keep" onClick={() => p.answerPlateAsk(null)}>{w("plate.dropPhoto")}</button>} />
+          <b className="pa-ask-q">{w("plate.addOrNewQ")}</b>
+          <div className="ca-go pa-go"><button type="button" className="pill pill-primary" onClick={() => p.answerPlateAsk("add")}>{w("plate.addToMine")}</button><button type="button" className="pill" onClick={() => p.answerPlateAsk("new")}>{w("plate.startNew")}</button></div>
+          <small>{w("plate.addOrNewHelpPhoto")}</small>
+        </section></>); }
       const add = <button key="add" type="button" className={`pill${photo ? " pill-primary" : ""}`} onClick={() => p.answerPlateAsk("add")}>{w("plate.addToMine")}</button>;
       const fresh = <button key="new" type="button" className={`pill${photo ? "" : " pill-primary"}`} onClick={() => p.answerPlateAsk("new")}>{w("plate.startNew")}</button>;
       return (
@@ -1565,7 +1584,7 @@ export function JourneyScreen(p: AppApi) {
         </div>
       </section>);
   })() : null;
-  if (step === "in" && inQuestion) return (<>{inHead}{!p.cookOpenAsk && <CookStrip p={p} />}{inQuestion}</>);
+  if (step === "in" && inQuestion) return (<>{ownHead ? null : inHead}{!p.cookOpenAsk && <CookStrip p={p} />}{inQuestion}</>);
   if (step === "in")
     return (
       <>
@@ -1653,11 +1672,14 @@ export function JourneyScreen(p: AppApi) {
             <p className="small moment-hint">{p.travelTo ? w("plate.travelPlans", { place: REGIONS.some((r) => r.id === p.travelTo) ? regionV(p.travelTo!) : "" }) : w("make.pickThePlaceAndChef")}</p>
           </>
         )}
+        {/* B146: your plate is not empty: a warning before the read that a decision comes after it */}
+        {photoScreen && items.length > 0 && (
+          <div className="warn-box plate-waits" role="note"><TriangleAlert size={20} aria-hidden="true" /><div><b>{w("plate.notEmptyLine")}</b>{w("plate.notEmptyAfter", { plate: plateHas })}</div></div>)}
         {photoScreen ? (
         <section className="card plate-card photo-screen">
           <PhotoAsk key={p.photoAsk!.at + p.photoAsk!.image.length} image={p.photoAsk!.image} at={p.photoAsk!.at} taken={p.photoAsk!.taken} drop={p.dropPhotoAsk} exploring={p.pick === "exploring"}
             mealAt={(d) => { const sl = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return sl ? sl.name.toLowerCase() : null; }}
-            look={p.lookAtPhoto} read={(x) => { void p.readMealPhoto(p.photoAsk!.image, { ...x, ...(p.photoAsk!.more?.length ? { more: p.photoAsk!.more } : {}) }); }} />
+            look={p.lookAtPhoto} read={(x) => { void p.readMealPhoto(p.photoAsk!.image, { ...x, ...(p.photoAsk!.more?.length ? { more: p.photoAsk!.more } : {}), ...(photoTitle.trim() ? { title: photoTitle.trim() } : {}) }); }} />
         </section>
         ) : readView ? readCard : (<>
         {/* R17 (0.2.45, board RS16): an empty plate asks what you crave, and finds it. DT301 (0.3.149, board Stories223): under

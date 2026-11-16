@@ -5709,6 +5709,12 @@
     "screen.plate.plannedFor": {"en":"Planned for {slot}. It's on Plan.","area":"The Plate","where":"The Plate","release":"0.3.151"},
     "screen.photo.kcalProt": {"en":"{kcal} and {prot}.","area":"The Plate","where":"The Plate","release":"0.3.151"},
     "screen.app.loggedForYesterday": {"en":"Logged for yesterday, {time}.","area":"Words used across the app","where":"Across the app","release":"0.3.151"},
-    "screen.app.loggedForDay": {"en":"Logged for {day}, {time}.","area":"Words used across the app","where":"Across the app","release":"0.3.151"}
+    "screen.app.loggedForDay": {"en":"Logged for {day}, {time}.","area":"Words used across the app","where":"Across the app","release":"0.3.151"},
+    "chef.plateHolds": {"en":"The photo holds {list}.","area":"The Plate","where":"A photo onto a plate that has foods: what the photo holds","release":"0.3.152"},
+    "screen.plate.notEmpty": {"en":"Your plate is not empty","area":"The Plate","where":"The Plate","release":"0.3.152"},
+    "screen.plate.notEmptyLine": {"en":"Your plate is not empty.","area":"The Plate","where":"The Plate","release":"0.3.152"},
+    "screen.plate.notEmptyAfter": {"en":"It has {plate}. After the read you choose: add the photo's foods to it, or start a new plate.","area":"The Plate","where":"The Plate","release":"0.3.152"},
+    "screen.plate.notEmptyWhy": {"en":"It already has {plate}, and your photo brings new foods. They cannot land on the plate by themselves: you decide where they go.","area":"The Plate","where":"The Plate","release":"0.3.152"},
+    "screen.plate.addOrNewQ": {"en":"Add them to your plate, or start a new plate?","area":"The Plate","where":"The Plate","release":"0.3.152"}
   }
 }

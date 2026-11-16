@@ -148,6 +148,10 @@
     "busyLateAhead": {
       "text": "Zauzet si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}, ili da skuvaš u {day} i podgreješ?|Zauzeta si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}, ili da skuvaš u {day} i podgreješ?",
       "checked": true
+    },
+    "plateHolds": {
+      "text": "Na fotografiji: {list}.",
+      "checked": true
     }
   },
   "safety": {
@@ -22839,6 +22843,26 @@
     },
     "app.loggedForDay": {
       "text": "Zapisano za: {day}, {time}.",
+      "checked": true
+    },
+    "plate.notEmpty": {
+      "text": "Tvoj tanjir nije prazan",
+      "checked": true
+    },
+    "plate.notEmptyLine": {
+      "text": "Tvoj tanjir nije prazan.",
+      "checked": true
+    },
+    "plate.notEmptyAfter": {
+      "text": "Na njemu je: {plate}. Posle čitanja biraš: dodaj namirnice sa fotografije na njega ili počni novi tanjir.",
+      "checked": true
+    },
+    "plate.notEmptyWhy": {
+      "text": "Na njemu je već: {plate}, a fotografija donosi nove namirnice. One ne mogu same na tanjir: ti biraš gde idu.",
+      "checked": true
+    },
+    "plate.addOrNewQ": {
+      "text": "Dodati ih na tvoj tanjir ili početi novi tanjir?",
       "checked": true
     }
   }

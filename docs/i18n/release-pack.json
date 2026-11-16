@@ -1,6 +1,6 @@
 {
-  "release": "0.3.151",
-  "at": "2026-11-16T10:59:10.571Z",
+  "release": "0.3.152",
+  "at": "2026-11-16T16:43:36.850Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -49430,6 +49430,115 @@
       "release": "0.3.151",
       "order": 900006,
       "at": "2026-11-16T10:59:10.571Z"
+    },
+    {
+      "id": "chef.plateHolds",
+      "kind": "chef",
+      "key": "plateHolds",
+      "en": "The photo holds {list}.",
+      "forms": "chef",
+      "slots": [
+        "list"
+      ],
+      "later": false,
+      "area": "The Plate",
+      "where": "A photo onto a plate that has foods: what the photo holds",
+      "sr": "Na fotografiji: {list}.",
+      "de": "Auf dem Foto: {list}.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.152",
+      "order": 900000,
+      "at": "2026-11-16T16:43:36.850Z"
+    },
+    {
+      "id": "screen.plate.notEmpty",
+      "kind": "screen",
+      "key": "plate.notEmpty",
+      "en": "Your plate is not empty",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Tvoj tanjir nije prazan",
+      "de": "Dein Teller ist nicht leer",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.152",
+      "order": 900001,
+      "at": "2026-11-16T16:43:36.850Z"
+    },
+    {
+      "id": "screen.plate.notEmptyLine",
+      "kind": "screen",
+      "key": "plate.notEmptyLine",
+      "en": "Your plate is not empty.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Tvoj tanjir nije prazan.",
+      "de": "Dein Teller ist nicht leer.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.152",
+      "order": 900002,
+      "at": "2026-11-16T16:43:36.850Z"
+    },
+    {
+      "id": "screen.plate.notEmptyAfter",
+      "kind": "screen",
+      "key": "plate.notEmptyAfter",
+      "en": "It has {plate}. After the read you choose: add the photo's foods to it, or start a new plate.",
+      "forms": "plain",
+      "slots": [
+        "plate"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Na njemu je: {plate}. Posle čitanja biraš: dodaj namirnice sa fotografije na njega ili počni novi tanjir.",
+      "de": "Darauf ist: {plate}. Nach dem Lesen wählst du: die Lebensmittel vom Foto dazulegen oder einen neuen Teller beginnen.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.152",
+      "order": 900003,
+      "at": "2026-11-16T16:43:36.850Z"
+    },
+    {
+      "id": "screen.plate.notEmptyWhy",
+      "kind": "screen",
+      "key": "plate.notEmptyWhy",
+      "en": "It already has {plate}, and your photo brings new foods. They cannot land on the plate by themselves: you decide where they go.",
+      "forms": "plain",
+      "slots": [
+        "plate"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Na njemu je već: {plate}, a fotografija donosi nove namirnice. One ne mogu same na tanjir: ti biraš gde idu.",
+      "de": "Darauf ist schon: {plate}, und dein Foto bringt neue Lebensmittel. Sie kommen nicht von selbst auf den Teller: du entscheidest, wohin sie gehen.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.152",
+      "order": 900004,
+      "at": "2026-11-16T16:43:36.850Z"
+    },
+    {
+      "id": "screen.plate.addOrNewQ",
+      "kind": "screen",
+      "key": "plate.addOrNewQ",
+      "en": "Add them to your plate, or start a new plate?",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Dodati ih na tvoj tanjir ili početi novi tanjir?",
+      "de": "Zu deinem Teller dazulegen oder einen neuen Teller beginnen?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.152",
+      "order": 900005,
+      "at": "2026-11-16T16:43:36.850Z"
     }
   ]
 }
