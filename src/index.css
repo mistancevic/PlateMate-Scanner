@@ -3385,3 +3385,23 @@ div.client-row { cursor: pointer; }
 .l-consent.l-bad { outline: 2px solid var(--low-text); outline-offset: 4px; border-radius: 8px; }
 .l-req { color: var(--muted); font-size: 14px; }
 .l-form input::placeholder, .l-form textarea::placeholder { color: var(--muted); opacity: .8; }
+
+/* DT305 (0.3.151, boards Stories230 and Stories231): the photo screen and the read */
+.pa-screen .chef-line-row { align-items: stretch; gap: 12px; }
+.pa-screen .bubble .chef-line-img { width: 104px; height: 104px; border-radius: 14px; }
+.chef-line-side { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.pa-remove { height: 44px; min-height: 44px; padding: 0 12px; white-space: nowrap; }
+.pa-note-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pa-say { height: 44px; min-height: 44px; flex: none; }
+.pa-screen .pa-go { justify-content: flex-end; } .pa-screen .pa-go .pill { flex: none; min-width: 50%; }
+.plan-line-done.pill { height: 44px; min-height: 44px; padding: 0 16px; flex: none; }
+.read-view .mp-tags .mp-tag { background: var(--tint); color: var(--navy); border: 0; border-radius: 999px; padding: 4px 9px; min-height: 28px; font: inherit; font-size: var(--fs-small); font-weight: 800; cursor: pointer; }
+.read-view .mp-tag-edit { display: inline-flex; align-items: center; gap: 6px; background: var(--tint); color: var(--navy); border-radius: 999px; padding: 2px 10px; font-size: var(--fs-small); font-weight: 800; }
+.rv-amount { width: 64px; height: 36px; border: 1.5px solid var(--line); border-radius: 10px; font: inherit; font-weight: 800; text-align: center; background: var(--surface); }
+.rv-change { display: flex; justify-content: flex-end; padding: 0 10px 12px; } .rv-change .pill { height: 44px; min-height: 44px; }
+.rv-chef { margin: 10px 0; } .rv-chef p { margin: 0; }
+.rv-q { margin: 12px 0 0; padding: 12px; border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface); }
+.rv-q .pa-chips { flex-wrap: wrap; } .rv-q .pa-opt { flex: none; padding: 0 14px; }
+.rv-weight { display: flex; align-items: center; gap: 10px; margin-top: 10px; } .rv-grams { width: 84px; min-height: 44px; text-align: center; font-weight: 800; }
+.rv-go { display: flex; gap: 8px; margin-top: 16px; } section.read-view .button-row.rv-go > .pill.pill-small { flex: 1; height: 44px; min-height: 44px; padding: 0 8px; }
+section.read-view .rv-change > .pill.pill-small, section.photo-screen .pa-remove.pill.pill-small, section.photo-screen .pa-say.pill.pill-small { height: 44px; min-height: 44px; }

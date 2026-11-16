@@ -5,6 +5,9 @@
 // A second photo soon after a meal asks once: Dessert to your dinner, or its own snack; within an hour Dessert is the main
 // button. One meal, two dishes: each keeps its own photo and foods; the meal adds them up; tap a dish to work on it, and a
 // change goes to that dish only. Fit to my target works on the dish you are on and counts the other as it is.
+// Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo you take
+// waits on the photo screen, and Read the plate reads it; the read shows alone, and Change the foods opens the plate this
+// story is about. The question about a second dish still comes first, alone.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -40,7 +43,9 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
     if (/could not be read/.test(await p.locator("body").innerText())) throw new Error("the seed is not a valid state");
     return p;
   };
-  const photo = async (p) => { await p.locator(".mp-button").first().click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(2500); };
+  const photo = async (p) => { await p.locator(".mp-button").first().click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(1500); if (await p.locator(".pa-screen").count()) { await p.getByRole("button", { name: "Read the plate" }).click(); await p.waitForTimeout(2500); } };
+  // DT305: the read shows alone; Change the foods opens the plate
+  const toPlate = async (p) => { if (await p.locator(".rv-change .pill").count()) { await p.locator(".rv-change .pill").click(); await p.waitForTimeout(600); } };
   const saved = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1") || "{}"));
   const main = (p) => p.locator("main").innerText();
   const text = async (l) => ((await l.count()) ? (await l.first().innerText()).replace(/\s+/g, " ") : "none");
@@ -69,6 +74,7 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
     await p.context().close();
     // Not mine is gone from the read plate: Don't count it, a button
     p = await open({ ...seed, feedback: [] }); await photo(p);
+    await toPlate(p);
     ok(await p.locator(".mp-say").getByRole("button", { name: "Not mine" }).count() === 0 && await p.locator(".mp-say").getByRole("button", { name: "Don't count it" }).count() === 1, "on the read plate: Don't count it, no Not mine");
     await p.context().close();
   } finally { await b.close(); server.kill(); }

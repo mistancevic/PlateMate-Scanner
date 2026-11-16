@@ -1,6 +1,10 @@
 {
   "about": "DT203 (0.3.76): Chef Mealan in Srpski (latinica). Drafted by Claude, checked by Coach Milan in his table; a line goes into the app only when checked is true. Slots in braces stay; they can move anywhere in the sentence. didTryWork holds two lines: the swap, then the side, split by |. Screens (DT203 release 2, 0.3.77): \"screens\" holds the words of the screens by key, same rules; a line with two forms is he|she, a count is 1|2 to 4|5 and on.",
   "chef": {
+    "photoHere": {
+      "text": "{from}",
+      "checked": true
+    },
     "photoWhose": {
       "text": "{from}. Čiji je ovo tanjir, i kada?",
       "checked": true
@@ -534,7 +538,7 @@
       "checked": true
     },
     "plate.dropPhoto": {
-      "text": "Odbaci sliku",
+      "text": "Ukloni fotografiju",
       "checked": true
     },
     "plate.keepMine": {
@@ -4278,11 +4282,11 @@
       "checked": true
     },
     "camera.readIt": {
-      "text": "Pročitaj",
+      "text": "Koristi ovu fotografiju",
       "checked": true
     },
     "camera.theShutterAddsAPhoto": {
-      "text": "Okidač dodaje fotografiju. Pročitaj ih kad imaš ono što želiš.",
+      "text": "Okidač dodaje fotografiju. Koristi ih kad imaš ono što želiš.",
       "checked": true
     },
     "camera.tapToTakeItOr": {
@@ -4322,7 +4326,7 @@
       "checked": true
     },
     "camera.readPhotos": {
-      "text": "Pročitaj {n} fotografiju|Pročitaj {n} fotografije|Pročitaj {n} fotografija",
+      "text": "Koristi {n} fotografiju|Koristi {n} fotografije|Koristi {n} fotografija",
       "checked": true
     },
     "camera.analyzePhotos": {
@@ -4382,7 +4386,7 @@
       "checked": true
     },
     "photoask.dropThePhoto": {
-      "text": "Odbaci fotografiju",
+      "text": "Ukloni fotografiju",
       "checked": true
     },
     "photoask.whosePlateAndWhen": {
@@ -21326,7 +21330,7 @@
       "checked": true
     },
     "howto.photoLog.line": {
-      "text": "Jedna slika, on pročita namirnice; ti kažeš čiji je i kada.",
+      "text": "Jedna slika, on pročita namirnice; ti kažeš koliko je pojedeno.",
       "checked": true
     },
     "howto.photoLog.what": {
@@ -21338,15 +21342,15 @@
       "checked": true
     },
     "howto.photoLog.s2": {
-      "text": "Slikaj ceo tanjir odozgo, pa Pročitaj ga. Ili izaberi sliku iz galerije.",
+      "text": "Slikaj ceo tanjir odozgo, pa Koristi ovu fotografiju. Ili izaberi sliku iz galerije.",
       "checked": true
     },
     "howto.photoLog.s3": {
-      "text": "Reci čiji je tanjir i kada: Pojedeno u, Jedem sada, ili Samo gledam.",
+      "text": "Napiši šta Chef Mealan treba da zna, ako želiš, pa dodirni Pročitaj tanjir.",
       "checked": true
     },
     "howto.photoLog.s4": {
-      "text": "Proveri namirnice koje je pročitao, pa dodirni Pojedeno ili Pola pojedeno.",
+      "text": "Proveri namirnice koje je pročitao. Pod Da li je pojedeno? izaberi Sve, Pola ili Deo, pa Gotovo.",
       "checked": true
     },
     "howto.bigBatch.title": {
@@ -22186,7 +22190,7 @@
       "checked": true
     },
     "plate.photoNotSaved": {
-      "text": "Ova slika nije sačuvana. Slikaj ponovo ili je odbaci.",
+      "text": "Ova fotografija nije sačuvana. Slikaj ponovo ili je ukloni.",
       "checked": true
     },
     "photos.notSaved": {
@@ -22690,11 +22694,11 @@
       "checked": true
     },
     "photoask.whatIsInIt": {
-      "text": "Reci Chef Mealanu šta je unutra, ako želiš",
+      "text": "Nešto što Chef Mealan treba da zna?",
       "checked": true
     },
     "photoask.wordsPlaceholder": {
-      "text": "Upiši šta je to, ili namirnice u njemu",
+      "text": "Šta je unutra, kako je spremljeno. Može da ostane prazno.",
       "checked": true
     },
     "photo.dishOfMeal": {
@@ -22739,6 +22743,102 @@
     },
     "clientweek.keyWeekend": {
       "text": "Osenčeno: vikend",
+      "checked": true
+    },
+    "photoask.namesIt": {
+      "text": "Chef Mealan daje ime",
+      "checked": true
+    },
+    "photoask.takenNow": {
+      "text": "Fotografija snimljena sada.",
+      "checked": true
+    },
+    "photoask.fromTodayYours": {
+      "text": "Fotografija od danas, u {time}, iz Tvojih fotografija.",
+      "checked": true
+    },
+    "photoask.fromYesterdayYours": {
+      "text": "Fotografija od juče, {time}, iz Tvojih fotografija.",
+      "checked": true
+    },
+    "photoask.fromDayYours": {
+      "text": "Fotografija napravljena: {day}, {time}, iz Tvojih fotografija.",
+      "checked": true
+    },
+    "photoask.yourPhoto": {
+      "text": "Tvoja fotografija",
+      "checked": true
+    },
+    "plate.photoMealLine": {
+      "text": "{meal}, {day} u {time}",
+      "checked": true
+    },
+    "plate.yesterdayLow": {
+      "text": "juče",
+      "checked": true
+    },
+    "plate.readSub": {
+      "text": "Pročitano sa tvoje slike. Dodirni količinu da je ispraviš.",
+      "checked": true
+    },
+    "plate.changeTheFoods": {
+      "text": "Promeni namirnice",
+      "checked": true
+    },
+    "plate.didYouEatIt": {
+      "text": "Da li je pojedeno?",
+      "checked": true
+    },
+    "plate.allOfIt": {
+      "text": "Sve",
+      "checked": true
+    },
+    "plate.half": {
+      "text": "Pola",
+      "checked": true
+    },
+    "plate.partOfIt": {
+      "text": "Deo",
+      "checked": true
+    },
+    "plate.gramsEaten": {
+      "text": "Pojedeno u gramima",
+      "checked": true
+    },
+    "plate.gOfTotal": {
+      "text": "g od {total} g. Dodirni da ispraviš.",
+      "checked": true
+    },
+    "plate.gramsOfFood": {
+      "text": "Grami: {food}",
+      "checked": true
+    },
+    "plate.isItForPlan": {
+      "text": "Da li je za plan?",
+      "checked": true
+    },
+    "plate.planItFor": {
+      "text": "Planiraj za: {slot}",
+      "checked": true
+    },
+    "plate.plannedForChip": {
+      "text": "Planirano za: {slot}",
+      "checked": true
+    },
+    "plate.plannedFor": {
+      "text": "Planirano za: {slot}. Nalazi se na Planu.",
+      "checked": true
+    },
+    "photo.kcalProt": {
+      "text": "{kcal} i {prot}.",
+      "checked": true
+    },
+    "app.loggedForYesterday": {
+      "text": "Zapisano za juče, {time}.",
+      "checked": true
+    },
+    "app.loggedForDay": {
+      "text": "Zapisano za: {day}, {time}.",
       "checked": true
     }
   }

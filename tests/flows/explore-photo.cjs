@@ -2,6 +2,9 @@
 // button showed. The photo's third chip is now Exploring (was An idea): the plate leaves the meal it was for, the pencil block
 // says Exploring, that meal stays as it was and Chef Mealan says so; the idea's buttons show; nothing is logged; no eating
 // window check. With the pencil block on Exploring first, a camera photo is Exploring too. The read is a stand-in (no AI here).
+// Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): the photo screen
+// has no chips. Just looking is the meal line's own answer, behind the pencil, also while the photo waits; a photo you take
+// waits on the photo screen too, and Read the plate reads it.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -59,15 +62,17 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     const before = (await st()).feedback.length;
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles({ name: "plate.jpg", mimeType: "image/jpeg", buffer: withExif("2026:10:29 19:40:00") }); await page.waitForTimeout(1200);
-    const chips = (await page.locator(".pa-chip").allTextContents()).map((x) => x.replace(/\s+/g, " ").trim());
-    ok(chips.length === 3 && /Just looking$/.test(chips[2]) && !chips.some((c) => /An idea/.test(c)), "the third chip is Just looking: " + chips.join(", "));
-    await page.locator(".pa-chip").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(200);
+    ok(await page.locator(".pa-screen").count() === 1 && await page.locator(".pa-chip").count() === 0, "DT305: the photo waits on the photo screen, with no chips");
+    await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300);
+    await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(400);
+    if (await page.locator(".plan-line-done").count()) { await page.locator(".plan-line-done").click(); await page.waitForTimeout(300); }
+    ok(await page.locator(".pa-screen").count() === 1 && /Just looking/.test(await text(".plan-line")), "DT305: Just looking behind the pencil, while the photo waits");
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     const s1 = await st();
     ok(s1.photo?.who === "idea" && s1.pick === "exploring" && !/Adding Wednesday's lunch/.test(await text(".step-head")) && /Just looking/.test(await text(".plan-line")), "the plate leaves Wednesday's lunch; the pencil block says Just looking");
     const pl = await text(".mp-big-say"); ok(/Just looking at a photo\. 2 foods read/.test(pl), "the photo line says Just looking: " + pl.slice(0, 80));
     const say = await text(".mp-say");
-    ok(/Just looking, so wednesday's lunch stays as it was\./i.test(say) && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Put it in my plan" }).count() === 1, "Chef Mealan says the lunch stays as it was; the idea's buttons show: " + say.slice(0, 160));
+    ok(await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Put it in my plan" }).count() === 1, "the idea's buttons show: " + say.slice(0, 160));
     // DT268 (0.3.118): the Served block says "Your day stays as it was"; the check is about the gates, so it reads the Plate without that block
     const noServed = (await page.evaluate(() => { const m = document.querySelector("main").cloneNode(true); m.querySelectorAll(".sv-plate").forEach((x) => x.remove()); return m.textContent; })).replace(/\s+/g, " ");
     ok(!/Your day/.test(noServed) && !/eating window/.test(noServed), "no eating-window check while exploring");
@@ -77,7 +82,8 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     await page.locator(".plan-line").click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: "Just looking", exact: true }).click(); await page.waitForTimeout(300);
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
-    await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(2200);
+    await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500);
+    await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     const s2 = await st();
     ok(s2.photo?.who === "idea" && s2.pick === "exploring" && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1, "Just looking first: the camera's photo is Just looking, with the idea's buttons");
     // ---- 0.3.65: Exploring in the pencil box on a meal of the plan too ----

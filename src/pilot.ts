@@ -302,6 +302,9 @@ export type PilotState = {
   photo?: { image: string; at: string; unsure?: { name: string; options: [number, number] } | null;
     // DT130 (0.2.110): a photo from Your photos says whose plate and when: ate (logged at the photo's time), idea (nothing logged)
     who?: "ate" | "now" | "idea";
+    // DT305 (0.3.151, boards Stories230 and Stories231): a photo just read shows as the read alone, until Done or Change the
+    // foods; saved holds the recipe Save in My recipes made from it
+    view?: "read"; saved?: string;
     // DT228 v2 (0.3.63): the other photos of the meal (thumbnails, at most 3), the person's words, and the kind the read could not tell
     more?: string[]; note?: string; which?: import("./mealPhoto").Which | null;
     // DT268 (0.3.118): an Exploring plate is kept as Served: its id there, whose it is, its visit, which dish; keep false: Don't keep it

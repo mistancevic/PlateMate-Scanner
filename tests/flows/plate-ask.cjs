@@ -1,6 +1,9 @@
 // JOURNEY (0.2.113, board Stories87, DT131; Milan 27 October 13:52 and 14:37 "Go"): when a batch of foods is about to land on a
 // plate that has foods (a photo read, Make it from Recipes, a meal from Plan), the Plate asks first: Add to my plate, or
-// Start a new plate; Drop the photo or Keep my plate leaves it as it is. No question on an empty plate.
+// Start a new plate; Remove the photo or Keep my plate leaves it as it is. No question on an empty plate.
+// Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo you take
+// waits on the photo screen, and Read the plate reads it; then the question about the plate that has foods comes, alone.
+// Drop the photo is Remove the photo.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -55,7 +58,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
 
   const typed = async () => { await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); const f = (re) => s.foods.find((x) => re.test(x.name));
     s.items = [{ id: "c1", food: f(/^Chicken breast, cooked/i) || s.foods[0], grams: 180, locked: false }, { id: "c2", food: f(/^Rice/) || s.foods[1], grams: 150, locked: false }]; s.title = "Chicken and rice"; s.photo = undefined; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); }); await page.reload(); await page.waitForTimeout(1500); };
-  const shoot = async () => { await page.locator(".mp-button").click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); if (await page.locator(".cam-analyze").count()) await page.locator(".cam-analyze").click(); await page.waitForTimeout(2000); };
+  const shoot = async () => { await page.locator(".mp-button").click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); if (await page.locator(".cam-analyze").count()) await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500); if (await page.locator(".pa-screen").count()) { await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2000); } };
   await page.goto(U + "/plate"); await page.waitForTimeout(1500);
   await typed();
   ok((await st()).items.length === 2, "the plate holds chicken and rice, typed in");
@@ -65,7 +68,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   const ask = await text(".plate-ask");
   ok(/Your plate already has 2 foods: Chicken and rice\.\s?The photo read 3 foods: chicken breast ~180 g, rice ~150 g, mixed salad ~90 g\./.test(ask), "DT131: the card names what is there and what waits: " + ask.slice(0, 160));
   const btns = (await page.locator(".plate-ask .pa-go button").allTextContents()).join();
-  ok(btns === "Add to my plate,Start a new plate" && (await page.locator(".plate-ask .pill-primary").textContent()) === "Add to my plate" && /Drop the photo/.test(ask), "DT131: for a photo, Add to my plate first, Start a new plate, Drop the photo: " + btns);
+  ok(btns === "Add to my plate,Start a new plate" && (await page.locator(".plate-ask .pill-primary").textContent()) === "Add to my plate" && /Remove the photo/.test(ask), "DT131: for a photo, Add to my plate first, Start a new plate, Remove the photo: " + btns);
   await page.getByRole("button", { name: "Add to my plate" }).click(); await page.waitForTimeout(500);
   let s = await st();
   ok(s.items.length === 5 && s.title === "Chicken and rice" && s.items.filter((i) => i.est).length === 3 && s.photo && await page.locator(".plate-ask").count() === 0, "DT131: Add: five foods, yours as they were, the photo's three marked ~, the name kept, the photo on the plate");
@@ -74,11 +77,11 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await page.getByRole("button", { name: "Start a new plate" }).click(); await page.waitForTimeout(500);
   s = await st();
   ok(s.items.length === 3 && s.items.every((i) => i.est) && s.title === "Grilled chicken with rice and salad", "DT131: Start a new plate: only the photo's foods, the read's name");
-  // Drop the photo
+  // Remove the photo
   await typed(); await shoot();
-  await page.getByRole("button", { name: "Drop the photo" }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: "Remove the photo" }).click(); await page.waitForTimeout(400);
   s = await st();
-  ok(s.items.length === 2 && s.title === "Chicken and rice" && !s.photo && await page.locator(".plate-ask").count() === 0, "DT131: Drop the photo: the plate as it was");
+  ok(s.items.length === 2 && s.title === "Chicken and rice" && !s.photo && await page.locator(".plate-ask").count() === 0, "DT131: Remove the photo: the plate as it was");
   // a recipe from Recipes onto the plate: Start a new plate first, Keep my plate
   await typed();
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(1200);

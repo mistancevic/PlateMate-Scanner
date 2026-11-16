@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.151",
     "0.3.150",
     "0.3.149",
     "0.3.148",
@@ -1215,10 +1216,43 @@
     },
     {
       "id": "DT303",
-      "title": "The Plate after a photo: say each thing once, fewer buttons",
+      "title": "From a photo to the plate: the parked drawings (a pot, a wrong read, Chef Mealan's question, the plate cleanup)",
       "epic": "trust",
       "state": "later",
-      "why": "Coach Milan 15 November 19:04: in general the whole page is a bit messy with what can be done here. Seen on his screenshot: Chef Mealan says the same thing about fat three times, and about 14 buttons (Retake, Photo, four ways to add, Add a food, five in the checks card, four under his line, Fit to my target). To brainstorm."
+      "why": "Coach Milan 15 November 19:04: in general the whole page is a bit messy with what can be done here. Seen on his screenshot: Chef Mealan says the same thing about fat three times, and about 14 buttons (Retake, Photo, four ways to add, Add a food, five in the checks card, four under his line, Fit to my target). To brainstorm. 15 and 16 November: drawn four times (Stories227, with Stories228 as an earlier drawing), then parked by Coach Milan 16 November 08:26 for DT305: finish one flow properly. What stays here for later cards: the pot question as All of it or A part of it with grams; Correct the read with another photo, voice or text; Chef Mealan's one question alone before the read; the plate cleanup (Empty plate and Done as buttons, the ways to add behind + Add a food, Chef Mealan speaking once); correcting one food by a tap (It was something else, It was not in it, Add a food he missed); What time? behind the pencil.",
+      "board": "Stories227"
+    },
+    {
+      "id": "DT305",
+      "title": "A photo of a meal: the photo screen, the read alone, and what you do with it",
+      "epic": "trust",
+      "state": "done",
+      "board": "Stories230, Stories231",
+      "version": "0.3.151",
+      "why": "Coach Milan 15 November 20:57, after his test of 0.3.150: the flow from a photo to the plate is overwhelming, with unrelated buttons and actions as text. 16 November 08:26: park DT303 and finish one flow properly; 09:11: the purposes of a photo (to be informed, to keep it, to count it for the day, to decide before you eat, to plan it, a past day, to change it first) as scenarios; 09:43 to 11:21 the read's bottom settled by drawing; Go 11:35; the camera's button 11:55. Built: Find ideas carries the hat. Every photo of a meal waits on the photo screen: the meal's title in the place of the question, the meal line as today, the photo bigger with Remove the photo beside it, one box (Anything Chef Mealan should know?, typed or said), Read the plate alone. Chef Mealan asks nothing about whose plate and when: the photo fills in the meal line (from Your photos and older than half an hour: a meal you ate at its time, on its day). The camera's button says Use this photo. The read shows alone: the photo and its foods (a tap corrects an amount) with Change the foods, always the result, what you said, his word; Did you eat it? All of it, Half, Part of it, with the weight below; for a coming day, Is it for the plan?; Save in My recipes and Done under everything. Done carries out what is chosen; nothing chosen, nothing is kept. Design rules D6 and D7 written down (docs/rules/design.md). Left as they were: a pot kept whole (opens as a recipe), Just looking (kept as Served, chosen behind the pencil), a planned meal eaten by the plan, the same photo read again, the plate itself. Known gaps, said to Coach Milan: the time of a picked photo can no longer be changed on the photo screen; Chef Mealan's one question about an unsure food shows on the plate, not on the read; Half no longer keeps the other half on Today."
+    },
+    {
+      "id": "B145",
+      "title": "The read invents cooking methods when no words were given",
+      "epic": "trust",
+      "state": "now",
+      "board": "Stories226",
+      "why": "Coach Milan 15 November 20:57, his test of 0.3.150: a photo read with no words showed For cooking, not counted: simmered, pureed. Those are methods, not foods he named. Drawn on Stories226; no Go yet. The board's other bug (the form asks a snack which dish it is) is gone with DT305: the dish row left the photo screen."
+    },
+    {
+      "id": "DT304",
+      "title": "Every way into the plate has a direction: the meal and when",
+      "epic": "trust",
+      "state": "later",
+      "board": "Stories229",
+      "why": "Coach Milan 16 November 00:06 to 00:14: the plate is filled in several ways and from several entry points; the meal and when should be one line on top of every plate, asked only when the app cannot know. A map of 13 ways in, from reading the code. Parked 07:39 (too much drafted). Note from 07:46: the meal line and its pencil already hold most of it."
+    },
+    {
+      "id": "DT306",
+      "title": "Blocks like the read's: an answer under its question, the section's buttons under it",
+      "epic": "trust",
+      "state": "later",
+      "why": "Coach Milan 16 November 11:35, with two screenshots: after DT305, update the blocks that are similar. Chef Mealan's card on the plate (Did you eat it? with Ate half, Add a food, Don't count it, Ate it as four buttons) and the questions behind the pencil of the meal line. By design rules D6 and D7."
     }
   ]
 }

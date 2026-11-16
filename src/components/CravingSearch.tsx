@@ -2,6 +2,7 @@
 // Code looks first, at once and for free: your recipes, Coach's, the members' and Chef Mealan's starters, and your foods; PD 7+
 // is a filter, shown as a chip. Chef Mealan is asked only on a tap; his idea is kept in My recipes as an idea, not made yet,
 // and the app works out every number from the foods. Picking a dish puts it on the plate, as Make it does.
+// DT305 (0.3.151, board Stories230; Coach Milan 16 November 09:43): Find ideas carries the chef's hat: he comes up with the ideas.
 // DT301 (0.3.149, board Stories223; Coach Milan 17:25 to 21:02): one card, the box and Find ideas, the one button. Find ideas looks
 // in your recipes, Coach's, the members' and the starters, and asks Chef Mealan at the same time for three ideas: the dish named,
 // as close as it can be, and two similar. Each idea is short (name, PD, why, View more); View more opens it, View less closes it.
@@ -141,7 +142,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
       <div className="chat-input crave-bar">
         <input className="crave-box" aria-label={w("plate.craving")} placeholder={w("plate.cravingBox")} value={q} onChange={(e) => { setQ(e.target.value); if (searched !== null) { setSearched(null); setIdeas([]); setOpenIdx(null); } }} onKeyDown={(e) => { if (e.key === "Enter") find(); }} enterKeyHint="search" />
       </div>
-      <button type="button" className="pill pill-primary pill-wide crave-find" disabled={!q.trim() || Boolean(asking)} onClick={find}>{w("craving.findIdeas")}</button>
+      <button type="button" className="pill pill-primary pill-wide crave-find" disabled={!q.trim() || Boolean(asking)} onClick={find}><ChefHat size={18} /> {w("craving.findIdeas")}</button>
       {active && groups && (<>
         {c.minPd !== null && <div className="crave-chips"><button type="button" className="pill pill-small" aria-label={w("craving.removePdFilter", { pd: c.minPd })} onClick={() => { const t = q.replace(/\bpd\s*(?:of\s*)?(?:>=|≥|>|over|above|at least)?\s*\d{1,2}(?:[.,]\d)?\s*(?:\+|or more|and up|or higher|plus)?/i, "").replace(/\s+/g, " ").trim(); setQ(t); setSearched(t || null); }}>{w("craving.pdAndUp", { pd: fmt(c.minPd, 1) })}</button></div>}
         {groups.groups.map((g) => <div key={g.key}><small className="pick-group crave-group">{g.title}</small><div className="menu-list pick-list">{g.shown.map(row)}</div></div>)}

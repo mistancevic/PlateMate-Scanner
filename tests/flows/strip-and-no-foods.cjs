@@ -3,6 +3,9 @@
 // was, the photo not kept: Chef Mealan says so, with Take it again and Add the foods myself. Empty plate shows whenever the
 // Plate has foods or a photo. DT224 (0.3.60, board Stories165): an empty Plate starts with What are you craving?, and Craft,
 // Make, Eat appears once it holds a food, a recipe or a photo. The read is a stand-in (no AI here).
+// Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo waits on
+// the photo screen, which has no chips, and Read the plate reads it. Just looking is chosen behind the pencil of the meal
+// line. After a read of your own meal the read shows alone; Change the foods opens the plate.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -65,14 +68,14 @@ const cook = { id: "c-1", startedAt: "2026-11-02T11:20:00", title: "Vanilla prot
     // ---- DT219: a read with no foods leaves the Plate as it was ----
     ({ ctx, page } = await open({ ...seed, items: [{ id: "i-s", grams: 150, locked: false, food: skyr }] }, "/plate"));
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
-    await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(2200);
+    await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500); await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     st = await store(page);
     const none = page.locator(".mp-none");
     ok(await page.locator(".camera-ui").count() === 0 && st.items.length === 1 && st.items[0].id === "i-s" && !st.photo, "no foods read: the Plate stays as it was; the photo is not kept");
     ok(/I could not find foods on this photo\. Take it again, from above with the whole plate in, or add the foods yourself\./.test(await none.textContent()) && /Your plate stays as it was; the photo is not kept\./.test(await none.textContent()), "Chef Mealan says so in one line");
     await none.getByRole("button", { name: "Take it again" }).click(); await page.waitForTimeout(1200);
     ok(await page.locator(".camera-ui").count() === 1 && await page.locator(".mp-none").count() === 0, "Take it again opens the meal camera");
-    await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(2200);
+    await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500); await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     await page.locator(".mp-none").getByRole("button", { name: "Add the foods myself" }).click(); await page.waitForTimeout(600);
     ok(await page.locator(".mp-none").count() === 0 && await page.evaluate(() => document.activeElement?.getAttribute("aria-label")) === "Search all my foods", "Add the foods myself: the line goes, the food search is ready");
     await ctx.close();

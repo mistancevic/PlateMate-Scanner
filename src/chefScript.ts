@@ -10,6 +10,8 @@ const n = (k: number, one: string, many = `${one}s`) => `${k} ${k === 1 ? one : 
 export const CHEF = {
   // ---- the Plate ----
   photoWhose: (from: string) => `${from.replace(/\.$/, "")}. Whose plate is it, and when?`,
+  // DT305 (0.3.151, board Stories230): the photo screen. He says where the photo is from and asks nothing: the meal line holds it
+  photoHere: (from: string) => from,
   photoNoFoods: () => "I could not find foods on this photo. Take it again, from above with the whole plate in, or add the foods yourself.",
   oneDish: () => "A food here is cooked, so these foods are made together. Is this one dish? Grouped into parts, Fit keeps each part's proportions and the steps go part by part.",
   whatMoment: () => "What kind of moment?",
@@ -86,6 +88,7 @@ const addOrNew = (foods: number, title: string, what: string) => ({ foods: foods
 const late = (until: string, meal: string, time: string, free: number, quick: string) => ({ until, meal: mealIn(meal), time, free: minutesIn(free), quick: mealAcc(local(), quick) });
 export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
   photoWhose: (from: string) => ({ from: from.replace(/\.$/, "") }),
+  photoHere: (from: string) => ({ from }),
   plateAddOrNew: addOrNew,
   plateAddPhoto: addOrNew,
   busyMeal: (meal: string, time: string, block: string, day: string) => ({ meal: mealIn(meal), time, block, day: dayIn(local(), day) }),
@@ -112,7 +115,7 @@ export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
 };
 // the slots each line takes, by name: the Serbian line names each of them once or more, and no other (the release check, the table)
 export const SR_ALLOWED: Partial<Record<ChefLineName, string[]>> = {
-  photoWhose: ["from"], plateOldAte: ["when", "plate"], plateOldBeforeCook: ["when", "plate"], plateSaveOrClear: ["foods", "ago", "dish"],
+  photoWhose: ["from"], photoHere: ["from"], plateOldAte: ["when", "plate"], plateOldBeforeCook: ["when", "plate"], plateSaveOrClear: ["foods", "ago", "dish"],
   plateAddOrNew: ["foods", "title", "what"], plateAddPhoto: ["foods", "title", "what"], scanWhileCooking: ["dish", "food"], useInCook: ["food", "dish"], resume: ["dish", "done"],
   howManyAte: ["made"], carryNow: ["minutes"], busyMeal: ["meal", "time", "block", "day"], busyLate: ["until", "meal", "time", "free", "quick"], busyLateAhead: ["until", "meal", "time", "free", "quick", "day"],
   busyCarry: ["block", "meal"], busyTraining: ["time", "block", "day"],

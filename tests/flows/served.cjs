@@ -2,6 +2,9 @@
 // on its own: the name and the dish as Chef Mealan read them; Scan another plate, mine or someone else's, joins the visit;
 // nothing is logged. Recipes shows the visit as one card with its note; a Served plate opens with its photo, the honest line
 // its numbers each with a range, and its foods; Share the numbers draws the picture and opens the share sheet; I ate this asks the day and the meal and puts your dishes in as one meal. The read is a stand-in (no AI here).
+// Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo waits on
+// the photo screen, which has no chips, and Read the plate reads it. Just looking is chosen behind the pencil of the meal
+// line. After a read of your own meal the read shows alone; Change the foods opens the plate.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -56,7 +59,7 @@ const READS = [
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(800);
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
-    await page.locator(".pa-chip").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(200);
+    await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300); await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(300); if (await page.locator(".plan-line-done").count()) { await page.locator(".plan-line-done").click(); await page.waitForTimeout(200); }
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     const sv = page.locator(".sv-plate");
     ok(await sv.count() === 1 && /Served\s*Kept in Recipes, under Served/.test(await text(".sv-head")), "the Plate says the plate is kept, marked Served");
@@ -222,7 +225,7 @@ const READS = [
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
-    await page.locator(".pa-chip").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(200);
+    await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300); await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(300); if (await page.locator(".plan-line-done").count()) { await page.locator(".plan-line-done").click(); await page.waitForTimeout(200); }
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     s = await st();
     ok(s.served.length === 3 && s.served[0].name === "Apple strudel" && s.served[0].dish === "main" && s.served[0].visit === s.served[1].visit, "a dish the read cannot name is a main; a plate soon after joins the visit");
@@ -231,7 +234,7 @@ const READS = [
     ok(s.served.length === 2 && s.items.length === 1 && /Not kept/.test(await text(".sv-off")), "Don't keep it: off the list, the Plate keeps its foods and says so");
     // 0.3.121: reading the same photo again keeps what the plate was: not kept stays not kept
     await page.locator(".mp-again-link").click(); await page.waitForTimeout(300);
-    await page.locator(".mp-help").getByLabel("Tell Chef Mealan what is in it") /* B144 (0.3.150): the words box asks what is in it */.fill("apple strudel with cream");
+    await page.locator(".mp-help").getByLabel("Anything Chef Mealan should know?") /* B144 (0.3.150): the words box asks what is in it */.fill("apple strudel with cream");
     await page.locator(".mp-help .pill-primary").click(); await page.waitForTimeout(2000);
     s = await st();
     ok(s.served.length === 2 && s.photo?.keep === false && /Not kept/.test(await text(".sv-off")), "Read it again on a plate you did not keep: still not kept");
@@ -239,7 +242,7 @@ const READS = [
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
-    await page.locator(".pa-chip").filter({ hasText: "Just looking" }).click(); await page.waitForTimeout(200);
+    await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300); await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(300); if (await page.locator(".plan-line-done").count()) { await page.locator(".plan-line-done").click(); await page.waitForTimeout(200); }
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     s = await st();
     const n274 = s.served.length, fb274 = s.feedback.length;

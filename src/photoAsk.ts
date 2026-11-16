@@ -83,3 +83,27 @@ export function atTime(at: Date, time: string): Date {
   if (m) d.setHours(+m[1], +m[2], 0, 0);
   return d;
 }
+
+// DT305 (0.3.151, board Stories230): the photo screen asks nothing; the photo says it. A photo you take now, or one from
+// the last half hour, is the meal in front of you. An older one is a meal you ate at its time, on its day. Just looking in
+// the meal line stays Just looking.
+export function photoWho(at: Date, now: Date, taken: boolean, exploring: boolean): Who {
+  if (exploring) return "idea";
+  if (taken) return "now";
+  const mins = (now.getTime() - at.getTime()) / 60000;
+  // a photo dated after now (a clock that is off) is the meal in front of you, never a meal of a coming day
+  return mins <= 30 ? "now" : "ate";
+}
+// "A photo from 12:40 today, from Your photos." / "from yesterday, 19:10, from Your photos." / "from Sunday 25 October, 19:10, ..."
+export function photoFromYours(at: Date, now: Date): string {
+  const y = new Date(now); y.setDate(y.getDate() - 1);
+  if (ymdOf(at) === ymdOf(now)) return w("photoask.fromTodayYours", { time: hhmm(at) });
+  if (ymdOf(at) === ymdOf(y)) return w("photoask.fromYesterdayYours", { time: hhmm(at) });
+  return w("photoask.fromDayYours", { day: dateText(at, { weekday: "long", day: "numeric", month: "long" }), time: hhmm(at) });
+}
+// the meal line for a photo you ate earlier: "Dinner, yesterday at 19:40" / "Lunch, today at 13:10" / "Dinner, Sunday 25 October at 19:10"
+export function photoMealLine(meal: Parameters<typeof w>[1][string], at: Date, now: Date): string {
+  const y = new Date(now); y.setDate(y.getDate() - 1);
+  const day = ymdOf(at) === ymdOf(now) ? w("plate.todayLow") : ymdOf(at) === ymdOf(y) ? w("plate.yesterdayLow") : dateText(at, { weekday: "long", day: "numeric", month: "long" });
+  return w("plate.photoMealLine", { meal, day, time: hhmm(at) });
+}

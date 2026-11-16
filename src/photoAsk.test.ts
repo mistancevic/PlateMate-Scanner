@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { exifTime, startWho, photoFrom, chipWord, whoLine, atTime, hhmm } from "./photoAsk";
+import { exifTime, startWho, photoFrom, chipWord, whoLine, atTime, hhmm, photoWho, photoFromYours, photoMealLine } from "./photoAsk";
 
 // a minimal JPEG with an EXIF block: IFD0 points to the Exif IFD, which holds DateTimeOriginal
 function jpegWithExif(when: string, le = true): ArrayBuffer {
@@ -45,4 +45,27 @@ test("DT130: the words: short chips, the line under them says what the chip on d
   assert.equal(startWho(new Date("2026-11-02T12:30:00"), new Date("2026-11-02T12:35:00"), true), "idea", "0.3.62: the pencil block on Exploring starts on Exploring");
   const t = atTime(new Date(2026, 9, 25, 19, 10), "20:05");
   assert.deepEqual([t.getDate(), t.getHours(), t.getMinutes()], [25, 20, 5]);
+});
+
+// DT305 (0.3.151, board Stories230): the photo screen asks nothing; the photo says it
+test("DT305: who a photo is: taken now or in the last half hour is now; older is a meal you ate then; Just looking stays", () => {
+  const now = new Date(2026, 10, 16, 19, 0);
+  assert.equal(photoWho(now, now, true, false), "now", "a photo you take");
+  assert.equal(photoWho(new Date(2026, 10, 16, 18, 40), now, false, false), "now", "from Your photos, 20 minutes ago");
+  assert.equal(photoWho(new Date(2026, 10, 16, 13, 10), now, false, false), "ate", "earlier today");
+  assert.equal(photoWho(new Date(2026, 10, 15, 19, 40), now, false, false), "ate", "yesterday");
+  assert.equal(photoWho(new Date(2026, 10, 2, 19, 40), now, false, false), "ate", "two weeks ago: a meal of that day, unless the meal line says Just looking");
+  assert.equal(photoWho(new Date(2026, 10, 17, 9, 0), now, false, false), "now", "a photo dated after now is the meal in front of you");
+  assert.equal(photoWho(new Date(2026, 10, 15, 19, 40), now, false, true), "idea", "Just looking in the meal line stays Just looking");
+  assert.equal(photoWho(now, now, true, true), "idea");
+});
+
+test("DT305: the words: where the photo is from, and the meal line it fills in", () => {
+  const now = new Date(2026, 10, 16, 19, 0);
+  assert.equal(photoFromYours(new Date(2026, 10, 16, 13, 10), now), "A photo from 13:10 today, from Your photos.");
+  assert.equal(photoFromYours(new Date(2026, 10, 15, 19, 40), now), "A photo from yesterday, 19:40, from Your photos.");
+  assert.equal(photoFromYours(new Date(2026, 10, 2, 19, 40), now), "A photo from Monday 2 November, 19:40, from Your photos.");
+  assert.equal(photoMealLine("Lunch", new Date(2026, 10, 16, 13, 10), now), "Lunch, today at 13:10");
+  assert.equal(photoMealLine("Dinner", new Date(2026, 10, 15, 19, 40), now), "Dinner, yesterday at 19:40");
+  assert.equal(photoMealLine("Dinner", new Date(2026, 10, 2, 19, 40), now), "Dinner, Monday 2 November at 19:40");
 });

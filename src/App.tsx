@@ -133,6 +133,9 @@ import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion,
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { plateWhenOf } from "./plateMode";
+// DT305 (0.3.151): the line after a meal is logged at its photo's time; a past day is named
+const loggedLine = (d: Date): string => { const now = new Date(), y = new Date(now); y.setDate(y.getDate() - 1); const time = d.toTimeString().slice(0, 5);
+  return d.toDateString() === now.toDateString() ? w("app.loggedAt", { time }) : d.toDateString() === y.toDateString() ? w("app.loggedForYesterday", { time }) : w("app.loggedForDay", { day: dateText(d, { weekday: "long", day: "numeric", month: "long" }), time }); };
 import { unseenFromCoach } from "./coachNotes";
 import { waitingFor, seenWaiting, markWaitingSeen } from "./coachNotes";
 import { activePlaces, inPlace, inferPlaces, placesOfNew, renameForPlace, usedIds, tripOn, tripOver, getPlacesOn, setPlacesOn, getTrip, setTrip, getStarted, setStarted, MIGRATED, type Trip } from "./places";
@@ -866,7 +869,7 @@ export default function App() {
     [mixQuestion, setMixQuestion] = useState<string | null>(null),
     [camera, setCamera] = useState(false),
     // DT130 (0.2.110): a photo picked from Your photos in the meal camera, waiting on the Plate for whose plate and when
-    [photoAsk, setPhotoAsk] = useState<{ image: string; at: string } | null>(null),
+    [photoAsk, setPhotoAsk] = useState<{ image: string; at: string; taken?: boolean; more?: string[] } | null>(null),
     // DT219 (0.3.58): the last photo read found no foods; nothing landed on the Plate
     [photoNoFoods, setPhotoNoFoods] = useState(false),
     // DT242 (0.3.96, board Stories182): a photo whose answer was lost twice is kept, with Try again
@@ -2562,7 +2565,7 @@ export default function App() {
         const potNow = share === "whole" && who !== "idea";
         const potId = potNow ? (again && state.photo?.pot && state.meals.some((m) => m.id === state.photo!.pot) ? state.photo.pot : uid()) : undefined;
         const course = x?.dish && x.dish !== "main" && who !== "idea" ? x.dish : undefined;
-        const photo = { image: thumb, at, unsure: potNow ? null : read.unsure, ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}) };
+        const photo: NonNullable<PilotState["photo"]> = { image: thumb, at, unsure: potNow ? null : read.unsure, ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}) };
         const land = (how: "add" | "new") => {
           // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
           // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
@@ -2573,6 +2576,10 @@ export default function App() {
           // DT247 (0.3.96, board Stories183): a second photo soon after a meal of today asks once
           const second = who !== "idea" && how === "new" && !filling ? secondDish(state.feedback, new Date(at)) : null;
           setDishAsk(second && second.prev.slot && second.prev.slot.date === ymd(new Date()) ? { dish: read.dish || "", prev: second.prev.meal.title, minutes: second.minutes, dessertFirst: second.dessertFirst, slotId: second.prev.slot.slotId, meal: second.prev.slot.name } : null);
+          // DT305: a new plate from a photo of your meal shows as the read alone first. Not a pot kept whole (it opens as a
+          // recipe), not Just looking (kept as Served), not the same photo read again, not a planned meal you eat by the plan
+          const readView = how === "new" && !again && !potId && who !== "idea" && !(filling && plateWhenOf(filling) === "now");
+          if (readView) photo.view = "read";
           if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null, photo }));
           else if (potId) {
             const whole = items.map((i) => ({ ...i, locked: true, est: undefined })), total = whole.reduce((n, i) => n + i.grams, 0), n = Math.max(2, read.serves ?? Math.round(total / 350));
@@ -2617,7 +2624,7 @@ export default function App() {
     },
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
     // DT133 (0.2.113): one portion of a plate of several, the rest kept on Today
-    ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback }) => {
+    ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback; part?: number }) => {
       const now = x.at ?? new Date().toISOString();
       // DT285: the same photo already a meal of that day: Update that meal, or Keep both
       const earlier = !x.same && x.photo ? samePhotoMeal(state.feedback, [x.photo], now) : null;
@@ -2625,7 +2632,9 @@ export default function App() {
       const into = x.same && x.same !== "both" ? x.same : null;
       const n = x.portions && x.portions >= 2 ? x.portions : x.half ? 2 : 1;
       const part = (m: Meal, k: number): Meal => ({ ...m, id: uid(), items: m.items.map((i) => ({ ...i, grams: Math.round((i.grams * k) / n), est: undefined })), portion: Math.round(((m.portion ?? 0) * k) / n) });
-      const eaten = n > 1 ? part(meal, 1) : { ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })) };
+      // DT305: Half or Part of it on the read: the grams you ate of the whole, as one eaten meal
+      const frac = x.part && x.part > 0 && x.part < 1 ? x.part : 1;
+      const eaten = n > 1 ? part(meal, 1) : { ...meal, items: meal.items.map((i) => ({ ...i, grams: frac < 1 ? Math.max(1, Math.round(i.grams * frac)) : i.grams, est: undefined })), portion: frac < 1 ? Math.round((meal.portion ?? 0) * frac) : meal.portion };
       setState((s) => ({ ...s,
         feedback: [...(into ? [] : [{ id: uid(), meal: structuredClone(eaten), status: "eaten" as const, taste: "", notes: "", createdAt: now, ...(slot ? { slot } : {}), ...(s.course ? { course: s.course } : {}), ...(x.photo ? { photo: x.photo, photos: [x.photo] } : {}), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined, moment } as Feedback]),
           ...(n > 1 ? [{ id: uid(), meal: structuredClone({ ...part(meal, n - 1), title: x.portions ? (n - 1 === 1 ? w("app.otherPortion", { title: meal.title }) : w("app.otherPortions", { title: meal.title, n: n - 1 })) : w("app.otherHalf", { title: meal.title }) }), status: "prepared" as const, taste: "", notes: "", createdAt: now, ...(x.photo ? { photo: x.photo } : {}) } as Feedback] : []),
@@ -2633,7 +2642,14 @@ export default function App() {
         items: [], portion: null, title: "", photo: undefined, course: undefined }));
       if (x.stay) { notify(w("app.loggedAt", { time: new Date(now).toTimeString().slice(0, 5) })); return; }
       setStep("in"); setTab("home");
-      notify(x.portions ? (n - 1 === 1 ? w("app.onePortionLogged") : w("app.onePortionLoggedN", { n: n - 1 })) : x.half ? w("app.halfLoggedTheOtherHalf") : x.at ? w("app.loggedAt", { time: new Date(x.at).toTimeString().slice(0, 5) }) : w("app.loggedItSOnToday"));
+      notify(x.portions ? (n - 1 === 1 ? w("app.onePortionLogged") : w("app.onePortionLoggedN", { n: n - 1 })) : x.half ? w("app.halfLoggedTheOtherHalf") : x.at ? loggedLine(new Date(x.at)) : w("app.loggedItSOnToday"));
+    },
+    // DT305 (0.3.151): Save in My recipes on the read: the plate as a recipe with its foods, amounts and photo, from your
+    // photo; the plate stays, and the button says Saved in My recipes
+    saveRead: (meal: Meal, photo: string | null) => {
+      const m: Meal = { ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })), steps: meal.steps ?? [], idea: { at: new Date().toISOString(), from: "photo" }, ...(photo ? withRecipePhotos([photo]) : {}) };
+      setState((s) => (s.photo ? { ...s, meals: [m, ...s.meals], photo: { ...s.photo, saved: m.id } } : s));
+      log("meal_photo_saved", {});
     },
     // DT130 (0.2.110, board Stories78, A): Photo of my meal opens the same camera as Scan, in Meal mode
     mealCamera: () => { setTalkOpen(false); setMode("meal"); setCamera(true); },
@@ -3294,9 +3310,9 @@ export default function App() {
             meal={screenProps.ai.on}
             onMeal={(image, at, more) => {
               setCamera(false);
-              if (!at) { void screenProps.readMealPhoto(image, more?.length ? { more } : undefined); return; }
-              // from Your photos: whose plate and when, asked on the Plate before the read
-              setPhotoAsk({ image, at }); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+              // DT305 (0.3.151, board Stories230): every photo of a meal waits on the photo screen before the read, a photo you
+              // take now too: the box for what Chef Mealan should know is there, and Read the plate reads
+              setPhotoAsk(at ? { image, at } : { image, at: new Date().toISOString(), taken: true, ...(more?.length ? { more } : {}) }); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
             }}
             processGroupScan={(x) => scan(x, true)}
             onBarcode={(x) => lookup(x)}

@@ -2,6 +2,8 @@
 // photo on the Plate, the photos with ＋ Photo and a line in your words; Read it again sends them all in one read. When the read
 // cannot tell what a food is, Chef Mealan asks once (pork, veal, chicken or fish?); a tap changes the food and keeps its grams.
 // A photo from Your photos has the same line before the read. The reads are stand-ins (no AI here).
+// Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): the box asks
+// Anything Chef Mealan should know?, on the photo screen and here; the photo screen has no chips.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -60,7 +62,7 @@ const READ = { dish: "Pork schnitzel with roasted potatoes", foods: [
     const help = page.locator(".mp-help");
     ok(/Help Chef Mealan read it/.test(await help.textContent()) && await help.locator(".mp-help-photos img").count() === 1 && /＋ Photo/.test(await help.textContent()) && (await help.locator(".pill-primary").textContent()).trim() === "Read it again", "under the photo: Help Chef Mealan read it, the photo, ＋ Photo, Read it again");
     await help.locator(".mp-help-add input").setInputFiles(path.join(ROOT, "tests/flows/plate.jpg")); await page.waitForTimeout(800);
-    await help.getByLabel("Tell Chef Mealan what is in it") /* B144 (0.3.150): the words box asks what is in it */.fill("pork schnitzel, breaded, Augustiner");
+    await help.getByLabel("Anything Chef Mealan should know?") /* DT305 (0.3.151): the words box asks what he should know */.fill("pork schnitzel, breaded, Augustiner");
     ok(await help.locator(".mp-help-photos img").count() === 2 && (await help.locator(".pill-primary").textContent()).trim() === "Read it again with 2 photos and this", "＋ Photo adds one; the button says what goes: Read it again with 2 photos and this");
     await help.locator(".pill-primary").click(); await page.waitForTimeout(1800);
     const st = await store(page);
@@ -77,8 +79,8 @@ const READ = { dish: "Pork schnitzel with roasted potatoes", foods: [
     await page.route("**/api/plate-photo", (r) => { sent.push(r.request().postDataJSON()); r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(READ) }); });
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(path.join(ROOT, "tests/flows/plate.jpg")); await page.waitForTimeout(1200);
-    ok(/Tell Chef Mealan what is in it, if you like/.test(await page.locator(".pa").textContent()), "a photo from Your photos: the line under the chips");
-    await page.locator(".pa-note textarea").fill("veal, Wiener Schnitzel");
+    ok(/Anything Chef Mealan should know\?/.test(await page.locator(".pa").textContent()), "a photo from Your photos: the box on the photo screen");
+    await page.locator(".pa-screen textarea").fill("veal, Wiener Schnitzel");
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     ok(sent[sent.length - 1].note === "veal, Wiener Schnitzel", "its words go with the read");
     await ctx.close();
