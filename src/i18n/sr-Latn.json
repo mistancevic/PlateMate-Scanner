@@ -22864,6 +22864,26 @@
     "plate.addOrNewQ": {
       "text": "Dodati ih na tvoj tanjir ili početi novi tanjir?",
       "checked": true
+    },
+    "nav.openCamera": {
+      "text": "Otvori kameru",
+      "checked": true
+    },
+    "camera.modeGroup": {
+      "text": "Grupa",
+      "checked": true
+    },
+    "camera.modeBarcode": {
+      "text": "Bar kod",
+      "checked": true
+    },
+    "camera.modeLabel": {
+      "text": "Deklaracija",
+      "checked": true
+    },
+    "camera.modeMeal": {
+      "text": "Obrok",
+      "checked": true
     }
   }
 }

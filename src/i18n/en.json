@@ -6314,5 +6314,10 @@
   "plate.notEmptyLine": "Your plate is not empty.",
   "plate.notEmptyAfter": "It has {plate}. After the read you choose: add the photo's foods to it, or start a new plate.",
   "plate.notEmptyWhy": "It already has {plate}, and your photo brings new foods. They cannot land on the plate by themselves: you decide where they go.",
-  "plate.addOrNewQ": "Add them to your plate, or start a new plate?"
+  "plate.addOrNewQ": "Add them to your plate, or start a new plate?",
+  "nav.openCamera": "Open the camera",
+  "camera.modeGroup": "Group",
+  "camera.modeBarcode": "Barcode",
+  "camera.modeLabel": "Label",
+  "camera.modeMeal": "Meal"
 }

@@ -295,7 +295,8 @@ export function CameraView({
           </button>
         </div>
         <div className="cam-modes" role="group" aria-label={w("camera.whatToScan")}>
-          {([["barcode", "Barcode"], ["label", "Label"], ["group", "Group"], ...(meal ? [["meal", "Meal"]] as const : [])] as const).map(([m, name]) => (
+          {/* DT309 (0.3.153): the same order as the menu a long press on Plate opens: by how often a mode is used, the most used on the right */}
+          {([["group", "Group"], ["barcode", "Barcode"], ["label", "Label"], ...(meal ? [["meal", "Meal"]] as const : [])] as const).map(([m, name]) => (
             <button key={m} aria-pressed={scannerMode === m} className={scannerMode === m ? "bg-white on" : ""} onClick={() => { if (m !== "barcode") setCodeRead(null); onModeChange(m); }}>{name}</button>
           ))}
         </div>

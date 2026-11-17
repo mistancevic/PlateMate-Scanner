@@ -22864,6 +22864,26 @@
     "plate.addOrNewQ": {
       "text": "Zu deinem Teller dazulegen oder einen neuen Teller beginnen?",
       "checked": true
+    },
+    "nav.openCamera": {
+      "text": "Kamera öffnen",
+      "checked": true
+    },
+    "camera.modeGroup": {
+      "text": "Gruppe",
+      "checked": true
+    },
+    "camera.modeBarcode": {
+      "text": "Barcode",
+      "checked": true
+    },
+    "camera.modeLabel": {
+      "text": "Etikett",
+      "checked": true
+    },
+    "camera.modeMeal": {
+      "text": "Mahlzeit",
+      "checked": true
     }
   }
 }
