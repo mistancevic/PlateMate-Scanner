@@ -165,16 +165,16 @@ start(6)
 T = ("Today", "f_t", "same", "Where you are: Today.")
 row("landing 1", "The one landing: the Plate with foods. Arriving from the list", [
   ("Why", "Coach Milan 03:32: after each of the four ways, adding must stay clean. Today the ways end on different screens: the read, the plate, a recipe page. So every way ends on one landing, built the same way."),
-  ("The landing", "The title, filled in. The meal line, set or not. What is on your plate: the foods, with the photo on top if it came by photo. The result: the score and the numbers. One closed row, + Add more to your plate. The end: What do you do with it?, with Save it, Plan it, Ate it; or Did you eat it? when a meal is set."),
-  ("Add more", "A tap opens the same four ways in place, so the long list is not repeated on a full plate. The X closes it."),
+  ("The landing", "The title, filled in. The meal line, set or not. Then, in the order of 0.3.152 (Coach Milan 10:48): the result on top, with the score and the numbers; the foods under it; + Add more to your plate directly under the foods, where + Add a food is today; Fit to my target and Prepare it in their row, as today; Chef Mealan's word; and the end: What do you do with it?, with Save it, Plan it, Ate it, or Did you eat it? when a meal is set."),
+  ("Add more", "A tap opens the same tiles and the list in place. The X closes it."),
   ("From the list", "+ Add on a food puts it on the plate at once, and you are on the landing."),
-  ("Kept from 0.3.152, to decide", "Fit to my target stands under the result. Prepare it has no place yet. The line about your day's energy and the question about a meal not logged are left out here."),
-], [T, ("The Plate", "l_1", "changed", "Tap: Plate, in the bar at the bottom."), ("The landing", "l_2", "changed", "Tap: + Add, on Skyr."), ("The landing, Add more open", "l_3", "changed", "Tap: + Add more to your plate.")], nid="DT308.7")
+  ("Left out here", "The line about your day's energy and the question about a meal not logged, which speak of a set meal."),
+], [T, ("Release 1 and 2 · The Plate", "l_1", "changed", "Tap: Plate, in the bar at the bottom."), ("Release 2 · The landing", "l_2", "changed", "Tap: + Add, on Skyr."), ("Release 2 · The landing, Add more open", "l_3", "changed", "Tap: + Add more to your plate.")], nid="DT308.7")
 row("landing 2", "Arriving from a photo: the read is the same landing", [
   ("The steps", "From the photo screen of DT308.2 you tap Read the plate."),
   ("The same landing", "The title, the meal line, the photo with its foods, the result, Chef Mealan's word, + Add more to your plate, and the end."),
   ("Not drawn yet", "Arriving from a barcode or a label, from a recipe, and from the internet. Each gets its own row."),
-], [("The photo screen", "n_n", "changed", "From DT308.2e: a photo you took."), ("The landing", "n_r1", "changed", "Tap: Read the plate.")], nid="DT308.8")
+], [("Release 2 · The photo screen", "n_n", "changed", "From DT308.2e: a photo you took."), ("Release 2 · The landing", "n_r1", "changed", "Tap: Read the plate.")], nid="DT308.8")
 board("Stories238.dc.html", "DT308 (3 of 3): the one landing, the Plate with foods",
-  "17 November 2026 (Coach Milan 03:32 to 03:35). Every way of adding ends on the same screen. Drawn so far: arriving from the list and from a photo. Drawn for approval; no Go.",
+  "17 November 2026 (Coach Milan 03:32 to 03:35). Every way of adding ends on the same screen. Drawn so far: arriving from the list and from a photo. Drawn for approval; no Go. Marked on every frame: Release 1 is the title with its pencil, the card Add to your plate with its tiles and the list, and Chef Mealan through his icon; in Release 1 the meal line stays as in 0.3.152. Release 2 is the meal line (not set, the calendar, the X), no guessed meal, the end of the read, and the landing. A frame marked Release 1 and 2 shows parts of both. Frames without a mark do not change.",
   B, W, y - 100, "Stories237.dc.html")

@@ -162,24 +162,24 @@ def flowmap():
     B.html.append("".join(out)); y += H + 60
 
 start(6)
-R1 = ("The read", "n_r1", "changed", "From DT308.2f: the read of a photo you took now.")
+R1 = ("Release 2 · The read", "n_r1", "changed", "From DT308.2f: the read of a photo you took now.")
 row("flow 3", "The end of the read: Ate it (continues DT308.2)", [
   ("The steps", "On the read you tap Ate it. Your calendar opens right there, under the button. The app marks its guess and says why: based on the current time, 18:00, so dinner. You tap Dinner."),
   ("After that", "The meal is set, in the header, with the X. The read goes on as in 0.3.152: Did you eat it? All of it, Half, Part of it, then Done."),
   ("Save it", "It keeps the read and counts nothing in your plan. Where it is kept (Recipes) is as today."),
-], [R1, ("The read, the calendar open", "n_r2", "changed", "Tap: Ate it."), ("The read, the meal set", "n_r3", "changed", "Tap: Dinner.")], nid="DT308.4")
+], [R1, ("Release 2 · The read, the calendar open", "n_r2", "changed", "Tap: Ate it."), ("Release 2 · The read, the meal set", "n_r3", "changed", "Tap: Dinner.")], nid="DT308.4")
 T = ("Today", "f_t", "same", "Where you are: Today.")
-A = ("The Plate", "n_a", "changed", "Tap: Plate, in the bar at the bottom.")
-CG = ("The camera", "f_cg", "same", "Tap: Open the camera.")
+A = ("Release 1 and 2 · The Plate", "n_a", "changed", "Tap: Plate, in the bar at the bottom.")
+CG = ("The camera", "f_cg", "same", "Tap: Photo or scan.")
 row("flow 4", "An older photo that you ate then", [
-  ("The steps", "On the Plate you tap Open the camera. In the camera you tap Your photos and pick a photo from Saturday, 15:57. On the photo screen you tap Read the plate. On the read you tap Ate it, then Lunch."),
+  ("The steps", "On the Plate you tap Photo or scan. In the camera you tap Your photos and pick a photo from Saturday, 15:57. On the photo screen you tap Read the plate. On the read you tap Ate it, then Lunch."),
   ("The bug, solved here", "No meal is claimed until you say you ate it. Then the calendar opens on the photo's day, not on today's clock, with the guess marked: lunch not eaten that day, so Lunch; with lunch eaten, Snack."),
-], [T, A, CG, ("The photo screen", "n_o", "changed", "Tap: Your photos, the photo."), ("The read", "n_o1", "changed", "Tap: Read the plate."), ("The read, the calendar open", "n_o2", "changed", "Tap: Ate it."), ("The read, the meal set", "n_o3", "changed", "Tap: Lunch.")], nid="DT308.5")
-O1 = ("The read", "n_p1", "changed", "The same read as DT308.5e.")
+], [T, A, CG, ("Release 2 · The photo screen", "n_o", "changed", "Tap: Your photos, the photo."), ("Release 2 · The read", "n_o1", "changed", "Tap: Read the plate."), ("Release 2 · The read, the calendar open", "n_o2", "changed", "Tap: Ate it."), ("Release 2 · The read, the meal set", "n_o3", "changed", "Tap: Lunch.")], nid="DT308.5")
+O1 = ("Release 2 · The read", "n_p1", "changed", "The same read as DT308.5e.")
 row("flow 5", "An older photo as an inspiration: Plan it (continues from the read of DT308.5)", [
   ("The steps", "On the read you tap Plan it. The calendar opens on tomorrow, with nothing marked. You tap Lunch."),
   ("After that", "The header says Lunch, Monday, 16 November, 13:00. Goes into your plan. Nothing is counted yet."),
-], [O1, ("The read, the calendar open", "n_p2", "changed", "Tap: Plan it."), ("The read, planned", "n_p3", "changed", "Tap: Lunch.")], nid="DT308.6")
+], [O1, ("Release 2 · The read, the calendar open", "n_p2", "changed", "Tap: Plan it."), ("Release 2 · The read, planned", "n_p3", "changed", "Tap: Lunch.")], nid="DT308.6")
 board("Stories237.dc.html", "DT308 (2 of 3): the end of the read; an older photo",
-  "17 November 2026. The second part of DT308, by the same rules as part 1. Not drawn again here: a plate that has foods (the warning and the decision of 0.3.152 stay; Add to my plate keeps the header as it is, Start a new plate starts with no meal set), and where the camera is reached from on a plate with foods. Drawn for approval; no Go.",
+  "17 November 2026. The second part of DT308, by the same rules as part 1. Not drawn again here: a plate that has foods (the warning and the decision of 0.3.152 stay; Add to my plate keeps the header as it is, Start a new plate starts with no meal set), and where the camera is reached from on a plate with foods. Drawn for approval; no Go. Marked on every frame: Release 1 is the title with its pencil, the card Add to your plate with its tiles and the list, and Chef Mealan through his icon; in Release 1 the meal line stays as in 0.3.152. Release 2 is the meal line (not set, the calendar, the X), no guessed meal, the end of the read, and the landing. A frame marked Release 1 and 2 shows parts of both. Frames without a mark do not change.",
   B, W, y - 100, "Stories236.dc.html")
