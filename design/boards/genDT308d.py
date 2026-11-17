@@ -122,17 +122,39 @@ row("fit", "Fit to my target with no meal set", [
   ("Why", "Today Fit lands a plate in its meal: the meal's energy and your PD target. With no meal set there is no meal size to aim at."),
   ("Proposed", "With no meal set, Fit aims only at your PD target. It moves the amounts of your own foods, as always. The energy is whatever the foods then give."),
   ("The result", "It says This plate where a meal's name stands today."),
-  ("Drawn on", "Just looking in 0.3.156, which already works this way. Only the meal line and the words This plate are drawn in."),
+  ("Chef Mealan's line", "New, after the tap: No meal is set, so Fit aimed at your PD target only: 4.8 or more. The energy is what your foods give. It stands first in his card. Under it, as today, what Fit did, with Undo."),
+  ("Drawn on", "Just looking in 0.3.156, which already works this way. The meal line, the words This plate and Chef Mealan's new line are drawn in."),
 ], [("The Plate, under the target", "f_1", "changed", "Where you are: the Plate, no meal set."), ("After Fit", "f_2", "changed", "Tap: Fit to my target.")], nid="DT308.10")
+board("Stories241.dc.html", "DT308: the calendar behind the pencil, and Fit with no meal set (DT308.9, DT308.10)",
+  "17 and 18 November 2026 (Coach Milan 22:33, 23:41, 00:07). Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
+  B, W, y - 100, "Stories240.dc.html")
+
+start(4)
 row("plan", "Plan it on a plate without a photo", [
   ("Why", "DT308.6 ends with Did you eat it? after Plan it. That cannot be meant: a planned plate is not eaten yet. And a plate without a photo has no read, so it had no place for the question at all."),
   ("Proposed", "A plate without a photo ends with the same question as a read: What do you do with it? Save it, Plan it, Ate it. The three are choices, so all three are white (DT310)."),
   ("Plan it", "The calendar opens under the button, on tomorrow, with nothing marked. A tap on a meal plans the plate at once. You land on Plan, on that day, with the message of today. Nothing is counted. No Did you eat it?. The Plate is empty again."),
-  ("One tap less", "Today the same end needs one more button, Put it in Monday's lunch. You already said Plan it and picked the meal, so that button would ask the same thing twice."),
+  ("For your decision", "<b>Put it in Monday's lunch falls away.</b> Today the same end needs that one more button. You already said Plan it and picked the meal, so the button would ask the same thing twice. With it gone, you no longer fit the plate to that meal's size before it goes into the plan."),
   ("New", "Plan opens on the day you planned for. Today it opens on today."),
   ("The same for a photo", "Plan it at the end of a read (DT308.6) would end the same way: on Plan, with no Did you eat it?."),
-  ("Not drawn", "Save it keeps the plate in My recipes and counts nothing. Ate it opens the calendar on today with the guess from the clock marked; a tap logs it and you land on Today."),
 ], [("The Plate with foods", "p_1", "changed", "Where you are: the Plate, no meal set."), ("The calendar under the button", "p_2", "changed", "Tap: Plan it."), ("Plan, Monday", "p_3", "changed", "Tap: Lunch.")], nid="DT308.11")
-board("Stories241.dc.html", "DT308: the three frames the meal model still missed",
-  "17 November 2026 (Coach Milan 22:33 and 23:41). The calendar with What is it? and the moment; Fit to my target with no meal set; Plan it on a plate without a photo. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
-  B, W, y - 100, "Stories240.dc.html")
+row("held", "A meal that already holds something", [
+  ("Today", "A plate put into a meal that holds one takes its place without a word."),
+  ("Proposed", "The calendar's row says what the meal holds. A tap on it opens one question right under the row: Monday's lunch has Rice &amp; Chicken breast. Keep it, or Replace it."),
+  ("Replace it", "The plate takes the meal's place. You land on Plan, on that day. The meal that was there leaves the plan and stays in My recipes."),
+  ("Keep it", "The question closes and nothing changes. The calendar stays open, so you can tap another meal or another day."),
+  ("The same for Ate it", "A meal already eaten asks the same way: Sunday's dinner has what you ate. Keep it, or Replace it."),
+], [("The Plate with foods", "p_1", "changed", "Where you are: the Plate, no meal set."), ("The calendar, a meal is taken", "p_5", "changed", "Tap: Plan it."), ("The question, in place", "p_6", "changed", "Tap: Lunch."), ("Plan, Monday", "p_7", "changed", "Tap: Replace it.")], nid="DT308.11", at=3)
+row("ate", "Ate it on a plate without a photo, to the end", [
+  ("The steps", "Ate it opens the calendar under the button, on today, with the guess from the clock marked and its reason. A tap on the meal logs the plate at once. You land on Today with the meal eaten and the message Logged. It's on Today."),
+  ("No amount asked", "A read asks Did you eat it? All of it, Half, Part of it, because the amounts are a guess from a photo. On a plate you built, the amounts are yours, so nothing more is asked."),
+  ("The end", "Today, as in 0.3.156. The Plate is empty again."),
+], [("The Plate with foods", "a_1", "changed", "Where you are: the Plate, no meal set."), ("The calendar under the button", "a_2", "changed", "Tap: Ate it."), ("Today", "a_3", "changed", "Tap: Dinner.")], nid="DT308.11", at=7)
+row("save", "Save it on a plate without a photo", [
+  ("Where it goes", "Into My recipes, as a recipe under the plate's name, with its foods and amounts. It is what Save in My recipes does on a read today."),
+  ("The plate stays", "Nothing is counted and no meal is set. The button turns into Saved in My recipes with a tick and cannot be tapped again. Plan it and Ate it are still there, so you can save a plate and then plan or log it."),
+  ("Not Saved for later", "Saved for later, the list of parked plates on the empty Plate, is a different thing and stays as it is."),
+], [("The Plate with foods", "s_1", "changed", "Where you are: the Plate, no meal set."), ("Saved, the plate stays", "s_2", "changed", "Tap: Save it."), ("Recipes", "s_3", "changed", "Tap: Recipes.")], nid="DT308.11", at=10)
+board("Stories242.dc.html", "DT308.11: a plate without a photo. Plan it, a meal that holds something, Ate it, Save it",
+  "18 November 2026 (Coach Milan 00:07). The end of a plate without a photo: What do you do with it? Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
+  B, W, y - 100, "Stories241.dc.html")
