@@ -21314,15 +21314,15 @@
       "checked": true
     },
     "howto.eatNow.s1": {
-      "text": "Otvori Tanjir. Pita te: Šta ti se jede?",
+      "text": "Otvori Tanjir i dodirni okruglu ikonu Chef Mealana.",
       "checked": true
     },
     "howto.eatNow.s2": {
-      "text": "Upiši jelo ili želju, npr. sarma ili čokolada, i dodirni Nađi ideje.",
+      "text": "Upiši ili reci jelo ili želju, npr. sarma ili čokolada, i pošalji.",
       "checked": true
     },
     "howto.eatNow.s3": {
-      "text": "Dodirni neko od svojih jela, ili Prikaži više na nekoj od ideja Chef Mealana, pa Stavi na moj tanjir.",
+      "text": "Dodirni + Dodaj na nekom od svojih recepata ili na nekoj od ideja Chef Mealana. Dodir na naslov ideje prvo pokazuje njene namirnice.",
       "checked": true
     },
     "howto.eatNow.s4": {
@@ -21342,7 +21342,7 @@
       "checked": true
     },
     "howto.photoLog.s1": {
-      "text": "Na Tanjiru dodirni Slika mog obroka.",
+      "text": "Na Tanjiru dodirni Slika ili skeniranje.",
       "checked": true
     },
     "howto.photoLog.s2": {
@@ -22883,6 +22883,114 @@
     },
     "camera.modeMeal": {
       "text": "Obrok",
+      "checked": true
+    },
+    "plate.mealTitle": {
+      "text": "Naziv obroka",
+      "checked": true
+    },
+    "plate.editTitle": {
+      "text": "Izmeni naziv",
+      "checked": true
+    },
+    "plate.nothingYours": {
+      "text": "Na tvom tanjiru još nema ničega.",
+      "checked": true
+    },
+    "plate.addToYourPlate": {
+      "text": "Dodaj na svoj tanjir",
+      "checked": true
+    },
+    "plate.recipePhoto": {
+      "text": "Slika recepta",
+      "checked": true
+    },
+    "plate.recipeLink": {
+      "text": "Link recepta",
+      "checked": true
+    },
+    "plate.photoOrScan": {
+      "text": "Slika ili skeniranje",
+      "checked": true
+    },
+    "plate.fromTheList": {
+      "text": "Sa liste",
+      "checked": true
+    },
+    "plate.searchAll": {
+      "text": "Pretraži sve namirnice",
+      "checked": true
+    },
+    "plate.macroProtein": {
+      "text": "Proteini",
+      "checked": true
+    },
+    "plate.macroCarbs": {
+      "text": "Ugljeni hidrati",
+      "checked": true
+    },
+    "plate.macroFat": {
+      "text": "Masti",
+      "checked": true
+    },
+    "plate.seeAllFoods": {
+      "text": "Vidi sve namirnice",
+      "checked": true
+    },
+    "plate.addManually": {
+      "text": "Dodaj ručno",
+      "checked": true
+    },
+    "chef.fromYourRecipes": {
+      "text": "Iz tvojih recepata",
+      "checked": true
+    },
+    "chef.ideasWithThem": {
+      "text": "Ideje od Chef Mealana sa njima",
+      "checked": true
+    },
+    "chef.aboutKcalPd": {
+      "text": "oko {kcal} kcal · PD {pd}",
+      "checked": true
+    },
+    "chef.aboutEach": {
+      "text": "oko {grams} g svake, kao procena",
+      "checked": true
+    },
+    "chef.aboutInAll": {
+      "text": "oko {grams} g ukupno, kao procena",
+      "checked": true
+    },
+    "chef.typeOrSay": {
+      "text": "Upiši ili reci šta ti se jede ili šta imaš",
+      "checked": true
+    },
+    "chef.seeWholeRecipe": {
+      "text": "Vidi ceo recept",
+      "checked": true
+    },
+    "chef.backToChef": {
+      "text": "Nazad na Chef Mealana",
+      "checked": true
+    },
+    "chef.ideaNotMade": {
+      "text": "Ideja od Chef Mealana, još nije napravljena",
+      "checked": true
+    },
+    "chef.gProtein": {
+      "text": "{protein} g proteina",
+      "checked": true
+    },
+    "chef.addYourFoods": {
+      "text": "Dodaj svoje namirnice na svoj tanjir",
+      "checked": true
+    },
+    "chef.addDish": {
+      "text": "Dodaj na svoj tanjir: {title}",
+      "checked": true
+    },
+    "recipein.aRecipePageFromAPhoto": {
+      "text": "Strana s receptom sa sajta. Linkovi sa Instagrama i TikToka traže prijavu, pa nam se ne otvaraju: tamo dodirni Slika recepta.",
       "checked": true
     }
   }

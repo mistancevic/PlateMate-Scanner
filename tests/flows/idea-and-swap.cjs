@@ -38,8 +38,10 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
     await page.route("**/api/crave", async (r) => { asked = JSON.parse(r.request().postData() || "{}"); while (hold) await new Promise((x) => setTimeout(x, 100)); r.fulfill({ json: IDEA }); });
     const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
     await page.goto(U + "/plate"); await page.waitForTimeout(1500);
-    await page.getByLabel("What are you craving?").fill("cheesecake"); await page.waitForTimeout(500);
-    await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(2300);
+    // Changed by story DT308.3 (0.3.154, board Stories236; Coach Milan 17 November 18:41 Go): Chef Mealan is asked through his
+    // round icon, in his chat over the Plate. The idea opens short; See the whole recipe opens it as a page, with + Add
+    await page.locator(".chat-fab").click(); await page.waitForTimeout(400);
+    await page.locator(".pc-input input").fill("cheesecake"); await page.locator(".pc-input input").press("Enter"); await page.waitForTimeout(2300);
     // the wait moves and counts
     const card = page.locator(".thinking-card");
     ok(await card.count() === 1 && await card.locator(".thinking-hat img").count() === 1 && await card.locator(".thinking-bar i").count() === 1, "a thinking card: the hat, the bar");
@@ -49,12 +51,13 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
     ok(asked && asked.place === "Limassol" && Array.isArray(asked.library), "Chef Mealan is told where you shop: " + asked?.place);
     hold = false; await page.waitForTimeout(1500);
     // the idea to read
-    const idea = page.locator(".crave-idea");
-    ok((await idea.locator(".crave-foods li").allTextContents()).join("|") === "200 g Quark, low fat (Magerquark)|30 g Oats|120 g Strawberries|10 g Honey", "the foods as points with their grams: " + (await idea.locator(".crave-foods li").allTextContents()).join(", "));
-    ok(await idea.locator(".crave-how li").count() === 4 && /Toast the oats/.test(await idea.locator(".crave-how").textContent()), "How to make it, in steps");
-    ok(await idea.getByRole("button", { name: /Swap|Add/ }).count() === 0, "nothing to edit on the card");
-    ok(/To change a food, put it on your plate: swap, remove, add and the amounts are all there\./.test(await idea.textContent()), "the card says where changes happen");
-    await idea.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200);
+    await page.locator(".pc-card .pc-title").first().click(); await page.waitForTimeout(300);
+    await page.locator(".pc-whole").click(); await page.waitForTimeout(400);
+    const idea = page.locator(".pc-page");
+    ok((await idea.locator(".pc-foods li").allTextContents()).join("|") === "200 g Quark, low fat (Magerquark)|30 g Oats|120 g Strawberries|10 g Honey", "the foods as points with their grams: " + (await idea.locator(".pc-foods li").allTextContents()).join(", "));
+    ok(await idea.locator(".pc-how li").count() === 4 && /Toast the oats/.test(await idea.locator(".pc-how").textContent()), "How to make it, in steps");
+    ok(await idea.getByRole("button", { name: /Swap/ }).count() === 0 && await idea.locator("input").count() === 0, "nothing to edit on the page");
+    await idea.getByRole("button", { name: "+ Add" }).click(); await page.waitForTimeout(1200);
     ok((await st()).meals.find((m) => m.title === "Cheesecake cup")?.idea?.how?.length === 4, "on the plate, the idea is kept with its steps");
     // the Plate: the swipe line and + Add a food under the foods
     ok(/Swipe a food left to swap it, right to remove it\./.test(await page.locator(".plate-card").textContent()), "one line says how to swap and remove");
@@ -86,7 +89,7 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
     const s = await st();
     ok(s.items.some((i) => /Sheep's milk yoghurt/.test(i.food.name)) && s.foods.some((f) => /Sheep's milk yoghurt/.test(f.name) && f.refId === "cy-yoghurt-sheep") && !s.items.some((i) => /^Quark/.test(i.food.name)), "picked: it takes Quark's place and joins your foods");
     // the bottom search reads + Add too
-    await page.getByLabel("Search all my foods").fill("kefir"); await page.waitForTimeout(600);
+    await page.getByLabel(/^Search all (my )?foods$/).fill("kefir"); await page.waitForTimeout(600);
     ok(await page.getByRole("button", { name: "Take it" }).count() === 0, "no Take it in the Plate's search");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough error: " + e.message); }

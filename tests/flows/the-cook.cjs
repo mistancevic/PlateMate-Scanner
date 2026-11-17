@@ -82,10 +82,10 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     await nav(page, "Plate"); await page.waitForTimeout(700);
     st = await store(page);
     ok(st.items.length === 0 && st.cook.plate.items.length === 4, "the Plate is free; the dish waits with the cook");
-    ok(/What are you craving\?/.test(await main()) && await page.locator(".cook-strip").count() === 1, "the Plate: the strip under What are you craving?");
+    ok(/Nothing on your plate yet\./.test(await main()) && await page.locator(".cook-strip").count() === 1, "the Plate is empty, with the cook's strip"); // DT308 (0.3.154): What are you craving? is gone from the page
     // ---- 4. a food while cooking asks where it goes ----
-    await page.locator("main input").first().fill("Skyr"); await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(700); // DT301 (0.3.149, board Stories223): what you typed shows on Find ideas
-    await page.locator("main button").filter({ hasText: /^Skyr, natural/ }).first().click(); await page.waitForTimeout(700);
+    await page.getByLabel(/^Search all (my )?foods$/).fill("Skyr"); await page.waitForTimeout(400); // DT308 (0.3.154, board Stories236): a food of yours is found in From the list
+    await page.locator(".rows .row-food").filter({ hasText: "Skyr, natural" }).first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(700);
     ok(/You are cooking Chicken rice bowl\. Shall I use this skyr in it, put it on the Plate, or keep it in your foods\?/.test(await main()), "Chef Mealan asks: use it in the dish, put it on the Plate, or keep it in your foods");
     await page.getByRole("button", { name: "Use it in Chicken rice bowl" }).click(); await page.waitForTimeout(900);
     ok(/what does it replace in Chicken rice bowl, or does it add to it\?/.test(await main()), "Use it: what it replaces, or Add it");

@@ -27,11 +27,12 @@ const U = "http://127.0.0.1:3239";
       localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "exact" }));
       localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, kitchens: ["Italian"], plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
       localStorage.setItem("chefmealan-unlogged", JSON.stringify({}));
+      localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z", aiConfirmedAt: "2026-10-06T09:00:00Z" }));
       localStorage.setItem("seeded", "1"); }, seed);
     await require("./adult.cjs")(page);
     await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
     await page.route("**/api/members", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recipes: [] }) }));
-    await page.route("**/api/crave", (r) => { asked.push(JSON.parse(r.request().postData() || "{}")); return r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ error: "no-idea", message: "Chef Mealan has no idea for that right now. Try other words." }) }); });
+    await page.route("**/api/crave", (r) => { asked.push(JSON.parse(r.request().postData() || "{}")); const one = { title: "Chocolate quark cream", why: "Sweet and full of protein.", how: [], items: [{ name: "Quark, low fat (Magerquark)", grams: 250, calories: 67, protein: 12, fats: 0.2, carbs: 4 }, { name: "Nutella", grams: 15, calories: 539, protein: 6.3, fats: 30.9, carbs: 57.5 }] }; return r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(/chocolate/.test(asked[asked.length - 1].craving) ? { ideas: [one] } : { error: "no-idea", message: "Chef Mealan has no idea for that right now. Try other words." }) }); });
     await page.goto(U + "/"); await page.waitForTimeout(1500);
 
     // ---- Me: the taste as chips ----
@@ -54,7 +55,7 @@ const U = "http://127.0.0.1:3239";
     ok(await what.getByRole("button").allTextContents().then((t) => t.join("|")) === "Savoury|Sweet, a DaaM|Both", "What is it?: Savoury, Sweet, a DaaM, Both");
     ok(await page.getByRole("radiogroup", { name: "Kind of plate" }).count() === 0 && await page.locator("main button", { hasText: /^Dessert$/ }).count() === 0, "Meal or Dessert is gone; a small thing is a Snack");
     ok(/Nothing picked: everything is offered/.test(await page.locator(".taste-hint").textContent()), "nothing picked: everything is offered");
-    const search = page.getByLabel("Search all my foods");
+    const search = page.getByLabel(/^Search all (my )?foods$/);
     const shown = async (q) => { await search.fill(q); await page.waitForTimeout(300); return page.locator(".rows .row-food").filter({ hasText: q }).count(); };
     ok(await shown("Nutella") > 0, "nothing picked: Nutella is offered");
     await what.getByRole("button", { name: "Savoury" }).click(); await page.waitForTimeout(300);
@@ -73,7 +74,7 @@ const U = "http://127.0.0.1:3239";
     await search.fill("Chicken"); await page.waitForTimeout(300);
     await page.locator(".rows .row-food").filter({ hasText: "Chicken" }).first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(600);
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(500);
-    await page.getByLabel("Search all my foods").fill("Vanilla ice"); await page.waitForTimeout(300);
+    await page.getByLabel(/^Search all (my )?foods$/).fill("Vanilla ice"); await page.waitForTimeout(300);
     await page.locator(".rows .row-food").filter({ hasText: "Vanilla ice cream" }).first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(600);
     const parts = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.map((i) => `${i.food.name}:${i.part}`));
     ok(parts.includes("Chicken breast, cooked:Main") && parts.includes("Vanilla ice cream:Sweet finish"), "Both: the chicken in Main, the ice cream in Sweet finish: " + parts.join(", "));
@@ -81,12 +82,12 @@ const U = "http://127.0.0.1:3239";
     // ---- a craving sets it; Chef Mealan gets the chips ----
     await page.locator(".plate-empty-link").click(); await page.waitForTimeout(200); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(600);
     // Changed by story DT301 (0.3.149, board Stories223): the dishes and foods show on Find ideas, which asks Chef Mealan too
-    await page.getByLabel("What are you craving?").fill("chocolate daam"); await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(700);
-    await page.getByRole("button", { name: "Add Nutella" }).first().click(); await page.waitForTimeout(700);
-    ok(/ · Sweet, a DaaM/.test(await page.locator(".plan-line").textContent()), "chocolate daam, Nutella taken: the plate is a DaaM");
+    // Changed by story DT308.3 (0.3.154, board Stories236): the craving is typed in Chef Mealan's chat, through his round icon
+    await page.locator(".chat-fab").click(); await page.waitForTimeout(400); await page.locator(".pc-input input").fill("chocolate daam"); await page.locator(".pc-input input").press("Enter"); await page.waitForTimeout(1200);
+    await page.locator(".pc-card .pc-add").first().click(); await page.waitForTimeout(900);
+    ok(/ · Sweet, a DaaM/.test(await page.locator(".plan-line").textContent()), "chocolate daam, his idea taken: the plate is a DaaM");
     await page.locator(".plate-empty-link").click(); await page.waitForTimeout(200); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(600);
-    await page.getByLabel("What are you craving?").fill("tiramisu"); await page.waitForTimeout(400);
-    await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(700);
+    await page.locator(".chat-fab").click(); await page.waitForTimeout(400); await page.locator(".pc-input input").fill("tiramisu"); await page.locator(".pc-input input").press("Enter"); await page.waitForTimeout(1200);
     const t = asked[asked.length - 1]?.tastes;
     ok(t && JSON.stringify(t.likes) === JSON.stringify(["Vanilla", "Chocolate"]) && JSON.stringify(t.rather_not) === JSON.stringify(["Sour", "Spicy"]) && t.own_words === "keep the chocolate flavour", "Chef Mealan is asked with the chips and your words: " + JSON.stringify(t));
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);

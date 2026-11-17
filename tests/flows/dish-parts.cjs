@@ -57,7 +57,7 @@ const U = "http://127.0.0.1:3211";
       c("Cream cheese, light", g["Cream cheese"], "swap", "cheese", 150, 7.5, { was: "Cream cheese" }), c("Eggs", g["Eggs"], "same", "protein", 155, 13), c("Vanilla whey protein powder", g["Vanilla whey protein powder"], "same", "protein", 390, 78), c("Sweetener", g["Sweetener"], "same", "sweet", 0, 0), c("Raspberries", g["Raspberries"], "same", "fruit", 52, 1.2)] }) });
   });
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
-  await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
+  await page.locator(".plate-card label").filter({ hasText: /Recipe photo|Screenshot/ }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
   await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
   await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
   // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.

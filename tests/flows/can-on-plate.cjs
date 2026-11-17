@@ -31,16 +31,16 @@ const tuna = { success: true, product_name: "Thunfisch in Olivenöl", brand: "Ri
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(500);
 
     // + Add on a food the pack sells as one piece
-    await page.getByLabel("Search all my foods").fill("pudding"); await page.waitForTimeout(300);
+    await page.getByLabel(/^Search all (my )?foods$/).fill("pudding"); await page.waitForTimeout(300);
     await page.locator(".row-food", { hasText: "Protein pudding" }).getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(600);
     let it = await items();
     ok(it.length === 1 && it[0].grams === 200, "+ Add puts one pot on the plate, 200 g: " + JSON.stringify(it));
     ok(/1 pot/.test(await rows()), "the row says 1 pot");
-    await page.getByLabel("Search all my foods").fill(""); await swipe(page, page.locator(".swipe-fg", { hasText: "Protein pudding" }).locator(".thumb"), "right");
+    await page.getByLabel(/^Search all (my )?foods$/).fill(""); await swipe(page, page.locator(".swipe-fg", { hasText: "Protein pudding" }).locator(".thumb"), "right");
     ok((await items()).length === 0, "a swipe takes it off");
 
     // a code for a food you have, scanned on the Plate: on the plate, not off to My foods
-    await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2000);
+    await page.getByRole("button", { name: /^(Scan|Photo or scan)$/ }).first().click(); await page.waitForTimeout(2000);
     await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
     await page.locator('input[aria-label^="Type t"]').fill("4006040000001"); await page.keyboard.press("Enter"); await page.waitForTimeout(1200);
     it = await items();
@@ -49,7 +49,7 @@ const tuna = { success: true, product_name: "Thunfisch in Olivenöl", brand: "Ri
     await swipe(page, page.locator(".swipe-fg", { hasText: "Protein pudding" }).locator(".thumb"), "right");
 
     // a new can, its label read on the Plate
-    await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2000);
+    await page.getByRole("button", { name: /^(Scan|Photo or scan)$/ }).first().click(); await page.waitForTimeout(2000);
     await page.getByRole("button", { name: /^Label$/ }).click(); await page.waitForTimeout(400);
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(600);
     await page.getByRole("button", { name: /Analyze 1 photo/ }).click(); await page.waitForTimeout(1500);
@@ -91,11 +91,11 @@ const tuna = { success: true, product_name: "Thunfisch in Olivenöl", brand: "Ri
     ok(it.length === 0, "taking the can off takes its oil: " + JSON.stringify(it.map((x) => x.name)));
 
     // Fit never moves the oil
-    await page.getByLabel("Search all my foods").fill("Thunfisch"); await page.waitForTimeout(300);
+    await page.getByLabel(/^Search all (my )?foods$/).fill("Thunfisch"); await page.waitForTimeout(300);
     await page.locator(".row-food", { hasText: "Thunfisch" }).getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(500);
     ok((await items())[0]?.grams === 120, "+ Add on the can is one can too, 120 g");
     await oil.getByRole("button", { name: "All, 40 g" }).click(); await page.waitForTimeout(400);
-    await page.getByLabel("Search all my foods").fill("rice"); await page.waitForTimeout(300);
+    await page.getByLabel(/^Search all (my )?foods$/).fill("rice"); await page.waitForTimeout(300);
     await page.locator(".row-food", { hasText: "Rice, cooked" }).getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(500);
     await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).first().click(); await page.waitForTimeout(1200);
     it = await items();

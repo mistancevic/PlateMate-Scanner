@@ -69,7 +69,7 @@ import { ymd } from "../plan";
 import { blockedByAllergy } from "../safety";
 import { minPortionOf, portionOf as portionRange, portionLine, startGrams, mealScale, fitPart, factorWords } from "../foodjob";
 import { tasteForChef } from "../kitchens";
-import { CravingSearch } from "../components/CravingSearch";
+import { PlateChef } from "../components/PlateChef";
 import { resizeImageBase64 } from "../utils/image";
 import { type InFlow } from "../components/RecipeIn";
 import { useRecipeIn, RecipeInFlow, StartWays, mealFromRead, estimate } from "../components/RecipeInBlock";
@@ -413,7 +413,10 @@ export function JourneyScreen(p: AppApi) {
   const autoTitle = (its: typeof items) => { const n = its.map((i) => i.food.name.split(",")[0].trim()); return n.length <= 1 ? n[0] ?? w("meal.meal") : `${n.slice(0, -1).join(", ")} & ${n[n.length - 1]}`; };
   const [shareWhy, setShareWhy] = useState<"look" | "ok" | "help" | null>(null);
   const [helper, setHelper] = useState<{ missing: string | null; prefill?: string } | null>(null);
-  useEffect(() => { if (p.mealanAsk && items.length > 0) { setHelper({ missing: null }); p.mealanAsked(); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.mealanAsk]);
+  // DT308.3 (0.3.154, board Stories236): on the empty Plate his icon opens his chat over the Plate; elsewhere on the Plate, the conversation
+  const [chefOpen, setChefOpen] = useState(false);
+  const chefHere = useRef(false);
+  useEffect(() => { if (!p.mealanAsk) return; if (items.length > 0) setHelper({ missing: null }); else if (chefHere.current) setChefOpen(true); else p.openOut(); p.mealanAsked(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.mealanAsk]);
   // a "Not quite? Tell Mealan" from a mix tip opens the helper with the tip as the question's start
   useEffect(() => { if (p.mixQuestion) { setHelper({ missing: null, prefill: p.mixQuestion }); setCardId(null); p.mixQuestionTaken(); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.mixQuestion]);
   // the mix tip for a food on this plate; the card logs what it showed
@@ -830,6 +833,7 @@ export function JourneyScreen(p: AppApi) {
     return <select className="pt-chip pt-select" aria-label={w("plate.part")} value={value} onChange={(e) => onPick(e.target.value)}><option value="">{w("plate.noPart")}</option>{all.map((x) => <option key={x} value={x}>{x}</option>)}</select>;
   };
   const mealNeed = share && share.kcal >= 150 && p.kind !== "dessert" ? share.kcal : null;
+  chefHere.current = p.ai.on && step === "in" && !p.filling && !imported && items.length === 0 && !inFlow && !p.photoAsk && !state.photo;
   // DT243: a recipe's own unit (pancakes) stays as written, one of it by its trailing s; portions are the app's words, in count lines
   const ownUnit = (m: Meal | null | undefined) => (m?.makes?.unit && m.makes.unit !== "portions" ? m.makes.unit : null);
   const unitOf = (m: Meal) => ownUnit(m) ?? w("plate.portionsWord"), oneOf = (m: Meal) => ownUnit(m)?.replace(/s$/, "") ?? w("plate.portionWord");
@@ -1729,9 +1733,7 @@ export function JourneyScreen(p: AppApi) {
             look={p.lookAtPhoto} read={(x) => { void p.readMealPhoto(p.photoAsk!.image, { ...x, ...(p.photoAsk!.more?.length ? { more: p.photoAsk!.more } : {}), ...(photoTitle.trim() ? { title: photoTitle.trim() } : {}) }); }} />
         </section>
         ) : readView ? readCard : (<>
-        {/* R17 (0.2.45, board RS16): an empty plate asks what you crave, and finds it. DT301 (0.3.149, board Stories223): under
-            the meal line, which now comes first and says what this plate is for */}
-        {!p.filling && !imported && items.length === 0 && !inFlow && <CravingSearch p={p} need={mealNeed} target={pdRef} onFood={add} />}
+        {/* DT308.3 (0.3.154, board Stories236): What are you craving? is gone from the page; Chef Mealan is asked through his round icon */}
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
         {/* DT246 (0.3.96, board Stories182): a plate already recorded says where it went; its changes go there too */}
         {p.recordNow && items.length > 0 && (() => { const r = p.recordNow!, d = new Date(r.at); return (
@@ -1750,7 +1752,7 @@ export function JourneyScreen(p: AppApi) {
                 <button key={f.id} type="button" className={`choice${f === cur ? " on" : ""}`} aria-pressed={f === cur} onClick={() => { if (f !== cur) p.openDish(f.id); }}>{word(k, f)} · {f.meal.title}</button>))}
                 {p.recordNow && <button type="button" className="choice" onClick={() => p.mealCamera()}>{w("dish.addDish")}</button>}</div>
             </section>); })()}
-        {inFlow ? <RecipeInFlow flow={recipeIn} put={(f) => void putRead(f)} /> : (
+        {inFlow ? <RecipeInFlow flow={recipeIn} put={(f) => void putRead(f)} photoWord={items.length === 0} /> : (
         <section className="card plate-card">
         {/* DT305 (0.3.151): the photo screen stands alone now, above */}
         {/* DT242 (0.3.96, board Stories182): the answer was lost twice (read again once by itself): the photo is kept, Try again */}
@@ -1924,6 +1926,7 @@ export function JourneyScreen(p: AppApi) {
           {/* DT175 (0.3.17, board Stories122): the foods you have, said or typed, landed as estimates */}
           {p.ai.on && !saying && <button type="button" className="pill pill-small say-button" onClick={() => setSaying(true)}><Mic size={items.length === 0 ? 24 : 15} /> {w("plate.sayWhatYouHave")}</button>}
         </div>)}
+        {chefOpen && <PlateChef p={p} need={mealNeed} target={pdRef} close={() => setChefOpen(false)} />}
         {saying && <SayHave busy={!!p.busy} onCancel={() => setSaying(false)} onDone={(text) => { void p.plateFromWords(text).then((ok) => { if (ok) setSaying(false); }); }} />}
         {/* Start from a recipe (0.2.16, board IM, IM1): only on an empty plate, because a recipe fills the plate */}
         {/* DT308: From the list, inside the card of an empty plate: the search of all foods, three of your foods for each

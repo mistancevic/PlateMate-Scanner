@@ -55,7 +55,8 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
   try {
     // ---- 1. to be informed: the Plate, the camera, the photo screen, the read, Done ----
     let { ctx, page } = await open();
-    ok(/What are you craving\?/.test(await txt(page, ".step-head")) && await page.locator(".crave-find svg").count() === 1, "a: the Plate asks What are you craving?; Find ideas carries Chef Mealan's hat");
+    // Changed by story DT308 (0.3.154, board Stories236): What are you craving? and Find ideas are gone from the page; Photo or scan opens the camera
+    ok(/Nothing on your plate yet\./.test(await txt(page, ".plate-empty-pic")) && await page.locator(".crave-find").count() === 0 && (await txt(page, ".mp-button")).trim() === "Photo or scan", "a: the empty Plate, with Photo or scan");
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(600);
     await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500);
@@ -86,7 +87,7 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     ok(await page.locator(".mp-say, .ways, .gate-card, .mp-again-link, .card-top").count() === 0 && !/Fit to my target|Quick picks|Empty plate/.test(await txt(page)), "d: nothing else: no plate tools, no Fit to my target, no Quick picks");
     await page.locator(".rv-done").click(); await page.waitForTimeout(900);
     st = await store(page);
-    ok(st.items.length === 0 && !st.photo && st.feedback.length === 0 && st.meals.length === 0 && /What are you craving\?/.test(await txt(page, ".step-head")) && /\/plate$/.test(page.url()), "e: Done with nothing chosen keeps nothing: back on the empty Plate");
+    ok(st.items.length === 0 && !st.photo && st.feedback.length === 0 && st.meals.length === 0 && /Nothing on your plate yet\./.test(await txt(page, ".plate-empty-pic")) && /\/plate$/.test(page.url()), "e: Done with nothing chosen keeps nothing: back on the empty Plate");
     await ctx.close();
 
     // ---- 2. to keep it: Save in My recipes ----

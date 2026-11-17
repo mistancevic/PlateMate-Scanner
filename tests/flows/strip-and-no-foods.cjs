@@ -81,8 +81,8 @@ const cook = { id: "c-1", startedAt: "2026-11-02T11:20:00", title: "Vanilla prot
     await ctx.close();
     // ---- DT224 (0.3.60, board Stories165): an empty Plate starts with What are you craving?; Craft, Make, Eat once it holds something ----
     ({ ctx, page } = await open({ ...seed, items: [] }, "/plate"));
-    ok(await page.locator(".phase-bar").count() === 0 && /What are you craving\?/.test(await page.locator("h2").first().textContent()), "DT224: an empty Plate: What are you craving?, no Craft, Make, Eat");
-    await page.getByLabel("Search all my foods").fill("skyr"); await page.waitForTimeout(400);
+    ok(await page.locator(".phase-bar").count() === 0 && /Nothing on your plate yet\./.test(await page.locator(".plate-empty-pic").textContent()), "DT224: an empty Plate: no Craft, Make, Eat (DT308, 0.3.154: it says Nothing on your plate yet)");
+    await page.getByLabel(/^Search all (my )?foods$/).fill("skyr"); await page.waitForTimeout(400);
     await page.locator(".rows .row-food", { hasText: "Skyr" }).first().getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(600);
     ok(await page.locator(".phase-bar").count() === 0, "DT230: a food on the Plate: still no bar, the Plate is Craft on paper");
     await ctx.close();

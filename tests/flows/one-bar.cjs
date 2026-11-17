@@ -50,9 +50,9 @@ const U = "http://127.0.0.1:3263";
   // DT103: Quick picks hold no ingredient; the list and the search still do
   const picks = await page.locator(".rows .row-food b").allTextContents();
   ok(picks.length > 0 && picks.every((n) => !/yeast|flour|oil/i.test(n)), "DT103: no yeast, flour or oil in Quick picks: " + picks.join(", "));
-  await page.getByLabel("Search all my foods").fill("yeast"); await page.waitForTimeout(400);
+  await page.getByLabel(/^Search all (my )?foods$/).fill("yeast"); await page.waitForTimeout(400);
   ok((await page.locator(".rows .row-food b").allTextContents()).some((n) => /yeast/i.test(n)), "DT103: the search still finds the yeast");
-  await page.getByLabel("Search all my foods").fill(""); await page.waitForTimeout(300);
+  await page.getByLabel(/^Search all (my )?foods$/).fill(""); await page.waitForTimeout(300);
   // the tip's Add puts the food on the plate at that amount
   const first = page.locator(".tip-row").first(); const name = await first.locator(".tip-text b").textContent(); const g = parseInt(await first.locator(".tip-text small").textContent(), 10);
   await first.getByRole("button", { name: "+ Add" }).click(); await page.waitForTimeout(600);

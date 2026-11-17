@@ -90,8 +90,10 @@ const SECOND = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, 
     // Say what you have, in Srpski, listens in Srpski
     page = await open(seed, "sr-Latn");
     await page.goto(B + "/plate"); await page.waitForTimeout(1200);
-    await page.locator("button").filter({ hasText: /Reci šta imaš/ }).first().click(); await page.waitForTimeout(500);
-    ok(await page.evaluate(() => window.__recs.at(-1)?.lang) === "sr-RS", "Say what you have listens in Srpski");
+    // Changed by story DT308.3b (0.3.154, board Stories236): you say your foods in Chef Mealan's chat, through his round icon
+    await page.locator(".chat-fab").click(); await page.waitForTimeout(500);
+    await page.locator(".pc-sheet .pc-mic").click(); await page.waitForTimeout(500);
+    ok(await page.evaluate(() => window.__recs.at(-1)?.lang) === "sr-RS", "Chef Mealan's chat listens in Srpski");
     await page.context().close();
 
     // DT249: two photos of the meal

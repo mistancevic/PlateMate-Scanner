@@ -67,11 +67,12 @@ const U = "http://127.0.0.1:3209";
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
   let t = await card();
   // Changed by story DT301 (0.3.149, board Stories223): the second part reads Have a recipe? Start from it; the buttons Use a screenshot, Paste a link
-  ok(/Add a food/.test(t) && /Have a recipe\? Start from it/.test(t) && await page.locator(".plate-card").getByText("Use a screenshot").count() === 1 && await page.locator(".plate-card").getByRole("button", { name: "Paste a link" }).count() === 1, "IM1: an empty plate: Add a food and Have a recipe? Start from it (Use a screenshot, Paste a link)");
+  // Changed by story DT308 (0.3.154, board Stories236): one heading, Add to your plate; the recipe's tiles are Recipe photo and Recipe link
+  ok(/Add to your plate/.test(t) && await page.locator(".plate-card").getByText("Recipe photo").count() === 1 && await page.locator(".plate-card").getByRole("button", { name: "Recipe link" }).count() === 1, "IM1: an empty plate: Add to your plate, with Recipe photo and Recipe link");
   ok(!/Empty plate/.test(t), "IM1: no Empty plate on an empty plate");
 
   // IM2: two screenshots, read in order
-  await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }, { name: "b.png", mimeType: "image/png", buffer: PNG }]);
+  await page.locator(".plate-card label").filter({ hasText: /Recipe photo|Screenshot/ }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }, { name: "b.png", mimeType: "image/png", buffer: PNG }]);
   await page.waitForTimeout(800);
   t = await card();
   ok(/A recipe from screenshots/.test(t) && /2 pictures, read in this order/.test(t) && await page.locator(".in-thumb img").count() === 2, "IM2: the two pictures, in order, with Read them");

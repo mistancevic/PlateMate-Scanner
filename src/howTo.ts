@@ -10,7 +10,7 @@ export type HowGroup = "day" | "cook" | "week";
 export type Situation = { id: string; icon: string; group: HowGroup; added: string; on: string; flow: string; steps: number; go: { tab?: Tab; menu?: MenuSection } };
 export const GROUPS: HowGroup[] = ["day", "cook", "week"];
 export const SITUATIONS: Situation[] = [
-  { id: "eatNow", icon: "🍽️", group: "day", added: "0.3.80", on: "2026-10-01", flow: "craving-search.cjs", steps: 4, go: { tab: "journey" } },
+  { id: "eatNow", icon: "🍽️", group: "day", added: "0.3.80", on: "2026-10-01", flow: "plate-chef.cjs", steps: 4, go: { tab: "journey" } },
   { id: "photoLog", icon: "📷", group: "day", added: "0.3.80", on: "2026-10-01", flow: "meal-photo.cjs", steps: 4, go: { tab: "journey" } },
   { id: "bigBatch", icon: "🍲", group: "day", added: "0.3.80", on: "2026-10-01", flow: "whole-recipe-count.cjs", steps: 5, go: { tab: "recipes" } },
   { id: "screenshot", icon: "🖼️", group: "cook", added: "0.3.80", on: "2026-10-01", flow: "recipe-import.cjs", steps: 4, go: { tab: "recipes" } },

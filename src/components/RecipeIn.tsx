@@ -54,7 +54,7 @@ export function ShotsCard({ shots, reading, slow, add, remove, read, cancel }: {
 }
 
 // IM2b: a recipe page's address
-export function LinkCard({ url, reading, slow, setUrl, read, cancel }: { url: string; reading?: boolean; slow?: boolean; setUrl: (v: string) => void; read: () => void; cancel: () => void }) {
+export function LinkCard({ url, reading, slow, setUrl, read, cancel, photoWord }: { url: string; reading?: boolean; slow?: boolean; setUrl: (v: string) => void; read: () => void; cancel: () => void; photoWord?: boolean }) {
   return (
     <section className="card plate-card in-card">
       <div className="card-top"><span>{w("recipein.aRecipeFromALink")}</span><button className="link" onClick={cancel}>{w("recipein.cancel")}</button></div>
@@ -62,7 +62,8 @@ export function LinkCard({ url, reading, slow, setUrl, read, cancel }: { url: st
       <button className="pill pill-primary pill-wide" disabled={!/^https?:\/\/\S+\.\S+/i.test(url.trim()) || reading} onClick={read}>{reading ? w("recipein.chefIsReading") : w("recipein.readIt")}</button>
       {reading && <ThinkingCard quietSlow title={w("recipein.chefReadingRecipe")} />}
       {reading && slow && <small className="rq-drafting in-slow" role="status">{slowLine("page")}</small>}
-      <small className="muted">{w("recipein.aRecipePageFromA")}</small>
+      {/* DT308 (0.3.154): on the empty Plate the tile is Recipe photo */}
+      <small className="muted">{w(photoWord ? "recipein.aRecipePageFromAPhoto" : "recipein.aRecipePageFromA")}</small>
       <small className="muted">{w("recipein.theLinkStaysWithThe")}</small>
     </section>
   );

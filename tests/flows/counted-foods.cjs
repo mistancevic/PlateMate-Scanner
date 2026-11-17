@@ -43,7 +43,7 @@ const U = "http://127.0.0.1:3216";
   const page = await open(seed);
   await page.route("**/api/recipe/read", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(read) }));
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
-  await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
+  await page.locator(".plate-card label").filter({ hasText: /Recipe photo|Screenshot/ }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
   await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(900);
   const eggRead = page.locator(".in-card .row").filter({ hasText: "Eggs" });
   let t = (await eggRead.textContent()).replace(/\s+/g, " ");
