@@ -1,6 +1,6 @@
 {
-  "release": "0.3.154",
-  "at": "2026-11-17T18:49:56.963Z",
+  "release": "0.3.155",
+  "at": "2026-11-17T19:41:47.599Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -50096,6 +50096,41 @@
       "release": "0.3.154",
       "order": 900030,
       "at": "2026-11-17T18:49:56.963Z"
+    },
+    {
+      "id": "screen.plate.onThePlate",
+      "kind": "screen",
+      "key": "plate.onThePlate",
+      "en": "On your plate",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "enBefore": "On the plate",
+      "sr": "Na tvom tanjiru",
+      "de": "Auf deinem Teller",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.155",
+      "order": 900000,
+      "at": "2026-11-17T19:41:47.599Z"
+    },
+    {
+      "id": "screen.plate.addMore",
+      "kind": "screen",
+      "key": "plate.addMore",
+      "en": "Add more to your plate",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Dodaj još na svoj tanjir",
+      "de": "Mehr auf deinen Teller legen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.155",
+      "order": 900001,
+      "at": "2026-11-17T19:41:47.599Z"
     }
   ]
 }

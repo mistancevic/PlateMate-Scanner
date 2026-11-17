@@ -81,7 +81,7 @@ const U = "http://127.0.0.1:3264";
   await page.locator(".talk-overlay .chat-head").getByRole("button", { name: "Back to the plate" }).click(); await page.waitForTimeout(500);
   // the tip's Ask: the plate goes in as a new question, even with the old turns there
   // the yeast back on the plate: the ingredient line comes back, and its Ask sends a new question even with the old turns there
-  await page.getByLabel(/^Search all (my )?foods$/).fill("yeast"); await page.waitForTimeout(400);
+  await (await require("./more.cjs")(page)).fill("yeast"); await page.waitForTimeout(400);
   await page.locator(".rows .row-food", { hasText: "Active dry yeast" }).getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(600);
   const askBtn = page.getByRole("button", { name: "Ask Chef Mealan for a dish around it" });
   ok(await askBtn.count() === 1, "DT105: the yeast back, the line is back");

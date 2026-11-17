@@ -43,7 +43,7 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
     if (/could not be read/.test(await p.locator("body").innerText())) throw new Error("the seed is not a valid state");
     return p;
   };
-  const photo = async (p) => { await p.locator(".mp-button").first().click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(1500); if (await p.locator(".pa-screen").count()) { await p.getByRole("button", { name: "Read the plate" }).click(); await p.waitForTimeout(2500); } };
+  const photo = async (p) => { await (await require("./more.cjs")(p, "mp")).click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(1500); if (await p.locator(".pa-screen").count()) { await p.getByRole("button", { name: "Read the plate" }).click(); await p.waitForTimeout(2500); } };
   // DT305: the read shows alone; Change the foods opens the plate
   const toPlate = async (p) => { if (await p.locator(".rv-change .pill").count()) { await p.locator(".rv-change .pill").click(); await p.waitForTimeout(600); } };
   const saved = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1") || "{}"));

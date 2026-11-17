@@ -1,8 +1,10 @@
 // Quick picks on the plate: eight at most, a favourite goes first, search reaches everything, All foods opens Foods.
+// Changed by story DT308 (0.3.154 and 0.3.155, boards Stories236 and 238): the empty Plate lists three of your foods each for
+// Protein, Carbs and Fat, a favourite first in its group; the search reaches everything; See all foods opens Foods.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
-const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8"));
+const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8")); seed.items = []; seed.title = "";
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3191" }, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((r) => setTimeout(r, 2500));
@@ -19,13 +21,14 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const lastName = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods; return f[f.length - 1].name; });
   await page.locator(".row").filter({ hasText: lastName }).getByRole("button", { name: /Favourite/ }).click(); await page.waitForTimeout(300);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);
-  const picks = await page.locator(".row-food .row-text b").allTextContents();
-  ok(picks.length === 8, `the plate shows 8 quick picks out of ${total}`);
-  ok(picks[0].includes(lastName), `the favourite comes first: ${picks[0]}`);
-  await page.getByLabel(/^Search all (my )?foods$/).fill(lastName.slice(0, 5)); await page.waitForTimeout(200);
-  ok(await page.getByText("From all your foods").count() === 1, "typing searches all foods");
-  await page.getByLabel(/^Search all (my )?foods$/).fill(""); await page.waitForTimeout(200);
-  await page.getByRole("button", { name: new RegExp(`all ${total} foods`, "i") }).click(); await page.waitForTimeout(300);
+  const picks = await page.locator(".from-list .row-food .row-text b").allTextContents();
+  const groups = await page.locator(".from-list .macro-group").count();
+  ok(picks.length >= 3 && picks.length <= 9 && groups >= 1 && groups <= 3, `the empty plate shows up to three foods per macro, ${picks.length} out of ${total}`);
+  ok(picks.some((n) => n.includes(lastName)) && (await page.locator(".from-list .macro-group + .row-food .row-text b").allTextContents()).some((n) => n.includes(lastName)), `the favourite comes first in its group: ${lastName}`);
+  await (await require("./more.cjs")(page)).fill(lastName.slice(0, 5)); await page.waitForTimeout(200);
+  ok(await page.locator(".from-list .macro-group").count() === 0 && (await page.locator(".from-list .row-food .row-text b").allTextContents()).some((n) => n.includes(lastName)), "typing searches all foods");
+  await (await require("./more.cjs")(page)).fill(""); await page.waitForTimeout(200);
+  await page.getByRole("button", { name: "See all foods" }).click(); await page.waitForTimeout(300);
   ok(await page.getByText(/Find a food/).count() >= 1, "All foods opens Foods");
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);

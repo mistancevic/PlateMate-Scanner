@@ -46,7 +46,7 @@
   "plate.offPlan": "Off the plan",
   "plate.aDish": "A dish",
   "plate.aMix": "A mix",
-  "plate.onThePlate": "On the plate",
+  "plate.onThePlate": "On your plate",
   "plate.empty": "Empty plate",
   "plate.emptyConfirm": "Tap again to empty",
   "plate.nothingYet": "Nothing on the plate yet.",
@@ -6346,5 +6346,6 @@
   "chef.gProtein": "{protein} g protein",
   "chef.addYourFoods": "Add your foods to your plate",
   "chef.addDish": "Add {title} to your plate",
-  "recipein.aRecipePageFromAPhoto": "A recipe page from a website. Instagram and TikTok links need a login, so they don't open for us: tap Recipe photo there."
+  "recipein.aRecipePageFromAPhoto": "A recipe page from a website. Instagram and TikTok links need a login, so they don't open for us: tap Recipe photo there.",
+  "plate.addMore": "Add more to your plate"
 }

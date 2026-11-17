@@ -31,7 +31,7 @@ const NAME = { group: "camera.modeGroup", barcode: "camera.modeBarcode", label: 
 export function PlateCamMenu({ meal, pick, close }: { meal: boolean; pick: (m: CamMode) => void; close: () => void }) {
   const modes = CAM_ORDER.filter((m) => m !== "meal" || meal);
   return (
-    <div className="plate-cam-back" onClick={close}>
+    <div className="plate-cam-back" onClick={close} onContextMenu={(e) => e.preventDefault()}>
       <div className="plate-cam-menu" role="dialog" aria-label={w("nav.openCamera")} onClick={(e) => e.stopPropagation()}>
         <div className="plate-cam-top">
           <b>{w("nav.openCamera")}</b>

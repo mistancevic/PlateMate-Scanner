@@ -40,7 +40,7 @@ const PORT = "3395", U = `http://127.0.0.1:${PORT}`;
   const main = (page) => page.locator("main").textContent();
   const scanSkyr = async (page) => {
     await nav(page, "Plate"); await page.waitForTimeout(700);
-    await page.getByLabel(/^Search all (my )?foods$/).fill("Skyr"); await page.waitForTimeout(400); // DT308 (0.3.154, board Stories236): a food of yours is found in From the list
+    await (await require("./more.cjs")(page)).fill("Skyr"); await page.waitForTimeout(400); // DT308 (0.3.154, board Stories236): a food of yours is found in From the list
     await page.locator(".rows .row-food").filter({ hasText: "Skyr, natural" }).first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(700);
   };
   try {

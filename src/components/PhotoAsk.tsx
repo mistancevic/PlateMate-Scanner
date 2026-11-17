@@ -5,6 +5,7 @@
 // look at the photo says what the food is in and which dish it looks like. A pot or a tray asks how much of it is yours (The
 // whole pot, My portion). A plate for a meal asks which dish of that meal it is, with Chef Mealan's guess ticked: the app
 // cannot know before you say. Your words get a box with room for a list of what is in it.
+import { Mark } from "./Mark";
 import { w, mealV, type WordKey } from "../words";
 import { DISHES, type Dish } from "../served";
 import { holdsMore, type Vessel } from "../mealPhoto";
@@ -66,8 +67,10 @@ export function PhotoAsk({ image, at, taken: fromCamera = false, mealAt, read, d
   const dish = seen && seen.course !== "drink" ? seen.course : "main";
   return (
     <section className="pa pa-screen" aria-label={w("photoask.yourPhoto")}>
-      <ChefLine className="pa-top" image={image} text={say("photoHere", fromCamera ? w("photoask.takenNow") : photoFromYours(taken, now))}
-        side={<button type="button" className="pill pill-small pill-danger-line pa-remove" onClick={drop}>{w("photoask.dropThePhoto")}</button>} />
+      {/* DT308 Release 2 (0.3.155, board Stories236, DT308.2): one card, the photo on top, then where it is from and Remove the photo */}
+      <img className="pa-photo" src={image} alt={w("photoask.yourPhoto")} />
+      <div className="pa-from"><Mark size={18} color="var(--brand)" /><span>{say("photoHere", fromCamera ? w("photoask.takenNow") : photoFromYours(taken, now))}</span>
+        <button type="button" className="pill pill-small pill-danger-line pa-remove" onClick={drop}>{w("photoask.dropThePhoto")}</button></div>
       {seen && <PotRows vessel={seen.vessel} share={share} setShare={setShare} dish={dish} setDish={() => {}} meal={null} />}
       <div className="pa-note">
         <div className="pa-note-top"><label htmlFor="pa-words">{w("photoask.whatIsInIt")}</label>{S && <button type="button" className="pill pill-small pill-action pa-say" aria-pressed={hearing} onClick={listen}>{hearing ? w("make.listening") : w("make.sayIt")}</button>}</div>

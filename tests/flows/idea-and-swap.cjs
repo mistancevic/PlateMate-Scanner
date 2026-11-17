@@ -61,11 +61,11 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
     ok((await st()).meals.find((m) => m.title === "Cheesecake cup")?.idea?.how?.length === 4, "on the plate, the idea is kept with its steps");
     // the Plate: the swipe line and + Add a food under the foods
     ok(/Swipe a food left to swap it, right to remove it\./.test(await page.locator(".plate-card").textContent()), "one line says how to swap and remove");
-    const under = await page.evaluate(() => { const rows = document.querySelector(".plate-card .rows"); const add = document.querySelector(".add-here-open"); return !!rows && !!add && rows.compareDocumentPosition(add) & 4 && add.getBoundingClientRect().top - rows.getBoundingClientRect().bottom < 80; });
-    ok(!!under, "+ Add a food sits right under the last food");
-    await page.locator(".add-here-open").click(); await page.waitForTimeout(300);
-    await page.getByLabel("Find a food to add").fill("yog"); await page.waitForTimeout(500);
-    const here = page.locator(".add-here");
+    const under = await page.evaluate(() => { const rows = document.querySelector(".plate-card .rows"); const add = document.querySelector(".add-more-open"); return !!rows && !!add && rows.compareDocumentPosition(add) & 4 && add.getBoundingClientRect().top - rows.getBoundingClientRect().bottom < 80; });
+    ok(!!under, "+ Add more to your plate sits right under the last food"); // DT308 Release 2 (0.3.155): was + Add a food
+    await page.locator(".add-more-open").click(); await page.waitForTimeout(300);
+    await page.getByLabel("Search all foods").fill("yog"); await page.waitForTimeout(500);
+    const here = page.locator(".add-more");
     ok(/Greek yogurt 2%/.test(await here.textContent()) && await here.getByRole("button", { name: "Take it" }).count() === 0, "the search opens there, with your foods; no Take it");
     const basic = here.locator(".row-basic").first();
     ok(await basic.count() === 1 && /joins your foods/.test(await basic.textContent()) && await basic.getByRole("button", { name: "Add" }).count() === 1, "a basic food: + Add, and the line says it joins your foods");
@@ -89,7 +89,7 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
     const s = await st();
     ok(s.items.some((i) => /Sheep's milk yoghurt/.test(i.food.name)) && s.foods.some((f) => /Sheep's milk yoghurt/.test(f.name) && f.refId === "cy-yoghurt-sheep") && !s.items.some((i) => /^Quark/.test(i.food.name)), "picked: it takes Quark's place and joins your foods");
     // the bottom search reads + Add too
-    await page.getByLabel(/^Search all (my )?foods$/).fill("kefir"); await page.waitForTimeout(600);
+    await (await require("./more.cjs")(page)).fill("kefir"); await page.waitForTimeout(600);
     ok(await page.getByRole("button", { name: "Take it" }).count() === 0, "no Take it in the Plate's search");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough error: " + e.message); }

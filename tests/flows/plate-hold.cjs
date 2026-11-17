@@ -74,6 +74,8 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   const mb = await menu.boundingBox(), pb = await plateBtn().boundingBox();
   ok(mb.y + mb.height <= pb.y + 12 && Math.abs((mb.x + mb.width / 2) - (pb.x + pb.width / 2)) < 30, "DT309: the menu sits above the Plate icon");
 
+  // 0.3.155 (Coach Milan 17 November 20:30: the long press selected the word Open on his phone): nothing in the menu can be selected
+  ok(await page.locator(".plate-cam-back").evaluate((x) => getComputedStyle(x).userSelect) === "none" && await page.locator(".plate-cam-top b").evaluate((x) => getComputedStyle(x).userSelect) === "none", "0.3.155: the menu and the layer behind it cannot be selected by the press");
   // the X closes it; so does a tap outside
   await menu.locator(".plate-cam-x").click(); await page.waitForTimeout(300);
   ok(await page.locator(".plate-cam-menu").count() === 0 && /Today/.test(await onToday()) && await page.locator(".camera-modal").count() === 0, "DT309: the X closes the menu and nothing else happens");

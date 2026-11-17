@@ -41,7 +41,7 @@ const READ = (portion) => ({ dish: "Creamy mushroom vegetable soup", foods: [f("
     await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "", around: "", betterAs: "meal", holds: "" }) }));
     await page.route("**/api/members/foods**", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, foods: [] }) }));
     await page.goto(U + "/plate"); await page.waitForTimeout(1300);
-    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(path.join(ROOT, "tests/flows/pot.jpg")); await page.waitForTimeout(1500);
     return { ctx, page };
   };

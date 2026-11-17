@@ -57,7 +57,7 @@ const READS = [
     // ---- 1. a photo read as Exploring is kept as Served ----
     await page.goto(U + "/"); await page.waitForTimeout(900);
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(800);
-    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
     await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300); await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(300); if (await page.locator(".plan-line-done").count()) { await page.locator(".plan-line-done").click(); await page.waitForTimeout(200); }
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
@@ -223,7 +223,7 @@ const READS = [
     ok(/\/plate$/.test(page.url()) && s.items.length === 2 && !s.photo && s.served.length === 2, "Put it on the Plate: its foods are on the Plate, the plate stays in Served");
     // ---- 8. Don't keep it; a dish the read cannot name is a main ----
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
-    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
     await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300); await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(300); if (await page.locator(".plan-line-done").count()) { await page.locator(".plan-line-done").click(); await page.waitForTimeout(200); }
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
@@ -240,7 +240,7 @@ const READS = [
     ok(s.served.length === 2 && s.photo?.keep === false && /Not kept/.test(await text(".sv-off")), "Read it again on a plate you did not keep: still not kept");
     // ---- DT274 (0.3.122, board Stories203): one Exploring, the pencil decides ----
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
-    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
     await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300); await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(300); if (await page.locator(".plan-line-done").count()) { await page.locator(".plan-line-done").click(); await page.waitForTimeout(200); }
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);

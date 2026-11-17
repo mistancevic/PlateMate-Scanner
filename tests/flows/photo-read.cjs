@@ -44,7 +44,7 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "", around: "", betterAs: "meal", holds: "" }) }));
     await page.route("**/api/members/foods**", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, foods: [] }) }));
     await page.goto(U + "/plate"); await page.waitForTimeout(1300);
-    if (file) { await page.locator(".mp-button").click(); await page.waitForTimeout(1500); await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1500); }
+    if (file) { await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500); await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1500); }
     return { ctx, page };
   };
   const store = (page) => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
@@ -57,7 +57,7 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     let { ctx, page } = await open();
     // Changed by story DT308 (0.3.154, board Stories236): What are you craving? and Find ideas are gone from the page; Photo or scan opens the camera
     ok(/Nothing on your plate yet\./.test(await txt(page, ".plate-empty-pic")) && await page.locator(".crave-find").count() === 0 && (await txt(page, ".mp-button")).trim() === "Photo or scan", "a: the empty Plate, with Photo or scan");
-    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(600);
     await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500);
     ok(sent.length === 0 && await page.locator(".camera-ui").count() === 0 && await page.locator(".pa-screen").count() === 1, "b to c: a photo you take waits on the photo screen; nothing is read yet");
@@ -66,8 +66,9 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     ok(/^Dinner, 20:00 by the clock · Off the plan/.test(await txt(page, ".plan-line")) && await page.locator(".plan-line-pen").count() === 1, "c: the meal line as today, with its pencil");
     let t = await txt(page, ".pa-screen");
     ok(/A photo taken now\./.test(t) && !/Whose plate/.test(t) && await page.locator(".pa-screen .pa-chip").count() === 0 && await page.locator(".pa-dish").count() === 0, "c: Chef Mealan says where the photo is from and asks nothing: no Ate at, Eating now, Just looking, no dish row");
-    const img = await page.locator(".pa-screen .chef-line-img").boundingBox(), rm = await page.locator(".pa-remove").boundingBox();
-    ok(img.width >= 100 && rm.height >= 44 && rm.x > img.x + img.width && (await page.locator(".pa-remove").textContent()).trim() === "Remove the photo" && /pill-danger-line/.test(await page.locator(".pa-remove").getAttribute("class")), "c: the photo is bigger, and Remove the photo sits beside it, 44 px, with the red border");
+    // Changed by story DT308 Release 2 (0.3.155, board Stories236, DT308.2): the photo screen is one card with the photo on top, as wide as the card
+    const img = await page.locator(".pa-screen .pa-photo").boundingBox(), rm = await page.locator(".pa-remove").boundingBox(), cardBox = await page.locator("section.photo-screen").boundingBox();
+    ok(img.width >= cardBox.width - 4 && img.height >= 200 && img.y - cardBox.y < 4 && rm.height >= 44 && rm.y > img.y + img.height && (await page.locator(".pa-remove").textContent()).trim() === "Remove the photo" && /pill-danger-line/.test(await page.locator(".pa-remove").getAttribute("class")), "c: one card, the photo on top as wide as the card; Remove the photo under it, 44 px, with the red border");
     ok(/Anything Chef Mealan should know\?/.test(t) && await page.locator(".pa-screen textarea").getAttribute("placeholder") === "What is in it, how it was cooked. You can leave it empty.", "c: one box: Anything Chef Mealan should know?, with grey text that says what goes in it");
     ok(await page.locator("main .pill-primary:visible").count() === 1 && (await page.locator(".pa-go .pill").allTextContents()).join("|").trim() === "Read the plate", "c: Read the plate, alone, the one filled button");
     ok(await page.locator(".crave-card, .ways, .plate-empty-pic, .all-foods").count() === 0 && !/Quick picks/.test(await txt(page)), "c: nothing else is on the screen: no ideas card, no empty plate, no ways to add, no Quick picks");
