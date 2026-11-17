@@ -5715,6 +5715,11 @@
     "screen.plate.notEmptyLine": {"en":"Your plate is not empty.","area":"The Plate","where":"The Plate","release":"0.3.152"},
     "screen.plate.notEmptyAfter": {"en":"It has {plate}. After the read you choose: add the photo's foods to it, or start a new plate.","area":"The Plate","where":"The Plate","release":"0.3.152"},
     "screen.plate.notEmptyWhy": {"en":"It already has {plate}, and your photo brings new foods. They cannot land on the plate by themselves: you decide where they go.","area":"The Plate","where":"The Plate","release":"0.3.152"},
-    "screen.plate.addOrNewQ": {"en":"Add them to your plate, or start a new plate?","area":"The Plate","where":"The Plate","release":"0.3.152"}
+    "screen.plate.addOrNewQ": {"en":"Add them to your plate, or start a new plate?","area":"The Plate","where":"The Plate","release":"0.3.152"},
+    "screen.nav.openCamera": {"en":"Open the camera","area":"Words used across the app","where":"Across the app","release":"0.3.153"},
+    "screen.camera.modeGroup": {"en":"Group","area":"Words used across the app","where":"Across the app","release":"0.3.153"},
+    "screen.camera.modeBarcode": {"en":"Barcode","area":"Words used across the app","where":"Across the app","release":"0.3.153"},
+    "screen.camera.modeLabel": {"en":"Label","area":"Words used across the app","where":"Across the app","release":"0.3.153"},
+    "screen.camera.modeMeal": {"en":"Meal","area":"Words used across the app","where":"Across the app","release":"0.3.153"}
   }
 }

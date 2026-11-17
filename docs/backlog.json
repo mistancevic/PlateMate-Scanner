@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.153",
     "0.3.152",
     "0.3.151",
     "0.3.150",
@@ -1269,9 +1270,25 @@
       "id": "DT308",
       "title": "The Plate from empty to the landing: title and meal line, Add to your plate, Chef Mealan through his icon, the end of the read",
       "epic": "trust",
-      "state": "next",
+      "state": "now",
       "board": "Stories236, Stories237, Stories238",
-      "why": "Coach Milan 16 November 18:52 to 17 November 03:35, drawn step by step, nothing approved, no Go. Holds B147. The model: a plate starts with no meal set and nothing changes in the plan or the numbers; the app guesses a meal only when you say Ate it (from the clock, or from an older photo's day and time) and shows it in your calendar. The empty Plate: Meal title in grey with a pencil; Meal and day not set in grey with a pencil, filled in dark with an X once set; no What are you craving?; one block Add to your plate with four ways in one template (From a photo or scan: Open the camera; From a recipe: Upload photo or screenshot; From the internet: a link field; From the list: search, three foods per macro, See all foods, + Add manually); Chef Mealan's field gone, his round icon the one place to ask him, ideas with Put on my plate. The calendar as the picker: days on top, that day's meals with time and state, one tap sets meal and day. The read's end with no meal set: What do you do with it? Save it, Plan it, Ate it. One landing for every way: the Plate with foods, with + Add more to your plate. Drawing rules said again: every row starts one step before its first screen with the tap that opens it; every frame shows what is tapped; no essays, just propose. Open: arrivals from a barcode or label, a recipe and the internet; Fit to my target and Prepare it on the landing; a plate with foods and where its camera is; the photo screen as one card with the photo on top; the moment (before training and the like); Start a new plate discards the old plate; after Add to my plate with an older photo the app asks Did you eat it? for yesterday."
+      "why": "Coach Milan 16 November 18:52 to 17 November 03:35, drawn step by step, nothing approved, no Go. Holds B147. The model: a plate starts with no meal set and nothing changes in the plan or the numbers; the app guesses a meal only when you say Ate it (from the clock, or from an older photo's day and time) and shows it in your calendar. The empty Plate: Meal title in grey with a pencil; Meal and day not set in grey with a pencil, filled in dark with an X once set; no What are you craving?; one block Add to your plate with four ways in one template (From a photo or scan: Open the camera; From a recipe: Upload photo or screenshot; From the internet: a link field; From the list: search, three foods per macro, See all foods, + Add manually); Chef Mealan's field gone, his round icon the one place to ask him, ideas with Put on my plate. The calendar as the picker: days on top, that day's meals with time and state, one tap sets meal and day. The read's end with no meal set: What do you do with it? Save it, Plan it, Ate it. One landing for every way: the Plate with foods, with + Add more to your plate. Drawing rules said again: every row starts one step before its first screen with the tap that opens it; every frame shows what is tapped; no essays, just propose. Open: arrivals from a barcode or label, a recipe and the internet; Fit to my target and Prepare it on the landing; a plate with foods and where its camera is; the photo screen as one card with the photo on top; the moment (before training and the like); Start a new plate discards the old plate; after Add to my plate with an older photo the app asks Did you eat it? for yesterday. 17 November 09:11 to 14:23: Add to your plate as a small empty plate, three tiles (Recipe photo, Recipe link, Photo or scan on the right) and From the list; Chef Mealan's ideas as cards with a photo and + Add; the landing in the order of 0.3.152 with + Add more to your plate where + Add a food is. Split in two releases, marked on every frame: Release 1 (0.3.154) is the title with its pencil, the card Add to your plate with the tiles and the list, and Chef Mealan through his icon, with the meal line as in 0.3.152; Release 2 (0.3.155) is the meal line (not set, the calendar, the X), no guessed meal, the end of the read, the landing, and the photo screen as one card with the photo on top. Coach Milan 14:23: yes, all good, we can proceed. Not drawn, stay as in 0.3.152: arriving from a barcode or label, a recipe photo and a recipe link; a plate that has foods when a photo comes; the read's layout; Prepare it."
+    },
+    {
+      "id": "DT309",
+      "title": "A long press on Plate opens a small menu with the camera's modes; the Plate icon as a plate and a shutter",
+      "epic": "trust",
+      "state": "done",
+      "board": "Stories239",
+      "version": "0.3.153",
+      "why": "Coach Milan 17 November 09:25 to 14:06, Go 14:12. A press of half a second on Plate in the bottom bar opens a small menu above the icon: Open the camera, with Group, Barcode, Label, Meal from left to right, each with its icon, and an X. A tap on a mode opens the camera in that mode as the Plate's camera. The X or a tap outside closes it and nothing else happens. A short tap still opens the Plate. The order is by how often a mode is used and how close it is to the thumb, not by habit; the camera's own row of modes has the same order. The Plate icon is a plate that is also a shutter (a circle in a circle with a small dot) between a fork and a knife. Closing the camera without a photo brings you back to the tab where you held the button. Five new lines in English, Serbian and German. Not built, to be worded: one line in How to and a hint the first time. To test on a phone: the browser's own long-press menu must stay away from the bar."
+    },
+    {
+      "id": "DT310",
+      "title": "Choices and actions look different: a chip is white and gets a blue background with a tick once chosen; rethink the colour of a chosen chip against the main button's blue",
+      "epic": "trust",
+      "state": "later",
+      "why": "Coach Milan 17 November 14:23: buttons that are blue although nothing was tapped (for example Ate it in What do you do with it?, Fit to my target). Chef Mealan's button may stay blue. Where a chip stands for a choice it is white, and once chosen it has a blue background and a tick. Maybe the colour of a chosen chip should differ from the main button's colour."
     },
     {
       "id": "DT304",

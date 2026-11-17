@@ -51,6 +51,7 @@ import {
   Microscope,
 } from "lucide-react";
 import { CameraView } from "./components/CameraView";
+import { PlateCamMenu, PlateIcon } from "./components/PlateCamMenu";
 import { resizeImageBase64, thumbnailBase64 } from "./utils/image";
 import { findMatch, mergeFoods, repoint } from "./dedupe";
 import { KNOWN, knownOf, displayRows, sortEuropean, tidy, withPackLines, rowsFromRaw, type LabelRow, type Unit } from "./labeltable";
@@ -868,6 +869,8 @@ export default function App() {
     [servedGo, setServedGo] = useState<string | null>(null),
     [mixQuestion, setMixQuestion] = useState<string | null>(null),
     [camera, setCamera] = useState(false),
+    // DT309 (0.3.153): the small menu a long press on Plate opens
+    [camMenu, setCamMenu] = useState(false),
     // DT130 (0.2.110): a photo picked from Your photos in the meal camera, waiting on the Plate for whose plate and when
     [photoAsk, setPhotoAsk] = useState<{ image: string; at: string; taken?: boolean; more?: string[] } | null>(null),
     // DT219 (0.3.58): the last photo read found no foods; nothing landed on the Plate
@@ -930,6 +933,15 @@ export default function App() {
   // the menu page on top, and moving between pages (M6): a page already walked goes back to it; up from a page opened
   // straight (the goal from Today) swaps it for its parent; anything else is one step further
   const menuSection: MenuSection | null = menuTrail.length ? menuTrail[menuTrail.length - 1] : null;
+  // DT309: a press of half a second on Plate opens the menu; the tap that ends such a press does not also open the Plate
+  const holdRef = useRef<{ t: ReturnType<typeof setTimeout> | null; fired: boolean }>({ t: null, fired: false });
+  const camBack = useRef<Tab | null>(null);
+  const holdEnd = () => { if (holdRef.current.t) { clearTimeout(holdRef.current.t); holdRef.current.t = null; } };
+  const plateHold = {
+    onPointerDown: () => { holdEnd(); holdRef.current.fired = false; holdRef.current.t = setTimeout(() => { holdRef.current.t = null; holdRef.current.fired = true; setCamMenu(true); }, 500); },
+    onPointerUp: holdEnd, onPointerLeave: holdEnd, onPointerCancel: holdEnd,
+    onContextMenu: (e: { preventDefault: () => void }) => e.preventDefault(),
+  };
   const setMenuSection = (s: MenuSection | null, up = false) => setMenuTrail((t) => {
     if (!s) return [];
     const i = t.indexOf(s);
@@ -3131,7 +3143,7 @@ export default function App() {
     // 0.2.121: a client sees how many things from the coach wait on Today (notes without Got it, recipes sent)
     { id: "home", label: w("tab.today"), icon: <span className="nav-icon"><Home size={20} />{shownProf.role !== "coach" && fromCoach > 0 && <span className="badge">{fromCoach}</span>}</span> },
     { id: "plan", label: w("tab.plan"), icon: <CalendarDays size={20} /> },
-    { id: "journey" as Tab, label: w("tab.plate"), icon: <Utensils size={20} /> },
+    { id: "journey" as Tab, label: w("tab.plate"), icon: <PlateIcon /> },
     { id: "recipes", label: w("tab.recipes"), icon: <ChefHat size={20} /> },
     // DT188: Explorer is the fifth tab, for everyone; Foods and Me stay in the menu
     { id: "explorer", label: w("tab.explorer"), icon: <Microscope size={20} /> },
@@ -3299,13 +3311,20 @@ export default function App() {
             key={n.id}
             className={!menuSection && (tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef"))) ? "active" : ""}
             aria-current={!menuSection && tab === n.id ? "page" : undefined}
-            onClick={() => { if (n.id === "recipes" && tab === "recipes") setRecipesHome((k) => k + 1); setMenuSection(null); setTalkOpen(false); if (n.id !== "journey") setFilling(null); setTab(n.id); }}
+            {...(n.id === "journey" ? plateHold : {})}
+            onClick={() => { if (n.id === "journey" && holdRef.current.fired) { holdRef.current.fired = false; return; } if (n.id === "recipes" && tab === "recipes") setRecipesHome((k) => k + 1); setMenuSection(null); setTalkOpen(false); if (n.id !== "journey") setFilling(null); setTab(n.id); }}
           >
             {n.icon}
             <span>{n.label}</span>
           </button>
         ))}
       </nav>
+      {camMenu && <PlateCamMenu meal={screenProps.ai.on} close={() => setCamMenu(false)} pick={(m) => {
+        // DT309: the camera opens in the chosen mode, as the Plate's camera: what it reads lands on the plate. Closing it
+        // without a photo or a scan brings you back to where you held the button.
+        setCamMenu(false); camBack.current = tab === "journey" && !menuSection ? null : tab;
+        setTalkOpen(false); setMenuSection(null); setTab("journey"); setMode(m); setCamera(true);
+      }} />}
       {camera && (
         <div className="camera-modal">
           <CameraView
@@ -3324,8 +3343,9 @@ export default function App() {
             onBarcodeWithPhotos={(c, x) => lookupWithPhotos(c, x)}
             addTo={tab === "journey" ? "plate" : "foods"}
             knownCodes={state.foods.map((f) => f.barcode).filter((x): x is string => Boolean(x))}
-            onCancel={() => setCamera(false)}
+            onCancel={() => { setCamera(false); const b = camBack.current; camBack.current = null; if (b) setTab(b); }}
             onOpenCart={() => {
+              camBack.current = null;
               setCamera(false);
               setStep("in");
               setTab("journey");

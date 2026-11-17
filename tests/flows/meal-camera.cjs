@@ -65,7 +65,8 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await page.locator(".mp-button").click(); await page.waitForTimeout(1800);
   const modes = await page.locator(".cam-modes button").allTextContents();
   ok(await page.locator(".camera-ui").count() === 1 && (await text(".cam-title")) === "Photo of my meal", "DT130: Photo of my meal opens the camera, titled Photo of my meal");
-  ok(modes.join() === "Barcode,Label,Group,Meal" && await page.locator(".cam-modes button[aria-pressed=true]").textContent() === "Meal", "DT130: Meal is a fourth mode next to Barcode, Label and Group, and it is on: " + modes.join());
+  // Changed by story DT309 (0.3.153, board Stories239; Coach Milan 17 November 14:06, Go 14:12): the modes stand by how often they are used, Group, Barcode, Label, Meal
+  ok(modes.join() === "Group,Barcode,Label,Meal" && await page.locator(".cam-modes button[aria-pressed=true]").textContent() === "Meal", "DT130, DT309: Meal is a fourth mode next to Group, Barcode and Label, and it is on: " + modes.join());
   ok(/The whole plate, from above/.test(await text(".cam-say")) && await page.locator(".meal-frame").count() === 1, "DT130: the round frame and the hint");
   ok(await page.locator(".auto-switch").count() === 0 && /Tap to take it/.test(await text(".cam-panel")) && await page.locator(".cam-gallery").count() === 1, "DT130: no auto shot; Tap to take it; Your photos bottom left");
   // DT228 v2 (0.3.63, board Stories168): the shutter stages the photo; a second one joins it; Read 2 photos reads them together

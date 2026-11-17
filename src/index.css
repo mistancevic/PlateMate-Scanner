@@ -3415,3 +3415,16 @@ section.read-view .rv-change > .pill.pill-small, section.photo-screen .pa-remove
 .plate-ask-photo .chef-line-row { align-items: stretch; gap: 12px; } .plate-ask-photo .bubble .chef-line-img { width: 104px; height: 104px; border-radius: 14px; }
 section.plate-ask-photo .pa-keep.pill.pill-small { height: 44px; min-height: 44px; padding: 0 12px; white-space: nowrap; }
 .pa-ask-q { display: block; font-size: 16px; margin: 14px 0 4px; }
+
+/* DT309 (0.3.153, board Stories239): the Plate icon, and the menu a long press on Plate opens */
+.bottom-nav button { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+.bottom-nav button .plate-icon { width: 33px; height: 20px; }
+.plate-cam-back { position: fixed; inset: 0; z-index: 56; background: rgba(var(--ink-rgb), 0.25); }
+.plate-cam-menu { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(86px + env(safe-area-inset-bottom, 0px)); width: min(330px, calc(100vw - 24px)); background: var(--surface); border-radius: 18px; box-shadow: var(--shadow-float); padding: 10px 12px 12px; }
+.plate-cam-menu::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 16px; height: 16px; background: var(--surface); transform: translateX(-50%) rotate(45deg); }
+.plate-cam-top { display: flex; align-items: center; justify-content: space-between; }
+.plate-cam-top b { font-size: 16px; color: var(--ink); }
+.plate-cam-x { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; color: var(--ink); }
+.plate-cam-modes { display: grid; gap: 8px; margin-top: 4px; }
+.plate-cam-menu .plate-cam-modes > .pill.pill-small.plate-cam-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: auto; min-height: 76px; padding: 6px 2px; font-size: 13px; }
+@media (min-width: 920px) { .plate-cam-menu { left: 118px; transform: none; bottom: auto; top: 50%; } .plate-cam-menu::after { display: none; } }
