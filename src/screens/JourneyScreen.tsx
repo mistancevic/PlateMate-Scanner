@@ -41,7 +41,7 @@ import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
 import { iconFor } from "../icons";
-import { quickPicks } from "../quick";
+import { quickPicks, macroPicks } from "../quick";
 import { lineTotal } from "../labeltable";
 import { SwipeRow } from "../components/SwipeRow";
 import { dishTaste, goesInDish, heldBackLine, offerTaste, presetOf, bothPartOf, PLATE_TASTE_WORD, PLATE_TASTE_LINE, type PlateTaste } from "../dishTaste";
@@ -112,7 +112,7 @@ const STEPS = ["in", "recipe", "make", "made", "after"] as const;
 const PHASES = ["Prep", "Make", "Eat"] as const;
 const phaseOf = (n: number) => (n <= 3 ? 0 : n === 4 ? 1 : 2);
 const phaseWord = (x: (typeof PHASES)[number]) => w(x === "Prep" ? "plate.phasePrep" : x === "Make" ? "plate.phaseMake" : "plate.phaseEat");
-function stepHead({ n, title, sub, nameField, back, label, bare }: { n: number; title: string; sub?: string; back?: React.ReactNode; label?: string; bare?: boolean; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
+function stepHead({ n, title, sub, nameField, back, label, bare }: { n: number; title: string; sub?: string; back?: React.ReactNode; label?: string; bare?: boolean; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void; pen?: boolean } }) {
   const ph = phaseOf(n);
   // DT230: no bar on the Plate (in) nor on what Fit makes of it (recipe): the bar starts with Prep
   if (n <= 2) bare = true;
@@ -130,7 +130,9 @@ function stepHead({ n, title, sub, nameField, back, label, bare }: { n: number; 
       {back}
       {/* DT224 (0.3.60, board Stories165): an empty Plate is the start screen; Craft, Make, Eat once it holds something */}
       {!bare && <div className="phase-bar" aria-label={w("plate.phaseOf", { n: ph + 1, phase: phaseWord(PHASES[ph]) })}>{PHASES.map((x, i) => <span key={x} className={i <= ph ? "on" : ""}><i />{phaseWord(x)}</span>)}</div>}
-      {nameField ? <input className="title-input" aria-label={w("make.nameOfTheMeal")} value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} onBlur={(e) => nameField.onCommit?.(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" /> : <h2>{title}</h2>}
+      {/* DT308 (0.3.154, board Stories236): on an empty plate the title is a placeholder, Meal title, with a pencil that puts you in it */}
+      {nameField?.pen ? <div className="title-row"><input className="title-input" aria-label={w("make.nameOfTheMeal")} value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} onBlur={(e) => nameField.onCommit?.(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" /><button type="button" className="icon title-pen" aria-label={w("plate.editTitle")} onClick={(e) => (e.currentTarget.previousElementSibling as HTMLInputElement | null)?.focus()}><Pencil size={18} /></button></div>
+        : nameField ? <input className="title-input" aria-label={w("make.nameOfTheMeal")} value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} onBlur={(e) => nameField.onCommit?.(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" /> : <h2>{title}</h2>}
       {sub && <p>{sub}</p>}
     </div>
   );
@@ -547,6 +549,8 @@ export function JourneyScreen(p: AppApi) {
     setSuggest(null);
   }
   const quick = quickPicks(state.foods.filter(p.inPlace), state.feedback);
+  // DT308: three of your foods for each macro, the most used first
+  const macro = macroPicks(state.foods.filter(p.inPlace), state.feedback);
   // DT115 (0.2.97): the swap list reaches the members' catalogue after your own foods: the same food in another state leads
   // (tuna in water for tuna in olive oil), only foods seen in your market or with a barcode (the same tin everywhere)
   const [swapMf, setSwapMf] = useState<{ id: string; foods: Food[] }>({ id: "", foods: [] });
@@ -1380,6 +1384,47 @@ export function JourneyScreen(p: AppApi) {
   // a plate that became Just looking or Don't count it is no longer the read: it is kept as Served, as before
   const readView = step === "in" && !p.photoAsk && state.photo?.view === "read" && state.photo.who !== "idea" && p.pick !== "exploring" && items.length > 0;
   const titleField = (placeholder: string) => ({ value: state.title === "DaaM" ? "" : state.title, placeholder, onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) });
+  // DT308 (0.3.154): the food list. On an empty plate it stands in the card under From the list; with foods on the plate it is Quick picks, as before
+  const listBlock = (empty: boolean) => (<>
+        {empty ? <b className="ways-head ways-head-second">{w("plate.fromTheList")}</b> : <p className="label">{q.trim() ? w("plate.fromAllFoods") : w("plate.quickPicks")}</p>}
+        <ClearField value={q} onClear={() => setQ("")} label={w("make.clearTheSearch")}><input className="search plate-search" aria-label={w(empty ? "plate.searchAll" : "plate.search")} placeholder={w(empty ? "plate.searchAll" : "plate.search")} value={q} onChange={(e) => setQ(e.target.value)} /></ClearField>
+        <div className="rows">
+          {/* R9 (0.2.33, boards RS4 and RS5): while a recipe is on the plate, only foods that go with the dish; one line names what was held back */}
+          {heldBack.length > 0 && plateTasteOf && <small className="muted held-back">{heldBackLine(plateTasteOf, heldBack)}</small>}
+          {(q.trim() ? found : empty ? macro.flatMap((g) => g.foods) : quick.picks.filter((f) => goesInDish(plateTasteOf, f.name))
+          ).map((f) => {
+              const head = !q.trim() && empty ? macro.find((g) => g.foods[0] === f) : null;
+              const inList = items.some((i) => libraryId(i.food.id) === f.id);
+              const why = q.trim() ? null : quick.why.get(f.id);
+              return (<Fragment key={f.id}>
+                {head && <small className="macro-group">{w(head.key === "protein" ? "plate.macroProtein" : head.key === "carbs" ? "plate.macroCarbs" : "plate.macroFat")}</small>}
+                <div className="row row-food">
+                  <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
+                  <div className="row-text"><b>{f.favorite && <span className="fav-mark" aria-label={w("make.favourite")}>★ </span>}{foodName(f)}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}{why === "often" ? " · often" : ""}</small></div>
+                  <button className={`pill pill-small${inList ? " pill-done" : ""}`} disabled={inList} onClick={() => add(f)}>{inList ? w("plate.onPlate") : <><Plus size={14} /> {w("plate.add")}</>}</button>
+                </div>
+              </Fragment>);
+            })}
+          {/* DT125 (0.2.104): the Plate's search reads the one list too: after your foods, the members' and the basic foods; + Add
+              (Take it until DT148, 0.2.129) puts a copy in your foods and on the plate */}
+          {q.trim() && plateOthers.map((r) => (
+            <div className={`row row-food row-${r.kind}`} key={r.key}>
+              <span className="thumb thumb-sm">{r.food.photo ? <img src={r.food.photo} alt="" /> : (r.kind === "basic" ? "📘" : iconFor(r.food.name))}</span>
+              <div className="row-text"><b>{r.names[0]}</b><small>{rowLine(r)}</small></div>
+              <button className="pill pill-small" onClick={() => { if (r.kind === "member") p.addMemberFood(r.member, "plate"); else { const f = { ...r.food, id: uid(), reviewedAt: new Date().toISOString() }; setState((st) => ({ ...st, foods: [f, ...st.foods] })); add(f); } }}><Plus size={14} /> {w("make.add")}</button>
+            </div>
+          ))}
+          {state.foods.length === 0 && <small>{w("make.noSavedFoodsYetScan")}</small>}
+        </div>
+        {empty ? (
+          <div className="button-row list-ends">
+            <button type="button" className="pill pill-small" onClick={() => setTab("foods")}>{w("plate.seeAllFoods")}</button>
+            <button type="button" className="pill pill-small" onClick={() => blank()}><Plus size={14} /> {w("plate.addManually")}</button>
+          </div>
+        ) : !q.trim() && state.foods.length > quick.picks.length && (
+          <button className="link all-foods" onClick={() => setTab("foods")}>{wn("plate.seeAll", state.foods.length)}</button>
+        )}
+  </>);
   const inHead = step === "in" ? (photoScreen ? stepHead({ n, title: "", bare: true, nameField: { value: photoTitle, placeholder: w("photoask.namesIt"), onChange: (v: string) => setPhotoTitle(v) } })
           : readView ? stepHead({ n, title: "", bare: true, sub: w("plate.readSub"), nameField: titleField(autoTitle(items)) })
           : p.filling
@@ -1392,10 +1437,12 @@ export function JourneyScreen(p: AppApi) {
               : w("plate.fromSub", { source: rec.source?.name || wordV(state.photo?.pot === rec.id ? "plate.yourPhoto" : rec.source?.from === "link" ? "plate.theLink" : "plate.yourScreenshot"), how: pmode === "whole" ? w("make.theWholeRecipeAsYou") : pmode === "sized" && mealNeed ? w("plate.mixSized", { meal: mealW }) : w("plate.oneAsMakes", { one: oneOf(rec) }) }) })
           : state.photo && items.length > 0
             ? Head({ name: true, title: "", sub: w("plate.readFromPhoto") })
-          : state.title && state.title !== "DaaM" && items.length > 0
+          // DT308: a title you typed on the empty plate is yours, not a recipe's: From My recipes only when a recipe has that name
+          : state.title && state.title !== "DaaM" && items.length > 0 && state.meals.some((m) => m.title === state.title)
             ? Head({ name: true, title: "", sub: w("plate.fromMyRecipes") })
             : items.length > 0 ? Head({ name: true, title: "", sub: w("plate.nameItOrKeep") })
-            : Head({ title: w("plate.craving"), sub: w("plate.cravingSub") })) : null;
+            // DT308 (0.3.154, board Stories236; Coach Milan 17 November 02:15 to 02:49): no second title under Plate; the meal's title as a placeholder
+            : stepHead({ n, title: "", bare: true, nameField: { ...titleField(w("plate.mealTitle")), pen: true } })) : null;
   // ---- DT212 v4 and DT214 v2 (0.3.53): every question on the Plate is Chef Mealan's line and shows alone; the foods wait ----
   const since = plateSince(state);
   const plateIsOld = plateOldOf(state);
@@ -1814,7 +1861,8 @@ export function JourneyScreen(p: AppApi) {
             </div>
           );
         })()}
-        <div className="card-top"><span>{w("plate.onThePlate")}</span>{/* DT219 (0.3.58): Empty plate whenever the Plate has foods or a photo */}{(items.length > 0 || !!state.photo) && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> {w("plate.empty")}</>} confirmLabel={w("plate.emptyConfirm")} onConfirm={emptyPlate} />}</div>
+        {/* DT308 (0.3.154): the empty plate has no heading; the small plate with its line says what the page is */}
+        {(items.length > 0 || !!state.photo) && <div className="card-top"><span>{w("plate.onThePlate")}</span>{/* DT219 (0.3.58): Empty plate whenever the Plate has foods or a photo */}{(items.length > 0 || !!state.photo) && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> {w("plate.empty")}</>} confirmLabel={w("plate.emptyConfirm")} onConfirm={emptyPlate} />}</div>}
         {/* DT176 (0.3.19, board Stories124): Travel mode on: the Plate says where it serves you, and what the kitchen there allows */}
         {p.travel && <small className="travel-plate-note">{placeName(p.travel.place)}, {kitchenName(p.travel.kitchen).toLowerCase()}: {p.travel.kitchen === "hotel" ? w("make.chefMealanSuggestsWhatYou") : p.travel.kitchen === "flat" ? w("make.chefMealanCooksWithA") : w("make.chefMealanCooksAsAt")} {w("plate.searchFindsThere")}</small>}
         {imported && rec && !way && rec.makes && (
@@ -1850,14 +1898,24 @@ export function JourneyScreen(p: AppApi) {
         {items.length > 0 && numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
         {/* DT301 (0.3.149, board Stories223): an empty plate shows a plate with Nothing on the plate yet, and the four ways as
             tiles in two rows, icon above the word, under the heading Add a food. With foods on the plate the ways stay as they were. */}
+        {/* DT308 (0.3.154, board Stories236, DT308.0c; Coach Milan 17 November 09:11 to 09:28): the empty plate is a small picture
+            of the state, not a button. Under it one title, Add to your plate, and three tiles in one row, each an icon and a short
+            name: Recipe photo, Recipe link, and Photo or scan on the right, where the thumb is. Then From the list. */}
         {items.length === 0 && (
           <div className="plate-empty-pic">
-            <svg width="132" height="132" viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="62" fill="#fff" stroke="#c9d6ee" strokeWidth="3" /><circle cx="66" cy="66" r="44" fill="#f4f7fd" stroke="#dbe4f4" strokeWidth="2" /></svg>
-            <span className="plate-empty">{w("plate.nothingYet")}</span>
+            <svg width="84" height="84" viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="62" fill="#fff" stroke="#c9d6ee" strokeWidth="4" /><circle cx="66" cy="66" r="44" fill="#f4f7fd" stroke="#dbe4f4" strokeWidth="3" /></svg>
+            <span className="plate-empty">{w("plate.nothingYours")}</span>
           </div>
         )}
-        {items.length === 0 && <b className="ways-head">{w("plate.addAFood")}</b>}
-        <div className={`ways${items.length === 0 ? " ways-tiles" : ""}`}>
+        {items.length === 0 && <b className="ways-head">{w("plate.addToYourPlate")}</b>}
+        {items.length === 0 ? (
+          <div className="ways ways-tiles ways-three">
+            <label className="pill pill-small"><ImageIcon size={24} /> {w("plate.recipePhoto")}<input type="file" accept="image/*" multiple hidden onChange={(e) => { void recipeIn.addShots(e.target.files); e.target.value = ""; }} /></label>
+            <button type="button" className="pill pill-small" onClick={() => recipeIn.setInFlow({ kind: "link", url: "" })}><LinkIcon size={24} /> {w("plate.recipeLink")}</button>
+            <button type="button" className="pill pill-small mp-button" onClick={() => { if (p.ai.on) p.mealCamera(); else { setMode("label"); setCamera(true); } }}><Camera size={24} /> {w("plate.photoOrScan")}</button>
+          </div>
+        ) : (
+        <div className="ways">
           {/* RP5b (0.2.25, Milan 17:42): Manual on the left, Scan on the right, where the thumb is */}
           <button className="pill pill-small" onClick={() => blank()}><Pencil size={items.length === 0 ? 24 : 15} /> {w("plate.manual")}</button>
           <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={items.length === 0 ? 24 : 15} /> {w("plate.scan")}</button>
@@ -1865,14 +1923,12 @@ export function JourneyScreen(p: AppApi) {
           {p.ai.on && <button type="button" className="pill pill-small mp-button" onClick={p.mealCamera}><Camera size={items.length === 0 ? 24 : 15} /> {w("plate.photoOfMeal")}</button>}
           {/* DT175 (0.3.17, board Stories122): the foods you have, said or typed, landed as estimates */}
           {p.ai.on && !saying && <button type="button" className="pill pill-small say-button" onClick={() => setSaying(true)}><Mic size={items.length === 0 ? 24 : 15} /> {w("plate.sayWhatYouHave")}</button>}
-        </div>
+        </div>)}
         {saying && <SayHave busy={!!p.busy} onCancel={() => setSaying(false)} onDone={(text) => { void p.plateFromWords(text).then((ok) => { if (ok) setSaying(false); }); }} />}
         {/* Start from a recipe (0.2.16, board IM, IM1): only on an empty plate, because a recipe fills the plate */}
-        {items.length === 0 && <>
-          {/* DT301 (0.3.149): the second part of an empty plate, after a line, as a heading: Have a recipe? Start from it */}
-          <b className="ways-head ways-head-second">{w("plate.startFromRecipe")}</b>
-          <StartWays flow={recipeIn} />
-        </>}
+        {/* DT308: From the list, inside the card of an empty plate: the search of all foods, three of your foods for each
+            macro, then See all foods and + Add manually */}
+        {items.length === 0 && <div className="from-list">{listBlock(true)}</div>}
         {items.length + opts.length > 0 && (() => {
           // the plate's rows (0.2.19): in the dish's parts when it has them (IM15, IM18b), optional foods inside their part
           // DT82: the oil of a can sits with the can's row, set there; a can swapped for something else lets it stand alone
@@ -2160,7 +2216,8 @@ export function JourneyScreen(p: AppApi) {
               <button type="button" className={`pill${p.recordNow ? " pill-primary" : ""}`} onClick={() => { setFills(null); p.savePlate(); }}>{w("plate.saveForLater")}</button></div>
             <div className="ca-links"><button type="button" className="link" onClick={() => { setFills(null); log("fit_used"); void askChef(items, [], [], [], true); }}>{w("fit.ideasAnyway")}</button></div>
           </section>); })()}
-        <div className={`ways-out${(imported && !way) || (p.filling && plateWhen !== "now") ? " ways-out-col" : ""}`} style={fillsNow && mealSlot ? { display: "none" } : undefined}>
+        {/* DT308: Fit to my target is not on an empty plate any more: it has nothing to fit yet */}
+        <div className={`ways-out${(imported && !way) || (p.filling && plateWhen !== "now") ? " ways-out-col" : ""}`} style={(fillsNow && mealSlot) || (items.length === 0 && !imported && !madeBy && !p.filling) ? { display: "none" } : undefined}>
           {imported && rec ? (<>
             {/* PF A6 (0.2.35, Milan 23:11 and 23:21 on 17 October, back after the 0.2.27 revert): Make it as it is is not Chef
                 Mealan's work, so no hat; the two ways are his, so both carry it. Wording and icons only: the ways work as before. */}
@@ -2203,7 +2260,7 @@ export function JourneyScreen(p: AppApi) {
           </>)}
         </div>
         {otherDishes.length > 0 && !fillsNow && items.length > 0 && <small className="muted dish-fit-note">{w("dish.fitOne", { dish: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), other: otherDishes.map((f) => f.meal.title).join(", ") })}</small>}
-        {!imported && !madeBy && items.length === 0 && <small className="ways-label ways-wait">{w("plate.addOneFirst", { meal: chefable && mealSlot ? mealV(mealSlot.name, true) : wordV("meal.meal") })}</small>}
+        {!imported && !madeBy && items.length === 0 && !!p.filling && <small className="ways-label ways-wait">{w("plate.addOneFirst", { meal: chefable && mealSlot ? mealV(mealSlot.name, true) : wordV("meal.meal") })}</small>}
         {/* RP1 (0.2.25, Milan 17:42 and 19:43): the recipe's steps, to review on the Plate before you make it */}
         {imported && rec && (rec.steps?.length || rec.source?.steps?.length) ? (
           <section className="card in-steps in-steps-plate" aria-label={w("make.theRecipeSSteps")}>
@@ -2241,37 +2298,7 @@ export function JourneyScreen(p: AppApi) {
         {foodCard}
         {askChange && changedBase(askChange.its) && ChangedAsk()}
         {helperSheet}
-        <p className="label">{q.trim() ? w("plate.fromAllFoods") : w("plate.quickPicks")}</p>
-        <ClearField value={q} onClear={() => setQ("")} label={w("make.clearTheSearch")}><input className="search plate-search" aria-label={w("plate.search")} placeholder={w("plate.search")} value={q} onChange={(e) => setQ(e.target.value)} /></ClearField>
-        <div className="rows">
-          {/* R9 (0.2.33, boards RS4 and RS5): while a recipe is on the plate, only foods that go with the dish; one line names what was held back */}
-          {heldBack.length > 0 && plateTasteOf && <small className="muted held-back">{heldBackLine(plateTasteOf, heldBack)}</small>}
-          {(q.trim() ? found : quick.picks.filter((f) => goesInDish(plateTasteOf, f.name))
-          ).map((f) => {
-              const inList = items.some((i) => libraryId(i.food.id) === f.id);
-              const why = q.trim() ? null : quick.why.get(f.id);
-              return (
-                <div className="row row-food" key={f.id}>
-                  <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
-                  <div className="row-text"><b>{f.favorite && <span className="fav-mark" aria-label={w("make.favourite")}>★ </span>}{foodName(f)}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}{why === "often" ? " · often" : ""}</small></div>
-                  <button className={`pill pill-small${inList ? " pill-done" : ""}`} disabled={inList} onClick={() => add(f)}>{inList ? w("plate.onPlate") : <><Plus size={14} /> {w("plate.add")}</>}</button>
-                </div>
-              );
-            })}
-          {/* DT125 (0.2.104): the Plate's search reads the one list too: after your foods, the members' and the basic foods; + Add
-              (Take it until DT148, 0.2.129) puts a copy in your foods and on the plate */}
-          {q.trim() && plateOthers.map((r) => (
-            <div className={`row row-food row-${r.kind}`} key={r.key}>
-              <span className="thumb thumb-sm">{r.food.photo ? <img src={r.food.photo} alt="" /> : (r.kind === "basic" ? "📘" : iconFor(r.food.name))}</span>
-              <div className="row-text"><b>{r.names[0]}</b><small>{rowLine(r)}</small></div>
-              <button className="pill pill-small" onClick={() => { if (r.kind === "member") p.addMemberFood(r.member, "plate"); else { const f = { ...r.food, id: uid(), reviewedAt: new Date().toISOString() }; setState((st) => ({ ...st, foods: [f, ...st.foods] })); add(f); } }}><Plus size={14} /> {w("make.add")}</button>
-            </div>
-          ))}
-          {state.foods.length === 0 && <small>{w("make.noSavedFoodsYetScan")}</small>}
-        </div>
-        {!q.trim() && state.foods.length > quick.picks.length && (
-          <button className="link all-foods" onClick={() => setTab("foods")}>{wn("plate.seeAll", state.foods.length)}</button>
-        )}
+        {items.length > 0 && listBlock(false)}
 
         </>)}
       </>

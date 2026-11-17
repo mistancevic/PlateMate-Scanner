@@ -25,3 +25,19 @@ export function quickPicks(foods0: Food[], feedback: Feedback[], now = Date.now(
   rest.forEach((f) => why.set(f.id, "new"));
   return { picks: [...favs, ...often, ...rest].slice(0, QUICK_MAX), why };
 }
+
+// DT308 (0.3.154, board Stories236; Coach Milan 17 November 02:02): on an empty plate the list shows three of your foods for each
+// macro, so its end is always in reach. A food belongs to the macro that gives most of its energy. Within a macro: favourites,
+// then the most used, then the library's own order. Ingredients (yeast, flour, oil to cook with) stay out, as in quick picks.
+export type MacroKey = "protein" | "carbs" | "fat";
+export const MACRO_EACH = 3;
+export function macroOf(f: Pick<Food, "protein" | "carbs" | "fats">): MacroKey {
+  const p = (f.protein ?? 0) * 4, c = (f.carbs ?? 0) * 4, fa = (f.fats ?? 0) * 9;
+  return p >= c && p >= fa ? "protein" : c >= fa ? "carbs" : "fat";
+}
+export function macroPicks(foods0: Food[], feedback: Feedback[], now = Date.now()): { key: MacroKey; foods: Food[] }[] {
+  const foods = foods0.filter((f) => !isIngredient(f));
+  const used = usageCounts(feedback, now);
+  const rank = (f: Food) => (f.favorite ? 1e6 : 0) + (used.get(f.id) ?? 0);
+  return (["protein", "carbs", "fat"] as MacroKey[]).map((key) => ({ key, foods: foods.map((f, i) => ({ f, i })).filter((x) => macroOf(x.f) === key).sort((a, b) => rank(b.f) - rank(a.f) || a.i - b.i).slice(0, MACRO_EACH).map((x) => x.f) })).filter((g) => g.foods.length > 0);
+}

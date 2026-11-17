@@ -3428,3 +3428,16 @@ section.plate-ask-photo .pa-keep.pill.pill-small { height: 44px; min-height: 44p
 .plate-cam-modes { display: grid; gap: 8px; margin-top: 4px; }
 .plate-cam-menu .plate-cam-modes > .pill.pill-small.plate-cam-mode { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; height: auto; min-height: 76px; padding: 6px 2px; font-size: 13px; }
 @media (min-width: 920px) { .plate-cam-menu { left: 118px; transform: none; bottom: auto; top: 50%; } .plate-cam-menu::after { display: none; } }
+
+/* DT308 release 1 (0.3.154, board Stories236): the empty Plate. The title as a placeholder with its pencil; a small empty plate;
+   Add to your plate with three tiles in one row; From the list with three foods for each macro */
+.title-row { display: flex; align-items: center; gap: 6px; }
+.title-row .title-input { flex: 1; min-width: 0; }
+.title-pen { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); border-radius: 12px; }
+.plate-card .plate-empty-pic { margin: 2px 0 12px; }
+.ways.ways-tiles.ways-three { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ways.ways-tiles.ways-three .pill { padding: 8px 4px; font-size: 14px; line-height: 1.2; white-space: normal; }
+.from-list .rows { margin-top: 4px; }
+.from-list .macro-group { display: block; font-size: 13px; font-weight: 800; color: var(--muted); margin: 12px 0 2px; }
+.from-list .list-ends { display: flex; gap: 8px; margin-top: 12px; }
+.from-list .list-ends > .pill.pill-small { flex: 1; height: 44px; min-height: 44px; }

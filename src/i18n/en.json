@@ -6319,5 +6319,19 @@
   "camera.modeGroup": "Group",
   "camera.modeBarcode": "Barcode",
   "camera.modeLabel": "Label",
-  "camera.modeMeal": "Meal"
+  "camera.modeMeal": "Meal",
+  "plate.mealTitle": "Meal title",
+  "plate.editTitle": "Edit the title",
+  "plate.nothingYours": "Nothing on your plate yet.",
+  "plate.addToYourPlate": "Add to your plate",
+  "plate.recipePhoto": "Recipe photo",
+  "plate.recipeLink": "Recipe link",
+  "plate.photoOrScan": "Photo or scan",
+  "plate.fromTheList": "From the list",
+  "plate.searchAll": "Search all foods",
+  "plate.macroProtein": "Protein",
+  "plate.macroCarbs": "Carbs",
+  "plate.macroFat": "Fat",
+  "plate.seeAllFoods": "See all foods",
+  "plate.addManually": "Add manually"
 }
