@@ -44,6 +44,7 @@ const U = "http://127.0.0.1:3237";
       localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "exact" }));
       localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, kitchens: ["Italian"], plan: Array(7).fill({ work: true, kind: "strength", intensity: "hard", when: "evening", at: "17:30", minutes: 60 }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
       localStorage.setItem("chefmealan-unlogged", JSON.stringify({}));
+      localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z", aiConfirmedAt: "2026-10-06T09:00:00Z" }));
       localStorage.setItem("seeded", "1"); }, seed);
     await require("./adult.cjs")(page);
     await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
@@ -91,8 +92,8 @@ const U = "http://127.0.0.1:3237";
 
     // ---- Chef Mealan's ideas get the two lists ----
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(800);
-    await page.getByLabel("What are you craving?").fill("tiramisu"); await page.waitForTimeout(400);
-    await page.getByRole("button", { name: "Find ideas" }).click(); await page.waitForTimeout(800); // DT301 (0.3.149, board Stories223): Find ideas asks Chef Mealan
+    // Changed by story DT308.3 (0.3.154, board Stories236): Chef Mealan is asked through his round icon, in his chat over the Plate
+    await page.locator(".chat-fab").click(); await page.waitForTimeout(400); await page.locator(".pc-input input").fill("tiramisu"); await page.locator(".pc-input input").press("Enter"); await page.waitForTimeout(1200);
     ok(asked.length === 1 && JSON.stringify(asked[0].carried) === JSON.stringify({ light: ["DaaM good protein crêpes"], heavy: ["Sarma"] }), "the craving's idea is asked with the lists: light, the crêpes; heavy, Sarma");
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
   } catch (e) { ok(false, "ran to the end: " + e.message.split("\n")[0]); }

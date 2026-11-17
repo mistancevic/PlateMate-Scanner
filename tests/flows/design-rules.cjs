@@ -94,7 +94,7 @@ const U = "http://127.0.0.1:3242";
     ok(await open3.count() === 1 && /Nothing planned yet/.test(await open3.textContent()) && await p3.locator(".next-meal .pill-wide").count() === 0, "D: lunch with nothing planned is a card, not a wide button");
     ok(JSON.stringify((await open3.getByRole("button").allTextContents()).map((t) => t.trim())) === JSON.stringify(["Pick a meal", "Make it on the Plate"]), "D: Pick a meal, Make it on the Plate");
     await open3.getByRole("button", { name: "Make it on the Plate" }).click(); await p3.waitForTimeout(900);
-    ok(/What are you craving\?/.test(await p3.locator("main").textContent()), "D: Make it on the Plate opens the Plate for lunch");
+    ok(/Add to your plate/.test(await p3.locator("main").textContent()), "D: Make it on the Plate opens the Plate for lunch");
     // ---- F: a food of yours with no fat or carbs: the plus, the note names it, and its name opens it in Foods ----
     const p5 = await open("2026-10-19T11:00:00Z");
     await p5.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); const f = { ...s.foods[0], id: "bar1", name: "Protein bar", calories: 380, protein: 30, fats: null, carbs: null };

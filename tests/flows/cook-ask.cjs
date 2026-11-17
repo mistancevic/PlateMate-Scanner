@@ -98,20 +98,28 @@ const PORT = "3195", B = `http://127.0.0.1:${PORT}`;
     await page.reload(); await page.waitForTimeout(900);
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(800);
     if (await page.getByRole("button", { name: /Empty plate/ }).count()) { await page.getByRole("button", { name: /Empty plate/ }).click(); await page.waitForTimeout(400); const yes = page.getByRole("button", { name: /^(Empty it|Yes|Empty)/ }); if (await yes.count()) { await yes.first().click(); await page.waitForTimeout(400); } }
-    ok(await page.getByRole("button", { name: "Say what you have" }).count() === 1, "an empty Plate offers Say what you have");
-    await page.getByRole("button", { name: "Say what you have" }).click(); await page.waitForTimeout(400);
-    const sh = page.locator(".say-have");
-    ok(await sh.count() === 1 && /Listening/.test(await sh.textContent()), "it listens");
+    // Changed by story DT308.3b (0.3.154, board Stories236; Coach Milan 17 November 18:41 Go): the tile Say what you have is gone
+    // from the empty Plate; you say your foods in Chef Mealan's chat, through his round icon. Tap the microphone, say them,
+    // tap it again: they are sent. He answers with one card, Your foods; + Add puts them on the plate.
+    ok(await page.getByRole("button", { name: "Say what you have" }).count() === 0, "an empty Plate has no Say what you have tile any more");
+    await page.locator(".chat-fab").click(); await page.waitForTimeout(400);
+    const mic = page.locator(".pc-sheet .pc-mic");
+    ok(await mic.count() === 1 && await mic.getAttribute("aria-pressed") === "false", "Chef Mealan's chat has a microphone");
+    await mic.click(); await page.waitForTimeout(300);
+    ok(await mic.getAttribute("aria-pressed") === "true" && await mic.getAttribute("aria-label") === "Listening", "it listens");
     await say("eggs, spinach"); await say("feta and half an onion");
-    ok(/eggs, spinach, feta and half an onion/.test(await sh.locator(".say-words").textContent()), "the words show as they come");
-    await sh.getByRole("button", { name: "Done" }).click(); await page.waitForTimeout(900);
-    ok(saidReq && /eggs, spinach, feta and half an onion/.test(saidReq.text) && Array.isArray(saidReq.library), "Done sends the words and the names of your foods");
+    ok(await page.locator(".pc-input input").inputValue() === "eggs, spinach, feta and half an onion", "the words show as they come");
+    await mic.click(); await page.waitForTimeout(1500);
+    ok(saidReq && /eggs, spinach, feta and half an onion/.test(saidReq.text) && Array.isArray(saidReq.library) && saidReq.orCraving === true, "a second tap sends the words and the names of your foods");
+    const yours = page.locator(".pc-card").first();
+    ok(/Your foods/.test(await page.locator(".pc-group").first().textContent()) && /Eggs, Spinach, Feta, Onion/.test(await yours.textContent()) && (await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.length)) === 0, "his answer starts with Your foods; nothing lands before your tap");
+    await yours.locator(".pc-add").click(); await page.waitForTimeout(900);
     // DT240 (0.3.96, board Stories182): the recipe's cook is still open, so the new plate asks once first; End it, the foods show
     ok(await page.locator(".cook-open-ask").count() === 1, "the cook still open asks once (DT240)");
     await page.locator(".cook-open-ask").getByRole("button", { name: "End it" }).click(); await page.waitForTimeout(600);
     const plateText = await page.textContent("body");
     ok(/Eggs/.test(plateText) && /Spinach/.test(plateText) && /Feta/.test(plateText) && /Onion/.test(plateText), "the four foods land on the plate");
-    ok(await page.getByRole("button", { name: "Fit to my target" }).count() > 0 && await page.locator(".say-have").count() === 0, "Fit to my target is next; the listening card is gone");
+    ok(await page.getByRole("button", { name: "Fit to my target" }).count() > 0 && await page.locator(".pc-sheet").count() === 0, "Fit to my target is next; the chat is closed");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
   } catch (e) { console.log("FAIL " + e.message); fail++; }
   await b.close(); server.kill();

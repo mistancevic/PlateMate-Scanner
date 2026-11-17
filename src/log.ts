@@ -13,6 +13,7 @@ export type LogEvent =
   | "travel_on"      // DT176 (0.3.19): Travel mode on: data.place, data.kitchen
   | "travel_off"     // DT176 (0.3.19): Travel mode off
   | "plate_said"     // DT175 (0.3.17): the foods you said you have, landed on the Plate: data.foods
+  | "plate_chef"     // DT308.3 (0.3.154): Chef Mealan asked through his icon on the empty Plate: data.foods, data.ideas, data.mine
   | "meal_photo_saved" // DT305 (0.3.151): Save in My recipes on the read of a photo
   | "meal_photo_idea" // DT130 (0.2.110): a plate from a photo kept as an idea in Mine: data.plan (put in a slot too)
   | "made"           // How did making it go?: data.went = as | not, data.ate = all | portion | later | not, data.photos

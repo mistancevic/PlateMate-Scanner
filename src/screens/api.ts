@@ -51,6 +51,8 @@ export interface AppApi {
   mealCamera: () => void;
   // DT175 (0.3.17): the foods you said you have, landed on the Plate as estimates; false when nothing came of it
   plateFromWords: (text: string) => Promise<boolean>;
+  saidRead: (text: string, x?: { orCraving?: boolean }) => Promise<SaidRead | null>;
+  saidLand: (r: SaidRead) => void;
   // DT131 (0.2.113): foods waiting to land on a plate that has foods; null when nothing waits
   plateAsk: PlateAsk | null;
   answerPlateAsk: (how: "add" | "new" | null) => void;
@@ -354,3 +356,6 @@ export type DbProduct = { code: string; name: string; brand: string; quantity: s
 export type MealFrom = { tab: "home" | "plan"; slot?: { date: string; slotId: string; name: string; time: string } };
 // DT247 (0.3.96): the question a second photo asks: its dish, the meal before it and how long ago
 export type DishAsk = { dish: string; prev: string; minutes: number; dessertFirst: boolean; slotId: string; meal: string };
+
+// DT308.3b: the foods you named, read and not landed yet
+export type SaidRead = { items: import("../pilot").Ingredient[]; fresh: import("../pilot").Food[]; dish: string };

@@ -2622,22 +2622,32 @@ export default function App() {
     plateFromWords: async (text: string) => {
       setBusy(w("app.listingFoods"));
       try {
-        const d = await api("/api/plate-said", { text, region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name), meal: moment });
-        const read = cleanRead(d);
-        if (!read) { setError(w("app.noFoodCaught")); return false; }
-        const { items, fresh } = itemsOfRead(read, state.foods, shopRegion, uid);
-        const land = (how: "add" | "new") => {
-          if (state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat")) setCookOpenAsk(true);
-          if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null }));
-          else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined }));
-          setKind("meal"); setStep("in");
-          notify(w("app.fromWhatYouSaid", { list: items.map((i) => i.food.name.split(",")[0].toLowerCase()).join(", ") }));
-        };
-        if (state.items.length) askPlate({ kind: "photo", what: wn("app.youSaid", items.length, { list: items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ") }), apply: land });
-        else land("new");
-        log("plate_said", { foods: items.length });
+        const got = await screenProps.saidRead(text);
+        if (!got) { setError(w("app.noFoodCaught")); return false; }
+        screenProps.saidLand(got);
         return true;
       } catch (e: any) { setError(e?.message || w("app.thatDidnTWorkTry")); return false; } finally { setBusy(""); }
+    },
+    // DT308.3b (0.3.154, board Stories236): the foods you named, read first and landed on your tap. orCraving: words that are a
+    // wish for something to eat, and not foods you have, come back as no foods
+    saidRead: async (text: string, x?: { orCraving?: boolean }) => {
+      const d = await api("/api/plate-said", { text, region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name), meal: moment, ...(x?.orCraving ? { orCraving: true } : {}) });
+      const read = cleanRead(d);
+      if (!read) return null;
+      const { items, fresh } = itemsOfRead(read, state.foods, shopRegion, uid);
+      return items.length ? { items, fresh, dish: read.dish || "" } : null;
+    },
+    saidLand: ({ items, fresh, dish }: import("./screens/api").SaidRead) => {
+      const land = (how: "add" | "new") => {
+        if (state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat")) setCookOpenAsk(true);
+        if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null }));
+        else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined }));
+        setKind("meal"); setStep("in");
+        notify(w("app.fromWhatYouSaid", { list: items.map((i) => i.food.name.split(",")[0].toLowerCase()).join(", ") }));
+      };
+      if (state.items.length) askPlate({ kind: "photo", what: wn("app.youSaid", items.length, { list: items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ") }), apply: land });
+      else land("new");
+      log("plate_said", { foods: items.length });
     },
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
     // DT133 (0.2.113): one portion of a plate of several, the rest kept on Today
@@ -3273,7 +3283,8 @@ export default function App() {
         {!talkOpen && (
           <button className="chat-fab" aria-label={w("app.chefMealan")} onClick={() => {
             // one door: on a plate with food it answers about the plate; anywhere else it's the conversation
-            if (!menuSection && tab === "journey" && (step === "in" || step === "recipe") && state.items.length > 0) setMealanAsk((n) => n + 1);
+            // DT308.3 (0.3.154): on the empty Plate his chat opens over the Plate; the Plate decides
+            if (!menuSection && tab === "journey" && (step === "in" || step === "recipe") && (state.items.length > 0 || step === "in")) setMealanAsk((n) => n + 1);
             else setTalkOpen(true);
           }}><Mark size={30} color="var(--surface)" /></button>
         )}

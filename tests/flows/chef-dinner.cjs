@@ -58,9 +58,12 @@ const STEPS = { steps: [
   await page.goto(U + "/plate"); await page.waitForTimeout(1400);
   // DT87: the button says what it does; on an empty plate a line says why it waits
   const fit = page.getByRole("button", { name: "Fit to my target" });
-  ok(await fit.count() === 1 && !(await fit.isEnabled()) && /Add one food first\. Chef Mealan builds the dinner around it\./.test(await text(page, ".plate-card")), "DT87: empty plate: Fit to my target waits, and the line says why");
+  // Changed by story DT308 (0.3.154, board Stories236): the empty Plate has no Fit to my target; it comes with the first food
+  ok(await fit.count() === 0 && /Nothing on your plate yet\./.test(await text(page, ".plate-card")), "DT308: the empty plate has no Fit to my target yet");
   ok(await page.getByRole("button", { name: /^Make it an? \w+$/ }).count() === 0, "DT87: no Make it a dinner");
+  await page.getByLabel(/^Search all (my )?foods$/).fill("Chicken breast"); await page.waitForTimeout(400);
   await page.locator(".row-food").filter({ hasText: "Chicken breast, cooked" }).getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(700);
+  await page.getByLabel(/^Search all (my )?foods$/).fill(""); await page.waitForTimeout(300);
   // DT96 (0.2.89): Add lands at a normal portion, 190 g of chicken; this story is at 150 g, as Milan's plate of 24 October
   await page.locator(".grams input").first().fill("150"); await page.waitForTimeout(400);
   ok(await fit.isEnabled() && /Chef Mealan adds what it needs to land your dinner in its range\./.test(await text(page, ".plate-card")), "DT87: one food: Fit to my target, and the line names the range");

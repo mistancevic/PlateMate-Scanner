@@ -50,7 +50,8 @@ const U = "http://127.0.0.1:3217";
   ok(await page.getByRole("button", { name: /Scan food/ }).count() === 0 && !/Does it fit my numbers\?/.test(await text("main")), "RP5: Today has no Scan food");
   await nav("Plate");
   const ways = (await page.locator(".plate-card .ways button").allTextContents()).map((x) => x.trim());
-  ok(ways[0] === "Manual" && ways[1] === "Scan", `RP5b: Manual on the left, Scan on the right (${ways.join(" | ")})`);
+  // Changed by story DT308 (0.3.154, board Stories236): the empty Plate's tiles are Recipe photo, Recipe link, and Photo or scan on the right
+  ok(ways.join(" | ") === "Recipe link | Photo or scan" && /Recipe photo/.test(await text(".plate-card .ways")), `RP5b: Recipe photo, Recipe link, and Photo or scan on the right (${ways.join(" | ")})`);
   await shot("rp5b", ".plate-card");
 
   // RP1: the original is the steps

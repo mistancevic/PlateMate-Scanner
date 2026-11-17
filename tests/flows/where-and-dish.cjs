@@ -64,7 +64,7 @@ seed.items = [];
   // Changed by story DS rule E (Milan 07:30, board DS2): Back sits top left and says where it goes, Back to the plate
   // 0.2.88: Fit stays on the Plate, so no Back to tap
   if (await page.getByRole("button", { name: /^Back/ }).count()) { await page.getByRole("button", { name: /^Back/ }).first().click(); await page.waitForTimeout(500); }
-  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
+  await page.getByRole("button", { name: /^(Scan|Photo or scan)$/ }).first().click(); await page.waitForTimeout(1500);
   ok(await page.locator(".cam-title").count() === 1, "Scan on the Plate opens the camera");
   await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
   const field = page.locator('input[aria-label="Type the barcode"]');

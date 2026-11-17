@@ -52,7 +52,7 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
   try {
     await page.route("**/api/recipe/read", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(read) }));
     await page.goto(U + "/plate"); await page.waitForTimeout(1300);
-    await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
+    await page.locator(".plate-card label").filter({ hasText: /Recipe photo|Screenshot/ }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
     await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
     await page.locator(".in-portion").getByRole("button", { name: "One slice, as the recipe makes it" }).click(); await page.waitForTimeout(500);

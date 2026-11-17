@@ -63,11 +63,11 @@ export function StartWays({ flow }: { flow: RecipeIn }) {
 }
 
 // the card the flow is at; put is the last step, named by the screen
-export function RecipeInFlow({ flow, put, putLabel }: { flow: RecipeIn; put: (f: Extract<InFlow, { kind: "read" }>) => void; putLabel?: string }) {
+export function RecipeInFlow({ flow, put, putLabel, photoWord }: { flow: RecipeIn; put: (f: Extract<InFlow, { kind: "read" }>) => void; putLabel?: string; photoWord?: boolean }) {
   const { inFlow, setInFlow, slowRead, addShots, readIn } = flow;
   if (!inFlow) return null;
   if (inFlow.kind === "shots") return <ShotsCard shots={inFlow.shots} reading={inFlow.reading} slow={slowRead} add={(f) => void addShots(f, inFlow.shots)} remove={(n) => setInFlow({ kind: "shots", shots: inFlow.shots.filter((_, k) => k !== n) })} read={() => void readIn({ shots: inFlow.shots })} cancel={() => setInFlow(null)} />;
-  if (inFlow.kind === "link") return <LinkCard url={inFlow.url} reading={inFlow.reading} slow={slowRead} setUrl={(v) => setInFlow({ kind: "link", url: v })} read={() => void readIn({ url: inFlow.url })} cancel={() => setInFlow(null)} />;
+  if (inFlow.kind === "link") return <LinkCard url={inFlow.url} reading={inFlow.reading} slow={slowRead} setUrl={(v) => setInFlow({ kind: "link", url: v })} read={() => void readIn({ url: inFlow.url })} cancel={() => setInFlow(null)} photoWord={photoWord} />;
   if (inFlow.kind === "read") return <ReadCard flow={inFlow} putLabel={putLabel} pdRef={flow.pdRef ?? null} fitPd={flow.fitPd} setSource={(v) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, source: v } })} setServings={(n) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, servings: n, servingsHow: inFlow.recipe.servingsHow } })} toggle={(k) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, items: inFlow.recipe.items.map((x, j) => (j === k ? { ...x, on: !(x.on ?? !x.optional) } : x)) } })} put={() => put(inFlow)} again={() => void readIn(inFlow.url ? { url: inFlow.url } : { shots: inFlow.shots })} cancel={() => setInFlow(null)} />;
   return <ErrorCard flow={inFlow} next={(to) => setInFlow(to === "link" ? { kind: "link", url: inFlow.url } : { kind: "shots", shots: inFlow.code === "not-recipe" ? [] : inFlow.shots })} cancel={() => setInFlow(null)} />;
 }

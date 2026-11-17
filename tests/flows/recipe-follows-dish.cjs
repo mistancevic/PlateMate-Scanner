@@ -43,7 +43,7 @@ const tacos = { url: "https://example.com/chicken-tacos/", recipe: { title: "Chi
     await page.locator(".plate-card").getByRole("button", { name: "Link" }).click(); await page.waitForTimeout(300);
     await page.getByLabel("Link to a recipe").fill(x.url); await page.getByRole("button", { name: /^Read/ }).first().click(); await page.waitForTimeout(1200);
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200); };
-  const search = async (page, q) => { await page.getByLabel("Search all my foods").fill(q); await page.waitForTimeout(400); };
+  const search = async (page, q) => { await page.getByLabel(/^Search all (my )?foods$/).fill(q); await page.waitForTimeout(400); };
   const offered = (page, name) => page.locator(".row-food").filter({ hasText: name }).count();
   const line = (page) => page.locator(".held-back").textContent().catch(() => "");
   try {

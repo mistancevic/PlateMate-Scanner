@@ -77,7 +77,7 @@ const U = "http://127.0.0.1:3233";
     const p2 = await open(seed);
     await p2.route("**/api/recipe/read", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recipe: read.recipe }) }));
     await p2.goto(U + "/plate"); await p2.waitForTimeout(1300);
-    await p2.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: ICON }]);
+    await p2.locator(".plate-card label").filter({ hasText: /Recipe photo|Screenshot/ }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: ICON }]);
     await p2.waitForTimeout(600); await p2.getByRole("button", { name: "Read it" }).click(); await p2.waitForTimeout(900);
     ok(/^data:image\//.test(await p2.locator(".in-card .in-picture").getAttribute("src")), "from screenshots, the first screenshot is the picture");
     await p2.context().close();

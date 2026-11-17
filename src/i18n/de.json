@@ -21314,15 +21314,15 @@
       "checked": true
     },
     "howto.eatNow.s1": {
-      "text": "Öffne den Teller. Er fragt: Worauf hast du Lust?",
+      "text": "Öffne den Teller und tipp auf das runde Symbol von Chef Mealan.",
       "checked": true
     },
     "howto.eatNow.s2": {
-      "text": "Tipp ein Gericht oder eine Lust ein, etwa Sarma oder Schokolade, und tipp auf Ideen finden.",
+      "text": "Tipp oder sag ein Gericht oder eine Lust, etwa Sarma oder Schokolade, und schick es ab.",
       "checked": true
     },
     "howto.eatNow.s3": {
-      "text": "Tipp auf eins deiner Gerichte, oder auf Mehr anzeigen bei einer Idee von Chef Mealan, dann auf Auf meinen Teller legen.",
+      "text": "Tipp auf + Hinzufügen bei einem deiner Rezepte oder bei einer Idee von Chef Mealan. Ein Tipp auf den Titel einer Idee zeigt zuerst ihre Lebensmittel.",
       "checked": true
     },
     "howto.eatNow.s4": {
@@ -21342,7 +21342,7 @@
       "checked": true
     },
     "howto.photoLog.s1": {
-      "text": "Tipp auf dem Teller auf Foto meiner Mahlzeit.",
+      "text": "Tipp auf dem Teller auf Foto oder Scan.",
       "checked": true
     },
     "howto.photoLog.s2": {
@@ -22883,6 +22883,114 @@
     },
     "camera.modeMeal": {
       "text": "Mahlzeit",
+      "checked": true
+    },
+    "plate.mealTitle": {
+      "text": "Titel der Mahlzeit",
+      "checked": true
+    },
+    "plate.editTitle": {
+      "text": "Titel bearbeiten",
+      "checked": true
+    },
+    "plate.nothingYours": {
+      "text": "Noch nichts auf deinem Teller.",
+      "checked": true
+    },
+    "plate.addToYourPlate": {
+      "text": "Auf deinen Teller legen",
+      "checked": true
+    },
+    "plate.recipePhoto": {
+      "text": "Rezeptfoto",
+      "checked": true
+    },
+    "plate.recipeLink": {
+      "text": "Rezeptlink",
+      "checked": true
+    },
+    "plate.photoOrScan": {
+      "text": "Foto oder Scan",
+      "checked": true
+    },
+    "plate.fromTheList": {
+      "text": "Aus der Liste",
+      "checked": true
+    },
+    "plate.searchAll": {
+      "text": "Alle Lebensmittel durchsuchen",
+      "checked": true
+    },
+    "plate.macroProtein": {
+      "text": "Protein",
+      "checked": true
+    },
+    "plate.macroCarbs": {
+      "text": "Kohlenhydrate",
+      "checked": true
+    },
+    "plate.macroFat": {
+      "text": "Fett",
+      "checked": true
+    },
+    "plate.seeAllFoods": {
+      "text": "Alle Lebensmittel ansehen",
+      "checked": true
+    },
+    "plate.addManually": {
+      "text": "Manuell hinzufügen",
+      "checked": true
+    },
+    "chef.fromYourRecipes": {
+      "text": "Aus deinen Rezepten",
+      "checked": true
+    },
+    "chef.ideasWithThem": {
+      "text": "Ideen von Chef Mealan damit",
+      "checked": true
+    },
+    "chef.aboutKcalPd": {
+      "text": "etwa {kcal} kcal · PD {pd}",
+      "checked": true
+    },
+    "chef.aboutEach": {
+      "text": "je etwa {grams} g, als Schätzung",
+      "checked": true
+    },
+    "chef.aboutInAll": {
+      "text": "etwa {grams} g insgesamt, als Schätzung",
+      "checked": true
+    },
+    "chef.typeOrSay": {
+      "text": "Tipp oder sag, worauf du Lust hast oder was du hast",
+      "checked": true
+    },
+    "chef.seeWholeRecipe": {
+      "text": "Das ganze Rezept ansehen",
+      "checked": true
+    },
+    "chef.backToChef": {
+      "text": "Zurück zu Chef Mealan",
+      "checked": true
+    },
+    "chef.ideaNotMade": {
+      "text": "Eine Idee von Chef Mealan, noch nicht zubereitet",
+      "checked": true
+    },
+    "chef.gProtein": {
+      "text": "{protein} g Protein",
+      "checked": true
+    },
+    "chef.addYourFoods": {
+      "text": "Deine Lebensmittel auf deinen Teller legen",
+      "checked": true
+    },
+    "chef.addDish": {
+      "text": "Auf deinen Teller legen: {title}",
+      "checked": true
+    },
+    "recipein.aRecipePageFromAPhoto": {
+      "text": "Eine Rezeptseite von einer Website. Links von Instagram und TikTok brauchen eine Anmeldung, deshalb öffnen sie sich bei uns nicht: Tipp dort auf Rezeptfoto.",
       "checked": true
     }
   }

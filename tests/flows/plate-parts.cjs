@@ -1,8 +1,11 @@
-// JOURNEY (DT301, 0.3.149, board Stories223; Coach Milan 14 November 17:25 to 21:08, Go): an empty plate shows a plate drawn,
-// with Nothing on the plate yet. Then two parts, each under its heading. Add a food: four tiles in two rows, icon above the word
-// (Manual, Scan, Photo of my meal, Say what you have), each 88 px or more. After a line, Have a recipe? Start from it: Use a
-// screenshot and Paste a link. Paste a link opens the box for the link, and its line names the button by its new words. With
-// foods on the plate, the ways stay a row of buttons, as before.
+// JOURNEY (DT308 Release 1, 0.3.154, boards Stories236; Coach Milan 16 November 21:40 to 17 November 14:50, Go 14:50): the empty
+// Plate. On top, the grey words Meal title with a pencil; no meal's name is guessed. One card: a small empty plate with Nothing
+// on your plate yet; the title Add to your plate; three tiles in one row, icon above the word: Recipe photo, Recipe link, and
+// Photo or scan on the right, where the thumb is. Then From the list: Search all foods, three of your foods each for Protein,
+// Carbs and Fat, then See all foods and Add manually. Gone from the empty Plate: What are you craving?, Chef Mealan's field,
+// the tiles Manual, Scan, Photo of my meal and Say what you have, and Fit to my target. Recipe link opens the box for the
+// link, and its line names the tile by its words. With a food on the plate, the plate keeps its 0.3.152 look.
+// Replaces the walkthrough of DT301 (0.3.149, board Stories223), whose four tiles and second heading are gone.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -25,20 +28,65 @@ const PORT = "3523", U = `http://127.0.0.1:${PORT}`;
     await require("./adult.cjs")(page);
     await page.goto(U + "/plate"); await page.waitForTimeout(1500);
     const card = page.locator(".plate-card").first();
-    ok(await card.locator(".plate-empty-pic svg").count() === 1 && /Nothing on the plate yet/.test(await card.locator(".plate-empty-pic").innerText()), "an empty plate is drawn, with Nothing on the plate yet");
+    const main = async () => ((await page.locator("main").innerText()) ?? "").replace(/\s+/g, " ");
+    // the top: Meal title, grey, with a pencil
+    const title = page.locator(".title-row .title-input"), pen = page.locator(".title-row .title-pen");
+    const pb = await pen.boundingBox();
+    ok(await title.count() === 1 && await title.inputValue() === "" && await title.getAttribute("placeholder") === "Meal title" && await pen.getAttribute("aria-label") === "Edit the title" && pb.width >= 44 && pb.height >= 44, "the top says Meal title in grey, with a pencil of at least 44 px; no name is guessed");
+    await pen.click(); await page.waitForTimeout(200);
+    ok(await title.evaluate((x) => document.activeElement === x), "the pencil opens the title to type");
+    // the card
+    ok(await card.locator(".plate-empty-pic svg").count() === 1 && (await card.locator(".plate-empty-pic").innerText()).trim() === "Nothing on your plate yet." && (await card.locator(".plate-empty-pic svg").boundingBox()).width <= 90, "a small empty plate is drawn, with Nothing on your plate yet.");
     const heads = await card.locator(".ways-head").allInnerTexts();
-    ok(heads.length === 2 && heads[0] === "Add a food" && heads[1] === "Have a recipe? Start from it", "two parts, each under its heading: " + heads.join(" | "));
-    const tiles = card.locator(".ways.ways-tiles > button");
+    ok(heads.join(" | ") === "Add to your plate | From the list", "two parts, each under its heading: " + heads.join(" | "));
+    const tiles = card.locator(".ways.ways-three > *");
     const words = (await tiles.allInnerTexts()).map((x) => x.trim());
-    ok(words.join("|") === "Manual|Scan|Photo of my meal|Say what you have", "Add a food: the four tiles: " + words.join(", "));
+    ok(words.join("|") === "Recipe photo|Recipe link|Photo or scan", "Add to your plate: three tiles, Photo or scan on the right: " + words.join(", "));
     const boxes = await tiles.evaluateAll((xs) => xs.map((x) => { const r = x.getBoundingClientRect(), i = x.querySelector("svg").getBoundingClientRect(); return { x: Math.round(r.left), y: Math.round(r.top), h: Math.round(r.height), iconAbove: i.top < r.top + r.height / 2 }; }));
-    ok(boxes[0].y === boxes[1].y && boxes[2].y === boxes[3].y && boxes[2].y > boxes[0].y && boxes[0].x === boxes[2].x, "two rows of two");
-    ok(boxes.every((x) => x.h >= 88 && x.iconAbove), "each tile 88 px or more, the icon above the word");
-    ok(await card.locator(".ways-head-second").evaluate((e) => getComputedStyle(e).borderTopStyle === "solid"), "a line before the second part");
-    const rec = (await card.locator(".start-ways button, .start-ways label, .ways-head-second + * button, .ways-head-second + * label").allInnerTexts()).map((x) => x.trim()).filter(Boolean);
-    ok(rec.includes("Use a screenshot") && rec.includes("Paste a link"), "Use a screenshot and Paste a link: " + rec.join(", "));
-    await card.getByRole("button", { name: "Paste a link" }).click(); await page.waitForTimeout(500);
-    ok(/tap Use a screenshot there/.test(await page.locator("main").innerText()), "the link box names the button by its new words");
+    ok(boxes[0].y === boxes[1].y && boxes[1].y === boxes[2].y && boxes[0].x < boxes[1].x && boxes[1].x < boxes[2].x, "one row of three");
+    ok(boxes.every((x) => x.h >= 76 && x.iconAbove), "each tile 76 px or more, the icon above the word");
+    const m = await main();
+    ok(!/What are you craving|Find ideas|Fit to my target|Empty plate|Quick picks/.test(m) && await page.getByRole("button", { name: /^(Manual|Scan|Photo of my meal|Say what you have)$/ }).count() === 0 && await page.locator(".crave").count() === 0, "gone from the empty Plate: What are you craving?, his field, Manual, Scan, Photo of my meal, Say what you have, Fit to my target");
+    // From the list
+    const list = card.locator(".from-list");
+    ok(await list.getByLabel("Search all foods").count() === 1 && await list.locator("input.plate-search").getAttribute("placeholder") === "Search all foods", "From the list: Search all foods");
+    const groups = await list.locator(".macro-group").allInnerTexts();
+    const per = await list.evaluate((x) => { const out = []; for (const e of x.querySelectorAll(".rows > *")) { if (e.classList.contains("macro-group")) out.push(0); else if (e.classList.contains("row-food") && out.length) out[out.length - 1]++; } return out; });
+    ok(groups.join(" | ") === "Protein | Carbs | Fat" && per.every((n) => n >= 1 && n <= 3), "three of your foods each for Protein, Carbs and Fat: " + groups.join(" | ") + " (" + per.join(", ") + ")");
+    const ends = (await list.locator(".list-ends button").allInnerTexts()).map((x) => x.trim());
+    ok(ends.join(" | ") === "See all foods | Add manually" && await list.locator(".list-ends button").evaluateAll((xs) => xs.every((x) => x.getBoundingClientRect().height >= 44)), "then See all foods and Add manually, each at least 44 px: " + ends.join(" | "));
+    const order = await card.evaluate((x) => [".plate-empty-pic", ".ways-three", ".from-list"].map((s) => x.querySelector(s).getBoundingClientRect().top));
+    ok(order[0] < order[1] && order[1] < order[2], "the order: the empty plate, Add to your plate, From the list");
+    // Add manually opens the sheet for a food the list does not have
+    await list.getByRole("button", { name: "Add manually" }).click(); await page.waitForTimeout(500);
+    ok(await page.locator(".sheet-backdrop h2, [role=dialog] h2").filter({ hasText: "Manual" }).count() === 1, "Add manually opens the sheet for a food of your own");
+    await page.keyboard.press("Escape"); await page.waitForTimeout(200);
+    if (await page.locator(".sheet-backdrop").count()) { await page.locator(".sheet-backdrop").first().click({ position: { x: 10, y: 10 } }); await page.waitForTimeout(300); }
+    // See all foods opens Foods
+    await page.goto(U + "/plate"); await page.waitForTimeout(1200);
+    await page.locator(".from-list").getByRole("button", { name: "See all foods" }).click(); await page.waitForTimeout(600);
+    ok(/\/foods$/.test(page.url()) || /My foods|Foods/.test(await page.locator(".topbar, header").first().innerText()), "See all foods opens Foods");
+    await page.goto(U + "/plate"); await page.waitForTimeout(1200);
+    // Recipe link opens the box for the link
+    await page.locator(".plate-card").first().getByRole("button", { name: "Recipe link" }).click(); await page.waitForTimeout(500);
+    ok(await page.getByLabel("Link to a recipe").count() === 1 && /tap Recipe photo there/.test(await main()), "Recipe link opens the box for the link; its line names the tile by its words");
+    await page.getByRole("button", { name: "Cancel" }).first().click(); await page.waitForTimeout(400);
+    // Photo or scan opens the camera
+    await page.locator(".plate-card").first().getByRole("button", { name: "Photo or scan" }).click(); await page.waitForTimeout(1500);
+    ok(await page.locator(".camera-modal").count() === 1 && (await page.locator(".cam-modes button[aria-pressed=true]").textContent()) === "Meal", "Photo or scan opens the camera, in Meal mode");
+    await page.locator(".cam-round").first().click(); await page.waitForTimeout(500);
+    // a food from the list: on the plate, and the plate keeps its look with foods
+    await page.locator(".from-list .row-food").first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(700);
+    const st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
+    ok(st.items.length === 1 && await page.locator(".plate-empty-pic, .ways-three, .from-list").count() === 0 && /Empty plate/.test(await main()) && await page.getByRole("button", { name: "Fit to my target" }).count() >= 1, "+ Add on a food puts it on the plate; with a food the plate keeps its look, with Fit to my target");
+    // in Serbian and German
+    for (const [lang, a1, a2, a3] of [["sr-Latn", "Naziv obroka", "Dodaj na svoj tanjir | Sa liste", "Slika recepta | Link recepta | Slika ili skeniranje"], ["de", "Titel der Mahlzeit", "Auf deinen Teller legen | Aus der Liste", "Rezeptfoto | Rezeptlink | Foto oder Scan"]]) {
+      await page.evaluate((l) => { localStorage.setItem("chefmealan-lang", l); const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.items = []; s.title = ""; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); }, lang);
+      await page.goto(U + "/plate"); await page.waitForTimeout(1300);
+      const c2 = page.locator(".plate-card").first();
+      const got = [await page.locator(".title-row .title-input").getAttribute("placeholder"), (await c2.locator(".ways-head").allInnerTexts()).join(" | "), (await c2.locator(".ways.ways-three > *").allInnerTexts()).map((x) => x.trim()).join(" | ")];
+      ok(got[0] === a1 && got[1] === a2 && got[2] === a3, `the empty Plate in ${lang}: ${got.join("; ")}`);
+    }
     await ctx.close();
   } catch (e) { ok(false, "walkthrough crashed: " + (e && e.message)); }
   ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
