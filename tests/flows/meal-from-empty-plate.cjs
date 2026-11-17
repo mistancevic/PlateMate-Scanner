@@ -27,16 +27,17 @@ seed.items = [];
   const step = async (name, fn) => { try { await fn(); console.log("ok  ", name); } catch (e) { console.log("FAIL", name, "->", e.message.split("\n")[0]); await shot("fail-" + name.replace(/\W+/g, "_")); } };
   await step("plate", async () => { await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400); });
   await step("add first food", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
-  await step("add second food", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
+  await step("add second food", async () => { await (await require("./more.cjs")(page)).fill("Rice"); await page.waitForTimeout(300); await page.locator(".add-more .row-food").first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(300); }); // DT308 Release 2 (0.3.155): under + Add more to your plate
   await shot("1-plate");
   console.log("items in state:", await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.length));
   await step("one line in, two ways in", async () => {
     const sub = page.locator(".step-head p, .step-head small").first();
     const box = await sub.boundingBox(); if (!box || box.height > 24) throw new Error("the sub line wraps: " + (box && box.height));
     // 0.2.16 (board IM, IM1b, Milan 21:48): Empty plate moved out of the row that adds foods, to the top of the plate card
-    const ways = await page.locator(".ways .pill").allTextContents(); if (ways.length !== 2 || !/^Manual/.test(ways[0].replace(/^[^A-Za-z]*/, "")) || !/Scan/.test(ways[1])) throw new Error("ways: " + ways.join(" | "));
+    // Changed by story DT308 Release 2 (0.3.155, board Stories238): with foods on the plate, the ways to add live under + Add more to your plate
+    const ways = (await page.locator(".add-more .ways-three > *").allTextContents()).map((x) => x.trim()); if (ways.join(" | ") !== "Recipe photo | Recipe link | Photo or scan") throw new Error("ways: " + ways.join(" | "));
     if (!/Empty plate/.test(await page.locator(".plate-card .card-top").textContent())) throw new Error("Empty plate is not at the top of the plate card");
-    const tops = await page.locator(".ways .pill").evaluateAll((es) => es.map((e) => Math.round(e.getBoundingClientRect().top))); if (new Set(tops).size !== 1) throw new Error("ways on more than one row: " + tops.join(","));
+    const tops = await page.locator(".add-more .ways-three > *").evaluateAll((es) => es.map((e) => Math.round(e.getBoundingClientRect().top))); if (new Set(tops).size !== 1) throw new Error("ways on more than one row: " + tops.join(","));
   });
   await step("empty plate asks twice, then empties", async () => {
     await click(/Empty plate/i); await click(/Tap again to empty/i);
@@ -44,7 +45,7 @@ seed.items = [];
     if (await page.getByRole("button", { name: /Empty plate/ }).count() !== 0) throw new Error("Empty plate still shown on an empty plate");
   });
   await step("add first food again", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
-  await step("add second food again", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
+  await step("add second food again", async () => { await (await require("./more.cjs")(page)).fill("Oats"); await page.waitForTimeout(300); await page.locator(".add-more .row-food").first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(300); });
   await step("moment afterwork", async () => { await require("./line.cjs")(page); await click(/Afterwork event/i); });
   await step("ask", () => click(/^(Fit to my target|Make it an? \w+)$/i));
   await shot("2-recipe");

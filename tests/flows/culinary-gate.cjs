@@ -54,7 +54,7 @@ const U = "http://127.0.0.1:3262";
   // Fit in place: the yeast stays at its portion, the line says so, the plate stays on Craft
   await page.locator(".grams input").nth(1).fill("10"); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Fit to my target" }).click(); await page.waitForTimeout(1500);
-  ok(await page.locator(".phase-bar").count() === 0 && await page.locator(".title-input").count() === 1 && await page.getByRole("button", { name: "Manual" }).count() === 1, "DT93: Fit stays on the Plate: the name field and Manual are still there");
+  ok(await page.locator(".phase-bar").count() === 0 && await page.locator(".title-input").count() === 1 && await page.locator(".add-more-open").count() === 1, "DT93: Fit stays on the Plate: the name field and + Add more to your plate are still there"); // DT308 Release 2 (0.3.155): was Manual
   // DT97 (0.2.90): Fit's line lives in Chef Mealan's one place, not under the row
   const fitLine = await page.locator(".fit-note").allTextContents();
   ok(fitLine.length === 1 && /^Fit set 10 g active dry yeast, the most for a portion \(it asked for \d+ g\)\.$/.test(fitLine[0]), "DT93, DT97: Fit never moves the yeast past 10 g, says what it asked for, in Chef Mealan's place: " + fitLine[0]);

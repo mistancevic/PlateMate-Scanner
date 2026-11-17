@@ -67,7 +67,7 @@ const cook = { id: "c-1", startedAt: "2026-11-02T11:20:00", title: "Vanilla prot
     await ctx.close();
     // ---- DT219: a read with no foods leaves the Plate as it was ----
     ({ ctx, page } = await open({ ...seed, items: [{ id: "i-s", grams: 150, locked: false, food: skyr }] }, "/plate"));
-    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500); await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     st = await store(page);
     const none = page.locator(".mp-none");
@@ -77,12 +77,12 @@ const cook = { id: "c-1", startedAt: "2026-11-02T11:20:00", title: "Vanilla prot
     ok(await page.locator(".camera-ui").count() === 1 && await page.locator(".mp-none").count() === 0, "Take it again opens the meal camera");
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500); await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     await page.locator(".mp-none").getByRole("button", { name: "Add the foods myself" }).click(); await page.waitForTimeout(600);
-    ok(await page.locator(".mp-none").count() === 0 && await page.evaluate(() => document.activeElement?.getAttribute("aria-label")) === "Search all my foods", "Add the foods myself: the line goes, the food search is ready");
+    ok(await page.locator(".mp-none").count() === 0 && /^Search all (my )?foods$/.test((await page.evaluate(() => document.activeElement?.getAttribute("aria-label"))) ?? ""), "Add the foods myself: the line goes, the food search is ready");
     await ctx.close();
     // ---- DT224 (0.3.60, board Stories165): an empty Plate starts with What are you craving?; Craft, Make, Eat once it holds something ----
     ({ ctx, page } = await open({ ...seed, items: [] }, "/plate"));
     ok(await page.locator(".phase-bar").count() === 0 && /Nothing on your plate yet\./.test(await page.locator(".plate-empty-pic").textContent()), "DT224: an empty Plate: no Craft, Make, Eat (DT308, 0.3.154: it says Nothing on your plate yet)");
-    await page.getByLabel(/^Search all (my )?foods$/).fill("skyr"); await page.waitForTimeout(400);
+    await (await require("./more.cjs")(page)).fill("skyr"); await page.waitForTimeout(400);
     await page.locator(".rows .row-food", { hasText: "Skyr" }).first().getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(600);
     ok(await page.locator(".phase-bar").count() === 0, "DT230: a food on the Plate: still no bar, the Plate is Craft on paper");
     await ctx.close();

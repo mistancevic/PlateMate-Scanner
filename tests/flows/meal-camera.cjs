@@ -62,7 +62,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
 
   // the Plate's Photo of my meal opens the meal camera (DT138: no longer on Today)
   await page.goto(U + "/plate"); await page.waitForTimeout(1500);
-  await page.locator(".mp-button").click(); await page.waitForTimeout(1800);
+  await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1800);
   const modes = await page.locator(".cam-modes button").allTextContents();
   ok(await page.locator(".camera-ui").count() === 1 && (await text(".cam-title")) === "Photo of my meal", "DT130: Photo of my meal opens the camera, titled Photo of my meal");
   // Changed by story DT309 (0.3.153, board Stories239; Coach Milan 17 November 14:06, Go 14:12): the modes stand by how often they are used, Group, Barcode, Label, Meal
@@ -76,7 +76,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(500);
   ok(/2 photos of this meal/.test(await text(".cam-staged")) && (await page.locator(".cam-analyze").textContent()).trim() === "Use 2 photos" && /The shutter adds a photo/.test(await text(".cam-panel")), "DT228, DT305: a second photo joins: Use 2 photos");
   await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500);
-  ok(sent.length === 0 && await page.locator(".camera-ui").count() === 0 && await page.locator(".pa-screen").count() === 1 && /A photo taken now\./.test(await text(".pa-top")) && await page.locator(".pa-chip").count() === 0, "DT305: the photos wait on the photo screen: A photo taken now., no chips, nothing read yet");
+  ok(sent.length === 0 && await page.locator(".camera-ui").count() === 0 && await page.locator(".pa-screen").count() === 1 && /A photo taken now\./.test(await text(".pa-from")) && await page.locator(".pa-chip").count() === 0, "DT305: the photos wait on the photo screen: A photo taken now., no chips, nothing read yet");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
   const s1 = await st();
   ok(sent.length === 1 && /^data:image\/jpeg;base64,/.test(sent[0].image) && Array.isArray(sent[0].more) && sent[0].more.length === 1 && s1.photo?.more?.length === 1 && await page.locator(".camera-ui").count() === 0, "DT228: both photos go in one read; the camera closes");
@@ -88,12 +88,12 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
 
   // the Plate: Photo of my meal opens the same camera; a photo from Your photos asks first
   await toPlate();
-  await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+  await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
   ok(await page.locator(".cam-modes button[aria-pressed=true]").textContent() === "Meal", "DT130: the Plate's Photo of my meal opens the meal camera too");
   await pick("2026:10:25 12:20:00");
   ok(await page.locator(".camera-ui").count() === 0 && await page.locator(".plate-card .pa-screen").count() === 1, "DT130, DT305: a photo from Your photos lands on the photo screen");
   ok(sent.length === 1, "DT130: nothing is read before Read the plate");
-  ok(/A photo from 12:20 today, from Your photos\./.test(await text(".pa-top")) && !/Whose plate/.test(await text(".pa-top")) && await page.locator(".pa-top.chef-line").count() === 1, "DT130, DT213, DT305: the photo's own time, in Chef Mealan's line, and no question: " + await text(".pa-top"));
+  ok(/A photo from 12:20 today, from Your photos\./.test(await text(".pa-from")) && !/Whose plate/.test(await text(".pa-from")) && await page.locator(".pa-from").count() === 1 && await page.locator(".pa-photo").count() === 1, "DT130, DT213, DT305: the photo's own time, in Chef Mealan's line, and no question: " + await text(".pa-from"));
   ok(await page.locator(".pa-chip").count() === 0 && await page.locator(".pa-time").count() === 0 && /^Lunch, today at 12:20 · Off the plan/.test(await text(".plan-line")), "DT305: no chips and no time field; the photo fills in the meal line: " + (await text(".plan-line")).slice(0, 40));
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   const s2 = await st();
@@ -107,9 +107,9 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
 
   // yesterday's photo: Ate at 19:10 starts on, as dinner; An idea instead
   await toPlate();
-  await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+  await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
   await pick("2026:10:24 19:10:00");
-  ok(/A photo from yesterday, 19:10, from Your photos\./.test(await text(".pa-top")) && /^Dinner, yesterday at 19:10/.test(await text(".plan-line")), "DT130, DT305: a photo from yesterday: the meal line says Dinner, yesterday at 19:10");
+  ok(/A photo from yesterday, 19:10, from Your photos\./.test(await text(".pa-from")) && /^Dinner, yesterday at 19:10/.test(await text(".plan-line")), "DT130, DT305: a photo from yesterday: the meal line says Dinner, yesterday at 19:10");
   // DT305: Just looking is the meal line's own answer, behind the pencil
   await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Just looking", exact: true }).click(); await page.waitForTimeout(300);
@@ -139,9 +139,9 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
 
   // an older photo starts on An idea; Save as an idea
   await toPlate();
-  await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+  await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
   await pick("2026:10:19 20:00:00");
-  ok(/A photo from Monday 19 October, 20:00, from Your photos\./.test(await text(".pa-top")) && /^Just looking/.test(await text(".plan-line")), "DT130, DT305: a photo from last week; the meal line still says Just looking, as you left it");
+  ok(/A photo from Monday 19 October, 20:00, from Your photos\./.test(await text(".pa-from")) && /^Just looking/.test(await text(".plan-line")), "DT130, DT305: a photo from last week; the meal line still says Just looking, as you left it");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   await page.getByRole("button", { name: "Save as an idea" }).click(); await page.waitForTimeout(1200);
   const s6 = await st();
@@ -152,7 +152,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
 
   // Drop the photo: nothing read, nothing kept
   await toPlate();
-  await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+  await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
   await pick("2026:10:25 11:00:00");
   await page.getByRole("button", { name: "Remove the photo" }).click(); await page.waitForTimeout(300);
   ok(await page.locator(".pa").count() === 0 && sent.length === 4, "DT130, DT305: Remove the photo: the photo screen goes, nothing is read");

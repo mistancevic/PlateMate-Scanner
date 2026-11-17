@@ -54,7 +54,7 @@ const oneList = { url: "https://example.com/bowl/", recipe: { title: "Skyr bowl"
     // take the Glaze foods off, one by one, with a swipe to the right
     const glaze = () => page.locator(".plate-card .pt-group").filter({ has: page.locator('[aria-label="Part: Glaze"]') });
     for (let k = 0; k < 2; k++) {
-      const row = glaze().locator(".swipe-fg").first(); await row.scrollIntoViewIfNeeded(); const th = await row.locator(".thumb").first().boundingBox();
+      const row = glaze().locator(".swipe-fg").first(); await row.evaluate((el) => el.scrollIntoView({ block: "center" })); await page.waitForTimeout(150); const th = await row.locator(".thumb").first().boundingBox();
       await page.mouse.move(th.x + th.width / 2, th.y + th.height / 2); await page.mouse.down();
       for (let s = 1; s <= 10; s++) await page.mouse.move(th.x + th.width / 2 + s * 15, th.y + th.height / 2);
       await page.mouse.up(); await page.waitForTimeout(500);
@@ -66,7 +66,8 @@ const oneList = { url: "https://example.com/bowl/", recipe: { title: "Skyr bowl"
     const add = glaze().getByRole("button", { name: "+ Add a food to Glaze" });
     ok(await add.count() === 1, "it offers + Add a food to Glaze");
     await add.click(); await page.waitForTimeout(500);
-    ok(await page.evaluate(() => document.activeElement?.getAttribute("aria-label")) === "Search all my foods", "the tap goes to the foods to pick from");
+    ok(await page.evaluate(() => document.activeElement?.getAttribute("aria-label")) === "Search all foods", "the tap goes to the foods to pick from"); // DT308 Release 2 (0.3.155): the search opens under + Add more to your plate
+    await page.getByLabel("Search all foods").fill("Skyr"); await page.waitForTimeout(400);
     const pick = page.locator(".row").filter({ hasText: "Skyr, natural" }).getByRole("button", { name: /Add/ }).first();
     await pick.click(); await page.waitForTimeout(700);
     const g2 = await glaze().textContent();

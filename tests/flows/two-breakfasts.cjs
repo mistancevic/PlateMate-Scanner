@@ -72,10 +72,10 @@ const U = "http://127.0.0.1:3266";
   ok(/Clean Protein Bar|Quark/.test(planText), "DT110: Plan shows the recipe for tomorrow: " + planText.slice(0, 100));
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(900);
   // DT112: the x empties the search
-  await page.getByLabel(/^Search all (my )?foods$/).fill("peanut"); await page.waitForTimeout(300);
+  await (await require("./more.cjs")(page)).fill("peanut"); await page.waitForTimeout(300);
   ok(await page.getByRole("button", { name: "Clear the search" }).count() === 1, "DT112: the x shows while the field has text");
   await page.getByRole("button", { name: "Clear the search" }).click(); await page.waitForTimeout(300);
-  ok((await page.getByLabel(/^Search all (my )?foods$/).inputValue()) === "" && await page.getByRole("button", { name: "Clear the search" }).count() === 0, "DT112: one tap empties it, the x goes");
+  ok((await (await require("./more.cjs")(page)).inputValue()) === "" && await page.getByRole("button", { name: "Clear the search" }).count() === 0, "DT112: one tap empties it, the x goes");
   // DT111: the wait on the ideas shows its steps, collapsed; a tap opens them. A plate of one bar and quark, under the target
   await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); const f = (id) => s.foods.find((x) => x.id === id); s.items = [{ id: "a", food: f("bar"), grams: 50, locked: false }, { id: "c", food: f("quark"), grams: 150, locked: false }]; s.fromRecipe = undefined; s.recipeFoods = undefined; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
   await page.reload(); await page.waitForTimeout(1800);

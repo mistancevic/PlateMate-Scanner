@@ -71,7 +71,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   l = await lines();
   ok(l.some((x) => /^20 g is over a portion of dry yeast, 3 to 10 g\./.test(x)), "DT135: yeast keeps 3 to 10 g: " + l.join(" | "));
   await put([], "");
-  await page.getByLabel(/^Search all (my )?foods$/).fill("Penne"); await page.waitForTimeout(600);
+  await (await require("./more.cjs")(page)).fill("Penne"); await page.waitForTimeout(600);
   await page.locator(".row-food").filter({ hasText: "Penne, dry" }).first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(800);
   const pen = (await st()).items.find((i) => i.food.id === "penne3");
   ok(pen && pen.grams === 200, "DT135: Add puts penne on at 200 g, the middle of the meal's 40 to 360 g: " + (pen && pen.grams));

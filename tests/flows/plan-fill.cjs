@@ -84,8 +84,8 @@ seed.items = [];
   await require("./swipe.cjs")(page, page.getByRole("button", { name: /Lunch at .*Chicken/ }), "left"); // R19: a planned meal opens on a tap; a swipe left swaps
   await page.getByRole("button", { name: "Create a new meal on the Plate" }).click(); await page.waitForTimeout(500);
   // DT308 (0.3.154, board Stories236): the empty Plate lists three foods each for Protein, Carbs and Fat; these two are found by name
-  for (const name of ["Nutella", "Leibniz"]) { await page.getByLabel(/^Search all (my )?foods$/).fill(name); await page.waitForTimeout(300); await page.locator(".row-food", { hasText: name }).getByRole("button").click(); await page.waitForTimeout(300); }
-  await page.getByLabel(/^Search all (my )?foods$/).fill(""); await page.waitForTimeout(300);
+  for (const name of ["Nutella", "Leibniz"]) { await (await require("./more.cjs")(page)).fill(name); await page.waitForTimeout(300); await page.locator(".row-food", { hasText: name }).getByRole("button").click(); await page.waitForTimeout(300); }
+  await (await require("./more.cjs")(page)).fill(""); await page.waitForTimeout(300);
   // changed by DT149 (0.2.130): planning Monday's lunch, Put it in is the main way out, Fit the other
   ok(await page.getByRole("button", { name: /^Put it in Monday's lunch$/ }).count() === 1 && await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count() === 1, "two ways out: Put it in Monday's lunch and Fit to my target");
   // the tip (canvas S, 11 October 2026): the plate is under, three foods from My foods that lift it, with the score each would reach

@@ -77,7 +77,7 @@ const READ = { dish: "Pork schnitzel with roasted potatoes", foods: [
     ({ ctx, page } = await open({ ...seed, items: [] }, "/plate"));
     await page.unroute("**/api/plate-photo");
     await page.route("**/api/plate-photo", (r) => { sent.push(r.request().postDataJSON()); r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(READ) }); });
-    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles(path.join(ROOT, "tests/flows/plate.jpg")); await page.waitForTimeout(1200);
     ok(/Anything Chef Mealan should know\?/.test(await page.locator(".pa").textContent()), "a photo from Your photos: the box on the photo screen");
     await page.locator(".pa-screen textarea").fill("veal, Wiener Schnitzel");

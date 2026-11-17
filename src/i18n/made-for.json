@@ -69,7 +69,7 @@
     "screen.plate.offPlan": {"en":"Off the plan","area":"The Plate","where":"The Plate"},
     "screen.plate.aDish": {"en":"A dish","area":"The Plate","where":"The Plate"},
     "screen.plate.aMix": {"en":"A mix","area":"The Plate","where":"The Plate"},
-    "screen.plate.onThePlate": {"en":"On the plate","area":"The Plate","where":"The Plate"},
+    "screen.plate.onThePlate": {"en":"On your plate","area":"The Plate","where":"The Plate","release":"0.3.155"},
     "screen.plate.empty": {"en":"Empty plate","area":"The Plate","where":"The Plate"},
     "screen.plate.emptyConfirm": {"en":"Tap again to empty","area":"The Plate","where":"The Plate"},
     "screen.plate.nothingYet": {"en":"Nothing on the plate yet.","area":"The Plate","where":"The Plate"},
@@ -5747,6 +5747,7 @@
     "screen.chef.gProtein": {"en":"{protein} g protein","area":"Words used across the app","where":"Across the app","release":"0.3.154"},
     "screen.chef.addYourFoods": {"en":"Add your foods to your plate","area":"Words used across the app","where":"Across the app","release":"0.3.154"},
     "screen.chef.addDish": {"en":"Add {title} to your plate","area":"Words used across the app","where":"Across the app","release":"0.3.154"},
-    "screen.recipein.aRecipePageFromAPhoto": {"en":"A recipe page from a website. Instagram and TikTok links need a login, so they don't open for us: tap Recipe photo there.","area":"Recipes","where":"Recipes","release":"0.3.154"}
+    "screen.recipein.aRecipePageFromAPhoto": {"en":"A recipe page from a website. Instagram and TikTok links need a login, so they don't open for us: tap Recipe photo there.","area":"Recipes","where":"Recipes","release":"0.3.154"},
+    "screen.plate.addMore": {"en":"Add more to your plate","area":"The Plate","where":"The Plate","release":"0.3.155"}
   }
 }

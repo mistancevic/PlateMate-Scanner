@@ -50,7 +50,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     if (/could not be read/.test(await p.locator("body").innerText())) throw new Error("the seed is not a valid state");
     return p;
   };
-  const photo = async (p) => { await p.locator(".mp-button").first().click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(1500); if (await p.locator(".pa-screen").count()) { await p.locator(".pa-screen .pa-go .pill").click(); await p.waitForTimeout(2500); } };
+  const photo = async (p) => { await (await require("./more.cjs")(p, "mp")).click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(1500); if (await p.locator(".pa-screen").count()) { await p.locator(".pa-screen .pa-go .pill").click(); await p.waitForTimeout(2500); } };
   const toPlate = async (p) => { if (await p.locator(".rv-change .pill").count()) { await p.locator(".rv-change .pill").click(); await p.waitForTimeout(600); } };
   const saved = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1") || "{}"));
   const main = (p) => p.locator("main").innerText();
@@ -63,7 +63,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     await p.getByRole("button", { name: "Try again" }).click(); await p.waitForTimeout(2500); await toPlate(p);
     ok(/Chicken breast/.test(await main(p)) && await p.locator(".mp-lost").count() === 0, "Try again: the foods are on the Plate, the card is gone");
     // DT241: a finished dish from a photo: no Prepare it, Fit stays
-    const ways = await p.locator(".ways-out button").allInnerTexts();
+    const ways = await p.locator(".plate-card .fit-top, .plate-card .prepare-it, .ways-out button").allInnerTexts(); // DT308 Release 2 (0.3.155): Fit under the result, Prepare it under + Add more
     ok(!ways.some((t) => /Prepare/.test(t)) && ways.some((t) => /Fit to my target/.test(t)), "a finished dish from a photo has no Prepare it: " + ways.join(" · "));
     await p.context().close();
 
@@ -153,7 +153,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     const ate = (id, at, slot, kcal) => ({ id, meal: { id: "m" + id, title: slot.name, items: [{ id: "i" + id, food: F("f" + id, "Meal " + id, 100, 8, 3, 10), grams: kcal, locked: false }], portion: kcal, savedAt: at }, status: "eaten", taste: "", notes: "", createdAt: at, slot });
     const fed = [ate("b", day(8, 0), { date: "2026-11-06", slotId: "breakfast", name: "Breakfast", time: "07:30" }, 1035), ate("l", day(13, 0), { date: "2026-11-06", slotId: "lunch", name: "Lunch", time: "13:45" }, 1035)];
     p = await open({ ...seed, feedback: fed }); await photo(p); await toPlate(p);
-    await p.locator(".ways-out button").filter({ hasText: "Fit to my target" }).click(); await p.waitForTimeout(800);
+    await p.locator(".plate-card .fit-top").click(); await p.waitForTimeout(800);
     const fills = p.locator(".fills-ask");
     ok(await fills.count() === 1 && /Your plate already fills this dinner: 639 kcal, in its range\./.test(await fills.innerText()), "Fit says first that the plate fills the dinner: " + (await fills.count() ? (await fills.innerText()).replace(/\s+/g, " ") : "none"));
     ok(await fills.getByRole("button", { name: "Ate it" }).count() === 1 && await fills.getByRole("button", { name: "Save for later" }).count() === 1 && await fills.getByRole("button", { name: "Ideas anyway ›" }).count() === 1, "I ate it, Save for later, Ideas anyway");

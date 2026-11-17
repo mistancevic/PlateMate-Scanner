@@ -3484,3 +3484,24 @@ section.plate-ask-photo .pa-keep.pill.pill-small { height: 44px; min-height: 44p
 .pc-saved { display: grid; place-items: center; color: var(--good-text); font-size: var(--fs-label); }
 .pc-read ol.pc-how { list-style: decimal; padding-left: 22px; }
 .pc-read ol.pc-how li { display: list-item; }
+
+/* 0.3.155: a long press on Plate must not select a word of the menu that opens under the finger (Coach Milan 17 November 20:30) */
+.plate-cam-back, .plate-cam-back * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+/* DT310 (0.3.155, board Stories240; Coach Milan 17 November 17:43, Go 20:30): a choice is a white chip; chosen, it is light blue
+   with a dark blue border and a tick, in every place. Solid blue stays for the one main action and for Chef Mealan's button. */
+.pa-chip.on, .pa-opt.on, .chip-inmeal.on, .ct-sizes button.on, .sv-dishes .pill.on, .sv-chips .pill.on, section.sv-plate .sv-whose > .pill.pill-small.on, section.sv-one .sv-whose > .pill.pill-small.on, .sv-whose .pill.on { background: var(--tint); border-color: var(--brand); color: var(--navy); font-weight: 900; }
+.pa-chip.on::before, .pa-opt.on::before, .chip-inmeal.on::before, .ct-sizes button.on::before, .sv-dishes .pill.on::before, .sv-chips .pill.on::before, .sv-whose .pill.on::before { content: "✓"; font-weight: 900; margin-right: 4px; }
+/* DT308 Release 2 (0.3.155): the photo screen as one card, the photo on top */
+section.photo-screen { padding: 0; overflow: hidden; }
+section.photo-screen .pa-screen { border: 0; border-radius: 0; margin: 0; padding: 0 14px 14px; gap: 12px; background: none; }
+.pa-photo { display: block; width: calc(100% + 28px); max-width: none; margin: 0 -14px; height: 225px; object-fit: cover; }
+.pa-from { display: flex; align-items: center; gap: 10px; } .pa-from span { flex: 1; font-size: var(--fs-body); line-height: 1.4; } .pa-from svg { flex: none; }
+/* DT308 Release 2 (0.3.155, boards Stories236 and 238): the landing. Fit to my target under the result; a dish as one row with its
+   foods under it; + Add more to your plate with the tiles and the list in place; Prepare it under it */
+.plate-card .fit-top { margin: 10px 0 12px; }
+.plate-card .add-more-open { margin: 10px 0 0; }
+.plate-card .prepare-it { margin: 10px 0 4px; }
+.add-more { border: 1.5px solid var(--line); border-radius: var(--r-card); padding: 10px 12px 12px; margin: 10px 0 0; background: var(--surface); }
+.add-more-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; } .add-more-top b { font-size: var(--fs-card); } .add-more-top .icon { width: 44px; height: 44px; margin-right: -8px; }
+.dish-one { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 8px 10px; margin: 0 0 6px; background: var(--surface); } .dish-one b { font-size: var(--fs-body); } .dish-one small { color: var(--muted); font-size: var(--fs-label); white-space: nowrap; }
+.rows.dish-foods { margin-left: 12px; padding-left: 10px; border-left: 2px solid var(--line); }

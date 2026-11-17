@@ -43,14 +43,14 @@ const tacos = { url: "https://example.com/chicken-tacos/", recipe: { title: "Chi
     await page.locator(".plate-card").getByRole("button", { name: "Link" }).click(); await page.waitForTimeout(300);
     await page.getByLabel("Link to a recipe").fill(x.url); await page.getByRole("button", { name: /^Read/ }).first().click(); await page.waitForTimeout(1200);
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200); };
-  const search = async (page, q) => { await page.getByLabel(/^Search all (my )?foods$/).fill(q); await page.waitForTimeout(400); };
+  const search = async (page, q) => { await (await require("./more.cjs")(page)).fill(q); await page.waitForTimeout(400); };
   const offered = (page, name) => page.locator(".row-food").filter({ hasText: name }).count();
   const line = (page) => page.locator(".held-back").textContent().catch(() => "");
   try {
     // the fritters: Glaze emptied, + Add a food to Glaze, chicken typed
     let page = await open(); await read(page, fritters);
     const glaze = () => page.locator(".plate-card .pt-group").filter({ has: page.locator('[aria-label="Part: Glaze"]') });
-    for (let k = 0; k < 2; k++) { const row = glaze().locator(".swipe-fg").first(); await row.scrollIntoViewIfNeeded(); const th = await row.locator(".thumb").first().boundingBox();
+    for (let k = 0; k < 2; k++) { const row = glaze().locator(".swipe-fg").first(); await row.evaluate((el) => el.scrollIntoView({ block: "center" })); await page.waitForTimeout(150); const th = await row.locator(".thumb").first().boundingBox();
       await page.mouse.move(th.x + th.width / 2, th.y + th.height / 2); await page.mouse.down();
       for (let s = 1; s <= 10; s++) await page.mouse.move(th.x + th.width / 2 + s * 15, th.y + th.height / 2);
       await page.mouse.up(); await page.waitForTimeout(500); }
@@ -82,7 +82,7 @@ const tacos = { url: "https://example.com/chicken-tacos/", recipe: { title: "Chi
     ok(await page.locator(".row-food:not(.row-basic):not(.row-member)").filter({ hasText: "Chicken breast" }).count() === 1 && (await page.locator(".held-back").count()) === 0, "on your own plate your search still offers chicken: your choice");
     ok((await page.locator(".row-basic").filter({ hasText: "Chicken breast, raw" }).count()) === 1, "DT125: the basic foods you don't have follow, with Take it");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
-  } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n")[0]); }
+  } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n").slice(0, 4).join(" / ")); }
   await b.close(); server.kill();
   console.log(fail ? `${fail} FAILED` : "all ok"); process.exit(fail ? 1 : 0);
 })();

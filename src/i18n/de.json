@@ -222,7 +222,7 @@
       "checked": true
     },
     "plate.onThePlate": {
-      "text": "Auf dem Teller",
+      "text": "Auf deinem Teller",
       "checked": true
     },
     "plate.empty": {
@@ -22991,6 +22991,10 @@
     },
     "recipein.aRecipePageFromAPhoto": {
       "text": "Eine Rezeptseite von einer Website. Links von Instagram und TikTok brauchen eine Anmeldung, deshalb öffnen sie sich bei uns nicht: Tipp dort auf Rezeptfoto.",
+      "checked": true
+    },
+    "plate.addMore": {
+      "text": "Mehr auf deinen Teller legen",
       "checked": true
     }
   }

@@ -60,7 +60,7 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     await page.locator(".past-add .past-plate").filter({ hasText: "Lunch" }).getByRole("button", { name: "Add what you ate" }).click(); await page.waitForTimeout(1000);
     ok(/Adding Wednesday's lunch/.test(await text(".step-head")), "Adding Wednesday's lunch");
     const before = (await st()).feedback.length;
-    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles({ name: "plate.jpg", mimeType: "image/jpeg", buffer: withExif("2026:10:29 19:40:00") }); await page.waitForTimeout(1200);
     ok(await page.locator(".pa-screen").count() === 1 && await page.locator(".pa-chip").count() === 0, "DT305: the photo waits on the photo screen, with no chips");
     await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300);
@@ -81,7 +81,7 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     // ---- the pencil block on Exploring first: a camera photo is Exploring too ----
     await page.locator(".plan-line").click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: "Just looking", exact: true }).click(); await page.waitForTimeout(300);
-    await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
+    await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     const s2 = await st();

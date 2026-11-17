@@ -38,7 +38,7 @@ const PORT = "3322", U = `http://127.0.0.1:${PORT}`;
     const plannedNow = () => page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned")));
     const toPlan = async () => { await page.goto(U + "/"); await page.waitForTimeout(800); await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(900); };
     const day = async (re) => { await page.getByRole("tab").filter({ hasText: re }).first().click(); await page.waitForTimeout(600); };
-    const addTwo = async () => { for (let i = 0; i < 2; i++) { await page.locator(".row-food").filter({ hasNot: page.locator(".pill-done") }).getByRole("button", { name: "Add", exact: true }).first().click(); await page.waitForTimeout(400); } };
+    const addTwo = async () => { for (const name of ["Skyr", "Rice"]) { await (await require("./more.cjs")(page)).fill(name); await page.waitForTimeout(300); await page.locator(".row-food").filter({ hasText: name }).filter({ hasNot: page.locator(".pill-done") }).getByRole("button", { name: "Add", exact: true }).first().click(); await page.waitForTimeout(400); } await (await require("./more.cjs")(page)).fill(""); }; // DT308 Release 2 (0.3.155): the foods are found by name
     // planning: tomorrow's dinner
     await toPlan(); await day(/30/);
     await page.getByRole("button", { name: /^Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(500);

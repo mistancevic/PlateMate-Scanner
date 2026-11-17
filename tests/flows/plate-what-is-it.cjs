@@ -74,7 +74,7 @@ const U = "http://127.0.0.1:3239";
     await search.fill("Chicken"); await page.waitForTimeout(300);
     await page.locator(".rows .row-food").filter({ hasText: "Chicken" }).first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(600);
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(500);
-    await page.getByLabel(/^Search all (my )?foods$/).fill("Vanilla ice"); await page.waitForTimeout(300);
+    await (await require("./more.cjs")(page)).fill("Vanilla ice"); await page.waitForTimeout(300);
     await page.locator(".rows .row-food").filter({ hasText: "Vanilla ice cream" }).first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(600);
     const parts = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.map((i) => `${i.food.name}:${i.part}`));
     ok(parts.includes("Chicken breast, cooked:Main") && parts.includes("Vanilla ice cream:Sweet finish"), "Both: the chicken in Main, the ice cream in Sweet finish: " + parts.join(", "));

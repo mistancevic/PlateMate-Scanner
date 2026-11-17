@@ -318,7 +318,7 @@
       "checked": true
     },
     "plate.onThePlate": {
-      "text": "Na tanjiru",
+      "text": "Na tvom tanjiru",
       "checked": true
     },
     "plate.empty": {
@@ -22991,6 +22991,10 @@
     },
     "recipein.aRecipePageFromAPhoto": {
       "text": "Strana s receptom sa sajta. Linkovi sa Instagrama i TikToka traže prijavu, pa nam se ne otvaraju: tamo dodirni Slika recepta.",
+      "checked": true
+    },
+    "plate.addMore": {
+      "text": "Dodaj još na svoj tanjir",
       "checked": true
     }
   }
