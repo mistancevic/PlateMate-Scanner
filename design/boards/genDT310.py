@@ -102,7 +102,7 @@ def start(cols):
     W = SX + cols * (SW + GAP) - GAP + 70; B = Board(); y = 30
 def row(rid, title, parts, shots, nid=None, at=0, arrows=True):
     global y
-    c = storyCard(B, y, rid, title, parts)
+    c = storyCard(B, y, (nid or rid), title, parts)
     hs = [B.screen(f"{nid or rid}{chr(97 + at + i)}", i, y, t, n, st, wd) for i, (t, n, st, wd) in enumerate(shots)]
     if arrows:
         for i in range(1, len(shots)): B.html.append(f'<div style="position:absolute;left:{B.x(i) - GAP}px;top:{y + TOP + 220}px;width:{GAP}px;text-align:center;font-size:44px;font-weight:900;color:#2a72d9">→</div>')
@@ -120,13 +120,14 @@ row("colour", "The colour of a chosen chip: two versions side by side, not steps
   ("Why", "Coach Milan 14:23: maybe the colour of a chosen chip should differ from the main button's colour."),
   ("Version 1", "Light blue with a dark blue border and a tick. It is in the app's family and clearly lighter than a solid blue button."),
   ("Version 2", "Green with a tick, the colour the app uses for what is done. Then blue means only: tap here to act."),
-  ("To choose", "One of the two, for every chip in the app."),
-], [("Version 1, light blue", "x_3", "changed", "Version 1."), ("Version 2, green", "x_4", "changed", "Version 2.")], nid="DT310.2", arrows=False)
-row("landing", "The landing: nothing is solid blue before you choose. Before and after, side by side", [
-  ("As drawn", "Fit to my target and Ate it are both solid blue."),
-  ("New", "Fit to my target is white with a blue border and Chef Mealan's hat. The three answers are chips."),
-  ("Open", "Chef Mealan's own card on the plate (Make it a snack, Keep it as it is, Add a protein base) keeps its blue button, as you said his button may."),
-], [("As drawn", "x_5", "now", "The landing of DT308.7c."), ("New", "x_6", "changed", "The same screen.")], nid="DT310.3", arrows=False)
+  ("Chosen", "Version 1, light blue (Coach Milan 17:43), for every chip in the app."),
+], [("Version 1, light blue", "x_3", "changed", "Version 1, chosen."), ("Version 2, green", "x_4", "changed", "Version 2.")], nid="DT310.2", arrows=False)
+row("landing", "The landing: solid blue only for Chef Mealan's action, and only when it is needed. Three versions side by side, not steps", [
+  ("As drawn before", "Fit to my target and Ate it are both solid blue, and nothing was tapped."),
+  ("The plate misses your target", "Fit to my target is directly under the result and solid blue, with his hat: the one main action. The three answers are chips."),
+  ("The plate fits", "Fit to my target is white with a blue border. Nothing is solid blue."),
+  ("Open", "Chef Mealan's own card on the plate keeps its blue button, as you said his button may."),
+], [("As drawn before", "x_5", "now", "The landing as it was drawn."), ("New, the plate misses", "c_4", "changed", "The same screen, a plate under your target."), ("New, the plate fits", "l_2", "changed", "The same screen, a plate that fits.")], nid="DT310.3", arrows=False)
 board("Stories240.dc.html", "DT310: choices and actions look different",
   "17 November 2026 (Coach Milan 14:23 and 14:51: draw; a separate release, it can go alongside the landing). Drawn for approval; no Go.",
   B, W, y - 100, "Stories239.dc.html")

@@ -102,7 +102,7 @@ def start(cols):
     W = SX + cols * (SW + GAP) - GAP + 70; B = Board(); y = 30
 def row(rid, title, parts, shots, nid=None, at=0, arrows=True):
     global y
-    c = storyCard(B, y, rid, title, parts)
+    c = storyCard(B, y, (nid or rid), title, parts)
     hs = [B.screen(f"{nid or rid}{chr(97 + at + i)}", i, y, t, n, st, wd) for i, (t, n, st, wd) in enumerate(shots)]
     if arrows:
         for i in range(1, len(shots)): B.html.append(f'<div style="position:absolute;left:{B.x(i) - GAP}px;top:{y + TOP + 220}px;width:{GAP}px;text-align:center;font-size:44px;font-weight:900;color:#2a72d9">→</div>')
@@ -161,7 +161,7 @@ def flowmap():
     out.append('</div>')
     B.html.append("".join(out)); y += H + 60
 
-start(6)
+start(7)
 flowmap()
 row("compare", "Adding to an empty plate: now, drawn last night, and chosen. Three versions of one screen, side by side, not steps", [
   ("Why", "Coach Milan 17 November 09:11: what is the better UX for the camera and upload buttons, and for the empty plate, now against new."),
@@ -186,16 +186,18 @@ row("flow 2", "A photo you take now, with no meal set", [
 ], [T, ("Release 1 and 2 · The Plate", "n_a", "changed", "Tap: Plate, in the bar at the bottom."), ("The camera", "f_cs", "same", "Tap: Photo or scan."), ("The camera, one photo taken", "f_cu", "same", "Tap: the shutter."), ("Release 2 · The photo screen", "n_n", "changed", "Tap: Use this photo."), ("Release 2 · The read", "n_r1", "changed", "Tap: Read the plate.")], nid="DT308.2")
 row("flow 3", "You ask Chef Mealan for an idea, through his icon", [
   ("One place", "His round icon is the one way to ask him, on this page as on the others. The field on the page is gone, so the page has more room."),
-  ("The chat", "It opens over the Plate. With an empty plate it has two choices above the field, I crave and I have, so your words go the right way. I crave is on (Coach Milan 14:51)."),
+  ("The chat", "It opens over the Plate. One field for everything, typed or spoken. No choices to make first: he reads whether your words are a craving or the foods you have (Coach Milan 16:10)."),
   ("The answer", "Your own recipes, your coach's and the members' for what you typed come first, then his new ideas, all as the same small cards: a small photo of the dish (the small plate until there is one), the title on up to two lines, the kcal and the PD, and + Add."),
-  ("Reading an idea", "A tap on a card's title opens it in place: its foods, how to make it, and Save in My recipes. + Add stays the one button of the card."),
-  ("+ Add", "It closes the chat and the dish is on your plate. The chat stays behind his icon."),
-], [T, ("Release 1 and 2 · The Plate", "c_1", "changed", "Tap: Plate, in the bar at the bottom."), ("Release 1 · Chef Mealan's chat", "c_2", "changed", "Tap: his icon."), ("Release 1 · His answer", "c_3", "changed", "You type what you crave, and send."), ("Release 1 · The idea, open", "c_3b", "changed", "Tap: the title of the idea."), ("Release 2 · The landing", "c_4", "changed", "Tap: + Add.")], nid="DT308.3")
+  ("Reading an idea", "A tap on a card's title opens it in place, and it stays short: only its foods, so it does not fill the chat. See the whole recipe opens the recipe page the app already has, over the chat, with the steps, Save in My recipes and + Add. Back returns you to the chat (Coach Milan 17:43 to 17:53)."),
+  ("+ Add", "It closes the chat and the dish is on your plate: one row with its name and weight, and its foods under it, each with its grams."),
+  ("The landing", "Fit to my target stands directly under the result, where the result says what is off. Solid blue with Chef Mealan's hat when the plate misses your target; white when it fits. The end as chips (DT310)."),
+], [T, ("Release 1 and 2 · The Plate", "c_1", "changed", "Tap: Plate, in the bar at the bottom."), ("Release 1 · Chef Mealan's chat", "c_2", "changed", "Tap: his icon."), ("Release 1 · His answer", "c_3", "changed", "You type what you crave, and send."), ("Release 1 · The idea, open", "c_3b", "changed", "Tap: the title of the idea."), ("Release 1 · The whole recipe", "c_3c", "changed", "Tap: See the whole recipe."), ("Release 2 · The landing", "c_4", "changed", "Tap: + Add.")], nid="DT308.3")
 row("flow 3b", "You tell Chef Mealan the foods you have", [
-  ("Why", "Today the tile Say what you have does this. The tile is gone, so the chat does it: under I have, your words are foods, not a craving."),
-  ("The steps", "In his chat you tap I have. The field asks for your foods. You type or say them, and send. The chat closes and the foods are on your plate as estimates."),
+  ("Why", "Today the tile Say what you have does this. The tile is gone, so the chat does it."),
+  ("The steps", "In his chat you type or say your foods, and send. He reads them as foods. His answer starts with one card, Your foods, with + Add; under it, ideas made from those foods. You tap + Add on Your foods. The chat closes and the foods are on your plate as estimates."),
+  ("Nothing by itself", "Whatever he understood, you see it as a card before anything lands. A wrong reading costs nothing."),
   ("In Release 1", "The Plate with foods keeps its 0.3.152 look. The landing comes with Release 2."),
-], [("Release 1 · Chef Mealan's chat", "c_h1", "changed", "From DT308.3c: his chat, open."), ("Release 1 · I have", "c_h2", "changed", "Tap: I have."), ("Release 1 · The Plate with your foods", "c_h3", "same", "You type your foods, and send.")], nid="DT308.3b")
+], [("Release 1 · Chef Mealan's chat", "c_h1", "changed", "From DT308.3c: his chat, open."), ("Release 1 · His answer", "c_h2", "changed", "You type your foods, and send."), ("Release 1 · The Plate with your foods", "c_h3", "same", "Tap: + Add, on Your foods.")], nid="DT308.3b")
 board("Stories236.dc.html", "DT308 (1 of 3): the flow as a map; the empty Plate; a photo; Chef Mealan",
   "17 November 2026 (Coach Milan 00:22 to 01:02). DT308 holds the meal line bug (B147) and the UX of this flow. The model: a plate starts with no meal set, and nothing changes in your plan or your numbers; the app asks what you do with the plate at the end of the read, and guesses a meal only then. On top the map. Then one row per flow: every row starts one step before the Plate, on Today; every frame shows what was tapped (orange outline), and the next frame is what that tap did. Blue outline and yellow note: what is new. Part 2 has the end of the read and the older photo; part 3 the landing. Drawn for approval; no Go. Marked on every frame: Release 1 is the title with its pencil, the card Add to your plate with its tiles and the list, and Chef Mealan through his icon; in Release 1 the meal line stays as in 0.3.152. Release 2 is the meal line (not set, the calendar, the X), no guessed meal, the end of the read, and the landing. A frame marked Release 1 and 2 shows parts of both. Frames without a mark do not change.",
   B, W, y - 100, "Stories235.dc.html")

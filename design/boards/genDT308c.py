@@ -102,7 +102,7 @@ def start(cols):
     W = SX + cols * (SW + GAP) - GAP + 70; B = Board(); y = 30
 def row(rid, title, parts, shots, nid=None, at=0, arrows=True):
     global y
-    c = storyCard(B, y, rid, title, parts)
+    c = storyCard(B, y, (nid or rid), title, parts)
     hs = [B.screen(f"{nid or rid}{chr(97 + at + i)}", i, y, t, n, st, wd) for i, (t, n, st, wd) in enumerate(shots)]
     if arrows:
         for i in range(1, len(shots)): B.html.append(f'<div style="position:absolute;left:{B.x(i) - GAP}px;top:{y + TOP + 220}px;width:{GAP}px;text-align:center;font-size:44px;font-weight:900;color:#2a72d9">→</div>')
@@ -165,7 +165,7 @@ start(6)
 T = ("Today", "f_t", "same", "Where you are: Today.")
 row("landing 1", "The one landing: the Plate with foods. Arriving from the list", [
   ("Why", "Coach Milan 03:32: after each of the four ways, adding must stay clean. Today the ways end on different screens: the read, the plate, a recipe page. So every way ends on one landing, built the same way."),
-  ("The landing", "The title, filled in. The meal line, set or not. Then, in the order of 0.3.152 (Coach Milan 10:48): the result on top, with the score and the numbers; the foods under it; + Add more to your plate directly under the foods, where + Add a food is today; Fit to my target and Prepare it in their row, as today; Chef Mealan's word; and the end: What do you do with it?, with Save it, Plan it, Ate it, or Did you eat it? when a meal is set."),
+  ("The landing", "The title, filled in. The meal line, set or not. Then: the result on top, with the score and the numbers; Fit to my target directly under it, solid blue with Chef Mealan's hat when the plate misses your target and white when it fits (Coach Milan 17:43); the foods, a dish as one row with its foods under it; + Add more to your plate; Prepare it; Chef Mealan's word; and the end as chips: What do you do with it?, with Save it, Plan it, Ate it (DT310, light blue once chosen)."),
   ("Add more", "A tap opens the same tiles and the list in place. The X closes it."),
   ("From the list", "+ Add on a food puts it on the plate at once, and you are on the landing."),
   ("Left out here", "The line about your day's energy and the question about a meal not logged, which speak of a set meal."),

@@ -102,7 +102,7 @@ def start(cols):
     W = SX + cols * (SW + GAP) - GAP + 70; B = Board(); y = 30
 def row(rid, title, parts, shots, nid=None, at=0, arrows=True):
     global y
-    c = storyCard(B, y, rid, title, parts)
+    c = storyCard(B, y, (nid or rid), title, parts)
     hs = [B.screen(f"{nid or rid}{chr(97 + at + i)}", i, y, t, n, st, wd) for i, (t, n, st, wd) in enumerate(shots)]
     if arrows:
         for i in range(1, len(shots)): B.html.append(f'<div style="position:absolute;left:{B.x(i) - GAP}px;top:{y + TOP + 220}px;width:{GAP}px;text-align:center;font-size:44px;font-weight:900;color:#2a72d9">→</div>')
