@@ -285,18 +285,6 @@
       "text": "Šta ti se jede?",
       "checked": true
     },
-    "plate.cravingSub": {
-      "text": "Uzmi ideju za ono što ti se jede ili složi svoj tanjir. Chef Mealan određuje količine.",
-      "checked": true
-    },
-    "plate.cravingBox": {
-      "text": "Upiši šta ti se jede ili šta želiš da kuvaš",
-      "checked": true
-    },
-    "plate.cravingHint": {
-      "text": "Traži jela u tvojim receptima, u receptima trenera i članova, kod Chef Mealana i u tvojim namirnicama. Dodaj PD 7+ i ostaju samo jela sa PD 7 ili više.",
-      "checked": true
-    },
     "plate.fromMyRecipes": {
       "text": "Iz Mojih recepata. Promeni šta želiš, pa Uklopi u moj cilj ili Ostavi kako jeste.",
       "checked": true
@@ -329,32 +317,12 @@
       "text": "Dodirni ponovo da ispraznim",
       "checked": true
     },
-    "plate.nothingYet": {
-      "text": "Tanjir je još prazan.",
-      "checked": true
-    },
-    "plate.addAFood": {
-      "text": "Dodaj namirnicu",
-      "checked": true
-    },
     "plate.manual": {
       "text": "Ručno",
       "checked": true
     },
     "plate.scan": {
       "text": "Skeniraj",
-      "checked": true
-    },
-    "plate.photoOfMeal": {
-      "text": "Slika mog obroka",
-      "checked": true
-    },
-    "plate.sayWhatYouHave": {
-      "text": "Reci šta imaš",
-      "checked": true
-    },
-    "plate.startFromRecipe": {
-      "text": "Imaš recept? Počni od njega",
       "checked": true
     },
     "plate.screenshot": {
@@ -437,10 +405,6 @@
       "text": "Povuci namirnicu ulevo da je zameniš, udesno da je ukloniš.",
       "checked": true
     },
-    "plate.addHere": {
-      "text": "+ Dodaj namirnicu",
-      "checked": true
-    },
     "plate.close": {
       "text": "Zatvori",
       "checked": true
@@ -463,14 +427,6 @@
     },
     "plate.addOneFirst": {
       "text": "Prvo dodaj jednu namirnicu. Chef Mealan gradi obrok oko nje ({meal}).",
-      "checked": true
-    },
-    "plate.quickPicks": {
-      "text": "Brzi izbor",
-      "checked": true
-    },
-    "plate.fromAllFoods": {
-      "text": "Od svih tvojih namirnica",
       "checked": true
     },
     "plate.search": {
@@ -695,10 +651,6 @@
     },
     "today.todaySMeals": {
       "text": "Današnji obroci",
-      "checked": true
-    },
-    "today.byThePlan": {
-      "text": "Po planu",
       "checked": true
     },
     "today.saveInMyRecipes": {
@@ -1985,14 +1937,6 @@
       "text": "Sigurno?",
       "checked": true
     },
-    "recipe.moveThePhotoEarlier": {
-      "text": "Pomeri sliku napred",
-      "checked": true
-    },
-    "recipe.moveThePhotoLater": {
-      "text": "Pomeri sliku nazad",
-      "checked": true
-    },
     "recipe.noPhotoYet2": {
       "text": "Još nema slike",
       "checked": true
@@ -2051,14 +1995,6 @@
     },
     "recipe.yourOwnPhotoIsAlways": {
       "text": "Tvoja slika je uvek bolja.",
-      "checked": true
-    },
-    "recipe.thisPhotoIsTheCover": {
-      "text": "Ova slika je naslovna. × je briše.",
-      "checked": true
-    },
-    "recipe.theFirstPhotoIsThe": {
-      "text": "Prva slika je naslovna. Dodirni sliku da je pomeriš sa ‹ ›; × je briše.",
       "checked": true
     },
     "recipe.asTheRecipeMakesIt": {
@@ -3065,10 +3001,6 @@
       "text": "Dodaj",
       "checked": true
     },
-    "make.yourFoodsFirstThenThe": {
-      "text": "Prvo tvoje namirnice, pa osnovne namirnice koje se prodaju gde kupuješ.",
-      "checked": true
-    },
     "make.optionalNotOnThePlate": {
       "text": "Po izboru, nije na tanjiru",
       "checked": true
@@ -3159,10 +3091,6 @@
     },
     "make.ateItAll": {
       "text": "Sve pojedeno",
-      "checked": true
-    },
-    "make.notMine": {
-      "text": "Nije moje",
       "checked": true
     },
     "make.stop": {
@@ -3397,10 +3325,6 @@
       "text": "Pomozi Chef Mealanu da pročita",
       "checked": true
     },
-    "make.tellChefMealanWhatIt": {
-      "text": "Reci Chef Mealanu šta je to",
-      "checked": true
-    },
     "make.thePhotosAndYourWords": {
       "text": "Slike i tvoje reči idu zajedno. Tvoje ispravke zamenjuje novo čitanje.",
       "checked": true
@@ -3419,10 +3343,6 @@
     },
     "make.changedFromYourRecipe": {
       "text": "Promenjeno u odnosu na tvoj recept",
-      "checked": true
-    },
-    "make.searchAllMyFoods": {
-      "text": "Pretraži sve moje namirnice",
       "checked": true
     },
     "make.useItInTheDish": {
@@ -3483,14 +3403,6 @@
     },
     "make.clearTheSearch": {
       "text": "Obriši pretragu",
-      "checked": true
-    },
-    "make.findAFoodToAdd": {
-      "text": "Nađi namirnicu za dodavanje",
-      "checked": true
-    },
-    "make.findAFood": {
-      "text": "Nađi namirnicu",
       "checked": true
     },
     "make.whichDayAndMeal": {
@@ -3653,10 +3565,6 @@
       "text": "Ceo recept, kako si ga uneo.|Ceo recept, kako si ga unela.",
       "checked": true
     },
-    "make.byThePlan": {
-      "text": "Po planu",
-      "checked": true
-    },
     "make.todayIsWhatYouEat": {
       "text": "Danas je ono što jedeš sada. Dan ranije dodaje ono što si pojeo; dan kasnije planira šta ćeš jesti.|Danas je ono što jedeš sada. Dan ranije dodaje ono što si pojela; dan kasnije planira šta ćeš jesti.",
       "checked": true
@@ -3675,10 +3583,6 @@
     },
     "make.chefMealanCooksAsAt": {
       "text": "Chef Mealan kuva kao kod kuće.",
-      "checked": true
-    },
-    "make.onPlate": {
-      "text": "Na tanjiru",
       "checked": true
     },
     "make.leftOutOfTheNumbers": {
@@ -4381,24 +4285,12 @@
       "text": "Pojedeno u",
       "checked": true
     },
-    "photoask.tellChefMealanWhatIt": {
-      "text": "Reci Chef Mealanu šta je to, ako želiš",
-      "checked": true
-    },
     "photoask.readThePlate": {
       "text": "Pročitaj tanjir",
       "checked": true
     },
     "photoask.dropThePhoto": {
       "text": "Ukloni fotografiju",
-      "checked": true
-    },
-    "photoask.whosePlateAndWhen": {
-      "text": "Čiji tanjir, i kada",
-      "checked": true
-    },
-    "photoask.theTimeYouAteIt": {
-      "text": "Vreme kada si jeo|Vreme kada si jela",
       "checked": true
     },
     "count.size": {
@@ -4415,46 +4307,6 @@
     },
     "count.peeledBananasVaryMoreThan": {
       "text": "Oljuštena. Banane se razlikuju više od jaja, pa je veličina okvirna.",
-      "checked": true
-    },
-    "sayhave.done": {
-      "text": "Gotovo",
-      "checked": true
-    },
-    "sayhave.cancel": {
-      "text": "Otkaži",
-      "checked": true
-    },
-    "sayhave.whatYouSayGoesTo": {
-      "text": "Ono što kažeš ide Chef Mealanu kao reči, da imenuje namirnice i njihove uobičajene vrednosti. Ništa se ne snima.",
-      "checked": true
-    },
-    "sayhave.sayWhatYouHave": {
-      "text": "Reci šta imaš",
-      "checked": true
-    },
-    "sayhave.notListening": {
-      "text": "Ne slušam",
-      "checked": true
-    },
-    "sayhave.typeWhatYouHave": {
-      "text": "Upiši šta imaš",
-      "checked": true
-    },
-    "sayhave.sayTheFoodsYouHave": {
-      "text": "Reci namirnice koje imaš, bilo kojim redom. Količine ako ih znaš: dva jajeta, pola luka. Dodirni Gotovo kad završiš.",
-      "checked": true
-    },
-    "sayhave.theFoodsYouHaveIn": {
-      "text": "Namirnice koje imaš, bilo kojim redom, sa količinama ako ih znaš.",
-      "checked": true
-    },
-    "sayhave.orTypeHere": {
-      "text": "Ili upiši ovde",
-      "checked": true
-    },
-    "sayhave.micBlocked": {
-      "text": "Mikrofon je blokiran za ovaj sajt. Upiši namirnice.",
       "checked": true
     },
     "where.close": {
@@ -4577,14 +4429,6 @@
       "text": "Dodaj",
       "checked": true
     },
-    "craving.nothingFound": {
-      "text": "Ništa nije pronađeno",
-      "checked": true
-    },
-    "craving.tapADishAndIt": {
-      "text": "Dodirni jelo i ono ide na tanjir.",
-      "checked": true
-    },
     "craving.forOneServing": {
       "text": "Za jednu porciju",
       "checked": true
@@ -4593,52 +4437,12 @@
       "text": "Kako se pravi",
       "checked": true
     },
-    "craving.keptInMyRecipesAs": {
-      "text": "Sačuvano u Mojim receptima kao ideja, još nije napravljeno.",
-      "checked": true
-    },
-    "craving.putItOnMyPlate": {
-      "text": "Stavi na moj tanjir",
-      "checked": true
-    },
-    "craving.yourRecipes": {
-      "text": "Tvoji recepti",
-      "checked": true
-    },
     "craving.coachSRecipes": {
       "text": "Recepti trenera",
       "checked": true
     },
     "craving.membersRecipes": {
       "text": "Recepti članova",
-      "checked": true
-    },
-    "craving.anotherIdea": {
-      "text": "Druga ideja",
-      "checked": true
-    },
-    "craving.addFood": {
-      "text": "Dodaj: {food}",
-      "checked": true
-    },
-    "craving.thinking": {
-      "text": "Chef Mealan razmišlja…",
-      "checked": true
-    },
-    "craving.askForOne": {
-      "text": "Pitaj Chef Mealana za jedno",
-      "checked": true
-    },
-    "craving.askForAnother": {
-      "text": "Pitaj Chef Mealana za drugo",
-      "checked": true
-    },
-    "craving.removePdFilter": {
-      "text": "Ukloni filter PD {pd} i više",
-      "checked": true
-    },
-    "craving.starters": {
-      "text": "Osnovna jela od Chef Mealana",
       "checked": true
     },
     "helper.close": {
@@ -4651,10 +4455,6 @@
     },
     "helper.swap": {
       "text": "Zameni",
-      "checked": true
-    },
-    "helper.somethingElseTalkToChef": {
-      "text": "Nešto drugo? Razgovaraj sa Chef Mealanom",
       "checked": true
     },
     "helper.onThePlate": {
@@ -4677,10 +4477,6 @@
       "text": "Obriši pitanje",
       "checked": true
     },
-    "helper.whatGoesWithThisWhat": {
-      "text": "Šta ide uz ovo? Šta umesto…?",
-      "checked": true
-    },
     "helper.ask": {
       "text": "Pitaj",
       "checked": true
@@ -4695,26 +4491,6 @@
     },
     "helper.chefMealanAboutThisPlate": {
       "text": "Chef Mealan, o ovom tanjiru",
-      "checked": true
-    },
-    "helper.whatGoesWithThis": {
-      "text": "Šta ide uz ovo?",
-      "checked": true
-    },
-    "helper.betterMatchForMyTarget": {
-      "text": "Bolje za moj cilj?",
-      "checked": true
-    },
-    "helper.makeItCrunchier": {
-      "text": "Da bude hrskavije",
-      "checked": true
-    },
-    "helper.lessSweet": {
-      "text": "Manje slatko",
-      "checked": true
-    },
-    "helper.cheaperOption": {
-      "text": "Jeftinije",
       "checked": true
     },
     "helper.insteadOf": {
@@ -5509,10 +5285,6 @@
       "text": "Obriši moj nalog",
       "checked": true
     },
-    "welcome.tapAgainToDeleteEverything": {
-      "text": "Dodirni ponovo da obrišeš sve",
-      "checked": true
-    },
     "welcome.welcomeName": {
       "text": "Dobro došao, {name}|Dobro došla, {name}",
       "checked": true
@@ -5743,18 +5515,6 @@
     },
     "voice.language": {
       "text": "Jezik",
-      "checked": true
-    },
-    "voice.units": {
-      "text": "Jedinice",
-      "checked": true
-    },
-    "voice.gramsAndMillilitresOuncesAnd": {
-      "text": "Grami i mililitri. Unce i šolje dolaze.",
-      "checked": true
-    },
-    "voice.comingSoon": {
-      "text": "Uskoro",
       "checked": true
     },
     "voice.devData": {
@@ -6471,10 +6231,6 @@
     },
     "menu.deleteMyAccount": {
       "text": "Obriši moj nalog",
-      "checked": true
-    },
-    "menu.tapAgainToDeleteEverything": {
-      "text": "Dodirni ponovo da obrišeš sve",
       "checked": true
     },
     "menu.clearLog": {
@@ -7789,10 +7545,6 @@
       "text": "Ime",
       "checked": true
     },
-    "share.nameOptional": {
-      "text": "Ime (nije obavezno)",
-      "checked": true
-    },
     "share.theirGoogleEmail": {
       "text": "Njihov Google imejl",
       "checked": true
@@ -7995,14 +7747,6 @@
     },
     "langpanel.deutsch": {
       "text": "Deutsch",
-      "checked": true
-    },
-    "langpanel.afterSerbianOnceAGerman": {
-      "text": "Posle srpskog, kad ga proveri neko ko govori nemački",
-      "checked": true
-    },
-    "langpanel.comingSoon": {
-      "text": "Uskoro",
       "checked": true
     },
     "langpanel.thePrivacyNoticeAndThe": {
@@ -9867,14 +9611,6 @@
     },
     "life.readsThis": {
       "text": "Chef Mealan ovo čita uz svaki tanjir i recept koji predloži.",
-      "checked": true
-    },
-    "week.barFoot": {
-      "text": "Traka pokazuje koliko je dan težak. Dodirni dan da ga otvoriš; dodirni ga ponovo da ga zatvoriš.",
-      "checked": true
-    },
-    "week.barFootSchool": {
-      "text": "Traka pokazuje koliko je dan težak, sport u školi i posle škole zajedno. Dodirni dan da ga otvoriš; dodirni ga ponovo da ga zatvoriš.",
       "checked": true
     },
     "sumdo.life.weekdays": {
@@ -13197,10 +12933,6 @@
       "text": "Upisano u {time}. Dodirni vreme da ga promeniš.",
       "checked": true
     },
-    "photoask.notePlaceholder": {
-      "text": "svinjska šnicla, pohovana, Skadarlija",
-      "checked": true
-    },
     "count.oneLess": {
       "text": "{piece}: jedan manje",
       "checked": true
@@ -13223,14 +12955,6 @@
     },
     "count.gramsWeighed": {
       "text": "{piece}, izmereno u gramima",
-      "checked": true
-    },
-    "sayhave.listening": {
-      "text": "Slušam",
-      "checked": true
-    },
-    "sayhave.eggsSpinachFeta": {
-      "text": "jaja, spanać, feta, pola glavice luka",
       "checked": true
     },
     "out.tagPlate": {
@@ -14637,10 +14361,6 @@
       "text": "Ostalo",
       "checked": true
     },
-    "plate.nothingCalled": {
-      "text": "Ništa pod imenom {q} u tvojim namirnicama ni među osnovnim namirnicama koje se ovde prodaju. Skeniraj, ili dodaj ručno gore.",
-      "checked": true
-    },
     "plate.addPutsOne": {
       "text": "Dodaj stavlja jednu na tanjir, kao namirnicu poput ostalih.",
       "checked": true
@@ -15301,10 +15021,6 @@
       "text": "Umesto: {food}",
       "checked": true
     },
-    "make.changeStepPhoto": {
-      "text": "Promeni sliku koraka {n}",
-      "checked": true
-    },
     "make.addStepPhoto": {
       "text": "Dodaj sliku koraku {n}",
       "checked": true
@@ -15577,10 +15293,6 @@
       "text": ", izabrana",
       "checked": true
     },
-    "recipe.deletePhoto": {
-      "text": "Obriši sliku {n}",
-      "checked": true
-    },
     "recipe.chefIsDrawing": {
       "text": "Chef Mealan crta…",
       "checked": true
@@ -15599,18 +15311,6 @@
     },
     "recipe.aPhotoMakesItEasy": {
       "text": "Uz sliku se recept lako nalazi, ovde i na njegovoj strani.",
-      "checked": true
-    },
-    "recipe.photoMovesEarlier": {
-      "text": "Slika {n} od {of}. ‹ je pomera napred: na prvom mestu postaje naslovna.",
-      "checked": true
-    },
-    "recipe.fromTheTimesYouMade": {
-      "text": "Sa ranijih kuvanja ovog recepta, dodir dodaje sliku:",
-      "checked": true
-    },
-    "recipe.addPlatePhoto": {
-      "text": "Dodaj sliku tanjira {n} u recept",
       "checked": true
     },
     "recipe.watchStepsLength": {
@@ -16449,18 +16149,6 @@
       "text": "Chef Mealan trenutno nema ideju za to. Probaj drugim rečima.",
       "checked": true
     },
-    "craving.errCantHave": {
-      "text": "U ideji od Chef Mealana je bila namirnica koju ne smeš da jedeš. Pitaj ponovo.",
-      "checked": true
-    },
-    "craving.kcalProt": {
-      "text": "{kcal} kcal · {protein} g proteina",
-      "checked": true
-    },
-    "craving.makesFromYourFoods": {
-      "text": "Chef Mealan ga pravi od tvojih namirnica",
-      "checked": true
-    },
     "craving.making": {
       "text": "Chef Mealan pravi: {what}",
       "checked": true
@@ -16477,46 +16165,6 @@
       "text": "Od tvojih namirnica, u prodaji: {place}",
       "checked": true
     },
-    "craving.pdAndUp": {
-      "text": "PD {pd} i više ✕",
-      "checked": true
-    },
-    "craving.underPd": {
-      "text": "Ispod PD {pd}",
-      "checked": true
-    },
-    "craving.underOne": {
-      "text": "Ispod PD {pd}: još 1 jelo, {title}, {dishPd}.",
-      "checked": true
-    },
-    "craving.underMany": {
-      "text": "Ispod PD {pd}: još {n} jela.",
-      "checked": true
-    },
-    "craving.showIt": {
-      "text": "Prikaži ga",
-      "checked": true
-    },
-    "craving.showThem": {
-      "text": "Prikaži ih",
-      "checked": true
-    },
-    "craving.noFoodAt": {
-      "text": "Nijedna tvoja namirnica nema PD {pd} ili više. {list}.",
-      "checked": true
-    },
-    "craving.foodIs": {
-      "text": "{name}: {pd}",
-      "checked": true
-    },
-    "craving.nothingIn": {
-      "text": "Ništa u tvojim receptima, receptima trenera, članova ili u tvojim namirnicama ne odgovara traženom: {crave}.",
-      "checked": true
-    },
-    "craving.nothingInPd": {
-      "text": "Ništa u tvojim receptima, receptima trenera, članova ili u tvojim namirnicama ne odgovara traženom: {crave}, sa PD {pd} ili više.",
-      "checked": true
-    },
     "craving.chefsIdea": {
       "text": "Ideja od Chef Mealana",
       "checked": true
@@ -16527,18 +16175,6 @@
     },
     "craving.gFood": {
       "text": "{grams} g {food}",
-      "checked": true
-    },
-    "craving.oneServing": {
-      "text": "Jedna porcija: {kcal} kcal · {protein} g proteina. Da promeniš namirnicu, stavi jelo na svoj tanjir: zamena, uklanjanje, dodavanje i količine, sve je tamo.",
-      "checked": true
-    },
-    "craving.numbersFrom": {
-      "text": "Brojevi su iz namirnica, izračunava ih aplikacija; namirnica koju nemaš je procena Chef Mealana.",
-      "checked": true
-    },
-    "craving.chefThinking": {
-      "text": "Chef Mealan razmišlja…",
       "checked": true
     },
     "carbsfat.kindDays": {
@@ -19765,10 +19401,6 @@
       "text": "sa: {page}",
       "checked": true
     },
-    "coach.reqFromSrc": {
-      "text": "sa: {page}, {src}",
-      "checked": true
-    },
     "coach.reqCount": {
       "text": "zahteva: {n}",
       "checked": true
@@ -22097,14 +21729,6 @@
       "text": "Prva slika je ona koju pokazuju stranica recepta i Pogledaj korake.",
       "checked": true
     },
-    "recipe.onTheSteps": {
-      "text": "Na koracima",
-      "checked": true
-    },
-    "recipe.photoOfStep": {
-      "text": "Slika koraka {n}",
-      "checked": true
-    },
     "steppics.photosOnTheSteps": {
       "text": "Slike na koracima",
       "checked": true
@@ -22647,18 +22271,6 @@
     },
     "craving.chefsIdeas": {
       "text": "Ideje od Chef Mealana",
-      "checked": true
-    },
-    "craving.findIdeas": {
-      "text": "Nađi ideje",
-      "checked": true
-    },
-    "craving.viewMore": {
-      "text": "Prikaži više",
-      "checked": true
-    },
-    "craving.viewLess": {
-      "text": "Prikaži manje",
       "checked": true
     },
     "craving.saveInMyRecipes": {

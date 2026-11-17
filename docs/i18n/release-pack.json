@@ -1,6 +1,6 @@
 {
-  "release": "0.3.155",
-  "at": "2026-11-17T19:41:47.599Z",
+  "release": "0.3.156",
+  "at": "2026-11-17T21:54:36.183Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -5000,23 +5000,6 @@
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
-      "id": "screen.photoask.notePlaceholder",
-      "kind": "screen",
-      "key": "photoask.notePlaceholder",
-      "en": "pork schnitzel, breaded, Augustiner",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "svinjska šnicla, pohovana, Skadarlija",
-      "de": "Schweineschnitzel, paniert, Augustiner",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900205,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
       "id": "screen.count.oneLess",
       "kind": "screen",
       "key": "count.oneLess",
@@ -5127,40 +5110,6 @@
       "beta": true,
       "release": "0.3.101",
       "order": 900211,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.sayhave.listening",
-      "kind": "screen",
-      "key": "sayhave.listening",
-      "en": "Listening",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Slušam",
-      "de": "Ich höre zu",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900212,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.sayhave.eggsSpinachFeta",
-      "kind": "screen",
-      "key": "sayhave.eggsSpinachFeta",
-      "en": "eggs, spinach, feta, half an onion",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "jaja, spanać, feta, pola glavice luka",
-      "de": "Eier, Spinat, Feta, eine halbe Zwiebel",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900213,
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
@@ -11588,25 +11537,6 @@
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
-      "id": "screen.plate.nothingCalled",
-      "kind": "screen",
-      "key": "plate.nothingCalled",
-      "en": "Nothing called {q} in your foods or the basic foods sold here. Scan it, or add it by hand above.",
-      "forms": "plain",
-      "slots": [
-        "q"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Ništa pod imenom {q} u tvojim namirnicama ni među osnovnim namirnicama koje se ovde prodaju. Skeniraj, ili dodaj ručno gore.",
-      "de": "Nichts namens {q} in deinen Lebensmitteln oder den Grundlebensmitteln, die es hier gibt. Scanne es oder füge es oben von Hand hinzu.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900565,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
       "id": "screen.plate.addPutsOne",
       "kind": "screen",
       "key": "plate.addPutsOne",
@@ -14609,25 +14539,6 @@
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
-      "id": "screen.make.changeStepPhoto",
-      "kind": "screen",
-      "key": "make.changeStepPhoto",
-      "en": "Change the photo of step {n}",
-      "forms": "plain",
-      "slots": [
-        "n"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Promeni sliku koraka {n}",
-      "de": "Foto von Schritt {n} ändern",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900731,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
       "id": "screen.make.addStepPhoto",
       "kind": "screen",
       "key": "make.addStepPhoto",
@@ -15890,25 +15801,6 @@
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
-      "id": "screen.recipe.deletePhoto",
-      "kind": "screen",
-      "key": "recipe.deletePhoto",
-      "en": "Delete photo {n}",
-      "forms": "plain",
-      "slots": [
-        "n"
-      ],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "Obriši sliku {n}",
-      "de": "Foto {n} löschen",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900800,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
       "id": "screen.recipe.chefIsDrawing",
       "kind": "screen",
       "key": "recipe.chefIsDrawing",
@@ -15995,62 +15887,6 @@
       "beta": true,
       "release": "0.3.101",
       "order": 900805,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.recipe.photoMovesEarlier",
-      "kind": "screen",
-      "key": "recipe.photoMovesEarlier",
-      "en": "Photo {n} of {of}. ‹ moves it earlier: in first place it becomes the cover.",
-      "forms": "plain",
-      "slots": [
-        "n",
-        "of"
-      ],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "Slika {n} od {of}. ‹ je pomera napred: na prvom mestu postaje naslovna.",
-      "de": "Foto {n} von {of}. ‹ schiebt es nach vorn: An erster Stelle wird es zum Titelbild.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900806,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.recipe.fromTheTimesYouMade",
-      "kind": "screen",
-      "key": "recipe.fromTheTimesYouMade",
-      "en": "From the times you made it, a tap adds the photo:",
-      "forms": "plain",
-      "slots": [],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "Sa ranijih kuvanja ovog recepta, dodir dodaje sliku:",
-      "de": "Aus den Malen, als du es gemacht hast, fügt ein Tippen das Foto hinzu:",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900807,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.recipe.addPlatePhoto",
-      "kind": "screen",
-      "key": "recipe.addPlatePhoto",
-      "en": "Add plate photo {n} to the recipe",
-      "forms": "plain",
-      "slots": [
-        "n"
-      ],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "Dodaj sliku tanjira {n} u recept",
-      "de": "Tellerfoto {n} zum Rezept hinzufügen",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900808,
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
@@ -19911,60 +19747,6 @@
       "at": "2026-11-07T11:00:21.692Z"
     },
     {
-      "id": "screen.craving.errCantHave",
-      "kind": "screen",
-      "key": "craving.errCantHave",
-      "en": "Chef Mealan's idea had a food you can't have. Ask again.",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "U ideji od Chef Mealana je bila namirnica koju ne smeš da jedeš. Pitaj ponovo.",
-      "de": "In der Idee von Chef Mealan war ein Lebensmittel, das du nicht essen darfst. Frag nochmal.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900103,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.kcalProt",
-      "kind": "screen",
-      "key": "craving.kcalProt",
-      "en": "{kcal} kcal · {protein} g protein",
-      "forms": "plain",
-      "slots": [
-        "kcal",
-        "protein"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{kcal} kcal · {protein} g proteina",
-      "de": "{kcal} kcal · {protein} g Protein",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900104,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.makesFromYourFoods",
-      "kind": "screen",
-      "key": "craving.makesFromYourFoods",
-      "en": "Chef Mealan makes it from your foods",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Chef Mealan ga pravi od tvojih namirnica",
-      "de": "Chef Mealan macht es aus deinen Lebensmitteln",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900105,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
       "id": "screen.craving.making",
       "kind": "screen",
       "key": "craving.making",
@@ -20039,198 +19821,6 @@
       "at": "2026-11-07T11:00:21.692Z"
     },
     {
-      "id": "screen.craving.pdAndUp",
-      "kind": "screen",
-      "key": "craving.pdAndUp",
-      "en": "PD {pd} and up ✕",
-      "forms": "plain",
-      "slots": [
-        "pd"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "PD {pd} i više ✕",
-      "de": "PD {pd} und mehr ✕",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900110,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.underPd",
-      "kind": "screen",
-      "key": "craving.underPd",
-      "en": "Under PD {pd}",
-      "forms": "plain",
-      "slots": [
-        "pd"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Ispod PD {pd}",
-      "de": "Unter PD {pd}",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900111,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.underOne",
-      "kind": "screen",
-      "key": "craving.underOne",
-      "en": "Under PD {pd}: 1 more dish, {title}, {dishPd}.",
-      "forms": "plain",
-      "slots": [
-        "dishPd",
-        "pd",
-        "title"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Ispod PD {pd}: još 1 jelo, {title}, {dishPd}.",
-      "de": "Unter PD {pd}: 1 weiteres Gericht, {title}, {dishPd}.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900112,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.underMany",
-      "kind": "screen",
-      "key": "craving.underMany",
-      "en": "Under PD {pd}: {n} more dishes.",
-      "forms": "plain",
-      "slots": [
-        "n",
-        "pd"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Ispod PD {pd}: još {n} jela.",
-      "de": "Unter PD {pd}: {n} weitere Gerichte.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900113,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.showIt",
-      "kind": "screen",
-      "key": "craving.showIt",
-      "en": "Show it",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Prikaži ga",
-      "de": "Zeig es",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900114,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.showThem",
-      "kind": "screen",
-      "key": "craving.showThem",
-      "en": "Show them",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Prikaži ih",
-      "de": "Zeig sie",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900115,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.noFoodAt",
-      "kind": "screen",
-      "key": "craving.noFoodAt",
-      "en": "No food of yours at PD {pd} or more. {list}.",
-      "forms": "plain",
-      "slots": [
-        "list",
-        "pd"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Nijedna tvoja namirnica nema PD {pd} ili više. {list}.",
-      "de": "Keins deiner Lebensmittel hat PD {pd} oder mehr. {list}.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900116,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.foodIs",
-      "kind": "screen",
-      "key": "craving.foodIs",
-      "en": "{name} is {pd}",
-      "forms": "plain",
-      "slots": [
-        "name",
-        "pd"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{name}: {pd}",
-      "de": "{name} hat {pd}",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900117,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.nothingIn",
-      "kind": "screen",
-      "key": "craving.nothingIn",
-      "en": "Nothing in your recipes, Coach's, the members' or your foods is {crave}.",
-      "forms": "plain",
-      "slots": [
-        "crave"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Ništa u tvojim receptima, receptima trenera, članova ili u tvojim namirnicama ne odgovara traženom: {crave}.",
-      "de": "Nichts in deinen Rezepten, denen vom Coach, denen der Mitglieder oder deinen Lebensmitteln passt zu {crave}.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900118,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.nothingInPd",
-      "kind": "screen",
-      "key": "craving.nothingInPd",
-      "en": "Nothing in your recipes, Coach's, the members' or your foods is {crave} at PD {pd} or more.",
-      "forms": "plain",
-      "slots": [
-        "crave",
-        "pd"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Ništa u tvojim receptima, receptima trenera, članova ili u tvojim namirnicama ne odgovara traženom: {crave}, sa PD {pd} ili više.",
-      "de": "Nichts in deinen Rezepten, denen vom Coach, denen der Mitglieder oder deinen Lebensmitteln passt zu {crave} mit PD {pd} oder mehr.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900119,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
       "id": "screen.craving.chefsIdea",
       "kind": "screen",
       "key": "craving.chefsIdea",
@@ -20282,60 +19872,6 @@
       "beta": true,
       "release": "0.3.103",
       "order": 900122,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.oneServing",
-      "kind": "screen",
-      "key": "craving.oneServing",
-      "en": "One serving: {kcal} kcal · {protein} g protein. To change a food, put it on your plate: swap, remove, add and the amounts are all there.",
-      "forms": "plain",
-      "slots": [
-        "kcal",
-        "protein"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Jedna porcija: {kcal} kcal · {protein} g proteina. Da promeniš namirnicu, stavi jelo na svoj tanjir: zamena, uklanjanje, dodavanje i količine, sve je tamo.",
-      "de": "Eine Portion: {kcal} kcal · {protein} g Protein. Um ein Lebensmittel zu ändern, leg das Gericht auf deinen Teller: Tauschen, Entfernen, Hinzufügen und die Mengen, alles ist dort.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900123,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.numbersFrom",
-      "kind": "screen",
-      "key": "craving.numbersFrom",
-      "en": "The numbers are from the foods, calculated by the app; a food you don't have is Chef Mealan's estimate.",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Brojevi su iz namirnica, izračunava ih aplikacija; namirnica koju nemaš je procena Chef Mealana.",
-      "de": "Die Zahlen kommen aus den Lebensmitteln, berechnet von der App; ein Lebensmittel, das du nicht hast, ist eine Schätzung von Chef Mealan.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900124,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.craving.chefThinking",
-      "kind": "screen",
-      "key": "craving.chefThinking",
-      "en": "Chef Mealan is thinking…",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Chef Mealan razmišlja…",
-      "de": "Chef Mealan denkt nach…",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900125,
       "at": "2026-11-07T11:00:21.692Z"
     },
     {
@@ -35038,26 +34574,6 @@
       "at": "2026-11-07T11:00:21.692Z"
     },
     {
-      "id": "screen.coach.reqFromSrc",
-      "kind": "screen",
-      "key": "coach.reqFromSrc",
-      "en": "from {page}, {src}",
-      "forms": "plain",
-      "slots": [
-        "page",
-        "src"
-      ],
-      "area": "Clients",
-      "where": "Clients",
-      "sr": "sa: {page}, {src}",
-      "de": "von {page}, {src}",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900932,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
       "id": "screen.coach.reqCount",
       "kind": "screen",
       "key": "coach.reqCount",
@@ -45338,42 +44854,6 @@
       "at": "2026-11-10T22:07:42.761Z"
     },
     {
-      "id": "screen.recipe.onTheSteps",
-      "kind": "screen",
-      "key": "recipe.onTheSteps",
-      "en": "On the steps",
-      "forms": "plain",
-      "slots": [],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "Na koracima",
-      "de": "Bei den Schritten",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.129",
-      "order": 900012,
-      "at": "2026-11-10T22:07:42.761Z"
-    },
-    {
-      "id": "screen.recipe.photoOfStep",
-      "kind": "screen",
-      "key": "recipe.photoOfStep",
-      "en": "A photo of step {n}",
-      "forms": "plain",
-      "slots": [
-        "n"
-      ],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "Slika koraka {n}",
-      "de": "Ein Foto von Schritt {n}",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.129",
-      "order": 900013,
-      "at": "2026-11-10T22:07:42.761Z"
-    },
-    {
       "id": "screen.steppics.photosOnTheSteps",
       "kind": "screen",
       "key": "steppics.photosOnTheSteps",
@@ -48108,42 +47588,6 @@
       "at": "2026-11-14T13:54:27.530Z"
     },
     {
-      "id": "screen.plate.cravingSub",
-      "kind": "screen",
-      "key": "plate.cravingSub",
-      "en": "Get an idea for what you crave, or build your own plate. Chef Mealan sets the amounts.",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "enBefore": "Add your foods. Chef Mealan sets the amounts.",
-      "sr": "Uzmi ideju za ono što ti se jede ili složi svoj tanjir. Chef Mealan određuje količine.",
-      "de": "Hol dir eine Idee für das, worauf du Lust hast, oder stell deinen eigenen Teller zusammen. Chef Mealan legt die Mengen fest.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.149",
-      "order": 900000,
-      "at": "2026-11-14T17:28:55.981Z"
-    },
-    {
-      "id": "screen.plate.cravingBox",
-      "kind": "screen",
-      "key": "plate.cravingBox",
-      "en": "Type what you crave or want to cook",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "Craving search",
-      "enBefore": "Crêpes, sarma, chocolate PD 7+…",
-      "sr": "Upiši šta ti se jede ili šta želiš da kuvaš",
-      "de": "Schreib, worauf du Lust hast oder was du kochen willst",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.149",
-      "order": 900001,
-      "at": "2026-11-14T17:28:55.981Z"
-    },
-    {
       "id": "screen.plate.screenshot",
       "kind": "screen",
       "key": "plate.screenshot",
@@ -48200,24 +47644,6 @@
       "at": "2026-11-14T17:28:55.981Z"
     },
     {
-      "id": "screen.plate.startFromRecipe",
-      "kind": "screen",
-      "key": "plate.startFromRecipe",
-      "en": "Have a recipe? Start from it",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "enBefore": "Have a recipe? Bring it in",
-      "sr": "Imaš recept? Počni od njega",
-      "de": "Hast du ein Rezept? Fang damit an",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.149",
-      "order": 900000,
-      "at": "2026-11-14T20:11:37.194Z"
-    },
-    {
       "id": "screen.recipein.aRecipePageFromA",
       "kind": "screen",
       "key": "recipein.aRecipePageFromA",
@@ -48268,57 +47694,6 @@
       "beta": true,
       "release": "0.3.149",
       "order": 900003,
-      "at": "2026-11-14T20:11:37.194Z"
-    },
-    {
-      "id": "screen.craving.findIdeas",
-      "kind": "screen",
-      "key": "craving.findIdeas",
-      "en": "Find ideas",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Nađi ideje",
-      "de": "Ideen finden",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.149",
-      "order": 900004,
-      "at": "2026-11-14T20:11:37.194Z"
-    },
-    {
-      "id": "screen.craving.viewMore",
-      "kind": "screen",
-      "key": "craving.viewMore",
-      "en": "View more",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Prikaži više",
-      "de": "Mehr anzeigen",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.149",
-      "order": 900005,
-      "at": "2026-11-14T20:11:37.194Z"
-    },
-    {
-      "id": "screen.craving.viewLess",
-      "kind": "screen",
-      "key": "craving.viewLess",
-      "en": "View less",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Prikaži manje",
-      "de": "Weniger anzeigen",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.149",
-      "order": 900006,
       "at": "2026-11-14T20:11:37.194Z"
     },
     {

@@ -2630,7 +2630,6 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .cook-foods summary { font-weight: 800; cursor: pointer; } .cook-foods ul { margin: 6px 0 0; padding-left: 18px; line-height: 1.6; }
 .mk-cook { margin: 6px 0 12px; display: flex; flex-direction: column; gap: 6px; } .mk-cook .pill { height: 52px; font-size: 17px; }
 .cook-ask-form { gap: 8px; } .cook-ask-row { display: flex; gap: 8px; } .cook-ask-row input { flex: 1; min-width: 0; height: 44px; margin: 0; } .cook-ask-row .pill { height: 44px; }
-.say-have { gap: 8px; } .say-head { display: flex; align-items: center; gap: 8px; } .say-words { font-size: 19px; line-height: 1.35; } .say-have .search { margin: 0; } .say-buttons .pill { height: 44px; }
 /* DT175a (0.3.18): step buttons, and a step's picture with its label under it */
 .cook-steps { display: flex; gap: 6px; } .cook-step-btn { flex: 1; min-width: 0; height: 44px; border-radius: 12px; font-weight: 800; font-size: 16px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); }
 .cook-step-btn.done { background: var(--good-soft); color: var(--good-text); } .cook-step-btn.on { background: var(--brand); border-color: var(--brand); color: #fff; }

@@ -2,7 +2,7 @@ import { w, wn, wIn, dec, mealV, mealName, wordV, dateV, dateText, type Val, typ
 import { samePhotoMeal, updateWith } from "../pastMeal";
 import { SamePhotoAsk } from "../components/SamePhotoAsk";
 import { ServedOnPlate } from "../components/Served";
-import { locOf, getLang, speechLang, useLang } from "../lang";
+import { locOf, getLang, useLang } from "../lang";
 import { shownMeal } from "../recipeLang";
 import type { PlateIn } from "../chefScript";
 import { plateWhenOf, capFirst, atMeal } from "../plateMode";
@@ -13,8 +13,8 @@ import { tasteForReq } from "../tasteChips";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon, Mic, TriangleAlert, X } from "lucide-react";
-import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn, foodOfRead, holdsMore } from "../mealPhoto";
-import { PhotoAsk, PotRows, dishWord } from "../components/PhotoAsk";
+import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn, foodOfRead } from "../mealPhoto";
+import { dishWord } from "../components/PhotoAsk";
 import { photoWho, photoMealLine } from "../photoAsk";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADish, isDrink, type Mix } from "../mixtip";
@@ -44,13 +44,13 @@ import { iconFor } from "../icons";
 import { quickPicks, macroPicks } from "../quick";
 import { lineTotal } from "../labeltable";
 import { SwipeRow } from "../components/SwipeRow";
-import { dishTaste, goesInDish, heldBackLine, offerTaste, presetOf, bothPartOf, PLATE_TASTE_WORD, PLATE_TASTE_LINE, type PlateTaste } from "../dishTaste";
+import { dishTaste, goesInDish, heldBackLine, offerTaste, presetOf, bothPartOf, type PlateTaste } from "../dishTaste";
 import { takenUpShort, capOil } from "../frying";
 import { plural, yourPortions } from "../portions";
 import { methodsFor } from "../methods";
 import { rankSwaps } from "../swaps";
 import { PlateHelper } from "../components/PlateHelper";
-import { momentOf, orderMoments, REGIONS, regionName, regionV } from "../moments";
+import { momentOf } from "../moments";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
@@ -87,6 +87,9 @@ import { type CookUi, type Later, stripWords, resumeLine, cookStarted, plateSinc
 import { ChefLine } from "../components/ChefLine";
 import { PhotoPick } from "../components/PhotoPick";
 import { CookStrip } from "../components/CookStrip";
+import { plateMealLine } from "./PlateMealLine";
+import { plateRead } from "./PlateRead";
+import { platePhotoWaits, platePhotoCard, PhotoSaid, HelpRead } from "./PlatePhoto";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
 // DT91 (0.2.88): cooking: the herbs and spices the dish uses, not counted; failed: the ideas that missed the range, with why
@@ -1581,70 +1584,8 @@ export function JourneyScreen(p: AppApi) {
   // block, with chips that are white until chosen: Did you eat it? All of it, Half, Part of it, and the weight below; for a
   // coming day, Is it for the plan? Under everything the two buttons of the read: Save in My recipes, Done. Done carries out
   // what is chosen; nothing chosen, nothing is kept.
-  const readCard = readView ? (() => {
-    const ph = state.photo!;
-    const total = Math.max(1, Math.round(items.reduce((k, i) => k + i.grams, 0)));
-    const planning = !!p.filling && plateWhen === "plan", past = !!p.filling && plateWhen === "past";
-    const today = !p.filling && new Date(ph.at).toDateString() === new Date().toDateString();
-    const adv = today ? photoAdvice({ items, protein: t.protein ?? 0, mealWord, mealKcal: sizeRef ?? null, big: bigN, nutrition: nutri, day: dayLine, culinaryOk: dishNow?.status === "done" ? Boolean(dishNow.makesIt) : null, dish: dishOfMeal ? state.course : undefined, asked: true }) : null;
-    const slot = p.pick === "snack" ? null : pickSlot && mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : photoMeal ? { date: photoMeal.date, slotId: photoMeal.slot.id, name: photoMeal.slot.name, time: photoMeal.slot.time } : mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : null;
-    const pick = (x: "all" | "half" | "part") => { setRvEat(x); setRvGrams(x === "all" ? String(total) : x === "half" ? String(Math.round(total / 2)) : ""); if (x === "part") window.setTimeout(() => document.querySelector<HTMLInputElement>("input.rv-grams")?.focus(), 0); };
-    const chip = (on: boolean, text: string, tap: () => void, cls = "") => (
-      <div key={text} role="radio" tabIndex={0} aria-checked={on} className={`pa-opt${on ? " on" : ""}${cls}`} onClick={tap} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } }}>{on && <span aria-hidden="true">✓</span>}{text}</div>);
-    const saved = !!ph.saved && state.meals.some((m) => m.id === ph.saved);
-    const done = () => {
-      if (planning) { if (!rvPlan) { clearPlate(); return; } const f = p.filling!; putInSlot(items); notify(w("plate.plannedFor", { slot: slotV(f) })); return; }
-      if (!rvEat) { clearPlate(); return; }
-      const g = Math.min(total, Math.round(Number(rvGrams) || 0));
-      if (g <= 0) { document.querySelector<HTMLInputElement>("input.rv-grams")?.focus(); return; }
-      const frac = g / total;
-      if (past) {
-        const f = p.filling!, title = (state.title || "").trim() && state.title !== "DaaM" ? state.title.trim() : autoTitle(items);
-        p.logEaten(frac < 1 ? items.map((i) => ({ ...i, grams: Math.max(1, Math.round(i.grams * frac)) })) : items, title, { date: f.date, slotId: f.slotId, name: f.name, time: f.time }, atMeal(f.date, f.time), f.mealId);
-        setState((s) => ({ ...s, items: [], portion: null, title: "", photo: undefined }));
-        p.setFilling(null); setStep("in"); setTab("plan"); notify(w("plate.isInEaten", { title, slot: slotV(f) })); return;
-      }
-      p.ateNow(plateMeal(), slot, { photo: ph.image, at: ph.who === "ate" ? ph.at : undefined, ...(frac < 1 ? { part: frac } : {}) });
-    };
-    const shots = [ph.image, ...(ph.more ?? [])], at = Math.min(shotAt, shots.length - 1);
-    return (
-      <section className="card plate-card read-view">
-        <div className="mp-big">
-          <div className="mp-big-img"><img src={shots[at]} alt={w("make.photoOfTheMeal")} /></div>
-          {shots.length > 1 && <div className="mp-shots" role="group" aria-label={w("make.photosOfTheMeal")}>{shots.map((src, k) => (
-            <button key={k} type="button" className={`mp-shot${k === at ? " on" : ""}`} aria-pressed={k === at} aria-label={w("make.photoN", { n: k + 1 })} onClick={() => setShotAt(k)}><img src={src} alt="" /></button>))}</div>}
-          {/* an amount is corrected here, by a tap on it */}
-          <div className="mp-tags">{items.map((i) => rvEdit === i.id
-            ? <span key={i.id} className="mp-tag-edit">{foodName(i.food).split(",")[0]} <input className="rv-amount" type="number" inputMode="numeric" min={1} autoFocus aria-label={w("plate.gramsOfFood", { food: foodName(i.food).split(",")[0] })} defaultValue={Math.round(i.grams)} onChange={(e) => { const g = Math.round(Number(e.target.value)); if (g > 0) updateItem(i.id, { grams: g }); }} onBlur={() => setRvEdit(null)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /> g</span>
-            : <button key={i.id} type="button" className="mp-tag" onClick={() => setRvEdit(i.id)}>{foodName(i.food).split(",")[0]} {i.est ? "~" : ""}{Math.round(i.grams)} g</button>)}</div>
-          <div className="mp-big-row"><small className="muted mp-big-say">{wn("plate.photoLine", items.length, { time: photoTime(ph.at) })}</small></div>
-          <div className="rv-change"><button type="button" className="pill pill-small pill-action" onClick={() => setState((s) => (s.photo ? { ...s, photo: { ...s.photo, view: undefined } } : s))}>{w("plate.changeTheFoods")}</button></div>
-        </div>
-        {readoutEl}
-        {numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
-        {p.ai.on && <PhotoSaid photo={ph} meal={mealSlot ? mealSlot.name : null} />}
-        {state.cooking?.length ? <small className="pt-cook"><b>{w("plate.forCooking")}</b> {state.cooking.join(", ")}</small> : null}
-        {adv && <div className="bubble mealan chef-line rv-chef"><p><b>{CHEF_NAME}:</b> {adv.line}</p></div>}
-        {planning ? (
-          <div className="pa-row rv-q rv-plan">
-            <small className="pa-row-q">{w("plate.isItForPlan")}</small>
-            <div className="pa-chips" role="group" aria-label={w("plate.isItForPlan")}>{chip(rvPlan, rvPlan ? w("plate.plannedForChip", { slot: slotV(p.filling!) }) : w("plate.planItFor", { slot: slotV(p.filling!) }), () => setRvPlan((x) => !x), " rv-plan-chip")}</div>
-          </div>
-        ) : (
-          <div className="pa-row rv-q rv-eat">
-            <small className="pa-row-q">{w("plate.didYouEatIt")}</small>
-            <div className="pa-chips" role="radiogroup" aria-label={w("plate.didYouEatIt")}>
-              {chip(rvEat === "all", w("plate.allOfIt"), () => pick("all"))}{chip(rvEat === "half", w("plate.half"), () => pick("half"))}{chip(rvEat === "part", w("plate.partOfIt"), () => pick("part"))}
-            </div>
-            {rvEat && <div className="rv-weight"><input className="search rv-grams" type="number" inputMode="numeric" min={1} max={total} aria-label={w("plate.gramsEaten")} value={rvGrams} onChange={(e) => { setRvGrams(e.target.value); const g = Math.round(Number(e.target.value)); setRvEat(g === total ? "all" : "part"); }} /><small className="muted">{w("plate.gOfTotal", { total })}</small></div>}
-          </div>
-        )}
-        <div className="button-row rv-go">
-          <button type="button" className="pill pill-small pill-action rv-save" disabled={saved} onClick={() => p.saveRead(plateMeal(), ph.image)}>{saved ? w("recipes.savedInMyRecipes") : w("make.saveInMyRecipes")}</button>
-          <button type="button" className="pill pill-small pill-primary rv-done" onClick={done}>{w("make.done")}</button>
-        </div>
-      </section>);
-  })() : null;
+  // the read of a meal photo (0.3.156: in PlateRead.tsx); its state stays here and is handed in
+  const readCard = readView ? plateRead({ autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem }) : null;
   if (step === "in" && inQuestion) return (<>{ownHead ? null : inHead}{!p.cookOpenAsk && <CookStrip p={p} />}{inQuestion}</>);
   if (step === "in")
     return (
@@ -1653,96 +1594,11 @@ export function JourneyScreen(p: AppApi) {
         {inHead}
         {!p.cookOpenAsk && <CookStrip p={p} />}
         {laterBlock}
-        {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
-            A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
-        {/* R11: a tap anywhere on the line opens its section; the pencil (or Done) stays the button for keyboards and readers */}
-        <div className="plan-line" onClick={() => setLineOpen((v) => !v)}>
-          <span>{p.filling ? (p.filling.mode === "eat" ? w("plate.planLine", { meal: mealV(p.filling.name), time: p.filling.time }) : w(plateWhen === "past" ? "plate.slotLineEaten" : plateWhen === "plan" ? "plate.slotLinePlanning" : "plate.slotLineByPlan", { slot: slotTitleV(p.filling), time: p.filling.time })) + (items.some((i) => i.dish) ? ` · ${w("plate.aDish")}` : "") : (linePhoto ?? lineNow)}{shownTaste && <b className="plate-taste-line"> · {PLATE_TASTE_LINE[shownTaste]}</b>}</span>
-          {lineOpen
-            ? <button className="pill pill-small pill-primary plan-line-done" onClick={(e) => { e.stopPropagation(); setLineOpen(false); }}>{w("make.done")}</button>
-            : <button className="icon plan-line-pen" aria-label={w("make.changeWhatThisPlateIs")} aria-expanded={lineOpen} onClick={(e) => { e.stopPropagation(); setLineOpen(true); }}><Pencil size={16} /></button>}
-        </div>
-        {lineOpen && (<>
-        {/* R11 (0.2.37, board RS8): What is it for: Exploring, the day's meals, a snack off the plan; a meal from the Plan keeps its own slot */}
-        {/* DT149 (0.2.130, board Stories101 version 2): Which day?, behind the pencil. Today is the moment; a day before adds
-            what you ate, a day after plans; picking that day's meal makes the plate that meal */}
-        {!p.filling && (() => {
-          const d0 = new Date(); d0.setHours(12, 0, 0, 0);
-          const dayAt = (n: number) => { const d = new Date(d0); d.setDate(d0.getDate() + n); return ymd(d); };
-          const chosen = otherDay ?? ymd(d0);
-          const slotsThere = otherDay ? slotsOn(lifestyleOf(p.personal), p.personal.timesOn, otherDay) : [];
-          const dn = otherDay ? new Date(`${otherDay}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }) : "";
-          const dnV: Val = otherDay ? dateV(new Date(`${otherDay}T12:00:00`), { weekday: "long" }) : "";
-          return (<>
-            <p className="label">{w("make.whichDay")}</p>
-            <div className="moments which-day" role="radiogroup" aria-label={w("make.whichDay2")}>
-              {([[-1, "plate.yesterday"], [0, "plate.today"], [1, "plate.tomorrow"]] as const).map(([n, k]) => <button key={k} type="button" className={`choice ${chosen === dayAt(n) ? "on" : ""}`} aria-pressed={chosen === dayAt(n)} onClick={() => { setOtherDay(n === 0 ? null : dayAt(n)); setPickDate(false); }}>{w(k)}</button>)}
-              <button type="button" className={`choice ${pickDate || (otherDay && ![dayAt(-1), dayAt(1)].includes(otherDay)) ? "on" : ""}`} aria-pressed={pickDate} onClick={() => setPickDate(!pickDate)}>{w("make.anotherDay")}</button>
-            </div>
-            {pickDate && <input className="search another-day" type="date" aria-label={w("make.anotherDay")} value={otherDay && ![dayAt(-1), dayAt(1)].includes(otherDay) ? otherDay : ""} onChange={(e) => { setOtherDay(e.target.value && e.target.value !== ymd(d0) ? e.target.value : null); }} />}
-            <p className="small which-day-hint">{otherDay ? (otherDay < ymd(d0) ? w("plate.dayAddsPick", { day: dnV }) : w("plate.dayPlansPick", { day: dnV })) : w("make.todayIsWhatYouEat")}</p>
-            {otherDay && <div className="moments for-row" role="radiogroup" aria-label={w("plate.dayWhichMeal", { day: dnV })}>
-              {slotsThere.map((x) => <button key={x.id} type="button" className="choice" onClick={() => { p.setFilling({ date: otherDay, slotId: x.id, name: x.name, time: x.time, dayName: dn }); setOtherDay(null); setPickDate(false); }}>{w("plate.mealAtTime", { meal: mealV(x.name), time: x.time })}</button>)}
-            </div>}
-          </>);
-        })()}
-        {/* 0.3.65 (Coach Milan 22:53, Go): Exploring is there on a meal of the plan too; it leaves that meal, which stays as it was */}
-        {p.filling && <>
-          <p className="label">{w("make.whatIsItFor")}</p>
-          <div className="moments for-row" role="radiogroup" aria-label={w("make.whatThePlateIsFor")}>
-            <button className="choice on" aria-pressed={true}>{slotTitleText(p.filling)}</button>
-            <button className="choice" aria-pressed={false} onClick={() => { const left = slotV(p.filling!); p.setFilling(null); p.setPick("exploring"); p.notify(w("plate.exploringStays", { slot: left })); }}>{w("plate.exploring")}</button>
-          </div>
-          <p className="small for-hint">{w("plate.exploringLeaves", { slot: slotV(p.filling) })}</p>
-        </>}
-        {!p.filling && !otherDay && <>
-          <p className="label">{w("make.whatIsItFor")}</p>
-          <div className="moments for-row" role="radiogroup" aria-label={w("make.whatThePlateIsFor")}>
-            <button className={`choice ${forKey === "exploring" ? "on" : ""}`} aria-pressed={forKey === "exploring"} onClick={() => p.setPick("exploring")}>{w("plate.exploring")}</button>
-            {daySlots.map((x) => <button key={x.id} className={`choice ${forKey === `meal:${x.id}` ? "on" : ""}`} aria-pressed={forKey === `meal:${x.id}`} onClick={() => p.setPick(`meal:${x.id}`)}>{mealName(x.name)}</button>)}
-            {!daySlots.some((x) => /snack/i.test(x.name)) && <button className={`choice ${forKey === "snack" ? "on" : ""}`} aria-pressed={forKey === "snack"} onClick={() => p.setPick("snack")}>{w("meal.snack")}</button>}
-          </div>
-          {/* DT274 (0.3.122, board Stories203): what each choice does; on Exploring in place of the one line that was there */}
-          {p.pick !== "exploring" && <p className="small for-hint">{forHint}</p>}
-          <p className="small for-say"><b>{w("make.forExploringHead")}</b> {w("make.forExploring")}<br /><b>{w("make.forMealHead")}</b> {w("make.forMeal")}</p>
-        </>}
-        {/* R22 (0.2.50, board RS21): What is it? in place of Meal or Dessert; a small thing is a Snack, above */}
-        <p className="label">{w("make.whatIsIt")}</p>
-        <div className="moments taste-row" role="radiogroup" aria-label={w("make.whatIsIt")}>
-          {(["savoury", "daam", "both"] as const).map((t) => (
-            <button key={t} className={`choice ${shownTaste === t ? "on" : ""}`} aria-pressed={shownTaste === t} onClick={() => pickTaste(t)}>{PLATE_TASTE_WORD[t]}</button>
-          ))}
-        </div>
-        <p className="small taste-hint">{tasteHint}</p>
-        <ChefLine text={say("whatMoment")} />
-        <div className="moments">
-          {orderMoments(p.usual).map((m) => (
-            <button key={m.id} className={`choice ${p.moment === m.id ? "on" : ""} ${m.planned ? "" : "pill-unplanned"}`} onClick={() => p.setMoment(m.id)}>{m.name}</button>
-          ))}
-        </div>
-        <p className="small moment-hint">{momentOf(p.moment).hint}{p.moment !== "regular" && pdRef !== null ? ` ${w("plate.targetForPlate", { pd: pdText(pdRef) })}` : ""}</p>
-        </>)}
-        {lineOpen && p.moment === "travel" && (
-          <>
-            <p className="label">{w("make.whereTo")}</p>
-            <div className="moments">
-              {REGIONS.filter((r) => r.id !== p.region).map((r) => (
-                <button key={r.id} className={`choice ${p.travelTo === r.id ? "on" : ""}`} onClick={() => p.setTravelTo(p.travelTo === r.id ? null : r.id)}>{regionName(r.id)}</button>
-              ))}
-            </div>
-            <p className="small moment-hint">{p.travelTo ? w("plate.travelPlans", { place: REGIONS.some((r) => r.id === p.travelTo) ? regionV(p.travelTo!) : "" }) : w("make.pickThePlaceAndChef")}</p>
-          </>
-        )}
-        {/* B146: your plate is not empty: a warning before the read that a decision comes after it */}
-        {photoScreen && items.length > 0 && (
-          <div className="warn-box plate-waits" role="note"><TriangleAlert size={20} aria-hidden="true" /><div><b>{w("plate.notEmptyLine")}</b>{w("plate.notEmptyAfter", { plate: plateHas })}</div></div>)}
-        {photoScreen ? (
-        <section className="card plate-card photo-screen">
-          <PhotoAsk key={p.photoAsk!.at + p.photoAsk!.image.length} image={p.photoAsk!.image} at={p.photoAsk!.at} taken={p.photoAsk!.taken} drop={p.dropPhotoAsk} exploring={p.pick === "exploring"}
-            mealAt={(d) => { const sl = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return sl ? sl.name.toLowerCase() : null; }}
-            look={p.lookAtPhoto} read={(x) => { void p.readMealPhoto(p.photoAsk!.image, { ...x, ...(p.photoAsk!.more?.length ? { more: p.photoAsk!.more } : {}), ...(photoTitle.trim() ? { title: photoTitle.trim() } : {}) }); }} />
-        </section>
-        ) : readView ? readCard : (<>
+        {/* the meal line with everything behind its pencil (0.3.156: in PlateMealLine.tsx); its state stays here and is handed in */}
+        {plateMealLine({ daySlots, forHint, forKey, items, lineNow, lineOpen, linePhoto, otherDay, p, pdRef, pickDate, pickTaste, plateWhen, setLineOpen, setOtherDay, setPickDate, shownTaste, slotTitleText, slotTitleV, slotV, tasteHint })}
+        {/* the photo screen (0.3.156: in PlatePhoto.tsx): the warning that your plate is not empty, then the card that asks about the photo */}
+        {platePhotoWaits({ items, photoScreen, plateHas })}
+        {photoScreen ? platePhotoCard({ p, photoTitle }) : readView ? readCard : (<>
         {/* DT308.3 (0.3.154, board Stories236): What are you craving? is gone from the page; Chef Mealan is asked through his round icon */}
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
         {/* DT246 (0.3.96, board Stories182): a plate already recorded says where it went; its changes go there too */}
@@ -2955,58 +2811,5 @@ function LaterRow({ x, onContinue, onRemove }: { x: Later; onContinue: () => voi
           : <><button type="button" className="pill" onClick={onContinue}>{w("make.continue")}</button><button type="button" className="lr-x" aria-label={w("make.removeTitle", { title: r.title })} onClick={() => setArmed(true)}>✕</button></>}
       </div>
     </div>
-  );
-}
-
-// B144 (0.3.150, board Stories225): under the photo, what you chose and what you said stay in view
-function PhotoSaid({ photo, meal }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; meal: string | null }) {
-  const how = holdsMore(photo.vessel) && photo.share ? w(photo.share === "portion" ? "photoask.myPortion" : photo.vessel === "tray" ? "photoask.wholeTray" : "photoask.wholePot") : "";
-  const what = photo.dish && meal ? w("photo.dishOfMeal", { dish: photo.dish === "main" ? w("photoask.dishMain") : dishWord(photo.dish), meal: mealV(meal, true) }) : "";
-  if (!how && !what && !photo.note) return null;
-  return (
-    <div className="mp-said">
-      {(how || what) && <small className="mp-said-top">{[how, what].filter(Boolean).join(" · ")}</small>}
-      {photo.note && <small className="muted">{w("photo.youSaid", { words: photo.note })}</small>}
-    </div>
-  );
-}
-
-// DT228 v2 (0.3.63, board Stories168; Coach Milan 2 November 19:50 to 22:00): help Chef Mealan read the meal. The photos (the
-// first is the plate's), ＋ Photo for the inside, another side or the menu, and a line in the person's words, typed or said.
-// Read it again sends them all; the new read replaces the foods and the corrections, as Read the photo again did.
-// B144 (0.3.150, board Stories225): the same form as before the read: how much of a pot is yours, which dish of the meal,
-// and what is in it, with the answers given before.
-function HelpRead({ photo, read, incoming, meal }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; read: (more: string[], note: string, pot: { share?: "whole" | "portion"; dish?: import("../served").Dish }) => void; incoming?: { file: File; at: number } | null; meal: string | null }) {
-  const [share, setShare] = useState<"whole" | "portion">(() => photo.share ?? "whole");
-  const [dish, setDish] = useState<import("../served").Dish>(() => photo.dish ?? "main");
-  // 0.3.65 (Coach Milan 22:53, Go): after a read it folds into one link and opens on a tap
-  const [open, setOpen] = useState(false);
-  const [more, setMore] = useState<string[]>(() => photo.more ?? []);
-  const [note, setNote] = useState(() => photo.note ?? "");
-  const [hearing, setHearing] = useState(false);
-  const S = typeof window !== "undefined" ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
-  const add = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 640).then((d) => setMore((m) => (m.length < 3 ? [...m, d] : m))).catch(() => {}); r.readAsDataURL(file); };
-  const listen = () => { if (!S || hearing) return; try { const r = new S(); r.lang = speechLang(getLang()); r.interimResults = false; r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript ?? "").trim(); if (t) setNote((n) => (n ? `${n} ${t}` : t).slice(0, 300)); }; r.onend = () => setHearing(false); r.onerror = () => setHearing(false); setHearing(true); r.start(); } catch { setHearing(false); } };
-  // DT230: ＋ Photo under the large photo opens this with that photo in it
-  useEffect(() => { if (incoming) { setOpen(true); add(incoming.file); } }, [incoming?.at]); // eslint-disable-line react-hooks/exhaustive-deps
-  const n = 1 + more.length, words = note.trim();
-  const label = n > 1 ? w(words ? "make.readAgainPhotosThis" : "make.readAgainPhotos", { n }) : w(words ? "make.readAgainThis" : "make.readAgain");
-  if (!open) return <button type="button" className="link mp-again-link" onClick={() => setOpen(true)}>{w("make.wrongFoodsHelpChefMealan")}</button>;
-  return (
-    <section className="mp-help" aria-label={w("make.helpChefMealanReadIt")}>
-      <b>{w("make.helpChefMealanReadIt")}</b>
-      <div className="mp-help-photos">
-        <img src={photo.image} alt={w("make.photoOfPlate")} />
-        {more.map((m, i) => <button key={i} type="button" className="mp-help-more" aria-label={w("make.removePhotoN", { n: i + 2 })} onClick={() => setMore((x) => x.filter((_, j) => j !== i))}><img src={m} alt="" /><span aria-hidden="true">✕</span></button>)}
-        {more.length < 3 && <label className="pill pill-small mp-help-add">{w("plate.addPhoto")}<input type="file" accept="image/*" capture="environment" onChange={(e) => { add(e.target.files?.[0]); e.target.value = ""; }} /></label>}
-      </div>
-      <PotRows vessel={photo.vessel} share={share} setShare={setShare} dish={dish} setDish={setDish} meal={meal} />
-      <label className="mp-help-note"><span>{w("photoask.whatIsInIt")}</span><textarea className="search pa-words" rows={3} value={note} maxLength={300} placeholder={w("photoask.wordsPlaceholder")} onChange={(e) => setNote(e.target.value)} /></label>
-      <div className="button-row">
-        <button type="button" className="pill pill-small pill-primary" onClick={() => read(more, words, { ...(holdsMore(photo.vessel) ? { share } : {}), ...(meal ? { dish } : {}) })}>{label}</button>
-        {S && <button type="button" className="pill pill-small" aria-pressed={hearing} onClick={listen}>{hearing ? w("make.listening") : w("make.sayIt")}</button>}
-      </div>
-      <small className="muted">{w("make.thePhotosAndYourWords")}</small>
-    </section>
   );
 }

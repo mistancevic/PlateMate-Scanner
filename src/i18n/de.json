@@ -189,18 +189,6 @@
       "text": "Worauf hast du Lust?",
       "checked": true
     },
-    "plate.cravingSub": {
-      "text": "Hol dir eine Idee für das, worauf du Lust hast, oder stell deinen eigenen Teller zusammen. Chef Mealan legt die Mengen fest.",
-      "checked": true
-    },
-    "plate.cravingBox": {
-      "text": "Schreib, worauf du Lust hast oder was du kochen willst",
-      "checked": true
-    },
-    "plate.cravingHint": {
-      "text": "Findet Gerichte in deinen Rezepten, in denen vom Coach, von den Mitgliedern und von Chef Mealan und in deinen Lebensmitteln. Füge PD 7+ hinzu, dann bleiben nur Gerichte mit PD 7 oder mehr.",
-      "checked": true
-    },
     "plate.fromMyRecipes": {
       "text": "Aus deinen Rezepten. Ändere, was du magst, dann tippe auf An mein Ziel anpassen oder So lassen.",
       "checked": true
@@ -233,32 +221,12 @@
       "text": "Zum Leeren nochmal tippen",
       "checked": true
     },
-    "plate.nothingYet": {
-      "text": "Noch nichts auf dem Teller.",
-      "checked": true
-    },
-    "plate.addAFood": {
-      "text": "Lebensmittel hinzufügen",
-      "checked": true
-    },
     "plate.manual": {
       "text": "Manuell",
       "checked": true
     },
     "plate.scan": {
       "text": "Scannen",
-      "checked": true
-    },
-    "plate.photoOfMeal": {
-      "text": "Foto meiner Mahlzeit",
-      "checked": true
-    },
-    "plate.sayWhatYouHave": {
-      "text": "Sag, was du hast",
-      "checked": true
-    },
-    "plate.startFromRecipe": {
-      "text": "Hast du ein Rezept? Fang damit an",
       "checked": true
     },
     "plate.asItStands": {
@@ -333,10 +301,6 @@
       "text": "Wische ein Lebensmittel nach links, um es zu tauschen, nach rechts, um es zu entfernen.",
       "checked": true
     },
-    "plate.addHere": {
-      "text": "+ Lebensmittel hinzufügen",
-      "checked": true
-    },
     "plate.close": {
       "text": "Schließen",
       "checked": true
@@ -359,14 +323,6 @@
     },
     "plate.addOneFirst": {
       "text": "Füge zuerst ein Lebensmittel hinzu. Chef Mealan baut den Rest für {meal} darum herum.",
-      "checked": true
-    },
-    "plate.quickPicks": {
-      "text": "Schnellauswahl",
-      "checked": true
-    },
-    "plate.fromAllFoods": {
-      "text": "Aus all deinen Lebensmitteln",
       "checked": true
     },
     "plate.search": {
@@ -621,10 +577,6 @@
       "text": "Hinzufügen",
       "checked": true
     },
-    "make.yourFoodsFirstThenThe": {
-      "text": "Zuerst deine Lebensmittel, dann die Grundlebensmittel, die es dort gibt, wo du einkaufst.",
-      "checked": true
-    },
     "make.optionalNotOnThePlate": {
       "text": "Optional, nicht auf dem Teller",
       "checked": true
@@ -715,10 +667,6 @@
     },
     "make.ateItAll": {
       "text": "Alles gegessen",
-      "checked": true
-    },
-    "make.notMine": {
-      "text": "Nicht meins",
       "checked": true
     },
     "make.stop": {
@@ -953,10 +901,6 @@
       "text": "Hilf Chef Mealan beim Lesen",
       "checked": true
     },
-    "make.tellChefMealanWhatIt": {
-      "text": "Sag Chef Mealan, was es ist",
-      "checked": true
-    },
     "make.thePhotosAndYourWords": {
       "text": "Die Fotos und deine Worte gehören zusammen. Das neue Lesen ersetzt deine Korrekturen.",
       "checked": true
@@ -1035,14 +979,6 @@
     },
     "make.clearTheSearch": {
       "text": "Suche leeren",
-      "checked": true
-    },
-    "make.findAFoodToAdd": {
-      "text": "Lebensmittel zum Hinzufügen suchen",
-      "checked": true
-    },
-    "make.findAFood": {
-      "text": "Lebensmittel suchen",
       "checked": true
     },
     "make.whichDayAndMeal": {
@@ -1205,10 +1141,6 @@
       "text": "Das ganze Rezept, so wie du es angelegt hast.",
       "checked": true
     },
-    "make.byThePlan": {
-      "text": "Nach Plan",
-      "checked": true
-    },
     "make.todayIsWhatYouEat": {
       "text": "Heute ist, was du jetzt isst. Ein Tag davor trägt nach, was du gegessen hast; ein Tag danach plant, was du essen wirst.",
       "checked": true
@@ -1227,10 +1159,6 @@
     },
     "make.chefMealanCooksAsAt": {
       "text": "Chef Mealan kocht wie zu Hause.",
-      "checked": true
-    },
-    "make.onPlate": {
-      "text": "Auf dem Teller",
       "checked": true
     },
     "make.leftOutOfTheNumbers": {
@@ -1593,24 +1521,12 @@
       "text": "Gegessen um",
       "checked": true
     },
-    "photoask.tellChefMealanWhatIt": {
-      "text": "Sag Chef Mealan, was es ist, wenn du magst",
-      "checked": true
-    },
     "photoask.readThePlate": {
       "text": "Teller lesen",
       "checked": true
     },
     "photoask.dropThePhoto": {
       "text": "Foto entfernen",
-      "checked": true
-    },
-    "photoask.whosePlateAndWhen": {
-      "text": "Wessen Teller und wann",
-      "checked": true
-    },
-    "photoask.theTimeYouAteIt": {
-      "text": "Die Uhrzeit, zu der du gegessen hast",
       "checked": true
     },
     "count.size": {
@@ -1627,42 +1543,6 @@
     },
     "count.peeledBananasVaryMoreThan": {
       "text": "Geschält. Bananen sind unterschiedlicher als Eier, die Größe ist also ein Richtwert.",
-      "checked": true
-    },
-    "sayhave.done": {
-      "text": "Fertig",
-      "checked": true
-    },
-    "sayhave.cancel": {
-      "text": "Abbrechen",
-      "checked": true
-    },
-    "sayhave.whatYouSayGoesTo": {
-      "text": "Was du sagst, geht als Text an Chef Mealan, um die Lebensmittel und ihre typischen Werte zu benennen. Nichts wird aufgenommen.",
-      "checked": true
-    },
-    "sayhave.sayWhatYouHave": {
-      "text": "Sag, was du hast",
-      "checked": true
-    },
-    "sayhave.notListening": {
-      "text": "Ich höre nicht zu",
-      "checked": true
-    },
-    "sayhave.typeWhatYouHave": {
-      "text": "Tippe ein, was du hast",
-      "checked": true
-    },
-    "sayhave.sayTheFoodsYouHave": {
-      "text": "Sag die Lebensmittel, die du hast, in beliebiger Reihenfolge. Mengen, wenn du sie kennst: zwei Eier, eine halbe Zwiebel. Tippe auf Fertig, wenn du fertig bist.",
-      "checked": true
-    },
-    "sayhave.theFoodsYouHaveIn": {
-      "text": "Die Lebensmittel, die du hast, in beliebiger Reihenfolge, mit Mengen, wenn du sie kennst.",
-      "checked": true
-    },
-    "sayhave.orTypeHere": {
-      "text": "Oder hier eintippen",
       "checked": true
     },
     "meal.thisMeal": {
@@ -1745,14 +1625,6 @@
       "text": "Hinzufügen",
       "checked": true
     },
-    "craving.nothingFound": {
-      "text": "Nichts gefunden",
-      "checked": true
-    },
-    "craving.tapADishAndIt": {
-      "text": "Tippe ein Gericht an, und es kommt auf den Teller.",
-      "checked": true
-    },
     "craving.forOneServing": {
       "text": "Für eine Portion",
       "checked": true
@@ -1761,28 +1633,12 @@
       "text": "So geht es",
       "checked": true
     },
-    "craving.keptInMyRecipesAs": {
-      "text": "Als Idee in Meine Rezepte aufgehoben, noch nicht zubereitet.",
-      "checked": true
-    },
-    "craving.putItOnMyPlate": {
-      "text": "Auf meinen Teller legen",
-      "checked": true
-    },
-    "craving.yourRecipes": {
-      "text": "Deine Rezepte",
-      "checked": true
-    },
     "craving.coachSRecipes": {
       "text": "Rezepte vom Coach",
       "checked": true
     },
     "craving.membersRecipes": {
       "text": "Rezepte der Mitglieder",
-      "checked": true
-    },
-    "craving.anotherIdea": {
-      "text": "Noch eine Idee",
       "checked": true
     },
     "helper.close": {
@@ -1795,10 +1651,6 @@
     },
     "helper.swap": {
       "text": "Tauschen",
-      "checked": true
-    },
-    "helper.somethingElseTalkToChef": {
-      "text": "Etwas anderes? Sprich mit Chef Mealan",
       "checked": true
     },
     "helper.onThePlate": {
@@ -1819,10 +1671,6 @@
     },
     "helper.clearTheQuestion": {
       "text": "Frage leeren",
-      "checked": true
-    },
-    "helper.whatGoesWithThisWhat": {
-      "text": "Was passt dazu? Was statt…?",
       "checked": true
     },
     "helper.ask": {
@@ -1877,26 +1725,6 @@
       "text": "Lebensmittel hinzufügen: Scannen",
       "checked": true
     },
-    "helper.whatGoesWithThis": {
-      "text": "Was passt dazu?",
-      "checked": true
-    },
-    "helper.betterMatchForMyTarget": {
-      "text": "Passt etwas besser zu meinem Ziel?",
-      "checked": true
-    },
-    "helper.makeItCrunchier": {
-      "text": "Knuspriger machen",
-      "checked": true
-    },
-    "helper.lessSweet": {
-      "text": "Weniger süß",
-      "checked": true
-    },
-    "helper.cheaperOption": {
-      "text": "Günstigere Option",
-      "checked": true
-    },
     "camera.noBarcode": {
       "text": "Kein Barcode gefunden. Versuch ein schärferes Foto oder gib die Nummer bei Gespeicherte Lebensmittel ein.",
       "checked": true
@@ -1929,10 +1757,6 @@
       "text": "Dein Foto",
       "checked": true
     },
-    "sayhave.micBlocked": {
-      "text": "Das Mikrofon ist für diese Website blockiert. Tippe die Lebensmittel stattdessen ein.",
-      "checked": true
-    },
     "meal.gramsOf": {
       "text": "Gramm: {food}",
       "checked": true
@@ -1941,32 +1765,8 @@
       "text": "Entfernen: {food}",
       "checked": true
     },
-    "craving.addFood": {
-      "text": "{food} hinzufügen",
-      "checked": true
-    },
-    "craving.thinking": {
-      "text": "Chef Mealan denkt nach…",
-      "checked": true
-    },
-    "craving.askForOne": {
-      "text": "Chef Mealan nach einem fragen",
-      "checked": true
-    },
-    "craving.askForAnother": {
-      "text": "Chef Mealan nach einem anderen fragen",
-      "checked": true
-    },
-    "craving.removePdFilter": {
-      "text": "Filter PD {pd} und höher entfernen",
-      "checked": true
-    },
     "helper.insteadOf": {
       "text": "Chef Mealan, statt {food}",
-      "checked": true
-    },
-    "craving.starters": {
-      "text": "Startgerichte von Chef Mealan",
       "checked": true
     },
     "out.undo": {
@@ -2503,10 +2303,6 @@
     },
     "today.todaySMeals": {
       "text": "Heutige Mahlzeiten",
-      "checked": true
-    },
-    "today.byThePlan": {
-      "text": "Nach Plan",
       "checked": true
     },
     "today.saveInMyRecipes": {
@@ -5261,14 +5057,6 @@
       "text": "Sicher?",
       "checked": true
     },
-    "recipe.moveThePhotoEarlier": {
-      "text": "Foto nach vorne",
-      "checked": true
-    },
-    "recipe.moveThePhotoLater": {
-      "text": "Foto nach hinten",
-      "checked": true
-    },
     "recipe.noPhotoYet2": {
       "text": "Noch kein Foto",
       "checked": true
@@ -5327,14 +5115,6 @@
     },
     "recipe.yourOwnPhotoIsAlways": {
       "text": "Dein eigenes Foto ist immer besser.",
-      "checked": true
-    },
-    "recipe.thisPhotoIsTheCover": {
-      "text": "Dieses Foto ist das Titelbild. × löscht es.",
-      "checked": true
-    },
-    "recipe.theFirstPhotoIsThe": {
-      "text": "Das erste Foto ist das Titelbild. Tippe ein Foto an, um es mit ‹ › zu verschieben; × löscht es.",
       "checked": true
     },
     "recipe.asTheRecipeMakesIt": {
@@ -7313,10 +7093,6 @@
       "text": "Mein Konto löschen",
       "checked": true
     },
-    "welcome.tapAgainToDeleteEverything": {
-      "text": "Tippe nochmal, um alles zu löschen",
-      "checked": true
-    },
     "safetyq.isAnyOfThisTrue": {
       "text": "Trifft etwas davon auf dich zu?",
       "checked": true
@@ -8207,10 +7983,6 @@
     },
     "share.name": {
       "text": "Name",
-      "checked": true
-    },
-    "share.nameOptional": {
-      "text": "Name (optional)",
       "checked": true
     },
     "share.theirGoogleEmail": {
@@ -10021,10 +9793,6 @@
       "text": "Mein Konto löschen",
       "checked": true
     },
-    "menu.tapAgainToDeleteEverything": {
-      "text": "Nochmal tippen, um alles zu löschen",
-      "checked": true
-    },
     "menu.clearLog": {
       "text": "Log leeren",
       "checked": true
@@ -10301,14 +10069,6 @@
       "text": "Deutsch",
       "checked": true
     },
-    "langpanel.afterSerbianOnceAGerman": {
-      "text": "Nach Serbisch, sobald eine deutschsprachige Person es geprüft hat",
-      "checked": true
-    },
-    "langpanel.comingSoon": {
-      "text": "Bald verfügbar",
-      "checked": true
-    },
     "langpanel.thePrivacyNoticeAndThe": {
       "text": "Die Datenschutzhinweise und der Haftungsausschluss bleiben auf Englisch. Namen von Lebensmitteln kommen schon auf Serbisch, wenn die Einkaufsregion Serbien ist.",
       "checked": true
@@ -10475,14 +10235,6 @@
     },
     "life.readsThis": {
       "text": "Chef Mealan liest das bei jedem Teller und jedem Rezept mit, das er vorschlägt.",
-      "checked": true
-    },
-    "week.barFoot": {
-      "text": "Der Balken zeigt, wie hart der Tag ist. Tippe einen Tag an, um ihn zu öffnen; tippe nochmal, um ihn zu schließen.",
-      "checked": true
-    },
-    "week.barFootSchool": {
-      "text": "Der Balken zeigt, wie hart der Tag ist, Sport in der Schule und nach der Schule zusammen. Tippe einen Tag an, um ihn zu öffnen; tippe nochmal, um ihn zu schließen.",
       "checked": true
     },
     "langpanel.coachReads": {
@@ -10663,22 +10415,6 @@
     },
     "ago.now": {
       "text": "jetzt",
-      "checked": true
-    },
-    "make.searchAllMyFoods": {
-      "text": "Alle meine Lebensmittel durchsuchen",
-      "checked": true
-    },
-    "voice.units": {
-      "text": "Einheiten",
-      "checked": true
-    },
-    "voice.gramsAndMillilitresOuncesAnd": {
-      "text": "Gramm und Milliliter. Unzen und Cups kommen bald.",
-      "checked": true
-    },
-    "voice.comingSoon": {
-      "text": "Kommt bald",
       "checked": true
     },
     "menu.me": {
@@ -13197,10 +12933,6 @@
       "text": "Eingetragen um {time}. Tippe auf die Uhrzeit, um sie zu ändern.",
       "checked": true
     },
-    "photoask.notePlaceholder": {
-      "text": "Schweineschnitzel, paniert, Augustiner",
-      "checked": true
-    },
     "count.oneLess": {
       "text": "{piece}: eins weniger",
       "checked": true
@@ -13223,14 +12955,6 @@
     },
     "count.gramsWeighed": {
       "text": "{piece}, in Gramm gewogen",
-      "checked": true
-    },
-    "sayhave.listening": {
-      "text": "Ich höre zu",
-      "checked": true
-    },
-    "sayhave.eggsSpinachFeta": {
-      "text": "Eier, Spinat, Feta, eine halbe Zwiebel",
       "checked": true
     },
     "out.tagPlate": {
@@ -14637,10 +14361,6 @@
       "text": "Sonstiges",
       "checked": true
     },
-    "plate.nothingCalled": {
-      "text": "Nichts namens {q} in deinen Lebensmitteln oder den Grundlebensmitteln, die es hier gibt. Scanne es oder füge es oben von Hand hinzu.",
-      "checked": true
-    },
     "plate.addPutsOne": {
       "text": "Hinzufügen legt eins auf den Teller, als Lebensmittel wie die anderen.",
       "checked": true
@@ -15301,10 +15021,6 @@
       "text": "Statt {food}",
       "checked": true
     },
-    "make.changeStepPhoto": {
-      "text": "Foto von Schritt {n} ändern",
-      "checked": true
-    },
     "make.addStepPhoto": {
       "text": "Foto zu Schritt {n} hinzufügen",
       "checked": true
@@ -15577,10 +15293,6 @@
       "text": ", ausgewählt",
       "checked": true
     },
-    "recipe.deletePhoto": {
-      "text": "Foto {n} löschen",
-      "checked": true
-    },
     "recipe.chefIsDrawing": {
       "text": "Chef Mealan zeichnet…",
       "checked": true
@@ -15599,18 +15311,6 @@
     },
     "recipe.aPhotoMakesItEasy": {
       "text": "Mit einem Foto findest du das Rezept leicht, hier und auf seiner Seite.",
-      "checked": true
-    },
-    "recipe.photoMovesEarlier": {
-      "text": "Foto {n} von {of}. ‹ schiebt es nach vorn: An erster Stelle wird es zum Titelbild.",
-      "checked": true
-    },
-    "recipe.fromTheTimesYouMade": {
-      "text": "Aus den Malen, als du es gemacht hast, fügt ein Tippen das Foto hinzu:",
-      "checked": true
-    },
-    "recipe.addPlatePhoto": {
-      "text": "Tellerfoto {n} zum Rezept hinzufügen",
       "checked": true
     },
     "recipe.watchStepsLength": {
@@ -16449,18 +16149,6 @@
       "text": "Chef Mealan hat gerade keine Idee dafür. Versuch es mit anderen Worten.",
       "checked": true
     },
-    "craving.errCantHave": {
-      "text": "In der Idee von Chef Mealan war ein Lebensmittel, das du nicht essen darfst. Frag nochmal.",
-      "checked": true
-    },
-    "craving.kcalProt": {
-      "text": "{kcal} kcal · {protein} g Protein",
-      "checked": true
-    },
-    "craving.makesFromYourFoods": {
-      "text": "Chef Mealan macht es aus deinen Lebensmitteln",
-      "checked": true
-    },
     "craving.making": {
       "text": "Chef Mealan macht {what}",
       "checked": true
@@ -16477,46 +16165,6 @@
       "text": "Aus deinen Lebensmitteln, erhältlich in {place}",
       "checked": true
     },
-    "craving.pdAndUp": {
-      "text": "PD {pd} und mehr ✕",
-      "checked": true
-    },
-    "craving.underPd": {
-      "text": "Unter PD {pd}",
-      "checked": true
-    },
-    "craving.underOne": {
-      "text": "Unter PD {pd}: 1 weiteres Gericht, {title}, {dishPd}.",
-      "checked": true
-    },
-    "craving.underMany": {
-      "text": "Unter PD {pd}: {n} weitere Gerichte.",
-      "checked": true
-    },
-    "craving.showIt": {
-      "text": "Zeig es",
-      "checked": true
-    },
-    "craving.showThem": {
-      "text": "Zeig sie",
-      "checked": true
-    },
-    "craving.noFoodAt": {
-      "text": "Keins deiner Lebensmittel hat PD {pd} oder mehr. {list}.",
-      "checked": true
-    },
-    "craving.foodIs": {
-      "text": "{name} hat {pd}",
-      "checked": true
-    },
-    "craving.nothingIn": {
-      "text": "Nichts in deinen Rezepten, denen vom Coach, denen der Mitglieder oder deinen Lebensmitteln passt zu {crave}.",
-      "checked": true
-    },
-    "craving.nothingInPd": {
-      "text": "Nichts in deinen Rezepten, denen vom Coach, denen der Mitglieder oder deinen Lebensmitteln passt zu {crave} mit PD {pd} oder mehr.",
-      "checked": true
-    },
     "craving.chefsIdea": {
       "text": "Idee von Chef Mealan",
       "checked": true
@@ -16527,18 +16175,6 @@
     },
     "craving.gFood": {
       "text": "{grams} g {food}",
-      "checked": true
-    },
-    "craving.oneServing": {
-      "text": "Eine Portion: {kcal} kcal · {protein} g Protein. Um ein Lebensmittel zu ändern, leg das Gericht auf deinen Teller: Tauschen, Entfernen, Hinzufügen und die Mengen, alles ist dort.",
-      "checked": true
-    },
-    "craving.numbersFrom": {
-      "text": "Die Zahlen kommen aus den Lebensmitteln, berechnet von der App; ein Lebensmittel, das du nicht hast, ist eine Schätzung von Chef Mealan.",
-      "checked": true
-    },
-    "craving.chefThinking": {
-      "text": "Chef Mealan denkt nach…",
       "checked": true
     },
     "carbsfat.kindDays": {
@@ -19765,10 +19401,6 @@
       "text": "von {page}",
       "checked": true
     },
-    "coach.reqFromSrc": {
-      "text": "von {page}, {src}",
-      "checked": true
-    },
     "coach.reqCount": {
       "text": "{n} Anfragen",
       "checked": true
@@ -22097,14 +21729,6 @@
       "text": "Das erste Foto ist das, das die Rezeptseite und Schritte ansehen zeigen.",
       "checked": true
     },
-    "recipe.onTheSteps": {
-      "text": "Bei den Schritten",
-      "checked": true
-    },
-    "recipe.photoOfStep": {
-      "text": "Ein Foto von Schritt {n}",
-      "checked": true
-    },
     "steppics.photosOnTheSteps": {
       "text": "Fotos bei den Schritten",
       "checked": true
@@ -22647,18 +22271,6 @@
     },
     "craving.chefsIdeas": {
       "text": "Ideen von Chef Mealan",
-      "checked": true
-    },
-    "craving.findIdeas": {
-      "text": "Ideen finden",
-      "checked": true
-    },
-    "craving.viewMore": {
-      "text": "Mehr anzeigen",
-      "checked": true
-    },
-    "craving.viewLess": {
-      "text": "Weniger anzeigen",
       "checked": true
     },
     "craving.saveInMyRecipes": {
