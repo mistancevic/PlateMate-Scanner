@@ -1253,9 +1253,9 @@
       "id": "B147",
       "title": "The meal line of a photo from between meals falls back to the clock",
       "epic": "trust",
-      "state": "next",
-      "why": "Coach Milan 16 November, his test of 0.3.151 (first drawn as bug 2 of B146; 17:39: unrelated, its own card, to be discussed separately, with every step connected to the next). A photo from yesterday 15:57, between lunch and dinner, shows Dinner, 20:00 by the clock; with a snack in the day it says Snack. Proposed rule, not approved: inside a meal's time, that meal; between meals with the meal before it not eaten, that meal, later than planned; that meal already eaten, Snack. Drawn on its own board, one row per case from the Plate to the read: lunch not eaten yet, lunch already eaten, inside a meal's time (no change). Not approved; no Go.",
-      "board": "Stories236"
+      "state": "later",
+      "why": "Coach Milan 16 November 20:44: merged into DT308. The bug (a photo from between meals shows Dinner, 20:00 by the clock) is solved there: no meal is claimed until you say Ate it, and then the calendar opens on the photo's day with the guess marked.",
+      "board": "Stories236, Stories237"
     },
     {
       "id": "DT307",
@@ -1264,6 +1264,14 @@
       "state": "next",
       "board": "Stories235",
       "why": "Coach Milan 16 November 15:49 to 17:04: Back at the top left stays, a second Back at the bottom when there is a scroll, Cancel goes back to the default with nothing changed; buttons on top must not push the content down (a light top row); fewer boxes, the photo not smaller; the pot question (How much of it do you eat? All of it, A part of it, with grams); Save in My recipes as a tick. 17:04: we have a mess; point by point, each resolved on one board. Earlier drawings Stories232 to 234. Also noted for later cards: the automatic photo in the camera's Meal mode and Group not firing (to reproduce); using what the app knows about a photo and asking if it is correct. No Go on any point."
+    },
+    {
+      "id": "DT308",
+      "title": "The Plate from empty to the landing: title and meal line, Add to your plate, Chef Mealan through his icon, the end of the read",
+      "epic": "trust",
+      "state": "next",
+      "board": "Stories236, Stories237, Stories238",
+      "why": "Coach Milan 16 November 18:52 to 17 November 03:35, drawn step by step, nothing approved, no Go. Holds B147. The model: a plate starts with no meal set and nothing changes in the plan or the numbers; the app guesses a meal only when you say Ate it (from the clock, or from an older photo's day and time) and shows it in your calendar. The empty Plate: Meal title in grey with a pencil; Meal and day not set in grey with a pencil, filled in dark with an X once set; no What are you craving?; one block Add to your plate with four ways in one template (From a photo or scan: Open the camera; From a recipe: Upload photo or screenshot; From the internet: a link field; From the list: search, three foods per macro, See all foods, + Add manually); Chef Mealan's field gone, his round icon the one place to ask him, ideas with Put on my plate. The calendar as the picker: days on top, that day's meals with time and state, one tap sets meal and day. The read's end with no meal set: What do you do with it? Save it, Plan it, Ate it. One landing for every way: the Plate with foods, with + Add more to your plate. Drawing rules said again: every row starts one step before its first screen with the tap that opens it; every frame shows what is tapped; no essays, just propose. Open: arrivals from a barcode or label, a recipe and the internet; Fit to my target and Prepare it on the landing; a plate with foods and where its camera is; the photo screen as one card with the photo on top; the moment (before training and the like); Start a new plate discards the old plate; after Add to my plate with an older photo the app asks Did you eat it? for yesterday."
     },
     {
       "id": "DT304",
