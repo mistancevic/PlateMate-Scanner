@@ -16,7 +16,7 @@ LEGEND = ('<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px
 def chip(e): return f'<span style="display:inline-block;background:{COL[e]};color:#fff;border-radius:999px;padding:1px 8px;font-size:11.5px;font-weight:800">{html.escape(E[e]["name"])}</span>'
 def card(t):
     meta = []
-    if t.get("board"): meta.append(f"Board Stories{t['board']}")
+    if t.get("board"): meta.append("Board " + (t["board"] if str(t["board"]).startswith("Stories") else f"Stories{t['board']}"))
     if t.get("version"): meta.append(f"v{t['version']}")
     why = f'<div style="font-size:12.5px;line-height:1.4;color:#3d4a63;margin-top:5px">{html.escape(t["why"])}</div>' if t.get("why") else ""
     m = f'<div style="font-size:11.5px;color:#5b6b8a;margin-top:5px;font-weight:700">{" · ".join(meta)}</div>' if meta else ""
@@ -44,6 +44,8 @@ def column(key, name, sub):
             f'<div style="margin-top:10px">{body}</div></div>')
 epics = "".join(f'<div style="width:{CW}px;flex:none;border:1.5px solid {COL[k]};border-radius:10px;padding:8px 10px;background:#fff"><div>{chip(k)}</div><div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:5px">{html.escape(e["why"])}</div></div>' for k, e in E.items())
 W = PAD * 2 + 3 * CW + 2 * G
+# the page is as tall as its longest column; measure it in a browser and give it as KANBAN_H (13,200 on 18 November 2026)
+H = int(os.environ.get("KANBAN_H", "13200"))
 page = f'''<!doctype html>
 <html lang="en">
 <head>
@@ -66,7 +68,7 @@ page = f'''<!doctype html>
 <div style="display:flex;gap:{G}px;align-items:flex-start;margin-top:18px">{"".join(column(*c) for c in cols)}</div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{W},"height":6400}}}}'>
+<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{W},"height":{H}}}}}'>
 class Component extends DCLogic {{
   renderVals() {{
     return {{}};
