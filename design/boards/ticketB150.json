@@ -1,7 +1,7 @@
 {
  "id": "B150",
  "title": "A photo from another day, logged under a meal of today, leaves two dinners on its day",
- "short": "A meal is logged on one day, at the meal's time, set in one edit mode; the line says No meal selected",
+ "short": "A meal is logged on one day, at the meal's time; meal and day are a detail of the plate, set in one edit mode",
  "epic": "plate",
  "rel": "Proposed; not agreed until Coach Milan says Go",
  "boardTitle": "B150: a photo from another day, logged under a meal of today, leaves two dinners on its day",
@@ -15,7 +15,7 @@
  "story": "When I log a photo from another day, I want it to land on one day, as the meal I picked, so that the day shows what I ate once and no planned meal keeps asking.",
  "words": "18 November 19:21: the dinner around that timing was only possible for the time slot as planned in the calendar at 18h. And now we have two dinners. One as set from the read, and the one planned in the list.",
  "cause": "Two things together. The pencil's calendar opens on today, also for a photo from another day, so the Dinner you tapped was Wednesday's dinner. The meal was then logged with the photo's own time, Tuesday 19:56. One record held Tuesday's time and Wednesday's dinner. Tuesday lists it by its time; Tuesday's planned dinner is closed only by a Tuesday dinner, so it still asks.",
- "proposed": "Two states and one edit mode. The meal line has a small title, Meal and day. Under it: No meal selected, or the meal with its day and time. The pencil is always there. A tap opens edit mode and the pencil turns into the X that closes it; the X does nothing else. Edit mode is the calendar you know: it opens on the photo's day, with the photo's time as a reference that cannot be changed. If the photo carries only the time it was saved, the line says that. A tap on a meal sets it, saved at once, no Done. The time in that meal's row is a field: the meal's time in the calendar, for this meal on this day. A tap on the row No meal selected takes the meal off again. One rule where a meal is logged: its day is the day of the meal I set, its time is that meal's time in the calendar. And the plate's name, when it has none: grey Untitled plate with the pencil, in the space it has today. On the read, the line under the title says Chef Mealan named it from your photo. It goes once I rename the plate.",
+ "proposed": "Meal and day are a detail of the plate, and nothing more. The meal line has a small title, Meal and day. Under it: No meal selected, or the meal with its day and time. The pencil is always there. A tap opens edit mode and the pencil turns into the X that closes it; the X does nothing else. Edit mode is the calendar you know: it opens on the photo's day, with the photo's time as a reference that cannot be changed. If the photo carries only the time it was saved, the line says that. A tap on a meal sets it, saved at once, no Done. The time in that meal's row is a field: the meal's time in the calendar, for this meal on this day. A tap on the row No meal selected takes the meal off again. Setting a meal changes only that line. The page still ends with What do you do with it?: Save it, Plan it, Ate it. Ate it logs the plate to the meal that is set and asks only how much. After it I am still on the Plate. One rule where a meal is logged: its day is the day of the meal I set, its time is that meal's time in the calendar. The plate's name, when it has none: grey Untitled plate with the pencil. On the read, the line under the title says Chef Mealan named it from your photo., until I rename the plate.",
  "repair": "The record from Tuesday is still wrong on your phone. Proposed: when the app opens, a record whose meal is on a later day than its own time is moved to the meal of its own day. Yours becomes Tuesday's dinner; Wednesday's dinner opens again.",
  "ac": [
   {
@@ -50,23 +50,23 @@
   },
   {
    "id": "AC7",
-   "title": "Closed, the line keeps the meal and the pencil",
-   "text": "Given Dinner at 19:30 is set, when I tap the X, then under the title Meal and day the line shows Dinner, Saturday, 14 November, 19:30 with the pencil, the read asks Did you eat it?, and a tap on the pencil opens edit mode again."
+   "title": "Closed, only the line has changed",
+   "text": "Given Dinner at 19:30 is set, when I tap the X, then under the title Meal and day the line shows Dinner, Saturday, 14 November, 19:30 with the pencil, and the page still ends with What do you do with it?: Save it, Plan it, Ate it."
   },
   {
    "id": "AC8",
-   "title": "One dinner on the photo's day",
-   "text": "Given that read and a Chicken rice bowl planned for Saturday's dinner, when I choose All of it and tap Done, then Saturday shows my meal as Dinner, 19:30, the Chicken rice bowl no longer asks, and today shows nothing of it."
+   "title": "Ate it logs to the meal that is set",
+   "text": "Given that read with Dinner, Saturday, 19:30 set, and a Chicken rice bowl planned for Saturday's dinner, when I tap Ate it, choose All of it and tap Done, then no calendar was asked, Saturday shows my meal as Dinner, 19:30, the Chicken rice bowl no longer asks, and today shows nothing of it."
   },
   {
    "id": "AC9",
    "title": "Back to no meal selected",
-   "text": "Given Dinner is set, when I open edit mode and tap the row No meal selected, then the line says No meal selected again, and the read ends with What do you do with it? again."
+   "text": "Given Dinner is set, when I open edit mode and tap the row No meal selected, then the line says No meal selected again, and nothing else on the page changes."
   },
   {
    "id": "AC10",
    "title": "A meal of today, when I mean today",
-   "text": "Given edit mode on Sat 14, when I tap Sun 15, today and then Dinner, then the line says Dinner, Sunday, 15 November, and after All of it and Done the meal is today's dinner and Saturday shows nothing of it."
+   "text": "Given edit mode on Sat 14, when I tap Sun 15, today and then Dinner, then the line says Dinner, Sunday, 15 November, and after Ate it, All of it and Done the meal is today's dinner and Saturday shows nothing of it."
   },
   {
    "id": "AC11",
@@ -102,6 +102,21 @@
    "id": "AC16",
    "title": "Three languages",
    "text": "Given the app in English, Serbian or German, when I walk steps 1 to 7, then Untitled plate, Meal and day, No meal selected, Chef Mealan named it from your photo. and the two lines about the photo's time are in that language."
+  },
+  {
+   "id": "AC18",
+   "title": "I stay on the Plate",
+   "text": "Given I tapped Ate it, All of it and Done, when the meal is logged, then I am still on the Plate with the photo and the foods, the block has closed, Ate it is blue with a tick, and one line says All of it. Logged to Dinner, Saturday, 14 November, 19:30."
+  },
+  {
+   "id": "AC19",
+   "title": "Plan it uses the meal that is set",
+   "text": "Given a meal of today or a later day is set, when I tap Plan it, then the plate is planned for that meal without a calendar, and I am still on the Plate; given the day is before today, Plan it asks for the day as it does today."
+  },
+  {
+   "id": "AC20",
+   "title": "With no meal selected, the buttons ask as today",
+   "text": "Given No meal selected, when I tap Ate it or Plan it, then the calendar asks the meal and day as it does today, and what I pick shows on the meal line."
   }
  ],
  "unchanged": [
@@ -118,14 +133,16 @@
   "New on the meal line: the small title Meal and day, and No meal selected when nothing is set. The pencil is always there.",
   "New on the name: grey Untitled plate with the pencil. No line is added under it.",
   "The app keeps where a photo's time came from: the camera's own record, or the file.",
-  "Frames 5 and 6 show Save in My recipes as a tick and Cancel left of Done. That row is DT307, drawn here so the flow looks as it will; B150 does not build it.",
   "The rule sits in the one place a meal is logged, so every way obeys it. The repair touches only records whose meal is on a later day than their time.",
-  "The row B150.1 on this board, steps 1 to 7 and the two frames after them, is what it looks like.",
-  "The line under the title on the read is part of this ticket. The hint under the chips, Tap an amount to correct it., stays as today; DT318 changes it."
+  "The line under the title on the read is part of this ticket. The hint under the chips, Tap an amount to correct it., stays as today; DT318 changes it.",
+  "Frame 6 shows Save in My recipes as a tick and Cancel left of Done. That row is DT307, drawn here so the flow looks as it will; B150 does not build it. Cancel closes the block and logs nothing.",
+  "Saturday in the Plan is on the board as the proof, not as a step: it is where the two dinners showed.",
+  "The row B150.1 on this board, steps 1 to 7, the two frames after them and the proof, is what it looks like."
  ],
- "words2": "18 November 19:34: I couldn't change the timing; it was only the timing from the settings. 19:43: better an edit mode where what is needed is set, than another way of correction. 19:49: edit mode is when the pencil is clicked and turns into an X to close it; saved automatically, no Done. The time of the picture is a reference; what should be changed is the timing in the calendar. 20:12: the X was to remove the meal and the pencil to edit, so there is no proper solution for no meal selected. Maybe the default is the status Just looking, or select the meal. Without selection it is not counted. When selected, the meal with its timing is displayed. What we need is the way from a selected meal back to Just looking. And: draw the new flow whole, with the existing screens, and say which did not change. 20:28: make it more of a call to act, both the title of the Plate and Just looking. The name, when nothing is there: something like Untitled, edit or Mealan will name it. Not counted seems obsolete. 20:31, on Pick a meal and No meal: from where? what? 20:47: the line under Untitled takes space and Chef Mealan will name it is unclear for a cold reader. Put it on a day: what does it mean, why changed? Not on any day is also new; better wording. What if the photo's time is not known? Save in My recipes is solved differently now, with Cancel left of Done. 21:19: 1a to 1b transition? The long button right below the title does not cover the right thing. Maybe a title of the block, and below it No meal selected, with the pencil for edit. 21:26 to 21:31: Read from your photo sounds like a task; say Chef Mealan named it from your photo (DT318). The title: Untitled plate. 21:35: the sentence in DT318 and not now in B150? 21:36: into B150.",
+ "words2": "18 November 19:34: I couldn't change the timing; it was only the timing from the settings. 19:43: better an edit mode where what is needed is set, than another way of correction. 19:49: edit mode is when the pencil is clicked and turns into an X to close it; saved automatically, no Done. The time of the picture is a reference; what should be changed is the timing in the calendar. 20:12: the X was to remove the meal and the pencil to edit, so there is no proper solution for no meal selected. Maybe the default is the status Just looking, or select the meal. Without selection it is not counted. When selected, the meal with its timing is displayed. What we need is the way from a selected meal back to Just looking. And: draw the new flow whole, with the existing screens, and say which did not change. 20:28: make it more of a call to act, both the title of the Plate and Just looking. The name, when nothing is there: something like Untitled, edit or Mealan will name it. Not counted seems obsolete. 20:31, on Pick a meal and No meal: from where? what? 20:47: the line under Untitled takes space and Chef Mealan will name it is unclear for a cold reader. Put it on a day: what does it mean, why changed? Not on any day is also new; better wording. What if the photo's time is not known? Save in My recipes is solved differently now, with Cancel left of Done. 21:19: 1a to 1b transition? The long button right below the title does not cover the right thing. Maybe a title of the block, and below it No meal selected, with the pencil for edit. 21:26 to 21:31: Read from your photo sounds like a task; say Chef Mealan named it from your photo (DT318). The title: Untitled plate. 21:35: the sentence in DT318 and not now in B150? 21:36: into B150. 22:18: Done on 1f would redirect to the Plan, even when a user was on the Plate to edit the meal? 22:25: why is it not closing the expanded block so the user continues with the Plate? 22:27: why are we talking about the Plan at all? We are creating the Plate and mapping the photo, with the goal of crafting a meal or recipe. There is no connection to the Plan other than editing the details so the Plate can be planned and tracked. 22:30: we are setting up meal and day, and now we ended up in the Plan and Ate it. 22:32: yes, keep them apart; it is the same as a click on the pencil, do the edit or nothing, and a click on the X to close.",
  "time_now": "Once a meal is set, the pencil is gone. An X stands in its place, and it does not close anything: it takes the meal off. The line says Dinner, Saturday, 14 November, 20:00. The time is words, so it cannot be changed.",
  "time_proposed": "One icon, one edit mode. The line always has the pencil. A tap opens edit mode and the pencil turns into the X that closes it. Every change is saved at once; there is no Done. In edit mode: the photo's time as one line of reference, which cannot be changed; the days; the meals. The time in the marked meal's row is a field: a tap opens the phone's clock and sets the meal's time, for this meal on this day only.",
- "more_change": "Four things change that are built today, so you see them before a Go. 1. Meal and day not set and Just looking become one state. Its line says No meal selected under the title Meal and day; the row in the calendar says the same. The page ends with What do you do with it?, as today. 2. The X that removed the meal goes. The X only closes edit mode; the row No meal selected removes the meal. 3. A photo logged to a meal is logged at the meal's time in the calendar. Today a photo of that same day is logged at the photo's time. 4. The words Just looking leave the app: eleven lines say them today. Chef Mealan names it becomes Untitled plate.",
- "days": "The board is drawn on the app's test days. The photo is from Saturday 15:57: that is your Tuesday 19:56. Today is Sunday: that is your Wednesday."
+ "more_change": "Six things change that are built today, so you see them before a Go. 1. Meal and day not set and Just looking become one state. Its line says No meal selected under the title Meal and day; the row in the calendar says the same. 2. The X that removed the meal goes. The X only closes edit mode; the row No meal selected removes the meal. 3. Setting a meal no longer turns the end of the page into Did you eat it?. The page keeps What do you do with it?. 4. After Ate it and Done the app no longer opens the Plan or Today. I stay on the Plate, and the plate stays. 5. A photo logged to a meal is logged at the meal's time in the calendar. Today a photo of that same day is logged at the photo's time. 6. The words Just looking leave the app: eleven lines say them today. Chef Mealan names it becomes Untitled plate.",
+ "days": "The board is drawn on the app's test days. The photo is from Saturday 15:57: that is your Tuesday 19:56. Today is Sunday: that is your Wednesday.",
+ "open": "One thing for your word. After Ate it the plate stays on the Plate, logged. What I change on it after that changes the eaten meal, as Change it on a past meal does today. A new plate starts with a new photo or with Empty plate. This also answers DT319: a meal back on the Plate is that meal, edited."
 }

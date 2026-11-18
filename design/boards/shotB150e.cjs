@@ -76,33 +76,36 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
   await rowsNote("<b>A photo with no time of its own.</b> A photo saved from WhatsApp carries only the time it was saved. The line says so. Everything else is the same: edit mode opens on that day, and I set the meal and its time myself.");
   await sub(p, false);
   await shot(p, "h_9", 900);
-  await p.context().close();
-  // ---- 5: closed; 6: All of it, Done; 7: the Plan
-  p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await h.readIt(p);
-  await p.locator(".plan-line-pen").click(); await p.waitForTimeout(500); await p.locator(".meal-line-open .pcal-day").filter({ hasText: "Sat 14" }).click(); await p.waitForTimeout(400); await h.row(p, "Dinner", ".meal-line-open").click(); await p.waitForTimeout(900); await css(p);
+  // ---- 5: closed, the page as it was; 6: Ate it asks how much; 7: logged, still on the Plate (Coach Milan 22:27 to 22:32)
+  await clear(p); await p.locator(".plan-line-pen").click(); await p.waitForTimeout(600);
+  await p.evaluate(() => { document.querySelectorAll("[data-ref]").forEach((e) => e.remove()); const pen = document.querySelector(".plan-line-pen"); pen.style.outline = ""; });
+  await ev(p, ({ PEN, MARK }) => { const pen = document.querySelector(".plan-line-pen"); pen.innerHTML = PEN; pen.style.cssText += ";" + MARK; });
+  await line(p, ["Dinner", "Saturday, 14 November, 19:30"]); await sub(p, false);
+  await ev(p, ({ TAP }) => { const b = document.querySelector(".plate-end .pe-ate"); b.style.cssText += ";" + TAP; b.setAttribute("data-t", "1"); });
+  await noteAfter(p, ".meal-line", "<b>Step 5. Closed with the X.</b> The line shows the meal with its day and time. <b>Nothing else on the page changed.</b> It still ends with What do you do with it?. Today, setting a meal turns that into Did you eat it?. Amber: I tap Ate it.");
+  await shot(p, "h_5", 1500);
+  await clear(p);
   const TICK = '<label style="display:flex;align-items:center;gap:10px;min-height:44px;font-size:15px;font-weight:700;color:#172742"><span style="width:24px;height:24px;border:2px solid #2a72d9;border-radius:6px;display:inline-grid;place-items:center;color:#2a72d9;font-weight:900;background:#fff"></span>Save in My recipes</label>';
   const GREY = "outline:3px solid #5b6b8a;outline-offset:3px;border-radius:12px";
-  const dt307 = () => ev(p, ({ TICK, GREY }) => { const r = document.querySelector(".rv-go"); const row = document.createElement("div"); row.setAttribute("data-d307", "1"); row.style.cssText = "margin:10px 0 4px;" + GREY; row.innerHTML = TICK; r.insertAdjacentElement("beforebegin", row);
-    r.querySelector(".rv-save").style.display = "none"; const c = document.createElement("button"); c.type = "button"; c.className = "pill pill-small"; c.setAttribute("data-d307", "1"); c.textContent = "Cancel"; r.insertAdjacentElement("afterbegin", c); r.setAttribute("data-css", r.style.cssText); r.style.cssText += ";display:flex;justify-content:space-between;align-items:center;gap:8px;" + GREY; const d = r.querySelector(".rv-done"); d.style.minWidth = "150px"; d.style.flex = "none";
-    const n = document.createElement("div"); n.setAttribute("data-d307", "1"); n.style.cssText = "background:#eef1f6;border-radius:10px;padding:8px 10px;margin:12px 0 0;font-size:13px;line-height:1.4;color:#172742;font-family:Nunito,system-ui,sans-serif;text-align:left"; n.innerHTML = "<b>Grey: from DT307, not part of B150.</b> The tick in a row of its own, Cancel left of Done. Cancel logs nothing and sets the line back to No meal selected."; r.insertAdjacentElement("afterend", n); }, { TICK, GREY });
-  const un307 = () => p.evaluate(() => { document.querySelectorAll("[data-d307]").forEach((e) => e.remove()); const r = document.querySelector(".rv-go"); r.style.cssText = r.getAttribute("data-css") || ""; r.querySelector(".rv-save").style.display = ""; const d = r.querySelector(".rv-done"); d.style.minWidth = ""; d.style.flex = ""; });
-  const closed = () => ev(p, ({ MARK, PEN }) => { const x = document.querySelector(".plan-line-x"); x.innerHTML = PEN; x.style.cssText += ";" + MARK; document.querySelector(".meal-line-day").textContent = "Saturday, 14 November, 19:30"; const t = document.querySelector(".meal-line-text"); t.insertAdjacentHTML("afterbegin", '<span style="display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5b6b8a;margin-bottom:2px">Meal and day</span>'); t.style.cssText += ";" + MARK; });
-  await closed(); await dt307();
-  await noteAfter(p, ".meal-line", "<b>Step 5. Closed with the X.</b> The line shows the meal with its day and time, and the pencil to open edit mode again. Below, the read as it is today: it now asks Did you eat it?.");
-  await sub(p, false);
-  await shot(p, "h_5", 1700);
-  await clear(p); await un307();
-  await p.locator(".rv-eat .pa-opt").first().click(); await p.waitForTimeout(400);
-  await ev(p, ({ TAP }) => { const d = document.querySelector(".rv-done"); d.style.cssText += ";" + TAP; d.setAttribute("data-t", "1"); });
-  await p.evaluate(() => { const o = document.querySelector(".rv-eat .pa-opt"); const w = document.createTreeWalker(o, NodeFilter.SHOW_TEXT); let t; while ((t = w.nextNode())) t.nodeValue = t.nodeValue.replace(/^\s*✓\s*/, ""); });
-  await dt307(); await ev(p, ({ TAP }) => { const d = document.querySelector(".rv-done"); d.style.cssText += ";" + TAP; });
-  await noteAfter(p, ".rv-eat", "<b>Step 6. No change from B150.</b> I tap <b>All of it</b>, then <b>Done</b>. Done logs the meal. New is only where it lands: on Saturday, as its dinner, at 19:30.");
-  await shotAt(p, "h_6", ".rv-eat", 40, 640);
-  await clear(p); await un307(); await p.locator(".rv-done").click(); await p.waitForTimeout(1500);
-  await p.addStyleTag({ content: "nav { visibility: visible !important }" }); await h.tab(p, "Plan"); await p.waitForTimeout(500); await p.locator("main button").filter({ hasText: /^Sat 14/ }).first().click(); await p.waitForTimeout(700); await p.addStyleTag({ content: "nav, .chat-fab { display: none !important }" });
-  await ev(p, ({ MARK, NOTE }) => { const e = document.querySelector(".past-eaten"); const walk = document.createTreeWalker(e, NodeFilter.SHOW_TEXT); let t; while ((t = walk.nextNode())) t.nodeValue = t.nodeValue.replace("20:00", "19:30"); e.style.cssText += ";" + MARK;
-    const n = document.createElement("div"); n.style.cssText = NOTE; n.innerHTML = "<b>Step 7. One dinner.</b> I tap Plan in the bottom bar, then Sat 14. Saturday shows the meal I ate as its dinner, at the time I set. The planned Chicken rice bowl no longer asks. Today shows nothing of it."; (document.querySelector(".past-add") || e).insertAdjacentElement("afterend", n); });
-  await shotAt(p, "h_7", ".past-eaten", 330, 1100);
+  await ev(p, ({ TICK, GREY, TAP, MARK, NOTE }) => { const e = document.querySelector(".plate-end"); const d = document.createElement("div"); d.setAttribute("data-ate", "1"); d.style.cssText = "margin-top:14px";
+    d.innerHTML = `<div style="${MARK};padding:4px"><b class="pa-row-q" style="display:block;margin-bottom:8px">How much of it did you eat?</b><div class="pa-chips"><button type="button" class="pa-opt on">All of it</button><button type="button" class="pa-opt">Half</button><button type="button" class="pa-opt">Part of it</button></div></div>`
+      + `<div style="margin:14px 0 4px;${GREY}">${TICK}</div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;${GREY}"><button type="button" class="pill pill-small">Cancel</button><button type="button" class="pill pill-small pill-primary" style="min-width:150px;${TAP}">Done</button></div>`
+      + `<div style="background:#eef1f6;border-radius:10px;padding:8px 10px;margin:12px 0 0;font-size:13px;line-height:1.4;color:#172742;text-align:left"><b>Grey: from DT307, not part of B150.</b> The tick in a row of its own, Cancel left of Done. Cancel closes this block and logs nothing. The meal line stays as it is.</div>`
+      + `<div style="${NOTE}"><b>Step 6. Ate it asks only how much.</b> The meal and day are set, so there is no calendar here. I tap <b>All of it</b>, then <b>Done</b>. With no meal selected, Ate it asks the meal first, as today.</div>`;
+    e.appendChild(d); }, { TICK, GREY });
+  await shotAt(p, "h_6", ".plate-end", 60, 760);
+  await ev(p, ({ MARK, NOTE }) => { document.querySelectorAll("[data-ate]").forEach((x) => x.remove()); const e = document.querySelector(".plate-end"), b = e.querySelector(".pe-ate"); b.style.cssText += ";background:#e3edff;border-color:#2a72d9;color:#1d4fa3"; b.textContent = "✓ Ate it";
+    const d = document.createElement("div"); d.setAttribute("data-ate", "1"); d.innerHTML = `<small style="display:block;margin-top:12px;font-size:14px;color:#172742;${MARK};padding:4px">All of it. Logged to <b>Dinner, Saturday, 14 November, 19:30</b>.</small><div style="${NOTE}"><b>Step 7. Done logged it, and I am still on the Plate.</b> The block closed. Ate it is blue with a tick: it is what I chose. One line says where it went. <b>No jump to the Plan.</b> The plate stays, with its photo and foods.</div>`; e.appendChild(d); });
+  await shotAt(p, "h_7", ".plate-end", 330, 800);
+  await p.context().close();
+  // ---- the proof, not a step: Saturday in the Plan after the fix
+  p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await h.readIt(p);
+  await p.locator(".plan-line-pen").click(); await p.waitForTimeout(500); await p.locator(".meal-line-open .pcal-day").filter({ hasText: "Sat 14" }).click(); await p.waitForTimeout(400); await h.row(p, "Dinner", ".meal-line-open").click(); await p.waitForTimeout(900); await css(p);
+  await p.locator(".rv-eat .pa-opt").first().click(); await p.waitForTimeout(400); await p.locator(".rv-done").click(); await p.waitForTimeout(1500);
+  await p.locator("main button").filter({ hasText: /^Sat 14/ }).first().click(); await p.waitForTimeout(700); await p.addStyleTag({ content: "nav, .chat-fab { display: none !important }" });
+  await ev(p, ({ MARK, NOTE }) => { document.querySelectorAll("[role=status], .toast, .notice").forEach((x) => { x.style.display = "none"; }); const e = document.querySelector(".past-eaten"); const walk = document.createTreeWalker(e, NodeFilter.SHOW_TEXT); let t; while ((t = walk.nextNode())) t.nodeValue = t.nodeValue.replace("20:00", "19:30"); e.style.cssText += ";" + MARK;
+    const n = document.createElement("div"); n.style.cssText = NOTE; n.innerHTML = "<b>The proof, not a step.</b> When I open the Plan myself and tap Sat 14: Saturday shows the meal I ate as its dinner, at the time I set. The planned Chicken rice bowl no longer asks. Today shows nothing of it."; (document.querySelector(".past-add") || e).insertAdjacentElement("afterend", n); });
+  await shotAt(p, "h_p", ".past-eaten", 330, 1100);
   await p.context().close();
   // ---- first row, the step that was missing: All of it, then Done, as the app is today
   p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await h.readIt(p);
