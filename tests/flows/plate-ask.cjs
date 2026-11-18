@@ -10,6 +10,9 @@
 // decision is a screen of its own: first the issue (Your plate is not empty, and why you are asked), then what the photo
 // holds with Remove the photo beside the photo, then the question and its two answers. A name typed on the photo screen is
 // kept for a new plate.
+// Changed by story DT313 (0.3.159, board Stories250; Coach Milan, Go 18 November 15:56): a recipe from Recipes asks on the
+// same screen as a photo. Add to my plate comes first, Keep my plate is gone, and Back to the recipe takes its place:
+// nothing lands, and you are on the recipe's page.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -106,16 +109,17 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await page.getByRole("button", { name: "Remove the photo" }).click(); await page.waitForTimeout(400);
   s = await st();
   ok(s.items.length === 2 && s.title === "Chicken and rice" && !s.photo && await page.locator(".plate-ask").count() === 0, "DT131: Remove the photo: the plate as it was");
-  // a recipe from Recipes onto the plate: Start a new plate first, Keep my plate
+  // a recipe from Recipes onto the plate: the photo's screen, Back to the recipe (DT313)
   await typed();
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(1200);
   await page.getByText("Lentil soup").first().click(); await page.waitForTimeout(900);
   await page.getByRole("button", { name: /^(Make it|Change it first)/ }).first().click(); await page.waitForTimeout(900);
-  const ask2 = await text(".plate-ask");
-  ok(/Your plate already has 2 foods: Chicken and rice\.\s?Lentil soup from your recipes has 2\./.test(ask2) && (await page.locator(".plate-ask .pa-go button").allTextContents()).join() === "Start a new plate,Add to my plate" && /Keep my plate/.test(ask2), "DT131: a recipe: Start a new plate first, Add to my plate, Keep my plate: " + ask2.slice(0, 140));
-  await page.getByRole("button", { name: "Keep my plate" }).click(); await page.waitForTimeout(400);
+  const ask2 = await text("main");
+  ok(/Your plate is not empty\s?It already has Chicken and rice, and the recipe brings its own foods/.test(ask2) && /The recipe is Lentil soup, from My recipes: 2 foods\./.test(ask2) && (await page.locator(".plate-ask .pa-go button").allTextContents()).join() === "Add to my plate,Start a new plate" && !/Keep my plate/.test(ask2), "DT131, as DT313 changed it: a recipe asks on the photo's screen: Add to my plate first, then Start a new plate, no Keep my plate: " + ask2.slice(0, 140));
+  await page.locator(".ask-back").click(); await page.waitForTimeout(600);
   s = await st();
-  ok(s.items.length === 2 && s.title === "Chicken and rice", "DT131: Keep my plate: nothing changes");
+  ok(s.items.length === 2 && s.title === "Chicken and rice" && await page.locator(".plate-ask").count() === 0, "DT131, as DT313 changed it: Back to the recipe: nothing changes");
+  await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
   // an empty plate: no question
   await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.items = []; s.title = ""; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); }); await page.reload(); await page.waitForTimeout(1500);
   await shoot();

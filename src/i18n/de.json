@@ -160,6 +160,10 @@
     "plateRecipeFor": {
       "text": "Das Rezept ist {title}: {foods}, für {makes}.",
       "checked": true
+    },
+    "plateArrives": {
+      "text": "{what}",
+      "checked": true
     }
   },
   "safety": {
@@ -366,11 +370,11 @@
       "checked": true
     },
     "plate.oldHelp": {
-      "text": "Gegessen speichert ihn für {day}, bei der Mahlzeit, für die er gedacht war, mit der Uhrzeit, zu der er begonnen wurde. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
+      "text": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort mit der Uhrzeit, zu der er begonnen wurde. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
       "checked": true
     },
     "plate.oldHelpPhoto": {
-      "text": "Gegessen speichert ihn für {day}, bei der Mahlzeit, für die er gedacht war, mit der Uhrzeit des Fotos. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
+      "text": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort mit der Uhrzeit des Fotos. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
       "checked": true
     },
     "plate.cookAskHelp": {
@@ -22763,6 +22767,38 @@
     },
     "cal.nothingCounted": {
       "text": "nichts wird gezählt",
+      "checked": true
+    },
+    "plate.arrRecipe": {
+      "text": "Das Rezept ist {title}, aus Meine Rezepte: {n} Lebensmittel.|Das Rezept ist {title}, aus Meine Rezepte: {n} Lebensmittel.",
+      "checked": true
+    },
+    "plate.arrPlan": {
+      "text": "Die Mahlzeit ist {title}, aus deinem Plan: {n} Lebensmittel.|Die Mahlzeit ist {title}, aus deinem Plan: {n} Lebensmittel.",
+      "checked": true
+    },
+    "plate.arrChat": {
+      "text": "Die Idee aus dem Chat hat {n} Lebensmittel.|Die Idee aus dem Chat hat {n} Lebensmittel.",
+      "checked": true
+    },
+    "plate.arrFood": {
+      "text": "Das Lebensmittel ist {name}.",
+      "checked": true
+    },
+    "plate.notEmptyWhyNew": {
+      "text": "Darauf ist schon: {plate}, und es kommen neue Lebensmittel. Sie kommen nicht von selbst auf den Teller: du entscheidest, wohin sie gehen.",
+      "checked": true
+    },
+    "plate.notEmptyWhyOld": {
+      "text": "Darauf ist schon: {plate} ({when}). Ein neues Lebensmittel kommt nicht von selbst darauf: du entscheidest, wohin es geht.",
+      "checked": true
+    },
+    "plate.holdsOnlyNew": {
+      "text": "Auf diesem Teller sind nur die neuen Lebensmittel.",
+      "checked": true
+    },
+    "cal.whichByPlate": {
+      "text": "Welche Mahlzeit? Der Teller wurde begonnen: {day}, {time}:",
       "checked": true
     }
   }

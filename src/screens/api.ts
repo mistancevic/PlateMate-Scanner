@@ -6,9 +6,12 @@ export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "che
 // DT285 (0.3.139): the same photo already a meal of that day: Update that meal, or Keep both
 export type SameAsk = { earlier: import("../pilot").Feedback; update: () => void; both: () => void };
 // B146 (0.3.152): holds is what a photo read, as a list in words; with it the question shows as a screen of its own
-export type PlateAsk = { kind: "photo" | "recipe" | "slot" | "food"; what: string; image?: string; holds?: string; apply: (how: "add" | "new") => void;
+export type PlateAsk = { kind: "photo" | "recipe" | "slot" | "food" | "chat" | "said"; what: string; image?: string; holds?: string; apply: (how: "add" | "new") => void;
   // 0.3.157 (DT308.12f): Back returns to where the question came from (the photo screen), with nothing changed
-  back?: () => void };
+  back?: () => void;
+  // 0.3.159 (DT313, board Stories250): every kind asks on the photo's screen. backTo: where Back leads, for its words
+  // (without it Back stays on the Plate); when: the day and time of a plate from earlier, for a food that would join it
+  backTo?: "recipe" | "plan" | "chat"; when?: string };
 export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "summary" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share" | "explorer" | "calendar" | "admin" | "settings" | "voice" | "dev" | "language" | "delete" | "howto";
 // the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
 // mode: "plan" fills the slot on Put it in; "eat" (from Today) records the meal for the slot on Save
@@ -59,6 +62,8 @@ export interface AppApi {
   plateFromWords: (text: string) => Promise<boolean>;
   saidRead: (text: string, x?: { orCraving?: boolean }) => Promise<SaidRead | null>;
   saidLand: (r: SaidRead) => void;
+  // 0.3.159 (DT313 AC7): Chef Mealan's idea from the chat onto the Plate; a plate that has foods is asked first
+  chatLand: (items: Ingredient[]) => void;
   // DT131 (0.2.113): foods waiting to land on a plate that has foods; null when nothing waits
   plateAsk: PlateAsk | null;
   answerPlateAsk: (how: "add" | "new" | null) => void;
@@ -142,6 +147,7 @@ export interface AppApi {
   pick: string | null;
   // DT137 (0.2.122): the recipe the plate was opened from, if any
   plateRecipeId: string | null;
+  setPlateRecipeId: (id: string | null) => void;
   setPick: (v: string | null) => void;
   usual: import("../moments").RhythmId[];
   setUsual: (ids: import("../moments").RhythmId[]) => void;
@@ -203,7 +209,7 @@ export interface AppApi {
   renameMeal: (id: string, title: string) => void;
   renamePlate: (title: string) => void;
   // Recipes, Open (0.2.3): the recipe on the Plate with its name as the title, nothing decided yet
-  openOnPlate: (meal: Meal, opts?: { cook?: boolean }) => void;
+  openOnPlate: (meal: Meal, opts?: { cook?: boolean; from?: "plan" }) => void;
   // DT174 (0.3.16): Cook it as written: the Plate takes the recipe as it is and goes straight to Make
   cookNow: boolean;
   // DT214 (0.3.53, board Stories162): the cook. startCook makes the plate as it is the cook's; goOnCook brings you back to where
@@ -247,7 +253,7 @@ export interface AppApi {
   fill: (date: string, slotId: string, meal: import("../planned").PlannedMeal | null) => void;
   filling: Filling | null;
   setFilling: (f: Filling | null) => void;
-  fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => void;
+  fillOnPlate: (f: Filling, meal?: Meal | null, title?: string, from?: "plan") => void;
   goalLog: import("../goal").GoalEntry[];
   addFoodPhoto: (foodId: string, dataUrl: string) => Promise<void>;
   saveFood: (f: import("../pilot").Food) => void;

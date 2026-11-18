@@ -334,7 +334,7 @@ export type PilotState = {
   // 0.3.157 (DT308.12 m to o, board Stories244): Start a new plate saved the plate that was there in My recipes. The one
   // line near the top of the new plate says so, with Open it in My recipes, Undo and X, until it is closed. made: the recipe
   // was made by this tap (Undo takes it out again); back: the plate as it was, for Undo
-  oldPlate?: { id: string; title: string; kind: "photo" | "recipe"; made: boolean; back: { items: Ingredient[]; title: string; portion: number | null; course?: PilotState["course"]; fromRecipe?: string; pick?: string | null } };
+  oldPlate?: { id: string; title: string; kind: "photo" | "recipe" | "new"; made: boolean; back: { items: Ingredient[]; title: string; portion: number | null; course?: PilotState["course"]; fromRecipe?: string; pick?: string | null; recipeId?: string | null } };
   // DT268 (0.3.118, board Stories201): plates scanned to explore, kept: cooked in another kitchen, read from a photo (served.ts)
   served?: import("./served").Served[];
   // DT268 step 3 (0.3.120): the menu of a visit, as read from its photo

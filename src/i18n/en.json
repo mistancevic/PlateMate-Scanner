@@ -88,8 +88,8 @@
   "plate.keepWorking": "Keep working on it",
   "plate.clearIt": "Clear it",
   "plate.cancel": "Cancel",
-  "plate.oldHelp": "Ate it saves it to {day}, to the meal it was set for, at the time it was started. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
-  "plate.oldHelpPhoto": "Ate it saves it to {day}, to the meal it was set for, at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+  "plate.oldHelp": "Ate it asks which meal, and saves it there at the time it was started. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+  "plate.oldHelpPhoto": "Ate it asks which meal, and saves it there at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
   "plate.cookAskHelp": "Whichever you pick, {dish} then starts on its own plate. Cancel goes back to the recipe.",
   "plate.saveMine": "Save my plate for later",
   "plate.clearMine": "Clear my plate",
@@ -6284,5 +6284,13 @@
   "plate.addOrNewQRecipe": "Add it to your plate, or start a new plate?",
   "plate.addOrNewHelpRecipe": "Add to my plate: the recipe joins your foods as one dish, and the plate keeps its name. Start a new plate: only the recipe.",
   "plate.joinedAsDish": "{title} joined your plate as one dish. Saved in My recipes.",
-  "cal.nothingCounted": "nothing is counted"
+  "cal.nothingCounted": "nothing is counted",
+  "plate.arrRecipe": {"one": "The recipe is {title}, from My recipes: {n} food.", "other": "The recipe is {title}, from My recipes: {n} foods."},
+  "plate.arrPlan": {"one": "The meal is {title}, from your plan: {n} food.", "other": "The meal is {title}, from your plan: {n} foods."},
+  "plate.arrChat": {"one": "The idea from the chat has {n} food.", "other": "The idea from the chat has {n} foods."},
+  "plate.arrFood": "The food is {name}.",
+  "plate.notEmptyWhyNew": "It already has {plate}, and new foods arrive. They cannot land on the plate by themselves: you decide where they go.",
+  "plate.notEmptyWhyOld": "It already has {plate}, from {when}. A new food cannot land on it by itself: you decide where it goes.",
+  "plate.holdsOnlyNew": "This plate holds only the new foods.",
+  "cal.whichByPlate": "Which meal? The plate was started on {day}, {time}:"
 }

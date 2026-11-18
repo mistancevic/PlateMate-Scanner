@@ -366,8 +366,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       const lib = state.foods.find((f) => f.name.toLowerCase() === i.food.name.toLowerCase());
       return { id: uid(), food: lib ?? i.food, grams: i.grams, locked: false };
     });
-    setState((s) => ({ ...s, items, portion: null }));
-    p.toPlate();
+    p.chatLand(items);
   }
   function keep(t: Turn) {
     if (!t.picks?.length) return;

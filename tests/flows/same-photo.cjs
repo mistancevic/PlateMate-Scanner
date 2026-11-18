@@ -1,6 +1,9 @@
 // DT285 (0.3.139, board Stories212; Coach Milan 12 November 09:44, Go): a meal about to be saved as eaten with a photo that a
 // meal of that same day already has asks first. The Plate's Did you eat it?: Update that meal keeps one record at its own time
 // with the plate's amounts; Keep both saves a second meal; Back saves nothing; a photo from another day asks nothing.
+// Changed by story DT314 (0.3.159, board Stories251; Coach Milan, Go 18 November 15:56): Ate it on a plate from earlier
+// opens the calendar on the plate's day with the nearest meal marked; the walkthrough taps that marked meal, and the
+// question about the same photo then comes as before.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -34,12 +37,13 @@ const PORT = "3502", U = `http://127.0.0.1:${PORT}`;
   };
   const st = (page) => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   const ateIt = (page) => page.locator(".chef-ask").getByRole("button", { name: "Ate it", exact: true });
+  const ateRow = async (page) => { await ateIt(page).click(); await page.waitForTimeout(400); await page.locator(".old-ate-cal .pcal-row.on").click(); };
   const Y = "2026-11-11T09:08:00.000Z";
   try {
     // ---- Update that meal ----
     let { ctx, page } = await open([logged(Y)]);
     ok(await ateIt(page).count() === 1, "the Plate asks about yesterday's plate: Did you eat it?");
-    await ateIt(page).click(); await page.waitForTimeout(500);
+    await ateRow(page); await page.waitForTimeout(500);
     const ask = page.locator(".same-ask");
     ok(await ask.count() === 1 && /This photo is already a meal of Wednesday\./.test(await ask.innerText()), "Ate it asks first: " + (await ask.innerText().catch(() => "")).replace(/\n/g, " | ").slice(0, 120));
     ok(/Wednesday, breakfast, 10:08/.test(await ask.locator(".same-meal").innerText()) && /Egg sandwiches, 443 g/.test(await ask.locator(".same-meal").innerText()), "it shows the earlier meal");
@@ -53,28 +57,28 @@ const PORT = "3502", U = `http://127.0.0.1:${PORT}`;
     await ctx.close();
     // ---- Keep both ----
     ({ ctx, page } = await open([logged(Y)]));
-    await ateIt(page).click(); await page.waitForTimeout(500);
+    await ateRow(page); await page.waitForTimeout(500);
     await page.locator(".same-ask").getByRole("button", { name: "Keep both" }).click(); await page.waitForTimeout(800);
     s = await st(page);
     ok(s.feedback.filter((f) => f.status === "eaten").length === 2 && s.feedback.some((f) => f.id === "c1" && f.meal.portion === 443), "Keep both: two meals, the first as it was");
     await ctx.close();
     // ---- Back ----
     ({ ctx, page } = await open([logged(Y)]));
-    await ateIt(page).click(); await page.waitForTimeout(500);
+    await ateRow(page); await page.waitForTimeout(500);
     await page.locator(".same-ask").getByRole("button", { name: "Back" }).click(); await page.waitForTimeout(500);
     s = await st(page);
     ok(s.feedback.length === 1 && s.items.length === 3 && await page.locator(".same-ask").count() === 0 && await ateIt(page).count() === 1, "Back: nothing saved, the Plate asks again");
     await ctx.close();
     // ---- another day: nothing asked ----
     ({ ctx, page } = await open([logged("2026-11-10T09:08:00.000Z")]));
-    await ateIt(page).click(); await page.waitForTimeout(800);
+    await ateRow(page); await page.waitForTimeout(800);
     s = await st(page);
     ok(await page.locator(".same-ask").count() === 0 && s.feedback.filter((f) => f.status === "eaten").length === 2, "the same photo on another day: saved, nothing asked");
     await ctx.close();
     // ---- Srpski and German ----
     for (const [lang, width] of [["sr-Latn", 390], ["de", 360]]) {
       ({ ctx, page } = await open([logged(Y)], width, lang));
-      await page.locator(".chef-ask .ca-go .pill-primary").first().click(); await page.waitForTimeout(500);
+      await page.locator(".chef-ask .ca-go .pill-primary").first().click(); await page.waitForTimeout(400); await page.locator(".old-ate-cal .pcal-row.on").click(); await page.waitForTimeout(500);
       const t = await page.locator(".same-ask").innerText();
       ok(!/This photo|Update that meal|Keep both|Back\b|Wednesday/.test(t) && await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${lang}: in the language, fits ${width} px: ` + t.replace(/\n/g, " | ").slice(0, 110));
       await ctx.close();
