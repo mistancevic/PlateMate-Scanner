@@ -20,9 +20,11 @@ def card(t):
     if t.get("version"): meta.append(f"v{t['version']}")
     why = f'<div style="font-size:12.5px;line-height:1.4;color:#3d4a63;margin-top:5px">{html.escape(t["why"])}</div>' if t.get("why") else ""
     m = f'<div style="font-size:11.5px;color:#5b6b8a;margin-top:5px;font-weight:700">{" · ".join(meta)}</div>' if meta else ""
-    # acceptance criteria as Given, When, Then (from 18 November 2026): one block per row, the card is too narrow for a table
-    ac = "".join(f'<div style="margin-top:6px;padding:6px 8px;border-radius:8px;background:#f4f7fc;font-size:12px;line-height:1.4;color:#172742"><b style="color:#123a7a">{html.escape(a["id"])}</b> <b>Given</b> {html.escape(a["given"])}. <b>When</b> {html.escape(a["when"])}. <b>Then</b> {html.escape(a["then"])}.</div>' for a in t.get("ac", []))
-    if ac: ac = '<div style="font-size:11.5px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin-top:8px">ACCEPTANCE CRITERIA</div>' + ac
+    # the story in one sentence, then the acceptance criteria as scenarios: a title that names the behaviour and one
+    # sentence Given ..., when ..., then ... (from 18 November 2026)
+    story = f'<div style="font-size:11.5px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin-top:8px">STORY</div><div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:3px">{html.escape(t["story"])}</div>' if t.get("story") else ""
+    ac = "".join(f'<div style="margin-top:6px;padding:6px 8px;border-radius:8px;background:#f4f7fc;font-size:12px;line-height:1.4;color:#172742"><b style="color:#123a7a">{html.escape(a["id"])}</b> <b>{html.escape(a["title"])}</b><br>{html.escape(a["text"])}</div>' for a in t.get("ac", []))
+    if ac: ac = story + '<div style="font-size:11.5px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin-top:8px">ACCEPTANCE CRITERIA</div>' + ac
     return (f'<div style="border:1.5px solid #d1dcf0;border-left:5px solid {COL[t["epic"]]};border-radius:10px;padding:9px 10px;background:#fff;margin-bottom:8px">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><b style="font-size:12.5px;color:#123a7a">{t["id"]}</b>{chip(t["epic"])}</div>'
             f'<div style="font-size:13.5px;font-weight:700;line-height:1.35;color:#172742;margin-top:4px">{html.escape(t["title"])}</div>{why}{m}{ac}</div>')
