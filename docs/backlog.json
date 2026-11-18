@@ -2053,40 +2053,50 @@
         {
           "id": "AC4",
           "title": "A check about a kind",
-          "text": "Given the question which yogurt is it with three kinds, when I tap 0.2% fat, then the chip says Yogurt, 0.2% fat and the question is gone."
+          "text": "Given the question which yogurt is it, when I tap Hildebrand yogurt, 0.2% fat, then the chip says Hildebrand yogurt, 0.2% fat and the question is gone."
         },
         {
           "id": "AC5",
+          "title": "The answers are real foods",
+          "text": "Given a check about a kind, when it shows, then each answer is a food by its full name, my own foods of that kind first and marked yours, then foods from the app's lists; and the one I tap is on the Plate with its label and all its values."
+        },
+        {
+          "id": "AC6",
+          "title": "An estimate says so",
+          "text": "Given no food of that kind is in my list or the app's lists, when the check shows, then the answer is marked estimate, and so is its chip."
+        },
+        {
+          "id": "AC7",
           "title": "My words, about a food",
           "text": "Given I tapped the yogurt's chip, when I write what it is and tap Send to Chef Mealan, then the field said About: Yogurt, 10% fat, the chip shows what he changed, and one line from him says it."
         },
         {
-          "id": "AC6",
+          "id": "AC8",
           "title": "My words, a missing food",
           "text": "Given no chip is marked, when I write There was mayo too and tap Send to Chef Mealan, then a chip Mayonnaise is there, marked as new."
         },
         {
-          "id": "AC7",
+          "id": "AC9",
           "title": "Said, not typed",
           "text": "Given the field, when I tap the microphone in it and speak, then my words stand in the field as if typed."
         },
         {
-          "id": "AC8",
+          "id": "AC10",
           "title": "What I set stays",
           "text": "Given I answered a check or typed an amount on the Plate, when Chef Mealan answers my words, then that food is as I set it and he does not ask about it again."
         },
         {
-          "id": "AC9",
+          "id": "AC11",
           "title": "By hand, on the Plate",
           "text": "Given the read, when I tap Continue on the Plate, then the Plate opens with its food list as it is today, and there is no button Change the foods."
         },
         {
-          "id": "AC10",
+          "id": "AC12",
           "title": "One place for words",
           "text": "Given the Plate with a photo, when I look at it, then there is no link Wrong foods? Help Chef Mealan read it."
         },
         {
-          "id": "AC11",
+          "id": "AC13",
           "title": "Three languages",
           "text": "Given the app in English, Serbian or German, when I walk steps 1 to 5, then Tell Chef Mealan what is wrong, About, Send to Chef Mealan, Continue on the Plate and Chef Mealan's line are in that language."
         }
