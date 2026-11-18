@@ -435,6 +435,8 @@ export function HomeScreen(p: AppApi) {
               : <small className="plan-mark fit-under">{rec.open.length && f.id === today.logged[today.logged.length - 1]?.id ? w("today.offPlanLean") : w("today.offPlan")}</small>)}
             <div className="button-row meal-row-acts">
               {justLogged.includes(f.id) && <button type="button" className="pill pill-small meal-undo" onClick={() => { p.deleteCard(f.id); setJustLogged((xs) => xs.filter((x) => x !== f.id)); p.notify(w("today.undone", { title: f.meal.title })); }}>{w("today.undo")}</button>}
+              {/* DT308.11 (0.3.157, board Stories242, frame j): a plate logged with Ate it: Undo puts it back on the Plate */}
+              {!justLogged.includes(f.id) && p.ateBack?.cardId === f.id && <button type="button" className="pill pill-small meal-undo" onClick={() => p.undoAte()}>{w("today.undo")}</button>}
               <button type="button" className="pill pill-small meal-change" onClick={() => setMealOpen(f.id)}>{w("today.changeOrDelete")}</button>
             </div>
             {(!r || p.profile.coachId) && (

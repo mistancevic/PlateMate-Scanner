@@ -335,7 +335,7 @@ export function RecipesScreen(p: AppApi) {
           </section>); })() : null}
         coverToday={Boolean(landed && landed.id === opened.id && landed.title === "✓ Made today" && (() => { const c = state.feedback.find((f) => f.status === "eaten" && (f.recipeId === opened.id || f.meal?.id === opened.id)); return c?.coverAsk === "used" && c.photo && recipePhotosOf(opened)[0] === c.photo; })())}
         top={cameFrom && cameFrom.id === opened.id && cameFrom.from.slot ? <SlotBar p={p} from={cameFrom.from} back={() => { const tab = cameFrom.from.tab; setCameFrom(null); setOpenId(null); p.setTab(tab); }} /> : null}
-        backLabel={cameFrom && cameFrom.id === opened.id ? (cameFrom.from.tab === "home" ? w("recipes.today") : w("recipes.plan")) : undefined}
+        backLabel={cameFrom && cameFrom.id === opened.id ? (cameFrom.from.tab === "home" ? w("recipes.today") : cameFrom.from.tab === "journey" ? w("tab.plate") : w("recipes.plan")) : undefined}
         openOriginal={opened.basedOn && state.meals.some((m) => m.id === opened.basedOn!.id) ? () => { setLanded(null); setOpenId(opened.basedOn!.id); } : null}
         onMakeIt={() => { const w = slotWhen(); const sl = cameFrom?.from.slot; const m = sl ? p.planned[sl.date]?.[sl.slotId] : undefined;
           // DT149 (0.2.130): a meal of another day opens on the Plate as that meal: planning, or adding what you ate

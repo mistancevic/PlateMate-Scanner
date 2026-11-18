@@ -14,10 +14,12 @@ function evals(root) {
   }
   return { evalCases: cases, evalSets: sets };
 }
-function releases(root, tags = [], merges = "") {
+// 0.3.157 (Coach Milan 18 November, Go 11:14): every version named in the change log and in docs/versions.md, each once, and
+// the version being built (its line in docs/versions.md is written after the merge). No git is read: release tags can't be
+// pushed from the build workspace, and a fresh clone is shallow, so tags and merge commits counted too few.
+function releases(root) {
   const v = new Set([...fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8").matchAll(/\*\*v(\d+\.\d+\.\d+)\*\*/g)].map((m) => m[1]));
-  for (const t of tags) { const m = /^v(\d+\.\d+\.\d+)$/.exec(t.trim()); if (m) v.add(m[1]); }
-  for (const m of merges.matchAll(/Merge dt\d+: (\d+\.\d+\.\d+)/g)) v.add(m[1]);
+  for (const m of fs.readFileSync(path.join(root, "docs/versions.md"), "utf8").matchAll(/^v(\d+\.\d+\.\d+) /gm)) v.add(m[1]);
   v.add(JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")).version);
   return v.size;
 }

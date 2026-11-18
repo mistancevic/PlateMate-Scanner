@@ -10,6 +10,7 @@
 // ago is a lunch you ate at its time). The read shows alone; Did you eat it? All of it, then Done, logs it. Just looking is
 // chosen behind the pencil, as the meal line's own question; a photo from last week is a meal of that day unless you say so.
 // Drop the photo is Remove the photo.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: a photo from earlier today no longer fills in the meal line: it says Meal and day not set, and the photo's time is the guess only when you say Ate it. Just looking is the last row of the calendar behind the pencil (just-looking.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -94,11 +95,15 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   ok(await page.locator(".camera-ui").count() === 0 && await page.locator(".plate-card .pa-screen").count() === 1, "DT130, DT305: a photo from Your photos lands on the photo screen");
   ok(sent.length === 1, "DT130: nothing is read before Read the plate");
   ok(/A photo from 12:20 today, from Your photos\./.test(await text(".pa-from")) && !/Whose plate/.test(await text(".pa-from")) && await page.locator(".pa-from").count() === 1 && await page.locator(".pa-photo").count() === 1, "DT130, DT213, DT305: the photo's own time, in Chef Mealan's line, and no question: " + await text(".pa-from"));
-  ok(await page.locator(".pa-chip").count() === 0 && await page.locator(".pa-time").count() === 0 && /^Lunch, today at 12:20 · Off the plan/.test(await text(".plan-line")), "DT305: no chips and no time field; the photo fills in the meal line: " + (await text(".plan-line")).slice(0, 40));
+  ok(await page.locator(".pa-chip").count() === 0 && await page.locator(".pa-time").count() === 0 && /^Meal and day not set$/.test((await text(".plan-line")).trim()), "DT305: no chips and no time field; changed by DT308.5: the photo does not fill in the meal line: " + (await text(".plan-line")).slice(0, 40));
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   const s2 = await st();
   ok(sent.length === 2 && s2.photo.who === "ate" && new Date(s2.photo.at).getHours() === 12 && new Date(s2.photo.at).getMinutes() === 20 && await page.locator(".pa").count() === 0, "DT130: Read the plate reads; the plate keeps the photo's time and who");
   ok(/Your photo, 12:20\./.test(await text(".mp-big-say")), "DT130: the photo line says the photo's time");
+  // changed by DT308.5 (0.3.157): the read ends with What do you do with it?; Ate it marks the guess from the photo's time
+  await page.locator(".read-view .pe-ate").click(); await page.waitForTimeout(300);
+  ok(/From the photo, \w+ 12:20:/.test(await text(".read-view .plate-end")) && /Lunch/.test(await text(".read-view .pcal-row.on")), "DT308.5: Ate it: the calendar marks the lunch, from the photo's time, 12:20");
+  await page.locator(".read-view .pcal-row.on").click(); await page.waitForTimeout(500);
   await page.locator(".rv-eat .pa-opt").filter({ hasText: "All of it" }).click(); await page.waitForTimeout(300);
   await page.locator(".rv-done").click(); await page.waitForTimeout(700);
   const s3 = await st();
@@ -109,11 +114,9 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await toPlate();
   await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
   await pick("2026:10:24 19:10:00");
-  ok(/A photo from yesterday, 19:10, from Your photos\./.test(await text(".pa-from")) && /^Dinner, yesterday at 19:10/.test(await text(".plan-line")), "DT130, DT305: a photo from yesterday: the meal line says Dinner, yesterday at 19:10");
+  ok(/A photo from yesterday, 19:10, from Your photos\./.test(await text(".pa-from")) && /^Meal and day not set$/.test((await text(".plan-line")).trim()), "DT130, DT305, changed by DT308.5: a photo from yesterday: the meal line still says Meal and day not set");
   // DT305: Just looking is the meal line's own answer, behind the pencil
-  await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: "Just looking", exact: true }).click(); await page.waitForTimeout(300);
-  await page.locator(".plan-line-done").click(); await page.waitForTimeout(300);
+  await require("./just-looking.cjs")(page);
   ok(/^Just looking/.test(await text(".plan-line")) && await page.locator(".pa-screen").count() === 1, "0.3.62, DT305: Just looking behind the pencil; the photo waits");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   const s4 = await st();

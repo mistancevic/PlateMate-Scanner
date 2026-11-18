@@ -7,6 +7,7 @@
 // Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo you take
 // waits on the photo screen, and Read the plate reads it; the read shows alone, and Change the foods opens the plate this
 // walkthrough is about.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed from a photo, so this walkthrough sets the meal with the pencil (set-meal.cjs) on the photo's plate; the gates and Chef Mealan's card with Ate it and Ate half then work as before.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -56,6 +57,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   ok(await page.locator(".mp-card").count() === 0, "DT138: Today has no Photo of my meal card");
   await page.goto(U + "/plate"); await page.waitForTimeout(1500);
   await snap(".mp-button");
+  await require("./set-meal.cjs")(page); await page.waitForTimeout(600);
   ok(sent.length === 1 && /^data:image\/jpeg;base64,/.test(sent[0].image) && Array.isArray(sent[0].library), "DT127: the photo goes to the read, with your food names");
   ok(/\/plate/.test(page.url()) || await page.locator(".plate-card").count() === 1, "DT127: the read lands on the Plate");
   // the rows as estimates, the photo in the line

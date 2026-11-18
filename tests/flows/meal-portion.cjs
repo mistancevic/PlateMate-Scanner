@@ -1,6 +1,7 @@
 // JOURNEY (0.2.116, board Stories92, DT135; Milan 27 October 15:34 "Everything should follow this approach", Go at 17:00): a
 // food's portion grows with the meal. One meal a day is 3 meals of three a day: pasta up to 900 g cooked, cheese up to 240 g;
 // the least stays; yeast keeps 3 to 10 g; Add puts a food on in the middle of the meal's range (penne 200 g, not 80 g).
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -59,6 +60,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   const put = async (its, title) => { await page.evaluate(([its, title]) => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.items = its.map(([id, g], k) => ({ id: "i" + k, food: s.foods.find((f) => f.id === id), grams: g, locked: false })); s.title = title; s.photo = undefined; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); const o = Storage.prototype.setItem; Storage.prototype.setItem = function (k, v) { if (k === "platemate-pilot-v1") return; return o.call(this, k, v); }; }, [its, title]); await page.reload(); await page.waitForTimeout(1800); };
   await page.goto(U + "/"); await page.waitForTimeout(1500);
   await toPlate();
+  await require("./set-meal.cjs")(page);
   const lines = async () => (await page.locator(".gate-line").allTextContents()).map((s) => s.replace(/\s+/g, " ").trim());
   await put([["pasta2", 1000], ["gouda2", 150], ["ts2", 400]], "Pasta with tomato sauce and cheese");
   let l = await lines();

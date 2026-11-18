@@ -1,6 +1,7 @@
 // JOURNEY (0.2.113, board Stories89, DT134; Milan 27 October 14:21 "We need one meal a day", 14:37 "Go"): Meals a day offers 1
 // to 5. One meal: one time, Your meal; the eating window an hour from it; the line says the meal carries the day. Plan holds one
 // slot, Meal; the meal's portion is the whole day, so a 2,314 kcal plate is one portion, not three lunches.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -70,6 +71,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   const rows = await page.locator(".plan-slot-wrap").count();
   ok(rows === 1 && /Meal/.test(await text(".plan-slot-wrap")), "DT134: Plan holds one slot a day, Meal");
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(800);
+  await require("./set-meal.cjs")(page);
   await put([["pasta2", 1000], ["gouda2", 150], ["ts2", 400]], "Pasta with tomato sauce and cheese");
   ok(await page.locator(".gate-big").count() === 0 && !/not a meal yet/.test(await text(".readout")) && /^Meal/.test(await text(".readout")), "DT134: 2,314 kcal is one portion of the one meal, not three lunches");
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));

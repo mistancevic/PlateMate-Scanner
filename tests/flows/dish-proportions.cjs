@@ -4,6 +4,7 @@
 // kept, the base and the topping stay; Undo puts the grams back. The steps, written for quark, say so when quark is swapped
 // for Greek yogurt, with Redraft; a change of amounts keeps them. The culinary gate reads the dish with its amounts and parts
 // and says when it won't hold.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -34,7 +35,7 @@ const PORT = "3323", U = `http://127.0.0.1:${PORT}`;
     await page.route("**/api/dish", async (r) => { dishBody = JSON.parse(r.request().postData() || "{}"); const q = dishBody.foods.find((f) => /Quark/.test(f.name)); r.fulfill({ json: { makesIt: true, why: "A baked cheesecake cup: a base, a filling, fruit on top.", around: "", betterAs: "dessert", holds: q && q.grams >= 300 ? "The filling will not set: 380 g of quark with one egg stays soft. Use two eggs, or 200 g of quark." : "" } }); });
     await page.route("**/api/steps", (r) => r.fulfill({ json: { steps: ["Heat the oven to 180 °C. Melt {2} and mix it with {1}; press it into two cups.", "Whisk {3}, {4} and {5} smooth and pour it over the base.", "Bake for 25 minutes, until set at the edge.", "Top with {6}."] } }));
     const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
-    const put = async (its, title) => { await page.goto(U + "/"); await page.waitForTimeout(600); await page.evaluate(([its, title]) => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.items = its.map(([id, g, part], k) => ({ id: "i" + k, food: s.foods.find((f) => f.id === id), grams: g, locked: false, ...(part ? { part } : {}) })); s.title = title; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); }, [its, title]); await page.reload(); await page.waitForTimeout(800); await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(1200); };
+    const put = async (its, title) => { await page.goto(U + "/"); await page.waitForTimeout(600); await page.evaluate(([its, title]) => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.items = its.map(([id, g, part], k) => ({ id: "i" + k, food: s.foods.find((f) => f.id === id), grams: g, locked: false, ...(part ? { part } : {}) })); s.title = title; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); }, [its, title]); await page.reload(); await page.waitForTimeout(800); await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(1200); await require("./set-meal.cjs")(page); await page.waitForTimeout(600); };
     const cup = [[id(/^Oats/), 80], [BU.id, 20], [id(/^Quark/), 100], [id(/^Eggs/), 50], [id(/^Honey/), 15], [ST.id, 80]];
     await put(cup, "Baked cheesecake cup");
     // Is this one dish?
@@ -54,9 +55,9 @@ const PORT = "3323", U = `http://127.0.0.1:${PORT}`;
     s = await st();
     ok(g(/^Oats/) === 80 && g(/^Butter/) === 20 && g(/^Straw/) === 80, "the base and the topping stay");
     ok(g(/^Quark/) > q0 && Math.abs(g(/^Quark/) / g(/^Eggs/) - q0 / e0) < 0.25, `the filling grows as a whole, quark to egg kept: ${g(/^Quark/)} to ${g(/^Eggs/)}`);
-    const note = (await page.locator(".fit-note").textContent()).replace(/\s+/g, " ");
+    const note = (await page.locator(".fit-note:not(.fit-aim)").textContent()).replace(/\s+/g, " ");
     ok(/Fit sized the filling as a whole/.test(note) && /keep their proportions/.test(note) && /The base and topping stay/.test(note), "the line says what Fit did: " + note);
-    await page.locator(".fit-note").getByRole("button", { name: "Undo" }).click(); await page.waitForTimeout(400);
+    await page.locator(".fit-note:not(.fit-aim)").getByRole("button", { name: "Undo" }).click(); await page.waitForTimeout(400);
     s = await st();
     ok(g(/^Quark/) === q0 && g(/^Eggs/) === e0, "Undo puts the filling back");
     // the culinary gate read the dish with its amounts and parts

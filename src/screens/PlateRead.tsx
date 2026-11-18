@@ -24,6 +24,8 @@ export type PlateReadIn = {
   dayNums: { kcal: number; protein: number; fats: number; carbs: number };
   dishNow: { sig: string; status: "working" | "done" | "off"; makesIt?: boolean; why?: string; around?: string; betterAs?: string; holds?: string } | null;
   dishOfMeal: boolean;
+  // 0.3.157 (DT308.4 to DT308.6): with no meal set the read ends with What do you do with it?, handed in by the Plate screen
+  endEl: React.ReactNode;
   extrasText: (items: { food: any; grams: number }[]) => string | null;
   items: Ingredient[];
   mealDate: string;
@@ -58,11 +60,12 @@ export type PlateReadIn = {
   slotV: (f: NonNullable<AppApi["filling"]>) => Val;
   state: PilotState;
   t: Nutrition & { weight: number | null };
+  unset: boolean;
   updateItem: (id: string, patch: Partial<Ingredient>) => void;
 };
 
 export function plateRead(given: PlateReadIn) {
-  const { autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem } = given;
+  const { autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, endEl, unset, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem } = given;
   const ph = state.photo!;
   const total = Math.max(1, Math.round(items.reduce((k, i) => k + i.grams, 0)));
   const planning = !!p.filling && plateWhen === "plan", past = !!p.filling && plateWhen === "past";
@@ -85,7 +88,9 @@ export function plateRead(given: PlateReadIn) {
       setState((s) => ({ ...s, items: [], portion: null, title: "", photo: undefined }));
       p.setFilling(null); setStep("in"); setTab("plan"); notify(w("plate.isInEaten", { title, slot: slotV(f) })); return;
     }
-    p.ateNow(plateMeal(), slot, { photo: ph.image, at: ph.who === "ate" ? ph.at : undefined, ...(frac < 1 ? { part: frac } : {}) });
+    // 0.3.157: a photo you ate then logs at its own time on its own day; set for a meal of another day, at that meal's time
+    const at = ph.who !== "ate" ? undefined : !slot || new Date(ph.at).toDateString() === new Date(`${slot.date}T12:00:00`).toDateString() ? ph.at : new Date(`${slot.date}T12:00:00`).toDateString() === new Date().toDateString() ? undefined : atMeal(slot.date, slot.time);
+    p.ateNow(plateMeal(), slot, { photo: ph.image, at, ...(frac < 1 ? { part: frac } : {}) });
   };
   const shots = [ph.image, ...(ph.more ?? [])], at = Math.min(shotAt, shots.length - 1);
   return (
@@ -106,7 +111,7 @@ export function plateRead(given: PlateReadIn) {
       {p.ai.on && <PhotoSaid photo={ph} meal={mealSlot ? mealSlot.name : null} />}
       {state.cooking?.length ? <small className="pt-cook"><b>{w("plate.forCooking")}</b> {state.cooking.join(", ")}</small> : null}
       {adv && <div className="bubble mealan chef-line rv-chef"><p><b>{CHEF_NAME}:</b> {adv.line}</p></div>}
-      {planning ? (
+      {unset ? endEl : planning ? (
         <div className="pa-row rv-q rv-plan">
           <small className="pa-row-q">{w("plate.isItForPlan")}</small>
           <div className="pa-chips" role="group" aria-label={w("plate.isItForPlan")}>{chip(rvPlan, rvPlan ? w("plate.plannedForChip", { slot: slotV(p.filling!) }) : w("plate.planItFor", { slot: slotV(p.filling!) }), () => setRvPlan((x) => !x), " rv-plan-chip")}</div>
@@ -120,9 +125,9 @@ export function plateRead(given: PlateReadIn) {
           {rvEat && <div className="rv-weight"><input className="search rv-grams" type="number" inputMode="numeric" min={1} max={total} aria-label={w("plate.gramsEaten")} value={rvGrams} onChange={(e) => { setRvGrams(e.target.value); const g = Math.round(Number(e.target.value)); setRvEat(g === total ? "all" : "part"); }} /><small className="muted">{w("plate.gOfTotal", { total })}</small></div>}
         </div>
       )}
-      <div className="button-row rv-go">
+      {!unset && <div className="button-row rv-go">
         <button type="button" className="pill pill-small pill-action rv-save" disabled={saved} onClick={() => p.saveRead(plateMeal(), ph.image)}>{saved ? w("recipes.savedInMyRecipes") : w("make.saveInMyRecipes")}</button>
         <button type="button" className="pill pill-small pill-primary rv-done" onClick={done}>{w("make.done")}</button>
-      </div>
+      </div>}
     </section>);
 }

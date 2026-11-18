@@ -4,6 +4,7 @@
 // the steps part by part (IM17). Then a bowl of your own put into parts on the plate, kept with its parts (IM18, IM18b).
 // Changed by story R21 (Milan 22:27, board RS20): one slice is the recipe divided by what it makes, from the exact grams, so
 // the kcal read one lower (284, 175, 301). Everything else is unchanged.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -120,7 +121,7 @@ const U = "http://127.0.0.1:3211";
   await p2.getByRole("button", { name: /I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it this way ›|Make it ›|Continue/ }).click(); await p2.waitForTimeout(400);
   await p2.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await p2.waitForTimeout(400);
   await p2.getByRole("button", { name: "DaaM good" }).click();
-  await p2.getByRole("button", { name: "Save", exact: true }).click(); await p2.waitForTimeout(600);
+  await require("./eat-save.cjs")(p2); await p2.waitForTimeout(600);
   const s2 = await p2.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   const kept = s2.meals[0];
   ok(kept && JSON.stringify(kept.items.map((i) => i.part)) === JSON.stringify(["Rice", "Chicken", "Chicken", "Toppings"]) && kept.optional?.[0]?.name === "Sour cream" && kept.optional[0].part === "Toppings" && !s2.optional, "IM18b: the recipe keeps its parts and the optional sour cream; the plate is clear");

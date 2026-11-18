@@ -5,6 +5,7 @@
 // The old row Manual, Scan, Photo of my meal, Say what you have, + Add a food and Quick picks are gone. A dish from a recipe is
 // one row with its name and weight, its foods under it. DT310: a choice is a white chip; chosen, it is light blue with a dark
 // blue border and a tick. Not in this release: the meal line Meal and day not set, the calendar, What do you do with it?
+// 0.3.157 (DT308, the meal model, and DT311; Coach Milan, Go 18 November 11:14), changed by the stories: Empty plate stands in the row above the foods, and the card's top says only On your plate (DT311). The read ends with What do you do with it?, three white choices; Ate it and the marked meal bring Did you eat it? back, whose chips this walkthrough looks at (DT308.4).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -54,7 +55,7 @@ const READ = { dish: "Grilled chicken with rice", foods: [
     await page.goto(U + "/plate"); await page.waitForTimeout(1500);
     // from the list onto the landing
     await find("Skyr");
-    ok((await card.locator(".card-top span").first().textContent()) === "On your plate" && /Empty plate/.test(await card.locator(".card-top").textContent()), "DT308.7: the card says On your plate, with Empty plate");
+    ok((await card.locator(".card-top span").first().textContent()) === "On your plate" && !/Empty plate/.test(await card.locator(".card-top").textContent()) && /Empty plate/.test(await card.locator(".plate-acts").textContent()), "DT308.7, changed by DT311 (0.3.157): the card's top says only On your plate; Empty plate stands in the row above the foods");
     const order = [await top(".plate-card .readout"), await top(".plate-card .fit-top"), await top(".plate-card .rows .row-food, .plate-card .rows .swipe-fg"), await top(".plate-card .swipe-line"), await top(".plate-card .add-more-open"), await top(".plate-card .prepare-it")];
     ok(order.every((y, i) => i === 0 || y > order[i - 1]), "DT308.7: the order: the result, Fit to my target, the foods, the swipe line, + Add more to your plate, Prepare it: " + order.map(Math.round).join(", "));
     const fitBtn = card.locator(".fit-top");
@@ -100,6 +101,11 @@ const READ = { dish: "Grilled chicken with rice", foods: [
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(700);
     await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2000);
+    // changed by DT308.4 (0.3.157): the read ends with What do you do with it?, three white choices; Ate it and the marked meal bring Did you eat it?
+    ok(await page.locator(".read-view .plate-end .pill").count() === 3 && await page.locator(".read-view .plate-end .pill-primary").count() === 0 && await page.locator(".read-view .plate-end .pill").evaluateAll((xs) => xs.every((x) => getComputedStyle(x).backgroundColor === "rgb(255, 255, 255)")), "DT310, DT308.4: Save it, Plan it and Ate it are choices: all three white");
+    await page.locator(".read-view .pe-ate").click(); await page.waitForTimeout(300);
+    ok(await page.locator(".read-view .pe-ate").evaluate((x) => getComputedStyle(x).backgroundColor === "rgb(218, 230, 251)"), "DT310: the choice tapped is light blue while its calendar is open");
+    await page.locator(".read-view .pcal-row.on").click(); await page.waitForTimeout(500);
     const chipsEat = page.locator(".rv-eat .pa-opt");
     const look = (loc) => loc.evaluate((x) => { const c = getComputedStyle(x), b = getComputedStyle(x, "::before"); return { bg: c.backgroundColor, border: c.borderTopColor, tick: b.content }; });
     const before = await look(chipsEat.first());

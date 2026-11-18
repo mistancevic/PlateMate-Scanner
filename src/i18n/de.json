@@ -152,6 +152,14 @@
     "plateHolds": {
       "text": "Auf dem Foto: {list}.",
       "checked": true
+    },
+    "plateRecipe": {
+      "text": "Das Rezept ist {title}: {foods}.",
+      "checked": true
+    },
+    "plateRecipeFor": {
+      "text": "Das Rezept ist {title}: {foods}, für {makes}.",
+      "checked": true
     }
   },
   "safety": {
@@ -323,10 +331,6 @@
     },
     "plate.addOneFirst": {
       "text": "Füge zuerst ein Lebensmittel hinzu. Chef Mealan baut den Rest für {meal} darum herum.",
-      "checked": true
-    },
-    "plate.search": {
-      "text": "Alle meine Lebensmittel durchsuchen",
       "checked": true
     },
     "plate.add": {
@@ -1517,10 +1521,6 @@
       "text": "Halte die Packung vor die Kamera",
       "checked": true
     },
-    "photoask.ateAt": {
-      "text": "Gegessen um",
-      "checked": true
-    },
     "photoask.readThePlate": {
       "text": "Teller lesen",
       "checked": true
@@ -1787,10 +1787,6 @@
     },
     "out.moveIt": {
       "text": "Verschieben",
-      "checked": true
-    },
-    "out.change": {
-      "text": "Ändern",
       "checked": true
     },
     "out.backToThePlan": {
@@ -10065,10 +10061,6 @@
       "text": "Die Sprache, in der Chef Mealan mit dir spricht. Die Bildschirme folgen, Teil für Teil.",
       "checked": true
     },
-    "langpanel.deutsch": {
-      "text": "Deutsch",
-      "checked": true
-    },
     "langpanel.thePrivacyNoticeAndThe": {
       "text": "Die Datenschutzhinweise und der Haftungsausschluss bleiben auf Englisch. Namen von Lebensmitteln kommen schon auf Serbisch, wenn die Einkaufsregion Serbien ist.",
       "checked": true
@@ -16165,10 +16157,6 @@
       "text": "Aus deinen Lebensmitteln, erhältlich in {place}",
       "checked": true
     },
-    "craving.chefsIdea": {
-      "text": "Idee von Chef Mealan",
-      "checked": true
-    },
     "craving.otherPart": {
       "text": "Sonstiges",
       "checked": true
@@ -21341,10 +21329,6 @@
       "text": "etwa {kcal} kcal · {protein} g Protein",
       "checked": true
     },
-    "served.aboutKcal": {
-      "text": "etwa {kcal} kcal",
-      "checked": true
-    },
     "served.aboutN": {
       "text": "etwa {kcal}",
       "checked": true
@@ -22607,6 +22591,178 @@
     },
     "plate.addMore": {
       "text": "Mehr auf deinen Teller legen",
+      "checked": true
+    },
+    "plate.mealNotSet": {
+      "text": "Mahlzeit und Tag nicht festgelegt",
+      "checked": true
+    },
+    "plate.clearMeal": {
+      "text": "Mahlzeit und Tag entfernen",
+      "checked": true
+    },
+    "plate.goesIntoPlan": {
+      "text": "Kommt in deinen Plan.",
+      "checked": true
+    },
+    "cal.days": {
+      "text": "Tage",
+      "checked": true
+    },
+    "cal.meals": {
+      "text": "Mahlzeiten des Tages",
+      "checked": true
+    },
+    "cal.dayToday": {
+      "text": "{day}, heute",
+      "checked": true
+    },
+    "cal.more": {
+      "text": "Mehr",
+      "checked": true
+    },
+    "cal.eaten": {
+      "text": "gegessen",
+      "checked": true
+    },
+    "cal.notEaten": {
+      "text": "nicht gegessen",
+      "checked": true
+    },
+    "cal.next": {
+      "text": "als Nächstes",
+      "checked": true
+    },
+    "cal.now": {
+      "text": "jetzt",
+      "checked": true
+    },
+    "cal.free": {
+      "text": "nichts geplant",
+      "checked": true
+    },
+    "cal.planned": {
+      "text": "geplant: {title}",
+      "checked": true
+    },
+    "cal.at": {
+      "text": "um {time}",
+      "checked": true
+    },
+    "cal.whichByClock": {
+      "text": "Welche Mahlzeit? Nach der aktuellen Uhrzeit, {time}:",
+      "checked": true
+    },
+    "cal.whichByPhoto": {
+      "text": "Welche Mahlzeit? Nach dem Foto, {day} {time}:",
+      "checked": true
+    },
+    "cal.whichDayMeal": {
+      "text": "Welcher Tag und welche Mahlzeit?",
+      "checked": true
+    },
+    "plate.whatDoYouDo": {
+      "text": "Was machst du damit?",
+      "checked": true
+    },
+    "plate.saveIt": {
+      "text": "Speichern",
+      "checked": true
+    },
+    "plate.planIt": {
+      "text": "Planen",
+      "checked": true
+    },
+    "plate.savedAs": {
+      "text": "Gespeichert unter dem Namen der Lebensmittel: {title}. Ein Name, den du oben eingibst, benennt es um.",
+      "checked": true
+    },
+    "plate.thisPlate": {
+      "text": "Dieser Teller",
+      "checked": true
+    },
+    "fit.noMealAim": {
+      "text": "Es ist keine Mahlzeit festgelegt, also hat Anpassen nur auf dein PD-Ziel gezielt: {pd} oder mehr. Die Energie ist das, was deine Lebensmittel ergeben.",
+      "checked": true
+    },
+    "cal.heldPlan": {
+      "text": "{slot} hat schon: {title}. Diesen Teller als weiteres Gericht hinzufügen oder es ersetzen?",
+      "checked": true
+    },
+    "cal.replaceIt": {
+      "text": "Ersetzen",
+      "checked": true
+    },
+    "cal.addDish": {
+      "text": "Als weiteres Gericht hinzufügen",
+      "checked": true
+    },
+    "plate.isInSlotWith": {
+      "text": "{title} steht jetzt bei {slot}, zusammen mit {other}.",
+      "checked": true
+    },
+    "plate.isInSlotWithSaved": {
+      "text": "{title} steht jetzt bei {slot}, zusammen mit {other}. Auch unter Meine Rezepte gespeichert.",
+      "checked": true
+    },
+    "app.loggedWhere": {
+      "text": "Eingetragen: {title}, {slot}, {kcal} kcal. Es steht unter Heute.",
+      "checked": true
+    },
+    "app.loggedSnack": {
+      "text": "Eingetragen: {title}, Snack, {kcal} kcal. Es steht unter Heute.",
+      "checked": true
+    },
+    "today.undonePlate": {
+      "text": "Rückgängig gemacht: {title} ist wieder auf deinem Teller.",
+      "checked": true
+    },
+    "plate.oldSavedSoft": {
+      "text": "Unter Meine Rezepte gespeichert: {plate}. Es geht nichts verloren.",
+      "checked": true
+    },
+    "plate.oldSaved": {
+      "text": "Unter Meine Rezepte gespeichert: {plate}.",
+      "checked": true
+    },
+    "plate.holdsOnlyPhoto": {
+      "text": "Auf diesem Teller sind nur die Lebensmittel vom Foto.",
+      "checked": true
+    },
+    "plate.holdsOnlyRecipe": {
+      "text": "Auf diesem Teller ist nur das Rezept.",
+      "checked": true
+    },
+    "plate.openInMyRecipes": {
+      "text": "In Meine Rezepte öffnen",
+      "checked": true
+    },
+    "plate.backToPhoto": {
+      "text": "Zurück zum Foto",
+      "checked": true
+    },
+    "plate.backToRecipe": {
+      "text": "Zurück zum Rezept",
+      "checked": true
+    },
+    "plate.notEmptyWhyRecipe": {
+      "text": "Darauf ist schon: {plate}, und das Rezept bringt seine eigenen Lebensmittel. Sie kommen nicht von selbst auf den Teller: du entscheidest, wohin sie gehen.",
+      "checked": true
+    },
+    "plate.addOrNewQRecipe": {
+      "text": "Zu deinem Teller dazulegen oder einen neuen Teller beginnen?",
+      "checked": true
+    },
+    "plate.addOrNewHelpRecipe": {
+      "text": "Zu meinem Teller hinzufügen: Das Rezept kommt als ein Gericht zu deinen Lebensmitteln dazu, und der Teller behält seinen Namen. Neuen Teller beginnen: nur das Rezept.",
+      "checked": true
+    },
+    "plate.joinedAsDish": {
+      "text": "{title} ist als ein Gericht auf deinem Teller dazugekommen. Unter Meine Rezepte gespeichert.",
+      "checked": true
+    },
+    "cal.nothingCounted": {
+      "text": "nichts wird gezählt",
       "checked": true
     }
   }

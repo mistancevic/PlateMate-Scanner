@@ -16,7 +16,7 @@ import { rowsOf, slotsOf, slotsOn, trainingWhen, trainingShown, type Slot, type 
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
 import { countOf, countLabel } from "../counted";
-import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, proteinOff, bandOf, fitPortions, usualPortions, amountText, isBatch, isFitted, piecesFor, withPieces, oneWord, type PlannedMeal } from "../planned";
+import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, proteinOff, bandOf, fitPortions, usualPortions, amountText, isBatch, isFitted, piecesFor, withPieces, oneWord, withoutDish, type PlannedMeal } from "../planned";
 import { PlanRow } from "../components/PlanRow";
 import { ShortHelp } from "../components/ShortHelp";
 import { Picture, pictureOfRecipe } from "../components/MealPicture";
@@ -186,7 +186,16 @@ export function PlanScreen(p: AppApi) {
           return (
             <div key={r.slot.id} className={`plan-slot-wrap ${fit?.state === "under" ? "plan-slot-under" : ""}`}>
               {/* R19 (0.2.47, board RS18): a planned meal is a row you tap to see it, swipe to Swap or Empty; the time is in its line */}
-              {m && !m.skipped
+              {/* DT308.11 (0.3.157, board Stories242, frame g): a meal that holds more than one dish shows each as its own row.
+                  A tap opens the dish; swipe to Empty takes that dish out and the meal keeps the rest; Swap is for the meal */}
+              {m && !m.skipped && (m.dishes?.length ?? 0) >= 2
+                ? m.dishes!.map((d, k) => { const share = m.kcal / Math.max(1, m.dishes!.reduce((n, x) => n + x.kcal, 0)), dk = { kcal: Math.round(d.kcal * share), protein: Math.round(d.protein * share) }, df = fitOf(dk, target, unit);
+                    return <PlanRow key={`${d.title}-${k}`} className="plan-slot plan-slot-set plan-dish-row" label={`${mealName(r.slot.name)}, ${r.slot.time}`} title={d.title} photo={pictureOfRecipe(d.mealId ? p.state.meals.find((x) => x.id === d.mealId) : null)}
+                      ariaLabel={w("plan.slotAt", { meal: mealV(r.slot.name), time: r.slot.time, title: d.title })}
+                      sub={<>{SOURCE[d.source]} · {w("plan.kcalG", { kcal: fmt(dk.kcal, 0), protein: fmt(dk.protein, 0) })} · {pdText(df.pd)}{df.state === "fits" ? <span className="fit-ok"> · {w("plan.fits")}</span> : df.state === "close" ? <span className="fit-close"> · {df.text}</span> : df.state === "under" ? <span className="fit-under"> · {df.text}</span> : null}</>}
+                      onOpen={() => { const rec = d.mealId ? p.state.meals.find((x) => x.id === d.mealId) : null; if (rec) p.openMeal(rec.id, { tab: "plan", slot: { date: key, slotId: r.slot.id, name: r.slot.name, time: r.slot.time } }); else setViewing(r.slot); }}
+                      onSwap={() => setOpen(r.slot)} onRight={() => p.fill(key, r.slot.id, withoutDish(m, k))} rightLabel={w("plan.empty")} swapName={w("plan.swapMeal", { meal: mealV(r.slot.name, true) })} rightName={`${w("plan.emptyMeal", { meal: mealV(r.slot.name, true) })}: ${d.title}`} />; })
+                : m && !m.skipped
                 ? <PlanRow className="plan-slot plan-slot-set" label={`${mealName(r.slot.name)}, ${r.slot.time}`} title={plannedName(m, p.state.meals)} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
                     ariaLabel={w("plan.slotAt", { meal: mealV(r.slot.name), time: r.slot.time, title: m.title })}
                     sub={fit ? <>{SOURCE[m.source]}{amountText(m) ? ` · ${amountText(m)}` : ""} · {w("plan.kcalG", { kcal: fmt(m.kcal, 0), protein: fmt(m.protein, 0) })} · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · {w("plan.fits")}</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}

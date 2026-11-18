@@ -7,6 +7,7 @@
 // Changed by story R16 (Milan 21:08, board RS15): one pizza's numbers and PD are in the PD block on the read, not a small line.
 // Changed by story R21 (Milan 22:27, board RS20): one pizza keeps the exact grams, 2.5 g of the 5 g, shown to a tenth.
 // Everything else is unchanged.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs). no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters. Changed by DT311 too: Empty plate stands in the row above the foods, not at the top of the card.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -90,6 +91,7 @@ const U = "http://127.0.0.1:3209";
   await page.getByRole("button", { name: "Leave it out" }).click(); await page.waitForTimeout(200);
   ok(/2 balls on the recipe · converted/.test(t) && /no amount on the recipe · guessed/.test(t) && /500 g on the recipe/.test(t), "IM3: every line says where its amount came from");
   await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(900);
+  await require("./set-meal.cjs")(page);
   // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
   await page.locator(".in-portion").getByRole("button", { name: "Sized for your dinner" }).click(); await page.waitForTimeout(500);
 
@@ -99,7 +101,7 @@ const U = "http://127.0.0.1:3209";
   ok(JSON.stringify(await grams()) === JSON.stringify([210, 83, 105, 8, 2]), `IM4: sized for dinner: every food scaled the same way (${await grams()})`);
   ok(/Sized for your dinner/.test(t) && /One pizza, as the recipe makes it/.test(t) && /One pizza is 1,121 kcal\. Your dinner is about 933\. Sized for it: 84% of one pizza\./.test(t), "IM4: two portions to pick from, with what each is");
   ok(/4\.2/.test(await page.locator(".plate-card .readout").textContent()), "IM4: PD 4.2, said in the readout (4.1 for the whole recipe; the amounts to the gram)");
-  ok(/Empty plate/.test(await page.locator(".plate-card .card-top").textContent()) && await page.locator(".plate-card .ways .ways-empty").count() === 0, "IM1b: Empty plate sits at the top of the card, out of the row that adds foods");
+  ok(/Empty plate/.test(await page.locator(".plate-card .plate-acts").textContent()) && !/Empty plate/.test(await page.locator(".plate-card .card-top").textContent()) && await page.locator(".plate-card .ways .ways-empty").count() === 0, "IM1b, changed by DT311 (0.3.157): Empty plate stands in the row above the foods, out of the row that adds foods");
   ok(/Under your PD 6\.4\. Make it as it is, or fit it one of two ways:/.test(t), "IM4: under the target: two ways to fit it (wording of board PF, A6, 0.2.35)");
   let s = await st();
   const m = s.meals[0];
@@ -136,7 +138,7 @@ const U = "http://127.0.0.1:3209";
   ok(/Did the side work\?/.test(t) && /Greek yogurt on the side/.test(t) && /Margherita pizza is in My recipes already/.test(t), "After: Did the side work?, and the card points at the recipe, no second copy");
   await page.getByRole("button", { name: "It worked" }).click();
   await page.getByRole("button", { name: "DaaM good" }).click();
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(600);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(600);
   s = await st();
   ok(s.feedback[0].tried && s.feedback[0].tried.result === "yes" && s.feedback[0].recipeId === m.id, "After: the card keeps that the side worked, and points at the recipe");
   ok(s.meals.filter((x) => x.title === "Margherita pizza").length === 1 && s.meals[0].tried?.[0]?.what === "Greek yogurt on the side" && !s.fromRecipe, "After: the recipe remembers it, once");

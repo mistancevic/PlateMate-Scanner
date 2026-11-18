@@ -9,6 +9,7 @@
 // Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo waits on
 // the photo screen, which has no chips, and Read the plate reads it. Just looking is chosen behind the pencil of the meal
 // line. After a read of your own meal the read shows alone; Change the foods opens the plate.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -153,6 +154,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     const ate = (id, at, slot, kcal) => ({ id, meal: { id: "m" + id, title: slot.name, items: [{ id: "i" + id, food: F("f" + id, "Meal " + id, 100, 8, 3, 10), grams: kcal, locked: false }], portion: kcal, savedAt: at }, status: "eaten", taste: "", notes: "", createdAt: at, slot });
     const fed = [ate("b", day(8, 0), { date: "2026-11-06", slotId: "breakfast", name: "Breakfast", time: "07:30" }, 1035), ate("l", day(13, 0), { date: "2026-11-06", slotId: "lunch", name: "Lunch", time: "13:45" }, 1035)];
     p = await open({ ...seed, feedback: fed }); await photo(p); await toPlate(p);
+    await require("./set-meal.cjs")(p);
     await p.locator(".plate-card .fit-top").click(); await p.waitForTimeout(800);
     const fills = p.locator(".fills-ask");
     ok(await fills.count() === 1 && /Your plate already fills this dinner: 639 kcal, in its range\./.test(await fills.innerText()), "Fit says first that the plate fills the dinner: " + (await fills.count() ? (await fills.innerText()).replace(/\s+/g, " ") : "none"));

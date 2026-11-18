@@ -5,6 +5,7 @@
 // Who eats the rest stays open. Never rewrite these lines to fit a change.
 // Changed by story R16 (Milan 21:56 to 22:11, board RS15): who eats the rest is not followed. The rest is counted in lunches
 // and goes on Plan for other days, not to Keep for later; no card waits on Today.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -45,6 +46,7 @@ const U = "http://127.0.0.1:3226";
     await page.locator(".plate-card label").filter({ hasText: /Recipe photo|Screenshot/ }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
     await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
+    await require("./set-meal.cjs")(page);
     // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
     await page.locator(".in-portion").getByRole("button", { name: "Sized for your lunch" }).click(); await page.waitForTimeout(500);
     // the plate: no recipe numbers

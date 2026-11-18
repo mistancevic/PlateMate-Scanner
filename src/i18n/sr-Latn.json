@@ -152,6 +152,14 @@
     "plateHolds": {
       "text": "Na fotografiji: {list}.",
       "checked": true
+    },
+    "plateRecipe": {
+      "text": "Recept je {title}: {foods}.",
+      "checked": true
+    },
+    "plateRecipeFor": {
+      "text": "Recept je {title}: {foods}, za {makes}.",
+      "checked": true
     }
   },
   "safety": {
@@ -427,10 +435,6 @@
     },
     "plate.addOneFirst": {
       "text": "Prvo dodaj jednu namirnicu. Chef Mealan gradi obrok oko nje ({meal}).",
-      "checked": true
-    },
-    "plate.search": {
-      "text": "Pretraži sve moje namirnice",
       "checked": true
     },
     "plate.add": {
@@ -4281,10 +4285,6 @@
       "text": "Tvoja fotografija",
       "checked": true
     },
-    "photoask.ateAt": {
-      "text": "Pojedeno u",
-      "checked": true
-    },
     "photoask.readThePlate": {
       "text": "Pročitaj tanjir",
       "checked": true
@@ -7153,10 +7153,6 @@
       "text": "Premesti",
       "checked": true
     },
-    "out.change": {
-      "text": "Promeni",
-      "checked": true
-    },
     "out.backToThePlan": {
       "text": "Nazad na plan",
       "checked": true
@@ -7743,10 +7739,6 @@
     },
     "langpanel.theLanguageChefMealanSpeaks": {
       "text": "Jezik kojim ti Chef Mealan govori. Ekrani slede, deo po deo.",
-      "checked": true
-    },
-    "langpanel.deutsch": {
-      "text": "Deutsch",
       "checked": true
     },
     "langpanel.thePrivacyNoticeAndThe": {
@@ -16165,10 +16157,6 @@
       "text": "Od tvojih namirnica, u prodaji: {place}",
       "checked": true
     },
-    "craving.chefsIdea": {
-      "text": "Ideja od Chef Mealana",
-      "checked": true
-    },
     "craving.otherPart": {
       "text": "Ostalo",
       "checked": true
@@ -21341,10 +21329,6 @@
       "text": "oko {kcal} kcal · {protein} g proteina",
       "checked": true
     },
-    "served.aboutKcal": {
-      "text": "oko {kcal} kcal",
-      "checked": true
-    },
     "served.aboutN": {
       "text": "oko {kcal}",
       "checked": true
@@ -22607,6 +22591,178 @@
     },
     "plate.addMore": {
       "text": "Dodaj još na svoj tanjir",
+      "checked": true
+    },
+    "plate.mealNotSet": {
+      "text": "Obrok i dan nisu postavljeni",
+      "checked": true
+    },
+    "plate.clearMeal": {
+      "text": "Ukloni obrok i dan",
+      "checked": true
+    },
+    "plate.goesIntoPlan": {
+      "text": "Ide u tvoj plan.",
+      "checked": true
+    },
+    "cal.days": {
+      "text": "Dani",
+      "checked": true
+    },
+    "cal.meals": {
+      "text": "Obroci tog dana",
+      "checked": true
+    },
+    "cal.dayToday": {
+      "text": "{day}, danas",
+      "checked": true
+    },
+    "cal.more": {
+      "text": "Još",
+      "checked": true
+    },
+    "cal.eaten": {
+      "text": "pojedeno",
+      "checked": true
+    },
+    "cal.notEaten": {
+      "text": "nije pojedeno",
+      "checked": true
+    },
+    "cal.next": {
+      "text": "sledeći",
+      "checked": true
+    },
+    "cal.now": {
+      "text": "sada",
+      "checked": true
+    },
+    "cal.free": {
+      "text": "ništa nije planirano",
+      "checked": true
+    },
+    "cal.planned": {
+      "text": "planirano: {title}",
+      "checked": true
+    },
+    "cal.at": {
+      "text": "u {time}",
+      "checked": true
+    },
+    "cal.whichByClock": {
+      "text": "Koji obrok? Prema trenutnom vremenu, {time}:",
+      "checked": true
+    },
+    "cal.whichByPhoto": {
+      "text": "Koji obrok? Prema fotografiji, {day} {time}:",
+      "checked": true
+    },
+    "cal.whichDayMeal": {
+      "text": "Koji dan i obrok?",
+      "checked": true
+    },
+    "plate.whatDoYouDo": {
+      "text": "Šta radiš s tim?",
+      "checked": true
+    },
+    "plate.saveIt": {
+      "text": "Sačuvaj",
+      "checked": true
+    },
+    "plate.planIt": {
+      "text": "Planiraj",
+      "checked": true
+    },
+    "plate.savedAs": {
+      "text": "Sačuvano pod imenom namirnica: {title}. Ime koje upišeš gore menja ga.",
+      "checked": true
+    },
+    "plate.thisPlate": {
+      "text": "Ovaj tanjir",
+      "checked": true
+    },
+    "fit.noMealAim": {
+      "text": "Obrok nije postavljen, pa je Uklopi ciljao samo tvoj PD cilj: {pd} ili više. Energija je ono što tvoje namirnice daju.",
+      "checked": true
+    },
+    "cal.heldPlan": {
+      "text": "{slot} već ima: {title}. Dodati ovaj tanjir kao još jedno jelo ili ga zameniti?",
+      "checked": true
+    },
+    "cal.replaceIt": {
+      "text": "Zameni",
+      "checked": true
+    },
+    "cal.addDish": {
+      "text": "Dodaj kao još jedno jelo",
+      "checked": true
+    },
+    "plate.isInSlotWith": {
+      "text": "{title} je sada: {slot}, uz: {other}.",
+      "checked": true
+    },
+    "plate.isInSlotWithSaved": {
+      "text": "{title} je sada: {slot}, uz: {other}. Sačuvano i u Mojim receptima.",
+      "checked": true
+    },
+    "app.loggedWhere": {
+      "text": "Upisano: {title}, {slot}, {kcal} kcal. Na Danas je.",
+      "checked": true
+    },
+    "app.loggedSnack": {
+      "text": "Upisano: {title}, užina, {kcal} kcal. Na Danas je.",
+      "checked": true
+    },
+    "today.undonePlate": {
+      "text": "Poništeno: {title} je ponovo na tvom Tanjiru.",
+      "checked": true
+    },
+    "plate.oldSavedSoft": {
+      "text": "Sačuvano u Mojim receptima: {plate}. Ništa se ne gubi.",
+      "checked": true
+    },
+    "plate.oldSaved": {
+      "text": "Sačuvano u Mojim receptima: {plate}.",
+      "checked": true
+    },
+    "plate.holdsOnlyPhoto": {
+      "text": "Na ovom tanjiru su samo namirnice sa fotografije.",
+      "checked": true
+    },
+    "plate.holdsOnlyRecipe": {
+      "text": "Na ovom tanjiru je samo recept.",
+      "checked": true
+    },
+    "plate.openInMyRecipes": {
+      "text": "Otvori u Mojim receptima",
+      "checked": true
+    },
+    "plate.backToPhoto": {
+      "text": "Nazad na fotografiju",
+      "checked": true
+    },
+    "plate.backToRecipe": {
+      "text": "Nazad na recept",
+      "checked": true
+    },
+    "plate.notEmptyWhyRecipe": {
+      "text": "Na njemu je već: {plate}, a recept donosi svoje namirnice. One ne mogu same na tanjir: ti biraš gde idu.",
+      "checked": true
+    },
+    "plate.addOrNewQRecipe": {
+      "text": "Dodati ga na tvoj tanjir ili početi novi tanjir?",
+      "checked": true
+    },
+    "plate.addOrNewHelpRecipe": {
+      "text": "Dodaj na moj tanjir: recept ide uz tvoje namirnice kao jedno jelo, a tanjir zadržava ime. Počni nov tanjir: samo recept.",
+      "checked": true
+    },
+    "plate.joinedAsDish": {
+      "text": "{title}: dodato na tvoj tanjir kao jedno jelo. Sačuvano u Mojim receptima.",
+      "checked": true
+    },
+    "cal.nothingCounted": {
+      "text": "ništa se ne broji",
       "checked": true
     }
   }

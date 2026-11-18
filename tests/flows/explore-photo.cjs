@@ -5,6 +5,7 @@
 // Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): the photo screen
 // has no chips. Just looking is the meal line's own answer, behind the pencil, also while the photo waits; a photo you take
 // waits on the photo screen too, and Read the plate reads it.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: Just looking is the last row of the calendar behind the pencil (just-looking.cjs), in place of the chip under What is it for; a meal is tapped in that calendar, and with a meal set the X clears it first.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -63,9 +64,7 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator(".camera-ui input[type=file]").setInputFiles({ name: "plate.jpg", mimeType: "image/jpeg", buffer: withExif("2026:10:29 19:40:00") }); await page.waitForTimeout(1200);
     ok(await page.locator(".pa-screen").count() === 1 && await page.locator(".pa-chip").count() === 0, "DT305: the photo waits on the photo screen, with no chips");
-    await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300);
-    await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(400);
-    if (await page.locator(".plan-line-done").count()) { await page.locator(".plan-line-done").click(); await page.waitForTimeout(300); }
+    await require("./just-looking.cjs")(page);
     ok(await page.locator(".pa-screen").count() === 1 && /Just looking/.test(await text(".plan-line")), "DT305: Just looking behind the pencil, while the photo waits");
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     const s1 = await st();
@@ -79,8 +78,7 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     ok((await st()).feedback.length === before, "nothing logged");
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
     // ---- the pencil block on Exploring first: a camera photo is Exploring too ----
-    await page.locator(".plan-line").click(); await page.waitForTimeout(300);
-    await page.getByRole("button", { name: "Just looking", exact: true }).click(); await page.waitForTimeout(300);
+    await require("./just-looking.cjs")(page);
     await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
@@ -91,9 +89,9 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(900);
     await page.getByRole("tab").filter({ hasText: /28/ }).first().click(); await page.waitForTimeout(600);
     await page.locator(".past-add .past-plate").filter({ hasText: "Lunch" }).getByRole("button", { name: "Add what you ate" }).click(); await page.waitForTimeout(1000);
-    await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300);
-    ok(await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).count() === 1, "0.3.65: on Adding Wednesday's lunch the pencil box has Just looking");
-    await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Just looking" }).click(); await page.waitForTimeout(500);
+    // changed by DT308.1 (0.3.157): a meal that is set shows an X; it clears the meal, and Just looking is in the calendar behind the pencil
+    ok(await page.locator(".meal-line .plan-line-x").count() === 1, "0.3.65, changed by DT308.1: on Adding Wednesday's lunch the meal line has its X; Just looking is behind the pencil once the meal is cleared");
+    await require("./just-looking.cjs")(page); await page.waitForTimeout(300);
     ok(!/Adding Wednesday's lunch/.test(await text(".step-head")) && (await st()).pick === "exploring" && /Just looking/.test(await text(".plan-line")), "0.3.65: Just looking leaves Wednesday's lunch");
     await ctx.close();
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);

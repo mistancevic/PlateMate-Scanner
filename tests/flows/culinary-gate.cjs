@@ -4,6 +4,7 @@
 // the red portion lines, the readout saying it is not a lunch yet, Chef Mealan's gate card with its three ways, Fit in place
 // (the yeast stays at its portion, the blue line says what Fit did, Undo), the three ways when the foods top out, the phase
 // bar, Lock the recipe, the Make screen with the steps to tick, and Feedback without Name it.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -36,6 +37,7 @@ const U = "http://127.0.0.1:3262";
   const text = async (sel = "main") => (await page.locator(sel).first().textContent()).replace(/\s+/g, " ");
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   await page.goto(U + "/plate"); await page.waitForTimeout(1800);
+  await require("./set-meal.cjs")(page);
   // DT94: the phase bar
   ok(await page.locator(".phase-bar").count() === 0, "DT230: the Plate is Craft on paper: no bar on it");
   // DT93, rule 1: the portion lines

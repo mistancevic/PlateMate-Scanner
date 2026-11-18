@@ -4,8 +4,9 @@
 //   unitTests     the tests that pass in src/*.test.ts (the test runner's own count)
 //   walkthroughs  the files tests/flows run on their own (scripts/run-flows.cjs --count)
 //   evalCases     the cases in evals/*-cases.json, swap-golden.json and plate-questions.jsonl; evalSets how many files
-//   releases      every version since numbering began on 2 October 2026: the change log, the git tags, the merge commits
-const fs = require("node:fs"), path = require("node:path"), { execFileSync, spawnSync } = require("node:child_process");
+//   releases      every version since numbering began on 2 October 2026: the change log and docs/versions.md together, each
+//                 version once, and the version being built (0.3.157; no git is read)
+const fs = require("node:fs"), path = require("node:path"), { spawnSync } = require("node:child_process");
 const ROOT = path.resolve(__dirname, "..");
 const counts = require("./built-counts.cjs");
 // the unit tests, all but this file's own check (it reads the file written here); its own tests are run and added after
@@ -14,9 +15,7 @@ const run = (files) => { const t = spawnSync(process.execPath, ["--import", "tsx
   return [Number(/^# pass (\d+)/m.exec(t.stdout || "")?.[1] ?? NaN), Number(/^# fail (\d+)/m.exec(t.stdout || "")?.[1] ?? NaN)]; };
 const [pass, fail] = run(fs.readdirSync(path.join(ROOT, "src")).filter((f) => f.endsWith(".test.ts") && f !== SELF));
 if (!(pass > 0) || fail !== 0) { console.error(`unit tests: ${pass} pass, ${fail} fail; the facts are not written`); process.exit(1); }
-let tags = [], merges = "";
-try { tags = execFileSync("git", ["tag"], { cwd: ROOT, encoding: "utf8" }).split("\n"); merges = execFileSync("git", ["log", "--format=%s"], { cwd: ROOT, encoding: "utf8" }); } catch { /* no git: the change log alone */ }
-const facts = { ...counts.fromFiles(ROOT), unitTests: pass, releases: counts.releases(ROOT, tags, merges) };
+const facts = { ...counts.fromFiles(ROOT), unitTests: pass, releases: counts.releases(ROOT) };
 facts.perDay = Math.round(facts.releases / Math.max(1, Math.round((Date.now() - Date.parse(facts.numberedSince + "T00:00:00Z")) / 86400000)));
 const write = () => fs.writeFileSync(path.join(ROOT, "src/builtFacts.json"), JSON.stringify(facts, null, 2) + "\n");
 write();

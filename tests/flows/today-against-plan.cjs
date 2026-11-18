@@ -11,6 +11,7 @@
 // on the number, and one note under the numbers names the foods with no value; a food in your foods opens there.
 // Changed by story DS6 J and L (Milan 10:21 to 11:26, board DS6): the note says why the plus, in a full sentence; Log a meal
 // sits in Today's meals, not in Next.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -60,7 +61,7 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "DaaM good" }).click();
-    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(700);
+    await require("./eat-save.cjs")(page); await page.waitForTimeout(700);
     await at("2026-10-18T16:00:00");
     const goal = await text("section.plan");
     ok(/To set: |Profile and plan fully set\. Target today:/.test(goal) && /of 2,800 kcal/.test(goal) && /of 180 g protein/.test(goal) && /\d+\+ ?of \d+ g fat/.test(goal) && !/at least/.test(goal) && /Why the \+: .+ (has|have) no (fat or carbs|fat|carbs) value, so .+ counted without (it|them)\. The real numbers are higher\./.test(goal), "the goal card: today against it, fat and carbs with a plus and a note naming the food when a food has no value: " + goal.slice(0, 200));

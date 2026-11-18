@@ -5,6 +5,7 @@
 // day gone by on Plan lists each meal: a planned one is I ate it, at its time; Add what you ate opens the Plate, Adding
 // Wednesday's lunch: no Fit, one button puts it in at the meal's time, no rating. Which day? behind the Plate's pencil makes a
 // plate tomorrow's lunch.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one (the meal, then the day, date and time; Goes into your plan. for a meal to come; the words Planning and Eaten are gone from it). Which day? is gone: the calendar behind the pencil makes a plate tomorrow's lunch, and that plate has no Put it in button. A meal opened from Plan keeps Put it in Friday's dinner, as before.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -43,9 +44,9 @@ const PORT = "3322", U = `http://127.0.0.1:${PORT}`;
     await toPlan(); await day(/30/);
     await page.getByRole("button", { name: /^Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(500);
     await page.getByRole("button", { name: /Create a new meal on the Plate/ }).click(); await page.waitForTimeout(1000);
-    const bar = () => page.locator(".plan-line").first().textContent();
-    ok(await page.locator(".phase-bar").count() === 0 && /^Friday's dinner, [\d:]+ · Planning$/.test((await bar()).trim()), "DT230: no bar; the pencil line says Friday's dinner · Planning: " + (await bar()).trim());
-    ok(/Friday's dinner, 20:00 · Planning/.test(await page.locator(".plan-line").textContent()), "the line says the day and Planning");
+    const bar = async () => (await page.locator(".plan-line").first().innerText()).replace(/\s+/g, " ");
+    ok(await page.locator(".phase-bar").count() === 0 && /^Dinner Friday, 30 October, [\d:]+ Goes into your plan\.$/.test((await bar()).trim()), "DT230: no bar; changed by DT308.1: the meal line says Dinner, Friday, and that it goes into your plan: " + (await bar()).trim());
+    ok(/Dinner Friday, 30 October, 20:00 Goes into your plan\./.test(await bar()) && await page.locator(".plan-line .plan-line-x").count() === 1, "the line says the day and that it goes into your plan, with an X");
     await addTwo();
     const primary = async () => (await page.locator(".pill-primary").allTextContents()).map((x) => x.trim());
     ok((await primary()).includes("Put it in Friday's dinner"), "the main button: Put it in Friday's dinner, before Fit");
@@ -59,7 +60,7 @@ const PORT = "3322", U = `http://127.0.0.1:${PORT}`;
     await page.locator(".plan-slot-set").first().click(); await page.waitForTimeout(900);
     ok(await page.getByRole("button", { name: /^Make it$/ }).count() === 0 && await page.getByRole("button", { name: "Change it on the Plate" }).count() === 1, "a recipe for Friday: Change it on the Plate, no Make it");
     await page.getByRole("button", { name: "Change it on the Plate" }).click(); await page.waitForTimeout(1000);
-    ok(/^Friday's breakfast, [\d:]+ · Planning$/.test((await bar()).trim()), "it opens as Friday's breakfast · Planning");
+    ok(/^Breakfast Friday, 30 October, [\d:]+ Goes into your plan\.$/.test((await bar()).trim()), "it opens as Friday's breakfast, going into your plan");
     // a day gone by
     await toPlan(); await day(/28/);
     const past = page.locator(".past-add");
@@ -70,7 +71,7 @@ const PORT = "3322", U = `http://127.0.0.1:${PORT}`;
     ok(fb.length === 1 && fb[0].slot?.date === "2026-10-28" && fb[0].slot?.slotId === "dinner" && at.getDate() === 28 && at.getHours() === 20 && !fb[0].taste, "I ate it adds it on Wednesday at 20:00, nothing rated");
     ok(/Skyr bowl/.test(await page.locator(".plan-past").textContent()) && /Dinner, 20:00/.test(await page.locator(".plan-past").textContent()), "the day shows it as eaten at dinner");
     await page.locator(".past-add .past-plate").filter({ hasText: "Lunch" }).getByRole("button", { name: "Add what you ate" }).click(); await page.waitForTimeout(1000);
-    ok(await page.locator(".phase-bar").count() === 0 && /Wednesday's lunch, 13:45 · Eaten/.test(await page.locator(".plan-line").textContent()), "Adding Wednesday's lunch; the line says Eaten");
+    ok(await page.locator(".phase-bar").count() === 0 && /^Lunch Wednesday, 28 October, 13:45$/.test((await bar()).trim()), "Adding Wednesday's lunch; changed by DT308.1: the line says Lunch, Wednesday, 28 October, 13:45");
     await addTwo();
     ok(await page.getByRole("button", { name: /Fit to my target/ }).count() === 0 && await page.getByRole("button", { name: /^Make it$|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›/ }).count() === 0, "no Fit, no Make: it is what you ate");
     await page.getByRole("button", { name: "Put it in Wednesday's lunch, eaten" }).click(); await page.waitForTimeout(800);
@@ -79,12 +80,14 @@ const PORT = "3322", U = `http://127.0.0.1:${PORT}`;
     ok(!!lunch && lunch.slot.date === "2026-10-28" && la.getDate() === 28 && la.getHours() === 13 && la.getMinutes() === 45 && !lunch.taste, "added on Wednesday at 13:45, nothing rated");
     // Which day? behind the Plate's pencil
     await page.goto(U + "/"); await page.waitForTimeout(700); await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(800);
-    await page.locator(".plan-line").click(); await page.waitForTimeout(300);
-    ok(await page.getByRole("radiogroup", { name: "Which day" }).count() === 1, "Which day? sits behind the pencil");
-    await page.getByRole("radiogroup", { name: "Which day" }).getByRole("button", { name: "Tomorrow" }).click(); await page.waitForTimeout(300);
-    ok(/plans what you will eat/.test(await page.locator(".which-day-hint").textContent()), "tomorrow plans");
-    await page.getByRole("radiogroup", { name: /Friday, which meal/ }).getByRole("button", { name: /^Lunch/ }).click(); await page.waitForTimeout(500);
-    ok(/^Friday's lunch, [\d:]+ · Planning/.test((await bar()).trim()), "the plate is now Friday's lunch · Planning: " + (await bar()).trim());
+    // changed by DT308.1 (0.3.157): the calendar behind the pencil took the place of Which day?: the days on top, that day's meals
+    await page.locator(".plan-line .plan-line-pen").click(); await page.waitForTimeout(300);
+    ok(await page.getByRole("radiogroup", { name: "Which day" }).count() === 0 && await page.locator(".meal-line-open .pcal-day").count() >= 4, "your calendar sits behind the pencil: the days on top (Which day? is gone)");
+    await page.locator(".meal-line-open .pcal-day").filter({ hasText: /^Fri 30$/ }).click(); await page.waitForTimeout(300);
+    ok(/nothing planned|planned:/.test(await page.locator(".meal-line-open .pcal-rows").innerText()), "tomorrow's meals say what is planned");
+    await page.locator(".meal-line-open .pcal-row").filter({ hasText: /^\s*Lunch/ }).click(); await page.waitForTimeout(500);
+    ok(/^Lunch Friday, 30 October, [\d:]+ Goes into your plan\.$/.test((await bar()).trim()), "the plate is now Friday's lunch, going into your plan: " + (await bar()).trim());
+    ok(await page.getByRole("button", { name: /^Put it in/ }).count() === 0, "a meal set with the pencil has no Put it in button: Plan it at the plate's end plans it");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
   await b.close(); server.kill();

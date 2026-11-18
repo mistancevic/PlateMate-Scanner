@@ -8,6 +8,7 @@
 // button, board RS26): the day is a header with a blue line under it, in the page. Everything else is unchanged.
 // Changed by story DS7 N (Milan 11:26, board DS7): Earlier says the last two days; two day cards with the exact day, each
 // opens that day in Plan; older days are in Plan. Added: DS6 L and M checks, Next is always a card, the cards' headings inside.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line says Meal and day not set, with what the plate is (Sweet, a DaaM) under it.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -83,7 +84,7 @@ const U = "http://127.0.0.1:3240";
     await p2.locator("nav button").filter({ hasText: "Plate" }).click(); await p2.waitForTimeout(700);
     await p2.locator(".chat-fab").click(); await p2.waitForTimeout(400); await p2.locator(".pc-input input").fill("pudding"); await p2.locator(".pc-input input").press("Enter"); await p2.waitForTimeout(1500); // DT308.3 (0.3.154, board Stories236): the craving is typed in Chef Mealan's chat // DT301 (0.3.149, board Stories223): what you typed shows on Find ideas
     await p2.locator(".pc-card").filter({ hasText: "pudding" }).first().locator(".pc-add").click(); await p2.waitForTimeout(900);
-    ok(/ · Sweet, a DaaM/.test(await p2.locator(".plan-line").textContent()), "the quark pudding on the Plate: Sweet, a DaaM, preset from its foods");
+    ok(/Sweet, a DaaM/.test(await p2.locator(".plan-line").textContent()), "the quark pudding on the Plate: Sweet, a DaaM, preset from its foods");
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
   } catch (e) { ok(false, "ran to the end: " + e.message.split("\n")[0]); }
   finally { await b.close(); server.kill(); }

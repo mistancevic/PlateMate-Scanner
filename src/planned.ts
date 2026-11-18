@@ -22,7 +22,13 @@ export type PlannedMeal = { title: string; kcal: number; protein: number; source
   unit?: string; usual?: number;
   // 0.2.121 (Tester 2, Milan 28 October 15:32): the recipe's foods and grams when it was planned; a recipe changed since then
   // updates the slot, on today and later, when the slot still holds the recipe as planned
-  sig?: string };
+  sig?: string;
+  // 0.3.157 (DT308.11, board Stories242, frames d to g): Add as another dish. The meal stays one meal: its foods are all
+  // the dishes' foods, at the grams eaten, and its kcal and protein are the dishes added up, so everything that reads the
+  // plan (Today, the shopping list, Fill, the calendar, the coach's view) reads it as before. dishes names them, in the
+  // order of the foods: n foods each, for Plan to show one row per dish and to take one out again.
+  dishes?: PlannedDish[] };
+export type PlannedDish = { title: string; kcal: number; protein: number; source: Source; mealId?: string; n: number };
 export type Planned = Record<string, Record<string, PlannedMeal>>; // by date (ymd), then by slot id
 
 const KEY = "chefmealan-planned";
@@ -63,7 +69,7 @@ export function refreshPlanned(p: Planned, meals: Meal[], today = localDay()): P
         else { const c = Math.max(1, Math.min(f.servings!, Math.round(m.kcal / Math.max(1, f.kcal)))); next[date][slot] = { ...withPieces({ ...f, title: m.title, note: m.note }, c, false), usual: c }; }
         changed = true;
       }
-      else if (!m.mealId && m.items?.length && twice(m.items)) { next[date][slot] = withoutTwice(m); changed = true; }
+      else if (!m.mealId && !m.dishes && m.items?.length && twice(m.items)) { next[date][slot] = withoutTwice(m); changed = true; }
       // DT76: a starter planned before 0.2.76 had no foods; it takes them, its numbers from the foods, at its amount
       else if (m.source === "starter" && !m.items?.length && STARTERS.some((x) => x.title === m.title)) {
         const st = STARTERS.find((x) => x.title === m.title)!, a = m.amount ?? 1;
@@ -82,6 +88,34 @@ function withoutTwice(m: PlannedMeal): PlannedMeal {
   const items = m.items!.filter((x, i) => !m.items!.slice(0, i).some((y) => sameItem(x, y)));
   const t = aggregate(items);
   return { ...m, items, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), portion: Math.round(items.reduce((n, i) => n + i.grams, 0)) };
+}
+// DT308.11: one more dish in a meal of the plan. Each dish comes in at the portion the plan counts (plannedPortion), so the
+// meal's foods are what is eaten; a meal without foods (a title with numbers) joins with its numbers alone.
+const oneDish = (m: PlannedMeal): { d: PlannedDish; items: Ingredient[] } => {
+  const { dishes: _d, ...plain } = m; void _d;
+  const items = plannedPortion(plain, "dish", "")?.items.map((i) => ({ ...i, grams: Math.round(i.grams * 10) / 10 })) ?? [];
+  return { d: { title: m.title, kcal: m.kcal, protein: m.protein, source: m.source, ...(m.mealId ? { mealId: m.mealId } : {}), n: items.length }, items };
+};
+export const dishTitle = (ds: { title: string }[]) => ds.map((d) => d.title).join(" + ");
+export function dishItems(m: PlannedMeal, k: number): Ingredient[] {
+  const ds = m.dishes ?? []; const from = ds.slice(0, k).reduce((n, d) => n + d.n, 0);
+  return (m.items ?? []).slice(from, from + (ds[k]?.n ?? 0));
+}
+const ofDishes = (ds: PlannedDish[], items: Ingredient[], skipped?: boolean): PlannedMeal => ({
+  title: dishTitle(ds), kcal: ds.reduce((n, d) => n + d.kcal, 0), protein: ds.reduce((n, d) => n + d.protein, 0),
+  source: ds.every((d) => d.source === ds[0].source) ? ds[0].source : "plate", items, portion: Math.round(items.reduce((n, i) => n + i.grams, 0)), dishes: ds, ...(skipped ? { skipped } : {}) });
+export function withDish(was: PlannedMeal, add: PlannedMeal): PlannedMeal {
+  const prev = was.dishes?.length ? was.dishes.map((d, k) => ({ d, items: dishItems(was, k) })) : [oneDish(was)];
+  const all = [...prev, oneDish(add)];
+  return ofDishes(all.map((x) => x.d), all.flatMap((x) => x.items));
+}
+// a dish taken out again; with one dish left the meal is that dish, as a meal planned on its own
+export function withoutDish(m: PlannedMeal, k: number): PlannedMeal | null {
+  const ds = m.dishes ?? []; if (!ds[k]) return m;
+  const left = ds.map((d, j) => ({ d, items: dishItems(m, j) })).filter((_, j) => j !== k);
+  if (!left.length) return null;
+  if (left.length === 1) { const { d, items } = left[0]; return { title: d.title, kcal: d.kcal, protein: d.protein, source: d.source, ...(d.mealId ? { mealId: d.mealId } : {}), ...(items.length ? { items, portion: Math.round(items.reduce((n, i) => n + i.grams, 0)) } : {}) }; }
+  return ofDishes(left.map((x) => x.d), left.flatMap((x) => x.items));
 }
 // put a meal in a slot, or empty it with null; a date with nothing left disappears
 export function withPlanned(p: Planned, date: string, slotId: string, meal: PlannedMeal | null): Planned {

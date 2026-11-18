@@ -4,6 +4,7 @@
 // leaving keeps everything and a strip says where it stands; coming back, Chef Mealan asks to go on; Eat asks how much and
 // how it tasted; 30 minutes on, the last answer closes the cook. A plate from earlier asks Did you eat it?, alone; Save for
 // later waits at the top of the Plate with Continue; Start cooking never adds to a plate; a food while cooking asks where it goes.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -118,7 +119,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     // DT225 v2 (0.3.61, board Stories166): Chef Mealan asks for your words; they go on the recipe, only for you
     ok(lines.length >= 2 && (await page.locator(".eat-words .chef-line").textContent()).includes("Anything you want to remember about it?") && /Kept on the recipe, only for you\. Your coach sees it when you share the meal\./.test(await page.locator(".eat-words").textContent()), "DT225: Eat asks for your words, kept on the recipe, only for you");
     await page.getByLabel("Anything you want to remember about it?").fill("I felt so energized.");
-    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1000);
+    await require("./eat-save.cjs")(page); await page.waitForTimeout(1000);
     st = await store(page);
     ok(st.cook && st.cook.stage === "carry" && st.cook.cardId === st.feedback[0].id && st.feedback[0].photoSteps?.[0] === 1, "eaten: the cook waits for the last question; the card keeps the step's photo with its step");
     await nav(page, "Today"); await page.waitForTimeout(600);

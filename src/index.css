@@ -3504,3 +3504,62 @@ section.photo-screen .pa-screen { border: 0; border-radius: 0; margin: 0; paddin
 .add-more-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; } .add-more-top b { font-size: var(--fs-card); } .add-more-top .icon { width: 44px; height: 44px; margin-right: -8px; }
 .dish-one { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 8px 10px; margin: 0 0 6px; background: var(--surface); } .dish-one b { font-size: var(--fs-body); } .dish-one small { color: var(--muted); font-size: var(--fs-label); white-space: nowrap; }
 .rows.dish-foods { margin-left: 12px; padding-left: 10px; border-left: 2px solid var(--line); }
+
+/* DT311 (0.3.157, board Stories246): Empty plate opposite Group into parts, one row above the foods; both 44 px high */
+.plate-acts { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0 6px; min-height: 44px; }
+.plate-acts .plate-empty-link { flex: none; min-height: 44px; padding: 0 4px; margin-left: -4px; white-space: nowrap; }
+.plate-acts .pt-open { flex: none; display: inline-flex; align-items: center; margin: 0 0 0 auto; min-height: 44px; padding: 0 16px; white-space: nowrap; }
+
+/* 0.3.157 (DT308.1, DT308.9; boards Stories236 and Stories241): the meal line. Grey with a pencil until a meal is set; then
+   the meal, the day with date and time, and the moment, with an X in the pencil's place. The calendar opens under it. */
+.plan-line.meal-line { align-items: center; gap: 10px; padding: 2px 0; margin: 0 0 12px; background: none; border-radius: 0; cursor: default; }
+.meal-line-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.plan-line.meal-line:not(.is-set) .meal-line-text { cursor: pointer; }
+.meal-line-unset { font-size: var(--fs-card); line-height: 1.3; font-weight: 700; color: var(--muted); }
+.meal-line-looking { font-size: var(--fs-card); line-height: 1.3; font-weight: 700; color: var(--ink); }
+.meal-line-meal { font-size: var(--fs-section); line-height: 1.3; font-weight: 900; color: var(--ink); }
+.meal-line-day { font-size: var(--fs-body); line-height: 1.4; font-weight: 600; color: var(--ink); }
+.meal-line-small { font-size: var(--fs-label); line-height: 1.4; font-weight: 600; color: var(--muted); }
+.meal-line .plan-line-pen, .meal-line .plan-line-x { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; }
+.meal-line .plan-line-pen.on { background: var(--tint); }
+.meal-line-open { margin: -4px 0 14px; }
+.meal-line-ask { margin: 14px 0 0; padding-top: 4px; border-top: 1px solid var(--line); }
+.pcal { margin: 10px 0 0; }
+.pcal-q { display: block; font-size: var(--fs-body); font-weight: 700; color: var(--ink); margin: 0 0 10px; }
+.pcal-days { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: -2px; } .pcal-days::-webkit-scrollbar { display: none; }
+.pcal-day { flex: none; min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface, #fff); color: var(--ink); font: inherit; font-size: var(--fs-label); font-weight: 700; white-space: nowrap; cursor: pointer; }
+.pcal-day.on { border-color: var(--brand); background: var(--tint); color: var(--navy); }
+.pcal-day:disabled { opacity: .45; cursor: default; }
+.pcal-date { margin: 10px 0 0; }
+.pcal-rows { margin: 10px 0 0; border: 1.5px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface, #fff); }
+.pcal-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 48px; padding: 6px 12px; margin: 0; border: 0; border-top: 1px solid var(--line); background: var(--surface, #fff); font: inherit; text-align: left; cursor: pointer; }
+.pcal-rows > .pcal-row:first-child { border-top: 0; }
+.pcal-row b { font-size: var(--fs-body); font-weight: 700; color: var(--ink); white-space: nowrap; } .pcal-row span { font-size: var(--fs-label); font-weight: 600; color: var(--muted); text-align: right; }
+.pcal-row.done b { color: var(--muted); }
+.pcal-row.on { background: var(--tint); }
+.pcal-row:disabled { cursor: default; } .pcal-row:disabled b, .pcal-row:disabled span { opacity: .55; }
+
+/* 0.3.157 (DT308.4 to DT308.6, DT308.11; boards Stories237 and Stories242): What do you do with it? Three white choices on
+   the right, 44 px high; the calendar opens under them; a meal that holds something asks under its row */
+.plate-end { margin: 14px 0 0; }
+.plate-end-btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 6px; }
+.plate-end-btns .pill.pill-small { height: 44px; min-height: 44px; padding: 0 16px; white-space: nowrap; flex: none; }
+.plate-end-btns.has-saved { gap: 6px; } .plate-end-btns.has-saved .pill.pill-small { padding: 0 9px; font-size: var(--fs-label); }
+.plate-end-btns .pill.on { background: var(--tint); border-color: var(--brand); color: var(--navy); }
+.plate-end-saved { display: block; margin: 8px 0 0; font-size: var(--fs-label); line-height: 1.4; color: var(--ink); font-weight: 600; }
+.pcal-held { padding: 10px 12px 12px; background: var(--base); border-top: 1px solid var(--line); }
+.pcal-held-q { font-size: var(--fs-label); font-weight: 600; line-height: 1.4; color: var(--ink); }
+.pcal-held-btns { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; margin-top: 8px; }
+.pcal-held-btns .pill.pill-small { height: 44px; min-height: 44px; padding: 0 9px; font-size: var(--fs-label); flex: none; white-space: nowrap; }
+/* Plan: a meal with more than one dish shows a row per dish under the meal's time */
+.plan-dish-row + .plan-dish-row, .swipe:has(.plan-dish-row) + .swipe:has(.plan-dish-row) { margin-top: 10px; }
+.eat-save.is-asking { background: var(--tint); color: var(--navy); border: 1.5px solid var(--brand); }
+.eat-cal { margin: 10px 0 0; padding: 8px; border-radius: 14px; background: var(--surface); }
+/* DT308.12 (0.3.157, boards Stories244 and Stories245): Back on the question; the one line about the old plate */
+.ask-back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 6px 0 0; margin: 0 0 4px; font-size: var(--fs-body); font-weight: 700; background: none; border: 0; cursor: pointer; }
+.warn-box.old-plate { display: block; margin: 0 0 12px; }
+.old-plate-top { display: flex; align-items: flex-start; gap: 8px; } .old-plate-say { flex: 1; min-width: 0; }
+.old-plate-x { flex: none; width: 44px; height: 44px; margin: -8px -8px 0 0; display: grid; place-items: center; color: var(--ink); background: none; border: 0; cursor: pointer; }
+.old-plate-acts { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
+.old-plate-open { min-height: 44px; padding: 0 4px; margin-left: -4px; font-size: var(--fs-label); font-weight: 700; background: none; border: 0; cursor: pointer; }
+.old-plate-undo.pill.pill-small { flex: none; height: 44px; min-height: 44px; padding: 0 18px; }

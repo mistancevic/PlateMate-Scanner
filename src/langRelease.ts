@@ -41,7 +41,7 @@ function chefTemplate(k: string): string {
   const D = new Date(2026, 0, 5, 9, 0), plate = () => "{plate}";
   const args: Record<string, any[]> = {
     photoWhose: ["{from}"], photoHere: ["{from}"], plateOldAte: [D, plate], plateOldBeforeCook: [D, plate], plateSaveOrClear: [2, D, "{dish}"],
-    plateAddOrNew: [2, "{title}", "{what}"], plateAddPhoto: [2, "{title}", "{what}"], plateHolds: ["{list}"], scanWhileCooking: ["{dish}", "{food}"], useInCook: ["{food}", "{dish}"], resume: ["{dish}", "{done}"],
+    plateAddOrNew: [2, "{title}", "{what}"], plateAddPhoto: [2, "{title}", "{what}"], plateHolds: ["{list}"], plateRecipe: ["{title}", 2], plateRecipeFor: ["{title}", 2, "{makes}"], scanWhileCooking: ["{dish}", "{food}"], useInCook: ["{food}", "{dish}"], resume: ["{dish}", "{done}"],
     howManyAte: ["{made}"], carryNow: [7], busyMeal: ["{meal}", "{time}", "{block}", "{day}"], busyLate: ["{until}", "{meal}", "{time}", 7, "{quick}"], busyLateAhead: ["{until}", "{meal}", "{time}", 7, "{quick}", "{day}"],
     busyCarry: ["{block}", "{meal}"], busyTraining: ["{time}", "{block}", "{day}"],
     cookOpen: ["{cook}", "{dish}"], plateFills: ["{meal}", "{kcal}"], secondDish: ["{dish}", 7, "{prev}", "{meal}"], recipeOther: ["sr-Latn", "en"], cookOther: ["sr-Latn", "en"],

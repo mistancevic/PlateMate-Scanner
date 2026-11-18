@@ -202,7 +202,8 @@ export function laterRow(x: Later): { title: string; photo?: string; foods: numb
 // DT206 and DT212: when the plate started (its first food, or its photo); over 3 hours, or another day, is a plate from an earlier
 // meal. Keep working on it marks it, and that plate is not asked about again.
 export function plateSince(s: Pick<PilotState, "plateAt" | "photo">): Date | null {
-  const t = [s.plateAt, s.photo?.at].filter(Boolean).map((x) => Date.parse(x!)).filter((x) => !Number.isNaN(x));
+  // 0.3.157 (DT308.12): a photo whose foods joined a plate does not make the plate older than it is
+  const t = [s.plateAt, s.photo?.joined ? undefined : s.photo?.at].filter(Boolean).map((x) => Date.parse(x!)).filter((x) => !Number.isNaN(x));
   return t.length ? new Date(Math.min(...t)) : null;
 }
 export function plateOldOf(s: Pick<PilotState, "plateAt" | "photo" | "items" | "plateAsked">, now = new Date()): boolean {

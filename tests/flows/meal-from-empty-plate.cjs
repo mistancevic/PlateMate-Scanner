@@ -1,3 +1,4 @@
+// 0.3.157 (DT311, board Stories246; Coach Milan, Go 18 November 11:14), changed by the story: Empty plate stands in the row above the foods, not at the top of the plate card.
 
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
@@ -36,7 +37,7 @@ seed.items = [];
     // 0.2.16 (board IM, IM1b, Milan 21:48): Empty plate moved out of the row that adds foods, to the top of the plate card
     // Changed by story DT308 Release 2 (0.3.155, board Stories238): with foods on the plate, the ways to add live under + Add more to your plate
     const ways = (await page.locator(".add-more .ways-three > *").allTextContents()).map((x) => x.trim()); if (ways.join(" | ") !== "Recipe photo | Recipe link | Photo or scan") throw new Error("ways: " + ways.join(" | "));
-    if (!/Empty plate/.test(await page.locator(".plate-card .card-top").textContent())) throw new Error("Empty plate is not at the top of the plate card");
+    if (!/Empty plate/.test(await page.locator(".plate-card .plate-acts").textContent()) || /Empty plate/.test(await page.locator(".plate-card .card-top").textContent())) throw new Error("Empty plate is not in the row above the foods (DT311)");
     const tops = await page.locator(".add-more .ways-three > *").evaluateAll((es) => es.map((e) => Math.round(e.getBoundingClientRect().top))); if (new Set(tops).size !== 1) throw new Error("ways on more than one row: " + tops.join(","));
   });
   await step("empty plate asks twice, then empties", async () => {
