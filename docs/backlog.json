@@ -1926,13 +1926,13 @@
       "ac": [
         {
           "id": "AC1",
-          "title": "No meal picked is Just looking",
-          "text": "Given a photo is read and I picked no meal, when I look at the meal line, then it says Just looking, Not counted, with the pencil, and the read ends with What do you do with it?."
+          "title": "On no day, the line is a button",
+          "text": "Given a photo is read and the plate is on no day, when I look at the meal line, then it is the white button Put it on a day, with no pencil and no Not counted, and the read ends with What do you do with it?."
         },
         {
           "id": "AC2",
-          "title": "The pencil opens edit mode, the X closes it",
-          "text": "Given that read of a photo from Saturday 15:57, when I tap the pencil, then edit mode opens on Sat 14 with Just looking marked, the pencil is an X, and a tap on the X closes edit mode."
+          "title": "The button opens edit mode, the X closes it",
+          "text": "Given that read of a photo from Saturday 15:57, when I tap Put it on a day, then edit mode opens on Sat 14 with Not on any day marked and an X at the right of the line, and a tap on the X closes edit mode and changes nothing."
         },
         {
           "id": "AC3",
@@ -1941,7 +1941,7 @@
         },
         {
           "id": "AC4",
-          "title": "A meal is picked and saved at once",
+          "title": "A meal is set and saved at once",
           "text": "Given edit mode is open, when I tap Dinner, then Dinner is marked, the line says Dinner, Saturday, 14 November, 20:00 at once, edit mode stays open, and there is no Done."
         },
         {
@@ -1957,7 +1957,7 @@
         {
           "id": "AC7",
           "title": "Closed, the line keeps the meal and the pencil",
-          "text": "Given Dinner at 19:30 is picked, when I tap the X, then the line shows Dinner, Saturday, 14 November, 19:30 with the pencil, and the read asks Did you eat it?."
+          "text": "Given Dinner at 19:30 is set, when I tap the X, then the line shows Dinner, Saturday, 14 November, 19:30 with the pencil, the read asks Did you eat it?, and a tap on the pencil opens edit mode again."
         },
         {
           "id": "AC8",
@@ -1966,8 +1966,8 @@
         },
         {
           "id": "AC9",
-          "title": "Back to Just looking",
-          "text": "Given Dinner is picked, when I open edit mode and tap Just looking, then the line says Just looking, Not counted, and the read ends with What do you do with it? again."
+          "title": "Back to no day",
+          "text": "Given Dinner is set, when I open edit mode and tap Not on any day, then the line is the button Put it on a day again, and the read ends with What do you do with it? again."
         },
         {
           "id": "AC10",
@@ -1987,7 +1987,22 @@
         {
           "id": "AC13",
           "title": "A plate without a photo",
-          "text": "Given a plate I built with no photo, when I open edit mode, then it opens on today with no line about a photo, and everything else is the same."
+          "text": "Given a plate I built with no photo, when I tap Put it on a day, then edit mode opens on today with no line about a photo, and everything else is the same."
+        },
+        {
+          "id": "AC14",
+          "title": "A plate with no name says Untitled",
+          "text": "Given a plate with no name, when I look at its title, then it says Untitled in grey with the pencil, and under it Name it, or Chef Mealan will., and a tap on the pencil puts the cursor in the name."
+        },
+        {
+          "id": "AC15",
+          "title": "Just looking is gone",
+          "text": "Given any screen or line of Chef Mealan that says Just looking today, when I open it after the release, then it says Not on any day, and no screen says Not counted for this state."
+        },
+        {
+          "id": "AC16",
+          "title": "Three languages",
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 7, then Untitled, Name it, or Chef Mealan will., Put it on a day, Not on any day and The photo was taken on are in that language."
         }
       ],
       "unchanged": [
