@@ -29,6 +29,8 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
     if (kind === "none") t.innerHTML = LAB + '<span class="meal-line-unset" style="color:#172742">No meal selected</span>';
     else t.innerHTML = LAB + `<span class="meal-line-unset" style="color:#172742">${kind[0]}</span><span class="meal-line-day" style="display:block">${kind[1]}</span>`;
     t.style.cssText += ";" + MARK; if (pen) { pen.style.display = ""; pen.style.outline = ""; if (tap) pen.style.cssText += ";" + TAP; } }, { kind, tap });
+  // the line under the title on the read (Coach Milan 21:28, into B150 at 21:36)
+  const sub = (p, mark) => ev(p, ({ MARK, mark }) => { const e = [...document.querySelectorAll("p, span, div")].find((x) => x.children.length === 0 && /^(Read from your photo|Chef Mealan named it)/.test(x.textContent.trim())); if (!e) return; e.textContent = "Chef Mealan named it from your photo."; e.style.outline = ""; if (mark) e.style.cssText += ";" + MARK; }, { mark });
   // ---- 1: the photo on the Plate, name empty
   let p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await css(p);
   await ev(p, ({ MARK, PEN }) => { const i = document.querySelector(".title-input"); i.placeholder = "Untitled plate"; i.value = ""; let row = i.closest(".title-row");
@@ -42,10 +44,10 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
   // ---- 2: the read (a fresh page, so nothing drawn on step 1 stays)
   p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await h.readIt(p); await css(p);
   await line(p, "none", true);
-  await noteAfter(p, ".meal-line", "<b>Step 2. The read. No change but that line.</b> Chef Mealan read the photo and named the plate. No meal is selected, so the read ends with What do you do with it?. Amber: the tap on the pencil.");
-  await ev(p, () => { const subs = [...document.querySelectorAll("p, span, div")].filter((e) => e.children.length === 0 && /^Read from your photo/.test(e.textContent.trim())); const e = subs[0]; if (e) { e.style.cssText += ";outline:3px solid #5b6b8a;outline-offset:3px;border-radius:8px"; const n = document.createElement("div"); n.setAttribute("data-g318", "1"); n.style.cssText = "background:#eef1f6;border-radius:10px;padding:8px 10px;margin:10px 0;font-size:13px;line-height:1.4;color:#172742;font-family:Nunito,system-ui,sans-serif;text-align:left"; n.innerHTML = "<b>Grey: DT318 changes this line, not B150.</b> It will say Chef Mealan named it from your photo. The hint about the amounts moves under the chips."; e.insertAdjacentElement("afterend", n); } });
+  await noteAfter(p, ".meal-line", "<b>Step 2. The read. Two lines changed.</b> Under the title: <b>Chef Mealan named it from your photo.</b> It was Read from your photo. Tap an amount to correct it. It goes once I rename the plate. The meal line: No meal selected, so the read ends with What do you do with it?. Amber: the tap on the pencil.");
+  await sub(p, true);
   await shot(p, "h_2", 1500);
-  await p.evaluate(() => document.querySelectorAll("[data-g318]").forEach((e) => e.remove()));
+  await sub(p, false);
   // ---- 3: edit mode
   await clear(p); await p.evaluate(() => { const b = document.querySelector(".plan-line-pen"); b.style.outline = ""; });
   await p.locator(".plan-line-pen").click(); await p.waitForTimeout(500); await p.locator(".meal-line-open .pcal-day").filter({ hasText: "Sat 14" }).click(); await p.waitForTimeout(500);
@@ -56,19 +58,23 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
   const rowsNote = async (html) => { await clear(p); await noteAfter(p, ".meal-line-open .pcal-rows", html); };
   await editBase(); await line(p, "none"); await markRow("No meal selected");
   await rowsNote("<b>Step 3. Edit mode.</b> The pencil opened it and is now the <b>X that closes it</b>. That is all the X does. It opens on the photo's day. The photo's time is a reference and cannot be changed. The row <b>No meal selected</b> is marked. It was the row Just looking.");
+  await sub(p, false);
   await shot(p, "h_3", 900);
   // ---- 4: Dinner and its time
   await markRow("Dinner", FIELD("19:30")); await line(p, ["Dinner", "Saturday, 14 November, 19:30"]);
   await rowsNote("<b>Step 4. I tap Dinner and set its time.</b> The line above shows it at once: saved, no Done. The time in Dinner's row is a field: a tap opens the phone's clock. I set 19:30, for this dinner on this day only.");
+  await sub(p, false);
   await shot(p, "h_4", 900);
   // ---- the way back
   await ev(p, () => { for (const r of document.querySelectorAll(".meal-line-open .pcal-row")) if (/Dinner/.test(r.textContent)) r.lastElementChild.textContent = "20:00 · planned: Chicken rice bowl"; });
   await markRow("No meal selected"); await line(p, "none");
   await rowsNote("<b>The way back.</b> In edit mode a tap on <b>No meal selected</b> takes the meal off again. This takes the place of the X that removed the meal.");
+  await sub(p, false);
   await shot(p, "h_8", 900);
   // ---- a photo that carries only the time it was saved
   await ev(p, () => { document.querySelector("[data-ref]").textContent = "The photo was saved on Saturday, 15:57. When it was taken is not known."; });
   await rowsNote("<b>A photo with no time of its own.</b> A photo saved from WhatsApp carries only the time it was saved. The line says so. Everything else is the same: edit mode opens on that day, and I set the meal and its time myself.");
+  await sub(p, false);
   await shot(p, "h_9", 900);
   await p.context().close();
   // ---- 5: closed; 6: All of it, Done; 7: the Plan
@@ -83,6 +89,7 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
   const closed = () => ev(p, ({ MARK, PEN }) => { const x = document.querySelector(".plan-line-x"); x.innerHTML = PEN; x.style.cssText += ";" + MARK; document.querySelector(".meal-line-day").textContent = "Saturday, 14 November, 19:30"; const t = document.querySelector(".meal-line-text"); t.insertAdjacentHTML("afterbegin", '<span style="display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5b6b8a;margin-bottom:2px">Meal and day</span>'); t.style.cssText += ";" + MARK; });
   await closed(); await dt307();
   await noteAfter(p, ".meal-line", "<b>Step 5. Closed with the X.</b> The line shows the meal with its day and time, and the pencil to open edit mode again. Below, the read as it is today: it now asks Did you eat it?.");
+  await sub(p, false);
   await shot(p, "h_5", 1700);
   await clear(p); await un307();
   await p.locator(".rv-eat .pa-opt").first().click(); await p.waitForTimeout(400);
