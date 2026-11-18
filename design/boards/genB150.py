@@ -19,9 +19,10 @@ readBoard("B150", "Stories260.dc.html", 4, [("B150", t["short"], parts, [
   ("Saturday in the Plan, today", "n_1", "draft", "The record as it is on your phone, shown on this board's days. Red: the two dinners."),
   ("The pencil opens on the photo's day", "n_2", "changed", "The same read. Blue: the reason, and the day."),
   ("One dinner", "n_3", "changed", "Saturday in the Plan after a tap on Dinner, All of it and Done.")], [1, 3]),
-  ("B150.2", "The time of the meal can be changed", [("In Coach Milan's words", t["words2"]), ("Now", t["time_now"]), ("Proposed", t["time_proposed"]), ("Decision", "Open.")], [
-  ("The meal line today", "n_4", "draft", "The read with Saturday's dinner set. Red: the time, as words."),
-  ("The time as a field", "n_5", "changed", "The same line. Blue: the field, at the photo's time.")], [1])],
+  ("B150.2", "One edit mode behind the pencil, with the time", [("In Coach Milan's words", t["words2"]), ("Now", t["time_now"]), ("Proposed", t["time_proposed"]), ("Decision", "Open.")], [
+  ("The meal line today", "n_4", "draft", "The read with Saturday's dinner set. Red: the time as words, and the X as the only button."),
+  ("The pencil stays", "n_5", "changed", "The same line with the pencil and the X."),
+  ("Edit mode", "n_6", "changed", "The pencil open: the day and the meal marked, and the row Time.")], [1, 2])],
   "Stories259.dc.html", "18 November 2026 (Coach Milan 19:21, with a screenshot of his Plan). A bug, reproduced on the app as built in 0.3.159. Drawn for approval; no Go.")
 json.dump(OUT, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outRead.json"), "w"))
 print(json.dumps({k: [v["file"], v["w"], v["h"]] for k, v in OUT.items()}))

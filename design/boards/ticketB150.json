@@ -45,21 +45,31 @@
   },
   {
    "id": "AC6",
-   "title": "The time is a field",
-   "text": "Given the read of a photo with Saturday's dinner set, when I look at the meal line, then the time stands in a field I can tap, 44 high, showing 15:57, the photo's time."
+   "title": "The pencil stays",
+   "text": "Given the read of a photo with Saturday's dinner set, when I look at the meal line, then it has the pencil and the X, and the line says Dinner, Saturday, 14 November, 15:57, the photo's time."
   },
   {
    "id": "AC7",
-   "title": "I change the time",
-   "text": "Given that field, when I set 19:30 and then choose All of it and Done, then Saturday shows my meal as Dinner, 19:30."
+   "title": "Edit mode shows what is set",
+   "text": "Given that line, when I tap the pencil, then the calendar opens on Sat 14 with Dinner marked, and under the meals stands the row Time with 15:57."
   },
   {
    "id": "AC8",
-   "title": "No photo's time to take",
-   "text": "Given a plate without a photo and Saturday's dinner set with the pencil, when I look at the meal line, then the field shows 20:00, Dinner's time from Slots and times, and I can change it the same way."
+   "title": "I change the time",
+   "text": "Given edit mode is open, when I tap the time, set 19:30 and then choose All of it and Done, then Saturday shows my meal as Dinner, 19:30."
   },
   {
    "id": "AC9",
+   "title": "I change the meal or the day",
+   "text": "Given edit mode is open, when I tap Lunch, then the line says Lunch, Saturday, 14 November, with the time I had, and edit mode closes."
+  },
+  {
+   "id": "AC10",
+   "title": "No photo's time to take",
+   "text": "Given a plate without a photo and Saturday's dinner set with the pencil, when I open edit mode, then Time shows 20:00, Dinner's time from Slots and times, and I can change it the same way."
+  },
+  {
+   "id": "AC11",
    "title": "The meal stays the meal",
    "text": "Given Dinner is set and I set the time to 14:00, when I log it, then it is still Saturday's dinner, at 14:00, and no other meal of that day is touched."
   }
@@ -72,12 +82,12 @@
   "Slots and times in the settings: a time set on one meal does not change the meal's usual time."
  ],
  "details": [
-  "One new element: the time field in the meal line. No new words: the line From the photo exists.",
+  "One addition to an element you know: the row Time in the calendar behind the pencil. No new words but Time and its one line.",
   "The rule sits in the one place a meal is logged, so every way obeys it.",
   "The repair touches only records whose meal is on a later day than their time.",
-  "The screens B150c, B150d and B150.2b are what it looks like."
+  "The screens B150c, B150d, B150.2b and B150.2c are what it looks like."
  ],
- "words2": "18 November 19:34: also the timing is an issue, as I couldn't change it. It was only the timing from the settings. So no possibility to change the time.",
- "time_now": "Once a meal is set, the line says Dinner, Saturday, 14 November, 20:00. The time is the meal's time from Slots and times, or the photo's time. It is words, not a field, so it cannot be changed.",
- "time_proposed": "The one element: the time in the meal line becomes a field. It starts at the photo's time for a photo of that day, otherwise at the meal's time. A tap opens the phone's clock. The meal is logged at the time I set; the meal itself does not change."
+ "words2": "18 November 19:34: also the timing is an issue, as I couldn't change it. It was only the timing from the settings. 19:43, on a first drawing with a time field in the line: better to have an edit mode and set there what is needed, instead of another way of correction.",
+ "time_now": "Once a meal is set, the pencil is gone and only the X is left, which takes the meal off. The line says Dinner, Saturday, 14 November, 20:00. The time is words, so it cannot be changed.",
+ "time_proposed": "No new way to correct. The pencil stays when a meal is set and is the one place to edit. It opens the calendar you know, with the day and the meal that are set marked, and one row more under the meals: Time. It starts at the photo's time for a photo of that day, otherwise at the meal's time. A tap opens the phone's clock. The X stays and still takes the meal off."
 }

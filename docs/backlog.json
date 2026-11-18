@@ -1914,7 +1914,7 @@
       "state": "next",
       "board": "Stories260",
       "where": "Page 5",
-      "why": "Coach Milan 18 November 19:21, with a screenshot of his Plan on Tuesday 17: a photo from Tuesday 19:56, tried as today's lunch, then set to dinner with the pencil; Tuesday shows it as Dinner, 19:56 and the planned Chicken rice bowl still asks. Cause: the pencil's calendar opens on today also for a photo from another day, and the meal is logged with the photo's time under the dinner of today. Reproduced on 0.3.159 as a record with the photo's day and another day's meal. Drawn; waits for a Go. Coach Milan 19:34: also the timing, he could not change it; only the times from the settings. Added to the board: the time in the meal line is a field (AC6 to AC9).",
+      "why": "Coach Milan 18 November 19:21, with a screenshot of his Plan on Tuesday 17: a photo from Tuesday 19:56, tried as today's lunch, then set to dinner with the pencil; Tuesday shows it as Dinner, 19:56 and the planned Chicken rice bowl still asks. Cause: the pencil's calendar opens on today also for a photo from another day, and the meal is logged with the photo's time under the dinner of today. Reproduced on 0.3.159 as a record with the photo's day and another day's meal. Drawn; waits for a Go. Coach Milan 19:34: also the timing, he could not change it; only the times from the settings. Added to the board: the time in the meal line is a field (AC6 to AC9). 19:43: better an edit mode where everything is set than another way of correction. Drawn again: the pencil stays when a meal is set and opens the calendar with what is set marked and a row Time (AC6 to AC11). No time field in the line.",
       "opportunity": {
         "from": "Coach Milan, 18 November 2026, 19:21, with a screenshot of his Plan on Tuesday 17 November. Found while testing the last releases on his phone.",
         "job": "Log a photo of a meal I ate on another day, to that day and that meal.",
@@ -1951,21 +1951,31 @@
         },
         {
           "id": "AC6",
-          "title": "The time is a field",
-          "text": "Given the read of a photo with Saturday's dinner set, when I look at the meal line, then the time stands in a field I can tap, 44 high, showing 15:57, the photo's time."
+          "title": "The pencil stays",
+          "text": "Given the read of a photo with Saturday's dinner set, when I look at the meal line, then it has the pencil and the X, and the line says Dinner, Saturday, 14 November, 15:57, the photo's time."
         },
         {
           "id": "AC7",
-          "title": "I change the time",
-          "text": "Given that field, when I set 19:30 and then choose All of it and Done, then Saturday shows my meal as Dinner, 19:30."
+          "title": "Edit mode shows what is set",
+          "text": "Given that line, when I tap the pencil, then the calendar opens on Sat 14 with Dinner marked, and under the meals stands the row Time with 15:57."
         },
         {
           "id": "AC8",
-          "title": "No photo's time to take",
-          "text": "Given a plate without a photo and Saturday's dinner set with the pencil, when I look at the meal line, then the field shows 20:00, Dinner's time from Slots and times, and I can change it the same way."
+          "title": "I change the time",
+          "text": "Given edit mode is open, when I tap the time, set 19:30 and then choose All of it and Done, then Saturday shows my meal as Dinner, 19:30."
         },
         {
           "id": "AC9",
+          "title": "I change the meal or the day",
+          "text": "Given edit mode is open, when I tap Lunch, then the line says Lunch, Saturday, 14 November, with the time I had, and edit mode closes."
+        },
+        {
+          "id": "AC10",
+          "title": "No photo's time to take",
+          "text": "Given a plate without a photo and Saturday's dinner set with the pencil, when I open edit mode, then Time shows 20:00, Dinner's time from Slots and times, and I can change it the same way."
+        },
+        {
+          "id": "AC11",
           "title": "The meal stays the meal",
           "text": "Given Dinner is set and I set the time to 14:00, when I log it, then it is still Saturday's dinner, at 14:00, and no other meal of that day is touched."
         }
