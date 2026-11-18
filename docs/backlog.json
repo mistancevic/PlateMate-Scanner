@@ -1991,8 +1991,8 @@
         },
         {
           "id": "AC14",
-          "title": "A plate with no name says Untitled",
-          "text": "Given a plate with no name, when I look at its title, then it says Untitled in grey with the pencil, no line is added under it, and a tap on the pencil puts the cursor in the name."
+          "title": "A plate with no name says Untitled plate",
+          "text": "Given a plate with no name, when I look at its title, then it says Untitled plate in grey with the pencil, no line is added under it, and a tap on the pencil puts the cursor in the name."
         },
         {
           "id": "AC15",
@@ -2002,7 +2002,7 @@
         {
           "id": "AC16",
           "title": "Three languages",
-          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 7, then Untitled, Meal and day, No meal selected and the two lines about the photo's time are in that language."
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 7, then Untitled plate, Meal and day, No meal selected and the two lines about the photo's time are in that language."
         }
       ],
       "unchanged": [
@@ -2019,7 +2019,8 @@
       "title": "The read: where and how to correct what Chef Mealan read",
       "epic": "plate",
       "state": "next",
-      "why": "Coach Milan 18 November 19:26, from the same test: the read gave a good list and asked about the chicken (he chose 200 g). The yogurt came as 10 % fat, fixed in the food list, not on the read's chip. Swap offered no 0.2 % fat yogurt. He added words (mayo was hidden; the yogurt is 0.2 % fat); the read then asked about the chicken again, this time whether it was 220 g. The list ended right, but it was confusing where and how to correct it. Four points: the kind of a food cannot be corrected on its chip; Swap lacks the variant; a second read asks again what was already answered, with another number; no one place to correct. Not reproduced and not drawn yet."
+      "why": "Coach Milan 18 November 19:26, from the same test: the read gave a good list and asked about the chicken (he chose 200 g). The yogurt came as 10 % fat, fixed in the food list, not on the read's chip. Swap offered no 0.2 % fat yogurt. He added words (mayo was hidden; the yogurt is 0.2 % fat); the read then asked about the chicken again, this time whether it was 220 g. The list ended right, but it was confusing where and how to correct it. Four points: the kind of a food cannot be corrected on its chip; Swap lacks the variant; a second read asks again what was already answered, with another number; no one place to correct. Not reproduced and not drawn yet.",
+      "agreed": "Agreed wording, Coach Milan 18 November 21:26 to 21:29: under the title on the read, Chef Mealan named it from your photo. (gone once the name is changed by hand), in place of Read from your photo. Tap an amount to correct it.; under the chips, Tap an amount to correct it. Change the foods to swap or add one."
     },
     {
       "id": "B151",

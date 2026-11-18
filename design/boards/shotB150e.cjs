@@ -31,19 +31,21 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
     t.style.cssText += ";" + MARK; if (pen) { pen.style.display = ""; pen.style.outline = ""; if (tap) pen.style.cssText += ";" + TAP; } }, { kind, tap });
   // ---- 1: the photo on the Plate, name empty
   let p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await css(p);
-  await ev(p, ({ MARK, PEN }) => { const i = document.querySelector(".title-input"); i.placeholder = "Untitled"; i.value = ""; let row = i.closest(".title-row");
+  await ev(p, ({ MARK, PEN }) => { const i = document.querySelector(".title-input"); i.placeholder = "Untitled plate"; i.value = ""; let row = i.closest(".title-row");
     if (!row) { row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:8px"; i.insertAdjacentElement("beforebegin", row); row.appendChild(i); i.style.flex = "1"; const b = document.createElement("button"); b.type = "button"; b.className = "icon title-pen"; b.innerHTML = PEN; row.appendChild(b); }
     row.style.cssText += ";" + MARK; });
   await line(p, "none");
   await ev(p, ({ TAP }) => { const b = [...document.querySelectorAll("button")].find((x) => /Read the plate/.test(x.textContent)); if (b) b.style.cssText += ";" + TAP; });
-  await noteAfter(p, ".meal-line", "<b>Step 1. Two lines changed, nothing else.</b> The name: grey <b>Untitled</b>, with the pencil. The meal line: a small title, Meal and day, and under it <b>No meal selected</b>, with the pencil. Today these say Chef Mealan names it, and Meal and day not set. Amber: the tap on Read the plate.");
+  await noteAfter(p, ".meal-line", "<b>Step 1. Two lines changed, nothing else.</b> The name: grey <b>Untitled plate</b>, with the pencil. The meal line: a small title, Meal and day, and under it <b>No meal selected</b>, with the pencil. Today these say Chef Mealan names it, and Meal and day not set. Amber: the tap on Read the plate.");
   await shot(p, "h_1", 1010);
   await p.context().close();
   // ---- 2: the read (a fresh page, so nothing drawn on step 1 stays)
   p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await h.readIt(p); await css(p);
   await line(p, "none", true);
   await noteAfter(p, ".meal-line", "<b>Step 2. The read. No change but that line.</b> Chef Mealan read the photo and named the plate. No meal is selected, so the read ends with What do you do with it?. Amber: the tap on the pencil.");
-  await shot(p, "h_2", 1400);
+  await ev(p, () => { const subs = [...document.querySelectorAll("p, span, div")].filter((e) => e.children.length === 0 && /^Read from your photo/.test(e.textContent.trim())); const e = subs[0]; if (e) { e.style.cssText += ";outline:3px solid #5b6b8a;outline-offset:3px;border-radius:8px"; const n = document.createElement("div"); n.setAttribute("data-g318", "1"); n.style.cssText = "background:#eef1f6;border-radius:10px;padding:8px 10px;margin:10px 0;font-size:13px;line-height:1.4;color:#172742;font-family:Nunito,system-ui,sans-serif;text-align:left"; n.innerHTML = "<b>Grey: DT318 changes this line, not B150.</b> It will say Chef Mealan named it from your photo. The hint about the amounts moves under the chips."; e.insertAdjacentElement("afterend", n); } });
+  await shot(p, "h_2", 1500);
+  await p.evaluate(() => document.querySelectorAll("[data-g318]").forEach((e) => e.remove()));
   // ---- 3: edit mode
   await clear(p); await p.evaluate(() => { const b = document.querySelector(".plan-line-pen"); b.style.outline = ""; });
   await p.locator(".plan-line-pen").click(); await p.waitForTimeout(500); await p.locator(".meal-line-open .pcal-day").filter({ hasText: "Sat 14" }).click(); await p.waitForTimeout(500);
