@@ -17,7 +17,7 @@ def chip(e): return f'<span style="display:inline-block;background:{COL[e]};colo
 def card(t):
     meta = []
     own = t.get("board") and t.get("where")
-    if own: meta.append(f'<a href="{t["board"]}.dc.html" style="display:inline-block;background:#eaf1fd;color:#123a7a;border:1px solid #b9cdf0;border-radius:6px;padding:1px 7px;text-decoration:none">Ticket and board: {t["id"]}, canvas {t["where"]} →</a>')
+    if own: meta.append(f'<span style="display:inline-block;background:#eaf1fd;color:#123a7a;border:1px solid #b9cdf0;border-radius:6px;padding:1px 7px">Board: {t["id"]}, canvas {t["where"]}</span>')
     elif t.get("board"): meta.append("Board " + (t["board"] if str(t["board"]).startswith("Stories") else f"Stories{t['board']}") + (f", canvas {t['where']}" if t.get("where") else ""))
     if t.get("version"): meta.append(f"v{t['version']}")
     why = f'<div style="font-size:12.5px;line-height:1.4;color:#3d4a63;margin-top:5px">{html.escape(t["why"])}</div>' if t.get("why") else ""

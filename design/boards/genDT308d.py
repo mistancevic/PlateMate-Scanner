@@ -250,7 +250,7 @@ def acTable(B, y, w, acs):
 
 start(3)
 row("empty", "Empty plate on the left, opposite Group into parts. Three states side by side, not steps", [
-  ("Ticket", "DT311. This board is the ticket: everything about it is here. On the <a href=\"Kanban.dc.html\">canvas page Kanban</a>, column Now, it is one short card with a label that leads here."),
+  ("Ticket", "DT311. This board is the ticket: everything about it is here. On the canvas page Kanban, column Now, it is one short card with the label Board: DT311, canvas Page 5."),
   ("How to read this board", "<b>This card, top to bottom:</b> the request, then the solution and the decision. <b>The screens</b> on the right: the design. <b>The wide block at the bottom:</b> the agreement, what gets built."),
   ("1. The request", ""),
   ("Opportunity, why we act", "<b>Where it comes from:</b> Coach Milan's own look at the Plate on 18 November 2026, 10:05, while going through the boards. No tester has reported it.<br><b>The job:</b> Read my plate and its result, then change its foods.<br><b>What stood in the way:</b> Nobody was blocked. Two kinds: a risk of a wrong tap, because a delete button is the first control on the card; and looks broken, because the words of Group into parts touch its border.<br><b>Why now:</b> 0.3.157 rebuilds this card anyway, so the change is small now and would cost a release of its own later."),

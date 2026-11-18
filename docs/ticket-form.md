@@ -4,7 +4,7 @@ Decided by Coach Milan on 18 November 2026, 12:41. Used from the next ticket on,
 
 ## Where a ticket lives
 
-- The Kanban card is short: id, title, one line, and a label that links to the ticket's board.
+- The Kanban card is short: id, title, one line, and a label that names the ticket's board, for example "Board: DT311, canvas Page 5". The label is text, not a link; the board's first line names the ticket and its Kanban column the same way.
 - The ticket's board on the canvas carries the weight. Its title starts with the ticket id. A board is named by its ticket id, never by its file name.
 - The data is in `docs/backlog.json`: `opportunity`, `problem`, `story`, `ac`, `unchanged`, `board`, `where`.
 
