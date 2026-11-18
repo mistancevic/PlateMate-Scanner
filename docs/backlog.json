@@ -2043,6 +2043,13 @@
         "The marked meal in the calendar: blue with a tick.",
         "Ate it on Did you eat it? for a plate from earlier: it is the main button there, filled blue, and stays so."
       ]
+    },
+    {
+      "id": "DT319",
+      "title": "A meal I ate, opened from the Plan: what Put it on the Plate again means",
+      "epic": "plan",
+      "state": "next",
+      "why": "Coach Milan 18 November 20:04: in the Plan he opened the What you ate card Chicken and sweet potato fries, tapped Put it on the Plate again. The foods landed right. The title was grey though the meal was saved; Meal and day were not set though it was saved as a meal. His question: is this that meal again, so a change on the Plate changes it (an edit), or a new meal that does not touch the old one (save as)? It has to be clear to everyone. As built (src/components/PastMeal.tsx, again): a copy of the foods only, no name, no photo, no meal, no link to the eaten meal; the eaten meal is edited by Change it on the same page (DT284). It also replaces a plate that has foods with no question (a way DT313 missed). Proposed to him: it stays a copy, a new plate; the button and one line say so; the name comes along; a plate with foods is asked first. Waits for his word on the meaning, then a board."
     }
   ]
 }
