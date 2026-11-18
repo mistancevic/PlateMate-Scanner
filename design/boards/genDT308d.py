@@ -40,7 +40,7 @@ class Board:
     def render(s, W, H): return f'<div style="position:relative;width:{W}px;height:{H}px">{"".join(s.html)}</div>'
 
 def storyCard(B, y, rid, title, parts, w=350):
-    body = "".join(f'<div style="margin-top:10px"><b style="font-size:12px;letter-spacing:.05em;color:#5b6b8a">{h.upper()}</b><div style="font-size:13.5px;line-height:1.5;color:#172742;margin-top:3px">{t}</div></div>' for h, t in parts)
+    body = "".join((f'<div style="margin-top:16px;padding-top:10px;border-top:2px solid #172742;font-size:15.5px;font-weight:900;color:#123a7a">{h}</div>' if t == "" else f'<div style="margin-top:10px"><b style="font-size:12px;letter-spacing:.05em;color:#5b6b8a">{h.upper()}</b><div style="font-size:13.5px;line-height:1.5;color:#172742;margin-top:3px">{t}</div></div>') for h, t in parts)
     B.html.append(f'<div style="position:absolute;left:20px;top:{y}px;width:{w}px;box-sizing:border-box;border:2px solid #172742;border-radius:14px;padding:14px 16px;background:#fff">'
                   f'<div style="font-size:19px;font-weight:900;color:#123a7a"><span style="background:#123a7a;color:#fff;border-radius:7px;padding:1px 8px;margin-right:7px">{rid}</span>{title}</div>{body}</div>')
     return y + 70 + sum(30 + math.ceil(len(re.sub("<[^>]+>|&amp;", "x", t)) / 40) * 21 for _, t in parts)
@@ -218,17 +218,54 @@ board("Stories245.dc.html", "DT308.12 (2 of 2): something is on the plate, and a
   "18 November 2026 (Coach Milan 00:16 and 00:22). On the landing of 0.3.155: a barcode or a label joins with no question; a recipe from Recipe photo or Recipe link asks the same question as a photo. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
   B, W, y - 100, "Stories244.dc.html")
 
+AC311 = [
+  ("AC1", "The top of the card is the plate, not a button", "Given my plate holds skyr, oats and a banana, when I open the Plate, then the top of the card says On your plate and the result comes right under it, with no button in between."),
+  ("AC2", "Empty plate stands with the foods", "Given the same plate, when I look at the row right above the foods, then Empty plate stands on its left."),
+  ("AC3", "Group into parts stands opposite and reads well", "Given the same plate, when I look at that row, then Group into parts stands on its right, with its words on one line and clear of the button's border."),
+  ("AC4", "With nothing to group, Empty plate keeps its place", "Given my plate holds only skyr, so there is no Group into parts, when I look above the food, then Empty plate stands alone in the same place on the left."),
+]
+def gwt(t):
+    m = re.match(r"Given (.*), when (.*), then (.*)$", t); return [x[0].upper() + x[1:] for x in m.groups()]
+def gwtBold(t): return t.replace("Given ", "<b>Given</b> ", 1).replace(", when ", ", <b>when</b> ", 1).replace(", then ", ", <b>then</b> ", 1)
+def acTable(B, y, w, acs):
+    th = "padding:9px 12px;text-align:left;font-size:13.5px;font-weight:800;color:#fff;background:#172742"
+    td = "padding:10px 12px;font-size:13.5px;line-height:1.45;color:#172742;vertical-align:top;border-bottom:1px solid #d1dcf0"
+    hd = "font-size:12px;font-weight:900;letter-spacing:.05em;color:#5b6b8a"
+    rows = ""
+    for i, t, x in acs:
+        g, wh, th2 = gwt(x.rstrip("."))
+        rows += f'<tr><td style="{td};font-weight:800;color:#123a7a;white-space:nowrap">{i}</td><td style="{td};font-weight:700">{t}</td><td style="{td}">{g}</td><td style="{td}">{wh}</td><td style="{td}">{th2}</td></tr>'
+    li = lambda x: f'<div style="font-size:13.5px;line-height:1.45;color:#172742;margin-top:4px">{x}</div>'
+    B.html.append(f'<div style="position:absolute;left:20px;top:{y}px;width:{w}px;box-sizing:border-box;border:2px solid #172742;border-radius:14px;padding:14px 16px;background:#fff">'
+      f'<div style="font-size:19px;font-weight:900;color:#123a7a"><span style="background:#123a7a;color:#fff;border-radius:7px;padding:1px 8px;margin-right:7px">DT311</span>3. The agreement: what gets built</div>'
+      f'<div style="margin-top:6px;font-size:13.5px;color:#172742">Empty plate on the left, opposite Group into parts. Release 0.3.157. A walkthrough check names its criterion, for example DT311 AC1.</div>'
+      f'<div style="{hd};margin-top:14px">ACCEPTANCE CRITERIA, WHAT IS NEW</div>'
+      f'<table style="margin-top:6px;width:100%;border-collapse:collapse;table-layout:fixed"><colgroup><col style="width:58px"><col style="width:20%"><col style="width:24%"><col style="width:22%"><col></colgroup>'
+      f'<tr><th style="{th};border-radius:8px 0 0 0">#</th><th style="{th}">Scenario</th><th style="{th}">Given</th><th style="{th}">When</th><th style="{th};border-radius:0 8px 0 0">Then</th></tr>{rows}</table>'
+      f'<div style="display:flex;gap:40px;margin-top:16px"><div style="flex:1.4"><div style="{hd}">ALREADY WORKS, MUST NOT CHANGE</div>'
+      + li("Empty plate asks once: the first tap says Tap again to empty, the second tap empties the plate.") + li("Group into parts groups the foods as it does today, and shows when it shows today.") + li("Everything else on the card: the result, Fit to my target, the foods, + Add more to your plate, Prepare it.")
+      + f'</div><div style="flex:1"><div style="{hd}">DESIGN DETAILS FOR THE BUILD</div>' + li("Group into parts: room around its words, on one line, 44 high.") + li("The screens above on this board, DT311b and DT311c, are what it looks like.")
+      + '</div></div></div>')
+    return y
+
 start(3)
 row("empty", "Empty plate on the left, opposite Group into parts. Three states side by side, not steps", [
-  ("Why", "Coach Milan, 18 November 10:05: Empty plate could stand on the left, opposite Group into parts; that button's words are tight to its border; and when Group into parts is not there, Empty plate needs one general position."),
+  ("Ticket", "DT311. This board is the ticket: everything about it is here. On the canvas page Kanban, column Now, it is one short card with the label Board: DT311, canvas Page 5."),
+  ("How to read this board", "<b>This card, top to bottom:</b> the request, then the solution and the decision. <b>The screens</b> on the right: the design. <b>The wide block at the bottom:</b> the agreement, what gets built."),
+  ("1. The request", ""),
+  ("Opportunity, why we act", "<b>Where it comes from:</b> Coach Milan's own look at the Plate on 18 November 2026, 10:05, while going through the boards. No tester has reported it.<br><b>The job:</b> Read my plate and its result, then change its foods.<br><b>What stood in the way:</b> Nobody was blocked. Two kinds: a risk of a wrong tap, because a delete button is the first control on the card; and looks broken, because the words of Group into parts touch its border.<br><b>Why now:</b> 0.3.157 rebuilds this card anyway, so the change is small now and would cost a release of its own later."),
+  ("Problem", "On a plate with foods, the first button I meet is the one that throws the plate away: Empty plate sits at the top of the card, next to its title and above the result. The other button for the foods, Group into parts, is somewhere else, and its words touch its border, so it looks broken."),
+  ("Story", "When I open my plate, I want to read what is on it and its result before anything else, and find the buttons for the foods next to the foods, so that I do not meet a delete button first and do not look in two places."),
+  ("In Coach Milan's words", "18 November 10:05: Empty plate could stand on the left, opposite Group into parts; that button's words are tight to its border; and when Group into parts is not there, Empty plate needs one general position."),
+  ("2. The solution and the decision", ""),
   ("Now", "Empty plate is at the top right of the card, next to On your plate, above the result. Group into parts is on the right above the foods, and its words touch its border."),
   ("Proposed", "One row above the foods: Empty plate on the left, Group into parts on the right. Both act on the foods, so they stand next to them. The card's top says only On your plate."),
   ("One position", "With no Group into parts (one food, or a plate already in parts) the row stays, with Empty plate alone on the left. It never moves."),
-  ("Above the PD block", "Not there: the top of the card is the best place of the page, and a button that throws the plate away should not sit where the eye lands first."),
-  ("Group into parts", "Room around its words, on one line, 44 high."),
-  ("Ticket", "DT311 on the canvas page Kanban, column Now. It goes into 0.3.157."),
-  ("Acceptance criteria", "<b>AC1</b> <b>Given</b> a plate that shows Group into parts. <b>When</b> I look at the card On your plate. <b>Then</b> one row stands above the foods: Empty plate on the left, Group into parts on the right. The card's top says only On your plate.<br><b>AC2</b> <b>Given</b> a plate with no Group into parts, for example one food. <b>When</b> I look at the card. <b>Then</b> the same row is there with Empty plate alone on the left, in the same place.<br><b>AC3</b> <b>Given</b> the row, on a phone 390 wide. <b>When</b> I read Group into parts. <b>Then</b> its words are on one line with at least 16 px to its border on each side. Both buttons are at least 44 px high.<br><b>AC4</b> <b>Given</b> foods on the plate. <b>When</b> I tap Empty plate. <b>Then</b> it does what it does in 0.3.156. Only its place changed."),
+  ("Looked at and not chosen: above the PD block", "Not there: the top of the card is the best place of the page, and a button that throws the plate away should not sit where the eye lands first."),
+  ("Decision", "Coach Milan, 18 November 10:53: DT311 goes into 0.3.157. Go for 0.3.157: 11:14."),
+  ("3. The agreement", "In the wide block at the bottom of this board."),
 ], [("Now", "e_0", "draft", "As it is in 0.3.156. Red: the two buttons."), ("With Group into parts", "e_1", "changed", "The same plate, with the change."), ("With one food", "e_2", "changed", "No Group into parts.")], nid="DT311", arrows=False)
+acTable(B, 1800, W - 40, AC311); y = 1800 + 469 + 150  # measured: the card ends at 1742, the block is 469 high, the table is 348 high
 board("Stories246.dc.html", "DT311: Empty plate on the left, opposite Group into parts",
   "18 November 2026 (Coach Milan 10:05). A small card of its own; it can go with 0.3.157. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
   B, W, y - 100, "Stories245.dc.html")

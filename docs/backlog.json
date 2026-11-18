@@ -1,5 +1,5 @@
 {
-  "about": "One entry per ticket. The Kanban on the canvas (page Kanban) and the handover read this file. States: later (one line, an idea), next (brainstormed, Milan's answer in, no board), now (board drawn and approved, waits for Go), progress (branch open), done (merged, with its version). Milan says the word; Claude moves the card. From 18 November 2026 a ticket can carry its acceptance criteria as ac: a list of Given, When, Then rows with an id (AC1, AC2 ...); the Kanban card and the board's story card both show them. A ticket names its board and the canvas page (where); the board's story card names its ticket and its Kanban column.",
+  "about": "One entry per ticket. The Kanban on the canvas (page Kanban) and the handover read this file. States: later (one line, an idea), next (brainstormed, Milan's answer in, no board), now (board drawn and approved, waits for Go), progress (branch open), done (merged, with its version). Milan says the word; Claude moves the card. From 18 November 2026 a ticket can carry five parts: opportunity (why we act on it: where it comes from, the job the person was doing, what stood in the way as one of the kinds below, and why now), problem (the pain today, in plain words), story (what the person wants to be able to do and why, never the solution), ac (the acceptance criteria for what is new only: scenarios with an id, a short title that names the behaviour, and one sentence Given ..., when ..., then ...; one behaviour each), and unchanged (what already works and must not change: preconditions, not requirements). Kinds of what stood in the way: could not do it, a bug; could not do it, the feature is missing; too many steps; did not find it or did not understand it; a risk of a wrong tap; looks broken. The opportunity says honestly who saw it: a tester in a test, or Coach Milan's own look. Decided 18 November 2026, 12:41, for every ticket from the next one on (DT311 is the example): the Kanban card is short and names the ticket's board as a text label (no link); the board carries the weight. On the board, a vertical card holds the request (opportunity, problem, story) and then the solution and the decision; the screens are the design; a wide block at the bottom holds the agreement: the acceptance criteria as a table (#, Scenario, Given, When, Then), what already works and must not change, and design details for the build. A board is named by its ticket id, never by its file name. The full description is the Project note claude/chef-mealan-ticket-form.md and docs/ticket-form.md. A ticket can also carry findings (what was checked, with the date) and open (the open questions); both show on its board.",
   "epics": {
     "home": {
       "name": "Home page",
@@ -1310,33 +1310,42 @@
       "epic": "plate",
       "state": "now",
       "board": "Stories246",
-      "why": "Coach Milan 18 November 10:05: Empty plate could stand opposite Group into parts; that button's words are tight to its border; one general position when Group into parts is not there; not above the PD block if that is not friendly. Drawn: one row above the foods, Empty plate left, Group into parts right; with one food Empty plate alone in the same place; the card's top says only On your plate. Coach Milan 18 November 10:53: it goes into 0.3.157. Waits for the Go on the boards.",
       "where": "Page 5",
+      "why": "Coach Milan 18 November 10:05: Empty plate could stand opposite Group into parts; that button's words are tight to its border; one general position when Group into parts is not there; not above the PD block if that is not friendly. Drawn: one row above the foods, Empty plate left, Group into parts right; with one food Empty plate alone in the same place; the card's top says only On your plate. Coach Milan 18 November 10:53: it goes into 0.3.157. Waits for the Go on the boards.",
+      "opportunity": {
+        "from": "Coach Milan's own look at the Plate on 18 November 2026, 10:05, while going through the boards. No tester has reported it.",
+        "job": "Read my plate and its result, then change its foods.",
+        "kind": "Nobody was blocked. Two kinds: a risk of a wrong tap, because a delete button is the first control on the card; and looks broken, because the words of Group into parts touch its border.",
+        "why_now": "0.3.157 rebuilds this card anyway, so the change is small now and would cost a release of its own later."
+      },
+      "problem": "On a plate with foods, the first button I meet is the one that throws the plate away: Empty plate sits at the top of the card, next to its title and above the result. The other button for the foods, Group into parts, is somewhere else, and its words touch its border, so it looks broken.",
+      "story": "When I open my plate, I want to read what is on it and its result before anything else, and find the buttons for the foods next to the foods, so that I do not meet a delete button first and do not look in two places.",
       "ac": [
         {
           "id": "AC1",
-          "given": "A plate that shows Group into parts",
-          "when": "I look at the card On your plate",
-          "then": "One row stands above the foods: Empty plate on the left, Group into parts on the right. The card's top says only On your plate"
+          "title": "The top of the card is the plate, not a button",
+          "text": "Given my plate holds skyr, oats and a banana, when I open the Plate, then the top of the card says On your plate and the result comes right under it, with no button in between."
         },
         {
           "id": "AC2",
-          "given": "A plate with no Group into parts, for example one food",
-          "when": "I look at the card",
-          "then": "The same row is there with Empty plate alone on the left, in the same place"
+          "title": "Empty plate stands with the foods",
+          "text": "Given the same plate, when I look at the row right above the foods, then Empty plate stands on its left."
         },
         {
           "id": "AC3",
-          "given": "The row, on a phone 390 wide",
-          "when": "I read Group into parts",
-          "then": "Its words are on one line with at least 16 px to its border on each side. Both buttons are at least 44 px high"
+          "title": "Group into parts stands opposite and reads well",
+          "text": "Given the same plate, when I look at that row, then Group into parts stands on its right, with its words on one line and clear of the button's border."
         },
         {
           "id": "AC4",
-          "given": "Foods on the plate",
-          "when": "I tap Empty plate",
-          "then": "It does what it does in 0.3.156. Only its place changed"
+          "title": "With nothing to group, Empty plate keeps its place",
+          "text": "Given my plate holds only skyr, so there is no Group into parts, when I look above the food, then Empty plate stands alone in the same place on the left."
         }
+      ],
+      "unchanged": [
+        "Empty plate asks once: the first tap says Tap again to empty, the second tap empties the plate.",
+        "Group into parts groups the foods as it does today, and shows when it shows today.",
+        "Everything else on the card: the result, Fit to my target, the foods, + Add more to your plate, Prepare it."
       ]
     },
     {
@@ -1360,6 +1369,104 @@
       "epic": "trust",
       "state": "later",
       "why": "Coach Milan 16 November 11:35, with two screenshots: after DT305, update the blocks that are similar. Chef Mealan's card on the plate (Did you eat it? with Ate half, Add a food, Don't count it, Ate it as four buttons) and the questions behind the pencil of the meal line. By design rules D6 and D7."
+    },
+    {
+      "id": "OP5",
+      "title": "Turn the repo private: what breaks, and what to do first",
+      "epic": "trust",
+      "state": "later",
+      "why": "Coach Milan 18 November 12:59: most likely the repo goes private. The findings are on the board.",
+      "board": "Stories247",
+      "where": "Page 5",
+      "opportunity": {
+        "from": "Coach Milan, 18 November 2026, 12:59: \"Most likely I will turn the project to private. It grew a lot and most of info can be published online without keeping repo public.\" He first weighed it on 24 October and kept the repo public then.",
+        "job": "Decide what of Chef Mealan the public can read, and keep the site, the releases and the job search working.",
+        "kind": "Nobody is blocked. It is a risk: the public repo now holds the backlog, the rules and the reasons behind decisions, next to the code.",
+        "why_now": "The two tool tickets, OP6 and OP7, depend on where tickets and documentation live."
+      },
+      "problem": "The repo started as code. It grew into the place where the tickets, the rules and the reasons behind decisions are kept, and all of it is public. Strategic information does not belong where anyone can read it.",
+      "story": "As the owner, I want to choose what of Chef Mealan is public, so that strategy stays with me and a visitor or a hiring manager still sees what I chose to show.",
+      "findings": [
+        "No page of chefmealan.com links into this repo for a visitor. Checked in the repo on 18 November 2026, 13:05, at commit ff5a200.",
+        "/built has two GitHub links, both to other places: the Worth Building PDF in the repo mistancevic/worth-building, and the PlateMate page at mistancevic.github.io/platemate. They keep working as long as those two stay public.",
+        "/built's system picture has a box \"GitHub: Code, boards, rules, test runs\". It is a statement with no link. It stays true.",
+        "Menu, Dev data, Deploy (the owner's own panel) reads the version of main from raw.githubusercontent.com. Once private, that row says \"not known\". It needs another source, or the row goes. This is the one place in the app that breaks.",
+        "The three rows Preview, Promote and Roll back in that panel open GitHub's workflow pages. They keep working for Coach Milan when he is signed in to GitHub.",
+        "The workflows sign in to Google by the repo owner's name, not by the repo being public, so Preview, Promote and Roll back should keep working. Not tested.",
+        "GitHub's free plan limits the free workflow minutes of a private repo per month. A public repo has no limit. To check: the plan, and how long one Preview run takes.",
+        "The Cloud Shell way to deploy (deploy/README.md) clones the repo by its public address. Once private, it needs a sign-in.",
+        "Every new Claude chat clones the repo. Once private, the GitHub connection of Claude must be allowed to read and push to it.",
+        "Links from outside, in LinkedIn, the CV and the portfolio PDF, cannot be checked from here. The Project note for LinkedIn and the CV has no link to the repo.",
+        "What was public stays copied: clones, forks and caches made before the switch are not taken back by it.",
+        "The rule \"testers by number, never by name\" exists because the repo is public. It can stay, and would no longer be needed.",
+        "The decision of 24 October 2026 (10:20 to 10:42): the repo stays public while the job search runs, because it is the proof behind LinkedIn and /built. Go private when the first coach or client pays, or the rulebook (DT197) ships, or the search ends. Then: Settings, Danger zone, Change visibility; a hiring manager gets read access on request; the GitHub profile shows private contributions; one line on /built: the code is private, ask for access."
+      ],
+      "open": [
+        "Does the decision of 24 October still hold, or does the repo go private while the job search runs?",
+        "Does /built get the line \"The code is private, ask for access\"?"
+      ]
+    },
+    {
+      "id": "OP6",
+      "title": "A Kanban tool of our own, in place of Jira or Trello",
+      "epic": "ops",
+      "state": "later",
+      "why": "Coach Milan 18 November 12:20 and 12:53: an internal Kanban board as a tool. The findings are on the board.",
+      "board": "Stories248",
+      "where": "Page 5",
+      "opportunity": {
+        "from": "Coach Milan, 18 November 2026, 12:20: \"We dont have Jira. Maybe that can be the project on its own.\" And 12:53: \"we will built internal Kanban board as a tool\". His own experience with the drawn Kanban page; no tester is involved.",
+        "job": "See where the work stands, open one ticket, and move a card.",
+        "kind": "Two kinds. Too many steps: a card moves only when Coach Milan says the word and Claude redraws the page. Did not find it: a card cannot open its ticket, and the ticket's board is found only by scrolling the canvas for its id.",
+        "why_now": "Not urgent. The ticket form was decided on 18 November, so the shape of a ticket is known."
+      },
+      "problem": "The Kanban is a drawn page on the design canvas. I cannot tap a card to open its ticket, I cannot move a card myself, and a link from a card to its board does not exist. To read a ticket I leave the Kanban and search the canvas.",
+      "story": "When I plan the next step, I want to see every ticket in its column, open one with a tap and move it myself, so that the state of the work is one look away and I do not need a chat to change it.",
+      "findings": [
+        "The data for it is in the repo today: docs/backlog.json holds 157 tickets, each with id, title, epic and state. 143 have a why, 96 name a board, 87 name their version. Checked in the repo on 18 November 2026, 13:05, at commit ff5a200.",
+        "Releases are in CHANGELOG.md and docs/versions.md, every version. The Done column can be built from them for the whole history, not only the last 21 versions.",
+        "Only DT311 has the full ticket form. The other tickets have a title and one line.",
+        "The backlog keeps a ticket's state, not when it changed. The history of a card can be read from the git history of docs/backlog.json, from 2 November 2026 on.",
+        "The id OP2 is used twice in the backlog: for the public Releases page (later) and for \"Nothing lives only in the build workspace\" (done). A tool needs each id once.",
+        "Ticket types beside DT: B (a bug fix), HP (home page), OP, EX, EV, R and f. The tool has to take all of them.",
+        "Where it could live, not decided: (1) a Claude artifact, private to Coach Milan, no login to build, Claude reads and writes it; (2) a page inside Chef Mealan behind the owner's login, like the Evals page; (3) an app of its own with its own login.",
+        "If the repo goes private (OP5), the tool can still read the backlog from it. If tickets move out of GitHub, the tool needs its own store."
+      ],
+      "open": [
+        "Does a card get moved by Coach Milan himself, or still by word?",
+        "Where does it live: artifact first, then outside? See OP7, the same question."
+      ]
+    },
+    {
+      "id": "OP7",
+      "title": "A pages tool of our own, in place of Confluence",
+      "epic": "ops",
+      "state": "later",
+      "why": "Coach Milan 18 November 12:28 and 12:59: the request, the design and the decision belong to a page, and strategic information to documentation. The findings are on the board.",
+      "board": "Stories249",
+      "where": "Page 5",
+      "opportunity": {
+        "from": "Coach Milan, 18 November 2026, 12:28: the steps before the ticket \"belong to Confluence page as a brainstorm and design documentation\". And 12:59: \"we will have to think about storing strategic info in documentation and maybe not at all on github. Just like Confluence store it nowadays in orgs\". His own view; no tester is involved.",
+        "job": "Find why something was decided: the request, what was looked at, the design, and the decision with its date.",
+        "kind": "Did not find it. The reasons are spread over the canvas boards, 23 handover notes in the Project, and Claude's working agreements. There is no one page per topic.",
+        "why_now": "Not urgent. It becomes needed when the repo goes private (OP5) or when a second person joins the work."
+      },
+      "problem": "The reasons behind Chef Mealan live in three places that do not know each other: the boards on the canvas, the handover notes written day by day, and the working agreements. To find one decision I have to remember the day it was made.",
+      "story": "When I ask why something is the way it is, I want one page for that topic with the request, the design and the decision, so that I, a new chat or a new colleague can read it without the history of the chats.",
+      "findings": [
+        "The boards themselves, the drawn pages with their screens, are only on the canvas (397 files). The repo holds the scripts that draw them (design/boards), not the pictures. Checked in the repo on 18 November 2026, 13:05, at commit ff5a200.",
+        "The decisions with Coach Milan's words and times are in the handover notes in the Project (23 notes, 24 October to 18 November 2026). They are not in the repo.",
+        "The handover notes name testers, and the repo is public. They cannot go into the repo as they are.",
+        "The rules are already pages of a kind and are in the repo: docs/rules/culinary.md, docs/rules/nutrition.md, docs/ticket-form.md, tests/flows/README.md.",
+        "The handover notes are sorted by day. A pages tool sorts by topic. Building it \"as if we had it from the start\" means sorting the notes into topics once.",
+        "The ticket form of 18 November already splits the two: the vertical card of a board is the page, the wide block is the ticket. A page per ticket can be made from that card.",
+        "Where it could live, not decided: the same three places as the Kanban tool (OP6). Claude's own Docs can hold pages today, with comments and sharing, without building anything.",
+        "Coach Milan, 12:59: strategic information maybe not on GitHub at all."
+      ],
+      "open": [
+        "Which information is strategic and stays out of GitHub, and which may be published?",
+        "Do the pages start in the Project and Claude's Docs, and move to a tool of our own later?"
+      ]
     }
   ]
 }

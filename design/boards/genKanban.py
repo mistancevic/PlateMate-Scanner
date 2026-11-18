@@ -16,13 +16,24 @@ LEGEND = ('<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px
 def chip(e): return f'<span style="display:inline-block;background:{COL[e]};color:#fff;border-radius:999px;padding:1px 8px;font-size:11.5px;font-weight:800">{html.escape(E[e]["name"])}</span>'
 def card(t):
     meta = []
-    if t.get("board"): meta.append("Board " + (t["board"] if str(t["board"]).startswith("Stories") else f"Stories{t['board']}") + (f", canvas {t['where']}" if t.get("where") else ""))
+    own = t.get("board") and t.get("where")
+    if own: meta.append(f'<span style="display:inline-block;background:#eaf1fd;color:#123a7a;border:1px solid #b9cdf0;border-radius:6px;padding:1px 7px">Board: {t["id"]}, canvas {t["where"]}</span>')
+    elif t.get("board"): meta.append("Board " + (t["board"] if str(t["board"]).startswith("Stories") else f"Stories{t['board']}") + (f", canvas {t['where']}" if t.get("where") else ""))
     if t.get("version"): meta.append(f"v{t['version']}")
     why = f'<div style="font-size:12.5px;line-height:1.4;color:#3d4a63;margin-top:5px">{html.escape(t["why"])}</div>' if t.get("why") else ""
     m = f'<div style="font-size:11.5px;color:#5b6b8a;margin-top:5px;font-weight:700">{" · ".join(meta)}</div>' if meta else ""
-    # acceptance criteria as Given, When, Then (from 18 November 2026): one block per row, the card is too narrow for a table
-    ac = "".join(f'<div style="margin-top:6px;padding:6px 8px;border-radius:8px;background:#f4f7fc;font-size:12px;line-height:1.4;color:#172742"><b style="color:#123a7a">{html.escape(a["id"])}</b> <b>Given</b> {html.escape(a["given"])}. <b>When</b> {html.escape(a["when"])}. <b>Then</b> {html.escape(a["then"])}.</div>' for a in t.get("ac", []))
-    if ac: ac = '<div style="font-size:11.5px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin-top:8px">ACCEPTANCE CRITERIA</div>' + ac
+    # from 18 November 2026: the opportunity, the problem, the story, the acceptance criteria for what is new, what must not change
+    head = lambda x: f'<div style="font-size:11.5px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin-top:8px">{x}</div>'
+    para = lambda x: f'<div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:3px">{html.escape(x)}</div>'
+    ac = ""
+    if own: t = {k: v for k, v in t.items() if k not in ("opportunity", "problem", "story", "ac", "unchanged")}
+    if t.get("opportunity"):
+        o = t["opportunity"]; row = lambda k, v: f'<div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:3px"><b>{k}</b> {html.escape(v)}</div>'
+        ac += head("OPPORTUNITY, WHY WE ACT") + row("Where it comes from:", o["from"]) + row("The job:", o["job"]) + row("What stood in the way:", o["kind"]) + row("Why now:", o["why_now"])
+    if t.get("problem"): ac += head("PROBLEM") + para(t["problem"])
+    if t.get("story"): ac += head("STORY") + para(t["story"])
+    if t.get("ac"): ac += head("ACCEPTANCE CRITERIA, WHAT IS NEW") + "".join(f'<div style="margin-top:6px;padding:6px 8px;border-radius:8px;background:#f4f7fc;font-size:12px;line-height:1.4;color:#172742"><b style="color:#123a7a">{html.escape(a["id"])}</b> <b>{html.escape(a["title"])}</b><br>{html.escape(a["text"]).replace("Given ", "<b>Given</b> ", 1).replace(", when ", ", <b>when</b> ", 1).replace(", then ", ", <b>then</b> ", 1)}</div>' for a in t["ac"])
+    if t.get("unchanged"): ac += head("ALREADY WORKS, MUST NOT CHANGE") + "".join(f'<div style="font-size:12px;line-height:1.4;color:#3d4a63;margin-top:3px">· {html.escape(u)}</div>' for u in t["unchanged"])
     return (f'<div style="border:1.5px solid #d1dcf0;border-left:5px solid {COL[t["epic"]]};border-radius:10px;padding:9px 10px;background:#fff;margin-bottom:8px">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><b style="font-size:12.5px;color:#123a7a">{t["id"]}</b>{chip(t["epic"])}</div>'
             f'<div style="font-size:13.5px;font-weight:700;line-height:1.35;color:#172742;margin-top:4px">{html.escape(t["title"])}</div>{why}{m}{ac}</div>')
@@ -47,8 +58,8 @@ def column(key, name, sub):
             f'<div style="margin-top:10px">{body}</div></div>')
 epics = "".join(f'<div style="width:{CW}px;flex:none;border:1.5px solid {COL[k]};border-radius:10px;padding:8px 10px;background:#fff"><div>{chip(k)}</div><div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:5px">{html.escape(e["why"])}</div></div>' for k, e in E.items())
 W = PAD * 2 + 3 * CW + 2 * G
-# the page is as tall as its longest column; measure it in a browser and give it as KANBAN_H (13,600 on 18 November 2026)
-H = int(os.environ.get("KANBAN_H", "13600"))
+# the page is as tall as its longest column; measure it in a browser and give it as KANBAN_H (13,700 on 18 November 2026, 13:15)
+H = int(os.environ.get("KANBAN_H", "13700"))
 page = f'''<!doctype html>
 <html lang="en">
 <head>
