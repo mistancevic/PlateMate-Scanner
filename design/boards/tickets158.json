@@ -1,0 +1,219 @@
+{
+ "DT313": {
+  "id": "DT313",
+  "title": "Whatever arrives on a plate with foods gets the question a photo gets",
+  "short": "One question for everything that arrives on a plate with foods",
+  "epic": "plate",
+  "opportunity": {
+   "from": "Found on 18 November 2026 while 0.3.157 was built, and noted in the handover as found, not changed. No tester has reported it.",
+   "job": "Put a recipe on the Plate without losing what is already on it.",
+   "kind": "Two kinds. Lost work: Start a new plate throws the old plate away, with no copy and no Undo. Two looks for one question: a photo and a recipe link ask on the new screen; a recipe from Recipes, a meal from the Plan, a dish from the chat, and a food onto a plate from earlier ask on the old one.",
+   "why_now": "0.3.157 built the screen and the rule for a photo. As long as the other ways skip it, the rule that nothing is lost is true only sometimes."
+  },
+  "problem": "My plate holds skyr, oats and a banana. I open a recipe in Recipes and tap Change it first. Chef Mealan asks in the old look, with Start a new plate as the first button. I tap it and my plate is gone: it is not in My recipes and there is no Undo. With a photo the same tap saves my plate first.",
+  "story": "When something with its own foods arrives on a plate that already has foods, I want the same question every time, and my old plate kept when I start a new one, so that I never lose a plate by one tap.",
+  "now": "Four ways ask on the old screen: a recipe from Recipes (Change it first), a meal from the Plan (Change it on the Plate), a dish from the chat, and one food onto a plate from an earlier meal. The buttons are Start a new plate, Add to my plate, Keep my plate. Start a new plate drops the old plate.",
+  "proposed": "The one element: the question screen of the board DT308 (frame DT308.12f), unchanged, used for these four ways too. Your plate is not empty, the plate's name, what arrives, then Add to my plate and Start a new plate. Start a new plate saves the old plate in My recipes and shows the one line with Undo.",
+  "more": [
+   [
+    "What goes away, for your word",
+    "Keep my plate. Back takes its place, at the top, and does the same: nothing lands, and I am where I came from. On the old screen Start a new plate was the first button; on this screen Add to my plate is first, as for a photo."
+   ],
+   [
+    "One food onto a plate of now",
+    "No change. As agreed on the board DT308.12: a barcode, a label or a food from my foods joins the plate with no question."
+   ],
+   [
+    "Not in this ticket",
+    "Start cooking with foods on the Plate keeps its own question (Save my plate, Clear my plate). Foods I say or type to Chef Mealan are in AC8 without a frame: tell me if you want it drawn."
+   ]
+  ],
+  "ac": [
+   {
+    "id": "AC1",
+    "title": "A recipe from Recipes asks on the photo's screen",
+    "text": "Given my plate holds skyr, oats and a banana, when I tap Change it first on Chicken and rice bowl in Recipes, then I see Your plate is not empty, It already has Skyr, Oats & Banana, the line The recipe is Chicken and rice bowl, from My recipes: 2 foods, and the buttons Add to my plate and Start a new plate, in that order."
+   },
+   {
+    "id": "AC2",
+    "title": "Back changes nothing",
+    "text": "Given that question is open, when I tap Back to the recipe, then I am on the recipe's page in Recipes and my plate holds what it held."
+   },
+   {
+    "id": "AC3",
+    "title": "Add to my plate",
+    "text": "Given that question is open, when I tap Add to my plate, then the recipe joins my foods as one dish and the plate keeps its name."
+   },
+   {
+    "id": "AC4",
+    "title": "Start a new plate keeps the old one",
+    "text": "Given that question is open, when I tap Start a new plate, then the plate holds only the recipe, Skyr, Oats & Banana is saved in My recipes, and one line on top says so, with Open it in My recipes and Undo."
+   },
+   {
+    "id": "AC5",
+    "title": "Undo",
+    "text": "Given that line is showing, when I tap Undo, then my plate holds skyr, oats and a banana again and the recipe is off it."
+   },
+   {
+    "id": "AC6",
+    "title": "A meal from the Plan",
+    "text": "Given my plate has foods and today's dinner in the Plan is Chicken and rice bowl, when I tap Change it on the Plate on that meal, then I get the same screen, with Back to the plan."
+   },
+   {
+    "id": "AC7",
+    "title": "A dish from the chat",
+    "text": "Given my plate has foods and Chef Mealan offers a dish in the chat, when I put it on my plate, then I get the same screen, with Back to the chat."
+   },
+   {
+    "id": "AC8",
+    "title": "Foods I said in words",
+    "text": "Given my plate has foods, when I tell Chef Mealan my foods in words and he has read them, then I get the same screen, with what I said in place of the photo."
+   },
+   {
+    "id": "AC9",
+    "title": "A food onto a plate from earlier",
+    "text": "Given it is Sunday and my plate holds skyr and oats from Saturday 19:10, when I add a banana from my foods, a barcode or a label, then I get the same screen, with the banana as what arrives, and Start a new plate keeps Skyr & Oats in My recipes"
+   },
+   {
+    "id": "AC10",
+    "title": "An empty plate is not asked",
+    "text": "Given my plate is empty, when a recipe, a meal or a dish arrives, then it lands with no question."
+   }
+  ],
+  "unchanged": [
+   "The question for a photo and for a recipe link, as built in 0.3.157.",
+   "Add to my plate: the recipe joins as one dish, as today.",
+   "One food onto a plate of now joins with no question (DT308.12).",
+   "A recipe already on the plate opens with no question.",
+   "Start cooking with foods on the Plate: its own question stays."
+  ],
+  "details": [
+   "No new element. The screen, the line and Undo are the ones of DT308.12.",
+   "New words: the recipe line with its source, the line for one food, Back to the plan, Back to the chat. English, Serbian, German.",
+   "The screens DT313e and DT313f on this board are what it looks like."
+  ],
+  "arrows": false
+ },
+ "DT314": {
+  "id": "DT314",
+  "title": "A plate from earlier: Ate it asks the meal in the calendar",
+  "short": "Ate it on a plate from earlier asks which meal",
+  "epic": "plate",
+  "opportunity": {
+   "from": "Found on 18 November 2026 while 0.3.157 was built, and noted in the handover as found, not changed. No tester has reported it.",
+   "job": "Log a plate I ate earlier to the meal I ate it at.",
+   "kind": "A wrong record. The app picks the meal nearest to the time the plate was started and logs it. I am not asked, and the message does not name the meal.",
+   "why_now": "0.3.157 made one rule: no meal is guessed, I say it. This is the last place where the app still decides for me."
+  },
+  "problem": "On Sunday I open the Plate. It holds skyr and oats from Saturday 19:10 and Chef Mealan asks Did you eat it?. I tap Ate it. It is logged for yesterday, 19:10, to a meal the app chose. I ate it as a late snack, and now Saturday's dinner holds it.",
+  "story": "When I say I ate a plate from earlier, I want to see which day and meal it goes to and change it with one tap, so that my days hold what I ate, where I ate it.",
+  "now": "Ate it logs at once to the day the plate was started, to the nearest meal. The message says Logged for yesterday, 19:10. No meal is named.",
+  "proposed": "The one element: the calendar of the board DT308, unchanged. Ate it opens it on the day the plate was started, with the nearest meal marked as the guess. One tap on a row logs it there.",
+  "more": [
+   [
+    "One tap more, on purpose",
+    "Today it is one tap. Proposed it is two: Ate it, then the row. The second tap is the answer the app guesses today."
+   ],
+   [
+    "Needs B148",
+    "Another day in this calendar opens only when the bug B148 is fixed. See the board B148 on Page 5."
+   ]
+  ],
+  "ac": [
+   {
+    "id": "AC1",
+    "title": "Ate it opens the calendar, nothing is logged yet",
+    "text": "Given it is Sunday 18:00 and my plate holds skyr and oats from Saturday 19:10, when I tap Ate it on Did you eat it?, then the calendar opens on Sat 14 with Dinner marked, the line above it says the plate was started on Saturday, 19:10, and nothing is logged."
+   },
+   {
+    "id": "AC2",
+    "title": "A tap on a row logs it there",
+    "text": "Given that calendar is open, when I tap Dinner, then the plate is logged to Saturday's dinner at 19:10, the Plate is free, and one line says Skyr & Oats is in Saturday's dinner, eaten."
+   },
+   {
+    "id": "AC3",
+    "title": "Another meal",
+    "text": "Given that calendar is open, when I tap Snack, then the plate is logged to Saturday as a snack at 19:10."
+   },
+   {
+    "id": "AC4",
+    "title": "Another day",
+    "text": "Given that calendar is open, when I tap Sun 15, today and then Snack, then the plate is logged to today as a snack."
+   },
+   {
+    "id": "AC5",
+    "title": "A meal that already holds something",
+    "text": "Given Saturday's dinner already holds a logged meal, when I tap Dinner, then I am asked Replace it or Add as another dish, as the calendar asks today."
+   },
+   {
+    "id": "AC6",
+    "title": "A plate with a photo",
+    "text": "Given the plate from earlier came from a photo taken Saturday 15:57, when I tap Ate it, then the calendar opens on Saturday with the meal nearest to 15:57 marked."
+   }
+  ],
+  "unchanged": [
+   "Did you eat it? and when it shows. Save for later, Keep working on it and Clear it do what they do today.",
+   "The calendar itself: its days, its rows, its marks.",
+   "Ate it at the bottom of a plate of now."
+  ],
+  "details": [
+   "The calendar opens under the question's buttons. The frame DT314c draws it on the plate's own Ate it; it is the same element.",
+   "New words: the line above the calendar, and the help under the buttons (Ate it asks which meal). English, Serbian, German.",
+   "The time logged stays the time the plate was started."
+  ]
+ },
+ "B148": {
+  "id": "B148",
+  "title": "Under Ate it and Plan it, a tap on another day does nothing",
+  "short": "The calendar under Ate it and Plan it: a tap on a day opens that day",
+  "epic": "plate",
+  "arrows": false,
+  "opportunity": {
+   "from": "Found on 18 November 2026 while drawing the board DT314, on the app as built in 0.3.157. No tester has reported it.",
+   "job": "Log or plan my plate on another day.",
+   "kind": "Blocked, with a way around. The day's button looks active, I tap it and nothing happens. Only More, then a date, moves the calendar.",
+   "why_now": "It is in the release that is out for testing, and it is the first thing a tester tries with yesterday's plate."
+  },
+  "problem": "My plate has no meal set. I tap Ate it at the bottom. The calendar opens on today. I tap Sat 14 and it stays on today. The same under Plan it: it opens on tomorrow and a tap on Tue 17 does nothing.",
+  "story": "When I tap a day in the calendar, I want that day's meals, so that I can log or plan my plate there.",
+  "now": "Under Ate it and Plan it a tap on a day is lost. The calendar behind the pencil works. No walkthrough taps a day under Ate it or Plan it, so the 206 passed.",
+  "proposed": "A tap on a day opens that day, as behind the pencil. Nothing new on the screen: a fix in the code, with walkthrough checks so it stays fixed.",
+  "more": [
+   [
+    "My miss",
+    "I built this in 0.3.157 and did not test this tap. The cause: the tap sets the day and closes More in two steps, and the second step puts the old day back."
+   ]
+  ],
+  "ac": [
+   {
+    "id": "AC1",
+    "title": "A day gone by under Ate it",
+    "text": "Given it is Sunday 15 November and my plate has no meal set, when I tap Ate it and then Sat 14, then Sat 14 is marked and the rows are Saturday's meals."
+   },
+   {
+    "id": "AC2",
+    "title": "A coming day under Plan it",
+    "text": "Given the same plate, when I tap Plan it and then Tue 17, then Tue 17 is marked and the rows are Tuesday's meals."
+   },
+   {
+    "id": "AC3",
+    "title": "After More",
+    "text": "Given I opened More and picked 12 November, when I tap Sat 14, then More closes, Sat 14 is marked and the rows are Saturday's meals."
+   },
+   {
+    "id": "AC4",
+    "title": "The row logs on the day shown",
+    "text": "Given Sat 14 is marked under Ate it, when I tap Lunch, then the plate is logged to Saturday's lunch."
+   }
+  ],
+  "unchanged": [
+   "The calendar behind the pencil.",
+   "Days that cannot be picked: a coming day under Ate it, a day gone by under Plan it.",
+   "More and its date field."
+  ],
+  "details": [
+   "No change to what is drawn on the boards DT308.",
+   "New checks in the walkthrough plate-end, named B148 AC1 to AC4."
+  ]
+ }
+}
