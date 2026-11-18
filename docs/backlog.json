@@ -1906,6 +1906,63 @@
       "unchanged": [
         "Which answer is chosen, and what a tap does."
       ]
+    },
+    {
+      "id": "B150",
+      "title": "A photo from another day, logged under a meal of today, leaves two dinners on its day",
+      "epic": "plate",
+      "state": "next",
+      "board": "Stories260",
+      "where": "Page 5",
+      "why": "Coach Milan 18 November 19:21, with a screenshot of his Plan on Tuesday 17: a photo from Tuesday 19:56, tried as today's lunch, then set to dinner with the pencil; Tuesday shows it as Dinner, 19:56 and the planned Chicken rice bowl still asks. Cause: the pencil's calendar opens on today also for a photo from another day, and the meal is logged with the photo's time under the dinner of today. Reproduced on 0.3.159 as a record with the photo's day and another day's meal. Drawn; waits for a Go.",
+      "opportunity": {
+        "from": "Coach Milan, 18 November 2026, 19:21, with a screenshot of his Plan on Tuesday 17 November. Found while testing the last releases on his phone.",
+        "job": "Log a photo of a meal I ate on another day, to that day and that meal.",
+        "kind": "A wrong record, on two days at once. The day I ate it shows two dinners. Today's dinner counts as eaten though I have not had it.",
+        "why_now": "It is in the releases under test, and every photo picked from Your photos can end this way."
+      },
+      "problem": "I read a photo from Tuesday 19:56. I tried it as today's lunch first, then wanted its real time. The pencil's calendar showed a dinner at 18:00 and I took it. Now Tuesday shows Chicken and sweet potato fries as Dinner, 19:56, and under it the planned dinner, Chicken rice bowl, still asks I ate it, I skipped it.",
+      "story": "When I log a photo from another day, I want it to land on one day, as the meal I picked, so that the day shows what I ate once and no planned meal keeps asking.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "The pencil opens on the photo's day",
+          "text": "Given it is Sunday and the read shows a photo from Saturday 15:57 that I said I ate then, when I tap the pencil, then the calendar opens on Sat 14, the line above says Which meal? From the photo, Saturday 15:57, and Lunch, the nearest meal, is marked."
+        },
+        {
+          "id": "AC2",
+          "title": "One dinner on the photo's day",
+          "text": "Given that calendar and a Chicken rice bowl planned for Saturday's dinner, when I tap Dinner, then All of it and Done, then Saturday shows my meal as its dinner and the Chicken rice bowl no longer asks."
+        },
+        {
+          "id": "AC3",
+          "title": "A meal of today, when I mean today",
+          "text": "Given the same read, when I tap Sun 15, today, then Dinner, then All of it and Done, then the meal is today's dinner at today's time, and Saturday shows nothing of it."
+        },
+        {
+          "id": "AC4",
+          "title": "One day per record",
+          "text": "Given a meal is logged from a photo by any way (the read, the plate, Ate it, the pencil), when I open the Plan, then it shows on the day of the meal I picked and on no other day."
+        },
+        {
+          "id": "AC5",
+          "title": "The record on your phone",
+          "text": "Given a record with the time Tuesday 19:56 and the dinner of Wednesday, when the app opens after the release, then it is Tuesday's dinner, Tuesday's planned dinner no longer asks, and Wednesday's dinner is open again."
+        }
+      ],
+      "unchanged": [
+        "Ate it's calendar: it already opens on the photo's day.",
+        "A photo taken now, and a photo I did not say I ate then: the pencil opens on today.",
+        "A dinner logged after midnight stays with the evening before: its meal is on the earlier day, and that is left alone.",
+        "What a planned meal shows when it is closed by a meal I ate."
+      ]
+    },
+    {
+      "id": "DT318",
+      "title": "The read: where and how to correct what Chef Mealan read",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 18 November 19:26, from the same test: the read gave a good list and asked about the chicken (he chose 200 g). The yogurt came as 10 % fat, fixed in the food list, not on the read's chip. Swap offered no 0.2 % fat yogurt. He added words (mayo was hidden; the yogurt is 0.2 % fat); the read then asked about the chicken again, this time whether it was 220 g. The list ended right, but it was confusing where and how to correct it. Four points: the kind of a food cannot be corrected on its chip; Swap lacks the variant; a second read asks again what was already answered, with another number; no one place to correct. Not reproduced and not drawn yet."
     }
   ]
 }

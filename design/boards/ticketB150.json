@@ -1,0 +1,59 @@
+{
+ "id": "B150",
+ "title": "A photo from another day, logged under a meal of today, leaves two dinners on its day",
+ "short": "A meal is logged on one day: the day of the meal I picked",
+ "epic": "plate",
+ "rel": "Proposed; not agreed until Coach Milan says Go",
+ "boardTitle": "B150: a photo from another day, logged under a meal of today, leaves two dinners on its day",
+ "opportunity": {
+  "from": "Coach Milan, 18 November 2026, 19:21, with a screenshot of his Plan on Tuesday 17 November. Found while testing the last releases on his phone.",
+  "job": "Log a photo of a meal I ate on another day, to that day and that meal.",
+  "kind": "A wrong record, on two days at once. The day I ate it shows two dinners. Today's dinner counts as eaten though I have not had it.",
+  "why_now": "It is in the releases under test, and every photo picked from Your photos can end this way."
+ },
+ "problem": "I read a photo from Tuesday 19:56. I tried it as today's lunch first, then wanted its real time. The pencil's calendar showed a dinner at 18:00 and I took it. Now Tuesday shows Chicken and sweet potato fries as Dinner, 19:56, and under it the planned dinner, Chicken rice bowl, still asks I ate it, I skipped it.",
+ "story": "When I log a photo from another day, I want it to land on one day, as the meal I picked, so that the day shows what I ate once and no planned meal keeps asking.",
+ "words": "18 November 19:21: the dinner around that timing was only possible for the time slot as planned in the calendar at 18h. And now we have two dinners. One as set from the read, and the one planned in the list.",
+ "cause": "Two things together. The pencil's calendar opens on today, also for a photo from another day, so the Dinner you tapped was Wednesday's dinner. The meal was then logged with the photo's own time, Tuesday 19:56. One record held Tuesday's time and Wednesday's dinner. Tuesday lists it by its time; Tuesday's planned dinner is closed only by a Tuesday dinner, so it still asks.",
+ "proposed": "The one element: the calendar behind the pencil, unchanged, opening where Ate it's calendar already opens for such a photo: on the photo's day, with the line From the photo, Tuesday 19:56 and the nearest meal marked. And one rule where a meal is logged: its day is the day of the meal I picked. A meal of the photo's day keeps the photo's time. A meal of another day takes that meal's own time.",
+ "repair": "The record from Tuesday is still wrong on your phone. Proposed: when the app opens, a record whose meal is on a later day than its own time is moved to the meal of its own day. Yours becomes Tuesday's dinner; Wednesday's dinner opens again.",
+ "ac": [
+  {
+   "id": "AC1",
+   "title": "The pencil opens on the photo's day",
+   "text": "Given it is Sunday and the read shows a photo from Saturday 15:57 that I said I ate then, when I tap the pencil, then the calendar opens on Sat 14, the line above says Which meal? From the photo, Saturday 15:57, and Lunch, the nearest meal, is marked."
+  },
+  {
+   "id": "AC2",
+   "title": "One dinner on the photo's day",
+   "text": "Given that calendar and a Chicken rice bowl planned for Saturday's dinner, when I tap Dinner, then All of it and Done, then Saturday shows my meal as its dinner and the Chicken rice bowl no longer asks."
+  },
+  {
+   "id": "AC3",
+   "title": "A meal of today, when I mean today",
+   "text": "Given the same read, when I tap Sun 15, today, then Dinner, then All of it and Done, then the meal is today's dinner at today's time, and Saturday shows nothing of it."
+  },
+  {
+   "id": "AC4",
+   "title": "One day per record",
+   "text": "Given a meal is logged from a photo by any way (the read, the plate, Ate it, the pencil), when I open the Plan, then it shows on the day of the meal I picked and on no other day."
+  },
+  {
+   "id": "AC5",
+   "title": "The record on your phone",
+   "text": "Given a record with the time Tuesday 19:56 and the dinner of Wednesday, when the app opens after the release, then it is Tuesday's dinner, Tuesday's planned dinner no longer asks, and Wednesday's dinner is open again."
+  }
+ ],
+ "unchanged": [
+  "Ate it's calendar: it already opens on the photo's day.",
+  "A photo taken now, and a photo I did not say I ate then: the pencil opens on today.",
+  "A dinner logged after midnight stays with the evening before: its meal is on the earlier day, and that is left alone.",
+  "What a planned meal shows when it is closed by a meal I ate."
+ ],
+ "details": [
+  "No new element and no new words: the line From the photo exists.",
+  "The rule sits in the one place a meal is logged, so every way obeys it.",
+  "The repair touches only records whose meal is on a later day than their time.",
+  "The screens B150c and B150d are what it looks like."
+ ]
+}

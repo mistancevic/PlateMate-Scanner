@@ -7,4 +7,4 @@ const { chromium } = require((process.env.ROOT || "/home/claude/pm159") + "/node
     res[id] = await p.evaluate(() => { const ac = document.querySelector("[data-ac]"); return { cards: [...document.querySelectorAll("[data-card]")].map((c) => Math.ceil(c.offsetHeight)), ac: ac ? Math.ceil(ac.offsetHeight) : 0 }; });
     if (process.env.SHOT) await p.screenshot({ path: `${process.env.SHOT}/${id}.png`, fullPage: true });
     await p.close(); }
-  fs.writeFileSync(__dirname + "/heightsRead.json", JSON.stringify(res)); console.log(JSON.stringify(res)); await b.close(); })();
+  fs.writeFileSync(__dirname + "/" + (process.env.HEIGHTS || "heightsRead.json"), JSON.stringify(res)); console.log(JSON.stringify(res)); await b.close(); })();
