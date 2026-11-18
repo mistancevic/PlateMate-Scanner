@@ -76,47 +76,30 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
   await rowsNote("<b>A photo with no time of its own.</b> A photo saved from WhatsApp carries only the time it was saved. The line says so. Everything else is the same: edit mode opens on that day, and I set the meal and its time myself.");
   await sub(p, false);
   await shot(p, "h_9", 900);
-  // ---- 5: closed, the page as it was; 6: Ate it asks how much; 7: logged, still on the Plate (Coach Milan 22:27 to 22:32)
-  await clear(p); await p.locator(".plan-line-pen").click(); await p.waitForTimeout(600);
-  await p.evaluate(() => { document.querySelectorAll("[data-ref]").forEach((e) => e.remove()); const pen = document.querySelector(".plan-line-pen"); pen.style.outline = ""; });
-  await ev(p, ({ PEN, MARK }) => { const pen = document.querySelector(".plan-line-pen"); pen.innerHTML = PEN; pen.style.cssText += ";" + MARK; });
-  await line(p, ["Dinner", "Saturday, 14 November, 19:30"]); await sub(p, false);
-  await ev(p, ({ TAP }) => { const b = document.querySelector(".plate-end .pe-ate"); b.style.cssText += ";" + TAP; b.setAttribute("data-t", "1"); });
-  await noteAfter(p, ".meal-line", "<b>Step 5. Closed with the X.</b> The line shows the meal with its day and time. <b>Nothing else on the page changed.</b> It still ends with What do you do with it?. Today, setting a meal turns that into Did you eat it?. Amber: I tap Ate it.");
-  await shot(p, "h_5", 1500);
-  await clear(p);
-  const TICK = '<label style="display:flex;align-items:center;gap:10px;min-height:44px;font-size:15px;font-weight:700;color:#172742"><span style="width:24px;height:24px;border:2px solid #2a72d9;border-radius:6px;display:inline-grid;place-items:center;color:#2a72d9;font-weight:900;background:#fff"></span>Save in My recipes</label>';
-  const GREY = "outline:3px solid #5b6b8a;outline-offset:3px;border-radius:12px";
-  await ev(p, ({ TICK, GREY, TAP, MARK, NOTE }) => { const e = document.querySelector(".plate-end"); const d = document.createElement("div"); d.setAttribute("data-ate", "1"); d.style.cssText = "margin-top:14px";
-    d.innerHTML = `<div style="${MARK};padding:4px"><b class="pa-row-q" style="display:block;margin-bottom:8px">How much of it did you eat?</b><div class="pa-chips"><button type="button" class="pa-opt on">All of it</button><button type="button" class="pa-opt">Half</button><button type="button" class="pa-opt">Part of it</button></div></div>`
-      + `<div style="margin:14px 0 4px;${GREY}">${TICK}</div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;${GREY}"><button type="button" class="pill pill-small">Cancel</button><button type="button" class="pill pill-small pill-primary" style="min-width:150px;${TAP}">Done</button></div>`
-      + `<div style="background:#eef1f6;border-radius:10px;padding:8px 10px;margin:12px 0 0;font-size:13px;line-height:1.4;color:#172742;text-align:left"><b>Grey: from DT307, not part of B150.</b> The tick in a row of its own, Cancel left of Done. Cancel closes this block and logs nothing. The meal line stays as it is.</div>`
-      + `<div style="${NOTE}"><b>Step 6. Ate it asks only how much.</b> The meal and day are set, so there is no calendar here. I tap <b>All of it</b>, then <b>Done</b>. With no meal selected, Ate it asks the meal first, as today.</div>`;
-    e.appendChild(d); }, { TICK, GREY });
-  await shotAt(p, "h_6", ".plate-end", 60, 760);
-  const eaten = (open, html) => ev(p, ({ MARK, NOTE, PEN, XS, open, html }) => { document.querySelectorAll("[data-ate]").forEach((x) => x.remove()); const e = document.querySelector(".plate-end"); [...e.children].forEach((c) => { c.style.display = "none"; });
-    const d = document.createElement("div"); d.setAttribute("data-ate", "1");
-    d.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="flex:1;${MARK};padding:2px 4px"><span style="display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5b6b8a;margin-bottom:2px">Eaten</span><b style="font-size:16px;color:#172742">All of it</b></div><button type="button" class="icon" style="${MARK}">${open ? XS : PEN}</button></div>`
-      + (open ? `<div style="margin-top:12px"><div class="pa-chips"><button type="button" class="pa-opt on">All of it</button><button type="button" class="pa-opt">Half</button><button type="button" class="pa-opt">Part of it</button><button type="button" class="pa-opt" style="${MARK}">Not eaten</button></div></div>` : "")
-      + `<div style="${NOTE}">${html}</div>`; e.appendChild(d); }, { open, html });
-  await eaten(false, "<b>Step 7. Done logged it, and I am still on the Plate.</b> The question and the three buttons are gone. In their place a status, in the shape of Meal and day: the small title <b>Eaten</b>, under it <b>All of it</b>, and the pencil. No jump to the Plan. The plate stays, with its photo and foods.");
-  await shotAt(p, "h_7", ".plate-end", 330, 800);
-  await eaten(true, "<b>Changing what happened.</b> The pencil opens the answers again, and is the X that closes. A tap on Half or Part of it changes the amount, saved at once. <b>Not eaten</b> takes the log back: the question What do you do with it? and its three buttons return.");
-  await shotAt(p, "h_10", ".plate-end", 330, 800);
   await p.context().close();
   // ---- the proof, not a step: Saturday in the Plan after the fix
   p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await h.readIt(p);
   await p.locator(".plan-line-pen").click(); await p.waitForTimeout(500); await p.locator(".meal-line-open .pcal-day").filter({ hasText: "Sat 14" }).click(); await p.waitForTimeout(400); await h.row(p, "Dinner", ".meal-line-open").click(); await p.waitForTimeout(900); await css(p);
+  await ev(p, ({ MARK, PEN }) => { const x = document.querySelector(".plan-line-x"); x.innerHTML = PEN; x.style.cssText += ";" + MARK; document.querySelector(".meal-line-day").textContent = "Saturday, 14 November, 19:30"; const t = document.querySelector(".meal-line-text"); t.insertAdjacentHTML("afterbegin", '<span data-lab="1" style="display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5b6b8a;margin-bottom:2px">Meal and day</span>'); t.style.cssText += ";" + MARK; });
+  await sub(p, false);
+  await noteAfter(p, ".meal-line", "<b>Step 5. Closed with the X.</b> The line shows the meal with its day and time, and the pencil to open edit mode again. <b>This is where the ticket ends.</b> The rest of the page is as it is today.");
+  await shot(p, "h_5", 1500);
+  await clear(p);
   await p.locator(".rv-eat .pa-opt").first().click(); await p.waitForTimeout(400); await p.locator(".rv-done").click(); await p.waitForTimeout(1500);
   await p.locator("main button").filter({ hasText: /^Sat 14/ }).first().click(); await p.waitForTimeout(700); await p.addStyleTag({ content: "nav, .chat-fab { display: none !important }" });
   await ev(p, ({ MARK, NOTE }) => { document.querySelectorAll("[role=status], .toast, .notice").forEach((x) => { x.style.display = "none"; }); const e = document.querySelector(".past-eaten"); const walk = document.createTreeWalker(e, NodeFilter.SHOW_TEXT); let t; while ((t = walk.nextNode())) t.nodeValue = t.nodeValue.replace("20:00", "19:30"); e.style.cssText += ";" + MARK;
-    const n = document.createElement("div"); n.style.cssText = NOTE; n.innerHTML = "<b>The proof, not a step.</b> When I open the Plan myself and tap Sat 14: Saturday shows the meal I ate as its dinner, at the time I set. The planned Chicken rice bowl no longer asks. Today shows nothing of it."; (document.querySelector(".past-add") || e).insertAdjacentElement("afterend", n); });
+    const n = document.createElement("div"); n.style.cssText = NOTE; n.innerHTML = "<b>The proof, not a step.</b> After the meal is logged the way the app does it today, Saturday in the Plan shows the meal I ate as its dinner, at the time I set. The planned Chicken rice bowl no longer asks. Today shows nothing of it."; (document.querySelector(".past-add") || e).insertAdjacentElement("afterend", n); });
   await shotAt(p, "h_p", ".past-eaten", 330, 1100);
   await p.context().close();
   // ---- first row, the step that was missing: All of it, then Done, as the app is today
   p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await h.readIt(p);
   await p.locator(".plate-end .pe-ate").click(); await p.waitForTimeout(500); await p.locator(".plate-end .pcal-day").filter({ hasText: "Sun 15" }).click(); await p.waitForTimeout(400); await h.row(p, "Lunch", ".plate-end").click(); await p.waitForTimeout(800);
   await p.locator(".plan-line-x").click(); await p.waitForTimeout(500); await p.locator(".plan-line-pen").click(); await p.waitForTimeout(500); await h.row(p, "Dinner", ".meal-line-open").click(); await p.waitForTimeout(900); await css(p);
+  await ev(p, ({ MARK, PEN }) => { const x = document.querySelector(".plan-line-x"); x.innerHTML = PEN; x.style.cssText += ";" + MARK; document.querySelector(".meal-line-day").textContent = "Saturday, 14 November, 19:30"; const t = document.querySelector(".meal-line-text"); t.insertAdjacentHTML("afterbegin", '<span data-lab="1" style="display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5b6b8a;margin-bottom:2px">Meal and day</span>'); t.style.cssText += ";" + MARK; });
+  await sub(p, false);
+  await noteAfter(p, ".meal-line", "<b>Step 5. Closed with the X.</b> The line shows the meal with its day and time, and the pencil to open edit mode again. <b>This is where the ticket ends.</b> The rest of the page is as it is today.");
+  await shot(p, "h_5", 1500);
+  await clear(p);
   await p.locator(".rv-eat .pa-opt").first().click(); await p.waitForTimeout(400);
   await ev(p, ({ TAP }) => { const d = document.querySelector(".rv-done"); d.style.cssText += ";" + TAP; });
   await noteAfter(p, ".rv-eat", "<b>Step 6.</b> With Dinner set, the read asks Did you eat it?. I tap <b>All of it</b>, then <b>Done</b>. Done logs the meal: with the photo's time, Saturday, and the dinner of today.", true);

@@ -1909,7 +1909,7 @@
     },
     {
       "id": "B150",
-      "title": "A photo from another day, logged under a meal of today, leaves two dinners on its day",
+      "title": "Setting the meal and its time on a photo: a photo from another day, logged under a meal of today, leaves two dinners on its day",
       "epic": "plate",
       "state": "next",
       "board": "Stories260",
@@ -1956,23 +1956,23 @@
         },
         {
           "id": "AC7",
-          "title": "Closed, only the line has changed",
-          "text": "Given Dinner at 19:30 is set, when I tap the X, then under the title Meal and day the line shows Dinner, Saturday, 14 November, 19:30 with the pencil, and the page still ends with What do you do with it?: Save it, Plan it, Ate it."
+          "title": "Closed, the line keeps the meal and the pencil",
+          "text": "Given Dinner at 19:30 is set, when I tap the X, then under the title Meal and day the line shows Dinner, Saturday, 14 November, 19:30 with the pencil, a tap on the pencil opens edit mode again, and the rest of the page is as it is today."
         },
         {
           "id": "AC8",
-          "title": "Ate it logs to the meal that is set",
-          "text": "Given that read with Dinner, Saturday, 19:30 set, and a Chicken rice bowl planned for Saturday's dinner, when I tap Ate it, choose All of it and tap Done, then no calendar was asked, Saturday shows my meal as Dinner, 19:30, the Chicken rice bowl no longer asks, and today shows nothing of it."
+          "title": "One dinner on the photo's day",
+          "text": "Given that read with Dinner, Saturday, 19:30 set, and a Chicken rice bowl planned for Saturday's dinner, when I log it as eaten the way the app asks today, then Saturday shows my meal as Dinner, 19:30, the Chicken rice bowl no longer asks, and today shows nothing of it."
         },
         {
           "id": "AC9",
           "title": "Back to no meal selected",
-          "text": "Given Dinner is set, when I open edit mode and tap the row No meal selected, then the line says No meal selected again, and nothing else on the page changes."
+          "text": "Given Dinner is set, when I open edit mode and tap the row No meal selected, then the line says No meal selected again."
         },
         {
           "id": "AC10",
           "title": "A meal of today, when I mean today",
-          "text": "Given edit mode on Sat 14, when I tap Sun 15, today and then Dinner, then the line says Dinner, Sunday, 15 November, and after Ate it, All of it and Done the meal is today's dinner and Saturday shows nothing of it."
+          "text": "Given edit mode on Sat 14, when I tap Sun 15, today and then Dinner, then the line says Dinner, Sunday, 15 November, and once it is logged as eaten the meal is today's dinner and Saturday shows nothing of it."
         },
         {
           "id": "AC11",
@@ -2007,37 +2007,7 @@
         {
           "id": "AC16",
           "title": "Three languages",
-          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 7, then Untitled plate, Meal and day, No meal selected, Chef Mealan named it from your photo. and the two lines about the photo's time are in that language."
-        },
-        {
-          "id": "AC18",
-          "title": "I stay on the Plate",
-          "text": "Given I tapped Ate it, All of it and Done, when the meal is logged, then I am still on the Plate with the photo and the foods, the question What do you do with it? and its three buttons are gone, and in their place stand the small title Eaten, All of it, and the pencil."
-        },
-        {
-          "id": "AC19",
-          "title": "Plan it uses the meal that is set",
-          "text": "Given a meal of today or a later day is set, when I tap Plan it, then the plate is planned for that meal without a calendar, and I am still on the Plate; given the day is before today, Plan it asks for the day as it does today."
-        },
-        {
-          "id": "AC20",
-          "title": "With no meal selected, the buttons ask as today",
-          "text": "Given No meal selected, when I tap Ate it or Plan it, then the calendar asks the meal and day as it does today, and what I pick shows on the meal line."
-        },
-        {
-          "id": "AC21",
-          "title": "The pencil changes what happened",
-          "text": "Given the status Eaten, All of it, when I tap the pencil and then Half, then the status says Half at once, the eaten meal counts half, and the X closes the answers."
-        },
-        {
-          "id": "AC22",
-          "title": "Not eaten takes the log back",
-          "text": "Given the status Eaten, when I tap the pencil and then Not eaten, then the meal is no longer logged, the day shows nothing of it, and the page ends with What do you do with it? and its three buttons again."
-        },
-        {
-          "id": "AC23",
-          "title": "Planned shows the same way",
-          "text": "Given a meal of today or later is set and I tapped Plan it, when it is planned, then the page shows the small title Planned with the pencil in place of the question, and the pencil offers Not planned."
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 5, then Untitled plate, Meal and day, No meal selected, Chef Mealan named it from your photo. and the two lines about the photo's time are in that language."
         }
       ],
       "unchanged": [
@@ -2179,6 +2149,13 @@
       "epic": "plate",
       "state": "next",
       "why": "Coach Milan 18 November 21:48, a screenshot of a tester's read in Serbian: ten foods, four of them twice. Prawns 700 g and ~50 g, passata 500 g and ~80 g, olive oil 50 g and ~8 g, fusilli 500 g and cooked fusilli ~220 g. The six exact amounts carry no ~, so they did not come from that read as estimates; the four with ~ did. Her steps are not known yet: needed before it can be replayed and drawn. Her answer, 18 November 23:12, through Coach Milan: she was crafting a recipe on the Plate, added a photo and asked Chef Mealan about it; the list came out of his read. So the recipe's foods were on the plate and the read of the photo was added to them."
+    },
+    {
+      "id": "DT320",
+      "title": "What happens to a plate after its meal is set: Ate it, Plan it, Done, and where the app goes",
+      "epic": "plate",
+      "state": "parked",
+      "why": "Parked by Coach Milan, 18 November 23:21: not part of B150. Notes from the talk of 22:18 to 23:17, none agreed: setting a meal should change only the meal line; today it turns the end of the read into Did you eat it?, and Done opens the Plan or Today by itself; he asked why Done does not close the block so he continues with the Plate, and why the Plan comes up at all; a logged plate showing a question with a coloured button is wrong; an open block must show which button it belongs to. Not to be picked up until he asks."
     },
     {
       "id": "DT319",
