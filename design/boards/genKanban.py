@@ -16,7 +16,8 @@ LEGEND = ('<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px
 def chip(e): return f'<span style="display:inline-block;background:{COL[e]};color:#fff;border-radius:999px;padding:1px 8px;font-size:11.5px;font-weight:800">{html.escape(E[e]["name"])}</span>'
 def card(t):
     meta = []
-    if t.get("board"): meta.append("Board " + (t["board"] if str(t["board"]).startswith("Stories") else f"Stories{t['board']}") + (f", canvas {t['where']}" if t.get("where") else ""))
+    if t.get("board") and t.get("where"): meta.append(f"Board: look for {t['id']} on canvas {t['where']}")
+    elif t.get("board"): meta.append("Board " + (t["board"] if str(t["board"]).startswith("Stories") else f"Stories{t['board']}") + (f", canvas {t['where']}" if t.get("where") else ""))
     if t.get("version"): meta.append(f"v{t['version']}")
     why = f'<div style="font-size:12.5px;line-height:1.4;color:#3d4a63;margin-top:5px">{html.escape(t["why"])}</div>' if t.get("why") else ""
     m = f'<div style="font-size:11.5px;color:#5b6b8a;margin-top:5px;font-weight:700">{" · ".join(meta)}</div>' if meta else ""
