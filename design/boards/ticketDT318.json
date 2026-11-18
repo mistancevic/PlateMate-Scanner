@@ -6,7 +6,7 @@
  "rel": "Proposed; not agreed until Coach Milan says Go",
  "boardTitle": "DT318: correcting what Chef Mealan read. One edit mode for the foods, by hand or by words",
  "opportunity": {
-  "from": "Coach Milan, 18 November 2026, 19:26, from a photo he logged; and 21:48 with a screenshot of Darinka's read.",
+  "from": "Coach Milan, 18 November 2026, 19:26, from a photo he logged; and 21:48 with a screenshot of a tester's read.",
   "job": "Make the list of foods right after a read, quickly, so the meal I log is the meal I ate.",
   "kind": "Several doors, each doing part of the job: a tap on a chip, Change the foods, a swipe, a link to a form, and Chef Mealan's own question. None says which to use.",
   "why_now": "Every read ends here. B150 changes the same screen, so both are tested once."
@@ -15,7 +15,7 @@
  "story": "When a read is not quite right, I want one place to correct the foods, with my hands or with my words, so that I do not hunt for the right door and nothing I set is lost.",
  "words": "18 November 19:26: jogurt was with 10% fixed in the food list, not on the read chip. I tried to swap for 0.2% fat but such jogurt was not listed. I added info as mayo was not recognized and said that I had 0.2% fat jogurt. Then it asked me again about the chicken, this time if it was 220 g. A bit confusing where and how to update it.",
  "cause": "Replayed on the app as built in 0.3.159. The chip shows a short name, so 10% fat is cut off. The question about an amount is not on the read; it is on the screen behind Change the foods. The swap list offers foods from my own list. And a second read starts from the photo again: it drops the amount I chose and asks anew.",
- "words2": "19:43: better an edit mode where what is needed is set, than another way of correction. 21:44: how would chips be edited? 21:48: saying it to Chef Mealan worked very well. If a chip can be edited, it should be deletable if wrong. Chef Mealan asks when not sure and suggests two options; both can be wrong. Or a food is doubled; that happened to Darinka. So we have several places for making it better and each of them does some work. 21:51: yes to two doors, by hand and by words, in one edit mode.",
+ "words2": "19:43: better an edit mode where what is needed is set, than another way of correction. 21:44: how would chips be edited? 21:48: saying it to Chef Mealan worked very well. If a chip can be edited, it should be deletable if wrong. Chef Mealan asks when not sure and suggests two options; both can be wrong. Or a food is doubled; that happened to a tester. So we have several places for making it better and each of them does some work. 21:51: yes to two doors, by hand and by words, in one edit mode.",
  "proposed": "One edit mode for the foods. The foods get a small title and one pencil. Closed, each chip shows the food's full name and its grams. A tap on the pencil opens edit mode in place, and the pencil turns into the X that closes it. In edit mode there are two ways. By words: on top, Tell Chef Mealan what is wrong, typed or said, then Read again. By hand: each food is a row with its full name, the grams as a field, Swap and Remove; under the rows, + Add a food. Every change by hand is saved at once. What I set or answered stays when he reads again, and he does not ask about it again. His own question stands on the read, under the chips, with a third answer, Neither, which opens edit mode on that food's grams.",
  "more_change": "Four things go that are built today. 1. Change the foods, the button on the read. 2. The tap on a chip that turns it into a number. 3. The link Wrong foods? Help Chef Mealan read it; its form is the top of edit mode. 4. Skip under his question; Neither takes its place. One link in edit mode still opens the screen behind Change the foods, for Retake, + Photo and Fit to my target.",
  "open": "Two things for your word. 1. The chips show the full name, Chicken breast, grilled 200 g. That is longer than today, and I said short names before. With short names the 10% stays hidden. 2. The link Retake, + Photo, Fit to my target keeps the second screen alive. Folding those three into the read would be a ticket of its own.",
@@ -32,7 +32,7 @@
   "Read again sends the photos, my words, and what I set: foods I removed, amounts I typed or answered. The read keeps those.",
   "One line from Chef Mealan says what the second read changed.",
   "A food he added or changed is marked in the rows until edit mode is closed.",
-  "Darinka's doubled foods are B152. Remove is the way out by hand until it is fixed.",
+  "A tester's doubled foods are B152. Remove is the way out by hand until it is fixed.",
   "The row DT318.1 on this board, steps 1 to 6 and Neither, is what it looks like."
  ],
  "ac": [

@@ -645,7 +645,7 @@
       "title": "Phase 10: every line still in the code into the language files, flow by flow",
       "epic": "plate",
       "state": "done",
-      "why": "Words only, no board (Milan 10:35, yes). Srpski check 7 November (Milan and Darinka's test): with every table line confirmed, the English left on screen is all built in code: the photo line (Your photo, 18:10. 5 foods read...), the row's raw weight note (about 240 g raw), the Plate's checks (Fat is about half of this dinner's energy..., To be clear of it...), Chef Mealan's line on a photo plate (Eat it as it is...; aria Chef Mealan on your meal), Fit's notes (set 80 g chicken breast (was 180 g)), the ideas screen (A dinner around your foods, didn't pass the checks, On the plate, Did not fit and its reason), the plan line (Dinner, 20:00 · ... · By the plan), the chat (Close, Say what you want..., I'm out, what do I take?), the kitchens on Where I shop (data). Coach Milan 7 November 08:49, a recipe's page in Srpski: the Nutrition card (Nutrition, All, 100 g, Energy, Fat, Carbohydrate, Protein, From the foods and their grams...), Your cooks (Once, the last on 30 October, the date in English). The foods' names on an English recipe are the recipe's own: DT250's offer translates them."
+      "why": "Words only, no board (Milan 10:35, yes). Srpski check 7 November (Milan and a tester's test): with every table line confirmed, the English left on screen is all built in code: the photo line (Your photo, 18:10. 5 foods read...), the row's raw weight note (about 240 g raw), the Plate's checks (Fat is about half of this dinner's energy..., To be clear of it...), Chef Mealan's line on a photo plate (Eat it as it is...; aria Chef Mealan on your meal), Fit's notes (set 80 g chicken breast (was 180 g)), the ideas screen (A dinner around your foods, didn't pass the checks, On the plate, Did not fit and its reason), the plan line (Dinner, 20:00 · ... · By the plan), the chat (Close, Say what you want..., I'm out, what do I take?), the kitchens on Where I shop (data). Coach Milan 7 November 08:49, a recipe's page in Srpski: the Nutrition card (Nutrition, All, 100 g, Energy, Fat, Carbohydrate, Protein, From the foods and their grams...), Your cooks (Once, the last on 30 October, the date in English). The foods' names on an English recipe are the recipe's own: DT250's offer translates them."
     },
     {
       "id": "DT244",
@@ -691,7 +691,7 @@
       "title": "Voice in the app's language",
       "epic": "cook",
       "state": "done",
-      "why": "Coach Milan 7 November 05:54 (test with Darinka, Srpski UI, English recipe, a loud room): voice felt English only. Check: cook mode listens in the app's language (sr-RS) and hears Srpski, English and German commands; Chef Mealan's answers are spoken in the app's language. Still English: every fixed line cook mode says (Step 1., Done. Enjoy your meal., the timer is done, Sorry, say that again?, This recipe has N steps, the how-much answers) and its English voice; the step's own words are read with an English voice whatever language the recipe is in; Say what you have on the Plate listens in English only (en-GB). Its own item, with a board (Milan 06:01). Board drawn 7 November, waits for Go. Built in 0.3.98 (Go 06:14).",
+      "why": "Coach Milan 7 November 05:54 (test with a tester, Srpski UI, English recipe, a loud room): voice felt English only. Check: cook mode listens in the app's language (sr-RS) and hears Srpski, English and German commands; Chef Mealan's answers are spoken in the app's language. Still English: every fixed line cook mode says (Step 1., Done. Enjoy your meal., the timer is done, Sorry, say that again?, This recipe has N steps, the how-much answers) and its English voice; the step's own words are read with an English voice whatever language the recipe is in; Say what you have on the Plate listens in English only (en-GB). Its own item, with a board (Milan 06:01). Board drawn 7 November, waits for Go. Built in 0.3.98 (Go 06:14).",
       "board": 184
     },
     {
@@ -2027,7 +2027,7 @@
       "why": "Coach Milan 18 November 19:26, from the same test: the read gave a good list and asked about the chicken (he chose 200 g). The yogurt came as 10 % fat, fixed in the food list, not on the read's chip. Swap offered no 0.2 % fat yogurt. He added words (mayo was hidden; the yogurt is 0.2 % fat); the read then asked about the chicken again, this time whether it was 220 g. The list ended right, but it was confusing where and how to correct it. Four points: the kind of a food cannot be corrected on its chip; Swap lacks the variant; a second read asks again what was already answered, with another number; no one place to correct. Not reproduced and not drawn yet.",
       "board": "Stories262",
       "opportunity": {
-        "from": "Coach Milan, 18 November 2026, 19:26, from a photo he logged; and 21:48 with a screenshot of Darinka's read.",
+        "from": "Coach Milan, 18 November 2026, 19:26, from a photo he logged; and 21:48 with a screenshot of a tester's read.",
         "job": "Make the list of foods right after a read, quickly, so the meal I log is the meal I ate.",
         "kind": "Several doors, each doing part of the job: a tap on a chip, Change the foods, a swipe, a link to a form, and Chef Mealan's own question. None says which to use.",
         "why_now": "Every read ends here. B150 changes the same screen, so both are tested once."
@@ -2148,7 +2148,7 @@
       "title": "A dish is on the plate twice: whole amounts and a portion's amounts",
       "epic": "plate",
       "state": "next",
-      "why": "Coach Milan 18 November 21:48, a screenshot of Darinka's read in Serbian: ten foods, four of them twice. Prawns 700 g and ~50 g, passata 500 g and ~80 g, olive oil 50 g and ~8 g, fusilli 500 g and cooked fusilli ~220 g. The six exact amounts carry no ~, so they did not come from that read as estimates; the four with ~ did. Her steps are not known yet: needed before it can be replayed and drawn."
+      "why": "Coach Milan 18 November 21:48, a screenshot of a tester's read in Serbian: ten foods, four of them twice. Prawns 700 g and ~50 g, passata 500 g and ~80 g, olive oil 50 g and ~8 g, fusilli 500 g and cooked fusilli ~220 g. The six exact amounts carry no ~, so they did not come from that read as estimates; the four with ~ did. Her steps are not known yet: needed before it can be replayed and drawn."
     },
     {
       "id": "DT319",

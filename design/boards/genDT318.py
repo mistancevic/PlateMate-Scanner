@@ -28,6 +28,6 @@ readBoard("DT318", "Stories262.dc.html", 8, [
   ("5. He read again", "n_5", "changed", "New: what I set stays, and one line says what he changed. Then the X."),
   ("6. Closed", "n_6", "changed", "The chips, corrected. The rest of the read is as today."),
   ("Neither", "n_7", "changed", "New. Not a step of this flow: the third answer to his question opens edit mode on that food.")], [1, 2, 3, 4, 5])],
-  "Stories261.dc.html", "18 November 2026 (Coach Milan 19:26, and 21:44 to 21:51 with a screenshot of Darinka's read). Replayed on the app as built in 0.3.159. Drawn for approval; no Go.")
+  "Stories261.dc.html", "18 November 2026 (Coach Milan 19:26, and 21:44 to 21:51 with a screenshot of a tester's read). Replayed on the app as built in 0.3.159. Drawn for approval; no Go.")
 json.dump(OUT, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outRead.json"), "w"))
 print(json.dumps({k: [v["file"], v["w"], v["h"]] for k, v in OUT.items()}))
