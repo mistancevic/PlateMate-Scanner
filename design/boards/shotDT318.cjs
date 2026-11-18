@@ -54,49 +54,32 @@ const READ2 = { dish: "Chicken and fries", foods: [f("Chicken breast, grilled", 
   else { await p.screenshot({ path: `${R}/t_6.png`, fullPage: true }); console.log("t_6 plain"); }
   await p.context().close();
 
-  // ================= row 2: the new flow, whole
+  // ================= row 2: the new flow, whole (Coach Milan 23:44: tap a chip and tell Chef Mealan; by hand on the Plate; his checks stay)
   const LAB = (t) => `<span style="display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5b6b8a">${t}</span>`;
   const base = (p) => ev(p, ({ LAB }) => { const sub = [...document.querySelectorAll("p, span, div, small")].find((x) => x.children.length === 0 && /^Read from your photo/.test(x.textContent.trim())); if (sub) sub.textContent = "Chef Mealan named it from your photo.";
-    const t = document.querySelector(".meal-line-text"); if (t) t.innerHTML = LAB + '<span class="meal-line-unset" style="color:#172742">No meal selected</span>'; const c = document.querySelector(".rv-change"); if (c) c.style.display = "none"; }, { LAB: LAB("Meal and day") });
-  // the foods block: a small title with the pencil (or the X), then chips or the edit rows
-  const foods = (p, o) => ev(p, ({ MARK, TAP, PEN, XS, LAB, o }) => { document.querySelectorAll("[data-fh], [data-ed], [data-q]").forEach((e) => e.remove()); const tags = document.querySelector(".mp-tags"), say = document.querySelector(".mp-big-say");
-    const hd = document.createElement("div"); hd.setAttribute("data-fh", "1"); hd.style.cssText = "display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px"; hd.innerHTML = LAB + `<button type="button" class="icon" style="${o.open ? MARK : o.tapPen ? TAP : o.markPen ? MARK : ""}">${o.open ? XS : PEN}</button>`; tags.insertAdjacentElement("beforebegin", hd);
+    const t = document.querySelector(".meal-line-text"); if (t) t.innerHTML = LAB + '<span class="meal-line-unset" style="color:#172742">No meal selected</span>'; }, { LAB: LAB("Meal and day") });
+  const chips = (p, o) => ev(p, ({ MARK, TAP, o }) => { document.querySelectorAll("[data-fd], [data-n]").forEach((e) => e.remove()); const tags = document.querySelector(".mp-tags"), say = document.querySelector(".mp-big-say"), ch = document.querySelector(".rv-change button");
+    tags.innerHTML = o.rows.map((r) => `<span class="mp-tag" style="${r.on ? "background:#e3edff;box-shadow:inset 0 0 0 1.5px #2a72d9;" : ""}${r.tap ? TAP : r.mark ? MARK : ""}">${r.on ? "✓ " : ""}${r.name} ${r.est ? "~" : ""}${r.g} g${r.tag ? ` <span style="font-weight:700;font-size:11px;color:#1d7a4f;background:#e2f5ea;border-radius:8px;padding:1px 6px">${r.tag}</span>` : ""}</span>`).join("");
     say.textContent = `Your photo, 18:00. ${o.rows.length} foods read, amounts estimated (~).`;
-    if (!o.open) { tags.style.display = ""; tags.innerHTML = o.rows.map((r) => `<span class="mp-tag" style="${r.mark ? MARK : ""}">${r.name} ${r.est ? "~" : ""}${r.g} g</span>`).join(""); }
-    else { tags.style.display = "none"; const ed = document.createElement("div"); ed.setAttribute("data-ed", "1"); ed.style.cssText = "margin:4px 0 10px";
-      const pill = (t, extra = "") => `<button type="button" class="pill pill-small" style="min-height:40px;padding:0 12px;${extra}">${t}</button>`;
-      ed.innerHTML = `<div style="border:1.5px solid #cfd9ea;border-radius:14px;padding:10px;margin-bottom:10px;${o.markWords ? MARK : ""}"><b style="font-size:14px">Tell Chef Mealan what is wrong</b><textarea class="search pa-words" rows="2" style="width:100%;box-sizing:border-box;margin:6px 0;min-height:64px" placeholder="What it is, what is missing. You can leave it empty.">${o.words || ""}</textarea><div style="display:flex;gap:8px;justify-content:flex-end">${pill("🎤 Say it")}${pill("Read again", o.tapRead ? TAP : "")}</div></div>`
-        + (o.chef ? `<div class="bubble mealan chef-line" style="margin:0 0 10px;${MARK}"><b>Chef Mealan:</b> ${o.chef}</div>` : "")
-        + o.rows.map((r) => `<div style="border-top:1px solid #e3e9f3;padding:10px 0;${r.mark ? MARK + ";padding:10px 6px" : ""}"><b style="display:block;font-size:15px;margin-bottom:6px">${r.name}${r.tag ? ` <span style="font-weight:700;font-size:12px;color:#1d7a4f;background:#e2f5ea;border-radius:8px;padding:2px 6px">${r.tag}</span>` : ""}</b><div style="display:flex;align-items:center;gap:8px"><span style="display:inline-flex;align-items:center;gap:4px;min-height:40px;padding:0 10px;border:1.5px solid ${r.field ? "#2a72d9" : "#cfd9ea"};border-radius:12px;font-weight:800;${r.field ? MARK : ""}">${r.est ? "~" : ""}${r.g}</span><span>g</span><span style="flex:1"></span>${pill("Swap")}${pill("Remove", "color:#b3261e;border-color:#e8b4b0")}</div></div>`).join("")
-        + `<div style="border-top:1px solid #e3e9f3;padding-top:10px;display:flex;justify-content:space-between;align-items:center;gap:8px">${pill("+ Add a food")}<button type="button" class="link" style="font-size:13px">Retake, + Photo, Fit to my target ›</button></div>`;
-      tags.insertAdjacentElement("afterend", ed); }
-    if (o.q) { const q = document.createElement("div"); q.setAttribute("data-q", "1"); q.className = "mp-ask"; q.style.cssText = "margin:10px 0;" + MARK; q.innerHTML = `<small><b>One thing I cannot tell from the photo:</b> is the chicken breast about 200 g or 350 g?</small><div class="button-row"><button type="button" class="choice" style="${o.q === "200" ? TAP : ""}">~200 g</button><button type="button" class="choice">~350 g</button><button type="button" class="pill pill-small pill-action" style="${o.q === "neither" ? TAP : ""}">Neither</button></div>`; document.querySelector(".mp-big-row").insertAdjacentElement("afterend", q); } }, { LAB: LAB("Foods"), o });
+    const pill = (t, extra = "") => `<button type="button" class="pill pill-small" style="min-height:40px;padding:0 12px;${extra}">${t}</button>`;
+    const fd = document.createElement("div"); fd.setAttribute("data-fd", "1"); fd.style.cssText = "margin:10px 0 4px";
+    fd.innerHTML = `<div style="border:1.5px solid #cfd9ea;border-radius:14px;padding:10px;${o.markField ? MARK : ""}"><b style="font-size:14px;display:block">Tell Chef Mealan what is wrong</b>${o.about ? `<small style="display:block;margin:4px 0 0;color:#1d4fa3;font-weight:700">About: ${o.about}</small>` : `<small class="muted" style="display:block;margin:4px 0 0">Tap a food above, or write what is missing.</small>`}<textarea class="search pa-words" rows="2" style="width:100%;box-sizing:border-box;margin:6px 0;min-height:${o.words ? 64 : 44}px" placeholder="What it is, what it is not, what is missing.">${o.words || ""}</textarea><div style="display:flex;gap:8px;justify-content:flex-end">${pill("🎤 Say it")}${pill("Read again", o.tapRead ? TAP : "")}</div></div>`
+      + (o.chef ? `<div class="bubble mealan chef-line" style="margin:10px 0 0;${MARK}"><b>Chef Mealan:</b> ${o.chef}</div>` : "")
+      + (o.note ? `<div data-n="1" style="background:#fff8d6;padding:8px 10px;margin:12px 0 0;font-size:14px;line-height:1.45;color:#172742;text-align:left;${MARK}">${o.note}</div>` : "");
+    document.querySelector(".mp-big-row").insertAdjacentElement("afterend", fd);
+    ch.textContent = "Edit on the Plate"; ch.style.outline = ""; if (o.tapEdit) ch.style.cssText += ";" + TAP; else if (o.markEdit) ch.style.cssText += ";" + MARK; }, { o });
   const A = { name: "Chicken breast, grilled", g: 250, est: true }, B = { name: "Sweet potato fries, baked", g: 180, est: true }, C = { name: "Yogurt, 10% fat", g: 80, est: true };
-  const A2 = { ...A, g: 200, est: false }, C2 = { name: "Yogurt, 0.2% fat", g: 80, est: true }, D = { name: "Mayonnaise", g: 20, est: true };
-  const anchor = async (p, html, grey) => { await clear(p); await note(p, ".mp-big-row", html, grey); };
+  const C2 = { name: "Yogurt, 0.2% fat", g: 80, est: true }, D = { name: "Mayonnaise", g: 20, est: true };
   p = await fresh(); await base(p);
-  await foods(p, { rows: [A, B, { ...C, mark: true }], markPen: true, q: "200" });
-  await ev(p, ({ NOTE }) => { const n = document.createElement("div"); n.setAttribute("data-n", "1"); n.style.cssText = NOTE; n.innerHTML = "<b>Step 1. The read.</b> New: the foods have a small title and <b>one pencil</b>. A chip shows the food's full name, so I see it is Yogurt, 10% fat. Chef Mealan's question stands here, under the chips, with a third answer: Neither. Change the foods is gone. Amber: I tap ~200 g."; document.querySelector("[data-q]").insertAdjacentElement("afterend", n); });
-  await shot(p, "n_1", 1160);
-  await foods(p, { rows: [{ ...A2, mark: true }, B, C], tapPen: true });
-  await anchor(p, "<b>Step 2. Answered.</b> The chip says 200 g, without the ~: it is my amount now. The question is gone. Amber: I tap the pencil.");
-  await shot(p, "n_2", 1000);
-  await foods(p, { rows: [A2, B, { ...C, mark: true }], open: true });
-  await ev(p, ({ NOTE }) => { document.querySelectorAll("[data-n]").forEach((e) => e.remove()); const n = document.createElement("div"); n.setAttribute("data-n", "1"); n.style.cssText = NOTE; n.innerHTML = "<b>Step 3. Edit mode, in place.</b> The pencil is the <b>X that closes it</b>. On top: tell Chef Mealan what is wrong. Under it each food is a row: its full name, the grams as a field, Swap, Remove. Then + Add a food. Every change is saved at once, no Done."; document.querySelector("[data-ed]").insertAdjacentElement("afterend", n); });
-  await shotAt(p, "n_3", "[data-fh]", 150, 1000);
-  await foods(p, { rows: [A2, B, C], open: true, words: "The yogurt was 0.2% fat. There was mayo too, under the chicken.", markWords: true, tapRead: true });
-  await ev(p, ({ NOTE }) => { document.querySelectorAll("[data-n]").forEach((e) => e.remove()); const n = document.createElement("div"); n.setAttribute("data-n", "1"); n.style.cssText = NOTE; n.innerHTML = "<b>Step 4. By words.</b> I write or say what was wrong. Amber: I tap Read again. It is the form that worked well, moved to the place where I correct."; document.querySelector("[data-ed]").firstElementChild.insertAdjacentElement("afterend", n); });
-  await shotAt(p, "n_4", "[data-fh]", 150, 1000);
-  await foods(p, { rows: [{ ...A2, mark: true, tag: "yours" }, B, { ...C2, mark: true, tag: "changed" }, { ...D, mark: true, tag: "new" }], open: true, words: "", chef: "I changed the yogurt to 0.2% fat and added mayonnaise. Your 200 g of chicken stay." });
-  await ev(p, ({ NOTE }) => { document.querySelectorAll("[data-n]").forEach((e) => e.remove()); const n = document.createElement("div"); n.setAttribute("data-n", "1"); n.style.cssText = NOTE; n.innerHTML = "<b>Step 5. He read again.</b> One line says what he changed. The yogurt is 0.2% fat, the mayonnaise is new. <b>My 200 g of chicken stay, and he does not ask again.</b> A wrong or doubled food: Remove."; document.querySelector("[data-ed]").insertAdjacentElement("afterend", n); });
-  await shotAt(p, "n_5", "[data-fh]", 150, 1100);
-  await foods(p, { rows: [A2, B, C2, D] });
-  await anchor(p, "<b>Step 6. Closed with the X.</b> The chips again, with what I corrected. Below, the read goes on as today: This plate, and What do you do with it?.");
-  await shot(p, "n_6", 1000);
-  await foods(p, { rows: [A, B, C], q: "neither", markPen: true });
-  await anchor(p, "", false); await clear(p);
-  await foods(p, { rows: [{ ...A, field: true }, B, C], open: true });
-  await ev(p, ({ NOTE }) => { const n = document.createElement("div"); n.setAttribute("data-n", "1"); n.style.cssText = NOTE; n.innerHTML = "<b>Neither.</b> When both amounts are wrong, a tap on Neither opens edit mode with that food's grams ready to type. Today the third button is Skip, and it only closes the question."; document.querySelector("[data-ed]").insertAdjacentElement("afterend", n); });
-  await shotAt(p, "n_7", "[data-fh]", 150, 1000);
+  await chips(p, { rows: [A, B, { ...C, tap: true }], markField: true, markEdit: true, note: "<b>Step 1. The read.</b> New: a chip shows the food's full name, so I see it is Yogurt, 10% fat. Under the chips one field for Chef Mealan. The button says Edit on the Plate. A tap on a chip no longer turns it into a number. Amber: I tap the yogurt." });
+  await shot(p, "n_1", 1200);
+  await chips(p, { rows: [A, B, { ...C, on: true }], about: "Yogurt, 10% fat", words: "It was 0.2% fat. There was mayo too, under the chicken.", markField: true, tapRead: true, note: "<b>Step 2. By words.</b> The chip is marked, and the field says what my words are about. I write or say what it is, and what is missing. Amber: I tap Read again." });
+  await shotAt(p, "n_2", ".mp-tags", 150, 760);
+  await chips(p, { rows: [A, B, { ...C2, mark: true, tag: "changed" }, { ...D, mark: true, tag: "new" }], chef: "I changed the yogurt to 0.2% fat and added mayonnaise.", tapEdit: true, note: "<b>Step 3. He read again.</b> One line says what he changed. The chips show it. An amount I set before stays, and he does not ask about it again. To correct by hand: amber, I tap Edit on the Plate." });
+  await shotAt(p, "n_3", ".mp-tags", 150, 820);
+  await clear(p); await p.locator(".rv-change button").click(); await p.waitForTimeout(900);
+  await p.locator(".mp-again-link").click(); await p.waitForTimeout(600); await p.locator(".mp-help textarea, .mp-help .pa-words").first().fill("It was 0.2% fat. There was mayo too."); await p.locator(".mp-help .pill-primary").click(); await p.waitForTimeout(3000); await css(p); await pic(p);
+  await ev(p, ({ NOTE }) => { const s = [...document.querySelectorAll("small, p")].find((x) => /^Swipe a food left/.test(x.textContent.trim())); const n = document.createElement("div"); n.setAttribute("data-n", "1"); n.style.cssText = NOTE; n.innerHTML = "<b>Step 4. By hand, on the Plate.</b> No change: the food list you know. Grams as fields, a swipe to swap or remove, + Add more to your plate. Chef Mealan's own questions about a kind or an amount stay on this screen, as today."; s.insertAdjacentElement("afterend", n); });
+  await shotAt(p, "n_4", ".pt-open", 60, 760);
   await p.context().close();
 } finally { h.kill(); await h.b.close(); } })().catch((e) => { console.log("ERR", e.message.slice(0, 800)); process.exit(1); });

@@ -1,10 +1,10 @@
 {
  "id": "DT318",
- "title": "Correcting what Chef Mealan read: one edit mode for the foods, by hand or by words",
- "short": "The foods of a read are corrected in one place: a pencil, rows to edit, and words for Chef Mealan",
+ "title": "Correcting what Chef Mealan read: by words on the read, by hand on the Plate",
+ "short": "A read is corrected by words on the read (tap a food, tell Chef Mealan) and by hand on the Plate",
  "epic": "plate",
  "rel": "Proposed; not agreed until Coach Milan says Go",
- "boardTitle": "DT318: correcting what Chef Mealan read. One edit mode for the foods, by hand or by words",
+ "boardTitle": "DT318: correcting what Chef Mealan read. By words on the read, by hand on the Plate",
  "opportunity": {
   "from": "Coach Milan, 18 November 2026, 19:26, from a photo he logged; and 21:48 with a screenshot of a tester's read.",
   "job": "Make the list of foods right after a read, quickly, so the meal I log is the meal I ate.",
@@ -15,86 +15,76 @@
  "story": "When a read is not quite right, I want one place to correct the foods, with my hands or with my words, so that I do not hunt for the right door and nothing I set is lost.",
  "words": "18 November 19:26: jogurt was with 10% fixed in the food list, not on the read chip. I tried to swap for 0.2% fat but such jogurt was not listed. I added info as mayo was not recognized and said that I had 0.2% fat jogurt. Then it asked me again about the chicken, this time if it was 220 g. A bit confusing where and how to update it.",
  "cause": "Replayed on the app as built in 0.3.159. The chip shows a short name, so 10% fat is cut off. The question about an amount is not on the read; it is on the screen behind Change the foods. The swap list offers foods from my own list. And a second read starts from the photo again: it drops the amount I chose and asks anew.",
- "words2": "19:43: better an edit mode where what is needed is set, than another way of correction. 21:44: how would chips be edited? 21:48: saying it to Chef Mealan worked very well. If a chip can be edited, it should be deletable if wrong. Chef Mealan asks when not sure and suggests two options; both can be wrong. Or a food is doubled; that happened to a tester. So we have several places for making it better and each of them does some work. 21:51: yes to two doors, by hand and by words, in one edit mode.",
- "proposed": "One edit mode for the foods. The foods get a small title and one pencil. Closed, each chip shows the food's full name and its grams. A tap on the pencil opens edit mode in place, and the pencil turns into the X that closes it. In edit mode there are two ways. By words: on top, Tell Chef Mealan what is wrong, typed or said, then Read again. By hand: each food is a row with its full name, the grams as a field, Swap and Remove; under the rows, + Add a food. Every change by hand is saved at once. What I set or answered stays when he reads again, and he does not ask about it again. His own question stands on the read, under the chips, with a third answer, Neither, which opens edit mode on that food's grams.",
- "more_change": "Four things go that are built today. 1. Change the foods, the button on the read. 2. The tap on a chip that turns it into a number. 3. The link Wrong foods? Help Chef Mealan read it; its form is the top of edit mode. 4. Skip under his question; Neither takes its place. One link in edit mode still opens the screen behind Change the foods, for Retake, + Photo and Fit to my target.",
- "open": "Two things for your word. 1. The chips show the full name, Chicken breast, grilled 200 g. That is longer than today, and I said short names before. With short names the 10% stays hidden. 2. The link Retake, + Photo, Fit to my target keeps the second screen alive. Folding those three into the read would be a ticket of its own.",
+ "words2": "19:43: better an edit mode where what is needed is set, than another way of correction. 21:48: saying it to Chef Mealan worked very well. So we have several places for making it better and each of them does some work. 23:33: editing chips is double work from the block where we edit foods anyway. A branch is drawn from its screen, or as a flow of its own. 23:44: select a chip and tell the chef what it is or is not; that is for using the chef for a second read. If correcting the read, send it to the Plate for editing. Keep the current few checks, where a pure guess is better than nothing.",
+ "proposed": "Three things, each with one job. By words, on the read: a tap on a chip marks it, and one field under the chips takes what I tell Chef Mealan about it, typed or said; with no chip marked, the field takes a missing food. Read again makes him read with my words. By hand: the button Edit on the Plate opens the Plate's food list, where foods are edited anyway. His own checks, the few questions about a kind or an amount, stay as they are. The chips show the food's full name. What I set stays when he reads again, and he does not ask about it a second time.",
+ "more_change": "Three things change that are built today. 1. A tap on a chip marks it for Chef Mealan; today it turns the chip into a number. Grams are typed on the Plate. 2. Change the foods is named Edit on the Plate. 3. The link Wrong foods? Help Chef Mealan read it goes from the Plate's screen; its job is the field on the read.",
+ "open": "One thing for your word. The link Wrong foods? Help Chef Mealan read it sits on the Plate's screen today. I took it out, so words have one place. Say if it should stay.",
  "days": "The board is drawn on the app's test photo. The foods are yours: chicken, sweet potato fries, yogurt, mayonnaise.",
  "unchanged": [
-  "The photo, the title, the meal line, This plate and What do you do with it?.",
-  "The swap list itself, and Find a food behind + Add a food.",
-  "Say it: the same voice input as on the photo form.",
-  "The Plate without a photo: its food list, the swipe, Fit to my target, Group into parts.",
-  "B150 draws the line under the title and the meal line; DT307 the bottom row. They are shown here as they will be."
+  "The photo, the title, the meal line, This plate and the end of the read.",
+  "The Plate's food list: grams, the swipe to swap or remove, + Add more to your plate, Fit to my target, Group into parts.",
+  "Chef Mealan's own questions about a kind or an amount, and where they stand.",
+  "Retake and + Photo.",
+  "Say it: the same voice input as on the photo form."
  ],
  "details": [
-  "No new screen. Edit mode opens in place, under the photo.",
-  "Read again sends the photos, my words, and what I set: foods I removed, amounts I typed or answered. The read keeps those.",
+  "No new screen and no new editor.",
+  "Read again sends the photos, my words, the food they are about, and what I set before: amounts I typed or answered. The read keeps those.",
   "One line from Chef Mealan says what the second read changed.",
-  "A food he added or changed is marked in the rows until edit mode is closed.",
-  "A tester's doubled foods are B152. Remove is the way out by hand until it is fixed.",
-  "The row DT318.1 on this board, steps 1 to 6 and Neither, is what it looks like."
+  "A food he changed or added is marked on its chip until the next tap.",
+  "The doubled foods of a tester are B152, not this ticket.",
+  "The row DT318.1 on this board, steps 1 to 4, is what it looks like."
  ],
  "ac": [
   {
    "id": "AC1",
-   "title": "The foods have one pencil",
-   "text": "Given Chef Mealan read a photo, when I look under the photo, then the foods have the small title Foods and one pencil, each chip shows the food's full name and grams, there is no Change the foods, and a tap on a chip does nothing."
+   "title": "A chip shows the full name",
+   "text": "Given Chef Mealan read a photo, when I look under the photo, then each chip shows the food's full name and grams, such as Yogurt, 10% fat ~80 g."
   },
   {
    "id": "AC2",
-   "title": "The pencil opens edit mode in place",
-   "text": "Given that read, when I tap the pencil, then under the photo I see Tell Chef Mealan what is wrong, one row per food with its full name, grams, Swap and Remove, and + Add a food, the pencil is an X, and a tap on the X shows the chips again."
+   "title": "A tap on a chip marks it",
+   "text": "Given that read, when I tap the yogurt's chip, then the chip is marked with a tick, the field under the chips says About: Yogurt, 10% fat, and the chip does not turn into a number."
   },
   {
    "id": "AC3",
-   "title": "Grams, saved at once",
-   "text": "Given edit mode, when I type 200 in the chicken's grams, then the plate's numbers follow at once, there is no Done, and closed the chip says 200 g without the ~."
+   "title": "By words, about a food",
+   "text": "Given the yogurt is marked, when I write It was 0.2% fat and tap Read again, then the chip says Yogurt, 0.2% fat, and one line from Chef Mealan says what he changed."
   },
   {
    "id": "AC4",
-   "title": "Remove",
-   "text": "Given edit mode with a food that is wrong or there twice, when I tap Remove on its row, then the row is gone and the plate's numbers follow."
+   "title": "By words, a missing food",
+   "text": "Given no chip is marked, when I write There was mayo too and tap Read again, then a chip Mayonnaise is there, marked as new."
   },
   {
    "id": "AC5",
-   "title": "Swap",
-   "text": "Given edit mode, when I tap Swap on the yogurt's row and pick a food in the swap list, then that food stands in the row with the same grams."
+   "title": "Said, not typed",
+   "text": "Given the field, when I tap Say it and speak, then my words stand in the field as if typed."
   },
   {
    "id": "AC6",
-   "title": "Add a food",
-   "text": "Given edit mode, when I tap + Add a food and pick one, then it is a new row at its normal portion, and I am still in edit mode."
+   "title": "What I set stays",
+   "text": "Given I set the chicken to 200 g on the Plate or answered Chef Mealan's question about it, when he reads again, then the chicken is still 200 g and he does not ask about it again."
   },
   {
    "id": "AC7",
-   "title": "By words",
-   "text": "Given edit mode, when I write The yogurt was 0.2% fat. There was mayo too. and tap Read again, then the rows show Yogurt, 0.2% fat and Mayonnaise, and one line from Chef Mealan says what he changed."
+   "title": "By hand, on the Plate",
+   "text": "Given the read, when I tap Edit on the Plate, then the Plate opens with its food list as it is today, and there is no button Change the foods."
   },
   {
    "id": "AC8",
-   "title": "What I set stays",
-   "text": "Given I chose 200 g for the chicken, by his question or by hand, when Chef Mealan reads again, then the chicken is still 200 g and he does not ask about it again; and a food I removed does not come back."
+   "title": "His checks stay",
+   "text": "Given a read that is not sure about a kind or an amount, when I open the Plate, then his question is there as it is today."
   },
   {
    "id": "AC9",
-   "title": "His question stands on the read",
-   "text": "Given the read is not sure about one amount, when the read opens, then the question is under the chips with ~200 g, ~350 g and Neither, and a tap on an amount sets it and closes the question."
+   "title": "One place for words",
+   "text": "Given the Plate with a photo, when I look at it, then there is no link Wrong foods? Help Chef Mealan read it."
   },
   {
    "id": "AC10",
-   "title": "Neither",
-   "text": "Given that question, when I tap Neither, then edit mode opens with that food's grams ready to type, and the question is gone."
-  },
-  {
-   "id": "AC11",
-   "title": "The old doors are gone",
-   "text": "Given a read, when I look at the page, then there is no link Wrong foods? Help Chef Mealan read it and no Skip, and Retake, + Photo and Fit to my target are behind one link in edit mode."
-  },
-  {
-   "id": "AC12",
    "title": "Three languages",
-   "text": "Given the app in English, Serbian or German, when I walk steps 1 to 6, then Foods, Tell Chef Mealan what is wrong, Read again, Swap, Remove, + Add a food, Neither and Chef Mealan's line are in that language."
+   "text": "Given the app in English, Serbian or German, when I walk steps 1 to 4, then Tell Chef Mealan what is wrong, About, Read again, Edit on the Plate and Chef Mealan's line are in that language."
   }
  ]
 }
