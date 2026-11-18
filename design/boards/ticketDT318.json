@@ -15,9 +15,9 @@
  "story": "When a read is not quite right, I want one place to correct the foods, with my hands or with my words, so that I do not hunt for the right door and nothing I set is lost.",
  "words": "18 November 19:26: jogurt was with 10% fixed in the food list, not on the read chip. I tried to swap for 0.2% fat but such jogurt was not listed. I added info as mayo was not recognized and said that I had 0.2% fat jogurt. Then it asked me again about the chicken, this time if it was 220 g. A bit confusing where and how to update it.",
  "cause": "Replayed on the app as built in 0.3.159. The chip shows a short name, so 10% fat is cut off. The question about an amount is not on the read; it is on the screen behind Change the foods. The swap list offers foods from my own list. And a second read starts from the photo again: it drops the amount I chose and asks anew.",
- "words2": "19:43: better an edit mode where what is needed is set, than another way of correction. 21:48: saying it to Chef Mealan worked very well. So we have several places for making it better and each of them does some work. 23:33: editing chips is double work from the block where we edit foods anyway. A branch is drawn from its screen, or as a flow of its own. 23:44: select a chip and tell the chef what it is or is not; that is for using the chef for a second read. If correcting the read, send it to the Plate for editing. Keep the current few checks, where a pure guess is better than nothing. 23:53: Say it next to Read again makes it unclear. 23:56: no one is updating the foods. I want to see in the design drawn examples of the current reads as suggestions for initial correction, and if not correct or a wrong food, to offer to edit details or change the food in the food list on the Plate.",
- "proposed": "Three ways, each with one job, in this order. 1. His checks, on the read: the few questions Chef Mealan has today about an amount or a kind stand under the chips as the first correction. Each offers its answers and Skip, and one way out when none is right: Not right? Edit it on the Plate. 2. My words, on the read: a tap on a chip marks it, and one field takes what I tell Chef Mealan about it, typed or said; with no chip marked, the field takes a missing food. The button says Send to Chef Mealan. 3. By hand: Edit on the Plate opens the Plate's food list, where an amount is typed, a food's details are opened and a food is changed. The chips show the food's full name. What I set stays, and he does not ask about it a second time.",
- "more_change": "Four things change that are built today. 1. His checks show on the read; today they show only on the Plate's screen. 2. Each check gets the way out Not right? Edit it on the Plate, which opens the Plate on that food. 3. A tap on a chip marks it for Chef Mealan; today it turns the chip into a number. Grams are typed on the Plate. 4. Change the foods is named Edit on the Plate, and the link Wrong foods? Help Chef Mealan read it goes from the Plate's screen; its job is the field on the read.",
+ "words2": "19:43: better an edit mode where what is needed is set, than another way of correction. 21:48: saying it to Chef Mealan worked very well. So we have several places for making it better and each of them does some work. 23:33: editing chips is double work from the block where we edit foods anyway. A branch is drawn from its screen, or as a flow of its own. 23:44: select a chip and tell the chef what it is or is not; that is for using the chef for a second read. If correcting the read, send it to the Plate for editing. Keep the current few checks, where a pure guess is better than nothing. 23:53: Say it next to Read again makes it unclear. 23:56: no one is updating the foods. I want to see in the design drawn examples of the current reads as suggestions for initial correction, and if not correct or a wrong food, to offer to edit details or change the food in the food list on the Plate. 00:06: it is not just about editing on the Plate, it can be adding; so Continue on the Plate. 00:11: we test this solution; if we see the need to edit every chip before continuing on the Plate, we work on it then.",
+ "proposed": "Three ways, each with one job, in this order. 1. His checks, on the read: the few questions Chef Mealan has today about an amount or a kind stand under the chips as the first correction. Each offers its answers and Skip, and one way out when none is right: Not right? Continue on the Plate. 2. My words, on the read: a tap on a chip marks it, and one field takes what I tell Chef Mealan about it, typed or said; with no chip marked, the field takes a missing food. The button says Send to Chef Mealan. 3. By hand: Continue on the Plate opens the Plate's food list, where an amount is typed, a food's details are opened and a food is changed. The chips show the food's full name. What I set stays, and he does not ask about it a second time.",
+ "more_change": "Four things change that are built today. 1. His checks show on the read; today they show only on the Plate's screen. 2. Each check gets the way out Not right? Continue on the Plate, which opens the Plate on that food. 3. A tap on a chip marks it for Chef Mealan; today it turns the chip into a number. Grams are typed on the Plate. 4. Change the foods is named Continue on the Plate, and the link Wrong foods? Help Chef Mealan read it goes from the Plate's screen; its job is the field on the read.",
  "open": "One thing for your word. The link Wrong foods? Help Chef Mealan read it sits on the Plate's screen today. I took it out, so words have one place. Say if it should stay.",
  "days": "The board is drawn on the app's test photo. The foods are yours: chicken, sweet potato fries, yogurt, mayonnaise.",
  "unchanged": [
@@ -33,7 +33,8 @@
   "A food he changed or added is marked on its chip until the next tap.",
   "The microphone sits inside the field.",
   "The doubled foods of a tester are B152, not this ticket.",
-  "The row DT318.1, steps 1 to 5, is the flow. The row DT318.2 is the branch from step 1."
+  "The row DT318.1, steps 1 to 5, is the flow. The row DT318.2 is the branch from step 1.",
+  "Later, not in this ticket (DT321, parked): one pencil at the top right of the chips, so each chip can be tapped and its food edited in place, one by one, before moving to the Plate."
  ],
  "ac": [
   {
@@ -59,7 +60,7 @@
   {
    "id": "AC5",
    "title": "None is right",
-   "text": "Given a check, when I tap Not right? Edit it on the Plate, then the Plate opens with that food's row in view and its amount ready to type."
+   "text": "Given a check, when I tap Not right? Continue on the Plate, then the Plate opens with that food's row in view and its amount ready to type."
   },
   {
    "id": "AC6",
@@ -84,7 +85,7 @@
   {
    "id": "AC10",
    "title": "By hand, on the Plate",
-   "text": "Given the read, when I tap Edit on the Plate, then the Plate opens with its food list as it is today, and there is no button Change the foods."
+   "text": "Given the read, when I tap Continue on the Plate, then the Plate opens with its food list as it is today, and there is no button Change the foods."
   },
   {
    "id": "AC11",
@@ -94,7 +95,7 @@
   {
    "id": "AC12",
    "title": "Three languages",
-   "text": "Given the app in English, Serbian or German, when I walk steps 1 to 5, then Not right? Edit it on the Plate, Tell Chef Mealan what is wrong, About, Send to Chef Mealan, Edit on the Plate and Chef Mealan's line are in that language."
+   "text": "Given the app in English, Serbian or German, when I walk steps 1 to 5, then Not right? Continue on the Plate, Tell Chef Mealan what is wrong, About, Send to Chef Mealan, Continue on the Plate and Chef Mealan's line are in that language."
   }
  ]
 }

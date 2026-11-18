@@ -2058,7 +2058,7 @@
         {
           "id": "AC5",
           "title": "None is right",
-          "text": "Given a check, when I tap Not right? Edit it on the Plate, then the Plate opens with that food's row in view and its amount ready to type."
+          "text": "Given a check, when I tap Not right? Continue on the Plate, then the Plate opens with that food's row in view and its amount ready to type."
         },
         {
           "id": "AC6",
@@ -2083,7 +2083,7 @@
         {
           "id": "AC10",
           "title": "By hand, on the Plate",
-          "text": "Given the read, when I tap Edit on the Plate, then the Plate opens with its food list as it is today, and there is no button Change the foods."
+          "text": "Given the read, when I tap Continue on the Plate, then the Plate opens with its food list as it is today, and there is no button Change the foods."
         },
         {
           "id": "AC11",
@@ -2093,7 +2093,7 @@
         {
           "id": "AC12",
           "title": "Three languages",
-          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 5, then Not right? Edit it on the Plate, Tell Chef Mealan what is wrong, About, Send to Chef Mealan, Edit on the Plate and Chef Mealan's line are in that language."
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 5, then Not right? Continue on the Plate, Tell Chef Mealan what is wrong, About, Send to Chef Mealan, Continue on the Plate and Chef Mealan's line are in that language."
         }
       ],
       "unchanged": [
@@ -2155,6 +2155,13 @@
       "epic": "plate",
       "state": "parked",
       "why": "Parked by Coach Milan, 18 November 23:21: not part of B150. Notes from the talk of 22:18 to 23:17, none agreed: setting a meal should change only the meal line; today it turns the end of the read into Did you eat it?, and Done opens the Plan or Today by itself; he asked why Done does not close the block so he continues with the Plate, and why the Plan comes up at all; a logged plate showing a question with a coloured button is wrong; an open block must show which button it belongs to. Not to be picked up until he asks."
+    },
+    {
+      "id": "DT321",
+      "title": "Edit a food from its chip on the read, before continuing on the Plate",
+      "epic": "plate",
+      "state": "parked",
+      "why": "Coach Milan, 19 November 00:11: first test DT318 as it is. If we see the need to edit every chip before continuing on the Plate: one pencil at the top right corner of the chips, which lets every chip be tapped and edited, one by one, in the block the Plate has for a food, so the food data is fixed before moving to the Plate. A long press that opens one food's block was his other idea, as an advanced feature."
     },
     {
       "id": "DT319",

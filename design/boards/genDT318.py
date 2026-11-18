@@ -24,11 +24,11 @@ readBoard("DT318", "Stories262.dc.html", 7, [
   ("1. The read, and his checks", "n_1", "changed", "Changed: full names on the chips; his checks stand on the read, each with a way to the Plate. Amber: the tap on ~200 g."),
   ("2. The check about the kind", "n_2", "changed", "The first check is answered. Amber: the tap on 0.2% fat."),
   ("3. My words", "n_3", "changed", "New: one field for what he could not see. Amber: the tap on Send to Chef Mealan."),
-  ("4. He answered", "n_4", "changed", "New: one line says what he did; what I set stays. Amber: the tap on Edit on the Plate."),
+  ("4. He answered", "n_4", "changed", "New: one line says what he did; what I set stays. Amber: the tap on Continue on the Plate."),
   ("5. By hand, on the Plate", "n_5", "changed", "No change to this screen: the food list you know.")], [1, 2, 3, 4]),
  ("DT318.2", "The branch from step 1: none of his answers is right", [("The branch", "It starts on the read of step 1. When neither amount is right, or the food is another one, the check itself leads to the Plate's food list. Nothing is edited on the read.")], [
-  ("1. The read, and his checks", "b_1", "changed", "The same screen as step 1. Amber: the tap on Not right? Edit it on the Plate."),
+  ("1. The read, and his checks", "b_1", "changed", "The same screen as step 1. Amber: the tap on Not right? Continue on the Plate."),
   ("2. The Plate, on that food", "b_2", "changed", "No change to this screen, only where it opens: that food's row, its amount ready to type.")], [1])],
-  "Stories261.dc.html", "18 November 2026 (Coach Milan 19:26, and 21:44 to 23:56 with a screenshot of a tester's read). Replayed on the app as built in 0.3.159. Drawn for approval; no Go.")
+  "Stories261.dc.html", "18 November 2026 (Coach Milan 19:26, and 21:44 to 00:11 with a screenshot of a tester's read). Replayed on the app as built in 0.3.159. Drawn for approval; no Go.")
 json.dump(OUT, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outRead.json"), "w"))
 print(json.dumps({k: [v["file"], v["w"], v["h"]] for k, v in OUT.items()}))
