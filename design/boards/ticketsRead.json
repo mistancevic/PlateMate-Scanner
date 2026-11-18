@@ -1,0 +1,380 @@
+{
+ "DT307a": {
+  "id": "DT307",
+  "short": "The read, point by point: points 1 to 4",
+  "rel": "Proposed; each point is agreed only when Coach Milan says Go to it",
+  "boardTitle": "DT307 (1 of 2): the read, point by point. The way back, fewer boxes, + Add more, the tick",
+  "opportunity": {
+   "from": "Coach Milan, 16 November 15:49 to 17:04, after his test of 0.3.151, with screenshots. His words: we have a mess; point by point, each resolved on one board. The earlier drawings are parked. 0.3.157 changed how the read ends, so the points are drawn again on today's app.",
+   "job": "Take a photo of what I eat, check what he read, and say what I do with it.",
+   "kind": "Nobody is blocked. Four kinds: no way back, too many boxes, a detour to add a food, and a button that looks like a way to finish and is not.",
+   "why_now": "The meal model is closed with 0.3.159. The read is the screen every photo ends on, and these are the points still open on it."
+  },
+  "problem": "I take a photo and Chef Mealan reads it. From the photo screen I cannot go back to the camera. From the read I cannot go back to the photo. The read sits in boxes inside a box, so the photo is smaller than it could be. A food he missed is three steps away. At the end two buttons stand side by side and only one of them finishes.",
+  "story": "When Chef Mealan has read my photo, I want to go back a step, see the photo large, add what he missed and finish with one button, so that logging a meal from a photo is short and I never feel stuck.",
+  "ac": [
+   {
+    "id": "1 AC1",
+    "title": "Back to the camera",
+    "text": "Given I took a photo and the photo screen shows it, when I tap Back to the camera, then the camera is open again for another shot and the first photo is not kept."
+   },
+   {
+    "id": "1 AC2",
+    "title": "Back to the photo",
+    "text": "Given Chef Mealan has read my photo and I see the read, when I tap Back to the photo, then the photo screen shows the same photo with the words I gave, and Read the plate reads it again."
+   },
+   {
+    "id": "1 AC3",
+    "title": "The second Back",
+    "text": "Given the read is longer than my screen, when I scroll to its end, then Back to the photo stands there too and does the same."
+   },
+   {
+    "id": "1 AC4",
+    "title": "Nothing is pushed down",
+    "text": "Given the photo screen or the read, when it opens, then the Back row is one light line above the title, 44 high to tap, and no button stands above the photo."
+   },
+   {
+    "id": "2 AC1",
+    "title": "One box",
+    "text": "Given the read of a photo, when I look at it, then only the result has a box, and the photo, its foods, Chef Mealan's word and What do you do with it? stand on the page itself."
+   },
+   {
+    "id": "2 AC2",
+    "title": "The photo is not smaller",
+    "text": "Given a phone 390 wide, when the read opens, then the photo is as wide as the page's column, 354, where it is 318 today."
+   },
+   {
+    "id": "3 AC1",
+    "title": "+ Add more opens the plate, ready to add",
+    "text": "Given the read shows chicken and rice and he missed the salad, when I tap + Add more, then the plate opens with the photo's foods on it and + Add more to your plate already open."
+   },
+   {
+    "id": "3 AC2",
+    "title": "The food joins",
+    "text": "Given that is open, when I add salad from the search, then it stands with the photo's foods, without the ~ of an estimate."
+   },
+   {
+    "id": "4 AC1",
+    "title": "A tick and one button",
+    "text": "Given a meal is set and the read asks Did you eat it?, when I look under the answers, then Save in My recipes is a tick, off, and Done is the only button."
+   },
+   {
+    "id": "4 AC2",
+    "title": "Ticked",
+    "text": "Given I tick Save in My recipes and choose All of it, when I tap Done, then the meal is logged and the plate is in My recipes."
+   },
+   {
+    "id": "4 AC3",
+    "title": "Not ticked",
+    "text": "Given I leave the tick off and choose All of it, when I tap Done, then the meal is logged and nothing is added to My recipes."
+   }
+  ],
+  "unchanged": [
+   "Remove the photo on the photo screen: the Plate as it was, nothing changed. It is the Cancel.",
+   "Change the foods, and everything on the plate it opens.",
+   "With no meal set the read ends with What do you do with it? Save it, Plan it, Ate it, as built in 0.3.157.",
+   "The result, Chef Mealan's word, the foods as chips with amounts to tap."
+  ],
+  "details": [
+   "Back is the link of the question screen (DT308.12f). No new element.",
+   "+ Add more is a small button, as Change the foods is.",
+   "Words: Back to the camera is new. Back to the photo exists. English, Serbian, German.",
+   "The screens named DT307.1c, 1d, 2b, 3b and 4b are what it looks like."
+  ]
+ },
+ "DT307b": {
+  "id": "DT307",
+  "short": "The read, point by point: point 5, B145 and DT306",
+  "rel": "Proposed; each point is agreed only when Coach Milan says Go to it",
+  "boardTitle": "DT307 (2 of 2): the read, point by point. The pot, the cooking line (B145), Chef Mealan's card (DT306)",
+  "ac": [
+   {
+    "id": "5 AC1",
+    "title": "The question is about what I eat",
+    "text": "Given the first look at my photo says it is a pot, when the photo screen opens, then it asks It looks like a pot. How much of it do you eat? with All of it and A part of it, and A part of it is chosen."
+   },
+   {
+    "id": "5 AC2",
+    "title": "A part, with grams",
+    "text": "Given A part of it is chosen, when I type 350 and tap Read the plate, then the read shows the pot's foods at 350 g in all."
+   },
+   {
+    "id": "5 AC3",
+    "title": "A part, no grams",
+    "text": "Given A part of it is chosen and the grams are empty, when I tap Read the plate, then the read shows one portion, as Chef Mealan sees the pot."
+   },
+   {
+    "id": "5 AC4",
+    "title": "The read, not the recipe",
+    "text": "Given a pot was read, when the read opens, then it is the read alone, as for a plate, and not the whole recipe on the plate."
+   },
+   {
+    "id": "5 AC5",
+    "title": "The pot as a recipe, when I say so",
+    "text": "Given I tick Save in My recipes on that read, when I tap Done, then the pot is in My recipes as a recipe with its portions."
+   },
+   {
+    "id": "B145 AC1",
+    "title": "No words, no line",
+    "text": "Given I gave Chef Mealan no words, when the read opens, then there is no For cooking, not counted line."
+   },
+   {
+    "id": "B145 AC2",
+    "title": "Only foods I named",
+    "text": "Given my words say fried in olive oil, when the read opens, then For cooking, not counted names olive oil."
+   },
+   {
+    "id": "B145 AC3",
+    "title": "Never a way of cooking",
+    "text": "Given the photo's read comes back with simmered and pureed, when the read opens, then neither word stands anywhere on it."
+   },
+   {
+    "id": "DT306 AC1",
+    "title": "The question is asked",
+    "text": "Given a photo's plate after Change the foods, with dinner set, when I look at Chef Mealan's card, then it asks Did you eat it? with All of it, Half and Part of it as choices under the question."
+   },
+   {
+    "id": "DT306 AC2",
+    "title": "The buttons under the answers",
+    "text": "Given that card, when I look under the choices, then Add a food and Don't count it stand on the left and Done, the one main button, on the right."
+   },
+   {
+    "id": "DT306 AC3",
+    "title": "Half",
+    "text": "Given I choose Half, when I tap Done, then half is logged and the other half is kept on Today, as Ate half does today."
+   },
+   {
+    "id": "DT306 AC4",
+    "title": "No meal set",
+    "text": "Given the same plate with no meal set, when I look at his card, then it has his word, Add a food and Don't count it, as today, and the page ends with What do you do with it?."
+   }
+  ],
+  "unchanged": [
+   "A plate on a plate: the form before the read, Wrong foods?, Retake and + Photo.",
+   "What Add a food and Don't count it do.",
+   "The questions behind the pencil of the meal line: since 0.3.157 they are the calendar's rows and choices already, so nothing is proposed there.",
+   "A photo of a plate, not a pot: no question about how much."
+  ],
+  "details": [
+   "The pot question keeps its place and its look; only the words and the grams field are new.",
+   "DT306 reuses the read's block as it is: the same question, choices and Done.",
+   "New words: How much of it do you eat?, A part of it, the grams line. All of it exists. English, Serbian, German.",
+   "The screens named DT307.5c, B145b and DT306b are what it looks like."
+  ]
+ },
+ "points": {
+  "1": [
+   [
+    "In Coach Milan's words",
+    "16 November: Back at the top left stays. A second Back at the bottom when there is a scroll. Cancel goes back with nothing changed. Buttons on top must not push the content down: a light top row."
+   ],
+   [
+    "Now",
+    "The photo screen has Remove the photo and nothing else. The read has no way back to the photo screen."
+   ],
+   [
+    "Proposed",
+    "The one element: the Back link the question screen already has (DT308.12f), as one light row above the title. On the photo screen it says Back to the camera. On the read it says Back to the photo, and stands once more at the bottom."
+   ],
+   [
+    "Open, for your word",
+    "Cancel: I read it as Remove the photo, which is there and does that. Say if you meant a separate Cancel."
+   ],
+   [
+    "Decision",
+    "Open."
+   ]
+  ],
+  "2": [
+   [
+    "In Coach Milan's words",
+    "16 November: fewer boxes, and the photo not smaller."
+   ],
+   [
+    "Now",
+    "A card holds the whole read. Inside it the photo has a box, Chef Mealan's word has a box, and What do you do with it? has a box. With the result that is five."
+   ],
+   [
+    "Proposed",
+    "Only the result keeps its box. Nothing is added and nothing is moved: four borders go. The photo grows from 318 to 354 wide."
+   ],
+   [
+    "Decision",
+    "Open."
+   ]
+  ],
+  "3": [
+   [
+    "Where it comes from",
+    "The board DT308, part 2, shows + Add more on the read. 0.3.157 did not build the read's layout, so it is missing."
+   ],
+   [
+    "Now",
+    "A food he missed: Change the foods, scroll to the end of the foods, + Add more to your plate."
+   ],
+   [
+    "Proposed",
+    "The one element: + Add more, a small button left of Change the foods. It opens the plate with + Add more to your plate already open."
+   ],
+   [
+    "Looked at and not chosen: the add block inside the read",
+    "The search, Photo or scan and Add manually inside the read would make the read a second plate."
+   ],
+   [
+    "Decision",
+    "Open."
+   ]
+  ],
+  "4": [
+   [
+    "In Coach Milan's words",
+    "16 November: Save in My recipes as a tick, with Done."
+   ],
+   [
+    "Now",
+    "With a meal set the read ends with two buttons, Save in My recipes and Done. The first only marks the plate to be kept; Done finishes."
+   ],
+   [
+    "Proposed",
+    "The one element: a tick in place of the button. Done is the one button and does both when the tick is on."
+   ],
+   [
+    "Not touched",
+    "With no meal set the read ends with Save it, Plan it, Ate it. Those are three actions and stay."
+   ],
+   [
+    "Decision",
+    "Open."
+   ]
+  ],
+  "5": [
+   [
+    "In Coach Milan's words",
+    "16 November: the pot question is How much of it do you eat? All of it, A part of it, with grams. The pot is kept as a recipe only with Save in My recipes."
+   ],
+   [
+    "Now",
+    "The question asks How much of it is yours? The whole pot, My portion. The whole pot opens as a whole recipe on the plate, with no read."
+   ],
+   [
+    "Proposed",
+    "The one element: the same question row, with words about what I eat and a grams field for a part. The read then shows what I eat, alone. The pot becomes a recipe only with the tick of point 4."
+   ],
+   [
+    "Open, for your word",
+    "Which answer is chosen when the screen opens. Proposed: A part of it, since a pot is rarely one person's meal. Today The whole pot is chosen."
+   ],
+   [
+    "Decision",
+    "Open."
+   ]
+  ],
+  "B145": [
+   [
+    "Where it comes from",
+    "Coach Milan, 15 November 20:57, his test of 0.3.150: a read with no words showed For cooking, not counted: simmered, pureed. Drawn before on the board B145; no Go then."
+   ],
+   [
+    "Now",
+    "The read shows what the photo's read returns as cooking foods, whatever it is."
+   ],
+   [
+    "Proposed",
+    "No new element. The line shows only foods my own words named that are not counted. With no words there is no line. A way of cooking is never shown."
+   ],
+   [
+    "Decision",
+    "Open."
+   ]
+  ],
+  "DT306": [
+   [
+    "In Coach Milan's words",
+    "16 November 11:35, with two screenshots: after the read was rebuilt, update the blocks that are like it. An answer under its question, the section's buttons under it."
+   ],
+   [
+    "Now",
+    "On a photo's plate with a meal set, Chef Mealan's card ends with four buttons in a row: Ate half, Add a food, Don't count it, Ate it. Their words wrap."
+   ],
+   [
+    "Proposed",
+    "The one element: the read's own block. Did you eat it? with All of it, Half, Part of it; under it Add a food and Don't count it, and Done."
+   ],
+   [
+    "Decision",
+    "Open."
+   ]
+  ]
+ },
+ "DT315": {
+  "short": "How to, log it with a photo: step 4 says what the app does now",
+  "from": "Found 18 November while 0.3.157 was built. No tester has reported it.",
+  "problem": "Step 4 says: Check the foods he read. Under Did you eat it? choose All of it, Half or Part of it, then Done. Since 0.3.157 the read first asks What do you do with it?, and Did you eat it? comes after Ate it and the meal.",
+  "proposed": "Words only. Step 4: Check the foods he read. Tap Ate it and the meal. Step 5, new: Under Did you eat it? choose All of it, Half or Part of it, then Done.",
+  "ac": [
+   {
+    "id": "AC1",
+    "title": "The steps match the app",
+    "text": "Given I open How to, I ate something: log it with a photo, when I follow its steps on a photo with no meal set, then each step names a button that is on the screen at that step."
+   }
+  ],
+  "unchanged": "The other steps and the other How to pages."
+ },
+ "DT316": {
+  "short": "English lines no code uses: the list, for your word",
+  "from": "Six went in 0.3.157 with your word. The builds of 0.3.157 and 0.3.159 left more behind.",
+  "problem": "Lines no screen shows still sit in the English, Serbian and German files. Each one is a line you may check in your table for nothing.",
+  "proposed": "Certain today, 5: the three old question lines (Skyr would join a plate from, from your recipes has, from your plan has), Keep my plate, and Chef Mealan's old question line. A first sweep finds 126 more candidates, most on the Plate (29) and the goal setup (22). I check each against the code and bring you the list by screen. Nothing goes without your word.",
+  "ac": [
+   {
+    "id": "AC1",
+    "title": "Only what you ticked goes",
+    "text": "Given the list with your word on each line, when the release is built, then every line you ticked is gone from English, Serbian and German, and no other."
+   },
+   {
+    "id": "AC2",
+    "title": "Nothing on screen changes",
+    "text": "Given the lines are gone, when all walkthroughs run, then they pass untouched."
+   }
+  ],
+  "unchanged": "Every line a screen shows."
+ },
+ "DT317": {
+  "short": "Start cooking with a plate from earlier: Ate it asks the meal",
+  "from": "Found 18 November while DT314 was built. It was not in DT314.",
+  "problem": "A plate from Saturday is on the Plate. I open a recipe and tap Start cooking. Chef Mealan asks about the old plate: Ate it, Save for later, Clear it, Cancel. Ate it logs it at once to the meal nearest its time, with no question. On the Plate itself the same tap now asks the meal (DT314).",
+  "proposed": "The one element: the calendar of DT314 under these buttons too. Ate it opens it on the plate's day with the nearest meal marked. A tap on a row logs the plate there, and the cooking starts.",
+  "ac": [
+   {
+    "id": "AC1",
+    "title": "Ate it asks the meal",
+    "text": "Given a plate from Saturday 19:10 and I tapped Start cooking on a recipe, when I tap Ate it, then the calendar opens on Sat 14 with Dinner marked and nothing is logged."
+   },
+   {
+    "id": "AC2",
+    "title": "Then the cooking starts",
+    "text": "Given that calendar, when I tap Dinner, then the plate is logged to Saturday's dinner at 19:10 and the recipe opens to cook."
+   }
+  ],
+  "unchanged": "Save for later, Clear it and Cancel. A plate of now: Save my plate, Clear my plate."
+ },
+ "B149": {
+  "short": "A chosen choice shows two ticks",
+  "from": "Found 18 November while drawing the read. Seen on the app as built in 0.3.159.",
+  "problem": "Two places show a chosen choice with two ticks: the pot question on the photo screen (✓ ✓ The whole pot) and Good for on a recipe's page (✓ ✓ Lunch). One tick comes from the choice's look, one is written into the words.",
+  "proposed": "One tick, the one of the look, as every other choice in the app has. No change to what is drawn on any board.",
+  "ac": [
+   {
+    "id": "AC1",
+    "title": "The pot question",
+    "text": "Given a photo of a pot on the photo screen, when I look at the chosen answer, then it shows one tick."
+   },
+   {
+    "id": "AC2",
+    "title": "Good for",
+    "text": "Given a recipe's page with Lunch chosen under Good for, when I look at Lunch, then it shows one tick."
+   }
+  ],
+  "unchanged": "Which answer is chosen, and what a tap does."
+ }
+}

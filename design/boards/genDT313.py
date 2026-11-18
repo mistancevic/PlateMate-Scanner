@@ -51,7 +51,7 @@ def make(tid, fname, cols, shots, after, sub):
     Hc = top + h["ac"] + 40
     board(fname, f'{tid}: {t["title"]}', sub, B, W, Hc, after)
     OUT[tid] = {"file": fname, "w": W, "h": min(8000, Hc + 230), "title": f'{tid}: {t["title"]}', "inner": g["B"].render(W, Hc)}
-SUB = "18 November 2026. The meal model, closed. Drawn on the app as built in 0.3.157. Go: 18 November 15:56, for 0.3.159."
+SUB = "18 November 2026. The meal model, closed. Drawn on the app as built in 0.3.157. Go: 18 November 15:56. Built in 0.3.159."
 make("DT313", "Stories250.dc.html", 6, [
   ("From Recipes: Change it first", "r_0", "draft", "A recipe's page in Recipes, with skyr, oats and a banana on the Plate. Amber: the tap."),
   ("The question today", "r_1", "draft", "The old look. Red: what differs from the screen a photo gets. The old plate is thrown away."),
