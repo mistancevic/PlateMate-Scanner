@@ -1,5 +1,5 @@
 {
-  "about": "One entry per ticket. The Kanban on the canvas (page Kanban) and the handover read this file. States: later (one line, an idea), next (brainstormed, Milan's answer in, no board), now (board drawn and approved, waits for Go), progress (branch open), done (merged, with its version). Milan says the word; Claude moves the card. From 18 November 2026 a ticket can carry its story (one sentence: who, what, so that) and its acceptance criteria as ac: a list of scenarios, each with an id (AC1, AC2 ...), a short title that names the behaviour, and one sentence Given ..., when ..., then .... One behaviour per scenario. The Kanban card and the board's story card both show them. A ticket names its board and the canvas page (where); the board's story card names its ticket and its Kanban column.",
+  "about": "One entry per ticket. The Kanban on the canvas (page Kanban) and the handover read this file. States: later (one line, an idea), next (brainstormed, Milan's answer in, no board), now (board drawn and approved, waits for Go), progress (branch open), done (merged, with its version). Milan says the word; Claude moves the card. From 18 November 2026 a ticket can carry four parts: problem (the pain today, in plain words), story (what the person wants to be able to do and why, never the solution), unchanged (what already works and must not change: preconditions, not requirements), and ac (the acceptance criteria for what is new only: scenarios with an id, a short title that names the behaviour, and one sentence Given ..., when ..., then ...; one behaviour each). The Kanban card and the board's story card show them. A ticket names its board and the canvas page (where); the board's story card names its ticket and its Kanban column.",
   "epics": {
     "home": {
       "name": "Home page",
@@ -1315,36 +1315,32 @@
       "ac": [
         {
           "id": "AC1",
-          "title": "Empty plate stands above the foods",
-          "text": "Given my plate holds skyr, oats and a banana, when I look at the card On your plate, then Empty plate stands on the left of the row right above the foods."
+          "title": "The top of the card is the plate, not a button",
+          "text": "Given my plate holds skyr, oats and a banana, when I open the Plate, then the top of the card says On your plate and the result comes right under it, with no button in between."
         },
         {
           "id": "AC2",
-          "title": "Group into parts stands opposite it",
-          "text": "Given the same plate, when I look at that row, then Group into parts stands on its right, with its words on one line and clear of the button's border."
+          "title": "Empty plate stands with the foods",
+          "text": "Given the same plate, when I look at the row right above the foods, then Empty plate stands on its left."
         },
         {
           "id": "AC3",
-          "title": "The top of the card holds no button",
-          "text": "Given the same plate, when I look at the top of the card, then it says On your plate and nothing else."
+          "title": "Group into parts stands opposite and reads well",
+          "text": "Given the same plate, when I look at that row, then Group into parts stands on its right, with its words on one line and clear of the button's border."
         },
         {
           "id": "AC4",
           "title": "With nothing to group, Empty plate keeps its place",
           "text": "Given my plate holds only skyr, so there is no Group into parts, when I look above the food, then Empty plate stands alone in the same place on the left."
-        },
-        {
-          "id": "AC5",
-          "title": "Empty plate still asks once",
-          "text": "Given skyr, oats and a banana on my plate, when I tap Empty plate, then the button says Tap again to empty and the foods are still there."
-        },
-        {
-          "id": "AC6",
-          "title": "The second tap empties the plate",
-          "text": "Given the button says Tap again to empty, when I tap it again, then the plate says Nothing on your plate yet."
         }
       ],
-      "story": "With foods on my plate, I want Empty plate and Group into parts together in one row right above the foods, so that the top of the card shows only my plate and its result, and Empty plate is always in the same place."
+      "story": "When I open my plate, I want to read what is on it and its result before anything else, and find the buttons for the foods next to the foods, so that I do not meet a delete button first and do not look in two places.",
+      "problem": "On a plate with foods, the first button I meet is the one that throws the plate away: Empty plate sits at the top of the card, next to its title and above the result. The other button for the foods, Group into parts, is somewhere else, and its words touch its border, so it looks broken.",
+      "unchanged": [
+        "Empty plate asks once: the first tap says Tap again to empty, the second tap empties the plate.",
+        "Group into parts groups the foods as it does today, and shows when it shows today.",
+        "Everything else on the card: the result, Fit to my target, the foods, + Add more to your plate, Prepare it."
+      ]
     },
     {
       "id": "DT312",

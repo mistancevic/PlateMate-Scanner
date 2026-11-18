@@ -20,11 +20,14 @@ def card(t):
     if t.get("version"): meta.append(f"v{t['version']}")
     why = f'<div style="font-size:12.5px;line-height:1.4;color:#3d4a63;margin-top:5px">{html.escape(t["why"])}</div>' if t.get("why") else ""
     m = f'<div style="font-size:11.5px;color:#5b6b8a;margin-top:5px;font-weight:700">{" · ".join(meta)}</div>' if meta else ""
-    # the story in one sentence, then the acceptance criteria as scenarios: a title that names the behaviour and one
-    # sentence Given ..., when ..., then ... (from 18 November 2026)
-    story = f'<div style="font-size:11.5px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin-top:8px">STORY</div><div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:3px">{html.escape(t["story"])}</div>' if t.get("story") else ""
-    ac = "".join(f'<div style="margin-top:6px;padding:6px 8px;border-radius:8px;background:#f4f7fc;font-size:12px;line-height:1.4;color:#172742"><b style="color:#123a7a">{html.escape(a["id"])}</b> <b>{html.escape(a["title"])}</b><br>{html.escape(a["text"])}</div>' for a in t.get("ac", []))
-    if ac: ac = story + '<div style="font-size:11.5px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin-top:8px">ACCEPTANCE CRITERIA</div>' + ac
+    # from 18 November 2026: the problem, the story, what must not change, then the acceptance criteria for what is new
+    head = lambda x: f'<div style="font-size:11.5px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin-top:8px">{x}</div>'
+    para = lambda x: f'<div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:3px">{html.escape(x)}</div>'
+    ac = ""
+    if t.get("problem"): ac += head("PROBLEM") + para(t["problem"])
+    if t.get("story"): ac += head("STORY") + para(t["story"])
+    if t.get("ac"): ac += head("ACCEPTANCE CRITERIA, WHAT IS NEW") + "".join(f'<div style="margin-top:6px;padding:6px 8px;border-radius:8px;background:#f4f7fc;font-size:12px;line-height:1.4;color:#172742"><b style="color:#123a7a">{html.escape(a["id"])}</b> <b>{html.escape(a["title"])}</b><br>{html.escape(a["text"])}</div>' for a in t["ac"])
+    if t.get("unchanged"): ac += head("ALREADY WORKS, MUST NOT CHANGE") + "".join(f'<div style="font-size:12px;line-height:1.4;color:#3d4a63;margin-top:3px">· {html.escape(u)}</div>' for u in t["unchanged"])
     return (f'<div style="border:1.5px solid #d1dcf0;border-left:5px solid {COL[t["epic"]]};border-radius:10px;padding:9px 10px;background:#fff;margin-bottom:8px">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><b style="font-size:12.5px;color:#123a7a">{t["id"]}</b>{chip(t["epic"])}</div>'
             f'<div style="font-size:13.5px;font-weight:700;line-height:1.35;color:#172742;margin-top:4px">{html.escape(t["title"])}</div>{why}{m}{ac}</div>')
@@ -49,8 +52,8 @@ def column(key, name, sub):
             f'<div style="margin-top:10px">{body}</div></div>')
 epics = "".join(f'<div style="width:{CW}px;flex:none;border:1.5px solid {COL[k]};border-radius:10px;padding:8px 10px;background:#fff"><div>{chip(k)}</div><div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:5px">{html.escape(e["why"])}</div></div>' for k, e in E.items())
 W = PAD * 2 + 3 * CW + 2 * G
-# the page is as tall as its longest column; measure it in a browser and give it as KANBAN_H (14,200 on 18 November 2026)
-H = int(os.environ.get("KANBAN_H", "14200"))
+# the page is as tall as its longest column; measure it in a browser and give it as KANBAN_H (14,400 on 18 November 2026)
+H = int(os.environ.get("KANBAN_H", "14400"))
 page = f'''<!doctype html>
 <html lang="en">
 <head>
