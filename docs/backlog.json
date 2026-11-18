@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.158",
     "0.3.157",
     "0.3.156",
     "0.3.155",
@@ -1474,10 +1475,10 @@
       "id": "DT313",
       "title": "Whatever arrives on a plate with foods gets the question a photo gets",
       "epic": "plate",
-      "state": "next",
+      "state": "now",
       "board": "Stories250",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as prep for 0.3.158, on the app as built in 0.3.157. Waits for Coach Milan's look and Go; nothing is built.",
+      "why": "Drawn 18 November 2026 as prep, on the app as built in 0.3.157. Coach Milan, Go 18 November 15:56. To build in 0.3.159.",
       "opportunity": {
         "from": "Found on 18 November 2026 while 0.3.157 was built, and noted in the handover as found, not changed. No tester has reported it.",
         "job": "Put a recipe on the Plate without losing what is already on it.",
@@ -1550,10 +1551,10 @@
       "id": "DT314",
       "title": "A plate from earlier: Ate it asks the meal in the calendar",
       "epic": "plate",
-      "state": "next",
+      "state": "now",
       "board": "Stories251",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as prep for 0.3.158, on the app as built in 0.3.157. Waits for Coach Milan's look and Go; nothing is built.",
+      "why": "Drawn 18 November 2026 as prep, on the app as built in 0.3.157. Coach Milan, Go 18 November 15:56. To build in 0.3.159.",
       "opportunity": {
         "from": "Found on 18 November 2026 while 0.3.157 was built, and noted in the handover as found, not changed. No tester has reported it.",
         "job": "Log a plate I ate earlier to the meal I ate it at.",
@@ -1604,10 +1605,10 @@
       "id": "B148",
       "title": "Under Ate it and Plan it, a tap on another day does nothing",
       "epic": "plate",
-      "state": "next",
+      "state": "done",
       "board": "Stories252",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as prep for 0.3.158, on the app as built in 0.3.157. Waits for Coach Milan's look and Go; nothing is built.",
+      "why": "Found 18 November while drawing the board DT314. Coach Milan 18 November 15:45: fix the bug first. Built in 0.3.158 on its own: a tap on a day under Ate it and Plan it opens that day; checks B148 AC1 to AC4 in the walkthrough plate-end.",
       "opportunity": {
         "from": "Found on 18 November 2026 while drawing the board DT314, on the app as built in 0.3.157. No tester has reported it.",
         "job": "Log or plan my plate on another day.",
@@ -1642,7 +1643,8 @@
         "The calendar behind the pencil.",
         "Days that cannot be picked: a coming day under Ate it, a day gone by under Plan it.",
         "More and its date field."
-      ]
+      ],
+      "version": "0.3.158"
     }
   ]
 }
