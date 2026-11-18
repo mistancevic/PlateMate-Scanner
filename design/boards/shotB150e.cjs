@@ -24,34 +24,36 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
   const clear = (p) => p.evaluate(() => { document.querySelectorAll("[data-n]").forEach((e) => e.remove()); document.querySelectorAll("[data-t]").forEach((e) => { e.style.outline = ""; e.removeAttribute("data-t"); }); });
   const noteAfter = (p, sel, html, grey) => ev(p, ({ NOTE, GNOTE, sel, html, grey }) => { const n = document.createElement("div"); n.setAttribute("data-n", "1"); n.style.cssText = grey ? GNOTE : NOTE; n.innerHTML = html; document.querySelector(sel).insertAdjacentElement("afterend", n); }, { sel, html, grey });
   // the meal line, drawn new. kind: "button" (nothing set, closed), "open" (nothing set, edit mode), or [meal, day]
-  const line = (p, kind, tap) => ev(p, ({ MARK, TAP, BTN, kind, tap }) => { const t = document.querySelector(".meal-line-text"); const pen = document.querySelector(".plan-line-pen") || document.querySelector(".plan-line-x");
-    if (kind === "button") { t.innerHTML = BTN; t.style.outline = ""; if (pen) pen.style.display = "none"; const b = t.querySelector("button"); b.style.cssText += ";" + (tap ? TAP : MARK); }
-    else if (kind === "open") { t.innerHTML = '<span class="meal-line-unset">Meal and day not set</span>'; t.style.cssText += ";" + MARK; if (pen) pen.style.display = ""; }
-    else { t.innerHTML = `<span class="meal-line-unset" style="color:#172742">${kind[0]}</span><span class="meal-line-day" style="display:block">${kind[1]}</span>`; t.style.cssText += ";" + MARK; if (pen) pen.style.display = ""; } }, { kind, tap });
+  const line = (p, kind, tap) => ev(p, ({ MARK, TAP, kind, tap }) => { const t = document.querySelector(".meal-line-text"); const pen = document.querySelector(".plan-line-pen") || document.querySelector(".plan-line-x");
+    const LAB = '<span style="display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5b6b8a;margin-bottom:2px">Meal and day</span>';
+    if (kind === "none") t.innerHTML = LAB + '<span class="meal-line-unset" style="color:#172742">No meal selected</span>';
+    else t.innerHTML = LAB + `<span class="meal-line-unset" style="color:#172742">${kind[0]}</span><span class="meal-line-day" style="display:block">${kind[1]}</span>`;
+    t.style.cssText += ";" + MARK; if (pen) { pen.style.display = ""; pen.style.outline = ""; if (tap) pen.style.cssText += ";" + TAP; } }, { kind, tap });
   // ---- 1: the photo on the Plate, name empty
   let p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await css(p);
   await ev(p, ({ MARK, PEN }) => { const i = document.querySelector(".title-input"); i.placeholder = "Untitled"; i.value = ""; let row = i.closest(".title-row");
     if (!row) { row = document.createElement("div"); row.style.cssText = "display:flex;align-items:center;gap:8px"; i.insertAdjacentElement("beforebegin", row); row.appendChild(i); i.style.flex = "1"; const b = document.createElement("button"); b.type = "button"; b.className = "icon title-pen"; b.innerHTML = PEN; row.appendChild(b); }
     row.style.cssText += ";" + MARK; });
-  await line(p, "button");
-  await noteAfter(p, ".meal-line", "<b>Step 1. Two lines changed, nothing else.</b> The name: grey <b>Untitled</b>, with the pencil, in the space it has today. The meal line: the white button <b>Set meal and day</b>. Today these say Chef Mealan names it, and Meal and day not set with a pencil.");
-  await shot(p, "h_1", 900);
+  await line(p, "none");
+  await ev(p, ({ TAP }) => { const b = [...document.querySelectorAll("button")].find((x) => /Read the plate/.test(x.textContent)); if (b) b.style.cssText += ";" + TAP; });
+  await noteAfter(p, ".meal-line", "<b>Step 1. Two lines changed, nothing else.</b> The name: grey <b>Untitled</b>, with the pencil. The meal line: a small title, Meal and day, and under it <b>No meal selected</b>, with the pencil. Today these say Chef Mealan names it, and Meal and day not set. Amber: the tap on Read the plate.");
+  await shot(p, "h_1", 1010);
   await p.context().close();
   // ---- 2: the read (a fresh page, so nothing drawn on step 1 stays)
   p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await h.readIt(p); await css(p);
-  await line(p, "button", true);
-  await noteAfter(p, ".meal-line", "<b>Step 2. The read. No change but the button.</b> Chef Mealan named the plate. No meal and day are set, so the read ends with What do you do with it?. Amber: the tap on Set meal and day.");
+  await line(p, "none", true);
+  await noteAfter(p, ".meal-line", "<b>Step 2. The read. No change but that line.</b> Chef Mealan read the photo and named the plate. No meal is selected, so the read ends with What do you do with it?. Amber: the tap on the pencil.");
   await shot(p, "h_2", 1400);
   // ---- 3: edit mode
-  await clear(p); await p.evaluate(() => { const b = document.querySelector(".plan-line-pen"); b.style.display = ""; });
+  await clear(p); await p.evaluate(() => { const b = document.querySelector(".plan-line-pen"); b.style.outline = ""; });
   await p.locator(".plan-line-pen").click(); await p.waitForTimeout(500); await p.locator(".meal-line-open .pcal-day").filter({ hasText: "Sat 14" }).click(); await p.waitForTimeout(500);
   const editBase = () => ev(p, ({ MARK, XS }) => { const pen = document.querySelector(".plan-line-pen"); pen.innerHTML = XS; pen.style.cssText += ";" + MARK; const c = document.querySelector(".meal-line-open .pcal"); if (!c.querySelector("[data-ref]")) { const q = document.createElement("b"); q.setAttribute("data-ref", "1"); q.className = "pcal-q"; q.textContent = "The photo was taken on Saturday, 15:57."; q.style.cssText = "display:block;margin:0 0 8px;" + MARK; c.insertAdjacentElement("afterbegin", q); }
-    for (const r of document.querySelectorAll(".meal-line-open .pcal-row")) if (/Just looking/.test(r.textContent)) { (r.querySelector("b") || r.firstElementChild).textContent = "Meal and day not set"; r.lastElementChild.textContent = ""; }
-    const walk = document.createTreeWalker(document.querySelector(".meal-line-open"), NodeFilter.SHOW_TEXT); let t; while ((t = walk.nextNode())) if (/Just looking/.test(t.nodeValue)) t.nodeValue = t.nodeValue.replace("Just looking", "Meal and day not set"); });
+    for (const r of document.querySelectorAll(".meal-line-open .pcal-row")) if (/Just looking/.test(r.textContent)) { (r.querySelector("b") || r.firstElementChild).textContent = "No meal selected"; r.lastElementChild.textContent = ""; }
+    const walk = document.createTreeWalker(document.querySelector(".meal-line-open"), NodeFilter.SHOW_TEXT); let t; while ((t = walk.nextNode())) if (/Just looking/.test(t.nodeValue)) t.nodeValue = t.nodeValue.replace("Just looking", "No meal selected"); });
   const markRow = (name, field) => ev(p, ({ name, field }) => { for (const r of document.querySelectorAll(".meal-line-open .pcal-row")) { const on = new RegExp("^\\s*(✓\\s*)?" + name).test(r.textContent); const b = r.querySelector("b") || r.firstElementChild; b.textContent = b.textContent.replace(/^✓\s*/, ""); r.style.background = on ? "#e3edff" : ""; if (on) { b.textContent = "✓ " + b.textContent; if (field) r.lastElementChild.innerHTML = field; } } }, { name, field });
   const rowsNote = async (html) => { await clear(p); await noteAfter(p, ".meal-line-open .pcal-rows", html); };
-  await editBase(); await line(p, "open"); await markRow("Meal and day not set");
-  await rowsNote("<b>Step 3. Edit mode.</b> The button opened it. The <b>X closes it</b>, and that is all the X does. It opens on the photo's day. The photo's time is a reference and cannot be changed. The row <b>Meal and day not set</b> is marked: the words the line has today. It was the row Just looking.");
+  await editBase(); await line(p, "none"); await markRow("No meal selected");
+  await rowsNote("<b>Step 3. Edit mode.</b> The pencil opened it and is now the <b>X that closes it</b>. That is all the X does. It opens on the photo's day. The photo's time is a reference and cannot be changed. The row <b>No meal selected</b> is marked. It was the row Just looking.");
   await shot(p, "h_3", 900);
   // ---- 4: Dinner and its time
   await markRow("Dinner", FIELD("19:30")); await line(p, ["Dinner", "Saturday, 14 November, 19:30"]);
@@ -59,8 +61,8 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
   await shot(p, "h_4", 900);
   // ---- the way back
   await ev(p, () => { for (const r of document.querySelectorAll(".meal-line-open .pcal-row")) if (/Dinner/.test(r.textContent)) r.lastElementChild.textContent = "20:00 · planned: Chicken rice bowl"; });
-  await markRow("Meal and day not set"); await line(p, "open");
-  await rowsNote("<b>The way back.</b> In edit mode a tap on <b>Meal and day not set</b> takes the meal off again. Closed, the line is the button Set meal and day. This takes the place of the X that removed the meal.");
+  await markRow("No meal selected"); await line(p, "none");
+  await rowsNote("<b>The way back.</b> In edit mode a tap on <b>No meal selected</b> takes the meal off again. This takes the place of the X that removed the meal.");
   await shot(p, "h_8", 900);
   // ---- a photo that carries only the time it was saved
   await ev(p, () => { document.querySelector("[data-ref]").textContent = "The photo was saved on Saturday, 15:57. When it was taken is not known."; });
@@ -74,9 +76,9 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
   const GREY = "outline:3px solid #5b6b8a;outline-offset:3px;border-radius:12px";
   const dt307 = () => ev(p, ({ TICK, GREY }) => { const r = document.querySelector(".rv-go"); const row = document.createElement("div"); row.setAttribute("data-d307", "1"); row.style.cssText = "margin:10px 0 4px;" + GREY; row.innerHTML = TICK; r.insertAdjacentElement("beforebegin", row);
     r.querySelector(".rv-save").style.display = "none"; const c = document.createElement("button"); c.type = "button"; c.className = "pill pill-small"; c.setAttribute("data-d307", "1"); c.textContent = "Cancel"; r.insertAdjacentElement("afterbegin", c); r.setAttribute("data-css", r.style.cssText); r.style.cssText += ";display:flex;justify-content:space-between;align-items:center;gap:8px;" + GREY; const d = r.querySelector(".rv-done"); d.style.minWidth = "150px"; d.style.flex = "none";
-    const n = document.createElement("div"); n.setAttribute("data-d307", "1"); n.style.cssText = "background:#eef1f6;border-radius:10px;padding:8px 10px;margin:12px 0 0;font-size:13px;line-height:1.4;color:#172742;font-family:Nunito,system-ui,sans-serif;text-align:left"; n.innerHTML = "<b>Grey: from DT307, not part of B150.</b> The tick in a row of its own, Cancel left of Done. Cancel logs nothing and sets the line back to the button Set meal and day."; r.insertAdjacentElement("afterend", n); }, { TICK, GREY });
+    const n = document.createElement("div"); n.setAttribute("data-d307", "1"); n.style.cssText = "background:#eef1f6;border-radius:10px;padding:8px 10px;margin:12px 0 0;font-size:13px;line-height:1.4;color:#172742;font-family:Nunito,system-ui,sans-serif;text-align:left"; n.innerHTML = "<b>Grey: from DT307, not part of B150.</b> The tick in a row of its own, Cancel left of Done. Cancel logs nothing and sets the line back to No meal selected."; r.insertAdjacentElement("afterend", n); }, { TICK, GREY });
   const un307 = () => p.evaluate(() => { document.querySelectorAll("[data-d307]").forEach((e) => e.remove()); const r = document.querySelector(".rv-go"); r.style.cssText = r.getAttribute("data-css") || ""; r.querySelector(".rv-save").style.display = ""; const d = r.querySelector(".rv-done"); d.style.minWidth = ""; d.style.flex = ""; });
-  const closed = () => ev(p, ({ MARK, PEN }) => { const x = document.querySelector(".plan-line-x"); x.innerHTML = PEN; x.style.cssText += ";" + MARK; document.querySelector(".meal-line-day").textContent = "Saturday, 14 November, 19:30"; document.querySelector(".meal-line-text").style.cssText += ";" + MARK; });
+  const closed = () => ev(p, ({ MARK, PEN }) => { const x = document.querySelector(".plan-line-x"); x.innerHTML = PEN; x.style.cssText += ";" + MARK; document.querySelector(".meal-line-day").textContent = "Saturday, 14 November, 19:30"; const t = document.querySelector(".meal-line-text"); t.insertAdjacentHTML("afterbegin", '<span style="display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5b6b8a;margin-bottom:2px">Meal and day</span>'); t.style.cssText += ";" + MARK; });
   await closed(); await dt307();
   await noteAfter(p, ".meal-line", "<b>Step 5. Closed with the X.</b> The line shows the meal with its day and time, and the pencil to open edit mode again. Below, the read as it is today: it now asks Did you eat it?.");
   await shot(p, "h_5", 1700);

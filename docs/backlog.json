@@ -1926,13 +1926,13 @@
       "ac": [
         {
           "id": "AC1",
-          "title": "Not set, the line is a button",
-          "text": "Given a photo is read and no meal and day are set, when I look at the meal line, then it is the white button Set meal and day, with no pencil and no Not counted, and the read ends with What do you do with it?."
+          "title": "No meal selected, said on the line",
+          "text": "Given a photo is read and no meal and day are set, when I look at the meal line, then it is the small title Meal and day, under it No meal selected, with the pencil and no Not counted, and the read ends with What do you do with it?."
         },
         {
           "id": "AC2",
-          "title": "The button opens edit mode, the X closes it",
-          "text": "Given that read of a photo from Saturday 15:57, when I tap Set meal and day, then edit mode opens on Sat 14 with the row Meal and day not set marked and an X at the right of the line, and a tap on the X closes edit mode and changes nothing."
+          "title": "The pencil opens edit mode, the X closes it",
+          "text": "Given that read of a photo from Saturday 15:57, when I tap the pencil, then edit mode opens on Sat 14 with the row No meal selected marked and the pencil turned into an X, and a tap on the X closes edit mode and changes nothing."
         },
         {
           "id": "AC3",
@@ -1957,7 +1957,7 @@
         {
           "id": "AC7",
           "title": "Closed, the line keeps the meal and the pencil",
-          "text": "Given Dinner at 19:30 is set, when I tap the X, then the line shows Dinner, Saturday, 14 November, 19:30 with the pencil, the read asks Did you eat it?, and a tap on the pencil opens edit mode again."
+          "text": "Given Dinner at 19:30 is set, when I tap the X, then under the title Meal and day the line shows Dinner, Saturday, 14 November, 19:30 with the pencil, the read asks Did you eat it?, and a tap on the pencil opens edit mode again."
         },
         {
           "id": "AC8",
@@ -1966,8 +1966,8 @@
         },
         {
           "id": "AC9",
-          "title": "Back to not set",
-          "text": "Given Dinner is set, when I open edit mode and tap the row Meal and day not set, then the line is the button Set meal and day again, and the read ends with What do you do with it? again."
+          "title": "Back to no meal selected",
+          "text": "Given Dinner is set, when I open edit mode and tap the row No meal selected, then the line says No meal selected again, and the read ends with What do you do with it? again."
         },
         {
           "id": "AC10",
@@ -1987,7 +1987,7 @@
         {
           "id": "AC13",
           "title": "A plate without a photo",
-          "text": "Given a plate I built with no photo, when I tap Set meal and day, then edit mode opens on today with no line about a photo, and everything else is the same."
+          "text": "Given a plate I built with no photo, when I tap the pencil, then edit mode opens on today with no line about a photo, and everything else is the same."
         },
         {
           "id": "AC14",
@@ -1997,12 +1997,12 @@
         {
           "id": "AC15",
           "title": "Just looking is gone",
-          "text": "Given any screen or line of Chef Mealan that says Just looking today, when I open it after the release, then it speaks of a meal and day not set, and no screen says Just looking or Not counted for this state."
+          "text": "Given any screen or line of Chef Mealan that says Just looking today, when I open it after the release, then it says No meal selected or speaks of no meal selected, and no screen says Just looking or Not counted for this state."
         },
         {
           "id": "AC16",
           "title": "Three languages",
-          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 7, then Untitled, Set meal and day, Meal and day not set and the two lines about the photo's time are in that language."
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 7, then Untitled, Meal and day, No meal selected and the two lines about the photo's time are in that language."
         }
       ],
       "unchanged": [
