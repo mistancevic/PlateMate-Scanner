@@ -2043,7 +2043,7 @@
         {
           "id": "AC2",
           "title": "His checks stand on the read",
-          "text": "Given the read is not sure about an amount or a kind, when the read opens, then his question stands under the chips with its answers and Skip, as it does on the Plate today."
+          "text": "Given the read is not sure about an amount or a kind, when the read opens, then his question stands under the chips with its answers and Skip, as it does on the Plate today; and a check I do not answer still stands on the Plate when I continue there."
         },
         {
           "id": "AC3",
@@ -2057,43 +2057,38 @@
         },
         {
           "id": "AC5",
-          "title": "None is right",
-          "text": "Given a check, when I tap Not right? Continue on the Plate, then the Plate opens with that food's row in view and its amount ready to type."
-        },
-        {
-          "id": "AC6",
           "title": "My words, about a food",
           "text": "Given I tapped the yogurt's chip, when I write what it is and tap Send to Chef Mealan, then the field said About: Yogurt, 10% fat, the chip shows what he changed, and one line from him says it."
         },
         {
-          "id": "AC7",
+          "id": "AC6",
           "title": "My words, a missing food",
           "text": "Given no chip is marked, when I write There was mayo too and tap Send to Chef Mealan, then a chip Mayonnaise is there, marked as new."
         },
         {
-          "id": "AC8",
+          "id": "AC7",
           "title": "Said, not typed",
           "text": "Given the field, when I tap the microphone in it and speak, then my words stand in the field as if typed."
         },
         {
-          "id": "AC9",
+          "id": "AC8",
           "title": "What I set stays",
           "text": "Given I answered a check or typed an amount on the Plate, when Chef Mealan answers my words, then that food is as I set it and he does not ask about it again."
         },
         {
-          "id": "AC10",
+          "id": "AC9",
           "title": "By hand, on the Plate",
           "text": "Given the read, when I tap Continue on the Plate, then the Plate opens with its food list as it is today, and there is no button Change the foods."
         },
         {
-          "id": "AC11",
+          "id": "AC10",
           "title": "One place for words",
           "text": "Given the Plate with a photo, when I look at it, then there is no link Wrong foods? Help Chef Mealan read it."
         },
         {
-          "id": "AC12",
+          "id": "AC11",
           "title": "Three languages",
-          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 5, then Not right? Continue on the Plate, Tell Chef Mealan what is wrong, About, Send to Chef Mealan, Continue on the Plate and Chef Mealan's line are in that language."
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 5, then Tell Chef Mealan what is wrong, About, Send to Chef Mealan, Continue on the Plate and Chef Mealan's line are in that language."
         }
       ],
       "unchanged": [
