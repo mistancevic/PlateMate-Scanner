@@ -244,7 +244,7 @@ def acTable(B, y, w, acs):
 
 start(3)
 row("empty", "Empty plate on the left, opposite Group into parts. Three states side by side, not steps", [
-  ("Ticket", "DT311 on the canvas page Kanban, column Now. It goes into 0.3.157."),
+  ("Ticket", "DT311. This board is the ticket: everything about it is here. On the <a href=\"Kanban.dc.html\">canvas page Kanban</a>, column Now, it is one short card with a label that leads here. It goes into 0.3.157."),
   ("Opportunity, why we act", "<b>Where it comes from:</b> Coach Milan's own look at the Plate on 18 November 2026, 10:05, while going through the boards. No tester has reported it.<br><b>The job:</b> Read my plate and its result, then change its foods.<br><b>What stood in the way:</b> Nobody was blocked. Two kinds: a risk of a wrong tap, because a delete button is the first control on the card; and looks broken, because the words of Group into parts touch its border.<br><b>Why now:</b> 0.3.157 rebuilds this card anyway, so the change is small now and would cost a release of its own later."),
   ("Problem", "On a plate with foods, the first button I meet is the one that throws the plate away: Empty plate sits at the top of the card, next to its title and above the result. The other button for the foods, Group into parts, is somewhere else, and its words touch its border, so it looks broken."),
   ("Story", "When I open my plate, I want to read what is on it and its result before anything else, and find the buttons for the foods next to the foods, so that I do not meet a delete button first and do not look in two places."),
@@ -257,7 +257,7 @@ row("empty", "Empty plate on the left, opposite Group into parts. Three states s
   ("Above the PD block", "Not there: the top of the card is the best place of the page, and a button that throws the plate away should not sit where the eye lands first."),
   ("Group into parts", "Room around its words, on one line, 44 high."),
 ], [("Now", "e_0", "draft", "As it is in 0.3.156. Red: the two buttons."), ("With Group into parts", "e_1", "changed", "The same plate, with the change."), ("With one food", "e_2", "changed", "No Group into parts.")], nid="DT311", arrows=False)
-acTable(B, 2060, W - 40, AC311); y = 2060 + 348 + 150  # measured: the card ends at 2014, the table is 348 high
+acTable(B, 2100, W - 40, AC311); y = 2100 + 348 + 150  # measured: the card ends at 2054, the table is 348 high
 board("Stories246.dc.html", "DT311: Empty plate on the left, opposite Group into parts",
   "18 November 2026 (Coach Milan 10:05). A small card of its own; it can go with 0.3.157. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
   B, W, y - 100, "Stories245.dc.html")
