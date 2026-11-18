@@ -1,5 +1,5 @@
 {
-  "about": "One entry per ticket. The Kanban on the canvas (page Kanban) and the handover read this file. States: later (one line, an idea), next (brainstormed, Milan's answer in, no board), now (board drawn and approved, waits for Go), progress (branch open), done (merged, with its version). Milan says the word; Claude moves the card.",
+  "about": "One entry per ticket. The Kanban on the canvas (page Kanban) and the handover read this file. States: later (one line, an idea), next (brainstormed, Milan's answer in, no board), now (board drawn and approved, waits for Go), progress (branch open), done (merged, with its version). Milan says the word; Claude moves the card. From 18 November 2026 a ticket can carry its acceptance criteria as ac: a list of Given, When, Then rows with an id (AC1, AC2 ...); the Kanban card and the board's story card both show them. A ticket names its board and the canvas page (where); the board's story card names its ticket and its Kanban column.",
   "epics": {
     "home": {
       "name": "Home page",
@@ -1310,7 +1310,34 @@
       "epic": "plate",
       "state": "now",
       "board": "Stories246",
-      "why": "Coach Milan 18 November 10:05: Empty plate could stand opposite Group into parts; that button's words are tight to its border; one general position when Group into parts is not there; not above the PD block if that is not friendly. Drawn: one row above the foods, Empty plate left, Group into parts right; with one food Empty plate alone in the same place; the card's top says only On your plate. Coach Milan 18 November 10:53: it goes into 0.3.157. Waits for the Go on the boards."
+      "why": "Coach Milan 18 November 10:05: Empty plate could stand opposite Group into parts; that button's words are tight to its border; one general position when Group into parts is not there; not above the PD block if that is not friendly. Drawn: one row above the foods, Empty plate left, Group into parts right; with one food Empty plate alone in the same place; the card's top says only On your plate. Coach Milan 18 November 10:53: it goes into 0.3.157. Waits for the Go on the boards.",
+      "where": "Page 5",
+      "ac": [
+        {
+          "id": "AC1",
+          "given": "A plate that shows Group into parts",
+          "when": "I look at the card On your plate",
+          "then": "One row stands above the foods: Empty plate on the left, Group into parts on the right. The card's top says only On your plate"
+        },
+        {
+          "id": "AC2",
+          "given": "A plate with no Group into parts, for example one food",
+          "when": "I look at the card",
+          "then": "The same row is there with Empty plate alone on the left, in the same place"
+        },
+        {
+          "id": "AC3",
+          "given": "The row, on a phone 390 wide",
+          "when": "I read Group into parts",
+          "then": "Its words are on one line with at least 16 px to its border on each side. Both buttons are at least 44 px high"
+        },
+        {
+          "id": "AC4",
+          "given": "Foods on the plate",
+          "when": "I tap Empty plate",
+          "then": "It does what it does in 0.3.156. Only its place changed"
+        }
+      ]
     },
     {
       "id": "DT312",
