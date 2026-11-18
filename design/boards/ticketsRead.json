@@ -55,8 +55,8 @@
    },
    {
     "id": "4 AC1",
-    "title": "A tick and one button",
-    "text": "Given a meal is set and the read asks Did you eat it?, when I look under the answers, then Save in My recipes is a tick, off, and Done is the only button."
+    "title": "A tick in its own row, then Cancel and Done",
+    "text": "Given a meal is set and the read asks Did you eat it?, when I look under the answers, then Save in My recipes is a tick with its label in a row of its own, off, and under it stand Cancel on the left and Done on the right."
    },
    {
     "id": "4 AC2",
@@ -67,6 +67,11 @@
     "id": "4 AC3",
     "title": "Not ticked",
     "text": "Given I leave the tick off and choose All of it, when I tap Done, then the meal is logged and nothing is added to My recipes."
+   },
+   {
+    "id": "4 AC4",
+    "title": "Cancel",
+    "text": "Given that read with an answer chosen, when I tap Cancel, then nothing is logged, the meal is off the meal line, and the read ends with What do you do with it? again."
    }
   ],
   "unchanged": [
@@ -130,13 +135,13 @@
    },
    {
     "id": "DT306 AC1",
-    "title": "The question is asked",
-    "text": "Given a photo's plate after Change the foods, with dinner set, when I look at Chef Mealan's card, then it asks Did you eat it? with All of it, Half and Part of it as choices under the question."
+    "title": "The question, with four answers",
+    "text": "Given a photo's plate after Change the foods, with dinner set, when I look at Chef Mealan's card, then under his word it asks Did you eat it? with All of it, Half, Part of it and Don't count it as choices."
    },
    {
     "id": "DT306 AC2",
-    "title": "The buttons under the answers",
-    "text": "Given that card, when I look under the choices, then Add a food and Don't count it stand on the left and Done, the one main button, on the right."
+    "title": "One button",
+    "text": "Given that card, when I look under the choices, then Done is the only button on the card, and + Add more to your plate stands right above the card."
    },
    {
     "id": "DT306 AC3",
@@ -145,8 +150,13 @@
    },
    {
     "id": "DT306 AC4",
+    "title": "Don't count it",
+    "text": "Given I choose Don't count it, when I tap Done, then the plate is not counted in my day and is kept as Served, as Don't count it does today."
+   },
+   {
+    "id": "DT306 AC5",
     "title": "No meal set",
-    "text": "Given the same plate with no meal set, when I look at his card, then it has his word, Add a food and Don't count it, as today, and the page ends with What do you do with it?."
+    "text": "Given the same plate with no meal set, when I look at his card, then it is as today: his word, Add a food and Don't count it, and the page ends with What do you do with it?."
    }
   ],
   "unchanged": [
@@ -228,15 +238,15 @@
   "4": [
    [
     "In Coach Milan's words",
-    "16 November: Save in My recipes as a tick, with Done."
+    "16 November: Save in My recipes as a tick, with Done. 18 November 18:46: keep the tick with its label in a row above the Done button; if it makes sense, Cancel on the left of Done."
    ],
    [
     "Now",
-    "With a meal set the read ends with two buttons, Save in My recipes and Done. The first only marks the plate to be kept; Done finishes."
+    "With a meal set the read ends with two buttons, Save in My recipes and Done. The first only marks the plate to be kept; Done finishes. There is no Cancel: the way out is the X on the meal line."
    ],
    [
     "Proposed",
-    "The one element: a tick in place of the button. Done is the one button and does both when the tick is on."
+    "A tick with its label in a row of its own. Under it one row: Cancel on the left, Done on the right. Cancel makes sense here: it logs nothing and takes the meal off again, so the read is back at What do you do with it?."
    ],
    [
     "Not touched",
@@ -290,7 +300,7 @@
   "DT306": [
    [
     "In Coach Milan's words",
-    "16 November 11:35, with two screenshots: after the read was rebuilt, update the blocks that are like it. An answer under its question, the section's buttons under it."
+    "16 November 11:35, with two screenshots: after the read was rebuilt, update the blocks that are like it. An answer under its question, the section's buttons under it. 18 November 18:46, on the first drawing: Add a food and Don't count it are a mess there; I cannot connect what they relate to."
    ],
    [
     "Now",
@@ -298,7 +308,11 @@
    ],
    [
     "Proposed",
-    "The one element: the read's own block. Did you eat it? with All of it, Half, Part of it; under it Add a food and Don't count it, and Done."
+    "Did you eat it? with four answers: All of it, Half, Part of it, Don't count it. Don't count it is an answer to that question, so it stands with the answers. Add a food leaves the card: it only jumped to + Add more to your plate, which stands right above the card. Done is the one button."
+   ],
+   [
+    "Open, for your word",
+    "With no meal set his card has Add a food and Don't count it today, and no question. I left that card as it is. Say if the two should go from there too."
    ],
    [
     "Decision",

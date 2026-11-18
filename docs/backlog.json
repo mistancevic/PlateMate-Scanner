@@ -1288,7 +1288,7 @@
       "epic": "trust",
       "state": "next",
       "board": "Stories253",
-      "why": "Coach Milan 16 November 15:49 to 17:04: Back at the top left stays, a second Back at the bottom when there is a scroll, Cancel goes back to the default with nothing changed; buttons on top must not push the content down (a light top row); fewer boxes, the photo not smaller; the pot question (How much of it do you eat? All of it, A part of it, with grams); Save in My recipes as a tick. 17:04: we have a mess; point by point, each resolved on one board. Earlier drawings Stories232 to 234. Also noted for later cards: the automatic photo in the camera's Meal mode and Group not firing (to reproduce); using what the app knows about a photo and asking if it is correct. No Go on any point. 18 November: drawn again on the app as built in 0.3.159, as one board, a row per point: 1 a way back (Back to the camera, Back to the photo, twice), 2 fewer boxes, 3 + Add more on the read, 4 Save in My recipes as a tick, 5 the pot (How much of it do you eat?). B145 and DT306 have boards of their own. Each point waits for its own Go.",
+      "why": "Coach Milan 16 November 15:49 to 17:04: Back at the top left stays, a second Back at the bottom when there is a scroll, Cancel goes back to the default with nothing changed; buttons on top must not push the content down (a light top row); fewer boxes, the photo not smaller; the pot question (How much of it do you eat? All of it, A part of it, with grams); Save in My recipes as a tick. 17:04: we have a mess; point by point, each resolved on one board. Earlier drawings Stories232 to 234. Also noted for later cards: the automatic photo in the camera's Meal mode and Group not firing (to reproduce); using what the app knows about a photo and asking if it is correct. No Go on any point. 18 November: drawn again on the app as built in 0.3.159, as one board, a row per point: 1 a way back (Back to the camera, Back to the photo, twice), 2 fewer boxes, 3 + Add more on the read, 4 Save in My recipes as a tick, 5 the pot (How much of it do you eat?). B145 and DT306 have boards of their own. Each point waits for its own Go. Coach Milan 18 November 18:46 on point 4: the tick with its label in a row above Done; Cancel left of Done if it makes sense. Drawn so: Cancel logs nothing and takes the meal off again.",
       "where": "Page 5",
       "opportunity": {
         "from": "Coach Milan, 16 November 15:49 to 17:04, after his test of 0.3.151, with screenshots. His words: we have a mess; point by point, each resolved on one board. The earlier drawings are parked. 0.3.157 changed how the read ends, so the points are drawn again on today's app.",
@@ -1341,8 +1341,8 @@
         },
         {
           "id": "4 AC1",
-          "title": "A tick and one button",
-          "text": "Given a meal is set and the read asks Did you eat it?, when I look under the answers, then Save in My recipes is a tick, off, and Done is the only button."
+          "title": "A tick in its own row, then Cancel and Done",
+          "text": "Given a meal is set and the read asks Did you eat it?, when I look under the answers, then Save in My recipes is a tick with its label in a row of its own, off, and under it stand Cancel on the left and Done on the right."
         },
         {
           "id": "4 AC2",
@@ -1353,6 +1353,11 @@
           "id": "4 AC3",
           "title": "Not ticked",
           "text": "Given I leave the tick off and choose All of it, when I tap Done, then the meal is logged and nothing is added to My recipes."
+        },
+        {
+          "id": "4 AC4",
+          "title": "Cancel",
+          "text": "Given that read with an answer chosen, when I tap Cancel, then nothing is logged, the meal is off the meal line, and the read ends with What do you do with it? again."
         },
         {
           "id": "5 AC1",
@@ -1487,19 +1492,19 @@
       "title": "Blocks like the read's: an answer under its question, the section's buttons under it",
       "epic": "trust",
       "state": "next",
-      "why": "Coach Milan 16 November 11:35, with two screenshots: after DT305, update the blocks that are similar. Chef Mealan's card on the plate (Did you eat it? with Ate half, Add a food, Don't count it, Ate it as four buttons) and the questions behind the pencil of the meal line. By design rules D6 and D7. 18 November: drawn again on a board of its own, on the app as built in 0.3.159. Waits for a Go.",
+      "why": "Coach Milan 16 November 11:35, with two screenshots: after DT305, update the blocks that are similar. Chef Mealan's card on the plate (Did you eat it? with Ate half, Add a food, Don't count it, Ate it as four buttons) and the questions behind the pencil of the meal line. By design rules D6 and D7. 18 November: drawn again on a board of its own, on the app as built in 0.3.159. Waits for a Go. Coach Milan 18 November 18:46: Add a food and Don't count it are a mess there, he cannot connect what they relate to. Drawn again: Don't count it is the fourth answer to Did you eat it?; Add a food leaves the card (+ Add more to your plate is right above); Done is the one button.",
       "board": "Stories255",
       "where": "Page 5",
       "ac": [
         {
           "id": "AC1",
-          "title": "The question is asked",
-          "text": "Given a photo's plate after Change the foods, with dinner set, when I look at Chef Mealan's card, then it asks Did you eat it? with All of it, Half and Part of it as choices under the question."
+          "title": "The question, with four answers",
+          "text": "Given a photo's plate after Change the foods, with dinner set, when I look at Chef Mealan's card, then under his word it asks Did you eat it? with All of it, Half, Part of it and Don't count it as choices."
         },
         {
           "id": "AC2",
-          "title": "The buttons under the answers",
-          "text": "Given that card, when I look under the choices, then Add a food and Don't count it stand on the left and Done, the one main button, on the right."
+          "title": "One button",
+          "text": "Given that card, when I look under the choices, then Done is the only button on the card, and + Add more to your plate stands right above the card."
         },
         {
           "id": "AC3",
@@ -1508,8 +1513,13 @@
         },
         {
           "id": "AC4",
+          "title": "Don't count it",
+          "text": "Given I choose Don't count it, when I tap Done, then the plate is not counted in my day and is kept as Served, as Don't count it does today."
+        },
+        {
+          "id": "AC5",
           "title": "No meal set",
-          "text": "Given the same plate with no meal set, when I look at his card, then it has his word, Add a food and Don't count it, as today, and the page ends with What do you do with it?."
+          "text": "Given the same plate with no meal set, when I look at his card, then it is as today: his word, Add a food and Don't count it, and the page ends with What do you do with it?."
         }
       ]
     },
