@@ -2021,7 +2021,7 @@
     },
     {
       "id": "DT318",
-      "title": "Correcting what Chef Mealan read: by words on the read, by hand on the Plate",
+      "title": "Correcting what Chef Mealan read: his checks first, then my words, and by hand on the Plate",
       "epic": "plate",
       "state": "next",
       "why": "Coach Milan 18 November 19:26, from the same test: the read gave a good list and asked about the chicken (he chose 200 g). The yogurt came as 10 % fat, fixed in the food list, not on the read's chip. Swap offered no 0.2 % fat yogurt. He added words (mayo was hidden; the yogurt is 0.2 % fat); the read then asked about the chicken again, this time whether it was 220 g. The list ended right, but it was confusing where and how to correct it. Four points: the kind of a food cannot be corrected on its chip; Swap lacks the variant; a second read asks again what was already answered, with another number; no one place to correct. Not reproduced and not drawn yet.",
@@ -2042,56 +2042,65 @@
         },
         {
           "id": "AC2",
-          "title": "A tap on a chip marks it",
-          "text": "Given that read, when I tap the yogurt's chip, then the chip is marked with a tick, the field under the chips says About: Yogurt, 10% fat, and the chip does not turn into a number."
+          "title": "His checks stand on the read",
+          "text": "Given the read is not sure about an amount or a kind, when the read opens, then his question stands under the chips with its answers and Skip, as it does on the Plate today."
         },
         {
           "id": "AC3",
-          "title": "By words, about a food",
-          "text": "Given the yogurt is marked, when I write It was 0.2% fat and tap Read again, then the chip says Yogurt, 0.2% fat, and one line from Chef Mealan says what he changed."
+          "title": "A check about an amount",
+          "text": "Given the question is the chicken breast about 200 g or 350 g, when I tap ~200 g, then the chip says 200 g without the ~ and the question is gone."
         },
         {
           "id": "AC4",
-          "title": "By words, a missing food",
-          "text": "Given no chip is marked, when I write There was mayo too and tap Read again, then a chip Mayonnaise is there, marked as new."
+          "title": "A check about a kind",
+          "text": "Given the question which yogurt is it with three kinds, when I tap 0.2% fat, then the chip says Yogurt, 0.2% fat and the question is gone."
         },
         {
           "id": "AC5",
-          "title": "Said, not typed",
-          "text": "Given the field, when I tap Say it and speak, then my words stand in the field as if typed."
+          "title": "None is right",
+          "text": "Given a check, when I tap Not right? Edit it on the Plate, then the Plate opens with that food's row in view and its amount ready to type."
         },
         {
           "id": "AC6",
-          "title": "What I set stays",
-          "text": "Given I set the chicken to 200 g on the Plate or answered Chef Mealan's question about it, when he reads again, then the chicken is still 200 g and he does not ask about it again."
+          "title": "My words, about a food",
+          "text": "Given I tapped the yogurt's chip, when I write what it is and tap Send to Chef Mealan, then the field said About: Yogurt, 10% fat, the chip shows what he changed, and one line from him says it."
         },
         {
           "id": "AC7",
+          "title": "My words, a missing food",
+          "text": "Given no chip is marked, when I write There was mayo too and tap Send to Chef Mealan, then a chip Mayonnaise is there, marked as new."
+        },
+        {
+          "id": "AC8",
+          "title": "Said, not typed",
+          "text": "Given the field, when I tap the microphone in it and speak, then my words stand in the field as if typed."
+        },
+        {
+          "id": "AC9",
+          "title": "What I set stays",
+          "text": "Given I answered a check or typed an amount on the Plate, when Chef Mealan answers my words, then that food is as I set it and he does not ask about it again."
+        },
+        {
+          "id": "AC10",
           "title": "By hand, on the Plate",
           "text": "Given the read, when I tap Edit on the Plate, then the Plate opens with its food list as it is today, and there is no button Change the foods."
         },
         {
-          "id": "AC8",
-          "title": "His checks stay",
-          "text": "Given a read that is not sure about a kind or an amount, when I open the Plate, then his question is there as it is today."
-        },
-        {
-          "id": "AC9",
+          "id": "AC11",
           "title": "One place for words",
           "text": "Given the Plate with a photo, when I look at it, then there is no link Wrong foods? Help Chef Mealan read it."
         },
         {
-          "id": "AC10",
+          "id": "AC12",
           "title": "Three languages",
-          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 4, then Tell Chef Mealan what is wrong, About, Read again, Edit on the Plate and Chef Mealan's line are in that language."
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 5, then Not right? Edit it on the Plate, Tell Chef Mealan what is wrong, About, Send to Chef Mealan, Edit on the Plate and Chef Mealan's line are in that language."
         }
       ],
       "unchanged": [
         "The photo, the title, the meal line, This plate and the end of the read.",
-        "The Plate's food list: grams, the swipe to swap or remove, + Add more to your plate, Fit to my target, Group into parts.",
-        "Chef Mealan's own questions about a kind or an amount, and where they stand.",
-        "Retake and + Photo.",
-        "Say it: the same voice input as on the photo form."
+        "Which checks Chef Mealan asks, and how many: as today.",
+        "The Plate's food list: grams, a food's details, the swipe to change or remove a food, + Add more to your plate, Fit to my target, Group into parts.",
+        "Retake and + Photo."
       ],
       "where": "Page 5, board DT318. With B150 in one release (Coach Milan 21:36)."
     },

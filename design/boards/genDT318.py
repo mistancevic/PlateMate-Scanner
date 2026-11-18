@@ -20,11 +20,15 @@ readBoard("DT318", "Stories262.dc.html", 7, [
   ("4. The swap list", "t_4", "draft", "After the swipe. The list offers foods from my own list. There is no 0.2% yogurt. I tap Cancel, then the link Wrong foods? Help Chef Mealan read it."),
   ("5. Telling Chef Mealan", "t_5", "draft", "The form behind the link. Amber: the tap on Read it again with this."),
   ("6. He asks again", "t_6", "draft", "After the second read. Red: the chicken is asked again, and my 200 g is gone.")], [1, 2, 3, 4, 5]),
- ("DT318.1", "The new flow, whole: by words on the read, by hand on the Plate", [("2. The solution and the decision", ""), ("In Coach Milan's words", t["words2"]), ("Proposed", t["proposed"]), ("What this changes", t["more_change"]), ("Open, for your word", t["open"]), ("Decision", "Open. Drawn for Coach Milan's look on 18 November 2026. No Go, so nothing is built."), ("3. The agreement", "In the wide block at the bottom of this board.")], [
-  ("1. The read", "n_1", "changed", "Changed: full names on the chips, one field under them, the button says Edit on the Plate. Amber: the tap on the yogurt."),
-  ("2. By words", "n_2", "changed", "New: the chip is marked and the field is about it. Amber: the tap on Read again."),
-  ("3. He read again", "n_3", "changed", "New: one line says what he changed. Amber: the tap on Edit on the Plate."),
-  ("4. By hand, on the Plate", "n_4", "unchanged" if False else "changed", "No change to this screen: the food list you know.")], [1, 2, 3])],
-  "Stories261.dc.html", "18 November 2026 (Coach Milan 19:26, and 21:44 to 23:45 with a screenshot of a tester's read). Replayed on the app as built in 0.3.159. Drawn for approval; no Go.")
+ ("DT318.1", "The new flow, whole: his checks, my words, by hand on the Plate", [("2. The solution and the decision", ""), ("In Coach Milan's words", t["words2"]), ("Proposed", t["proposed"]), ("What this changes", t["more_change"]), ("Open, for your word", t["open"]), ("Decision", "Open. Drawn for Coach Milan's look on 18 November 2026. No Go, so nothing is built."), ("3. The agreement", "In the wide block at the bottom of this board.")], [
+  ("1. The read, and his checks", "n_1", "changed", "Changed: full names on the chips; his checks stand on the read, each with a way to the Plate. Amber: the tap on ~200 g."),
+  ("2. The check about the kind", "n_2", "changed", "The first check is answered. Amber: the tap on 0.2% fat."),
+  ("3. My words", "n_3", "changed", "New: one field for what he could not see. Amber: the tap on Send to Chef Mealan."),
+  ("4. He answered", "n_4", "changed", "New: one line says what he did; what I set stays. Amber: the tap on Edit on the Plate."),
+  ("5. By hand, on the Plate", "n_5", "changed", "No change to this screen: the food list you know.")], [1, 2, 3, 4]),
+ ("DT318.2", "The branch from step 1: none of his answers is right", [("The branch", "It starts on the read of step 1. When neither amount is right, or the food is another one, the check itself leads to the Plate's food list. Nothing is edited on the read.")], [
+  ("1. The read, and his checks", "b_1", "changed", "The same screen as step 1. Amber: the tap on Not right? Edit it on the Plate."),
+  ("2. The Plate, on that food", "b_2", "changed", "No change to this screen, only where it opens: that food's row, its amount ready to type.")], [1])],
+  "Stories261.dc.html", "18 November 2026 (Coach Milan 19:26, and 21:44 to 23:56 with a screenshot of a tester's read). Replayed on the app as built in 0.3.159. Drawn for approval; no Go.")
 json.dump(OUT, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outRead.json"), "w"))
 print(json.dumps({k: [v["file"], v["w"], v["h"]] for k, v in OUT.items()}))
