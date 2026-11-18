@@ -1761,7 +1761,9 @@ export function JourneyScreen(p: AppApi) {
         </div>
       </div>);
   };
-  const endCalendar = endCal ? plateCal({ mode: endCal.kind, day: endCal.day, setDay: (d) => setEndCal({ ...endCal, day: d, ask: null }), more: endCal.more, setMore: (b) => setEndCal({ ...endCal, more: b }), now: new Date(), today: todayKey, infoOf: calInfo,
+  // B148 (0.3.158, board Stories252): a tap on a day sets the day and closes More, two changes in one tap. Each change is made
+  // on the calendar as it is at that moment, so the second no longer puts the old day back.
+  const endCalendar = endCal ? plateCal({ mode: endCal.kind, day: endCal.day, setDay: (d) => setEndCal((c) => (c ? { ...c, day: d, ask: null } : c)), more: endCal.more, setMore: (b) => setEndCal((c) => (c ? { ...c, more: b } : c)), now: new Date(), today: todayKey, infoOf: calInfo,
     marked: endGuess, photoAt: photoThen, onPick: endPick,
     title: endCal.kind === "plan" ? w("cal.whichDayMeal") : photoThen ? w("cal.whichByPhoto", { day: dateV(photoThen, { weekday: "long" }), time: hhmm(photoThen) }) : w("cal.whichByClock", { time: hhmm(new Date()) }),
     under: endCal.ask && endCal.ask.date === endCal.day && endCal.ask.id ? { id: endCal.ask.id, node: heldAsk(endCal.ask.date, endCal.ask.id) } : null }) : null;
