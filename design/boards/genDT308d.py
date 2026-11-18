@@ -188,15 +188,15 @@ row("old", "An older photo, on a plate whose meal is set", [
   ("The fault", "In 0.3.152, after Add to my plate with an older photo, the whole plate is treated as from the photo's time, and the app asks Did you eat it? for yesterday."),
   ("Solved by the meal model", "No meal is guessed from a photo. The plate keeps its own meal line: the one you set, or not set. The photo's day and time are used only if you later say Ate it on a plate with no meal set, as the marked guess in the calendar."),
 ], [("Add more, open", "x_h", "changed", "Where you are: the Plate, the meal is set. + Add more to your plate is open."), ("The camera", "x_i", "same", "Tap: Photo or scan."), ("The photo screen", "x_j", "changed", "Tap: Your photos, and you pick a photo from Saturday."), ("The question", "x_k", "changed", "Tap: Read the plate."), ("The Plate with foods", "x_l", "changed", "Tap: Add to my plate.")], nid="DT308.12", at=7)
-row("new", "Start a new plate: the old plate is saved in My recipes, and a line near the top says so", [
+row("new", "Start a new plate: the old plate is saved in My recipes and waits in Saved for later", [
   ("Today", "Start a new plate keeps only the new foods. The plate that was there is gone, not kept anywhere."),
-  ("Decided", "Coach Milan, 18 November 10:53: the permanent place is My recipes. The old plate is saved there before the new plate starts. With no name typed it takes the foods' name."),
-  ("Before the tap", "The question's last line says it: Skyr, Oats &amp; Banana is saved in My recipes first, so nothing is lost."),
-  ("After the tap", "A line near the top of the new plate, on the plate itself and in the warning's colour: what was saved, a link that opens it in My recipes, and an X that closes the line. It stays until you close it or leave the plate."),
-  ("No second question", "A double confirmation would cost a tap every time. The line that stays and the link do its job: a wrong tap is not a loss, the plate is one tap away."),
-  ("Saved for later", "Stays what it is today, the list of parked plates on the empty Plate. It is not used here, and it gets no new row on the Plate."),
+  ("Decided", "Coach Milan, 18 November 10:53 and 11:01: both together. My recipes is the permanent place. Saved for later is the place for the time being. Undo stays."),
+  ("Before the tap", "The question's last line says it: Skyr, Oats &amp; Banana is saved in My recipes and waits in Saved for later, so nothing is lost."),
+  ("After the tap, the line", "Near the top of the new plate, on the plate itself and in the warning's colour: what was saved and where, the link Open it in My recipes, Undo, and an X that closes the line. It stays until you close it."),
+  ("Undo", "It takes the tap back: your old plate is on the Plate again, as if you had not tapped. The question is not asked twice; one tap undoes a wrong one."),
+  ("Where Saved for later is", "Today the list shows only on the empty Plate. New: whenever something is parked, the Plate has one row near the top, under the meal line, Saved for later with its count. A tap opens the list in place, with the rows of 0.3.156: Continue, and a way to remove. On the empty Plate the list stays where it is today."),
   ("The new plate", "It holds only what came, and starts with no meal set. For a photo you are on its read, which ends with What do you do with it? (DT308.4)."),
-], [("The question", "x_m", "changed", "Where you are: the question after the read."), ("The new plate, the old one saved", "x_n", "changed", "Tap: Start a new plate."), ("The old plate in My recipes", "x_o", "same", "Tap: Open it in My recipes.")], nid="DT308.12", at=12)
+], [("The question", "x_m", "changed", "Where you are: the question after the read."), ("The new plate, the old one kept", "x_n", "changed", "Tap: Start a new plate."), ("Saved for later, open", "x_o", "changed", "Tap: Saved for later.")], nid="DT308.12", at=12)
 board("Stories244.dc.html", "DT308.12 (1 of 2): something is on the plate, and a photo comes. Add to my plate, Start a new plate",
   "18 November 2026 (Coach Milan 00:16 and 00:22). On the landing of 0.3.155: a photo taken now, an older photo, and what Start a new plate does with the old plate. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
   B, W, y - 100, "Stories243.dc.html")
@@ -211,7 +211,7 @@ row("recipe", "A recipe from Recipe photo or Recipe link", [
   ("The gap", "Since 0.3.155 both tiles are reachable with foods on the plate. Today the recipe takes the plate's place with no question, and the plate is gone."),
   ("Proposed", "The same question, in the same look, when you tap Put it on my plate: what is on your plate, what the recipe is, Add to my plate or Start a new plate. Back on the top left returns to what was read, with nothing changed."),
   ("Add to my plate", "The recipe joins your foods as one dish: one row with its name and weight, its foods under it, as built in 0.3.155."),
-  ("Start a new plate", "Only the recipe, as today, and the old plate is saved in My recipes first, with the same line near the top (DT308.12n)."),
+  ("Start a new plate", "Only the recipe, as today. The old plate is saved in My recipes and waits in Saved for later, with the same line, Undo and row near the top (DT308.12n and o)."),
   ("Recipe photo", "The same from the other tile: the pictures are read, then Put it on my plate asks."),
 ], [("Add more, open", "x_t", "changed", "Where you are: the Plate, no meal set. + Add more to your plate is open."), ("The link", "x_u", "same", "Tap: Recipe link, and you paste the link."), ("What was read", "x_v", "same", "Tap: Read it."), ("The question", "x_w", "changed", "Tap: Put it on my plate."), ("The Plate with foods", "x_x", "changed", "Tap: Add to my plate.")], nid="DT308.12", at=19)
 board("Stories245.dc.html", "DT308.12 (2 of 2): something is on the plate, and a barcode, a label or a recipe comes",
