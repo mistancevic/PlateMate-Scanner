@@ -20,10 +20,13 @@ def card(t):
     if t.get("version"): meta.append(f"v{t['version']}")
     why = f'<div style="font-size:12.5px;line-height:1.4;color:#3d4a63;margin-top:5px">{html.escape(t["why"])}</div>' if t.get("why") else ""
     m = f'<div style="font-size:11.5px;color:#5b6b8a;margin-top:5px;font-weight:700">{" · ".join(meta)}</div>' if meta else ""
-    # from 18 November 2026: the problem, the story, what must not change, then the acceptance criteria for what is new
+    # from 18 November 2026: the opportunity, the problem, the story, the acceptance criteria for what is new, what must not change
     head = lambda x: f'<div style="font-size:11.5px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin-top:8px">{x}</div>'
     para = lambda x: f'<div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:3px">{html.escape(x)}</div>'
     ac = ""
+    if t.get("opportunity"):
+        o = t["opportunity"]; row = lambda k, v: f'<div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:3px"><b>{k}</b> {html.escape(v)}</div>'
+        ac += head("OPPORTUNITY, WHY WE ACT") + row("Where it comes from:", o["from"]) + row("The job:", o["job"]) + row("What stood in the way:", o["kind"]) + row("Why now:", o["why_now"])
     if t.get("problem"): ac += head("PROBLEM") + para(t["problem"])
     if t.get("story"): ac += head("STORY") + para(t["story"])
     if t.get("ac"): ac += head("ACCEPTANCE CRITERIA, WHAT IS NEW") + "".join(f'<div style="margin-top:6px;padding:6px 8px;border-radius:8px;background:#f4f7fc;font-size:12px;line-height:1.4;color:#172742"><b style="color:#123a7a">{html.escape(a["id"])}</b> <b>{html.escape(a["title"])}</b><br>{html.escape(a["text"])}</div>' for a in t["ac"])
@@ -52,8 +55,8 @@ def column(key, name, sub):
             f'<div style="margin-top:10px">{body}</div></div>')
 epics = "".join(f'<div style="width:{CW}px;flex:none;border:1.5px solid {COL[k]};border-radius:10px;padding:8px 10px;background:#fff"><div>{chip(k)}</div><div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:5px">{html.escape(e["why"])}</div></div>' for k, e in E.items())
 W = PAD * 2 + 3 * CW + 2 * G
-# the page is as tall as its longest column; measure it in a browser and give it as KANBAN_H (14,400 on 18 November 2026)
-H = int(os.environ.get("KANBAN_H", "14400"))
+# the page is as tall as its longest column; measure it in a browser and give it as KANBAN_H (14,800 on 18 November 2026)
+H = int(os.environ.get("KANBAN_H", "14800"))
 page = f'''<!doctype html>
 <html lang="en">
 <head>

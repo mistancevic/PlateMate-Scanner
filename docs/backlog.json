@@ -1,5 +1,5 @@
 {
-  "about": "One entry per ticket. The Kanban on the canvas (page Kanban) and the handover read this file. States: later (one line, an idea), next (brainstormed, Milan's answer in, no board), now (board drawn and approved, waits for Go), progress (branch open), done (merged, with its version). Milan says the word; Claude moves the card. From 18 November 2026 a ticket can carry four parts: problem (the pain today, in plain words), story (what the person wants to be able to do and why, never the solution), unchanged (what already works and must not change: preconditions, not requirements), and ac (the acceptance criteria for what is new only: scenarios with an id, a short title that names the behaviour, and one sentence Given ..., when ..., then ...; one behaviour each). The Kanban card and the board's story card show them. A ticket names its board and the canvas page (where); the board's story card names its ticket and its Kanban column.",
+  "about": "One entry per ticket. The Kanban on the canvas (page Kanban) and the handover read this file. States: later (one line, an idea), next (brainstormed, Milan's answer in, no board), now (board drawn and approved, waits for Go), progress (branch open), done (merged, with its version). Milan says the word; Claude moves the card. From 18 November 2026 a ticket can carry five parts: opportunity (why we act on it: where it comes from, the job the person was doing, what stood in the way as one of the kinds below, and why now), problem (the pain today, in plain words), story (what the person wants to be able to do and why, never the solution), ac (the acceptance criteria for what is new only: scenarios with an id, a short title that names the behaviour, and one sentence Given ..., when ..., then ...; one behaviour each), and unchanged (what already works and must not change: preconditions, not requirements). Kinds of what stood in the way: could not do it, a bug; could not do it, the feature is missing; too many steps; did not find it or did not understand it; a risk of a wrong tap; looks broken. The opportunity says honestly who saw it: a tester in a test, or Coach Milan's own look. The Kanban card and the board's story card show the parts. A ticket names its board and the canvas page (where); the board's story card names its ticket and its Kanban column.",
   "epics": {
     "home": {
       "name": "Home page",
@@ -1310,8 +1310,16 @@
       "epic": "plate",
       "state": "now",
       "board": "Stories246",
-      "why": "Coach Milan 18 November 10:05: Empty plate could stand opposite Group into parts; that button's words are tight to its border; one general position when Group into parts is not there; not above the PD block if that is not friendly. Drawn: one row above the foods, Empty plate left, Group into parts right; with one food Empty plate alone in the same place; the card's top says only On your plate. Coach Milan 18 November 10:53: it goes into 0.3.157. Waits for the Go on the boards.",
       "where": "Page 5",
+      "why": "Coach Milan 18 November 10:05: Empty plate could stand opposite Group into parts; that button's words are tight to its border; one general position when Group into parts is not there; not above the PD block if that is not friendly. Drawn: one row above the foods, Empty plate left, Group into parts right; with one food Empty plate alone in the same place; the card's top says only On your plate. Coach Milan 18 November 10:53: it goes into 0.3.157. Waits for the Go on the boards.",
+      "opportunity": {
+        "from": "Coach Milan's own look at the Plate on 18 November 2026, 10:05, while going through the boards. No tester has reported it.",
+        "job": "Read my plate and its result, then change its foods.",
+        "kind": "Nobody was blocked. Two kinds: a risk of a wrong tap, because a delete button is the first control on the card; and looks broken, because the words of Group into parts touch its border.",
+        "why_now": "0.3.157 rebuilds this card anyway, so the change is small now and would cost a release of its own later."
+      },
+      "problem": "On a plate with foods, the first button I meet is the one that throws the plate away: Empty plate sits at the top of the card, next to its title and above the result. The other button for the foods, Group into parts, is somewhere else, and its words touch its border, so it looks broken.",
+      "story": "When I open my plate, I want to read what is on it and its result before anything else, and find the buttons for the foods next to the foods, so that I do not meet a delete button first and do not look in two places.",
       "ac": [
         {
           "id": "AC1",
@@ -1334,8 +1342,6 @@
           "text": "Given my plate holds only skyr, so there is no Group into parts, when I look above the food, then Empty plate stands alone in the same place on the left."
         }
       ],
-      "story": "When I open my plate, I want to read what is on it and its result before anything else, and find the buttons for the foods next to the foods, so that I do not meet a delete button first and do not look in two places.",
-      "problem": "On a plate with foods, the first button I meet is the one that throws the plate away: Empty plate sits at the top of the card, next to its title and above the result. The other button for the foods, Group into parts, is somewhere else, and its words touch its border, so it looks broken.",
       "unchanged": [
         "Empty plate asks once: the first tap says Tap again to empty, the second tap empties the plate.",
         "Group into parts groups the foods as it does today, and shows when it shows today.",
