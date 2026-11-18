@@ -9,6 +9,7 @@
 // Go 11:35): the dish row left the photo screen: Chef Mealan's guess of the dish goes with the read and shows under the photo.
 // The box asks Anything Chef Mealan should know?. After a read of your own portion the read shows alone; Change the foods
 // opens the plate, where Wrong foods? still has both rows.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed from a photo, so this walkthrough sets the dinner with the pencil while the photo waits (set-meal.cjs); the pot and the dish of the dinner are then read as before.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -56,6 +57,7 @@ const READ = (portion) => ({ dish: "Creamy mushroom vegetable soup", foods: [f("
     ok(await pa.locator("textarea").count() === 1 && /Anything Chef Mealan should know\?/.test(await pa.innerText()), "your words have a box with room for a list");
     ok(await pa.locator(".pa-row .pa-opt").evaluateAll((xs) => xs.every((x) => x.getBoundingClientRect().height >= 44)), "every chip of the new rows is 44 px or more");
     await pa.locator("textarea").fill(WORDS);
+    await require("./set-meal.cjs")(page);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     ok(sent.length === 1 && sent[0].share === "whole" && sent[0].course === "starter" && sent[0].note === WORDS, "the read gets your answers and your words: " + JSON.stringify(sent[0]).slice(0, 80));
     let st = await store(page);
@@ -69,6 +71,7 @@ const READ = (portion) => ({ dish: "Creamy mushroom vegetable soup", foods: [f("
     // ---- my portion ----
     ({ ctx, page } = await open());
     await page.locator(".pa-share .pa-opt").nth(1).click(); await page.locator(".pa-screen textarea").fill(WORDS);
+    await require("./set-meal.cjs")(page);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200);
     st = await store(page);
     ok(sent[sent.length - 1].share === "portion" && st.items.length === 6 && !st.photo.pot && !st.fromRecipe && st.items[0].grams === 100 && st.course === "starter", "My portion: the six foods at one portion's amounts, no recipe made");

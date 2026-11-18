@@ -322,7 +322,8 @@ export function stripPhotos<T>(state: T, fileUp?: (key: string) => boolean): T {
   (s.foods ?? []).forEach(strip);
   (s.items ?? []).forEach((i: any) => strip(i.food));
   // DT214 (0.3.53): the cook's plate and the plates saved for later carry their foods without the foods' photos, like the plate
-  const snaps = [s.cook?.plate, s.cook?.free, ...(s.later ?? []).flatMap((x: any) => [x.plate, x.cook?.plate])];
+  // 0.3.157: the plate kept for Undo after Start a new plate, the same way
+  const snaps = [s.cook?.plate, s.cook?.free, s.oldPlate?.back, ...(s.later ?? []).flatMap((x: any) => [x.plate, x.cook?.plate])];
   snaps.forEach((p: any) => (p?.items ?? []).forEach((i: any) => strip(i.food)));
   // a recipe's own photos are files too (0.2.5+r10), so they never ride in the account's block either; until 0.2.14 they did,
   // and drawn covers (0.2.11) took a block past Firestore's 1 MB (Milan, 16 October 2026, 19:05). The recipe's record names them.

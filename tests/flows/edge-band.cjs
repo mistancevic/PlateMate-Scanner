@@ -2,6 +2,7 @@
 // within 2 points of a rule's line passes, amber, with the number, the line and one hint; no DaaM Good spot. Well over the line
 // stays a fail. The plate's size 1.3 to 1.5 portions is on the edge too. A letter within 5 percent of a band edge says so in
 // Per 100 kcal; the quick line of letters stays as it is.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -59,6 +60,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
 
   const put = async (its, title) => { await page.evaluate(([its, title]) => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.items = its.map(([id, g], k) => ({ id: "i" + k, food: s.foods.find((f) => f.id === id), grams: g, locked: false })); s.title = title; s.photo = undefined; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); }, [its, title]); await page.reload(); await page.waitForTimeout(1800); };
   await page.goto(U + "/plate"); await page.waitForTimeout(1200);
+  await require("./set-meal.cjs")(page);
   await put([["salmon", 200], ["rice2", 80], ["avo", 60]], "Salmon bowl");
   await page.locator(".gate-edge").first().waitFor({ timeout: 5000 }).catch(() => {});
   const e = await text(".gate-edge");

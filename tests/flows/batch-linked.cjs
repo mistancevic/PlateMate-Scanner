@@ -6,6 +6,7 @@
 // Changed by story R5 (Milan 17:23 to 19:00, board RS13): a linked meal shows Open the recipe in place of In My recipes, and I ate one asks which meal it is.
 // Changed by story R16 (Milan 21:56 to 22:11, board RS15): the slices left are not followed, so no card waits for later; a slice
 // reaches a day through the plan, and I ate it on Today logs it, linked to the cheesecake.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -55,7 +56,7 @@ const U = "http://127.0.0.1:3225";
     await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "DaaM good" }).click();
-    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(700);
+    await require("./eat-save.cjs")(page); await page.waitForTimeout(700);
     let st = await state(page);
     const recipe = st.meals.find((m) => m.title === "Protein cheesecake");
     ok(!!recipe && !st.feedback.some((f) => f.status === "prepared"), "R16: the cheesecake is in My recipes; no card waits for the 7 left");

@@ -2,6 +2,7 @@
 // like flour in the dough and flour for dusting. Each step names its own one, with its own amount: on How to make it for the
 // whole recipe and for just your plate, the dusting step says what the plate lists for dusting, never the dough's flour.
 // Never rewrite these lines to fit a change.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -44,6 +45,7 @@ const U = "http://127.0.0.1:3228";
     await page.locator(".plate-card").getByRole("button", { name: "Link" }).click(); await page.waitForTimeout(300);
     await page.getByLabel("Link to a recipe").fill(fritters.url); await page.getByRole("button", { name: /^Read/ }).first().click(); await page.waitForTimeout(1200);
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200);
+    await require("./set-meal.cjs")(page);
     // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
     await page.locator(".in-portion").getByRole("button", { name: "Sized for your lunch" }).click(); await page.waitForTimeout(500);
     const onPlate = await page.locator(".plate-card .row").filter({ hasText: "All-purpose flour" }).locator("input[type=number]").evaluateAll((xs) => xs.map((x) => Number(x.value)));

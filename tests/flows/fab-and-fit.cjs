@@ -1,5 +1,6 @@
 // 0.2.7+r2 (Milan, 15 October 2026): the floating Chef Mealan on a menu page opens the conversation over it, and closing
 // it comes back to the page; Fit to my target on a plate already above the target says nothing moved, and the PD stands.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -30,6 +31,7 @@ const U = "http://127.0.0.1:3202";
   ok(await page.locator(".chat-fab").isVisible(), "and the floating Chef Mealan with it");
   // Fit on a plate already above the target
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
+  await require("./set-meal.cjs")(page);
   const before = (await page.locator(".readout").first().textContent()).replace(/\s+/g, " ");
   ok(/PD16\.8/.test(before.replace(/ /g, "")), "as it stands: PD 16.8 (" + before + ")");
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).click(); await page.waitForTimeout(1200);

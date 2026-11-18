@@ -3,6 +3,7 @@
 // and peanut butter as a lunch fails nutrition (most protein from the powder) while PD fits; Add a protein base puts one on;
 // chicken and rice at 23:10 fail your day (the eating window); a plain lunch at 13:00 is the DaaM Good spot; the grams line
 // under the letters. Chef Mealan's read is a stand-in (no AI).
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -42,6 +43,7 @@ const U = "http://127.0.0.1:3268";
   const text = async (sel = "main") => (await page.locator(sel).first().textContent()).replace(/\s+/g, " ");
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   await page.goto(U + "/plate"); await page.waitForTimeout(1800);
+  await require("./set-meal.cjs")(page);
   const gate = page.locator(".gate-card").first();
   // Changed by story DT129 (0.2.109, board Stories86): the four letters on one line; beside PD, Energy, Weight, Protein
   const cells = await page.locator(".readout .letters-line .letters").allTextContents();

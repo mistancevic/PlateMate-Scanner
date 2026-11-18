@@ -6,11 +6,14 @@ export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "che
 // DT285 (0.3.139): the same photo already a meal of that day: Update that meal, or Keep both
 export type SameAsk = { earlier: import("../pilot").Feedback; update: () => void; both: () => void };
 // B146 (0.3.152): holds is what a photo read, as a list in words; with it the question shows as a screen of its own
-export type PlateAsk = { kind: "photo" | "recipe" | "slot" | "food"; what: string; image?: string; holds?: string; apply: (how: "add" | "new") => void };
+export type PlateAsk = { kind: "photo" | "recipe" | "slot" | "food"; what: string; image?: string; holds?: string; apply: (how: "add" | "new") => void;
+  // 0.3.157 (DT308.12f): Back returns to where the question came from (the photo screen), with nothing changed
+  back?: () => void };
 export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "summary" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share" | "explorer" | "calendar" | "admin" | "settings" | "voice" | "dev" | "language" | "delete" | "howto";
 // the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
 // mode: "plan" fills the slot on Put it in; "eat" (from Today) records the meal for the slot on Save
-export type Filling = { date: string; slotId: string; name: string; time: string; dayName: string; mealId?: string; mode?: "plan" | "eat" };
+// by "line" (0.3.157): the meal was set with the Plate's pencil, not opened from Plan; the plate then ends with What do you do with it?
+export type Filling = { date: string; slotId: string; name: string; time: string; dayName: string; mealId?: string; mode?: "plan" | "eat"; by?: "line" };
 export type Step = "in" | "recipe" | "make" | "made" | "after";
 
 export interface AppApi {
@@ -46,7 +49,10 @@ export interface AppApi {
   readMenu: (visit: string, image: string) => Promise<boolean>;
   pickMenuLine: (plate: string, line: number | null) => void;
   dropMenuLine: (plate: string) => void;
-  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback; part?: number }) => boolean | void;
+  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback; part?: number; back?: boolean; line?: string; quiet?: boolean }) => boolean | void;
+  // 0.3.157 (DT308.11, board Stories242, frame j): a plate logged with Ate it has Undo on its card on Today, while you are
+  // still on Today: the meal leaves Today and the plate is back on the Plate, with no meal set
+  ateBack: { cardId: string } | null; undoAte: () => void;
   // DT130 (0.2.110): Photo of my meal opens the meal camera; a photo from Your photos waits on the Plate for whose and when
   mealCamera: () => void;
   // DT175 (0.3.17): the foods you said you have, landed on the Plate as estimates; false when nothing came of it
@@ -353,7 +359,7 @@ export interface AppApi {
 
 export type DbProduct = { code: string; name: string; brand: string; quantity: string; kcal: number | null; protein: number | null };
 // R19 (0.2.47, board RS18): where a meal's page was opened from, and the slot it is planned for
-export type MealFrom = { tab: "home" | "plan"; slot?: { date: string; slotId: string; name: string; time: string } };
+export type MealFrom = { tab: "home" | "plan" | "journey"; slot?: { date: string; slotId: string; name: string; time: string } };
 // DT247 (0.3.96): the question a second photo asks: its dish, the meal before it and how long ago
 export type DishAsk = { dish: string; prev: string; minutes: number; dessertFirst: boolean; slotId: string; meal: string };
 

@@ -3,6 +3,7 @@
 // one meal by accident. With the whole recipe on the plate, How did making it go? counts: You made 12 fritters. How many did
 // you eat?, starting on 1, with the kcal; the rest is said, not followed. All 12 stays a choice. A meal over 2,000 kcal, or
 // over the whole day, is asked once before it is logged; nothing is blocked. Never rewrite these lines to fit a change.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -60,7 +61,7 @@ const U = "http://127.0.0.1:3241";
     const two = Math.round((whole * 2) / 12).toLocaleString("en");
     ok((await count.locator("b").textContent()) === "2" && (await count.textContent()).includes(`${two} kcal`), `+ makes it 2, with their kcal: ${two}`);
     await page.getByRole("button", { name: "DaaM good" }).click();
-    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
+    await require("./eat-save.cjs")(page); await page.waitForTimeout(900);
     const c1 = await cards();
     ok(c1.length === 1 && Math.abs(c1[0] - whole * 2 / 12) <= 2, `Today counts 2 fritters, ${c1[0]} kcal, not ${whole}`);
     ok(/You ate 2 fritters\./.test(await text("main")) && /10 fritters left/.test(await text("main")), "the landing says You ate 2 fritters, 10 fritters left");
@@ -72,12 +73,12 @@ const U = "http://127.0.0.1:3241";
     await toMade();
     await page.getByRole("button", { name: "All 12" }).click(); await page.waitForTimeout(200);
     await page.getByRole("button", { name: "DaaM good" }).click();
-    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(400);
+    await require("./eat-save.cjs")(page); await page.waitForTimeout(400);
     const ask = page.getByRole("alertdialog", { name: "A big meal" });
     ok(await ask.count() === 1 && new RegExp(`${whole.toLocaleString("en")} kcal in one meal\\?`).test(await ask.textContent()) && /more than your whole day/.test(await ask.textContent()), "All 12: asked once, " + (await ask.textContent()).slice(0, 90));
     await ask.getByRole("button", { name: "How many I ate" }).click(); await page.waitForTimeout(300);
     ok(await ask.count() === 0 && await page.getByRole("group", { name: "How many did you eat?" }).count() === 1, "How many I ate goes back to the count");
-    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(400);
+    await require("./eat-save.cjs")(page); await page.waitForTimeout(400);
     await page.getByRole("alertdialog", { name: "A big meal" }).getByRole("button", { name: "Yes, all 12" }).click(); await page.waitForTimeout(900);
     ok((await cards()).length === 2, "Yes, all 12 saves it: nothing is blocked");
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);

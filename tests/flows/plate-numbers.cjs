@@ -2,6 +2,7 @@
 // tap. The heading is the meal by name; beside PD the status and Energy, Weight, Protein with the plate's numbers, right
 // aligned; under the number the four letters on one line. A tap opens Against your planned day: the plate against the meal
 // planned in this slot (Plate, Planned, %), then what is in it (g, kcal, % plate, % day, a Total). No meal planned: no first part.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -33,6 +34,7 @@ const PORT = "3274", U = `http://127.0.0.1:${PORT}`;
     await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "A plain plate.", around: "", better_as: "" }) }));
     await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
     await page.goto(U + "/plate"); await page.waitForTimeout(1600);
+  await require("./set-meal.cjs")(page);
     return page;
   };
   const txt = (page, sel) => page.locator(sel).first().textContent().then((t) => t.replace(/\s+/g, " ").trim());

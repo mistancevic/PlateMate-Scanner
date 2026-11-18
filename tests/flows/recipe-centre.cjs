@@ -3,6 +3,7 @@
 // works with your foods; Chef Mealan's way on a tap, then a toggle. PD sits above the table, as on the Plate; each column
 // says its weight. How to make it says what you make and what you eat. A changed dish: the line says what differs.
 // Every recipe made ends on its page; a plate that is no recipe ends on Today. Today has no camera; Manual, then Scan.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -102,7 +103,7 @@ const U = "http://127.0.0.1:3217";
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();
   const w = page.getByRole("button", { name: "It worked" }); if (await w.count()) await w.click();
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(1200);
   ok(/Saved in Mine/.test(await text(".rq-landed")) && /No-bake cheesecake, more protein/.test(await text(".rq")), "RP4: the changed dish, saved, opens on its page");
   // the original, made again: it ends on its page too
   await page.locator(".rq-back").click(); await page.waitForTimeout(500);
@@ -112,7 +113,7 @@ const U = "http://127.0.0.1:3217";
   await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(1200);
   ok(/Made today/.test(await text(".rq-landed")) && /No-bake cheesecake/.test(await text(".rq")), "RP4: a recipe made again ends on its page");
   await shot("rp4", ".rq-landed");
 
@@ -126,7 +127,7 @@ const U = "http://127.0.0.1:3217";
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();
   await page.getByRole("button", { name: "Not this one" }).click();
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1000);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(1000);
   const where = await page.evaluate(() => location.pathname);
   ok(where !== "/plate" && await page.locator(".rq").count() === 0 && !/What are you craving\?/.test(await text("main")), `RP4: a plate that is no recipe ends on Today (${where})`);
   ok(errs.length === 0, `No page errors${errs.length ? `: ${errs.join(" | ")}` : ""}`);

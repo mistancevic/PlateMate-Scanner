@@ -3,6 +3,7 @@
 // ideas, the gate says what it is with three ways (Make it two breakfasts, Shrink it to one breakfast, Keep it as it is); the
 // wait on the ideas shows its steps, collapsed, a tap opens them; the x empties the search and the chat's field; the four
 // letters sit under the PD on the recipe page. Chef Mealan's answers are stand-ins (no AI).
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -44,6 +45,7 @@ const U = "http://127.0.0.1:3266";
   const text = async (sel = "main") => (await page.locator(sel).first().textContent()).replace(/\s+/g, " ");
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   await page.goto(U + "/plate"); await page.waitForTimeout(1800);
+  await require("./set-meal.cjs")(page);
   // DT110: the plate is two breakfasts; the gate says so and never offers the ideas
   const gate = page.locator(".gate-card").first();
   const gt = await gate.textContent();

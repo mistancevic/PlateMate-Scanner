@@ -1,6 +1,7 @@
 // JOURNEY (0.2.122, board Stories94, DT137; Milan 28 October 15:32 and 16:09 Go; Tester 2's breakfast): a plate opened from a
 // recipe and changed asks once at Put it in: Update my recipe, Save as a new recipe (its own name), or Only for this day.
 // Update: one recipe, the plate's foods, Plan's slot as the recipe is now. Before, a second recipe with the same name.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -50,7 +51,7 @@ const PORT = "3306", U = `http://127.0.0.1:${PORT}`;
   await ask.getByRole("button", { name: "Save as a new recipe" }).click(); await page.waitForTimeout(200);
   ok(await ask.getByLabel("Its name").inputValue() === "Skyr breakfast, changed", "DT137: a new recipe's name is never the old one: " + await ask.getByLabel("Its name").inputValue());
   await ask.getByRole("button", { name: "Update my recipe" }).click(); await page.waitForTimeout(200);
-  await page.getByRole("button", { name: /^Save$/ }).click(); await page.waitForTimeout(1200);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(1200);
   const s = await st(), meals = s.meals.filter((m) => /Skyr breakfast/.test(m.title));
   ok(meals.length === 1 && meals[0].id === "r1" && meals[0].items.find((i) => i.food.id === "oats2").grams === 60, "DT137: Update my recipe: one Skyr breakfast, now with 60 g oats: " + meals.map((m) => m.title).join(", "));
   const day = Object.values(await plan())[0] || {};

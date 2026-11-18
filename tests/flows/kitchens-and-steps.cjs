@@ -2,6 +2,7 @@
 // 16 October 2026). Chef Mealan's answers are fixed here (no AI in the walkthroughs); what is checked is the app's part:
 // the kitchen line and its three dishes, Another and Undo, the taste kept and sent to Chef Mealan, and for the steps, the
 // checks on the draft, the one retry with the reason, and the steps kept with the recipe's own amounts.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -57,6 +58,7 @@ const U = "http://127.0.0.1:3205";
   let asked = null;
   await page.route("**/api/meal", async (route) => { asked = JSON.parse(route.request().postData() || "{}"); await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ options: [] }) }); });
   await page.goto(U + "/plate"); await page.waitForTimeout(1200);
+  await require("./set-meal.cjs")(page);
   await page.getByRole("button", { name: "Fit to my target" }).click(); await page.waitForTimeout(800);
   const tb = asked?.taste?.find((x) => x.kitchen === "Balkan");
   ok(tb && tb.leave_out.join() === "Sarma" && tb.cook_toward.includes("Šopska salad with grilled chicken") && asked.taste.find((x) => x.kitchen === "Italian")?.cook_toward.length === 3, "the taste is sent: cook toward the dishes kept, leave out Sarma");

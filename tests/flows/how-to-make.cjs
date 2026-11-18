@@ -5,6 +5,7 @@
 // checklist. A mix of ready foods keeps How do you want to eat it?
 // Changed by story R16 (Milan 21:56 to 22:11, board RS15): the slices left are not followed: no card for later, nothing on
 // Today; to eat them on other days, the recipe goes on Plan.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -78,7 +79,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "DaaM good" }).click();
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(600);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(600);
   let st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   // R16 (0.2.44, Milan 21:56, board RS15): the rest of the cake is not followed: no card for later, nothing on Today
   ok(!st.feedback.some((f) => f.status === "prepared") && st.feedback.filter((f) => f.status === "eaten" && f.meal.title === "Protein cheesecake").length === 1, "R16: one slice logged; no card for the 7 left");

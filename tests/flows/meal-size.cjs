@@ -2,6 +2,7 @@
 // 2,800 kcal, meals at 07:30, 13:45 and 20:00. At 17:30, after the Šopska plate at 13:10 logged off the plan, with nothing
 // logged at breakfast. MS1: that plate closes lunch, so dinner is about 936 kcal (it was 624). MS2: the plate asks once
 // about breakfast; I skipped it gives dinner what is left, about 1,873 kcal; Undo puts it back; I had it keeps 936.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -31,6 +32,7 @@ const U = "http://127.0.0.1:3207";
   await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
   const card = () => page.locator(".plate-card").textContent().then((t) => t.replace(/\s+/g, " "));
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
+  await require("./set-meal.cjs")(page);
   ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && /Dinner is about/.test(await page.locator(".plate-card").textContent()), "the plate at 17:30 is for dinner");
   ok(/Dinner is about 936 kcal of your 2,800/.test(await card()), "MS1: the lunch eaten off the plan closes lunch: dinner about 936 kcal (it was 624; the drawing said 937, the lunch is 927.4 kcal)");
   ok(/Breakfast isn't logged today\. Did you have it\?/.test(await card()) && /I skipped it: breakfast's share moves to dinner, about 1,873 kcal/.test(await card()), "MS2: the plate asks once about breakfast, with what each answer means");

@@ -227,3 +227,43 @@ test("0.2.121: an edited recipe updates today's and later slots that hold it as 
   const { sig, ...old } = planned0 as any; void sig;
   assert.equal(refreshPlanned({ "2026-10-28": { breakfast: old } } as any, [r1], "2026-10-28")["2026-10-28"].breakfast.kcal, fromMeal(r1, "mine").kcal);
 });
+
+// 0.3.157 (DT308.11, board Stories242, frames d to g): Add as another dish. The meal stays one meal for everything that
+// reads the plan; dishes names what it holds.
+import { withDish, withoutDish, dishItems } from "./planned";
+import { dayRecord } from "./record";
+test("D5: a meal that holds two dishes is one meal with both dishes' foods and their numbers added up", () => {
+  const a = STARTERS.find((x) => x.title === "Chicken, rice and greens")!, b = STARTERS.find((x) => x.title === "Cottage cheese and fruit")!;
+  const m = withDish(a, b);
+  assert.equal(m.title, "Chicken, rice and greens + Cottage cheese and fruit");
+  assert.equal(m.kcal, a.kcal + b.kcal); assert.equal(m.protein, a.protein + b.protein);
+  assert.equal(m.items!.length, a.items!.length + b.items!.length);
+  assert.deepEqual(m.dishes!.map((d) => [d.title, d.n]), [[a.title, a.items!.length], [b.title, b.items!.length]]);
+  assert.deepEqual(dishItems(m, 1).map((i) => i.food.name), b.items!.map((i) => i.food.name));
+  // every reader of the plan: the day adds up, the shopping list has both dishes' foods, I ate it logs them all
+  assert.equal(sumOf({ lunch: m }).kcal, a.kcal + b.kcal);
+  const list = shoppingList({ "2026-11-16": { lunch: m } }, ["2026-11-16"]);
+  assert.ok(list.lines.some((l) => /chicken/i.test(l.name)) && list.lines.some((l) => /cottage/i.test(l.name)), "the shopping list has both dishes' foods");
+  const eaten = plannedPortion(m, "x", "2026-11-16T13:45:00.000Z")!;
+  assert.equal(eaten.items.length, m.items!.length);
+  assert.equal(Math.round(eaten.portion!), Math.round(m.items!.reduce((n, i) => n + i.grams, 0)));
+  assert.equal(dayRecord([{ id: "lunch", name: "Lunch", time: "13:45" }], { lunch: m }, [], "2026-11-16").open.length, 1);
+  assert.equal(refreshPlanned({ "2026-11-16": { lunch: m } }, [], "2026-11-15")["2026-11-16"].lunch, m, "a meal with dishes is left as it is");
+});
+test("D5: a recipe in portions joins at the portion the plan counts; a third dish joins the two", () => {
+  const a = STARTERS.find((x) => x.title === "Sarma")!, half = { ...a, amount: 1.5, kcal: Math.round(a.kcal * 1.5), protein: Math.round(a.protein * 1.5) };
+  const b = STARTERS.find((x) => x.title === "Protein pancakes")!, c = STARTERS.find((x) => x.title === "Cottage cheese and fruit")!;
+  const two = withDish(half, b);
+  assert.ok(Math.abs(dishItems(two, 0).reduce((n, i) => n + i.grams, 0) - a.items!.reduce((n, i) => n + i.grams, 0) * 1.5) < 2, "one and a half portions of the first dish");
+  const three = withDish(two, c);
+  assert.deepEqual(three.dishes!.map((d) => d.title), [a.title, b.title, c.title]);
+  assert.equal(three.kcal, half.kcal + b.kcal + c.kcal);
+});
+test("D5: a dish taken out again: with one left, the meal is that dish as planned on its own", () => {
+  const a = STARTERS.find((x) => x.title === "Chicken, rice and greens")!, b = STARTERS.find((x) => x.title === "Cottage cheese and fruit")!;
+  const one = withoutDish(withDish(a, b), 0)!;
+  assert.equal(one.title, b.title); assert.equal(one.kcal, b.kcal); assert.equal(one.dishes, undefined);
+  assert.deepEqual(one.items!.map((i) => i.food.name), b.items!.map((i) => i.food.name));
+  const two = withoutDish(withDish(withDish(a, b), a), 1)!;
+  assert.deepEqual(two.dishes!.map((d) => d.title), [a.title, a.title]);
+});

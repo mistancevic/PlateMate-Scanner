@@ -305,6 +305,12 @@ export type PilotState = {
     // DT305 (0.3.151, boards Stories230 and Stories231): a photo just read shows as the read alone, until Done or Change the
     // foods; saved holds the recipe Save in My recipes made from it
     view?: "read"; saved?: string;
+    // 0.3.157 (DT308.5): the meal you tapped for a photo of another day, after Ate it. No meal is guessed from a photo's time
+    // any more; slotId null is a snack off the plan
+    meal?: { date: string; slotId: string | null };
+    // 0.3.157 (DT308.12, board Stories244): the photo's foods joined a plate that had foods (Add to my plate). The plate
+    // stays the plate it was: the photo's day and time do not take it over, and it is not a dish as served
+    joined?: true;
     // DT228 v2 (0.3.63): the other photos of the meal (thumbnails, at most 3), the person's words, and the kind the read could not tell
     more?: string[]; note?: string; which?: import("./mealPhoto").Which | null;
     // DT268 (0.3.118): an Exploring plate is kept as Served: its id there, whose it is, its visit, which dish; keep false: Don't keep it
@@ -322,6 +328,13 @@ export type PilotState = {
   // DT214 (0.3.53, board Stories162): the cook that runs, and the plates and cooks saved for later (see cooking.ts)
   cook?: import("./cooking").Cook;
   later?: import("./cooking").Later[];
+  // 0.3.157 (DT308.11, board Stories242): Save it on a plate without a photo: the recipe it made, and the foods and amounts
+  // it was saved with. While they are the same the button says Saved in My recipes
+  savedPlate?: { id: string; sig: string };
+  // 0.3.157 (DT308.12 m to o, board Stories244): Start a new plate saved the plate that was there in My recipes. The one
+  // line near the top of the new plate says so, with Open it in My recipes, Undo and X, until it is closed. made: the recipe
+  // was made by this tap (Undo takes it out again); back: the plate as it was, for Undo
+  oldPlate?: { id: string; title: string; kind: "photo" | "recipe"; made: boolean; back: { items: Ingredient[]; title: string; portion: number | null; course?: PilotState["course"]; fromRecipe?: string; pick?: string | null } };
   // DT268 (0.3.118, board Stories201): plates scanned to explore, kept: cooked in another kitchen, read from a photo (served.ts)
   served?: import("./served").Served[];
   // DT268 step 3 (0.3.120): the menu of a visit, as read from its photo

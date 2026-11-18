@@ -2,6 +2,7 @@
 // planned take more than 8; the recipe page says so on its label and offers to cook what the plan takes; the foods follow;
 // the shopping list buys for that batch; on the Plate the batch is counted after cooking (it made one more), and the plan's
 // sarmas are that batch's share from then on.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs). no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -65,7 +66,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await made.getByRole("button", { name: "It made one more" }).click(); await page.waitForTimeout(300);
   ok(new RegExp(`You made ${planned + 1} sarmas\\. How many did you eat\\?`).test(await txt("main")), `counted: You made ${planned + 1} sarmas`);
   await page.getByRole("button", { name: "DaaM good" }).click();
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(900);
   const m = await store();
   ok(m.batch?.cooked === planned && m.batch?.made === planned + 1 && !m.cook && m.makes.n === 8, `the batch is kept: cooked for ${planned}, made ${planned + 1}; the recipe still makes 8`);
   // the plan's sarmas are now that batch's share
@@ -93,7 +94,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   const ask = page.getByRole("group", { name: "What it makes" });
   ok(await ask.count() === 1, "a tap asks what it makes");
   await ask.getByLabel("How many it makes").fill("10"); await ask.getByLabel("Of what").fill("sarma");
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(900);
   const fresh = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.find((m) => m.id !== "sarma"));
   ok(fresh && fresh.makes?.n === 10 && fresh.makes.unit === "sarmas", "the new recipe makes 10 sarmas: " + JSON.stringify(fresh && fresh.makes));
   // clearly more than one meal: the save asks, with the Plate's guess in it
@@ -105,6 +106,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await page.locator(".add-more .row-food").first().getByRole("button", { name: "Add", exact: true }).click(); await page.waitForTimeout(300);
   for (const inp of await page.locator('input[aria-label^="Grams of"]').all()) { await inp.fill("900"); }
   await page.waitForTimeout(300);
+  await require("./set-meal.cjs")(page);
   // changed by DT110 (0.2.94): a plate this big gets Chef Mealan's two-lunches card with its own Keep it as it is; the step on is Lock the recipe
   await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›/ }).first().click(); await page.waitForTimeout(800);
   if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); }
@@ -118,7 +120,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   const guess = await big.getByLabel("How many it makes").inputValue();
   ok(/You ate a portion of it, and it is about \d+ of your meals\. How many does it make\?/.test(bigText) && Number(guess) >= 2, `you ate a portion of a big plate: the save asks, ${guess} filled in (${bigText.slice(0, 90)})`);
   ok(await big.getByRole("button", { name: "One plate" }).count() === 1, "and One plate");
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(900);
   const st = await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); return { m: s.meals[0], f: s.feedback.filter((x) => x.status === "eaten")[0] }; });
   const kc = (items) => items.reduce((a, i) => a + i.food.calories * i.grams / 100, 0);
   ok(st.m.makes?.n === Number(guess) && Math.abs(kc(st.f.meal.items) - kc(st.m.items) / Number(guess)) < 2, `saved as ${guess} portions, and today counts one of them`);

@@ -5,6 +5,7 @@
 // stays as it was. A read that takes longer than 20 seconds says so. AI answers faked (no key here).
 // Changed by story R16 (Milan 21:56 to 22:11, board RS15): the slices left are not kept as a card for later; the landing line
 // says they go on Plan, not on Today.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -87,7 +88,7 @@ const U = "http://127.0.0.1:3215";
   await shot("im23b", '.save-recipe:has-text("Save your changed dish")');
   await page.getByRole("button", { name: "DaaM good" }).first().click();
   await page.getByRole("button", { name: "It worked" }).click();
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(1200);
   const s = await st();
   const nw = s.meals.find((m) => m.title === "No-bake cheesecake, more protein");
   ok(s.meals.length === 2 && nw && nw.makes?.n === 10 && nw.items.find((i) => i.food.name === "Light cream cheese").grams === 678 && nw.items.find((i) => i.food.name === "Vanilla whey protein powder").part === "Filling", "IM23b: the changed dish is a whole recipe, 10 slices, 678 g light cream cheese, in its parts");
@@ -116,7 +117,7 @@ const U = "http://127.0.0.1:3215";
   const mk = page.getByRole("button", { name: /Make it from the original|I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›/ }); if (await mk.count()) { await mk.first().click(); await page.waitForTimeout(500); }
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(900);
   ok(/Made today/.test(await text(".rq-landed")) && /No-bake cheesecake, more protein/.test(await text(".rq")), "RP4: a recipe made before ends on its page too");
   await page.reload(); await page.waitForTimeout(1300);
   ok(!/could not be read/.test(await text("main")), "The stored data reads back");

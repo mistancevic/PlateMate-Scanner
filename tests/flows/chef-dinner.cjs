@@ -7,6 +7,7 @@
 // DT91 (0.2.88, board Stories59): the dinner lands in its range (840 to 1,026 kcal), the penne stays a normal portion (110 g
 // dry at most) and the other foods grow with it, the potato dinner fits, the bulgur bowl that cannot is shown with why, the
 // herbs come as For cooking, not counted, and the cooked chicken says about how much that is raw.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters. no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -56,6 +57,7 @@ const STEPS = { steps: [
   await page.route("**/api/meal", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(MEAL) }));
   await page.route("**/api/steps", (r) => { asked = JSON.parse(r.request().postData() || "{}"); r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(STEPS) }); });
   await page.goto(U + "/plate"); await page.waitForTimeout(1400);
+  await require("./set-meal.cjs")(page);
   // DT87: the button says what it does; on an empty plate a line says why it waits
   const fit = page.getByRole("button", { name: "Fit to my target" });
   // Changed by story DT308 (0.3.154, board Stories236): the empty Plate has no Fit to my target; it comes with the first food
@@ -98,7 +100,7 @@ const STEPS = { steps: [
   ok(await page.getByRole("button", { name: /^\W*As the steps say$/ }).count() === 1 && !/as the recipe says/i.test(await text(page)), "DT90: How did it go? says As the steps say");
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(700);
   await page.getByRole("button", { name: "DaaM good" }).click();
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1300);
+  await require("./eat-save.cjs")(page); await page.waitForTimeout(1300);
   let s = await st(page);
   const m = s.meals[0];
   ok(m && m.title === "Pollo alla pizzaiola with penne" && m.steps?.length === 4 && m.kitchen === "Italian" && m.byChef?.around === "chicken breast" && m.cooking?.length === 2, "DT90, DT91: the recipe keeps the steps, its kitchen, who made it, the herbs");
@@ -122,7 +124,7 @@ const STEPS = { steps: [
   await p2.getByRole("button", { name: "Good", exact: true }).click();
   ok(/Yeast fritters · named in Craft/.test(await text(p2)), "DT94: Feedback shows the name set in Craft, no Name it field");
   ok(await p2.getByRole("button", { name: "Yes, save it" }).count() === 1, "DT90: a name you typed: Save in My recipes is offered, not This card points at it");
-  await p2.getByRole("button", { name: "Save", exact: true }).click(); await p2.waitForTimeout(1300);
+  await require("./eat-save.cjs")(p2); await p2.waitForTimeout(1300);
   s = await st(p2);
   ok(s.meals.length === 2 && s.meals[0].title === "Yeast fritters" && s.meals[0].basedOn?.id === "fritters" && s.meals[1].title === "Fritters", "DT90: Yeast fritters saved as its own recipe, adapted from Fritters; Fritters as it was");
   ok(/Yeast fritters/.test(await text(p2, ".rq-name")), "DT90: Save lands on Yeast fritters, not on Fritters");

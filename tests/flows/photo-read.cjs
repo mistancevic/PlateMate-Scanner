@@ -9,6 +9,7 @@
 // carries out what is chosen; nothing chosen, nothing is kept. Change the foods opens the plate as it was. The design rule
 // added by this story: an answer to tick sits under its question in its own block; the buttons of a section sit under the
 // whole section in one row. The reads are stand-ins.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, and a photo no longer fills in the meal line: it says Meal and day not set. With no meal set the read ends with What do you do with it? Save it, Plan it, Ate it (DT308.4 to DT308.6); Save it is what Save in My recipes was. Ate it opens the calendar with the guess marked (the clock's, or an older photo's day and time), and after the tap the read goes on exactly as this story drew it: Did you eat it?, the weight, Save in My recipes and Done. For a coming day the calendar behind the pencil takes the place of Tomorrow and Done. Change the foods opens the plate, which now ends with What do you do with it?; Chef Mealan's card keeps his word, Add a food and Don't count it, and its Ate it and Ate half come back once the meal is set.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -52,6 +53,10 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
   const justNow = () => photoAt(new Date(NOW.getTime() - 5 * 60000));
   const toRead = async (page, words) => { if (words) await page.locator(".pa-screen textarea").fill(words); await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200); };
   const chips = (page) => page.locator(".rv-eat .pa-opt");
+  // changed by DT308.4 (0.3.157): with no meal set the read ends with What do you do with it?. Ate it opens the calendar with
+  // the guess marked; a tap on it sets the meal, and the read goes on with Did you eat it?, as this story drew it
+  const line = async (page) => (await page.locator(".plan-line").innerText()).replace(/\s+/g, " ").trim();
+  const ateIt = async (page) => { await page.locator(".read-view .pe-ate").click(); await page.waitForTimeout(300); await page.locator(".read-view .pcal-row.on").click(); await page.waitForTimeout(500); };
   try {
     // ---- 1. to be informed: the Plate, the camera, the photo screen, the read, Done ----
     let { ctx, page } = await open();
@@ -63,7 +68,7 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     ok(sent.length === 0 && await page.locator(".camera-ui").count() === 0 && await page.locator(".pa-screen").count() === 1, "b to c: a photo you take waits on the photo screen; nothing is read yet");
     const title = page.locator(".step-head input.title-input");
     ok(await page.locator(".step-head h2").count() === 0 && await title.inputValue() === "" && await title.getAttribute("placeholder") === "Chef Mealan names it", "c: the meal's title takes the place of the question: still empty, Chef Mealan names it");
-    ok(/^Dinner, 20:00 by the clock · Off the plan/.test(await txt(page, ".plan-line")) && await page.locator(".plan-line-pen").count() === 1, "c: the meal line as today, with its pencil");
+    ok(/^Meal and day not set$/.test(await line(page)) && await page.locator(".plan-line-pen").count() === 1, "c: changed by DT308.1: the meal line says Meal and day not set, with its pencil");
     let t = await txt(page, ".pa-screen");
     ok(/A photo taken now\./.test(t) && !/Whose plate/.test(t) && await page.locator(".pa-screen .pa-chip").count() === 0 && await page.locator(".pa-dish").count() === 0, "c: Chef Mealan says where the photo is from and asks nothing: no Ate at, Eating now, Just looking, no dish row");
     // Changed by story DT308 Release 2 (0.3.155, board Stories236, DT308.2): the photo screen is one card with the photo on top, as wide as the card
@@ -77,7 +82,11 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     let st = await store(page);
     ok(st.photo.view === "read" && st.items.length === 2 && await page.locator(".read-view").count() === 1 && await title.inputValue() === "Pancakes with raspberries" && /Read from your photo\. Tap an amount to correct it\./.test(await txt(page, ".step-head")), "d: the read alone, the title filled in: Pancakes with raspberries");
     t = await txt(page, ".read-view");
-    ok(/Pancakes ~180 g/.test(t) && /Raspberries ~30 g/.test(t) && await page.locator(".read-view .readout").count() === 1 && /Main dish of your dinner/.test(t) && t.includes("You said: " + YOU) && /Chef Mealan:/.test(t), "d: the photo's foods, always the result, his guess of the dish, what you said, and his word");
+    ok(/Pancakes ~180 g/.test(t) && /Raspberries ~30 g/.test(t) && await page.locator(".read-view .readout").count() === 1 && t.includes("You said: " + YOU) && /Chef Mealan:/.test(t), "d: the photo's foods, always the result, what you said, and his word");
+    ok(/^Meal and day not set$/.test(await line(page)) && /What do you do with it\? Save it Plan it Ate it$/.test(t.trim()) && await page.locator(".rv-eat, .rv-go").count() === 0, "d: changed by DT308.4: no meal is guessed, so the read ends with What do you do with it? Save it, Plan it, Ate it");
+    await ateIt(page);
+    t = await txt(page, ".read-view");
+    ok(/^Dinner \w+, \d+ \w+, 20:00$/.test(await line(page)) && /Main dish of your dinner/.test(t), "d: Ate it, then the marked meal: the dinner is set in the line, and his guess of the dish says Main dish of your dinner");
     ok(!/Did you eat it\?.*Did you eat it\?/.test(t) && await page.locator(".rv-chef").count() === 1, "d: his word does not ask Did you eat it? again");
     ok((await page.locator(".rv-change .pill").textContent()).trim() === "Change the foods" && await page.locator(".rv-change .pill").evaluate((x) => x.getBoundingClientRect().height >= 44 && x.compareDocumentPosition(document.querySelector(".read-view .readout")) & 4), "d: Change the foods sits at the foods, above the result");
     ok((await page.locator(".rv-eat .pa-row-q").textContent()).trim() === "Did you eat it?" && (await chips(page).allTextContents()).join("|") === "All of it|Half|Part of it" && await page.locator(".rv-eat .pa-opt.on").count() === 0 && await page.locator(".rv-weight").count() === 0, "d: Did you eat it? All of it, Half, Part of it, white until chosen; no weight yet");
@@ -95,9 +104,10 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     ({ ctx, page } = await open(justNow()));
     ok(/A photo from 18:55 today, from Your photos\./.test(await txt(page, ".pa-screen")), "a photo from Your photos says so, with its time");
     await toRead(page);
-    await page.locator(".rv-save").click(); await page.waitForTimeout(500);
+    await page.locator(".pe-save").click(); await page.waitForTimeout(500);
     st = await store(page);
-    ok((await page.locator(".rv-save").textContent()).trim() === "✓ Saved in My recipes" && await page.locator(".rv-save").isDisabled() && st.meals.length === 1 && st.meals[0].title === "Pancakes with raspberries" && st.meals[0].items.length === 2 && st.meals[0].idea?.from === "photo" && !!(st.meals[0].photo || st.meals[0].photoSigs?.length) && st.items.length === 2, "Save in My recipes keeps it as a recipe from your photo, with its foods and photo; the button says Saved; the read stays");
+    ok((await page.locator(".pe-save").textContent()).trim() === "✓ Saved in My recipes" && await page.locator(".pe-save").isDisabled() && st.meals.length === 1 && st.meals[0].title === "Pancakes with raspberries" && st.meals[0].items.length === 2 && st.meals[0].idea?.from === "photo" && !!(st.meals[0].photo || st.meals[0].photoSigs?.length) && st.items.length === 2, "Save it (Save in My recipes until 0.3.157) keeps it as a recipe from your photo, with its foods and photo; the button says Saved; the read stays");
+    await ateIt(page);
     await page.locator(".rv-done").click(); await page.waitForTimeout(900);
     st = await store(page);
     ok(st.items.length === 0 && st.meals.length === 1 && st.feedback.length === 0, "Done: the recipe is kept, nothing counts");
@@ -105,7 +115,7 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
 
     // ---- 3. to count it for the day: All of it ----
     ({ ctx, page } = await open(justNow()));
-    await toRead(page);
+    await toRead(page); await ateIt(page);
     await chips(page).nth(0).click(); await page.waitForTimeout(300);
     ok((await page.locator(".rv-eat .pa-opt.on").allTextContents()).join().replace("✓", "").trim() === "All of it" && await page.locator(".rv-grams").inputValue() === "210" && /g of 210 g\. Tap to correct it\./.test(await txt(page, ".rv-weight")), "All of it: chosen with the check mark; the weight shows below, 210 g of 210 g");
     await page.locator(".rv-done").click(); await page.waitForTimeout(1200);
@@ -115,7 +125,7 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
 
     // ---- 4. a part of it: Half, then Part of it with the grams typed ----
     ({ ctx, page } = await open(justNow()));
-    await toRead(page);
+    await toRead(page); await ateIt(page);
     await chips(page).nth(1).click(); await page.waitForTimeout(300);
     ok(await page.locator(".rv-grams").inputValue() === "105" && (await page.locator(".rv-eat .pa-opt.on").allTextContents()).join().replace("✓", "").trim() === "Half", "Half fills the field: 105 g");
     await chips(page).nth(2).click(); await page.waitForTimeout(300);
@@ -132,10 +142,10 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     // ---- 5. to count it for the plan: the pencil, Tomorrow, the meal, Plan it ----
     ({ ctx, page } = await open(justNow()));
     await page.locator(".plan-line-pen").click(); await page.waitForTimeout(400);
-    await page.locator(".which-day .choice", { hasText: "Tomorrow" }).click(); await page.waitForTimeout(400);
-    await page.locator("main .choice", { hasText: /^Dinner/ }).first().click(); await page.waitForTimeout(500);
-    const doneBtn = page.locator(".plan-line-done");
-    if (await doneBtn.count()) { ok(/pill/.test(await doneBtn.getAttribute("class")) && (await doneBtn.boundingBox()).height >= 44, "behind the pencil: Done is a button, 44 px"); await doneBtn.click(); await page.waitForTimeout(400); }
+    // changed by DT308.1 (0.3.157): the calendar behind the pencil: tomorrow, then its dinner; the tap closes it (no Done)
+    await page.locator(".meal-line-open .pcal-day", { hasText: /^Tue 17$/ }).click(); await page.waitForTimeout(400);
+    await page.locator(".meal-line-open .pcal-row", { hasText: /^\s*Dinner/ }).click(); await page.waitForTimeout(500);
+    ok(await page.locator(".meal-line-open").count() === 0 && /^Dinner Tuesday, 17 November, 20:00 Goes into your plan\.$/.test(await line(page)), "behind the pencil: a tap on tomorrow's dinner sets it and closes the calendar");
     ok(await page.locator(".pa-screen").count() === 1, "the photo waits while you set the day and the meal");
     await toRead(page);
     t = await txt(page, ".read-view");
@@ -151,9 +161,13 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
 
     // ---- 6. a past day: a photo from yesterday fills in the meal line ----
     ({ ctx, page } = await open(photoAt(new Date("2026-11-15T19:40:00"))));
-    ok(/A photo from yesterday, 19:40, from Your photos\./.test(await txt(page, ".pa-screen")) && /^Dinner, yesterday at 19:40 · Off the plan/.test(await txt(page, ".plan-line")), "the photo fills in the meal line: Dinner, yesterday at 19:40");
+    ok(/A photo from yesterday, 19:40, from Your photos\./.test(await txt(page, ".pa-screen")) && /^Meal and day not set$/.test(await line(page)), "changed by DT308.5: a photo from yesterday does not fill in the meal line: Meal and day not set");
     await toRead(page);
-    ok(await page.locator(".read-view").count() === 1 && await page.locator(".chef-ask").count() === 0 && /^Dinner, yesterday at 19:40/.test(await txt(page, ".plan-line")) && await page.locator(".rv-chef").count() === 0, "the read, with no page asking about an old plate in front of it; the meal line still says yesterday");
+    ok(await page.locator(".read-view").count() === 1 && await page.locator(".chef-ask").count() === 0 && /^Meal and day not set$/.test(await line(page)) && await page.locator(".rv-chef").count() === 0, "the read, with no page asking about an old plate in front of it; still no meal set");
+    await page.locator(".read-view .pe-ate").click(); await page.waitForTimeout(300);
+    ok(/Which meal\? From the photo, Sunday 19:40:/.test(await txt(page, ".read-view .plate-end")) && (await page.locator(".read-view .pcal-day.on").innerText()).trim() === "Sun 15" && /Dinner/.test(await page.locator(".read-view .pcal-row.on").innerText()), "Ate it: the calendar opens on the photo's day, yesterday, with the guess from the photo's time marked: Dinner");
+    await page.locator(".read-view .pcal-row.on").click(); await page.waitForTimeout(500);
+    ok(/^Dinner Sunday, 15 November, 19:40$/.test(await line(page)), "the tap sets yesterday's dinner in the line, at the photo's time");
     await chips(page).nth(0).click(); await page.waitForTimeout(300);
     await page.locator(".rv-done").click(); await page.waitForTimeout(1200);
     st = await store(page);
@@ -169,7 +183,7 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     ok(st.items.find((i) => /Pancakes/.test(i.food.name)).grams === 200 && /Pancakes ~?200 g/.test(await txt(page, ".read-view .mp-tags")), "an amount is corrected on the read, by a tap on it: 200 g");
     await page.locator(".rv-change .pill").click(); await page.waitForTimeout(700);
     st = await store(page);
-    ok(!st.photo.view && st.items.length === 2 && await page.locator(".read-view").count() === 0 && await page.locator(".mp-say").count() === 1 && /Fit to my target/.test(await txt(page)) && await page.locator(".rows .row, .rows > *").count() > 0, "Change the foods opens the plate as it is today, with these foods and its tools");
+    ok(!st.photo.view && st.items.length === 2 && await page.locator(".read-view").count() === 0 && await page.locator(".plate-end").count() === 1 && await page.locator(".mp-say").count() === 1 && await page.locator(".mp-say").getByRole("button", { name: /^Ate/ }).count() === 0 && /Fit to my target/.test(await txt(page)) && await page.locator(".rows .row, .rows > *").count() > 0, "Change the foods opens the plate as it is today, with these foods and its tools");
     await ctx.close();
     ok(errs.length === 0, "no page errors: " + errs.slice(0, 2).join(" | "));
   } finally { await b.close(); server.kill(); }

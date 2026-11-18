@@ -2,6 +2,7 @@
 // breast 200 g and cottage cheese 150 g, Maintain at 2,800 kcal and 180 g protein, PD target 6.4, at 11:00 so the plate is
 // for lunch. Chef Mealan's answer is fixed here (no AI in the walkthroughs); what is checked is the app's part: which way
 // the plate goes, what Chef Mealan is asked, the grams the app sets, the checks, and the meal on the plate.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -33,6 +34,7 @@ const answer = { options: [
   await page.route("**/api/meal", async (route) => { calls++; asked = JSON.parse(route.request().postData() || "{}"); await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(answer) }); });
   // CH1: the plate says what it is for and what it aims at
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
+  await require("./set-meal.cjs")(page);
   ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).count() === 1, "CH1, DT87 (0.2.87): Fit to my target, and Keep it as it is");
   ok(/Lunch is about 933 kcal of your 2,800, at PD 6\.4 or more\. Chef Mealan adds what it needs to land your lunch in its range\./.test(await page.locator(".plate-card").textContent()), "CH1: lunch is about 933 kcal: what is left of the day over the three meals to come");
   // CH2: PD above the target, half a lunch: maths cannot make it a meal, so Chef Mealan

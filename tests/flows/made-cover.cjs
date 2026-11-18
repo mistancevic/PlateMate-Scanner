@@ -3,6 +3,7 @@
 // while making it becomes the cover of a recipe with no photo of its own (no cover, or one Chef Mealan drew), with a line that
 // says so, Change the cover, and Remove it behind a second tap. A cover of your own stays. Share with the coach sits in the
 // Made today line only for a person with a coach. Never rewrite these lines to fit a change.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -31,7 +32,7 @@ seed.meals = [bowl("bowl", "Chicken rice bowl"), bowl("mine", "Rice bowl with a 
     await page.locator(".plate-photo").filter({ hasText: "Add a photo of the meal" }).click(); await page.locator(".pp-camera input").setInputFiles([{ name: "plate.jpg", mimeType: "image/jpeg", buffer: PHOTO }]); await page.waitForTimeout(900);
     await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
     await page.getByRole("button", { name: "DaaM good" }).click();
-    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
+    await require("./eat-save.cjs")(page); await page.waitForTimeout(1200);
     // DT285 (0.3.139): the same photo made twice in one day asks first; here it was made twice
     if (await page.locator(".same-ask").count()) { await page.locator(".same-ask").getByRole("button", { name: "Keep both" }).click(); await page.waitForTimeout(1200); }
   };

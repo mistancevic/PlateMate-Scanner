@@ -2,6 +2,7 @@
 // the Plate. It opens with the answer for the goal; each suggestion shows its amount and what it does to PD and kcal, and Add puts
 // that amount on the plate; More like this asks for more of the same, never the same again; chips pick the direction; Something I
 // crave adds how to stay close to the goal; one conversation, no second chat; what was said for this dish is not said again.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -32,6 +33,7 @@ const PORT = "3506", U = `http://127.0.0.1:${PORT}`;
       if (lang !== "en") localStorage.setItem("chefmealan-lang", lang); localStorage.setItem("seeded", "1"); }, { s: seed, lang });
     await require("./adult.cjs")(page);
     await page.goto(U + "/plate"); await page.waitForTimeout(1500);
+  await require("./set-meal.cjs")(page);
     return { ctx, page, asked };
   };
   const logOf = (page, ev) => page.evaluate((e) => JSON.parse(localStorage.getItem("chefmealan-log") || "[]").filter((x) => x.event === e), ev);
