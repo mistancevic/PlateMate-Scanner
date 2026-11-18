@@ -2021,11 +2021,89 @@
     },
     {
       "id": "DT318",
-      "title": "The read: where and how to correct what Chef Mealan read",
+      "title": "Correcting what Chef Mealan read: one edit mode for the foods, by hand or by words",
       "epic": "plate",
       "state": "next",
       "why": "Coach Milan 18 November 19:26, from the same test: the read gave a good list and asked about the chicken (he chose 200 g). The yogurt came as 10 % fat, fixed in the food list, not on the read's chip. Swap offered no 0.2 % fat yogurt. He added words (mayo was hidden; the yogurt is 0.2 % fat); the read then asked about the chicken again, this time whether it was 220 g. The list ended right, but it was confusing where and how to correct it. Four points: the kind of a food cannot be corrected on its chip; Swap lacks the variant; a second read asks again what was already answered, with another number; no one place to correct. Not reproduced and not drawn yet.",
-      "agreed": "Agreed wording, Coach Milan 18 November 21:26 to 21:36: under the chips on the read, Tap an amount to correct it. Change the foods to swap or add one. The line under the title (Chef Mealan named it from your photo.) moved into B150. Coach Milan asked to consider B150 and DT318 for the same release."
+      "board": "Stories262",
+      "opportunity": {
+        "from": "Coach Milan, 18 November 2026, 19:26, from a photo he logged; and 21:48 with a screenshot of Darinka's read.",
+        "job": "Make the list of foods right after a read, quickly, so the meal I log is the meal I ate.",
+        "kind": "Several doors, each doing part of the job: a tap on a chip, Change the foods, a swipe, a link to a form, and Chef Mealan's own question. None says which to use.",
+        "why_now": "Every read ends here. B150 changes the same screen, so both are tested once."
+      },
+      "problem": "After the read I got a nice list of foods. Chef Mealan asked about the chicken and I chose 200 g. The yogurt was fixed at 10% fat, which I saw only in the food list, not on the chip. I tried to swap it, but there was no 0.2% yogurt. So I told Chef Mealan: it was 0.2% yogurt, and there was mayo. He read again and asked about the chicken a second time, now 220 g. The list was right in the end, but where and how to correct it was confusing.",
+      "story": "When a read is not quite right, I want one place to correct the foods, with my hands or with my words, so that I do not hunt for the right door and nothing I set is lost.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "The foods have one pencil",
+          "text": "Given Chef Mealan read a photo, when I look under the photo, then the foods have the small title Foods and one pencil, each chip shows the food's full name and grams, there is no Change the foods, and a tap on a chip does nothing."
+        },
+        {
+          "id": "AC2",
+          "title": "The pencil opens edit mode in place",
+          "text": "Given that read, when I tap the pencil, then under the photo I see Tell Chef Mealan what is wrong, one row per food with its full name, grams, Swap and Remove, and + Add a food, the pencil is an X, and a tap on the X shows the chips again."
+        },
+        {
+          "id": "AC3",
+          "title": "Grams, saved at once",
+          "text": "Given edit mode, when I type 200 in the chicken's grams, then the plate's numbers follow at once, there is no Done, and closed the chip says 200 g without the ~."
+        },
+        {
+          "id": "AC4",
+          "title": "Remove",
+          "text": "Given edit mode with a food that is wrong or there twice, when I tap Remove on its row, then the row is gone and the plate's numbers follow."
+        },
+        {
+          "id": "AC5",
+          "title": "Swap",
+          "text": "Given edit mode, when I tap Swap on the yogurt's row and pick a food in the swap list, then that food stands in the row with the same grams."
+        },
+        {
+          "id": "AC6",
+          "title": "Add a food",
+          "text": "Given edit mode, when I tap + Add a food and pick one, then it is a new row at its normal portion, and I am still in edit mode."
+        },
+        {
+          "id": "AC7",
+          "title": "By words",
+          "text": "Given edit mode, when I write The yogurt was 0.2% fat. There was mayo too. and tap Read again, then the rows show Yogurt, 0.2% fat and Mayonnaise, and one line from Chef Mealan says what he changed."
+        },
+        {
+          "id": "AC8",
+          "title": "What I set stays",
+          "text": "Given I chose 200 g for the chicken, by his question or by hand, when Chef Mealan reads again, then the chicken is still 200 g and he does not ask about it again; and a food I removed does not come back."
+        },
+        {
+          "id": "AC9",
+          "title": "His question stands on the read",
+          "text": "Given the read is not sure about one amount, when the read opens, then the question is under the chips with ~200 g, ~350 g and Neither, and a tap on an amount sets it and closes the question."
+        },
+        {
+          "id": "AC10",
+          "title": "Neither",
+          "text": "Given that question, when I tap Neither, then edit mode opens with that food's grams ready to type, and the question is gone."
+        },
+        {
+          "id": "AC11",
+          "title": "The old doors are gone",
+          "text": "Given a read, when I look at the page, then there is no link Wrong foods? Help Chef Mealan read it and no Skip, and Retake, + Photo and Fit to my target are behind one link in edit mode."
+        },
+        {
+          "id": "AC12",
+          "title": "Three languages",
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 6, then Foods, Tell Chef Mealan what is wrong, Read again, Swap, Remove, + Add a food, Neither and Chef Mealan's line are in that language."
+        }
+      ],
+      "unchanged": [
+        "The photo, the title, the meal line, This plate and What do you do with it?.",
+        "The swap list itself, and Find a food behind + Add a food.",
+        "Say it: the same voice input as on the photo form.",
+        "The Plate without a photo: its food list, the swipe, Fit to my target, Group into parts.",
+        "B150 draws the line under the title and the meal line; DT307 the bottom row. They are shown here as they will be."
+      ],
+      "where": "Page 5, board DT318. With B150 in one release (Coach Milan 21:36)."
     },
     {
       "id": "B151",
@@ -2064,6 +2142,13 @@
         "The marked meal in the calendar: blue with a tick.",
         "Ate it on Did you eat it? for a plate from earlier: it is the main button there, filled blue, and stays so."
       ]
+    },
+    {
+      "id": "B152",
+      "title": "A dish is on the plate twice: whole amounts and a portion's amounts",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 18 November 21:48, a screenshot of Darinka's read in Serbian: ten foods, four of them twice. Prawns 700 g and ~50 g, passata 500 g and ~80 g, olive oil 50 g and ~8 g, fusilli 500 g and cooked fusilli ~220 g. The six exact amounts carry no ~, so they did not come from that read as estimates; the four with ~ did. Her steps are not known yet: needed before it can be replayed and drawn."
     },
     {
       "id": "DT319",
