@@ -42,18 +42,42 @@
    "id": "AC5",
    "title": "The record on your phone",
    "text": "Given a record with the time Tuesday 19:56 and the dinner of Wednesday, when the app opens after the release, then it is Tuesday's dinner, Tuesday's planned dinner no longer asks, and Wednesday's dinner is open again."
+  },
+  {
+   "id": "AC6",
+   "title": "The time is a field",
+   "text": "Given the read of a photo with Saturday's dinner set, when I look at the meal line, then the time stands in a field I can tap, 44 high, showing 15:57, the photo's time."
+  },
+  {
+   "id": "AC7",
+   "title": "I change the time",
+   "text": "Given that field, when I set 19:30 and then choose All of it and Done, then Saturday shows my meal as Dinner, 19:30."
+  },
+  {
+   "id": "AC8",
+   "title": "No photo's time to take",
+   "text": "Given a plate without a photo and Saturday's dinner set with the pencil, when I look at the meal line, then the field shows 20:00, Dinner's time from Slots and times, and I can change it the same way."
+  },
+  {
+   "id": "AC9",
+   "title": "The meal stays the meal",
+   "text": "Given Dinner is set and I set the time to 14:00, when I log it, then it is still Saturday's dinner, at 14:00, and no other meal of that day is touched."
   }
  ],
  "unchanged": [
   "Ate it's calendar: it already opens on the photo's day.",
   "A photo taken now, and a photo I did not say I ate then: the pencil opens on today.",
   "A dinner logged after midnight stays with the evening before: its meal is on the earlier day, and that is left alone.",
-  "What a planned meal shows when it is closed by a meal I ate."
+  "What a planned meal shows when it is closed by a meal I ate.",
+  "Slots and times in the settings: a time set on one meal does not change the meal's usual time."
  ],
  "details": [
-  "No new element and no new words: the line From the photo exists.",
+  "One new element: the time field in the meal line. No new words: the line From the photo exists.",
   "The rule sits in the one place a meal is logged, so every way obeys it.",
   "The repair touches only records whose meal is on a later day than their time.",
-  "The screens B150c and B150d are what it looks like."
- ]
+  "The screens B150c, B150d and B150.2b are what it looks like."
+ ],
+ "words2": "18 November 19:34: also the timing is an issue, as I couldn't change it. It was only the timing from the settings. So no possibility to change the time.",
+ "time_now": "Once a meal is set, the line says Dinner, Saturday, 14 November, 20:00. The time is the meal's time from Slots and times, or the photo's time. It is words, not a field, so it cannot be changed.",
+ "time_proposed": "The one element: the time in the meal line becomes a field. It starts at the photo's time for a photo of that day, otherwise at the meal's time. A tap opens the phone's clock. The meal is logged at the time I set; the meal itself does not change."
 }

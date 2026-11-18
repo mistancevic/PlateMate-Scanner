@@ -1914,7 +1914,7 @@
       "state": "next",
       "board": "Stories260",
       "where": "Page 5",
-      "why": "Coach Milan 18 November 19:21, with a screenshot of his Plan on Tuesday 17: a photo from Tuesday 19:56, tried as today's lunch, then set to dinner with the pencil; Tuesday shows it as Dinner, 19:56 and the planned Chicken rice bowl still asks. Cause: the pencil's calendar opens on today also for a photo from another day, and the meal is logged with the photo's time under the dinner of today. Reproduced on 0.3.159 as a record with the photo's day and another day's meal. Drawn; waits for a Go.",
+      "why": "Coach Milan 18 November 19:21, with a screenshot of his Plan on Tuesday 17: a photo from Tuesday 19:56, tried as today's lunch, then set to dinner with the pencil; Tuesday shows it as Dinner, 19:56 and the planned Chicken rice bowl still asks. Cause: the pencil's calendar opens on today also for a photo from another day, and the meal is logged with the photo's time under the dinner of today. Reproduced on 0.3.159 as a record with the photo's day and another day's meal. Drawn; waits for a Go. Coach Milan 19:34: also the timing, he could not change it; only the times from the settings. Added to the board: the time in the meal line is a field (AC6 to AC9).",
       "opportunity": {
         "from": "Coach Milan, 18 November 2026, 19:21, with a screenshot of his Plan on Tuesday 17 November. Found while testing the last releases on his phone.",
         "job": "Log a photo of a meal I ate on another day, to that day and that meal.",
@@ -1948,13 +1948,34 @@
           "id": "AC5",
           "title": "The record on your phone",
           "text": "Given a record with the time Tuesday 19:56 and the dinner of Wednesday, when the app opens after the release, then it is Tuesday's dinner, Tuesday's planned dinner no longer asks, and Wednesday's dinner is open again."
+        },
+        {
+          "id": "AC6",
+          "title": "The time is a field",
+          "text": "Given the read of a photo with Saturday's dinner set, when I look at the meal line, then the time stands in a field I can tap, 44 high, showing 15:57, the photo's time."
+        },
+        {
+          "id": "AC7",
+          "title": "I change the time",
+          "text": "Given that field, when I set 19:30 and then choose All of it and Done, then Saturday shows my meal as Dinner, 19:30."
+        },
+        {
+          "id": "AC8",
+          "title": "No photo's time to take",
+          "text": "Given a plate without a photo and Saturday's dinner set with the pencil, when I look at the meal line, then the field shows 20:00, Dinner's time from Slots and times, and I can change it the same way."
+        },
+        {
+          "id": "AC9",
+          "title": "The meal stays the meal",
+          "text": "Given Dinner is set and I set the time to 14:00, when I log it, then it is still Saturday's dinner, at 14:00, and no other meal of that day is touched."
         }
       ],
       "unchanged": [
         "Ate it's calendar: it already opens on the photo's day.",
         "A photo taken now, and a photo I did not say I ate then: the pencil opens on today.",
         "A dinner logged after midnight stays with the evening before: its meal is on the earlier day, and that is left alone.",
-        "What a planned meal shows when it is closed by a meal I ate."
+        "What a planned meal shows when it is closed by a meal I ate.",
+        "Slots and times in the settings: a time set on one meal does not change the meal's usual time."
       ]
     },
     {
