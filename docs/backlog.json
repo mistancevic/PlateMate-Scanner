@@ -1243,9 +1243,9 @@
       "id": "B145",
       "title": "The read invents cooking methods when no words were given",
       "epic": "trust",
-      "state": "next",
+      "state": "now",
       "board": "Stories254",
-      "why": "Coach Milan 15 November 20:57, his test of 0.3.150: a photo read with no words showed For cooking, not counted: simmered, pureed. Those are methods, not foods he named. Drawn on Stories226; no Go yet. The board's other bug (the form asks a snack which dish it is) is gone with DT305: the dish row left the photo screen. 18 November: drawn again on a board of its own, on the app as built in 0.3.159. Waits for a Go.",
+      "why": "Coach Milan 15 November 20:57, his test of 0.3.150: a photo read with no words showed For cooking, not counted: simmered, pureed. Those are methods, not foods he named. Drawn on Stories226; no Go yet. The board's other bug (the form asks a snack which dish it is) is gone with DT305: the dish row left the photo screen. 18 November: drawn again on a board of its own, on the app as built in 0.3.159. Waits for a Go. Coach Milan, 18 November 19:13: Go for code.",
       "where": "Page 5",
       "ac": [
         {
@@ -1286,9 +1286,9 @@
       "id": "DT307",
       "title": "After the test of 0.3.151, point by point on the one board: a way back and Cancel, fewer boxes, the pot question, Save in My recipes as a tick",
       "epic": "trust",
-      "state": "next",
+      "state": "now",
       "board": "Stories253",
-      "why": "Coach Milan 16 November 15:49 to 17:04: Back at the top left stays, a second Back at the bottom when there is a scroll, Cancel goes back to the default with nothing changed; buttons on top must not push the content down (a light top row); fewer boxes, the photo not smaller; the pot question (How much of it do you eat? All of it, A part of it, with grams); Save in My recipes as a tick. 17:04: we have a mess; point by point, each resolved on one board. Earlier drawings Stories232 to 234. Also noted for later cards: the automatic photo in the camera's Meal mode and Group not firing (to reproduce); using what the app knows about a photo and asking if it is correct. No Go on any point. 18 November: drawn again on the app as built in 0.3.159, as one board, a row per point: 1 a way back (Back to the camera, Back to the photo, twice), 2 fewer boxes, 3 + Add more on the read, 4 Save in My recipes as a tick, 5 the pot (How much of it do you eat?). B145 and DT306 have boards of their own. Each point waits for its own Go. Coach Milan 18 November 18:46 on point 4: the tick with its label in a row above Done; Cancel left of Done if it makes sense. Drawn so: Cancel logs nothing and takes the meal off again.",
+      "why": "Coach Milan 16 November 15:49 to 17:04: Back at the top left stays, a second Back at the bottom when there is a scroll, Cancel goes back to the default with nothing changed; buttons on top must not push the content down (a light top row); fewer boxes, the photo not smaller; the pot question (How much of it do you eat? All of it, A part of it, with grams); Save in My recipes as a tick. 17:04: we have a mess; point by point, each resolved on one board. Earlier drawings Stories232 to 234. Also noted for later cards: the automatic photo in the camera's Meal mode and Group not firing (to reproduce); using what the app knows about a photo and asking if it is correct. No Go on any point. 18 November: drawn again on the app as built in 0.3.159, as one board, a row per point: 1 a way back (Back to the camera, Back to the photo, twice), 2 fewer boxes, 3 + Add more on the read, 4 Save in My recipes as a tick, 5 the pot (How much of it do you eat?). B145 and DT306 have boards of their own. Each point waits for its own Go. Coach Milan 18 November 18:46 on point 4: the tick with its label in a row above Done; Cancel left of Done if it makes sense. Drawn so: Cancel logs nothing and takes the meal off again. Coach Milan, 18 November 19:13: Go for code.",
       "where": "Page 5",
       "opportunity": {
         "from": "Coach Milan, 16 November 15:49 to 17:04, after his test of 0.3.151, with screenshots. His words: we have a mess; point by point, each resolved on one board. The earlier drawings are parked. 0.3.157 changed how the read ends, so the points are drawn again on today's app.",
@@ -1491,8 +1491,8 @@
       "id": "DT306",
       "title": "Blocks like the read's: an answer under its question, the section's buttons under it",
       "epic": "trust",
-      "state": "next",
-      "why": "Coach Milan 16 November 11:35, with two screenshots: after DT305, update the blocks that are similar. Chef Mealan's card on the plate (Did you eat it? with Ate half, Add a food, Don't count it, Ate it as four buttons) and the questions behind the pencil of the meal line. By design rules D6 and D7. 18 November: drawn again on a board of its own, on the app as built in 0.3.159. Waits for a Go. Coach Milan 18 November 18:46: Add a food and Don't count it are a mess there, he cannot connect what they relate to. Drawn again: Don't count it is the fourth answer to Did you eat it?; Add a food leaves the card (+ Add more to your plate is right above); Done is the one button.",
+      "state": "now",
+      "why": "Coach Milan 16 November 11:35, with two screenshots: after DT305, update the blocks that are similar. Chef Mealan's card on the plate (Did you eat it? with Ate half, Add a food, Don't count it, Ate it as four buttons) and the questions behind the pencil of the meal line. By design rules D6 and D7. 18 November: drawn again on a board of its own, on the app as built in 0.3.159. Waits for a Go. Coach Milan 18 November 18:46: Add a food and Don't count it are a mess there, he cannot connect what they relate to. Drawn again: Don't count it is the fourth answer to Did you eat it?; Add a food leaves the card (+ Add more to your plate is right above); Done is the one button. Coach Milan, 18 November 19:13: Go for code.",
       "board": "Stories255",
       "where": "Page 5",
       "ac": [
@@ -1802,10 +1802,10 @@
       "id": "DT315",
       "title": "How to, log it with a photo: step 4 says what the app does now",
       "epic": "plate",
-      "state": "next",
+      "state": "now",
       "board": "Stories256",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while 0.3.157 was built. No tester has reported it. Waits for a Go.",
+      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while 0.3.157 was built. No tester has reported it. Waits for a Go. Coach Milan, 18 November 19:13: Go for code.",
       "problem": "Step 4 says: Check the foods he read. Under Did you eat it? choose All of it, Half or Part of it, then Done. Since 0.3.157 the read first asks What do you do with it?, and Did you eat it? comes after Ate it and the meal.",
       "story": "Words only. Step 4: Check the foods he read. Tap Ate it and the meal. Step 5, new: Under Did you eat it? choose All of it, Half or Part of it, then Done.",
       "ac": [
@@ -1821,24 +1821,34 @@
     },
     {
       "id": "DT316",
-      "title": "English lines no code uses: the list, for your word",
+      "title": "English lines no code uses are removed",
       "epic": "plate",
-      "state": "next",
+      "state": "now",
       "board": "Stories257",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as a small card beside the read. Six went in 0.3.157 with your word. The builds of 0.3.157 and 0.3.159 left more behind. Waits for a Go.",
-      "problem": "Lines no screen shows still sit in the English, Serbian and German files. Each one is a line you may check in your table for nothing.",
-      "story": "Certain today, 5: the three old question lines (Skyr would join a plate from, from your recipes has, from your plan has), Keep my plate, and Chef Mealan's old question line. A first sweep finds 126 more candidates, most on the Plate (29) and the goal setup (22). I check each against the code and bring you the list by screen. Nothing goes without your word.",
+      "why": "Drawn 18 November 2026 as a small card beside the read. Six went in 0.3.157 with your word. The builds of 0.3.157 and 0.3.159 left more behind. Waits for a Go. Coach Milan, 18 November 19:13: Go for code. No ticking: if the sentences are not in use, they go. Only lines proven unused by hand are removed; the handover names each.",
+      "problem": "Lines no screen shows still sit in the English, Serbian and German files. Each one is a line to check and translate for nothing.",
+      "story": "Remove them. Certain today, 5: the three old question lines, Keep my plate, and Chef Mealan's old question line. A first sweep finds 126 more candidates. I check each against the code by hand; a line goes only when nothing can show it. A line with any doubt stays.",
       "ac": [
         {
           "id": "AC1",
-          "title": "Only what you ticked goes",
-          "text": "Given the list with your word on each line, when the release is built, then every line you ticked is gone from English, Serbian and German, and no other."
+          "title": "The five certain lines are gone",
+          "text": "Given the five lines of the table on this board, when the release is built, then none of them is in the English, Serbian or German files."
         },
         {
           "id": "AC2",
+          "title": "Only proven lines go",
+          "text": "Given a line from the sweep, when I cannot prove by hand that no screen can show it, then it stays in all three files."
+        },
+        {
+          "id": "AC3",
           "title": "Nothing on screen changes",
-          "text": "Given the lines are gone, when all walkthroughs run, then they pass untouched."
+          "text": "Given the lines are gone, when all walkthroughs and unit tests run, then they pass, and no screen shows a missing line or a bare key."
+        },
+        {
+          "id": "AC4",
+          "title": "The list is kept",
+          "text": "Given the release is merged, when Coach Milan asks what went, then the handover names every removed line with its English."
         }
       ],
       "unchanged": [
@@ -1849,10 +1859,10 @@
       "id": "DT317",
       "title": "Start cooking with a plate from earlier: Ate it asks the meal",
       "epic": "plate",
-      "state": "next",
+      "state": "now",
       "board": "Stories258",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while DT314 was built. It was not in DT314. Waits for a Go.",
+      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while DT314 was built. It was not in DT314. Waits for a Go. Coach Milan, 18 November 19:13: Go for code.",
       "problem": "A plate from Saturday is on the Plate. I open a recipe and tap Start cooking. Chef Mealan asks about the old plate: Ate it, Save for later, Clear it, Cancel. Ate it logs it at once to the meal nearest its time, with no question. On the Plate itself the same tap now asks the meal (DT314).",
       "story": "The one element: the calendar of DT314 under these buttons too. Ate it opens it on the plate's day with the nearest meal marked. A tap on a row logs the plate there, and the cooking starts.",
       "ac": [
@@ -1875,10 +1885,10 @@
       "id": "B149",
       "title": "A chosen choice shows two ticks",
       "epic": "plate",
-      "state": "next",
+      "state": "now",
       "board": "Stories259",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while drawing the read. Seen on the app as built in 0.3.159. Waits for a Go.",
+      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while drawing the read. Seen on the app as built in 0.3.159. Waits for a Go. Coach Milan, 18 November 19:13: Go for code.",
       "problem": "Two places show a chosen choice with two ticks: the pot question on the photo screen (✓ ✓ The whole pot) and Good for on a recipe's page (✓ ✓ Lunch). One tick comes from the choice's look, one is written into the words.",
       "story": "One tick, the one of the look, as every other choice in the app has. No change to what is drawn on any board.",
       "ac": [

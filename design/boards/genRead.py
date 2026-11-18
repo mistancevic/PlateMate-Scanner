@@ -30,15 +30,15 @@ def readBoard(key, fname, cols, rows, after, sub):
     OUT[key] = {"file": fname, "w": W, "h": min(8000, Hc + 230), "title": t["boardTitle"], "inner": B.render(W, Hc)}
     print(key, "inner", Hc, "board", Hc + 230)
 def P(pt): return [(h, x) for h, x in T["points"][pt]]
-SUB = "18 November 2026. Drawn on the app as built in 0.3.159. This board is the ticket. Drawn for approval; no Go."
+SUB = "18 November 2026. Drawn on the app as built in 0.3.159. This board is the ticket. Go: Coach Milan, 18 November 19:13."
 A, Bb = T["DT307a"], T["DT307b"]
 def sub(pre): return [{**x, "id": x["id"].replace(pre, "")} for x in Bb["ac"] if x["id"].startswith(pre)]
 T["DT307"] = {**A, "short": "The read, point by point: five points", "boardTitle": "DT307: the read, point by point. The way back, fewer boxes, + Add more, the tick, the pot",
   "ac": A["ac"] + [x for x in Bb["ac"] if x["id"].startswith("5 ")], "unchanged": A["unchanged"] + ["A photo of a plate, not a pot: no question about how much."],
   "details": A["details"][:3] + ["The pot question keeps its place and its look; only the words and the grams field are new. New words: How much of it do you eat?, A part of it, the grams line.", "The screens named DT307.1c, 1d, 2b, 3b, 4b and 5c are what it looks like."]}
-T["B145"] = {"id": "B145", "short": "The read invents ways of cooking", "rel": "Proposed; not agreed until Coach Milan says Go", "boardTitle": "B145: the read invents ways of cooking", "ac": sub("B145 "),
+T["B145"] = {"id": "B145", "short": "The read invents ways of cooking", "rel": "Go: Coach Milan, 18 November 19:13", "boardTitle": "B145: the read invents ways of cooking", "ac": sub("B145 "),
   "unchanged": ["With words that name a cooking food, the line shows it, as today.", "The foods that are counted, and their amounts."], "details": ["No new element and no new words.", "The screen named B145b is what it looks like."]}
-T["DT306"] = {"id": "DT306", "short": "Chef Mealan's card on the plate of a photo, in the read's shape", "rel": "Proposed; not agreed until Coach Milan says Go", "boardTitle": "DT306: Chef Mealan's card on the plate of a photo, in the read's shape", "ac": sub("DT306 "),
+T["DT306"] = {"id": "DT306", "short": "Chef Mealan's card on the plate of a photo, in the read's shape", "rel": "Go: Coach Milan, 18 November 19:13", "boardTitle": "DT306: Chef Mealan's card on the plate of a photo, in the read's shape", "ac": sub("DT306 "),
   "unchanged": ["What Add a food and Don't count it do.", "The questions behind the pencil of the meal line: since 0.3.157 they are the calendar's rows and choices already, so nothing is proposed there.", "His word above the buttons."], "details": ["The read's block is reused as it is: the same question, choices and Done. No new words.", "The screen named DT306b is what it looks like."]}
 T["DT306"]["unchanged"] = ["What Don't count it does, and what Half does.", "+ Add more to your plate, right above the card.", "The questions behind the pencil of the meal line: since 0.3.157 they are the calendar's rows and choices already, so nothing is proposed there.", "His word at the top of the card."]
 T["DT306"]["details"] = ["The read's block is reused: the same question and choices, with Don't count it as a fourth choice. No new words.", "The screen named DT306b is what it looks like."]
@@ -81,15 +81,17 @@ readBoard("DT306", "Stories255.dc.html", 2, [
 # ---- four small tickets, a board each, with their screens
 def smallBoard(k, fname, cols, shots, arrows, after, wide=None):
     B = Board(); W = SX + cols * (SW + GAP) - GAP + 70; c = T[k]
-    card(B, 20, 30, k, c["short"], [("Ticket", f"{k}. This board is the ticket: everything about it is here."), ("Where it comes from", c["from"]), ("Problem", c["problem"]), ("Proposed", c["proposed"])] + [(f'{a["id"]}: {a["title"]}', gwtBold(a["text"])) for a in c["ac"]] + [("Must not change", c["unchanged"]), ("Decision", "Open. No Go, so nothing is built.")])
+    card(B, 20, 30, k, c["short"], [("Ticket", f"{k}. This board is the ticket: everything about it is here."), ("How to read this board", "<b>This card:</b> the request and the solution. <b>The screens</b> on the right: the design. <b>The wide block at the bottom:</b> the agreement, as Given, When, Then rows."), ("Where it comes from", c["from"]), ("Problem", c["problem"]), ("Proposed", c["proposed"]), ("Decision", "Coach Milan, 18 November 19:13: Go.")])
     hs = [B.screen(f"{k}{chr(97 + i)}", i, 30, t, n, st, wd) for i, (t, n, st, wd) in enumerate(shots)]
     if wide: hs.append(B.wide(f"{k}a", 30, *wide))
     for i in arrows: B.html.append(f'<div style="position:absolute;left:{B.x(i) - GAP}px;top:{30 + TOP + 120}px;width:{GAP}px;text-align:center;font-size:44px;font-weight:900;color:#2a72d9">→</div>')
-    Hc = max(HT.get(k, {}).get("cards", [1000])[0] + 30, max(hs)) + 60
+    y = max(HT.get(k, {}).get("cards", [1000])[0] + 30, max(hs)) + 80
+    acTable(B, y, W - 40, c)
+    Hc = y + HT.get(k, {}).get("ac", 600) + 40
     board(fname, f'{k}: {c["short"]}', SUB, B, W, Hc, after)
     OUT[k] = {"file": fname, "w": W, "h": min(8000, Hc + 230), "title": f'{k}: {c["short"]}', "inner": B.render(W, Hc)}
 smallBoard("DT315", "Stories256.dc.html", 2, [("How to, step 4 today", "h_0", "draft", "Menu, How to, I ate something: log it with a photo. Red: step 4."), ("Step 4, and a step 5", "h_1", "changed", "The same page with the steps as the app goes now.")], [1], "Stories255.dc.html")
-smallBoard("DT316", "Stories257.dc.html", 3, [], [], "Stories256.dc.html", wide=("The five certain lines, to tick", "u_0", "changed", "No screen shows these lines, so this table is the design: what you tick is what goes."))
+smallBoard("DT316", "Stories257.dc.html", 3, [], [], "Stories256.dc.html", wide=("The five certain lines", "u_0", "changed", "No screen shows these lines, so this table is the design: these go, with every other line proven unused."))
 smallBoard("DT317", "Stories258.dc.html", 2, [("Before you cook, today", "k_0", "draft", "Saturday's plate is on the Plate and I tapped Start cooking on a recipe. Amber: the tap."), ("Ate it asks the meal", "k_1", "changed", "The same question with the calendar under its buttons.")], [1], "Stories257.dc.html")
 smallBoard("B149", "Stories259.dc.html", 4, [("The pot question today", "w_0", "draft", "The photo screen. Red: the chosen answer."), ("One tick", "w_1", "changed", "The same answer."), ("Good for, today", "w_2", "draft", "A recipe's page in Recipes. Red: the chosen meals."), ("One tick each", "w_3", "changed", "The same choices.")], [1, 3], "Stories258.dc.html")
 json.dump(OUT, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outRead.json"), "w"))

@@ -2,7 +2,7 @@
  "DT307a": {
   "id": "DT307",
   "short": "The read, point by point: points 1 to 4",
-  "rel": "Proposed; each point is agreed only when Coach Milan says Go to it",
+  "rel": "Go: Coach Milan, 18 November 19:13, all points",
   "boardTitle": "DT307 (1 of 2): the read, point by point. The way back, fewer boxes, + Add more, the tick",
   "opportunity": {
    "from": "Coach Milan, 16 November 15:49 to 17:04, after his test of 0.3.151, with screenshots. His words: we have a mess; point by point, each resolved on one board. The earlier drawings are parked. 0.3.157 changed how the read ends, so the points are drawn again on today's app.",
@@ -90,7 +90,7 @@
  "DT307b": {
   "id": "DT307",
   "short": "The read, point by point: point 5, B145 and DT306",
-  "rel": "Proposed; each point is agreed only when Coach Milan says Go to it",
+  "rel": "Go: Coach Milan, 18 November 19:13, all points",
   "boardTitle": "DT307 (2 of 2): the read, point by point. The pot, the cooking line (B145), Chef Mealan's card (DT306)",
   "ac": [
    {
@@ -192,7 +192,7 @@
    ],
    [
     "Decision",
-    "Open."
+    "Coach Milan, 18 November 19:13: Go."
    ]
   ],
   "2": [
@@ -210,7 +210,7 @@
    ],
    [
     "Decision",
-    "Open."
+    "Coach Milan, 18 November 19:13: Go."
    ]
   ],
   "3": [
@@ -232,7 +232,7 @@
    ],
    [
     "Decision",
-    "Open."
+    "Coach Milan, 18 November 19:13: Go."
    ]
   ],
   "4": [
@@ -254,7 +254,7 @@
    ],
    [
     "Decision",
-    "Open."
+    "Coach Milan, 18 November 19:13: Go."
    ]
   ],
   "5": [
@@ -276,7 +276,7 @@
    ],
    [
     "Decision",
-    "Open."
+    "Coach Milan, 18 November 19:13: Go."
    ]
   ],
   "B145": [
@@ -294,7 +294,7 @@
    ],
    [
     "Decision",
-    "Open."
+    "Coach Milan, 18 November 19:13: Go."
    ]
   ],
   "DT306": [
@@ -316,7 +316,7 @@
    ],
    [
     "Decision",
-    "Open."
+    "Coach Milan, 18 November 19:13: Go."
    ]
   ]
  },
@@ -332,26 +332,52 @@
     "text": "Given I open How to, I ate something: log it with a photo, when I follow its steps on a photo with no meal set, then each step names a button that is on the screen at that step."
    }
   ],
-  "unchanged": "The other steps and the other How to pages."
+  "unchanged": [
+   "The other steps and the other How to pages."
+  ],
+  "id": "DT315",
+  "rel": "Go: Coach Milan, 18 November 19:13",
+  "details": [
+   "Words only: step 4 changed, step 5 new. English, Serbian, German.",
+   "The screen DT315b is what it looks like."
+  ]
  },
  "DT316": {
-  "short": "English lines no code uses: the list, for your word",
+  "short": "English lines no code uses are removed",
   "from": "Six went in 0.3.157 with your word. The builds of 0.3.157 and 0.3.159 left more behind.",
-  "problem": "Lines no screen shows still sit in the English, Serbian and German files. Each one is a line you may check in your table for nothing.",
-  "proposed": "Certain today, 5: the three old question lines (Skyr would join a plate from, from your recipes has, from your plan has), Keep my plate, and Chef Mealan's old question line. A first sweep finds 126 more candidates, most on the Plate (29) and the goal setup (22). I check each against the code and bring you the list by screen. Nothing goes without your word.",
+  "problem": "Lines no screen shows still sit in the English, Serbian and German files. Each one is a line to check and translate for nothing.",
+  "proposed": "Remove them. Certain today, 5: the three old question lines, Keep my plate, and Chef Mealan's old question line. A first sweep finds 126 more candidates. I check each against the code by hand; a line goes only when nothing can show it. A line with any doubt stays.",
   "ac": [
    {
     "id": "AC1",
-    "title": "Only what you ticked goes",
-    "text": "Given the list with your word on each line, when the release is built, then every line you ticked is gone from English, Serbian and German, and no other."
+    "title": "The five certain lines are gone",
+    "text": "Given the five lines of the table on this board, when the release is built, then none of them is in the English, Serbian or German files."
    },
    {
     "id": "AC2",
+    "title": "Only proven lines go",
+    "text": "Given a line from the sweep, when I cannot prove by hand that no screen can show it, then it stays in all three files."
+   },
+   {
+    "id": "AC3",
     "title": "Nothing on screen changes",
-    "text": "Given the lines are gone, when all walkthroughs run, then they pass untouched."
+    "text": "Given the lines are gone, when all walkthroughs and unit tests run, then they pass, and no screen shows a missing line or a bare key."
+   },
+   {
+    "id": "AC4",
+    "title": "The list is kept",
+    "text": "Given the release is merged, when Coach Milan asks what went, then the handover names every removed line with its English."
    }
   ],
-  "unchanged": "Every line a screen shows."
+  "unchanged": [
+   "Every line a screen shows."
+  ],
+  "id": "DT316",
+  "rel": "Go: Coach Milan, 18 November 19:13",
+  "details": [
+   "Coach Milan, 18 November 19:13: if those sentences are not in use, we should get rid of them. No ticking.",
+   "The same six-line rule as in 0.3.157: a line goes from English, Serbian and German together."
+  ]
  },
  "DT317": {
   "short": "Start cooking with a plate from earlier: Ate it asks the meal",
@@ -370,7 +396,15 @@
     "text": "Given that calendar, when I tap Dinner, then the plate is logged to Saturday's dinner at 19:10 and the recipe opens to cook."
    }
   ],
-  "unchanged": "Save for later, Clear it and Cancel. A plate of now: Save my plate, Clear my plate."
+  "unchanged": [
+   "Save for later, Clear it and Cancel. A plate of now: Save my plate, Clear my plate."
+  ],
+  "id": "DT317",
+  "rel": "Go: Coach Milan, 18 November 19:13",
+  "details": [
+   "The calendar is the one of DT314, unchanged. No new words.",
+   "The screen DT317b is what it looks like."
+  ]
  },
  "B149": {
   "short": "A chosen choice shows two ticks",
@@ -389,6 +423,14 @@
     "text": "Given a recipe's page with Lunch chosen under Good for, when I look at Lunch, then it shows one tick."
    }
   ],
-  "unchanged": "Which answer is chosen, and what a tap does."
+  "unchanged": [
+   "Which answer is chosen, and what a tap does."
+  ],
+  "id": "B149",
+  "rel": "Go: Coach Milan, 18 November 19:13",
+  "details": [
+   "One tick: the one the choice's look draws. The tick written into the words goes.",
+   "The screens B149b and B149d are what it looks like."
+  ]
  }
 }
