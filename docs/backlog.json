@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.159",
     "0.3.158",
     "0.3.157",
     "0.3.156",
@@ -1475,10 +1476,10 @@
       "id": "DT313",
       "title": "Whatever arrives on a plate with foods gets the question a photo gets",
       "epic": "plate",
-      "state": "now",
+      "state": "done",
       "board": "Stories250",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as prep, on the app as built in 0.3.157. Coach Milan, Go 18 November 15:56. To build in 0.3.159.",
+      "why": "Drawn 18 November 2026 on the app as built in 0.3.157. Coach Milan, Go 18 November 15:56. Built in 0.3.159 (Go as proposed, 16:34). AC8 has no walkthrough check: foods are said only on an empty Plate, so the case cannot be reached by hand. The idea from the chat used to replace a plate with no question; it now asks.",
       "opportunity": {
         "from": "Found on 18 November 2026 while 0.3.157 was built, and noted in the handover as found, not changed. No tester has reported it.",
         "job": "Put a recipe on the Plate without losing what is already on it.",
@@ -1545,16 +1546,17 @@
         "One food onto a plate of now joins with no question (DT308.12).",
         "A recipe already on the plate opens with no question.",
         "Start cooking with foods on the Plate: its own question stays."
-      ]
+      ],
+      "version": "0.3.159"
     },
     {
       "id": "DT314",
       "title": "A plate from earlier: Ate it asks the meal in the calendar",
       "epic": "plate",
-      "state": "now",
+      "state": "done",
       "board": "Stories251",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as prep, on the app as built in 0.3.157. Coach Milan, Go 18 November 15:56. To build in 0.3.159.",
+      "why": "Drawn 18 November 2026 on the app as built in 0.3.157. Coach Milan, Go 18 November 15:56. Built in 0.3.159 (Go as proposed, 16:34). Start cooking with a plate from earlier still logs Ate it at once (not in this ticket).",
       "opportunity": {
         "from": "Found on 18 November 2026 while 0.3.157 was built, and noted in the handover as found, not changed. No tester has reported it.",
         "job": "Log a plate I ate earlier to the meal I ate it at.",
@@ -1599,7 +1601,8 @@
         "Did you eat it? and when it shows. Save for later, Keep working on it and Clear it do what they do today.",
         "The calendar itself: its days, its rows, its marks.",
         "Ate it at the bottom of a plate of now."
-      ]
+      ],
+      "version": "0.3.159"
     },
     {
       "id": "B148",
