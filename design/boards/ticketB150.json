@@ -15,18 +15,18 @@
  "story": "When I log a photo from another day, I want it to land on one day, as the meal I picked, so that the day shows what I ate once and no planned meal keeps asking.",
  "words": "18 November 19:21: the dinner around that timing was only possible for the time slot as planned in the calendar at 18h. And now we have two dinners. One as set from the read, and the one planned in the list.",
  "cause": "Two things together. The pencil's calendar opens on today, also for a photo from another day, so the Dinner you tapped was Wednesday's dinner. The meal was then logged with the photo's own time, Tuesday 19:56. One record held Tuesday's time and Wednesday's dinner. Tuesday lists it by its time; Tuesday's planned dinner is closed only by a Tuesday dinner, so it still asks.",
- "proposed": "The one element: the calendar behind the pencil, unchanged, opening where Ate it's calendar already opens for such a photo: on the photo's day, with the line From the photo, Tuesday 19:56 and the nearest meal marked. And one rule where a meal is logged: its day is the day of the meal I picked. A meal of the photo's day keeps the photo's time. A meal of another day takes that meal's own time.",
+ "proposed": "The one element: the calendar behind the pencil, opening where Ate it's calendar already opens for such a photo: on the photo's day, with the photo's time as a reference above and the nearest meal marked. And one rule where a meal is logged: its day is the day of the meal I picked, and its time is that meal's time in the calendar, which I can change in edit mode. The photo's time is never the meal's time by itself.",
  "repair": "The record from Tuesday is still wrong on your phone. Proposed: when the app opens, a record whose meal is on a later day than its own time is moved to the meal of its own day. Yours becomes Tuesday's dinner; Wednesday's dinner opens again.",
  "ac": [
   {
    "id": "AC1",
    "title": "The pencil opens on the photo's day",
-   "text": "Given it is Sunday and the read shows a photo from Saturday 15:57 that I said I ate then, when I tap the pencil, then the calendar opens on Sat 14, the line above says Which meal? From the photo, Saturday 15:57, and Lunch, the nearest meal, is marked."
+   "text": "Given it is Sunday and the read shows a photo from Saturday 15:57 that I said I ate then, when I tap the pencil, then edit mode opens on Sat 14, one line above says The photo was taken on Saturday, 15:57, and Lunch, the nearest meal, is marked."
   },
   {
    "id": "AC2",
    "title": "One dinner on the photo's day",
-   "text": "Given that calendar and a Chicken rice bowl planned for Saturday's dinner, when I tap Dinner, then All of it and Done, then Saturday shows my meal as its dinner and the Chicken rice bowl no longer asks."
+   "text": "Given that edit mode and a Chicken rice bowl planned for Saturday's dinner, when I tap Dinner, close, then choose All of it and Done, then Saturday shows my meal as its dinner, at 20:00, and the Chicken rice bowl no longer asks."
   },
   {
    "id": "AC3",
@@ -45,33 +45,43 @@
   },
   {
    "id": "AC6",
-   "title": "The pencil stays",
-   "text": "Given the read of a photo with Saturday's dinner set, when I look at the meal line, then it has the pencil and the X, and the line says Dinner, Saturday, 14 November, 15:57, the photo's time."
+   "title": "One icon: the pencil",
+   "text": "Given the read of a photo with Saturday's dinner set, when I look at the meal line, then it has the pencil and no X."
   },
   {
    "id": "AC7",
-   "title": "Edit mode shows what is set",
-   "text": "Given that line, when I tap the pencil, then the calendar opens on Sat 14 with Dinner marked, and under the meals stands the row Time with 15:57."
+   "title": "The pencil turns into the X that closes",
+   "text": "Given that line, when I tap the pencil, then edit mode opens on Sat 14 with Dinner marked and the pencil is an X, and a tap on the X closes edit mode with everything as I set it."
   },
   {
    "id": "AC8",
-   "title": "I change the time",
-   "text": "Given edit mode is open, when I tap the time, set 19:30 and then choose All of it and Done, then Saturday shows my meal as Dinner, 19:30."
+   "title": "Saved at once, no Done",
+   "text": "Given edit mode is open, when I tap Lunch, then the line says Lunch, Saturday, 14 November, 13:45 at once, edit mode stays open, and there is no Done button."
   },
   {
    "id": "AC9",
-   "title": "I change the meal or the day",
-   "text": "Given edit mode is open, when I tap Lunch, then the line says Lunch, Saturday, 14 November, with the time I had, and edit mode closes."
+   "title": "The photo's time is a reference",
+   "text": "Given edit mode for a photo from Saturday 15:57, when I look above the days, then one line says The photo was taken on Saturday, 15:57, and a tap on it does nothing."
   },
   {
    "id": "AC10",
-   "title": "No photo's time to take",
-   "text": "Given a plate without a photo and Saturday's dinner set with the pencil, when I open edit mode, then Time shows 20:00, Dinner's time from Slots and times, and I can change it the same way."
+   "title": "I change the meal's time in the calendar",
+   "text": "Given Dinner is marked in edit mode, when I tap the time in its row and set 19:30, then the line says Dinner, Saturday, 14 November, 19:30, and after All of it and Done Saturday shows my meal as Dinner, 19:30."
   },
   {
    "id": "AC11",
-   "title": "The meal stays the meal",
-   "text": "Given Dinner is set and I set the time to 14:00, when I log it, then it is still Saturday's dinner, at 14:00, and no other meal of that day is touched."
+   "title": "Only this meal, only this day",
+   "text": "Given I set Saturday's dinner to 19:30, when I open Slots and times or another day, then Dinner is at 20:00 there."
+  },
+  {
+   "id": "AC12",
+   "title": "Taking the meal off",
+   "text": "Given Dinner is marked in edit mode, when I tap Dinner again, then nothing is marked and the line says Meal and day not set."
+  },
+  {
+   "id": "AC13",
+   "title": "With no meal set",
+   "text": "Given no meal is set, when I tap the pencil and then Dinner, then Dinner is set at once, edit mode stays open with the X, and I close it myself."
   }
  ],
  "unchanged": [
@@ -79,15 +89,17 @@
   "A photo taken now, and a photo I did not say I ate then: the pencil opens on today.",
   "A dinner logged after midnight stays with the evening before: its meal is on the earlier day, and that is left alone.",
   "What a planned meal shows when it is closed by a meal I ate.",
-  "Slots and times in the settings: a time set on one meal does not change the meal's usual time."
+  "Slots and times in the settings: a time set on one meal of one day does not change the meal's usual time.",
+  "The days, the rows and Just looking in the calendar, and What is it? and the kind of moment under it."
  ],
  "details": [
-  "One addition to an element you know: the row Time in the calendar behind the pencil. No new words but Time and its one line.",
+  "One addition to an element you know: the time in the marked row is a field. One line of reference for the photo. No other new element.",
   "The rule sits in the one place a meal is logged, so every way obeys it.",
   "The repair touches only records whose meal is on a later day than their time.",
   "The screens B150c, B150d, B150.2b and B150.2c are what it looks like."
  ],
- "words2": "18 November 19:34: also the timing is an issue, as I couldn't change it. It was only the timing from the settings. 19:43, on a first drawing with a time field in the line: better to have an edit mode and set there what is needed, instead of another way of correction.",
- "time_now": "Once a meal is set, the pencil is gone and only the X is left, which takes the meal off. The line says Dinner, Saturday, 14 November, 20:00. The time is words, so it cannot be changed.",
- "time_proposed": "No new way to correct. The pencil stays when a meal is set and is the one place to edit. It opens the calendar you know, with the day and the meal that are set marked, and one row more under the meals: Time. It starts at the photo's time for a photo of that day, otherwise at the meal's time. A tap opens the phone's clock. The X stays and still takes the meal off."
+ "words2": "18 November 19:34: also the timing is an issue, as I couldn't change it. It was only the timing from the settings. 19:43: better an edit mode where what is needed is set, than another way of correction. 19:49: edit mode is when the pencil is clicked and turns into an X to close it. It is saved automatically, so no Done; just close it. You can't change the time of the picture taken; it is a reference. What should be changed is the timing in the calendar.",
+ "time_now": "Once a meal is set, the pencil is gone. An X stands in its place, and it does not close anything: it takes the meal off. The line says Dinner, Saturday, 14 November, 20:00. The time is words, so it cannot be changed.",
+ "time_proposed": "One icon, one edit mode. The line always has the pencil. A tap opens edit mode and the pencil turns into the X that closes it. Every change is saved at once; there is no Done. In edit mode: the photo's time as one line of reference, which cannot be changed; the days; the meals. The time in the marked meal's row is a field: a tap opens the phone's clock and sets the meal's time, for this meal on this day only.",
+ "more_change": "Two things change that 0.3.157 built, so you see them before a Go. 1. With a meal set, the X no longer takes the meal off; a tap on the marked meal in edit mode does. 2. A photo logged to a meal is logged at the meal's time in the calendar, not at the photo's time. Today a photo of that same day is logged at the photo's time."
 }
