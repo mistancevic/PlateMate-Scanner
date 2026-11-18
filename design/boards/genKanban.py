@@ -58,8 +58,8 @@ def column(key, name, sub):
             f'<div style="margin-top:10px">{body}</div></div>')
 epics = "".join(f'<div style="width:{CW}px;flex:none;border:1.5px solid {COL[k]};border-radius:10px;padding:8px 10px;background:#fff"><div>{chip(k)}</div><div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:5px">{html.escape(e["why"])}</div></div>' for k, e in E.items())
 W = PAD * 2 + 3 * CW + 2 * G
-# the page is as tall as its longest column; measure it in a browser and give it as KANBAN_H (13,200 on 18 November 2026, 12:30)
-H = int(os.environ.get("KANBAN_H", "13200"))
+# the page is as tall as its longest column; measure it in a browser and give it as KANBAN_H (13,700 on 18 November 2026, 13:15)
+H = int(os.environ.get("KANBAN_H", "13700"))
 page = f'''<!doctype html>
 <html lang="en">
 <head>
