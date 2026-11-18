@@ -30,15 +30,25 @@ def readBoard(key, fname, cols, rows, after, sub):
     OUT[key] = {"file": fname, "w": W, "h": min(8000, Hc + 230), "title": t["boardTitle"], "inner": B.render(W, Hc)}
     print(key, "inner", Hc, "board", Hc + 230)
 def P(pt): return [(h, x) for h, x in T["points"][pt]]
-SUB = "18 November 2026. The read, point by point, as Coach Milan asked on 16 November: each point on one board, resolved one at a time. Drawn on the app as built in 0.3.159. Drawn for approval; no Go."
-o = T["DT307a"]["opportunity"]
-HEAD = [("Ticket", "DT307, with B145 and DT306. These two boards are the ticket. Each row is one point and can get its own Go or No."),
+SUB = "18 November 2026. Drawn on the app as built in 0.3.159. This board is the ticket. Drawn for approval; no Go."
+A, Bb = T["DT307a"], T["DT307b"]
+def sub(pre): return [{**x, "id": x["id"].replace(pre, "")} for x in Bb["ac"] if x["id"].startswith(pre)]
+T["DT307"] = {**A, "short": "The read, point by point: five points", "boardTitle": "DT307: the read, point by point. The way back, fewer boxes, + Add more, the tick, the pot",
+  "ac": A["ac"] + [x for x in Bb["ac"] if x["id"].startswith("5 ")], "unchanged": A["unchanged"] + ["A photo of a plate, not a pot: no question about how much."],
+  "details": A["details"][:3] + ["The pot question keeps its place and its look; only the words and the grams field are new. New words: How much of it do you eat?, A part of it, the grams line.", "The screens named DT307.1c, 1d, 2b, 3b, 4b and 5c are what it looks like."]}
+T["B145"] = {"id": "B145", "short": "The read invents ways of cooking", "rel": "Proposed; not agreed until Coach Milan says Go", "boardTitle": "B145: the read invents ways of cooking", "ac": sub("B145 "),
+  "unchanged": ["With words that name a cooking food, the line shows it, as today.", "The foods that are counted, and their amounts."], "details": ["No new element and no new words.", "The screen named B145b is what it looks like."]}
+T["DT306"] = {"id": "DT306", "short": "Chef Mealan's card on the plate of a photo, in the read's shape", "rel": "Proposed; not agreed until Coach Milan says Go", "boardTitle": "DT306: Chef Mealan's card on the plate of a photo, in the read's shape", "ac": sub("DT306 "),
+  "unchanged": ["What Add a food and Don't count it do.", "The questions behind the pencil of the meal line: since 0.3.157 they are the calendar's rows and choices already, so nothing is proposed there.", "His word above the buttons."], "details": ["The read's block is reused as it is: the same question, choices and Done. No new words.", "The screen named DT306b is what it looks like."]}
+o = A["opportunity"]
+HEAD = [("Ticket", "DT307. This board is the ticket. Each row is one point and can get its own Go or No."),
   ("How to read this board", "<b>Each row:</b> the card says the point, then the screens show the app as it is and the same screen with the change. <b>The wide block at the bottom:</b> the agreement, what gets built, point by point."),
   ("1. The request", ""),
   ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
-  ("Problem", T["DT307a"]["problem"]), ("Story", T["DT307a"]["story"]),
+  ("Problem", A["problem"]), ("Story", A["story"]),
   ("2. The solution and the decision, point 1", "")]
-readBoard("DT307a", "Stories253.dc.html", 4, [
+def tk(k): return [("Ticket", f"{k}. This board is the ticket: everything about it is here."), ("The request and the solution", "")]
+readBoard("DT307", "Stories253.dc.html", 4, [
   ("DT307.1", "A way back from the photo screen and from the read", HEAD + P("1"), [
     ("The photo screen today", "b_0", "draft", "A photo just taken. Red: the only way out."),
     ("The read today", "b_1", "draft", "The read of that photo. Nothing leads back to the photo screen."),
@@ -53,24 +63,26 @@ readBoard("DT307a", "Stories253.dc.html", 4, [
   ("DT307.4", "Save in My recipes as a tick", P("4"), [
     ("The end of the read today", "t_0", "draft", "A meal is set. Red: two buttons side by side."),
     ("A tick, and one button", "t_1", "changed", "Save in My recipes is a tick. Done is the button.")], [1]),
-], "Stories252.dc.html", SUB)
-readBoard("DT307b", "Stories254.dc.html", 3, [
-  ("DT307.5", "A pot: how much of it do you eat?", [("Ticket", "DT307, point 5. The second of the two boards of the read."), ("2. The solution and the decision, point 5", "")] + P("5"), [
+  ("DT307.5", "A pot: how much of it do you eat?", P("5"), [
     ("The pot question today", "p_0", "draft", "The first look says pot. Red: the question and its answers."),
     ("After Read the plate, today", "p_1", "draft", "The whole pot, opened as a whole recipe on the plate."),
     ("What do you eat", "p_2", "changed", "The same screen with the question about me, and grams for a part.")], [1]),
-  ("B145", "The read invents ways of cooking", P("B145"), [
+], "Stories252.dc.html", SUB)
+readBoard("B145", "Stories254.dc.html", 2, [
+  ("B145", "The read invents ways of cooking", tk("B145") + P("B145"), [
     ("For cooking, today", "c_0", "draft", "A read with no words from me. Red: the line and its two chips."),
-    ("No words, no line", "c_1", "changed", "The same place on the same read.")], [1]),
-  ("DT306", "Chef Mealan's card on the plate of a photo, in the read's shape", P("DT306"), [
+    ("No words, no line", "c_1", "changed", "The same place on the same read.")], [1])], "Stories253.dc.html", SUB)
+readBoard("DT306", "Stories255.dc.html", 2, [
+  ("DT306", "Chef Mealan's card on the plate of a photo, in the read's shape", tk("DT306") + P("DT306"), [
     ("His card today", "d_0", "draft", "A photo's plate after Change the foods, dinner set. Red: four buttons in a row."),
-    ("A question, its answers, then the buttons", "d_1", "changed", "The same card with the read's own block.")], [1]),
-], "Stories253.dc.html", SUB)
-# ---- the four small cards, side by side
-B = Board(); xs = [20, 400, 780, 1160]; W = 1160 + 350 + 20
-for x, k in zip(xs, ["DT315", "DT316", "DT317", "B149"]):
-    c = T[k]; card(B, x, 30, k, c["short"], [("Where it comes from", c["from"]), ("Problem", c["problem"]), ("Proposed", c["proposed"])] + [(f'{a["id"]}: {a["title"]}', gwtBold(a["text"])) for a in c["ac"]] + [("Must not change", c["unchanged"]), ("Decision", "Open. No Go, so nothing is built.")])
-Hc = max(HT.get("small", {}).get("cards", [1300])) + 60
-board("Stories255.dc.html", "Small cards beside the read: DT315, DT316, DT317, B149", "18 November 2026. Four small tickets found while 0.3.157 to 0.3.159 were built. Each card is its ticket. Drawn for approval; no Go.", B, W, Hc, "Stories254.dc.html")
-OUT["small"] = {"file": "Stories255.dc.html", "w": W, "h": min(8000, Hc + 230), "title": "Small cards beside the read: DT315, DT316, DT317, B149", "inner": B.render(W, Hc)}
+    ("A question, its answers, then the buttons", "d_1", "changed", "The same card with the read's own block.")], [1])], "Stories254.dc.html", SUB)
+# ---- four small tickets, a board each
+prev = "Stories255.dc.html"
+for n, k in zip((256, 257, 258, 259), ["DT315", "DT316", "DT317", "B149"]):
+    B = Board(); W = 390; c = T[k]; fname = f"Stories{n}.dc.html"
+    card(B, 20, 30, k, c["short"], [("Where it comes from", c["from"]), ("Problem", c["problem"]), ("Proposed", c["proposed"])] + [(f'{a["id"]}: {a["title"]}', gwtBold(a["text"])) for a in c["ac"]] + [("Must not change", c["unchanged"]), ("Decision", "Open. No Go, so nothing is built.")])
+    Hc = HT.get(k, {}).get("cards", [900])[0] + 60
+    board(fname, f'{k}: {c["short"]}', "18 November 2026. This board is the ticket. No Go.", B, W, Hc, prev); prev = fname
+    OUT[k] = {"file": fname, "w": W, "h": min(8000, Hc + 230), "title": f'{k}: {c["short"]}', "inner": B.render(W, Hc)}
 json.dump(OUT, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outRead.json"), "w"))
+print(json.dumps({k: [v["file"], v["w"], v["h"], v["title"]] for k, v in OUT.items()}))
