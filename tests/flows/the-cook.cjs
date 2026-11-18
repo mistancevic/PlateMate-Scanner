@@ -4,6 +4,8 @@
 // leaving keeps everything and a strip says where it stands; coming back, Chef Mealan asks to go on; Eat asks how much and
 // how it tasted; 30 minutes on, the last answer closes the cook. A plate from earlier asks Did you eat it?, alone; Save for
 // later waits at the top of the Plate with Continue; Start cooking never adds to a plate; a food while cooking asks where it goes.
+// Changed by story DT313 (0.3.159, board Stories250; Coach Milan, Go 18 November 15:56): check 10 reads the question a
+// recipe gets now, on the photo's screen: the question is the line under Chef Mealan's, and the two buttons are as before.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
@@ -195,7 +197,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     await page.setViewportSize({ width: 360, height: 780 });
     await toRecipe(page);
     await page.getByRole("button", { name: "Change it first" }).click(); await page.waitForTimeout(900);
-    ok(/Start a new plate with it, or add it to yours\?/.test(await page.locator(".chef-line").first().textContent()), "the plate question is Chef Mealan's line");
+    ok(/The recipe is .+, from My recipes: \d+ foods?\./.test(await page.locator(".plate-ask .chef-line").first().textContent()) && /Add it to your plate, or start a new plate\?/.test(await page.locator(".plate-ask .pa-ask-q").textContent()), "the plate question: Chef Mealan says what arrives, and the question stands under his line");
     const box = await page.locator(".plate-ask").boundingBox(), btns = await page.locator(".plate-ask .ca-go button").evaluateAll((bs) => bs.map((x) => { const r = x.getBoundingClientRect(); return [r.left, r.right, r.top]; }));
     ok(btns.length === 2 && btns.every(([l, r]) => l >= box.x - 1 && r <= box.x + box.width + 1) && btns[1][2] > btns[0][2], "its buttons stay inside, one under the other");
     ok(await page.locator(".plate-card").count() === 0, "and it shows alone");

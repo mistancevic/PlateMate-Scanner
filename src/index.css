@@ -3558,6 +3558,8 @@ section.photo-screen .pa-screen { border: 0; border-radius: 0; margin: 0; paddin
 /* DT308.12 (0.3.157, boards Stories244 and Stories245): Back on the question; the one line about the old plate */
 .ask-back { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 6px 0 0; margin: 0 0 4px; font-size: var(--fs-body); font-weight: 700; background: none; border: 0; cursor: pointer; }
 .warn-box.old-plate { display: block; margin: 0 0 12px; }
+/* DT314 (0.3.159): the calendar under the question for a plate from earlier */
+.old-ate-cal { margin: 14px 0 6px; }
 .old-plate-top { display: flex; align-items: flex-start; gap: 8px; } .old-plate-say { flex: 1; min-width: 0; }
 .old-plate-x { flex: none; width: 44px; height: 44px; margin: -8px -8px 0 0; display: grid; place-items: center; color: var(--ink); background: none; border: 0; cursor: pointer; }
 .old-plate-acts { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }

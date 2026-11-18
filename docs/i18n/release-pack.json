@@ -1,6 +1,6 @@
 {
-  "release": "0.3.157",
-  "at": "2026-11-18T12:50:34.418Z",
+  "release": "0.3.159",
+  "at": "2026-11-18T15:41:38.467Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -50287,6 +50287,216 @@
       "release": "0.3.157",
       "order": 900000,
       "at": "2026-11-18T12:50:34.418Z"
+    },
+    {
+      "id": "chef.plateArrives",
+      "kind": "chef",
+      "key": "plateArrives",
+      "en": "{what}",
+      "forms": "chef",
+      "slots": [
+        "what"
+      ],
+      "later": false,
+      "area": "The Plate",
+      "where": "A recipe, a meal or a food onto a plate that has foods: what arrives",
+      "sr": "{what}",
+      "de": "{what}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900000,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.plate.oldHelp",
+      "kind": "screen",
+      "key": "plate.oldHelp",
+      "en": "Ate it asks which meal, and saves it there at the time it was started. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "enBefore": "Ate it saves it to {day}, to the meal it was set for, at the time it was started. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+      "sr": "Pojeo sam ga pita koji obrok i upisuje ga tamo, u vreme kad je počet. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "de": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort mit der Uhrzeit, zu der er begonnen wurde. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900001,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.plate.oldHelpPhoto",
+      "kind": "screen",
+      "key": "plate.oldHelpPhoto",
+      "en": "Ate it asks which meal, and saves it there at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "enBefore": "Ate it saves it to {day}, to the meal it was set for, at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+      "sr": "Pojeo sam ga pita koji obrok i upisuje ga tamo, u vreme kad je slika nastala. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "de": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort mit der Uhrzeit des Fotos. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900002,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.plate.arrRecipe",
+      "kind": "screen",
+      "key": "plate.arrRecipe",
+      "en": "The recipe is {title}, from My recipes: {n} food.|The recipe is {title}, from My recipes: {n} foods.",
+      "forms": "count",
+      "slots": [
+        "n",
+        "title"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Recept je {title}, iz Mojih recepata: {n} namirnica.|Recept je {title}, iz Mojih recepata: {n} namirnice.|Recept je {title}, iz Mojih recepata: {n} namirnica.",
+      "de": "Das Rezept ist {title}, aus Meine Rezepte: {n} Lebensmittel.|Das Rezept ist {title}, aus Meine Rezepte: {n} Lebensmittel.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900003,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.plate.arrPlan",
+      "kind": "screen",
+      "key": "plate.arrPlan",
+      "en": "The meal is {title}, from your plan: {n} food.|The meal is {title}, from your plan: {n} foods.",
+      "forms": "count",
+      "slots": [
+        "n",
+        "title"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Obrok je {title}, iz tvog plana: {n} namirnica.|Obrok je {title}, iz tvog plana: {n} namirnice.|Obrok je {title}, iz tvog plana: {n} namirnica.",
+      "de": "Die Mahlzeit ist {title}, aus deinem Plan: {n} Lebensmittel.|Die Mahlzeit ist {title}, aus deinem Plan: {n} Lebensmittel.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900004,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.plate.arrChat",
+      "kind": "screen",
+      "key": "plate.arrChat",
+      "en": "The idea from the chat has {n} food.|The idea from the chat has {n} foods.",
+      "forms": "count",
+      "slots": [
+        "n"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Ideja iz četa ima {n} namirnicu.|Ideja iz četa ima {n} namirnice.|Ideja iz četa ima {n} namirnica.",
+      "de": "Die Idee aus dem Chat hat {n} Lebensmittel.|Die Idee aus dem Chat hat {n} Lebensmittel.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900005,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.plate.arrFood",
+      "kind": "screen",
+      "key": "plate.arrFood",
+      "en": "The food is {name}.",
+      "forms": "plain",
+      "slots": [
+        "name"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Namirnica je: {name}.",
+      "de": "Das Lebensmittel ist {name}.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900006,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.plate.notEmptyWhyNew",
+      "kind": "screen",
+      "key": "plate.notEmptyWhyNew",
+      "en": "It already has {plate}, and new foods arrive. They cannot land on the plate by themselves: you decide where they go.",
+      "forms": "plain",
+      "slots": [
+        "plate"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Na njemu je već: {plate}, a stižu nove namirnice. One ne mogu same na tanjir: ti biraš gde idu.",
+      "de": "Darauf ist schon: {plate}, und es kommen neue Lebensmittel. Sie kommen nicht von selbst auf den Teller: du entscheidest, wohin sie gehen.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900007,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.plate.notEmptyWhyOld",
+      "kind": "screen",
+      "key": "plate.notEmptyWhyOld",
+      "en": "It already has {plate}, from {when}. A new food cannot land on it by itself: you decide where it goes.",
+      "forms": "plain",
+      "slots": [
+        "plate",
+        "when"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Na njemu je već: {plate} ({when}). Nova namirnica ne može sama na njega: ti biraš gde ide.",
+      "de": "Darauf ist schon: {plate} ({when}). Ein neues Lebensmittel kommt nicht von selbst darauf: du entscheidest, wohin es geht.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900008,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.plate.holdsOnlyNew",
+      "kind": "screen",
+      "key": "plate.holdsOnlyNew",
+      "en": "This plate holds only the new foods.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Na ovom tanjiru su samo nove namirnice.",
+      "de": "Auf diesem Teller sind nur die neuen Lebensmittel.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900009,
+      "at": "2026-11-18T15:41:38.467Z"
+    },
+    {
+      "id": "screen.cal.whichByPlate",
+      "kind": "screen",
+      "key": "cal.whichByPlate",
+      "en": "Which meal? The plate was started on {day}, {time}:",
+      "forms": "plain",
+      "slots": [
+        "day",
+        "time"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Koji obrok? Tanjir je započet: {day}, {time}:",
+      "de": "Welche Mahlzeit? Der Teller wurde begonnen: {day}, {time}:",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.159",
+      "order": 900010,
+      "at": "2026-11-18T15:41:38.467Z"
     }
   ]
 }

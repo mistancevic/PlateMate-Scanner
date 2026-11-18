@@ -105,8 +105,8 @@
     "screen.plate.keepWorking": {"en":"Keep working on it","area":"The Plate","where":"The Plate"},
     "screen.plate.clearIt": {"en":"Clear it","area":"The Plate","where":"The Plate"},
     "screen.plate.cancel": {"en":"Cancel","area":"The Plate","where":"The Plate"},
-    "screen.plate.oldHelp": {"en":"Ate it saves it to {day}, to the meal it was set for, at the time it was started. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.","area":"The Plate","where":"The Plate"},
-    "screen.plate.oldHelpPhoto": {"en":"Ate it saves it to {day}, to the meal it was set for, at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.","area":"The Plate","where":"The Plate"},
+    "screen.plate.oldHelp": {"en":"Ate it asks which meal, and saves it there at the time it was started. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.","area":"The Plate","where":"The Plate","release":"0.3.159"},
+    "screen.plate.oldHelpPhoto": {"en":"Ate it asks which meal, and saves it there at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.","area":"The Plate","where":"The Plate","release":"0.3.159"},
     "screen.plate.cookAskHelp": {"en":"Whichever you pick, {dish} then starts on its own plate. Cancel goes back to the recipe.","area":"The Plate","where":"The Plate"},
     "screen.plate.saveMine": {"en":"Save my plate for later","area":"The Plate","where":"The Plate"},
     "screen.plate.clearMine": {"en":"Clear my plate","area":"The Plate","where":"The Plate"},
@@ -5690,6 +5690,15 @@
     "screen.plate.addOrNewQRecipe": {"en":"Add it to your plate, or start a new plate?","area":"The Plate","where":"The Plate","release":"0.3.157"},
     "screen.plate.addOrNewHelpRecipe": {"en":"Add to my plate: the recipe joins your foods as one dish, and the plate keeps its name. Start a new plate: only the recipe.","area":"The Plate","where":"The Plate","release":"0.3.157"},
     "screen.plate.joinedAsDish": {"en":"{title} joined your plate as one dish. Saved in My recipes.","area":"The Plate","where":"The Plate","release":"0.3.157"},
-    "screen.cal.nothingCounted": {"en":"nothing is counted","area":"Words used across the app","where":"Across the app","release":"0.3.157"}
+    "screen.cal.nothingCounted": {"en":"nothing is counted","area":"Words used across the app","where":"Across the app","release":"0.3.157"},
+    "chef.plateArrives": {"en":"{what}","area":"The Plate","where":"A recipe, a meal or a food onto a plate that has foods: what arrives","release":"0.3.159"},
+    "screen.plate.arrRecipe": {"en":"The recipe is {title}, from My recipes: {n} food.|The recipe is {title}, from My recipes: {n} foods.","area":"The Plate","where":"The Plate","release":"0.3.159"},
+    "screen.plate.arrPlan": {"en":"The meal is {title}, from your plan: {n} food.|The meal is {title}, from your plan: {n} foods.","area":"The Plate","where":"The Plate","release":"0.3.159"},
+    "screen.plate.arrChat": {"en":"The idea from the chat has {n} food.|The idea from the chat has {n} foods.","area":"The Plate","where":"The Plate","release":"0.3.159"},
+    "screen.plate.arrFood": {"en":"The food is {name}.","area":"The Plate","where":"The Plate","release":"0.3.159"},
+    "screen.plate.notEmptyWhyNew": {"en":"It already has {plate}, and new foods arrive. They cannot land on the plate by themselves: you decide where they go.","area":"The Plate","where":"The Plate","release":"0.3.159"},
+    "screen.plate.notEmptyWhyOld": {"en":"It already has {plate}, from {when}. A new food cannot land on it by itself: you decide where it goes.","area":"The Plate","where":"The Plate","release":"0.3.159"},
+    "screen.plate.holdsOnlyNew": {"en":"This plate holds only the new foods.","area":"The Plate","where":"The Plate","release":"0.3.159"},
+    "screen.cal.whichByPlate": {"en":"Which meal? The plate was started on {day}, {time}:","area":"Words used across the app","where":"Across the app","release":"0.3.159"}
   }
 }

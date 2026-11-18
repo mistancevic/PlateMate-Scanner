@@ -160,6 +160,10 @@
     "plateRecipeFor": {
       "text": "Recept je {title}: {foods}, za {makes}.",
       "checked": true
+    },
+    "plateArrives": {
+      "text": "{what}",
+      "checked": true
     }
   },
   "safety": {
@@ -470,11 +474,11 @@
       "checked": true
     },
     "plate.oldHelp": {
-      "text": "Pojeo sam ga upisuje u dan: {day}, u obrok za koji je bio, u vreme kad je počet. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "text": "Pojeo sam ga pita koji obrok i upisuje ga tamo, u vreme kad je počet. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
       "checked": true
     },
     "plate.oldHelpPhoto": {
-      "text": "Pojeo sam ga upisuje u dan: {day}, u obrok za koji je bio, u vreme kad je slika nastala. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "text": "Pojeo sam ga pita koji obrok i upisuje ga tamo, u vreme kad je slika nastala. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
       "checked": true
     },
     "plate.cookAskHelp": {
@@ -22763,6 +22767,38 @@
     },
     "cal.nothingCounted": {
       "text": "ništa se ne broji",
+      "checked": true
+    },
+    "plate.arrRecipe": {
+      "text": "Recept je {title}, iz Mojih recepata: {n} namirnica.|Recept je {title}, iz Mojih recepata: {n} namirnice.|Recept je {title}, iz Mojih recepata: {n} namirnica.",
+      "checked": true
+    },
+    "plate.arrPlan": {
+      "text": "Obrok je {title}, iz tvog plana: {n} namirnica.|Obrok je {title}, iz tvog plana: {n} namirnice.|Obrok je {title}, iz tvog plana: {n} namirnica.",
+      "checked": true
+    },
+    "plate.arrChat": {
+      "text": "Ideja iz četa ima {n} namirnicu.|Ideja iz četa ima {n} namirnice.|Ideja iz četa ima {n} namirnica.",
+      "checked": true
+    },
+    "plate.arrFood": {
+      "text": "Namirnica je: {name}.",
+      "checked": true
+    },
+    "plate.notEmptyWhyNew": {
+      "text": "Na njemu je već: {plate}, a stižu nove namirnice. One ne mogu same na tanjir: ti biraš gde idu.",
+      "checked": true
+    },
+    "plate.notEmptyWhyOld": {
+      "text": "Na njemu je već: {plate} ({when}). Nova namirnica ne može sama na njega: ti biraš gde ide.",
+      "checked": true
+    },
+    "plate.holdsOnlyNew": {
+      "text": "Na ovom tanjiru su samo nove namirnice.",
+      "checked": true
+    },
+    "cal.whichByPlate": {
+      "text": "Koji obrok? Tanjir je započet: {day}, {time}:",
       "checked": true
     }
   }

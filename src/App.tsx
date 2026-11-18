@@ -1277,7 +1277,7 @@ export default function App() {
     if (!asked && plateOld()) {
       const at = plateSince()!, hm = `${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}`;
       const when = ymd(at) === ymd(new Date()) ? hm : w("app.dayAndTime", { day: weekdayName((at.getDay() + 6) % 7), time: hm });
-      askPlate({ kind: "food", what: w("app.wouldJoinPlate", { name: food0.name, when }), apply: (how) => {
+      askPlate({ kind: "food", what: w("plate.arrFood", { name: food0.name }), when, apply: (how) => {
         if (how === "new") setState((s) => ({ ...s, items: [], portion: null, title: "", fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined, plateAt: undefined }));
         add(food0, true);
       } });
@@ -1762,6 +1762,10 @@ export default function App() {
     setKind(meal.kind ?? "meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
   };
   // a slot's meal onto the Plate as it always opened
+  // DT313 AC3 (0.3.159): Add to my plate puts a recipe or a planned meal next to my foods as one dish, a portion of it,
+  // the way a recipe from a link joins (DT308.12): its foods move together and carry its name
+  const joinAsDish = (meal: Meal): Ingredient[] => { const of = Math.max(1, servingsOf(meal)), id = meal.id || uid();
+    return meal.items.map((i) => ({ ...structuredClone(i), id: uid(), locked: true, grams: i.grams / of, dish: { id, title: meal.title, of, n: 1, base: i.grams / of } })); };
   const fillOnPlateNow = (f: Filling, meal?: Meal | null, title?: string) => {
     setFilling(f);
     setPlateRecipeId(meal?.id || f.mealId || null);
@@ -1789,7 +1793,7 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, rates, dayPd, kind, setKind, plateTaste, setPlateTaste, moment, setMoment: (m: MomentId) => setMomentState(m), pick, setPick, plateRecipeId, usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
+    pdRef, rates, dayPd, kind, setKind, plateTaste, setPlateTaste, moment, setMoment: (m: MomentId) => setMomentState(m), pick, setPick, plateRecipeId, setPlateRecipeId, usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
@@ -2093,9 +2097,21 @@ export default function App() {
         setKind("meal"); setStep("in");
         notify(w("app.fromWhatYouSaid", { list: items.map((i) => i.food.name.split(",")[0].toLowerCase()).join(", ") }));
       };
-      if (state.items.length) askPlate({ kind: "photo", what: wn("app.youSaid", items.length, { list: items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ") }), apply: land });
+      if (state.items.length) askPlate({ kind: "said", what: wn("app.youSaid", items.length, { list: items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ") }), apply: land });
       else land("new");
       log("plate_said", { foods: items.length });
+    },
+    // 0.3.159 (DT313 AC7, board Stories250): the idea from the chat. An empty plate takes it at once; a plate that has foods
+    // is asked on the photo's screen, with Back to the chat. Before, the idea replaced the plate with no question.
+    chatLand: (items: Ingredient[]) => {
+      const go = () => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); };
+      const land = (how: "add" | "new") => {
+        if (how === "add") setState((s) => ({ ...s, items: [...s.items, ...items], portion: null }));
+        else setState((s) => ({ ...s, items, portion: null, title: "", fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined, plateAt: undefined }));
+      };
+      if (state.items.length) askPlate({ kind: "chat", what: wn("plate.arrChat", items.length, {}), backTo: "chat", back: () => { setPlateAsk(null); setTalkOpen(true); }, apply: land });
+      else setState((s) => ({ ...s, items, portion: null }));
+      go();
     },
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
     // DT133 (0.2.113): one portion of a plate of several, the rest kept on Today
@@ -2242,7 +2258,7 @@ export default function App() {
     openMeal: (id: string, from: import("./screens/api").MealFrom) => { setLanding({ id, line: "", quiet: true, from }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openRecipePage: (id: string) => { setLanding({ id, line: "", quiet: true }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     // DT131: a recipe onto a plate that has foods asks first; Add puts its foods next to yours, without the recipe's link
-    openOnPlate: (meal: Meal, opts?: { cook?: boolean }) => {
+    openOnPlate: (meal: Meal, opts?: { cook?: boolean; from?: "plan" }) => {
       const cook = !!opts?.cook;
       // DT212 v4 (0.3.53, board Stories159): Start cooking never adds to a plate. With foods on the Plate, Chef Mealan asks first:
       // a plate from earlier, Did you eat it?; a plate of now, save it for later or clear it. Then the recipe on its own plate.
@@ -2251,7 +2267,11 @@ export default function App() {
       }
       if (state.items.length && state.fromRecipe !== meal.id && plateRecipeId !== meal.id) {
         const add = asDish(meal);
-        askPlate({ kind: "recipe", what: w("app.fromRecipesHas", { title: meal.title, n: add.length }), apply: (how) => (how === "new" ? openOnPlateNow(meal, cook) : setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null }))) });
+        // DT313 (0.3.159): Back leads to where the recipe was opened from: its page in Recipes, or the plan
+        askPlate(opts?.from === "plan" ? { kind: "slot", what: wn("plate.arrPlan", add.length, { title: meal.title }), backTo: "plan", back: () => { setPlateAsk(null); setTab("plan"); },
+          apply: (how) => (how === "new" ? openOnPlateNow(meal, cook) : setState((s) => ({ ...s, items: [...s.items, ...joinAsDish(meal)], portion: null }))) }
+          : { kind: "recipe", what: wn("plate.arrRecipe", add.length, { title: meal.title }), backTo: "recipe", back: () => { setPlateAsk(null); setLanding({ id: meal.id, line: "", quiet: true }); setTab("recipes"); },
+          apply: (how) => (how === "new" ? openOnPlateNow(meal, cook) : setState((s) => ({ ...s, items: [...s.items, ...joinAsDish(meal)], portion: null }))) });
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey"); return;
       }
       openOnPlateNow(meal, cook);
@@ -2338,14 +2358,15 @@ export default function App() {
     // from the latest state, so several fills in one go (Put them in the plan, 0.2.4) all land
     fill: (date: string, slotId: string, meal: PlannedMeal | null) => setPlannedState((prev) => { const next = withPlanned(prev, date, slotId, meal); storePlanned(next); return next; }),
     // DT131: a meal from Plan onto a plate that has foods asks first
-    fillOnPlate: (f0: Filling, meal?: Meal | null, title?: string) => {
+    fillOnPlate: (f0: Filling, meal?: Meal | null, title?: string, from?: "plan") => {
       // DT149 (0.2.130): a meal around its time today is the moment, what you eat now, wherever it was opened from
       const f: Filling = !f0.mode && plateWhenOf(f0) === "now" ? { ...f0, mode: "eat" } : f0;
       // the plate already is this meal (the same recipe, the same slot): nothing to ask
       const same = (plateRecipeId && plateRecipeId === meal?.id) || (filling && filling.date === f.date && filling.slotId === f.slotId);
       if (state.items.length && meal && !same) {
         const add = asDish(meal);
-        askPlate({ kind: "slot", what: wn("app.fromPlanHas", add.length, { title: meal.title }), apply: (how) => { if (how === "new") fillOnPlateNow(f, meal, title); else { setFilling(f); setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null })); } } });
+        const cameFromTab = from ?? tab;
+        askPlate({ kind: "slot", what: wn("plate.arrPlan", add.length, { title: meal.title }), ...(cameFromTab === "plan" ? { backTo: "plan" as const, back: () => { setPlateAsk(null); setTab("plan"); } } : cameFromTab === "recipes" ? { backTo: "recipe" as const, back: () => { setPlateAsk(null); setTab("recipes"); } } : {}), apply: (how) => { if (how === "new") fillOnPlateNow(f, meal, title); else { setFilling(f); setState((s) => ({ ...s, items: [...s.items, ...joinAsDish(meal)], portion: null })); } } });
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey"); return;
       }
       fillOnPlateNow(f, meal, title);

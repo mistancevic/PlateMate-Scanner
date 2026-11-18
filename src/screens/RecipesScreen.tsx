@@ -339,8 +339,8 @@ export function RecipesScreen(p: AppApi) {
         openOriginal={opened.basedOn && state.meals.some((m) => m.id === opened.basedOn!.id) ? () => { setLanded(null); setOpenId(opened.basedOn!.id); } : null}
         onMakeIt={() => { const w = slotWhen(); const sl = cameFrom?.from.slot; const m = sl ? p.planned[sl.date]?.[sl.slotId] : undefined;
           // DT149 (0.2.130): a meal of another day opens on the Plate as that meal: planning, or adding what you ate
-          if (w && w !== "now" && sl) { setOpenId(null); p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }), mealId: m?.mealId ?? opened.id }, m?.items ? { id: m.mealId ?? opened.id, title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : opened, m?.title ?? opened.title); return; }
-          setOpenId(null); p.openOnPlate(opened); }}
+          if (w && w !== "now" && sl) { setOpenId(null); p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }), mealId: m?.mealId ?? opened.id }, m?.items ? { id: m.mealId ?? opened.id, title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : opened, m?.title ?? opened.title, cameFrom.from.tab === "plan" ? "plan" : undefined); return; }
+          setOpenId(null); p.openOnPlate(opened, cameFrom && cameFrom.id === opened.id && cameFrom.from.tab === "plan" ? { from: "plan" } : undefined); }}
         onCookIt={(m?: Meal) => { setOpenId(null); setLanded(null); p.openOnPlate(m ?? opened, { cook: true }); }}
         makeAs={(() => { const sw = slotWhen(), sl = cameFrom?.from.slot; if (!sw || sw === "now" || !sl) return null; const d = dateV(new Date(`${sl.date}T12:00:00`), { weekday: "long" });
           return sw === "plan" ? { label: w("recipes.changeItOnThePlate"), hint: w("recipes.plannedForHint", { day: d, meal: mealV(sl.name, true) }) }

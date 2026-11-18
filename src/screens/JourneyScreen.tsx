@@ -163,6 +163,9 @@ function extrasText(items: { food: any; grams: number }[]): string | null {
 function extras(items: { food: any; grams: number }[]) { const t = extrasText(items); return t ? <small className="readout-extra">{t}</small> : null; }
 // R25 (0.2.53, board RS25): a meal above this, or above the whole day, is asked once before it is logged
 const BIG_MEAL = 2000;
+// draws what a later part of the same screen built (DT314: the calendar under the question for a plate from earlier)
+function Late({ get }: { get: () => React.ReactNode }) { return <>{get()}</>; }
+
 export function JourneyScreen(p: AppApi) {
   const { state: stateAll, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
     setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback, add } = p;
@@ -601,7 +604,7 @@ export function JourneyScreen(p: AppApi) {
   // the old plate's photo, for Undo (kept in memory only: a photo is never written into the saved state twice)
   const oldPhoto = useRef<typeof state.photo>(undefined);
   const eatSlot = useRef<{ slot: Feedback["slot"] | null } | null>(null);
-  const [endCal, setEndCal] = useState<{ kind: "plan" | "ate"; day: string; more: boolean; ask?: { date: string; id: string | null } | null } | null>(null);
+  const [endCal, setEndCal] = useState<{ kind: "plan" | "ate"; day: string; more: boolean; ask?: { date: string; id: string | null } | null; old?: boolean } | null>(null);
   // DT150: No, separate foods, for these foods
   const [dishNo, setDishNo] = useState("");
   useEffect(() => setSwapMore(false), [swapId]);
@@ -1530,6 +1533,8 @@ export function JourneyScreen(p: AppApi) {
   const plateHas = state.title && state.title !== "DaaM" ? state.title : autoTitle(items);
   // set when a question brings its own head (B146): the plate's title does not stand over it
   let ownHead = false;
+  // DT314: the calendar is built further down; the question that shows it reads it when it is drawn
+  const lateCal: { el: React.ReactNode } = { el: null };
   const inQuestion = step !== "in" ? null
     // DT285 (0.3.139, board Stories212): the same photo already a meal of that day asks first
     : p.sameAsk ? (<section className="chef-ask same-ask-wrap" aria-label={w("make.yourPlateFromEarlier")}>{plateIsOld && since && <ChefLine image={state.photo?.image} text={say("plateOldAte", since, plateIn)} />}<SamePhotoAsk ask={p.sameAsk} answer={p.answerSameAsk} /></section>)
@@ -1603,6 +1608,21 @@ export function JourneyScreen(p: AppApi) {
           <div className="ca-go pa-go"><button type="button" className="pill pill-primary" onClick={() => p.answerPlateAsk("add")}>{w("plate.addToMine")}</button><button type="button" className="pill" onClick={() => { parkOld("photo"); p.answerPlateAsk("new"); }}>{w("plate.startNew")}</button></div>
           <small>{w("plate.addOrNewHelpPhoto")} <span className="ask-old-goes">{w("plate.oldSavedSoft", { plate: plateHas })}</span></small>
         </section></>); }
+      // DT313 (0.3.159, board Stories250, frames e and f; Coach Milan, Go 18 November 15:56): a recipe from Recipes, a meal
+      // from the Plan, the idea from the chat, foods said in words and a food onto a plate from earlier ask on the same
+      // screen as a photo. Back takes the place of Keep my plate: nothing lands. Start a new plate keeps the old plate in
+      // My recipes, with the one line and Undo.
+      if (!photo) { ownHead = true; const dish = a.kind === "recipe" || a.kind === "slot";
+        const why = (a.kind === "food" && a.when ? w("plate.notEmptyWhyOld", { plate: "\u0001", when: a.when }) : w(dish ? "plate.notEmptyWhyRecipe" : "plate.notEmptyWhyNew", { plate: "\u0001" })).split("\u0001");
+        return (<>
+          <button type="button" className="link ask-back" onClick={a.back ?? (() => p.answerPlateAsk(null))}><ChevronLeft size={18} aria-hidden="true" />{a.backTo === "recipe" ? w("plate.backToRecipe") : a.backTo === "plan" ? w("out.backToThePlan") : a.backTo === "chat" ? w("out.backToTheChat") : w("make.backToThePlate")}</button>
+          <div className="step-head plate-ask-head"><h2 className="warn-title"><TriangleAlert size={26} aria-hidden="true" />{w("plate.notEmpty")}</h2><div className="warn-box">{why[0]}<b>{plateHas}</b>{why[1] ?? ""}</div></div>
+          <section className={`chef-ask pa plate-ask plate-ask-photo plate-ask-recipe plate-ask-${a.kind}`} aria-label={w("make.addToThisPlateOr")}>
+            <ChefLine text={say("plateArrives", a.what)} />
+            <b className="pa-ask-q">{w(a.kind === "said" ? "plate.addOrNewQ" : "plate.addOrNewQRecipe")}</b>
+            <div className="ca-go pa-go"><button type="button" className="pill pill-primary" onClick={() => p.answerPlateAsk("add")}>{w("plate.addToMine")}</button><button type="button" className="pill" onClick={() => { parkOld(dish ? "recipe" : "new"); p.answerPlateAsk("new"); }}>{w("plate.startNew")}</button></div>
+            <small>{w(dish ? "plate.addOrNewHelpRecipe" : "plate.addOrNewHelp")} <span className="ask-old-goes">{w("plate.oldSavedSoft", { plate: plateHas })}</span></small>
+          </section></>); }
       const add = <button key="add" type="button" className={`pill${photo ? " pill-primary" : ""}`} onClick={() => p.answerPlateAsk("add")}>{w("plate.addToMine")}</button>;
       const fresh = <button key="new" type="button" className={`pill${photo ? "" : " pill-primary"}`} onClick={() => p.answerPlateAsk("new")}>{w("plate.startNew")}</button>;
       return (
@@ -1617,8 +1637,11 @@ export function JourneyScreen(p: AppApi) {
     : plateIsOld && since && !p.filling && !inCook && !p.recordNow && !readView && !photoScreen ? (
       <section className="chef-ask" aria-label={w("make.yourPlateFromEarlier")}>
         <ChefLine image={state.photo?.image} text={say("plateOldAte", since, plateIn)} />
-        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => ateEarlier(false)}>{w("plate.ateIt")}</button><button type="button" className="pill" onClick={p.savePlate}>{w("plate.saveForLater")}</button></div>
+        {/* DT314 (0.3.159, board Stories251; Coach Milan, Go 18 November 15:56): Ate it asks the meal. The calendar opens
+            under the buttons on the day the plate was started, the nearest meal marked; a tap on a row logs it there. */}
+        <div className="ca-go"><button type="button" className={`pill pill-primary old-ate${endCal?.old ? " on" : ""}`} aria-expanded={!!endCal?.old} onClick={() => setEndCal(endCal?.old ? null : { kind: "ate", day: ymd(new Date(state.photo?.at ?? since.toISOString())), more: false, old: true })}>{w("plate.ateIt")}</button><button type="button" className="pill" onClick={p.savePlate}>{w("plate.saveForLater")}</button></div>
         <div className="ca-links"><button type="button" className="link" onClick={p.keepWorking}>{w("plate.keepWorking")}</button><button type="button" className="pill pill-small pill-danger-line" onClick={clearPlate}>{w("plate.clearIt")}</button></div>
+        {endCal?.old && <div className="old-ate-cal"><Late get={() => lateCal.el} /></div>}
         <small>{w(state.photo ? "plate.oldHelpPhoto" : "plate.oldHelp", { day: dayOfV })}</small>
       </section>)
     : null;
@@ -1638,7 +1661,7 @@ export function JourneyScreen(p: AppApi) {
   const fitsTarget = ["plan", "high", "top"].includes(p.fitPd(pd));
   // ---- DT308.12 (0.3.157, board Stories244, frames m to o): Start a new plate saves the plate that was there in My recipes ----
   // With no name typed it takes the foods' name. The same foods under the same name are already that recipe: no copy.
-  function parkOld(kind: "photo" | "recipe") {
+  function parkOld(kind: "photo" | "recipe" | "new") {
     if (!items.length) return;
     const title = (state.title && state.title !== "DaaM" ? state.title.trim() : "") || autoTitle(items);
     const sameFoods = (m: Meal) => m.items.length === items.length && m.items.every((x, i) => x.food.id === items[i].food.id && Math.round(x.grams) === Math.round(items[i].grams));
@@ -1647,7 +1670,7 @@ export function JourneyScreen(p: AppApi) {
     const meal: Meal = found ?? { id: uid(), title, items: structuredClone(items).map((i) => ({ ...i, est: undefined })), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString(), steps: [], ...(ph ? withRecipePhotos([ph]) : {}) };
     oldPhoto.current = stateAll.photo;
     setState((s) => ({ ...s, meals: found ? s.meals : [structuredClone(meal), ...s.meals], savedPlate: undefined,
-      oldPlate: { id: meal.id, title: meal.title, kind, made: !found, back: { items: structuredClone(s.items), title: s.title, portion: s.portion ?? null, course: s.course, fromRecipe: s.fromRecipe, pick: p.pick } } }));
+      oldPlate: { id: meal.id, title: meal.title, kind, made: !found, back: { items: structuredClone(s.items), title: s.title, portion: s.portion ?? null, course: s.course, fromRecipe: s.fromRecipe, pick: p.pick, recipeId: p.plateRecipeId } } }));
     // the new plate starts with no meal set
     p.setPick(null); if (p.filling) p.setFilling(null); if (p.moment !== "regular") p.setMoment("regular"); setEndCal(null); setLineOpen(false);
   }
@@ -1658,10 +1681,12 @@ export function JourneyScreen(p: AppApi) {
     setState((s) => ({ ...s, meals: o.made ? s.meals.filter((m) => m.id !== o.id) : s.meals, items: o.back.items, title: o.back.title, portion: o.back.portion, course: o.back.course, fromRecipe: o.back.fromRecipe,
       photo: oldPhoto.current, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, openRecipe: undefined, recorded: undefined, oldPlate: undefined }));
     p.setPick(o.back.pick ?? null);
+    // DT313 (0.3.159): the meal the new plate was opened for goes with it, and the old plate is the recipe it was again
+    if (p.filling) p.setFilling(null); if ("recipeId" in o.back) p.setPlateRecipeId(o.back.recipeId ?? null);
   };
   const oldLine = state.oldPlate && items.length > 0 && step === "in" ? (() => { const o = state.oldPlate!, says = w("plate.oldSaved", { plate: "\u0001" }).split("\u0001"); return (
     <div className="warn-box old-plate" role="status">
-      <div className="old-plate-top"><div className="old-plate-say"><b>{says[0]}{o.title}{says[1] ?? ""}</b> {w(o.kind === "photo" ? "plate.holdsOnlyPhoto" : "plate.holdsOnlyRecipe")}</div>
+      <div className="old-plate-top"><div className="old-plate-say"><b>{says[0]}{o.title}{says[1] ?? ""}</b> {w(o.kind === "photo" ? "plate.holdsOnlyPhoto" : o.kind === "new" ? "plate.holdsOnlyNew" : "plate.holdsOnlyRecipe")}</div>
         <button type="button" className="icon old-plate-x" aria-label={w("plate.close")} onClick={() => setState((s) => ({ ...s, oldPlate: undefined }))}><X size={20} /></button></div>
       <div className="old-plate-acts"><button type="button" className="link old-plate-open" onClick={() => p.openMeal(o.id, { tab: "journey" })}>{w("plate.openInMyRecipes")} ›</button>
         <button type="button" className="pill pill-small old-plate-undo" onClick={undoOld}>{w("today.undo")}</button></div>
@@ -1693,12 +1718,13 @@ export function JourneyScreen(p: AppApi) {
   // Ate it on a plate you built: logged at once, no amount asked (the amounts are yours). Today: you land on Today, the
   // message says what was logged and where, and the meal's card has Undo. A day gone by: at that meal's time, and you land
   // on Plan on that day. replace: what was eaten in that meal leaves it first.
-  const atePlate = (date: string, sl: Slot | null, how: "set" | "add" | "replace") => {
+  const atePlate = (date: string, sl: Slot | null, how: "set" | "add" | "replace", started?: Date) => {
     const title = plateTitle(), kcal = kcalNow(), today = date === todayKey;
     if (how === "replace" && sl) for (const f of state.feedback) if (f.status === "eaten" && f.slot?.date === date && f.slot.slotId === sl.id) p.deleteCard(f.id);
     const slot = sl ? { date, slotId: sl.id, name: sl.name, time: sl.time } : null;
     const ph = (state.photo && state.photo.who !== "idea" ? state.photo : null) ?? joinedPhoto;
-    const at = today ? (ph?.who === "ate" && ymd(new Date(ph.at)) === date ? ph.at : undefined) : ph?.who === "ate" && ymd(new Date(ph.at)) === date ? ph.at : atMeal(date, sl?.time ?? "12:00");
+    // DT314: a plate from earlier logged on the day it was started keeps the time it was started
+    const at = started && ymd(started) === date ? started.toISOString() : today ? (ph?.who === "ate" && ymd(new Date(ph.at)) === date ? ph.at : undefined) : ph?.who === "ate" && ymd(new Date(ph.at)) === date ? ph.at : atMeal(date, sl?.time ?? "12:00");
     const ok = p.ateNow(plateMeal(), slot, { photo: ph?.image ?? null, at, back: today, quiet: !today, line: sl ? w("app.loggedWhere", { title, slot: slotV(fillingOn(date, sl)), kcal: fmt(kcal, 0) }) : w("app.loggedSnack", { title, kcal: fmt(kcal, 0) }) });
     if (ok === false) return;
     leavePlate();
@@ -1707,9 +1733,11 @@ export function JourneyScreen(p: AppApi) {
   // the photo's own day and time, when you said you ate it then: the calendar opens there and marks the guess
   const photoOf = state.photo ?? joinedPhoto;
   const photoThen = photoOf && photoOf.who === "ate" && ymd(new Date(photoOf.at)) <= todayKey ? new Date(photoOf.at) : null;
+  // DT314: when a plate from earlier was started (its photo's time, or the first food's)
+  const plateStart = since ? new Date(state.photo?.at ?? since.toISOString()) : null;
   const endGuess = (() => {
     if (!endCal || endCal.kind !== "ate") return null;
-    const at = photoThen ?? new Date(), date = ymd(at), info = calInfo(date), id = calGuess(info.slots, info.eaten, at);
+    const at = (endCal.old ? plateStart : null) ?? photoThen ?? new Date(), date = ymd(at), info = calInfo(date), id = calGuess(info.slots, info.eaten, at);
     if (id === undefined) return null;
     return { date, id };
   })();
@@ -1718,6 +1746,8 @@ export function JourneyScreen(p: AppApi) {
   const endDo = (kind: "plan" | "ate", date: string, id: string | null, how: "set" | "add" | "replace") => {
     const sl = id ? calInfo(date).slots.find((x) => x.id === id) ?? null : null;
     if (kind === "plan") { if (sl) planPlate(fillingOn(date, sl), how); return; }
+    // DT314: the plate from earlier is logged at once, with or without a photo
+    if (endCal?.old) { setEndCal(null); atePlate(date, sl, how, plateStart ?? undefined); return; }
     if (onRead() || (!!state.photo && state.photo.who !== "idea")) {
       // the read: the meal is set in the line; Did you eat it? follows. The same on the plate of a photo (after Change the
       // foods): the meal is set, and Chef Mealan's card asks how much of it you ate, as in 0.3.156
@@ -1731,7 +1761,7 @@ export function JourneyScreen(p: AppApi) {
     if (!endCal) return;
     // a meal that already holds something asks first, right under its row (DT308.11 d to g); not on a read, whose
     // Did you eat it? comes next and adds a dish to the meal as before
-    const holds = endCal.kind === "plan" ? r.state === "planned" : r.state === "eaten" && !onRead() && !state.photo;
+    const holds = endCal.kind === "plan" ? r.state === "planned" : r.state === "eaten" && (endCal.old || (!onRead() && !state.photo));
     if (holds && r.id) { setEndCal({ ...endCal, ask: { date, id: r.id } }); return; }
     endDo(endCal.kind, date, r.id, "set");
   };
@@ -1765,7 +1795,7 @@ export function JourneyScreen(p: AppApi) {
   // on the calendar as it is at that moment, so the second no longer puts the old day back.
   const endCalendar = endCal ? plateCal({ mode: endCal.kind, day: endCal.day, setDay: (d) => setEndCal((c) => (c ? { ...c, day: d, ask: null } : c)), more: endCal.more, setMore: (b) => setEndCal((c) => (c ? { ...c, more: b } : c)), now: new Date(), today: todayKey, infoOf: calInfo,
     marked: endGuess, photoAt: photoThen, onPick: endPick,
-    title: endCal.kind === "plan" ? w("cal.whichDayMeal") : photoThen ? w("cal.whichByPhoto", { day: dateV(photoThen, { weekday: "long" }), time: hhmm(photoThen) }) : w("cal.whichByClock", { time: hhmm(new Date()) }),
+    title: endCal.kind === "plan" ? w("cal.whichDayMeal") : endCal.old && plateStart && !state.photo ? w("cal.whichByPlate", { day: dateV(plateStart, { weekday: "long" }), time: hhmm(plateStart) }) : endCal.old && plateStart ? w("cal.whichByPhoto", { day: dateV(plateStart, { weekday: "long" }), time: hhmm(plateStart) }) : photoThen ? w("cal.whichByPhoto", { day: dateV(photoThen, { weekday: "long" }), time: hhmm(photoThen) }) : w("cal.whichByClock", { time: hhmm(new Date()) }),
     under: endCal.ask && endCal.ask.date === endCal.day && endCal.ask.id ? { id: endCal.ask.id, node: heldAsk(endCal.ask.date, endCal.ask.id) } : null }) : null;
   // Save it: the plate as a recipe in My recipes, with its foods and amounts (and its photo); the plate stays
   const sigNow = savedSig, savedId = savedNowId;
@@ -1776,7 +1806,8 @@ export function JourneyScreen(p: AppApi) {
     setState((s) => ({ ...s, meals: [m, ...s.meals], savedPlate: { id: m.id, sig: sigNow } }));
   };
   const savedAsName = plateSaved && !(state.title && state.title !== "DaaM" && state.title.trim()) ? state.meals.find((m) => m.id === savedId)?.title ?? null : null;
-  const endEl = plateEnd({ calendar: endCalendar, open: endCal?.kind ?? null, saved: plateSaved, savedAs: savedAsName, onSave: saveIt, onPlan: () => endOpen("plan"), onAte: () => endOpen("ate") });
+  lateCal.el = endCalendar;
+  const endEl = plateEnd({ calendar: endCal?.old ? null : endCalendar, open: endCal?.old ? null : endCal?.kind ?? null, saved: plateSaved, savedAs: savedAsName, onSave: saveIt, onPlan: () => endOpen("plan"), onAte: () => endOpen("ate") });
   // the photo's own card with Ate it and Ate half is for a plate whose meal is set, as in 0.3.156
   const mpSay = !!state.photo && state.photo.who !== "idea" && items.length > 0 && !p.filling && !p.recordNow && !unset;
   // with no meal set his card keeps his word, Add a food and Don't count it; Ate it is the end's, which asks for the meal first

@@ -2,6 +2,8 @@
 // middle, Next: Goal the main button; Your summary, Plan your week, then Back comes back to Your summary; Shopping lists shows
 // the earlier lists first, New shopping list its own button; a food added to a plate started hours ago asks Add or Start a
 // new plate (DT206); a plate of only a drink gets no meal built around it.
+// Changed by story DT313 (0.3.159, board Stories250; Coach Milan, Go 18 November 15:56): a food onto a plate from hours ago
+// asks on the same screen as a photo; the check DT206 reads the new words. Nothing else changed.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -35,7 +37,10 @@ const list1 = { n: 1, madeAt: "2026-10-20T10:00:00Z", from: "2026-10-20", to: "2
     await page.goto(U + "/foods"); await page.waitForTimeout(1500);
     await page.locator(".row").filter({ hasText: "Skyr" }).first().getByRole("button", { name: "Add to meal" }).click(); await page.waitForTimeout(800);
     const ask = page.locator(".plate-ask");
-    ok(await ask.count() === 1 && /Skyr would join a plate from \d\d:\d\d|Skyr would join a plate from \w+day \d\d:\d\d/.test(await ask.textContent()), "DT206: a food for a plate from hours ago asks first: " + ((await ask.textContent().catch(() => "")) || "").slice(0, 120));
+    // Changed by story DT313 (0.3.159, board Stories250; Coach Milan, Go 18 November 15:56): the question is asked on the
+    // photo's screen. The plate's day and time stand in the warning above it, and Chef Mealan says which food arrives.
+    const why = (await page.locator(".plate-ask-head .warn-box").textContent().catch(() => "")) || "";
+    ok(await ask.count() === 1 && /, from (\d\d:\d\d|\w+day \d\d:\d\d)\. A new food cannot land on it by itself/.test(why) && /The food is Skyr/.test(await ask.textContent()), "DT206: a food for a plate from hours ago asks first: " + why.slice(0, 120));
     await ask.getByRole("button", { name: "Start a new plate" }).click(); await page.waitForTimeout(600);
     const names = (await page.locator(".plate-card .name-link").allTextContents()).map((x) => x.trim());
     ok(names.join("|") === "Skyr", "Start a new plate: only the skyr: " + names.join(", "));
