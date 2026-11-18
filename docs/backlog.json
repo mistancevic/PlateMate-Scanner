@@ -2103,7 +2103,7 @@
         {
           "id": "AC14",
           "title": "Three languages",
-          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 6, then Tell Chef Mealan what is wrong, About, Send to Chef Mealan, Continue on the Plate and Chef Mealan's line are in that language."
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 6, then Tell Chef Mealan what to check, About, Send to Chef Mealan, Continue on the Plate and Chef Mealan's line are in that language."
         }
       ],
       "unchanged": [
