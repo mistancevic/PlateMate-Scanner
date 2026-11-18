@@ -1305,6 +1305,21 @@
       "why": "Coach Milan 17 November 22:33 and 22:39: move, do not change. Out of the Plate screen (3,012 lines to 2,815): the meal line with everything behind its pencil, the read, the photo screen, as plain functions; state and effects stay in the Plate screen. Out of the app's main file (3,512 lines to 2,954): the label check, Chef Mealan's card, the daily reference, the dialog. Removed: SayHave and 97 English lines no code refers to, after a check for names built from parts; Serbian and German follow. 199 of 199 walkthroughs with none edited. Into 0.3.157: the release count on /built from the change log and docs/versions.md together; six more unused lines."
     },
     {
+      "id": "DT311",
+      "title": "Empty plate on the left of the row above the foods, opposite Group into parts; Group into parts with room around its words",
+      "epic": "plate",
+      "state": "now",
+      "board": "Stories246",
+      "why": "Coach Milan 18 November 10:05: Empty plate could stand opposite Group into parts; that button's words are tight to its border; one general position when Group into parts is not there; not above the PD block if that is not friendly. Drawn: one row above the foods, Empty plate left, Group into parts right; with one food Empty plate alone in the same place; the card's top says only On your plate. It can go with 0.3.157. No Go yet."
+    },
+    {
+      "id": "DT312",
+      "title": "Prep rebuilt to fit today's app: How do you want to eat it? was a quick fixed set of ways",
+      "epic": "cook",
+      "state": "later",
+      "why": "Coach Milan 18 November 10:05, on DT308.11o: the three ways (All in one, Topped, Protein first) were a chip solution with a fixed set, to get through the process quickly. The flow should be reconstructed to fit today's app. Not part of 0.3.157; the meal question at Save on Eat does not depend on it. With Opus 5.5, together with Prepare it."
+    },
+    {
       "id": "DT304",
       "title": "Every way into the plate has a direction: the meal and when",
       "epic": "trust",

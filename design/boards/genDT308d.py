@@ -169,6 +169,7 @@ row("prep", "Prepare it with no meal set: cook first, the meal is asked when you
   ("With a meal set", "If you set the meal with the pencil before Prepare it, nothing is asked on Eat. Save logs to that meal, as today."),
   ("What is logged", "The meal on Today, for the meal and day you tapped, eaten at the time you saved, with the amount you said (All of it) and its numbers. Your taste and your note. The cook on the recipe: Your cooks and Every time you ate it."),
   ("The end", "The recipe's page, as in 0.3.156. The Plate is empty again."),
+  ("Prep, frames o and p", "The fixed set of ways (All in one, Topped, Protein first) was a quick solution to get through the process (Coach Milan, 18 November 10:05). Prep is to be rebuilt to fit today's app, as its own card, DT312. It is not part of 0.3.157, and the meal question at Save does not depend on it."),
 ], [("The Plate with foods", "r_1", "changed", "Where you are: the Plate, no meal set."), ("Prep", "r_2", "same", "Tap: Prepare it."), ("Prep, a way picked", "r_3", "same", "Tap: Protein first."), ("Make", "r_4", "same", "Tap: Make it this way."), ("Eat", "r_5", "same", "Tap: Cooked. Next: Eat. Then All of it and Good, as today."), ("Eat, the calendar", "r_6", "changed", "Tap: Save."), ("The recipe", "r_7", "same", "Tap: Dinner.")], nid="DT308.11", at=13)
 board("Stories243.dc.html", "DT308.11: Prepare it with no meal set",
   "18 November 2026 (Coach Milan 00:22). You tap Prepare it on the landing, cook, and reach the end. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
@@ -181,20 +182,21 @@ row("now", "Something is on the plate: a photo taken now", [
   ("One question, one look", "The same screen for a photo taken now, an older photo and a recipe: what is on your plate, what comes, Add to my plate, Start a new plate."),
   ("Add to my plate", "New: you land on the Plate with foods, the one landing, not on a read. The foods join, marked ~. The meal line stays as it was."),
   ("Start a new plate", "New: the last line of the question says where the old plate goes. See DT308.12m to o."),
+  ("A way back", "New (Coach Milan, 18 November 10:05): the question is also information, so you can step away from it. Back on the top left returns to the photo screen with nothing changed. Remove the photo stays the way to drop the photo."),
 ], [("The Plate with foods", "x_a", "changed", "Where you are: the Plate, no meal set."), ("Add more, open", "x_b", "changed", "Tap: + Add more to your plate."), ("The camera", "x_c", "same", "Tap: Photo or scan. The camera opens on Meal, as in 0.3.155."), ("One photo taken", "x_d", "same", "Tap: the shutter."), ("The photo screen", "x_e", "changed", "Tap: Use this photo."), ("The question", "x_f", "changed", "Tap: Read the plate."), ("The Plate with foods", "x_g", "changed", "Tap: Add to my plate.")], nid="DT308.12")
 row("old", "An older photo, on a plate whose meal is set", [
   ("The fault", "In 0.3.152, after Add to my plate with an older photo, the whole plate is treated as from the photo's time, and the app asks Did you eat it? for yesterday."),
   ("Solved by the meal model", "No meal is guessed from a photo. The plate keeps its own meal line: the one you set, or not set. The photo's day and time are used only if you later say Ate it on a plate with no meal set, as the marked guess in the calendar."),
 ], [("Add more, open", "x_h", "changed", "Where you are: the Plate, the meal is set. + Add more to your plate is open."), ("The camera", "x_i", "same", "Tap: Photo or scan."), ("The photo screen", "x_j", "changed", "Tap: Your photos, and you pick a photo from Saturday."), ("The question", "x_k", "changed", "Tap: Read the plate."), ("The Plate with foods", "x_l", "changed", "Tap: Add to my plate.")], nid="DT308.12", at=7)
-row("new", "Start a new plate: what happens to the old plate", [
+row("new", "Start a new plate: what happens to the old plate, and where Saved for later is", [
   ("Today", "Start a new plate keeps only the new foods. The plate that was there is gone, not kept anywhere."),
-  ("Proposed", "The old plate goes to Saved for later, the list of parked plates on the empty Plate. Nothing is lost, and no extra question is asked. The question's last line says so before you tap, and a message says so after."),
-  ("Your proposal", "You proposed to offer Save it in My recipes first. That is one more tap and makes a recipe of every plate you set aside. Saved for later is the place for a plate you are not done with; from there Continue puts it back. Say the word and I draw yours."),
-  ("The new plate", "It holds only what came, and starts with no meal set. For a photo you are on its read, which ends with What do you do with it? (DT308.4). For a recipe you are on the Plate with the recipe."),
-], [("The question", "x_m", "changed", "Where you are: the question after the read."), ("The new plate, the old one parked", "x_n", "changed", "Tap: Start a new plate.")], nid="DT308.12", at=12)
-row("later", "Where the old plate is. A state, not a step", [
-  ("Saved for later", "On the empty Plate, as in 0.3.156: the plate by its name, when it was parked, how many foods, Continue and a way to remove it. It stays 7 days."),
-], [("The empty Plate, later", "x_o", "changed", "Not a tap from the frame above: this is what the empty Plate shows the next time.")], nid="DT308.12", at=14, arrows=False)
+  ("Proposed", "The old plate goes to Saved for later. The question's last line says so before you tap."),
+  ("No second question", "A double confirmation would cost a tap every time. Instead the next screen carries a line that stays, on the plate itself and in the warning's colour, with Undo. It cannot be missed like a message that goes away, and a wrong tap is taken back with one tap."),
+  ("Undo", "Your old plate is back on the Plate, and the new one is parked in its place. Nothing is lost either way."),
+  ("Where Saved for later is", "Today the list shows only on the empty Plate, so with foods on the plate it has no place. New: whenever something is parked, the Plate has one quiet row at the end of the page, Saved for later with its count. A tap opens the list in place, with the rows of 0.3.156: Continue, and a way to remove. On the empty Plate the list stays where it is today."),
+  ("Your proposal", "You proposed to offer Save it in My recipes first. That is one more tap and makes a recipe of every plate you set aside. Say the word and I draw yours."),
+  ("The new plate", "It holds only what came, and starts with no meal set. For a photo you are on its read, which ends with What do you do with it? (DT308.4)."),
+], [("The question", "x_m", "changed", "Where you are: the question after the read."), ("The new plate, the old one parked", "x_n", "changed", "Tap: Start a new plate."), ("Saved for later, open", "x_o", "changed", "Tap: Saved for later.")], nid="DT308.12", at=12)
 board("Stories244.dc.html", "DT308.12 (1 of 2): something is on the plate, and a photo comes. Add to my plate, Start a new plate",
   "18 November 2026 (Coach Milan 00:16 and 00:22). On the landing of 0.3.155: a photo taken now, an older photo, and what Start a new plate does with the old plate. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
   B, W, y - 100, "Stories243.dc.html")
@@ -207,7 +209,7 @@ row("code", "A barcode or a label", [
 ], [("Add more, open", "x_b", "changed", "Where you are: the Plate, no meal set. + Add more to your plate is open."), ("The camera", "x_q", "same", "Tap: Photo or scan."), ("Barcode", "x_r", "same", "Tap: Barcode. The code is read, or typed as here."), ("The Plate with foods", "x_s", "changed", "Tap: Look up.")], nid="DT308.12", at=15)
 row("recipe", "A recipe from Recipe photo or Recipe link", [
   ("The gap", "Since 0.3.155 both tiles are reachable with foods on the plate. Today the recipe takes the plate's place with no question, and the plate is gone."),
-  ("Proposed", "The same question, in the same look, when you tap Put it on my plate: what is on your plate, what the recipe is, Add to my plate or Start a new plate."),
+  ("Proposed", "The same question, in the same look, when you tap Put it on my plate: what is on your plate, what the recipe is, Add to my plate or Start a new plate. Back on the top left returns to what was read, with nothing changed."),
   ("Add to my plate", "The recipe joins your foods as one dish: one row with its name and weight, its foods under it, as built in 0.3.155."),
   ("Start a new plate", "Only the recipe, as today, and the old plate goes to Saved for later."),
   ("Recipe photo", "The same from the other tile: the pictures are read, then Put it on my plate asks."),
@@ -215,3 +217,16 @@ row("recipe", "A recipe from Recipe photo or Recipe link", [
 board("Stories245.dc.html", "DT308.12 (2 of 2): something is on the plate, and a barcode, a label or a recipe comes",
   "18 November 2026 (Coach Milan 00:16 and 00:22). On the landing of 0.3.155: a barcode or a label joins with no question; a recipe from Recipe photo or Recipe link asks the same question as a photo. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
   B, W, y - 100, "Stories244.dc.html")
+
+start(3)
+row("empty", "Empty plate on the left, opposite Group into parts. Three states side by side, not steps", [
+  ("Why", "Coach Milan, 18 November 10:05: Empty plate could stand on the left, opposite Group into parts; that button's words are tight to its border; and when Group into parts is not there, Empty plate needs one general position."),
+  ("Now", "Empty plate is at the top right of the card, next to On your plate, above the result. Group into parts is on the right above the foods, and its words touch its border."),
+  ("Proposed", "One row above the foods: Empty plate on the left, Group into parts on the right. Both act on the foods, so they stand next to them. The card's top says only On your plate."),
+  ("One position", "With no Group into parts (one food, or a plate already in parts) the row stays, with Empty plate alone on the left. It never moves."),
+  ("Above the PD block", "Not there: the top of the card is the best place of the page, and a button that throws the plate away should not sit where the eye lands first."),
+  ("Group into parts", "Room around its words, on one line, 44 high."),
+], [("Now", "e_0", "draft", "As it is in 0.3.156. Red: the two buttons."), ("With Group into parts", "e_1", "changed", "The same plate, with the change."), ("With one food", "e_2", "changed", "No Group into parts.")], nid="DT311", arrows=False)
+board("Stories246.dc.html", "DT311: Empty plate on the left, opposite Group into parts",
+  "18 November 2026 (Coach Milan 10:05). A small card of its own; it can go with 0.3.157. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
+  B, W, y - 100, "Stories245.dc.html")
