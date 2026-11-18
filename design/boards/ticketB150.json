@@ -96,10 +96,11 @@
   "One addition to an element you know: the time in the marked row is a field. One line of reference for the photo. No other new element.",
   "The rule sits in the one place a meal is logged, so every way obeys it.",
   "The repair touches only records whose meal is on a later day than their time.",
-  "The screens B150c, B150d, B150.2b and B150.2c are what it looks like."
+  "The screens B150.1a, B150.1b, B150.2b and B150.2c are what it looks like."
  ],
  "words2": "18 November 19:34: also the timing is an issue, as I couldn't change it. It was only the timing from the settings. 19:43: better an edit mode where what is needed is set, than another way of correction. 19:49: edit mode is when the pencil is clicked and turns into an X to close it. It is saved automatically, so no Done; just close it. You can't change the time of the picture taken; it is a reference. What should be changed is the timing in the calendar.",
  "time_now": "Once a meal is set, the pencil is gone. An X stands in its place, and it does not close anything: it takes the meal off. The line says Dinner, Saturday, 14 November, 20:00. The time is words, so it cannot be changed.",
  "time_proposed": "One icon, one edit mode. The line always has the pencil. A tap opens edit mode and the pencil turns into the X that closes it. Every change is saved at once; there is no Done. In edit mode: the photo's time as one line of reference, which cannot be changed; the days; the meals. The time in the marked meal's row is a field: a tap opens the phone's clock and sets the meal's time, for this meal on this day only.",
- "more_change": "Two things change that 0.3.157 built, so you see them before a Go. 1. With a meal set, the X no longer takes the meal off; a tap on the marked meal in edit mode does. 2. A photo logged to a meal is logged at the meal's time in the calendar, not at the photo's time. Today a photo of that same day is logged at the photo's time."
+ "more_change": "Two things change that 0.3.157 built, so you see them before a Go. 1. With a meal set, the X no longer takes the meal off; a tap on the marked meal in edit mode does. 2. A photo logged to a meal is logged at the meal's time in the calendar, not at the photo's time. Today a photo of that same day is logged at the photo's time.",
+ "days": "The board is drawn on the app's test days. The photo is from Saturday 15:57: that is your Tuesday 19:56. Today is Sunday: that is your Wednesday."
 }
