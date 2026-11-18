@@ -2012,7 +2012,7 @@
         {
           "id": "AC18",
           "title": "I stay on the Plate",
-          "text": "Given I tapped Ate it, All of it and Done, when the meal is logged, then I am still on the Plate with the photo and the foods, the block has closed, Ate it is blue with a tick, and one line says All of it. Logged to Dinner, Saturday, 14 November, 19:30."
+          "text": "Given I tapped Ate it, All of it and Done, when the meal is logged, then I am still on the Plate with the photo and the foods, the question What do you do with it? and its three buttons are gone, and in their place stand the small title Eaten, All of it, and the pencil."
         },
         {
           "id": "AC19",
@@ -2023,6 +2023,21 @@
           "id": "AC20",
           "title": "With no meal selected, the buttons ask as today",
           "text": "Given No meal selected, when I tap Ate it or Plan it, then the calendar asks the meal and day as it does today, and what I pick shows on the meal line."
+        },
+        {
+          "id": "AC21",
+          "title": "The pencil changes what happened",
+          "text": "Given the status Eaten, All of it, when I tap the pencil and then Half, then the status says Half at once, the eaten meal counts half, and the X closes the answers."
+        },
+        {
+          "id": "AC22",
+          "title": "Not eaten takes the log back",
+          "text": "Given the status Eaten, when I tap the pencil and then Not eaten, then the meal is no longer logged, the day shows nothing of it, and the page ends with What do you do with it? and its three buttons again."
+        },
+        {
+          "id": "AC23",
+          "title": "Planned shows the same way",
+          "text": "Given a meal of today or later is set and I tapped Plan it, when it is planned, then the page shows the small title Planned with the pencil in place of the question, and the pencil offers Not planned."
         }
       ],
       "unchanged": [
@@ -2163,7 +2178,7 @@
       "title": "A dish is on the plate twice: whole amounts and a portion's amounts",
       "epic": "plate",
       "state": "next",
-      "why": "Coach Milan 18 November 21:48, a screenshot of a tester's read in Serbian: ten foods, four of them twice. Prawns 700 g and ~50 g, passata 500 g and ~80 g, olive oil 50 g and ~8 g, fusilli 500 g and cooked fusilli ~220 g. The six exact amounts carry no ~, so they did not come from that read as estimates; the four with ~ did. Her steps are not known yet: needed before it can be replayed and drawn."
+      "why": "Coach Milan 18 November 21:48, a screenshot of a tester's read in Serbian: ten foods, four of them twice. Prawns 700 g and ~50 g, passata 500 g and ~80 g, olive oil 50 g and ~8 g, fusilli 500 g and cooked fusilli ~220 g. The six exact amounts carry no ~, so they did not come from that read as estimates; the four with ~ did. Her steps are not known yet: needed before it can be replayed and drawn. Her answer, 18 November 23:12, through Coach Milan: she was crafting a recipe on the Plate, added a photo and asked Chef Mealan about it; the list came out of his read. So the recipe's foods were on the plate and the read of the photo was added to them."
     },
     {
       "id": "DT319",

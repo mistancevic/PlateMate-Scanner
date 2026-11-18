@@ -94,9 +94,15 @@ const FIELD = (t) => `<span style="display:inline-flex;align-items:center;gap:6p
       + `<div style="${NOTE}"><b>Step 6. Ate it asks only how much.</b> The meal and day are set, so there is no calendar here. I tap <b>All of it</b>, then <b>Done</b>. With no meal selected, Ate it asks the meal first, as today.</div>`;
     e.appendChild(d); }, { TICK, GREY });
   await shotAt(p, "h_6", ".plate-end", 60, 760);
-  await ev(p, ({ MARK, NOTE }) => { document.querySelectorAll("[data-ate]").forEach((x) => x.remove()); const e = document.querySelector(".plate-end"), b = e.querySelector(".pe-ate"); b.style.cssText += ";background:#e3edff;border-color:#2a72d9;color:#1d4fa3"; b.textContent = "✓ Ate it";
-    const d = document.createElement("div"); d.setAttribute("data-ate", "1"); d.innerHTML = `<small style="display:block;margin-top:12px;font-size:14px;color:#172742;${MARK};padding:4px">All of it. Logged to <b>Dinner, Saturday, 14 November, 19:30</b>.</small><div style="${NOTE}"><b>Step 7. Done logged it, and I am still on the Plate.</b> The block closed. Ate it is blue with a tick: it is what I chose. One line says where it went. <b>No jump to the Plan.</b> The plate stays, with its photo and foods.</div>`; e.appendChild(d); });
+  const eaten = (open, html) => ev(p, ({ MARK, NOTE, PEN, XS, open, html }) => { document.querySelectorAll("[data-ate]").forEach((x) => x.remove()); const e = document.querySelector(".plate-end"); [...e.children].forEach((c) => { c.style.display = "none"; });
+    const d = document.createElement("div"); d.setAttribute("data-ate", "1");
+    d.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="flex:1;${MARK};padding:2px 4px"><span style="display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5b6b8a;margin-bottom:2px">Eaten</span><b style="font-size:16px;color:#172742">All of it</b></div><button type="button" class="icon" style="${MARK}">${open ? XS : PEN}</button></div>`
+      + (open ? `<div style="margin-top:12px"><div class="pa-chips"><button type="button" class="pa-opt on">All of it</button><button type="button" class="pa-opt">Half</button><button type="button" class="pa-opt">Part of it</button><button type="button" class="pa-opt" style="${MARK}">Not eaten</button></div></div>` : "")
+      + `<div style="${NOTE}">${html}</div>`; e.appendChild(d); }, { open, html });
+  await eaten(false, "<b>Step 7. Done logged it, and I am still on the Plate.</b> The question and the three buttons are gone. In their place a status, in the shape of Meal and day: the small title <b>Eaten</b>, under it <b>All of it</b>, and the pencil. No jump to the Plan. The plate stays, with its photo and foods.");
   await shotAt(p, "h_7", ".plate-end", 330, 800);
+  await eaten(true, "<b>Changing what happened.</b> The pencil opens the answers again, and is the X that closes. A tap on Half or Part of it changes the amount, saved at once. <b>Not eaten</b> takes the log back: the question What do you do with it? and its three buttons return.");
+  await shotAt(p, "h_10", ".plate-end", 330, 800);
   await p.context().close();
   // ---- the proof, not a step: Saturday in the Plan after the fix
   p = await h.open({ foods: [], planned }); await h.toPhoto(p, true); await h.readIt(p);

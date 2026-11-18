@@ -14,7 +14,7 @@ head = [("Ticket", "B150. This board is the ticket: everything about it is here.
   ("1. The request", ""),
   ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]), ("In Coach Milan's words", t["words"]), ("What happened", t["cause"])]
-readBoard("B150", "Stories260.dc.html", 10, [
+readBoard("B150", "Stories260.dc.html", 11, [
  ("B150", "The step we are on: the read, and what happened after it", head, [
   ("1. The photo, on the Plate", "f_1", "draft", "A photo picked from Your photos, taken yesterday."),
   ("2. The read", "f_2", "draft", "Right after Read the plate. No meal is set. Amber: the tap."),
@@ -30,10 +30,11 @@ readBoard("B150", "Stories260.dc.html", 10, [
   ("4. Dinner, and its time", "h_4", "changed", "New. Dinner is set, saved at once. Its time in the calendar is a field, set to 19:30."),
   ("5. Closed: the page as it was", "h_5", "changed", "Changed: only the meal line. The page still ends with What do you do with it?. Amber: the tap on Ate it."),
   ("6. Ate it asks how much", "h_6", "changed", "New: no calendar, the meal is set. Grey: the row as DT307 has it. Amber: the tap on Done."),
-  ("7. Logged, still on the Plate", "h_7", "changed", "New: no jump to the Plan. Ate it is blue with a tick, and one line says where it went."),
+  ("7. Logged, still on the Plate", "h_7", "changed", "New: no jump to the Plan. In place of the question, the status Eaten, All of it, with the pencil."),
+  ("Changing what happened", "h_10", "changed", "New. Not a step of this flow: the pencil on the status, and Not eaten to take the log back."),
   ("The way back", "h_8", "changed", "New. Not a step of this flow: from a set meal back to No meal selected, in edit mode."),
   ("A photo with no time of its own", "h_9", "changed", "New. Not a step of this flow: the reference line when only the time it was saved is known."),
   ("The proof: Saturday in the Plan", "h_p", "changed", "Not a step. No change to the screen. What it shows is right: one dinner, at the time I set.")], [1, 2, 3, 4, 5, 6])],
-  "Stories259.dc.html", "18 November 2026 (Coach Milan 19:21 to 22:32, with a screenshot of his Plan). A bug in the step after the read. Reproduced on the app as built in 0.3.159. Drawn for approval; no Go.")
+  "Stories259.dc.html", "18 November 2026 (Coach Milan 19:21 to 23:10, with a screenshot of his Plan). A bug in the step after the read. Reproduced on the app as built in 0.3.159. Drawn for approval; no Go.")
 json.dump(OUT, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outRead.json"), "w"))
 print(json.dumps({k: [v["file"], v["w"], v["h"]] for k, v in OUT.items()}))
