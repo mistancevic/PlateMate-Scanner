@@ -1914,7 +1914,7 @@
       "state": "next",
       "board": "Stories260",
       "where": "Page 5",
-      "why": "Coach Milan 18 November 19:21, with a screenshot of his Plan on Tuesday 17: a photo from Tuesday 19:56, tried as today's lunch, then set to dinner with the pencil; Tuesday shows it as Dinner, 19:56 and the planned Chicken rice bowl still asks. Cause: the pencil's calendar opens on today also for a photo from another day, and the meal is logged with the photo's time under the dinner of today. Reproduced on 0.3.159 as a record with the photo's day and another day's meal. Drawn; waits for a Go. Coach Milan 19:34: also the timing, he could not change it; only the times from the settings. Added to the board: the time in the meal line is a field (AC6 to AC9). 19:43: better an edit mode where everything is set than another way of correction. Drawn again: the pencil stays when a meal is set and opens the calendar with what is set marked and a row Time (AC6 to AC11). No time field in the line. 19:49: everything is wrong. Edit mode is when the pencil is clicked and turns into an X that closes it; saved automatically, no Done. The photo's time is a reference and cannot be changed; what changes is the time in the calendar. Drawn again: one icon; the time of the marked meal's row is a field; the photo's time is one line of reference (AC1 to AC13).",
+      "why": "Coach Milan 18 November 19:21, with a screenshot of his Plan on Tuesday 17: a photo from Tuesday 19:56, tried as today's lunch, then set to dinner with the pencil; Tuesday shows it as Dinner, 19:56 and the planned Chicken rice bowl still asks. Cause: the pencil's calendar opens on today also for a photo from another day, and the meal is logged with the photo's time under the dinner of today. Reproduced on 0.3.159 as a record with the photo's day and another day's meal. Drawn; waits for a Go. Coach Milan 19:34: also the timing, he could not change it; only the times from the settings. Added to the board: the time in the meal line is a field (AC6 to AC9). 19:43: better an edit mode where everything is set than another way of correction. Drawn again: the pencil stays when a meal is set and opens the calendar with what is set marked and a row Time (AC6 to AC11). No time field in the line. 19:49: everything is wrong. Edit mode is when the pencil is clicked and turns into an X that closes it; saved automatically, no Done. The photo's time is a reference and cannot be changed; what changes is the time in the calendar. Drawn again: one icon; the time of the marked meal's row is a field; the photo's time is one line of reference (AC1 to AC13). 20:04: yes to the six steps. 20:12: draw the new flow whole, with the screens that did not change; and no meal picked should be the status Just looking, a picked meal shows with its time, and the way back from a picked meal is Just looking. Drawn so: one status, one edit mode (AC1 to AC13).",
       "opportunity": {
         "from": "Coach Milan, 18 November 2026, 19:21, with a screenshot of his Plan on Tuesday 17 November. Found while testing the last releases on his phone.",
         "job": "Log a photo of a meal I ate on another day, to that day and that meal.",
@@ -1926,77 +1926,77 @@
       "ac": [
         {
           "id": "AC1",
-          "title": "The pencil opens on the photo's day",
-          "text": "Given it is Sunday and the read shows a photo from Saturday 15:57 that I said I ate then, when I tap the pencil, then edit mode opens on Sat 14, one line above says The photo was taken on Saturday, 15:57, and Lunch, the nearest meal, is marked."
+          "title": "No meal picked is Just looking",
+          "text": "Given a photo is read and I picked no meal, when I look at the meal line, then it says Just looking, Not counted, with the pencil, and the read ends with What do you do with it?."
         },
         {
           "id": "AC2",
-          "title": "One dinner on the photo's day",
-          "text": "Given that edit mode and a Chicken rice bowl planned for Saturday's dinner, when I tap Dinner, close, then choose All of it and Done, then Saturday shows my meal as its dinner, at 20:00, and the Chicken rice bowl no longer asks."
+          "title": "The pencil opens edit mode, the X closes it",
+          "text": "Given that read of a photo from Saturday 15:57, when I tap the pencil, then edit mode opens on Sat 14 with Just looking marked, the pencil is an X, and a tap on the X closes edit mode."
         },
         {
           "id": "AC3",
-          "title": "A meal of today, when I mean today",
-          "text": "Given the same read, when I tap Sun 15, today, then Dinner, then All of it and Done, then the meal is today's dinner at today's time, and Saturday shows nothing of it."
+          "title": "The photo's time is a reference",
+          "text": "Given edit mode for that photo, when I look above the days, then one line says The photo was taken on Saturday, 15:57, and a tap on it does nothing."
         },
         {
           "id": "AC4",
-          "title": "One day per record",
-          "text": "Given a meal is logged from a photo by any way (the read, the plate, Ate it, the pencil), when I open the Plan, then it shows on the day of the meal I picked and on no other day."
+          "title": "A meal is picked and saved at once",
+          "text": "Given edit mode is open, when I tap Dinner, then Dinner is marked, the line says Dinner, Saturday, 14 November, 20:00 at once, edit mode stays open, and there is no Done."
         },
         {
           "id": "AC5",
-          "title": "The record on your phone",
-          "text": "Given a record with the time Tuesday 19:56 and the dinner of Wednesday, when the app opens after the release, then it is Tuesday's dinner, Tuesday's planned dinner no longer asks, and Wednesday's dinner is open again."
+          "title": "I change the meal's time in the calendar",
+          "text": "Given Dinner is marked, when I tap the time in its row and set 19:30, then the line says Dinner, Saturday, 14 November, 19:30."
         },
         {
           "id": "AC6",
-          "title": "One icon: the pencil",
-          "text": "Given the read of a photo with Saturday's dinner set, when I look at the meal line, then it has the pencil and no X."
-        },
-        {
-          "id": "AC7",
-          "title": "The pencil turns into the X that closes",
-          "text": "Given that line, when I tap the pencil, then edit mode opens on Sat 14 with Dinner marked and the pencil is an X, and a tap on the X closes edit mode with everything as I set it."
-        },
-        {
-          "id": "AC8",
-          "title": "Saved at once, no Done",
-          "text": "Given edit mode is open, when I tap Lunch, then the line says Lunch, Saturday, 14 November, 13:45 at once, edit mode stays open, and there is no Done button."
-        },
-        {
-          "id": "AC9",
-          "title": "The photo's time is a reference",
-          "text": "Given edit mode for a photo from Saturday 15:57, when I look above the days, then one line says The photo was taken on Saturday, 15:57, and a tap on it does nothing."
-        },
-        {
-          "id": "AC10",
-          "title": "I change the meal's time in the calendar",
-          "text": "Given Dinner is marked in edit mode, when I tap the time in its row and set 19:30, then the line says Dinner, Saturday, 14 November, 19:30, and after All of it and Done Saturday shows my meal as Dinner, 19:30."
-        },
-        {
-          "id": "AC11",
           "title": "Only this meal, only this day",
           "text": "Given I set Saturday's dinner to 19:30, when I open Slots and times or another day, then Dinner is at 20:00 there."
         },
         {
+          "id": "AC7",
+          "title": "Closed, the line keeps the meal and the pencil",
+          "text": "Given Dinner at 19:30 is picked, when I tap the X, then the line shows Dinner, Saturday, 14 November, 19:30 with the pencil, and the read asks Did you eat it?."
+        },
+        {
+          "id": "AC8",
+          "title": "One dinner on the photo's day",
+          "text": "Given that read and a Chicken rice bowl planned for Saturday's dinner, when I choose All of it and tap Done, then Saturday shows my meal as Dinner, 19:30, the Chicken rice bowl no longer asks, and today shows nothing of it."
+        },
+        {
+          "id": "AC9",
+          "title": "Back to Just looking",
+          "text": "Given Dinner is picked, when I open edit mode and tap Just looking, then the line says Just looking, Not counted, and the read ends with What do you do with it? again."
+        },
+        {
+          "id": "AC10",
+          "title": "A meal of today, when I mean today",
+          "text": "Given edit mode on Sat 14, when I tap Sun 15, today and then Dinner, then the line says Dinner, Sunday, 15 November, and after All of it and Done the meal is today's dinner and Saturday shows nothing of it."
+        },
+        {
+          "id": "AC11",
+          "title": "One day per record",
+          "text": "Given a meal is logged from a photo by any way (the read, the plate, Ate it, edit mode), when I open the Plan, then it shows on the day of the meal I picked and on no other day."
+        },
+        {
           "id": "AC12",
-          "title": "Taking the meal off",
-          "text": "Given Dinner is marked in edit mode, when I tap Dinner again, then nothing is marked and the line says Meal and day not set."
+          "title": "The record on your phone",
+          "text": "Given a record with the time Tuesday 19:56 and the dinner of Wednesday, when the app opens after the release, then it is Tuesday's dinner, Tuesday's planned dinner no longer asks, and Wednesday's dinner is open again."
         },
         {
           "id": "AC13",
-          "title": "With no meal set",
-          "text": "Given no meal is set, when I tap the pencil and then Dinner, then Dinner is set at once, edit mode stays open with the X, and I close it myself."
+          "title": "A plate without a photo",
+          "text": "Given a plate I built with no photo, when I open edit mode, then it opens on today with no line about a photo, and everything else is the same."
         }
       ],
       "unchanged": [
-        "Ate it's calendar: it already opens on the photo's day.",
-        "A photo taken now, and a photo I did not say I ate then: the pencil opens on today.",
-        "A dinner logged after midnight stays with the evening before: its meal is on the earlier day, and that is left alone.",
-        "What a planned meal shows when it is closed by a meal I ate.",
-        "Slots and times in the settings: a time set on one meal of one day does not change the meal's usual time.",
-        "The days, the rows and Just looking in the calendar, and What is it? and the kind of moment under it."
+        "The photo screen and the read, but for the meal line.",
+        "What do you do with it? Save it, Plan it, Ate it, and Ate it's calendar.",
+        "Did you eat it?, All of it, Half, Part of it, Done.",
+        "The days and the rows of the calendar, and What is it? and the kind of moment under it.",
+        "Slots and times in the settings.",
+        "A dinner logged after midnight stays with the evening before."
       ]
     },
     {
