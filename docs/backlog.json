@@ -1926,18 +1926,18 @@
       "ac": [
         {
           "id": "AC1",
-          "title": "On no day, the line is a button",
-          "text": "Given a photo is read and the plate is on no day, when I look at the meal line, then it is the white button Put it on a day, with no pencil and no Not counted, and the read ends with What do you do with it?."
+          "title": "Not set, the line is a button",
+          "text": "Given a photo is read and no meal and day are set, when I look at the meal line, then it is the white button Set meal and day, with no pencil and no Not counted, and the read ends with What do you do with it?."
         },
         {
           "id": "AC2",
           "title": "The button opens edit mode, the X closes it",
-          "text": "Given that read of a photo from Saturday 15:57, when I tap Put it on a day, then edit mode opens on Sat 14 with Not on any day marked and an X at the right of the line, and a tap on the X closes edit mode and changes nothing."
+          "text": "Given that read of a photo from Saturday 15:57, when I tap Set meal and day, then edit mode opens on Sat 14 with the row Meal and day not set marked and an X at the right of the line, and a tap on the X closes edit mode and changes nothing."
         },
         {
           "id": "AC3",
-          "title": "The photo's time is a reference",
-          "text": "Given edit mode for that photo, when I look above the days, then one line says The photo was taken on Saturday, 15:57, and a tap on it does nothing."
+          "title": "The photo's time is a reference, taken or saved",
+          "text": "Given edit mode for a photo, when I look above the days, then one line says The photo was taken on Saturday, 15:57. for a photo that carries its own time, and The photo was saved on Saturday, 15:57. When it was taken is not known. for one that does not, and a tap on the line does nothing."
         },
         {
           "id": "AC4",
@@ -1966,8 +1966,8 @@
         },
         {
           "id": "AC9",
-          "title": "Back to no day",
-          "text": "Given Dinner is set, when I open edit mode and tap Not on any day, then the line is the button Put it on a day again, and the read ends with What do you do with it? again."
+          "title": "Back to not set",
+          "text": "Given Dinner is set, when I open edit mode and tap the row Meal and day not set, then the line is the button Set meal and day again, and the read ends with What do you do with it? again."
         },
         {
           "id": "AC10",
@@ -1987,22 +1987,22 @@
         {
           "id": "AC13",
           "title": "A plate without a photo",
-          "text": "Given a plate I built with no photo, when I tap Put it on a day, then edit mode opens on today with no line about a photo, and everything else is the same."
+          "text": "Given a plate I built with no photo, when I tap Set meal and day, then edit mode opens on today with no line about a photo, and everything else is the same."
         },
         {
           "id": "AC14",
           "title": "A plate with no name says Untitled",
-          "text": "Given a plate with no name, when I look at its title, then it says Untitled in grey with the pencil, and under it Name it, or Chef Mealan will., and a tap on the pencil puts the cursor in the name."
+          "text": "Given a plate with no name, when I look at its title, then it says Untitled in grey with the pencil, no line is added under it, and a tap on the pencil puts the cursor in the name."
         },
         {
           "id": "AC15",
           "title": "Just looking is gone",
-          "text": "Given any screen or line of Chef Mealan that says Just looking today, when I open it after the release, then it says Not on any day, and no screen says Not counted for this state."
+          "text": "Given any screen or line of Chef Mealan that says Just looking today, when I open it after the release, then it speaks of a meal and day not set, and no screen says Just looking or Not counted for this state."
         },
         {
           "id": "AC16",
           "title": "Three languages",
-          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 7, then Untitled, Name it, or Chef Mealan will., Put it on a day, Not on any day and The photo was taken on are in that language."
+          "text": "Given the app in English, Serbian or German, when I walk steps 1 to 7, then Untitled, Set meal and day, Meal and day not set and the two lines about the photo's time are in that language."
         }
       ],
       "unchanged": [
