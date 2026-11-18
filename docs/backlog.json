@@ -2005,6 +2005,44 @@
       "epic": "plate",
       "state": "next",
       "why": "Coach Milan 18 November 19:26, from the same test: the read gave a good list and asked about the chicken (he chose 200 g). The yogurt came as 10 % fat, fixed in the food list, not on the read's chip. Swap offered no 0.2 % fat yogurt. He added words (mayo was hidden; the yogurt is 0.2 % fat); the read then asked about the chicken again, this time whether it was 220 g. The list ended right, but it was confusing where and how to correct it. Four points: the kind of a food cannot be corrected on its chip; Swap lacks the variant; a second read asks again what was already answered, with another number; no one place to correct. Not reproduced and not drawn yet."
+    },
+    {
+      "id": "B151",
+      "title": "Ate it and Plan it turn blue while their calendar is open: an action looks like a chosen choice",
+      "epic": "plate",
+      "state": "next",
+      "board": "Stories261",
+      "where": "Page 5",
+      "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? Eaten would need a checkmark, to be selected would be white. Cause: .plate-end-btns .pill.on tints Ate it and Plan it while their calendar is open. Drawn; waits for a Go.",
+      "problem": "At the end of a plate I tap Ate it. Its calendar opens and the button turns blue. Blue is the look of a chosen choice, and there is no tick. It reads as eaten, and nothing is eaten yet. Plan it does the same.",
+      "story": "Ate it and Plan it stay white, also while their calendar is open. The calendar under the buttons shows what is open. Nothing else changes.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "Ate it stays white",
+          "text": "Given a plate with no meal set, when I tap Ate it and its calendar opens, then Ate it has the same white look as before the tap."
+        },
+        {
+          "id": "AC2",
+          "title": "Plan it stays white",
+          "text": "Given the same plate, when I tap Plan it and its calendar opens, then Plan it has the same white look as before the tap."
+        },
+        {
+          "id": "AC3",
+          "title": "The second tap still closes",
+          "text": "Given Ate it's calendar is open, when I tap Ate it again, then the calendar closes."
+        },
+        {
+          "id": "AC4",
+          "title": "Blue with a tick is for the chosen",
+          "text": "Given the calendar is open with Dinner as the guess, when I look at it, then Dinner's row is blue with a tick, and no button above it is blue."
+        }
+      ],
+      "unchanged": [
+        "What Save it, Plan it and Ate it do.",
+        "The marked meal in the calendar: blue with a tick.",
+        "Ate it on Did you eat it? for a plate from earlier: it is the main button there, filled blue, and stays so."
+      ]
     }
   ]
 }
