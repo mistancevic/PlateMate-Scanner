@@ -7,6 +7,8 @@
 // foods' name when none was typed, says which name, and the plate stays. With a meal already set with the pencil nothing is
 // asked again (Coach Milan, 18 November): Ate it and Plan it act at once on that meal.
 // The checks name the rows of the build brief (D1, D2, D8 to D10).
+// Changed by B148 (0.3.158, board Stories252; Coach Milan, Go 18 November 15:45): new checks at the end, B148 AC1 to AC4.
+// Under Ate it and under Plan it a tap on another day opens that day; in 0.3.157 the tap was lost. Nothing else changed.
 const start = require("./plate157.cjs");
 const PORT = "3562";
 (async () => { const h = await start(PORT); const { ok } = h; try {
@@ -84,4 +86,27 @@ const PORT = "3562";
   await p.locator(".plan-line-pen").click(); await p.locator(".meal-line-open .pcal-day").filter({ hasText: "Mon 16" }).click(); await h.row(p, "Lunch", ".meal-line-open").click(); await p.waitForTimeout(500);
   await p.locator(".pe-ate").click(); await p.waitForTimeout(500);
   ok(await p.locator(".plate-end .pcal").count() === 1 && (await h.st(p)).feedback.length === 0, "Monday's lunch is set and I tap Ate it: a meal still to come cannot be eaten, so the calendar opens on today");
+  await p.context().close();
+  // ---- B148: a tap on a day in the calendar under Ate it and under Plan it opens that day
+  const pe = ".plate-end", days = async (q) => q.locator(pe + " .pcal-day.on").allInnerTexts();
+  p = await h.open();
+  await p.locator(".pe-ate").click(); await p.waitForTimeout(500);
+  await p.locator(pe + " .pcal-day").filter({ hasText: "Sat 14" }).click(); await p.waitForTimeout(400);
+  let rs = await h.rows(p, pe);
+  ok((await days(p)).join() === "Sat 14" && rs.length === 4 && rs.every((r) => !/next|now/.test(r)) && /^Dinner 20:00 · not eaten/.test(rs[2]), "B148 AC1: Ate it, then Sat 14: Sat 14 is marked and the rows are Saturday's meals");
+  await p.locator(pe + " .pcal-more").click(); await p.waitForTimeout(300);
+  await p.locator(pe + " .pcal-date").fill("2026-11-12"); await p.waitForTimeout(400);
+  ok((await days(p)).some((d) => /Thu 12/.test(d)) && await p.locator(pe + " .pcal-date").count() === 1, "B148 AC3: More, then 12 November: the calendar is on Thursday 12");
+  await p.locator(pe + " .pcal-day").filter({ hasText: "Sat 14" }).click(); await p.waitForTimeout(400);
+  ok((await days(p)).join() === "Sat 14" && await p.locator(pe + " .pcal-date").count() === 0 && !/ on/.test(await p.locator(pe + " .pcal-more").getAttribute("class")), "B148 AC3: then Sat 14: More closes, Sat 14 is marked");
+  await h.row(p, "Lunch", pe).click(); await p.waitForTimeout(1200);
+  const fb = (await h.st(p)).feedback;
+  ok(fb.length === 1 && /Skyr, Oats & Banana is in Saturday's lunch, eaten/.test(await h.body(p)) && (await h.st(p)).items.length === 0, "B148 AC4: Sat 14 is marked and I tap Lunch: the plate is logged to Saturday's lunch");
+  await p.context().close();
+  p = await h.open();
+  await p.locator(".pe-plan").click(); await p.waitForTimeout(500);
+  await p.locator(pe + " .pcal-day").filter({ hasText: "Tue 17" }).click(); await p.waitForTimeout(400);
+  ok((await days(p)).join() === "Tue 17" && (await h.rows(p, pe)).length === 3, "B148 AC2: Plan it, then Tue 17: Tue 17 is marked and the rows are Tuesday's meals");
+  await h.row(p, "Dinner", pe).click(); await p.waitForTimeout(1200);
+  ok((await h.plan(p))["2026-11-17"]?.dinner?.title === "Skyr, Oats & Banana", "B148 AC2: a tap on Dinner plans the plate for Tuesday's dinner");
 } catch (e) { ok(false, "walkthrough error: " + (e && e.message)); } finally { await h.end(); } })();
