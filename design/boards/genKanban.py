@@ -29,7 +29,7 @@ def card(t):
         ac += head("OPPORTUNITY, WHY WE ACT") + row("Where it comes from:", o["from"]) + row("The job:", o["job"]) + row("What stood in the way:", o["kind"]) + row("Why now:", o["why_now"])
     if t.get("problem"): ac += head("PROBLEM") + para(t["problem"])
     if t.get("story"): ac += head("STORY") + para(t["story"])
-    if t.get("ac"): ac += head("ACCEPTANCE CRITERIA, WHAT IS NEW") + "".join(f'<div style="margin-top:6px;padding:6px 8px;border-radius:8px;background:#f4f7fc;font-size:12px;line-height:1.4;color:#172742"><b style="color:#123a7a">{html.escape(a["id"])}</b> <b>{html.escape(a["title"])}</b><br>{html.escape(a["text"])}</div>' for a in t["ac"])
+    if t.get("ac"): ac += head("ACCEPTANCE CRITERIA, WHAT IS NEW") + "".join(f'<div style="margin-top:6px;padding:6px 8px;border-radius:8px;background:#f4f7fc;font-size:12px;line-height:1.4;color:#172742"><b style="color:#123a7a">{html.escape(a["id"])}</b> <b>{html.escape(a["title"])}</b><br>{html.escape(a["text"]).replace("Given ", "<b>Given</b> ", 1).replace(", when ", ", <b>when</b> ", 1).replace(", then ", ", <b>then</b> ", 1)}</div>' for a in t["ac"])
     if t.get("unchanged"): ac += head("ALREADY WORKS, MUST NOT CHANGE") + "".join(f'<div style="font-size:12px;line-height:1.4;color:#3d4a63;margin-top:3px">· {html.escape(u)}</div>' for u in t["unchanged"])
     return (f'<div style="border:1.5px solid #d1dcf0;border-left:5px solid {COL[t["epic"]]};border-radius:10px;padding:9px 10px;background:#fff;margin-bottom:8px">'
             f'<div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><b style="font-size:12.5px;color:#123a7a">{t["id"]}</b>{chip(t["epic"])}</div>'

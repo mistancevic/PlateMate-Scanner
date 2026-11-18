@@ -218,13 +218,37 @@ board("Stories245.dc.html", "DT308.12 (2 of 2): something is on the plate, and a
   "18 November 2026 (Coach Milan 00:16 and 00:22). On the landing of 0.3.155: a barcode or a label joins with no question; a recipe from Recipe photo or Recipe link asks the same question as a photo. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
   B, W, y - 100, "Stories244.dc.html")
 
+AC311 = [
+  ("AC1", "The top of the card is the plate, not a button", "Given my plate holds skyr, oats and a banana, when I open the Plate, then the top of the card says On your plate and the result comes right under it, with no button in between."),
+  ("AC2", "Empty plate stands with the foods", "Given the same plate, when I look at the row right above the foods, then Empty plate stands on its left."),
+  ("AC3", "Group into parts stands opposite and reads well", "Given the same plate, when I look at that row, then Group into parts stands on its right, with its words on one line and clear of the button's border."),
+  ("AC4", "With nothing to group, Empty plate keeps its place", "Given my plate holds only skyr, so there is no Group into parts, when I look above the food, then Empty plate stands alone in the same place on the left."),
+]
+def gwt(t):
+    m = re.match(r"Given (.*), when (.*), then (.*)$", t); return [x[0].upper() + x[1:] for x in m.groups()]
+def gwtBold(t): return t.replace("Given ", "<b>Given</b> ", 1).replace(", when ", ", <b>when</b> ", 1).replace(", then ", ", <b>then</b> ", 1)
+def acTable(B, y, w, acs):
+    th = "padding:9px 12px;text-align:left;font-size:13.5px;font-weight:800;color:#fff;background:#172742"
+    td = "padding:10px 12px;font-size:13.5px;line-height:1.45;color:#172742;vertical-align:top;border-bottom:1px solid #d1dcf0"
+    rows = ""
+    for i, t, x in acs:
+        g, wh, th2 = gwt(x.rstrip("."))
+        rows += f'<tr><td style="{td};font-weight:800;color:#123a7a;white-space:nowrap">{i}</td><td style="{td};font-weight:700">{t}</td><td style="{td}">{g}</td><td style="{td}">{wh}</td><td style="{td}">{th2}</td></tr>'
+    B.html.append(f'<div style="position:absolute;left:20px;top:{y}px;width:{w}px;box-sizing:border-box;border:2px solid #2a72d9;border-radius:14px;padding:14px 16px;background:#fff">'
+      f'<div style="font-size:19px;font-weight:900;color:#123a7a"><span style="background:#123a7a;color:#fff;border-radius:7px;padding:1px 8px;margin-right:7px">DT311</span>Acceptance criteria, what is new: the alternative, as a table</div>'
+      f'<div style="margin-top:6px"><span style="display:inline-block;background:#2a72d9;color:#fff;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:800">New, drawn for your approval</span>'
+      f'<span style="font-size:13.5px;color:#172742;margin-left:10px">The same four criteria as in the card above, word for word. There: one sentence each, with <b>Given</b>, <b>when</b> and <b>then</b> in bold. Here: one row each. Pick one.</span></div>'
+      f'<table style="margin-top:12px;width:100%;border-collapse:collapse;table-layout:fixed"><colgroup><col style="width:58px"><col style="width:20%"><col style="width:24%"><col style="width:22%"><col></colgroup>'
+      f'<tr><th style="{th};border-radius:8px 0 0 0">#</th><th style="{th}">Scenario</th><th style="{th}">Given</th><th style="{th}">When</th><th style="{th};border-radius:0 8px 0 0">Then</th></tr>{rows}</table></div>')
+    return y + 150 + sum(24 + 21 * max(1, math.ceil(max(len(c) for c in gwt(x.rstrip("."))) / 42)) for _, _, x in acs)
+
 start(3)
 row("empty", "Empty plate on the left, opposite Group into parts. Three states side by side, not steps", [
   ("Ticket", "DT311 on the canvas page Kanban, column Now. It goes into 0.3.157."),
   ("Opportunity, why we act", "<b>Where it comes from:</b> Coach Milan's own look at the Plate on 18 November 2026, 10:05, while going through the boards. No tester has reported it.<br><b>The job:</b> Read my plate and its result, then change its foods.<br><b>What stood in the way:</b> Nobody was blocked. Two kinds: a risk of a wrong tap, because a delete button is the first control on the card; and looks broken, because the words of Group into parts touch its border.<br><b>Why now:</b> 0.3.157 rebuilds this card anyway, so the change is small now and would cost a release of its own later."),
   ("Problem", "On a plate with foods, the first button I meet is the one that throws the plate away: Empty plate sits at the top of the card, next to its title and above the result. The other button for the foods, Group into parts, is somewhere else, and its words touch its border, so it looks broken."),
   ("Story", "When I open my plate, I want to read what is on it and its result before anything else, and find the buttons for the foods next to the foods, so that I do not meet a delete button first and do not look in two places."),
-  ("Acceptance criteria, what is new", "<b>AC1 The top of the card is the plate, not a button.</b> Given my plate holds skyr, oats and a banana, when I open the Plate, then the top of the card says On your plate and the result comes right under it, with no button in between.<br><b>AC2 Empty plate stands with the foods.</b> Given the same plate, when I look at the row right above the foods, then Empty plate stands on its left.<br><b>AC3 Group into parts stands opposite and reads well.</b> Given the same plate, when I look at that row, then Group into parts stands on its right, with its words on one line and clear of the button's border.<br><b>AC4 With nothing to group, Empty plate keeps its place.</b> Given my plate holds only skyr, so there is no Group into parts, when I look above the food, then Empty plate stands alone in the same place on the left."),
+  ("Acceptance criteria, what is new", "<br>".join(f"<b>{i} {t}.</b> {gwtBold(x)}" for i, t, x in AC311)),
   ("Already works, must not change", "Empty plate asks once: the first tap says Tap again to empty, the second tap empties the plate.<br>Group into parts groups the foods as it does today, and shows when it shows today.<br>Everything else on the card: the result, Fit to my target, the foods, + Add more to your plate, Prepare it."),
   ("Why", "Coach Milan, 18 November 10:05: Empty plate could stand on the left, opposite Group into parts; that button's words are tight to its border; and when Group into parts is not there, Empty plate needs one general position."),
   ("Now", "Empty plate is at the top right of the card, next to On your plate, above the result. Group into parts is on the right above the foods, and its words touch its border."),
@@ -233,6 +257,7 @@ row("empty", "Empty plate on the left, opposite Group into parts. Three states s
   ("Above the PD block", "Not there: the top of the card is the best place of the page, and a button that throws the plate away should not sit where the eye lands first."),
   ("Group into parts", "Room around its words, on one line, 44 high."),
 ], [("Now", "e_0", "draft", "As it is in 0.3.156. Red: the two buttons."), ("With Group into parts", "e_1", "changed", "The same plate, with the change."), ("With one food", "e_2", "changed", "No Group into parts.")], nid="DT311", arrows=False)
+acTable(B, 2060, W - 40, AC311); y = 2060 + 348 + 150  # measured: the card ends at 2014, the table is 348 high
 board("Stories246.dc.html", "DT311: Empty plate on the left, opposite Group into parts",
   "18 November 2026 (Coach Milan 10:05). A small card of its own; it can go with 0.3.157. Drawn on the app as built in 0.3.156. Drawn for approval; no Go.",
   B, W, y - 100, "Stories245.dc.html")
