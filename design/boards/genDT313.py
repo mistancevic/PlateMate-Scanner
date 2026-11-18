@@ -20,7 +20,7 @@ def acTable(B, y, w, t):
     li = lambda x: f'<div style="font-size:13.5px;line-height:1.45;color:#172742;margin-top:4px">{x}</div>'
     B.html.append(f'<div data-ac style="position:absolute;left:20px;top:{y}px;width:{w}px;box-sizing:border-box;border:2px solid #172742;border-radius:14px;padding:14px 16px;background:#fff">'
       f'<div style="font-size:19px;font-weight:900;color:#123a7a"><span style="background:#123a7a;color:#fff;border-radius:7px;padding:1px 8px;margin-right:7px">{t["id"]}</span>3. The agreement: what gets built</div>'
-      f'<div style="margin-top:6px;font-size:13.5px;color:#172742">{t["short"]}. Proposed for 0.3.158; not agreed until Coach Milan says Go. A walkthrough check names its criterion, for example {t["id"]} AC1.</div>'
+      f'<div style="margin-top:6px;font-size:13.5px;color:#172742">{t["short"]}. {t.get("rel", "Proposed; not agreed until Coach Milan says Go")}. A walkthrough check names its criterion, for example {t["id"]} AC1.</div>'
       f'<div style="{hd};margin-top:14px">ACCEPTANCE CRITERIA, WHAT IS NEW</div>'
       f'<table style="margin-top:6px;width:100%;border-collapse:collapse;table-layout:fixed"><colgroup><col style="width:58px"><col style="width:20%"><col style="width:24%"><col style="width:22%"><col></colgroup>'
       f'<tr><th style="{th};border-radius:8px 0 0 0">#</th><th style="{th}">Scenario</th><th style="{th}">Given</th><th style="{th}">When</th><th style="{th};border-radius:0 8px 0 0">Then</th></tr>{rows}</table>'
@@ -35,7 +35,7 @@ def parts(t):
       ("Problem", t["problem"]), ("Story", t["story"]),
       ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"])]
     p += [(h, x) for h, x in t.get("more", [])]
-    p += [("Decision", "Open. Drawn for Coach Milan's look on 18 November 2026. No Go, so nothing is built."), ("3. The agreement", "In the wide block at the bottom of this board.")]
+    p += [("Decision", t.get("decision", "Open. Drawn for Coach Milan's look on 18 November 2026. No Go, so nothing is built.")), ("3. The agreement", "In the wide block at the bottom of this board.")]
     return p
 # card heights and the place of the agreement are measured in a browser (measure158.cjs writes heights158.json)
 HT = json.load(open(f"{HERE}/heights158.json")) if os.path.exists(f"{HERE}/heights158.json") else {}
@@ -51,7 +51,7 @@ def make(tid, fname, cols, shots, after, sub):
     Hc = top + h["ac"] + 40
     board(fname, f'{tid}: {t["title"]}', sub, B, W, Hc, after)
     OUT[tid] = {"file": fname, "w": W, "h": min(8000, Hc + 230), "title": f'{tid}: {t["title"]}', "inner": g["B"].render(W, Hc)}
-SUB = "18 November 2026. Prep for 0.3.158, the meal model, closed. Drawn on the app as built in 0.3.157. Drawn for approval; no Go."
+SUB = "18 November 2026. The meal model, closed. Drawn on the app as built in 0.3.157. Go: 18 November 15:56, for 0.3.159."
 make("DT313", "Stories250.dc.html", 6, [
   ("From Recipes: Change it first", "r_0", "draft", "A recipe's page in Recipes, with skyr, oats and a banana on the Plate. Amber: the tap."),
   ("The question today", "r_1", "draft", "The old look. Red: what differs from the screen a photo gets. The old plate is thrown away."),
@@ -69,5 +69,5 @@ make("DT314", "Stories251.dc.html", 4, [
 make("B148", "Stories252.dc.html", 2, [
   ("Under Ate it, a tap on Sat 14", "o_b", "draft", "0.3.157. The calendar stays on Sun 15, today. Amber: the tap that does nothing."),
   ("What the tap should open", "o_c", "changed", "Saturday's meals, as the calendar behind the pencil already does."),
-], "Stories251.dc.html", SUB.replace("Prep for 0.3.158, the meal model, closed.", "A bug found in 0.3.157 while drawing the board DT314."))
+], "Stories251.dc.html", "18 November 2026. A bug found in 0.3.157 while drawing the board DT314. Go 15:45; built in 0.3.158.")
 json.dump(OUT, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out158.json"), "w"))

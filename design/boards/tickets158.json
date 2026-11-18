@@ -92,7 +92,9 @@
    "New words: the recipe line with its source, the line for one food, Back to the plan, Back to the chat. English, Serbian, German.",
    "The screens DT313e and DT313f on this board are what it looks like."
   ],
-  "arrows": false
+  "arrows": false,
+  "decision": "Coach Milan, 18 November 15:56: Go. To build in 0.3.159.",
+  "rel": "Go for 0.3.159"
  },
  "DT314": {
   "id": "DT314",
@@ -160,7 +162,9 @@
    "The calendar opens under the question's buttons. The frame DT314c draws it on the plate's own Ate it; it is the same element.",
    "New words: the line above the calendar, and the help under the buttons (Ate it asks which meal). English, Serbian, German.",
    "The time logged stays the time the plate was started."
-  ]
+  ],
+  "decision": "Coach Milan, 18 November 15:56: Go. To build in 0.3.159.",
+  "rel": "Go for 0.3.159"
  },
  "B148": {
   "id": "B148",
@@ -214,6 +218,8 @@
   "details": [
    "No change to what is drawn on the boards DT308.",
    "New checks in the walkthrough plate-end, named B148 AC1 to AC4."
-  ]
+  ],
+  "decision": "Coach Milan, 18 November 15:45: fix the bug first. Built in 0.3.158, on its own.",
+  "rel": "Built in 0.3.158"
  }
 }
