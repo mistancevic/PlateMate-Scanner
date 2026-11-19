@@ -17,19 +17,27 @@ import { photoFromYours, photoWho, type Who } from "../photoAsk";
 
 export const dishWord = (d: Dish) => w(`served.dish.${d}` as WordKey);
 const FORM_DISHES: Dish[] = DISHES.filter((d) => d !== "drink");
-// the two rows that adapt: how much of a pot or a tray is yours; which dish of the meal it is
-export function PotRows({ vessel, share, setShare, dish, setDish, meal }: { vessel?: Vessel | null; share: "whole" | "portion"; setShare: (x: "whole" | "portion") => void; dish: Dish; setDish: (d: Dish) => void; meal: string | null }) {
+// the two rows that adapt: how much of a pot or a tray you eat; which dish of the meal it is
+// DT307.5 (0.3.163, board DT307; Coach Milan 16 November, Go 18 November 19:13 and 19 November 11:36): the pot question is
+// about what I eat: All of it, or A part of it (chosen when the screen opens), with grams. Empty grams: one portion.
+export type PotShare = "all" | "part";
+// what the read is asked for: the whole pot, the whole pot cut down to the grams I eat, or one portion as he sees the pot
+export const potAsk = (share: PotShare, grams: string): { share: "whole" | "portion"; eat?: number } => { const g = Math.round(Number(grams) || 0); return share === "all" ? { share: "whole" } : g > 0 ? { share: "whole", eat: Math.min(20000, g) } : { share: "portion" }; };
+export const potShareOf = (x: { share?: "whole" | "portion"; eat?: number }): { share: PotShare; grams: string } => (x.share === "whole" && !x.eat ? { share: "all", grams: "" } : { share: "part", grams: x.eat ? String(x.eat) : "" });
+export function PotRows({ vessel, share, setShare, grams, setGrams, dish, setDish, meal }: { vessel?: Vessel | null; share: PotShare; setShare: (x: PotShare) => void; grams: string; setGrams: (g: string) => void; dish: Dish; setDish: (d: Dish) => void; meal: string | null }) {
   // B149 (0.3.161, board B149): one tick, the one the look of a chosen choice draws; the tick written into the words is gone
   const chip = (on: boolean, text: string, tap: () => void) => (
     <div key={text} role="radio" tabIndex={0} aria-checked={on} className={`pa-opt${on ? " on" : ""}`} onClick={tap} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } }}>{text}</div>);
+  const q = w(vessel === "tray" ? "photoask.looksTray" : "photoask.looksPot"), about = w("photoask.partGrams", { grams: "\u0001" }).split("\u0001");
   return (<>
     {holdsMore(vessel) && (
       <div className="pa-row pa-share">
-        <small className="pa-row-q">{w(vessel === "tray" ? "photoask.looksTray" : "photoask.looksPot")}</small>
-        <div className="pa-chips" role="radiogroup" aria-label={w(vessel === "tray" ? "photoask.looksTray" : "photoask.looksPot")}>
-          {chip(share === "whole", w(vessel === "tray" ? "photoask.wholeTray" : "photoask.wholePot"), () => setShare("whole"))}
-          {chip(share === "portion", w("photoask.myPortion"), () => setShare("portion"))}
+        <small className="pa-row-q">{q}</small>
+        <div className="pa-chips" role="radiogroup" aria-label={q}>
+          {chip(share === "all", w("plate.allOfIt"), () => setShare("all"))}
+          {chip(share === "part", w("photoask.aPartOfIt"), () => setShare("part"))}
         </div>
+        {share === "part" && <div className="pa-part"><label className="pa-part-g">{about[0]}<input className="search pa-grams" type="number" inputMode="numeric" min={1} max={20000} value={grams} aria-label={w("photoask.partGramsAria")} onChange={(e) => setGrams(e.target.value)} />{about[1] ?? ""}</label><small className="muted">{w("photoask.partHelp")}</small></div>}
       </div>)}
     {meal && (
       <div className="pa-row pa-dish">
@@ -47,13 +55,15 @@ export function PotRows({ vessel, share, setShare, dish, setDish, meal }: { vess
 // at its time; a photo you take now is the meal in front of you; Just looking in the meal line stays Just looking). The
 // photo is bigger, with Remove the photo beside it. One box: Anything Chef Mealan should know?, typed or said. Read the
 // plate, alone. A pot or a tray still asks how much of it is yours; the dish is Chef Mealan's guess and shows on the read.
-export function PhotoAsk({ image, at, taken: fromCamera = false, mealAt, read, drop, look, exploring = false }: { image: string; at: string; taken?: boolean; mealAt: (d: Date) => string | null; read: (x: { at: string; who: Who; note?: string; share?: "whole" | "portion"; dish?: Dish }) => void; drop: () => void; look?: (image: string) => Promise<{ vessel: Vessel; course: Dish } | null>; exploring?: boolean }) {
+export function PhotoAsk({ image, at, taken: fromCamera = false, mealAt, read, drop, look, exploring = false, note0 = "" }: { note0?: string; image: string; at: string; taken?: boolean; mealAt: (d: Date) => string | null; read: (x: { at: string; who: Who; note?: string; share?: "whole" | "portion"; eat?: number; dish?: Dish }) => void; drop: () => void; look?: (image: string) => Promise<{ vessel: Vessel; course: Dish } | null>; exploring?: boolean }) {
   const taken = new Date(at), now = new Date();
   const who: Who = photoWho(taken, now, fromCamera, exploring);
-  const [note, setNote] = useState("");
+  // DT307.1: Back to the photo comes back with the words I gave
+  const [note, setNote] = useState(note0);
   // B144: the first look; until it answers the pot row waits, so a guess never jumps after you tapped
   const [seen, setSeen] = useState<{ vessel: Vessel | null; course: Dish } | null>(look ? null : { vessel: null, course: "main" });
-  const [share, setShare] = useState<"whole" | "portion">("whole");
+  const [share, setShare] = useState<PotShare>("part");
+  const [grams, setGrams] = useState("");
   useEffect(() => {
     if (!look) return; let on = true;
     look(image).then((r) => { if (!on) return; setSeen(r ?? { vessel: null, course: "main" }); }).catch(() => { if (on) setSeen({ vessel: null, course: "main" }); });
@@ -72,13 +82,13 @@ export function PhotoAsk({ image, at, taken: fromCamera = false, mealAt, read, d
       <img className="pa-photo" src={image} alt={w("photoask.yourPhoto")} />
       <div className="pa-from"><Mark size={18} color="var(--brand)" /><span>{say("photoHere", fromCamera ? w("photoask.takenNow") : photoFromYours(taken, now))}</span>
         <button type="button" className="pill pill-small pill-danger-line pa-remove" onClick={drop}>{w("photoask.dropThePhoto")}</button></div>
-      {seen && <PotRows vessel={seen.vessel} share={share} setShare={setShare} dish={dish} setDish={() => {}} meal={null} />}
+      {seen && <PotRows vessel={seen.vessel} share={share} setShare={setShare} grams={grams} setGrams={setGrams} dish={dish} setDish={() => {}} meal={null} />}
       <div className="pa-note">
         <div className="pa-note-top"><label htmlFor="pa-words">{w("photoask.whatIsInIt")}</label>{S && <button type="button" className="pill pill-small pill-action pa-say" aria-pressed={hearing} onClick={listen}>{hearing ? w("make.listening") : w("make.sayIt")}</button>}</div>
         <textarea id="pa-words" className="search pa-words" rows={3} value={note} placeholder={w("photoask.wordsPlaceholder")} onChange={(e) => setNote(e.target.value)} maxLength={300} />
       </div>
       <div className="pa-go">
-        <button type="button" className="pill pill-primary" onClick={() => read({ at: taken.toISOString(), who, ...(note.trim() ? { note: note.trim() } : {}), ...(seen && holdsMore(seen.vessel) ? { share } : {}), ...(seen && meal ? { dish } : {}) })}>{w("photoask.readThePlate")}</button>
+        <button type="button" className="pill pill-primary" onClick={() => read({ at: taken.toISOString(), who, ...(note.trim() ? { note: note.trim() } : {}), ...(seen && holdsMore(seen.vessel) ? potAsk(share, grams) : {}), ...(seen && meal ? { dish } : {}) })}>{w("photoask.readThePlate")}</button>
       </div>
     </section>
   );

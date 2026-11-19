@@ -5,7 +5,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import { w, wn, type Val } from "../words";
 import { atMeal, mealAt, type PlateWhen } from "../plateMode";
-import { photoAdvice } from "../mealPhoto";
+import { photoAdvice, holdsMore } from "../mealPhoto";
 import { NumbersTable, type PlanNumbers } from "../components/Letters";
 import type { GateLine } from "../gates";
 import type { Meal, Ingredient, PilotState } from "../pilot";
@@ -64,10 +64,16 @@ export type PlateReadIn = {
   t: Nutrition & { weight: number | null };
   unset: boolean;
   updateItem: (id: string, patch: Partial<Ingredient>) => void;
+  // DT307 (0.3.163, board DT307): Cancel, + Add more (point 3), Save in My recipes as a tick (point 4), the second Back (point 1)
+  cancelMeal: () => void;
+  addMore: () => void;
+  setRvKeep: (x: boolean) => void;
+  rvKeep: boolean;
+  backEl: React.ReactNode;
 };
 
 export function plateRead(given: PlateReadIn) {
-  const { checksEl, autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, endEl, unset, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem } = given;
+  const { checksEl, autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, endEl, unset, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem, rvKeep, setRvKeep, cancelMeal, addMore, backEl } = given;
   const ph = state.photo!;
   const total = Math.max(1, Math.round(items.reduce((k, i) => k + i.grams, 0)));
   const planning = !!p.filling && plateWhen === "plan", past = !!p.filling && plateWhen === "past";
@@ -93,7 +99,16 @@ export function plateRead(given: PlateReadIn) {
     // 0.3.157: a photo you ate then logs at its own time when no meal is set
     // B150 (0.3.160): set for a meal, it logs on that meal's day at that meal's time in the calendar
     const at = ph.who !== "ate" ? undefined : slot ? mealAt(slot.date, slot.time) : ph.at;
+    if (rvKeep && !saved) keep();
     p.ateNow(plateMeal(), slot, { photo: ph.image, at, ...(frac < 1 ? { part: frac } : {}) });
+  };
+  // DT307.4 and DT307.5 (0.3.163): with the tick, Done also keeps the plate in My recipes. A pot or a tray goes in whole, as a
+  // recipe with its portions; the plate is what I ate of it.
+  const keep = () => {
+    const m = plateMeal(), pw = holdsMore(ph.vessel) ? ph.potWhole : undefined;
+    if (!pw) { p.saveRead(m, ph.image); return; }
+    const whole = m.items.map((i) => ({ ...i, grams: Math.max(1, Math.round(i.grams * pw.scale)), locked: true })), all = whole.reduce((n, i) => n + i.grams, 0);
+    p.saveRead({ ...m, items: whole, portion: Math.round(all / pw.serves), makes: { n: pw.serves, unit: "portions" } }, ph.image);
   };
   const shots = [ph.image, ...(ph.more ?? [])], at = Math.min(shotAt, shots.length - 1);
   // DT318: the food my words are about, what Chef Mealan did when asked again, and the sending of my words. What I set
@@ -117,7 +132,8 @@ export function plateRead(given: PlateReadIn) {
         {p.ai.on && checksEl}
         {p.ai.on && <TellChef key={ph.at + ph.image.length} about={marked ? foodName(marked.food) : null} send={tell} />}
         {did?.line && <div className="bubble mealan chef-line rv-did"><p><b>{CHEF_NAME}:</b> {did.line}</p></div>}
-        <div className="rv-change"><button type="button" className="pill pill-small pill-action" onClick={() => setState((s) => (s.photo ? { ...s, photo: { ...s.photo, view: undefined } } : s))}>{w("plate.changeTheFoods")}</button></div>
+        {/* DT307.3 (0.3.163, board DT307): + Add more, left of Continue on the Plate: the Plate with + Add more to your plate open */}
+        <div className="rv-change"><button type="button" className="pill pill-small rv-add-more" onClick={addMore}>+ {w("plate.addMoreShort")}</button><button type="button" className="pill pill-small pill-action rv-continue" onClick={() => setState((s) => (s.photo ? { ...s, photo: { ...s.photo, view: undefined } } : s))}>{w("plate.changeTheFoods")}</button></div>
       </div>
       {readoutEl}
       {numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
@@ -138,9 +154,18 @@ export function plateRead(given: PlateReadIn) {
           {rvEat && <div className="rv-weight"><input className="search rv-grams" type="number" inputMode="numeric" min={1} max={total} aria-label={w("plate.gramsEaten")} value={rvGrams} onChange={(e) => { setRvGrams(e.target.value); const g = Math.round(Number(e.target.value)); setRvEat(g === total ? "all" : "part"); }} /><small className="muted">{w("plate.gOfTotal", { total })}</small></div>}
         </div>
       )}
-      {!unset && <div className="button-row rv-go">
+      {!unset && planning && <div className="button-row rv-go">
         <button type="button" className="pill pill-small pill-action rv-save" disabled={saved} onClick={() => p.saveRead(plateMeal(), ph.image)}>{saved ? w("recipes.savedInMyRecipes") : w("make.saveInMyRecipes")}</button>
         <button type="button" className="pill pill-small pill-primary rv-done" onClick={done}>{w("make.done")}</button>
       </div>}
+      {/* DT307.4 (0.3.163, board DT307; Coach Milan 18 November 18:46): Save in My recipes is a tick in a row of its own, off
+          when the read opens; under it Cancel on the left and Done on the right. Cancel logs nothing and takes the meal off. */}
+      {!unset && !planning && <>
+        <label className="rv-keep"><input type="checkbox" checked={rvKeep || saved} disabled={saved} onChange={(e) => setRvKeep(e.target.checked)} /><span>{saved ? w("recipes.savedInMyRecipes") : w("make.saveInMyRecipes")}</span></label>
+        <div className="button-row rv-go rv-end">
+          <button type="button" className="pill pill-small rv-cancel" onClick={cancelMeal}>{w("plate.cancel")}</button>
+          <button type="button" className="pill pill-small pill-primary rv-done" onClick={done}>{w("make.done")}</button>
+        </div></>}
+      {backEl}
     </section>);
 }

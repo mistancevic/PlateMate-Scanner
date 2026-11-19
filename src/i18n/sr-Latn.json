@@ -3061,14 +3061,6 @@
       "text": "Stavi u moj plan",
       "checked": true
     },
-    "make.ateIt": {
-      "text": "Pojedeno",
-      "checked": true
-    },
-    "make.ateHalf": {
-      "text": "Pola pojedeno",
-      "checked": true
-    },
     "make.addAFood": {
       "text": "Dodaj namirnicu",
       "checked": true
@@ -22142,23 +22134,11 @@
       "checked": true
     },
     "photoask.looksPot": {
-      "text": "Izgleda kao šerpa. Koliko od toga je tvoje?",
+      "text": "Izgleda kao šerpa. Koliko od toga pojedeš?",
       "checked": true
     },
     "photoask.looksTray": {
-      "text": "Izgleda kao pleh. Koliko od toga je tvoje?",
-      "checked": true
-    },
-    "photoask.wholePot": {
-      "text": "Cela šerpa",
-      "checked": true
-    },
-    "photoask.wholeTray": {
-      "text": "Ceo pleh",
-      "checked": true
-    },
-    "photoask.myPortion": {
-      "text": "Moja porcija",
+      "text": "Izgleda kao pleh. Koliko od toga pojedeš?",
       "checked": true
     },
     "photoask.whichDish": {
@@ -22747,6 +22727,34 @@
     },
     "howto.photoLog.s5": {
       "text": "Pod Da li je pojedeno? izaberi Sve, Pola ili Deo, pa Gotovo.",
+      "checked": true
+    },
+    "photoask.aPartOfIt": {
+      "text": "Jedan deo",
+      "checked": true
+    },
+    "photoask.partGrams": {
+      "text": "Oko {grams} g",
+      "checked": true
+    },
+    "photoask.partGramsAria": {
+      "text": "Grami koje pojedeš",
+      "checked": true
+    },
+    "photoask.partHelp": {
+      "text": "Ostavi prazno i Chef Mealan uzima jednu porciju.",
+      "checked": true
+    },
+    "photoask.partSaid": {
+      "text": "Jedan deo, oko {grams} g",
+      "checked": true
+    },
+    "plate.addMoreShort": {
+      "text": "Dodaj još",
+      "checked": true
+    },
+    "plate.backToCamera": {
+      "text": "Nazad na kameru",
       "checked": true
     }
   }

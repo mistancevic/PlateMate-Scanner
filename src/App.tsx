@@ -225,6 +225,8 @@ export default function App() {
   useLang();
   // DT214 v2 (0.3.53): the app opened again in the middle of a cook starts on the free Plate; the strip says where the cook
   // stands and Go on brings Chef Mealan's question
+  // DT307.1: the photo screen the last read came from (its photo at full size, the other photos, the words)
+  const readFrom = useRef<{ image: string; at: string; taken?: boolean; more?: string[]; saved?: boolean; note?: string } | null>(null);
   const [state, setState] = useState<PilotState>(() => cooking.swapOut(load())),
     // DT188 (0.3.30, board Stories137): the coach's two views, My day and My clients, switched at the top of Today; the chosen client
     [coachView, setCoachViewState] = useState<"day" | "clients">(() => { try { return localStorage.getItem("chefmealan-coach-view") === "clients" ? "clients" : "day"; } catch { return "day"; } }),
@@ -315,7 +317,7 @@ export default function App() {
     // DT309 (0.3.153): the small menu a long press on Plate opens
     [camMenu, setCamMenu] = useState(false),
     // DT130 (0.2.110): a photo picked from Your photos in the meal camera, waiting on the Plate for whose plate and when
-    [photoAsk, setPhotoAsk] = useState<{ image: string; at: string; taken?: boolean; more?: string[]; saved?: boolean } | null>(null),
+    [photoAsk, setPhotoAsk] = useState<{ image: string; at: string; taken?: boolean; more?: string[]; saved?: boolean; note?: string } | null>(null),
     // DT219 (0.3.58): the last photo read found no foods; nothing landed on the Plate
     [photoNoFoods, setPhotoNoFoods] = useState(false),
     // DT242 (0.3.96, board Stories182): a photo whose answer was lost twice is kept, with Try again
@@ -1977,7 +1979,15 @@ export default function App() {
     lookAtPhoto: async (image: string) => {
       try { const d: any = await api("/api/plate-look", { image: await resizeImageBase64(image, 640, 640) }); return d && typeof d.vessel === "string" ? { vessel: d.vessel as Vessel, course: dishOf(d.course) } : null; } catch { return null; }
     },
-    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: Dish; title?: string; told?: boolean }) => {
+    // DT307.1 (0.3.163, board DT307; Coach Milan 16 November, Go 18 November 19:13): a way back from the photo screen and the read
+    backToCamera: () => { setPhotoAsk(null); setTalkOpen(false); setMode("meal"); setCamera(true); },
+    backToPhoto: () => {
+      const ph = state.photo; if (!ph) return;
+      const from = readFrom.current && readFrom.current.at === ph.at ? readFrom.current : { image: ph.image, at: ph.at, ...(ph.who === "ate" ? {} : { taken: true }), ...(ph.more?.length ? { more: ph.more } : {}) };
+      setState((s) => ({ ...s, items: [], portion: null, title: "", photo: undefined, cooking: undefined, cookingFor: undefined, course: undefined, savedPlate: undefined }));
+      setPhotoAsk({ ...from, ...(ph.note ? { note: ph.note } : {}) }); setStep("in");
+    },
+    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; eat?: number; dish?: Dish; title?: string; told?: boolean }) => {
       const more0 = (x?.more ?? []).slice(0, 3), note = (x?.note ?? "").replace(/\s+/g, " ").trim().slice(0, 300);
       setBusy(more0.length ? w("app.readingPhotos", { n: more0.length + 1 }) : w("app.readingYourPlate"));
       try {
@@ -2006,7 +2016,13 @@ export default function App() {
         const fresh = got.fresh;
         // DT318: asked again with the person's words: what they set stays; one line says what Chef Mealan did
         const told = x?.told && x.replace && read ? toldAgain(state.items, got.items, sameKind) : null;
-        const items = told ? told.items : got.items;
+        // DT307.5 (0.3.163, board DT307): a pot or a tray is read alone, as a plate. A part of it with grams: the whole pot's foods
+        // cut down to those grams in all. What the plate needs to become the whole pot again stays with the photo, for My recipes.
+        const potShare = read && holdsMore(read.vessel) ? x?.share : undefined, potEat = potShare === "whole" && x?.eat && x.eat > 0 ? x.eat : undefined;
+        const readTotal = got.items.reduce((n, i) => n + i.grams, 0);
+        const potK = potEat && readTotal > 0 && !told ? potEat / readTotal : 1;
+        const readItems = potK === 1 ? got.items : got.items.map((i) => ({ ...i, grams: Math.max(1, Math.round(i.grams * potK)), ...(i.est ? { est: { ...i.est, low: Math.max(1, Math.round(i.est.low * potK)), high: Math.max(1, Math.round(i.est.high * potK)) } } : {}) }));
+        const items = told ? told.items : readItems;
         const did = told ? (() => { const list = (xs: string[]) => { try { return new (Intl as any).ListFormat(locOf(getLang()), { style: "long", type: "conjunction" }).format(xs); } catch { return xs.join(", "); } };
           const nm = (i: { food: Food }) => { const n = foodName(i.food).split(",")[0]; return getLang() === "en" ? n.toLowerCase() : n; };
           const parts = [...told.changed.map((c) => w("plate.didChanged", { from: nm(c.from), to: foodName(c.to.food) })), ...(told.fresh.length ? [w("plate.didAdded", { foods: list(told.fresh.map(nm)) })] : []), ...(told.gone.length ? [w("plate.didRemoved", { foods: list(told.gone.map(nm)) })] : [])];
@@ -2037,13 +2053,14 @@ export default function App() {
         const served: OnPlate | undefined = who !== "idea" ? undefined : kept ? { ...kept, dish: kept.dish ?? dishOf(read.course) }
           : again ? undefined
           : { id: uid(), mine: x?.served?.mine ?? true, visit: x?.served?.visit ?? visitFor(state.served ?? [], at) ?? uid(), dish: dishOf(read.course) };
-        // B144: your answers stay with the photo. A whole pot or tray for a meal becomes a recipe with portions, as a whole
-        // recipe does: the Plate opens it whole, sized for the meal, or one portion. Read again changes that same recipe.
-        const share = holdsMore(read.vessel) ? x?.share : undefined;
-        const potNow = share === "whole" && who !== "idea";
-        const potId = potNow ? (again && state.photo?.pot && state.meals.some((m) => m.id === state.photo!.pot) ? state.photo.pot : uid()) : undefined;
+        // B144: your answers stay with the photo. DT307.5 (0.3.163): a pot is no longer a recipe on the Plate by itself; it becomes
+        // one only with Save in My recipes ticked on the read (potWhole says how the plate grows back to the whole pot)
+        const share = potShare;
+        const serves = Math.max(2, read.serves ?? Math.round(((potShare === "portion" ? readTotal * 2 : readTotal) || 700) / 350));
+        const potWhole = share ? (x?.replace && state.photo?.potWhole ? state.photo.potWhole : { scale: share === "portion" ? serves : potEat ? 1 / potK : 1, serves }) : undefined;
+        const potNow = false, potId: string | undefined = undefined;
         const course = x?.dish && x.dish !== "main" && who !== "idea" ? x.dish : undefined;
-        const photo: NonNullable<PilotState["photo"]> = { image: thumb, at, unsure: potNow || keptName(read.unsure?.name) ? null : read.unsure, ...(did ? { did } : {}), ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: keptName(read.which?.name) ? null : read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}),
+        const photo: NonNullable<PilotState["photo"]> = { image: thumb, at, unsure: potNow || keptName(read.unsure?.name) ? null : read.unsure, ...(did ? { did } : {}), ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(potEat ? { eat: potEat } : {}), ...(potWhole ? { potWhole } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: keptName(read.which?.name) ? null : read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}),
           // B150 (0.3.160): the photo's time is only the time its file was saved; and the name Chef Mealan gave the plate
           ...((photoAsk?.saved && who === "ate") || (again && state.photo?.atSaved) ? { atSaved: true as const } : {}), ...(!(x?.title ?? "").trim() && (read.dishLocal || read.dish) ? { namedAs: read.dishLocal || read.dish } : again && state.photo?.namedAs ? { namedAs: state.photo.namedAs } : {}) };
         // B146 (0.3.152): a name typed on the photo screen is kept for a new plate
@@ -2076,6 +2093,8 @@ export default function App() {
           setKind("meal"); setStep("in");
         };
         const asked = photoAsk;
+        // DT307.1: the photo screen a read came from, for Back to the photo
+        if (asked) readFrom.current = { ...asked, ...(note ? { note } : {}) };
         setPhotoAsk(null);
         if (x?.replace) { land("new"); setTab("journey"); log("meal_photo", { foods: items.length, again: true }); return true; }
         { const parts = items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`);

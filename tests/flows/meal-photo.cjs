@@ -8,6 +8,8 @@
 // waits on the photo screen, and Read the plate reads it; the read shows alone, and Change the foods opens the plate this
 // walkthrough is about.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed from a photo, so this walkthrough sets the meal with the pencil (set-meal.cjs) on the photo's plate; the gates and Chef Mealan's card with Ate it and Ate half then work as before.
+// Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)
+// Changed by story DT306 (0.3.163, board DT306; Coach Milan, Go 19 November 11:36): Chef Mealan's card asks Did you eat it? with All of it, Half, Part of it and Don't count it, and Done is its one button; with no meal selected the card is his word alone
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -50,7 +52,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   const text = async (sel = "main") => (await page.locator(sel).first().textContent()).replace(/\s+/g, " ");
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   // 0.2.110 (DT130): Photo of my meal opens the meal camera; the shutter reads at once
-  const snap = async (sel) => { await page.locator(sel).click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); if (await page.locator(".cam-analyze").count()) await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500); if (await page.locator(".pa-screen").count()) { await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200); } if (await page.locator(".rv-change .pill").count()) { await page.locator(".rv-change .pill").click(); await page.waitForTimeout(600); } };
+  const snap = async (sel) => { await page.locator(sel).click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); if (await page.locator(".cam-analyze").count()) await page.locator(".cam-analyze").click(); await page.waitForTimeout(1500); if (await page.locator(".pa-screen").count()) { await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(2200); } if (await page.locator(".rv-change .rv-continue").count()) { await page.locator(".rv-change .rv-continue").click(); await page.waitForTimeout(600); } };
 
   // DT138 (0.2.122): Today has no Photo of my meal; the Plate has it
   await page.goto(U + "/"); await page.waitForTimeout(1500);
@@ -82,10 +84,10 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   // Chef Mealan's line and the buttons
   const say = await text(".mp-say");
   ok(/^Chef Mealan: Eat it as it is\. About [\d,]+( to [\d,]+)? kcal and \d+ g protein, a full lunch for your day/.test(say), "DT127: the line by code: eat it as it is, the energy as a range, the protein: " + say);
-  const btns = await page.locator(".mp-say .button-row button").allTextContents();
-  ok(btns.join() === "Ate it,Ate half,Add a food,Don't count it" && await page.locator(".mp-say .pill-primary").textContent() === "Ate it", "DT127: the buttons, the advice first: " + btns.join());
-  // Ate it logs it now, with the photo, at the meal of the moment
-  await page.getByRole("button", { name: "Ate it", exact: true }).click(); await page.waitForTimeout(600);
+  const opts = (await page.locator(".mp-say .mp-eat .pa-opt").allTextContents()).map((x) => x.trim()), btns = (await page.locator(".mp-say button").allTextContents()).map((x) => x.trim());
+  ok(opts.join() === "All of it,Half,Part of it,Don't count it" && btns.join() === "Done" && await page.locator(".mp-done").isDisabled(), "DT306: Did you eat it? with four answers, and Done the one button, off until an answer: " + opts.join() + " / " + btns.join());
+  // All of it, then Done, logs it now, with the photo, at the meal of the moment
+  await page.locator(".mp-eat .pa-opt").filter({ hasText: "All of it" }).click(); await page.waitForTimeout(200); await page.locator(".mp-done").click(); await page.waitForTimeout(600);
   const s3 = await st();
   const card = s3.feedback.find((f) => f.status === "eaten");
   ok(card && card.meal.title === "Grilled chicken with rice and salad" && card.slot && /lunch/i.test(card.slot.name) && !card.meal.items.some((i) => i.est), "DT127: Ate it logs the plate as eaten, as lunch; the estimate marks do not travel");
@@ -99,7 +101,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   await snap(".mp-button");
   // DT247 (0.3.96, board Stories183): a second photo minutes after the lunch asks once; here it is more of that lunch
   ok(await page.locator(".dish-ask").count() === 1, "DT247: the second photo asks once: dessert to your lunch, or its own snack");
-  await page.locator(".dish-ask .ca-go button").filter({ hasText: /^Dessert to your/ }).click(); await page.waitForTimeout(600); if (await page.locator(".rv-change .pill").count()) { await page.locator(".rv-change .pill").click(); await page.waitForTimeout(600); }
+  await page.locator(".dish-ask .ca-go button").filter({ hasText: /^Dessert to your/ }).click(); await page.waitForTimeout(600); if (await page.locator(".rv-change .rv-continue").count()) { await page.locator(".rv-change .rv-continue").click(); await page.waitForTimeout(600); }
   const big = await text(".mp-say");
   ok(/^Chef Mealan: Be aware: this plate is about 2 portions of your (lunch|dinner), about [\d,]+ to [\d,]+ kcal for a (lunch|dinner) of about [\d,]+\. Eat one portion and keep the rest\./.test(big), "DT133: the big plate in portions, by code from the size line: " + big);
   ok((await page.locator(".mp-say .button-row button").allTextContents()).slice(0, 2).join() === "Ate one portion,Ate it all", "DT133: Ate one portion first, then Ate it all");
@@ -114,7 +116,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
   await snap(".mp-button");
   // DT247: again minutes after a meal: it asks once; its own snack this time
-  await page.locator(".dish-ask .ca-go button").filter({ hasText: "Its own snack" }).click(); await page.waitForTimeout(400); if (await page.locator(".rv-change .pill").count()) { await page.locator(".rv-change .pill").click(); await page.waitForTimeout(600); }
+  await page.locator(".dish-ask .ca-go button").filter({ hasText: "Its own snack" }).click(); await page.waitForTimeout(400); if (await page.locator(".rv-change .rv-continue").count()) { await page.locator(".rv-change .rv-continue").click(); await page.waitForTimeout(600); }
   // DT278 (0.3.145, board Stories218): Don't count it in place of Not mine: the plate stays, not counted, kept with its day
   await page.getByRole("button", { name: "Don't count it" }).click(); await page.waitForTimeout(500);
   const s5 = await st();

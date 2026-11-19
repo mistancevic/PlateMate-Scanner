@@ -637,14 +637,6 @@
       "text": "In meinen Plan legen",
       "checked": true
     },
-    "make.ateIt": {
-      "text": "Gegessen",
-      "checked": true
-    },
-    "make.ateHalf": {
-      "text": "Halb gegessen",
-      "checked": true
-    },
     "make.addAFood": {
       "text": "Lebensmittel hinzufügen",
       "checked": true
@@ -22142,23 +22134,11 @@
       "checked": true
     },
     "photoask.looksPot": {
-      "text": "Das sieht nach einem Topf aus. Wie viel davon ist deins?",
+      "text": "Das sieht nach einem Topf aus. Wie viel davon isst du?",
       "checked": true
     },
     "photoask.looksTray": {
-      "text": "Das sieht nach einem Blech aus. Wie viel davon ist deins?",
-      "checked": true
-    },
-    "photoask.wholePot": {
-      "text": "Der ganze Topf",
-      "checked": true
-    },
-    "photoask.wholeTray": {
-      "text": "Das ganze Blech",
-      "checked": true
-    },
-    "photoask.myPortion": {
-      "text": "Meine Portion",
+      "text": "Das sieht nach einem Blech aus. Wie viel davon isst du?",
       "checked": true
     },
     "photoask.whichDish": {
@@ -22747,6 +22727,34 @@
     },
     "howto.photoLog.s5": {
       "text": "Wähl unter Hast du es gegessen? Alles, Die Hälfte oder Einen Teil, dann Fertig.",
+      "checked": true
+    },
+    "photoask.aPartOfIt": {
+      "text": "Einen Teil",
+      "checked": true
+    },
+    "photoask.partGrams": {
+      "text": "Etwa {grams} g",
+      "checked": true
+    },
+    "photoask.partGramsAria": {
+      "text": "Gramm, die du isst",
+      "checked": true
+    },
+    "photoask.partHelp": {
+      "text": "Lass es leer, dann nimmt Chef Mealan eine Portion.",
+      "checked": true
+    },
+    "photoask.partSaid": {
+      "text": "Ein Teil, etwa {grams} g",
+      "checked": true
+    },
+    "plate.addMoreShort": {
+      "text": "Mehr hinzufügen",
+      "checked": true
+    },
+    "plate.backToCamera": {
+      "text": "Zurück zur Kamera",
       "checked": true
     }
   }
