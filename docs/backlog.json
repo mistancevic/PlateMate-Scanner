@@ -2479,7 +2479,7 @@
       "state": "next",
       "board": "Stories268",
       "where": "Page 5",
-      "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's. 18:08: New at the top right. 18:17: it is not about trying, it is doing it; and feedback, a scale plus free text. 18:25: smiley faces instead of numbers, yes, as line faces.",
+      "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's. 18:08: New at the top right. 18:17: it is not about trying, it is doing it; and feedback, a scale plus free text. 18:25: smiley faces instead of numbers, yes, as line faces. 18:40: colour on the chosen face only, from the five steps.",
       "opportunity": {
         "from": "Coach Milan, 19 November 2026, 17:31 and 17:43. The twelve videos are on 0.3.165, and How to holds eight situations as steps in words.",
         "job": "As a beta tester, see a path once before I try it, and find the paths the app has that I would not guess.",
@@ -2558,6 +2558,11 @@
           "id": "AC14",
           "title": "Coach Milan sees it",
           "text": "Given a tester sent the fourth face and a line, when Coach Milan opens that tester under Clients, then the situation says Done, the day, the face with 4 of 5, and the line."
+        },
+        {
+          "id": "AC15",
+          "title": "The chosen face in colour",
+          "text": "Given How did it go?, when I choose a face, then only that face takes a colour, from the app's five steps as the PD chips have them: Frown red, Annoyed amber, Meh blue, Smile green, Laugh dark green, the face white on it; the face under I did it and in Coach Milan's list has the same colour."
         }
       ],
       "unchanged": [

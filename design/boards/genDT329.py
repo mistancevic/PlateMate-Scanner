@@ -33,7 +33,10 @@ td = "padding:10px 12px;font-size:14px;line-height:1.45;color:#172742;vertical-a
 rows = "".join(f'<tr><td style="{td};font-weight:700">{where}</td><td style="{td};background:#fdf0f0">{old or "<i>none</i>"}</td><td style="{td};background:#eaf1fd;font-weight:700">{new}</td><td style="{td};color:#3d4a63">{why}</td></tr>' for _k, where, old, new, why in t["text"])
 TW = 2300
 SVG = json.load(open(f"{HERE}/iconsDT329.json"))
-tile = lambda i: f'<span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:#e3edfb;vertical-align:middle;margin-right:10px">{SVG[i]}</span>'
+FACE = {"Frown": "#f0705c", "Annoyed": "#f6b94a", "Meh": "#2a72d9", "Smile": "#35cf9e", "Laugh": "#0f7d5b"}
+tile1 = lambda i: f'<span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:#e3edfb;vertical-align:middle;margin-right:10px">{SVG[i]}</span>'
+# a face: as it stands (line), then as it looks chosen (white on its colour)
+tile = lambda i: (tile1(i) + f'<span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:{FACE[i]};vertical-align:middle;margin-right:10px">{SVG[i + "-white"]}</span>') if i in FACE else tile1(i)
 ic = "".join(f'<tr><td style="{td};font-weight:700">{n}</td><td style="{td};background:#fdf0f0;font-size:20px">{e}</td><td style="{td};background:#eaf1fd;font-weight:700">{tile(i)}{i}</td></tr>' for n, e, i in t["icons"])
 B.html.append(f'<div data-tbl style="position:absolute;left:{SX}px;top:30px;width:{TW}px;box-sizing:border-box;border:2px solid #172742;border-radius:14px;padding:14px 16px;background:#fff">'
   f'<div style="font-size:19px;font-weight:900;color:#123a7a">The new lines</div>'
