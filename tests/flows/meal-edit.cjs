@@ -19,7 +19,7 @@ const hm = (iso) => new Date(iso).toLocaleTimeString("en-GB", { timeZone: "Europ
   const open = ".meal-line-open", pen = ".meal-line .plan-line-pen";
   const eaten = async (p) => (await h.st(p)).feedback.filter((f) => f.status === "eaten");
   // the line without its small title (drawn in capitals); the title itself is checked once
-  const ln = async (p) => (await h.line(p)).replace(/^meal and day\s+/i, "");
+  const ln = h.line;
   const titled = async (p) => (await p.locator(".meal-line .meal-line-title").textContent()).trim() === "Meal and day";
   const edit = async (p) => { await p.locator(pen).click(); await p.waitForTimeout(500); };
   // ---- AC14: a plate with no name
@@ -129,7 +129,7 @@ const hm = (iso) => new Date(iso).toLocaleTimeString("en-GB", { timeZone: "Europ
   // ---- AC15: Just looking is gone
   await edit(p);
   const openText = (await p.locator(open).innerText()).replace(/\s+/g, " ");
-  ok(!/Just looking/.test(await h.body(p)) && /No meal selected: a plate you look at\. Nothing is logged\./.test(openText), "B150 AC15: edit mode says No meal selected where it said Just looking, in the row and in the help under it");
+  ok(!/Just looking/.test(await h.body(p)) && /No meal selected: nothing is logged until you select a meal\./.test(openText), "B150 AC15: edit mode says No meal selected where it said Just looking, in the row and in the help under it");
   const en = JSON.parse(fs.readFileSync(path.join(__dirname, "../../src/i18n/en.json"), "utf8"));
   ok(!Object.values(en).some((v) => /Just looking/.test(typeof v === "string" ? v : Object.values(v).join(" "))), "B150 AC15: no English line of the app says Just looking");
   // ---- AC16: three languages

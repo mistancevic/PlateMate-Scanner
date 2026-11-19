@@ -6,6 +6,8 @@
 // the photo screen, which has no chips, and Read the plate reads it. Just looking is chosen behind the pencil of the meal
 // line. After a read of your own meal the read shows alone; Change the foods opens the plate.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: Just looking is the last row of the calendar behind the pencil (just-looking.cjs), in place of the chip under What is it for; a meal is tapped in that calendar, and with a meal set the X clears it first.
+// Changed by DT318 (0.3.160, board DT318; Coach Milan 19 November 01:00, Go): the link Wrong foods? Help Chef Mealan read it is gone; the form opens with one more photo of the same plate, behind ＋ Photo (one-more-photo.cjs).
+// Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): Just looking and No meal selected are one state, and a photo read with no meal selected is a photo of yours. A plate is kept as Served with Don't count it (not-counted.cjs): it starts as not counted, someone else's, with Main picked by hand, and a tap on Mine makes it mine. Scan another plate reads the dish as before.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -62,11 +64,12 @@ const READS = [
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
     await require("./just-looking.cjs")(page);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
+    await require("./not-counted.cjs")(page); await page.locator(".sv-plate").getByRole("radio", { name: "Mine" }).click(); await page.waitForTimeout(300); // changed by B150: Don't count it keeps the plate; it starts as someone else's, and a tap makes it mine
     const sv = page.locator(".sv-plate");
     ok(await sv.count() === 1 && /Served\s*Kept in Recipes, under Served/.test(await text(".sv-head")), "the Plate says the plate is kept, marked Served");
     let s = await st();
     ok(s.served?.length === 1 && s.served[0].mine === true && s.served[0].dish === "main" && s.served[0].name === "Meatballs in tomato sauce" && s.served[0].items.length === 2 && /^data:image/.test(s.served[0].photo), "kept by itself: the name and the dish as read, the foods, the photo");
-    ok(await sv.locator(".sv-name").inputValue() === "Meatballs in tomato sauce" && await sv.locator(".sv-by").count() === 2, "the name and the dish say filled by Chef Mealan");
+    ok(await sv.locator(".sv-name").inputValue() === "Meatballs in tomato sauce" && await sv.locator(".sv-by").count() === 1, "changed by B150: the name says filled by Chef Mealan; the dish is Main, not read for a plate kept with Don't count it");
     ok(await sv.getByRole("radio", { name: "Main" }).getAttribute("aria-checked") === "true" && await sv.locator(".sv-dishes").getByRole("radio").count() === 5, "five dishes, Main set by the read");
     ok(s.feedback.length === 0 && /Nothing is logged/.test(await text(".sv-foot")), "nothing is logged");
     ok(await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1, "the idea's buttons stay as they were");
@@ -228,13 +231,14 @@ const READS = [
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
     await require("./just-looking.cjs")(page);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
+    await require("./not-counted.cjs")(page); await page.locator(".sv-plate").getByRole("radio", { name: "Mine" }).click(); await page.waitForTimeout(300); // changed by B150: Don't count it keeps the plate; it starts as someone else's, and a tap makes it mine
     s = await st();
     ok(s.served.length === 3 && s.served[0].name === "Apple strudel" && s.served[0].dish === "main" && s.served[0].visit === s.served[1].visit, "a dish the read cannot name is a main; a plate soon after joins the visit");
     await page.locator(".sv-drop").click(); await page.waitForTimeout(400);
     s = await st();
     ok(s.served.length === 2 && s.items.length === 1 && /Not kept/.test(await text(".sv-off")), "Don't keep it: off the list, the Plate keeps its foods and says so");
     // 0.3.121: reading the same photo again keeps what the plate was: not kept stays not kept
-    await page.locator(".mp-again-link").click(); await page.waitForTimeout(300);
+    await require("./one-more-photo.cjs")(page);
     await page.locator(".mp-help").getByLabel("Anything Chef Mealan should know?") /* B144 (0.3.150): the words box asks what is in it */.fill("apple strudel with cream");
     await page.locator(".mp-help .pill-primary").click(); await page.waitForTimeout(2000);
     s = await st();
@@ -245,22 +249,27 @@ const READS = [
     await page.locator(".camera-ui input[type=file]").setInputFiles(file); await page.waitForTimeout(1200);
     await require("./just-looking.cjs")(page);
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
+    await require("./not-counted.cjs")(page); await page.locator(".sv-plate").getByRole("radio", { name: "Mine" }).click(); await page.waitForTimeout(300); // changed by B150: Don't count it keeps the plate; it starts as someone else's, and a tap makes it mine
     s = await st();
     const n274 = s.served.length, fb274 = s.feedback.length;
-    ok(s.photo?.who === "idea" && !!s.photo?.served && await page.locator(".sv-plate").count() === 1, "an Just looking plate, kept");
+    ok(s.photo?.who === "idea" && !!s.photo?.served && await page.locator(".sv-plate").count() === 1, "a plate kept as Served");
     await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300);
     const say = await text(".for-say");
-    ok(/Just looking: a plate you look at\. Nothing is logged\. With a photo it is kept in Recipes, under Served\./.test(say) && /A meal \(Breakfast, Lunch, Dinner\): your meal\. It counts in your day when you tap Eat or Ate it\. If it was under Served, it leaves Served\./.test(say) && await page.locator(".for-hint").count() === 0, "the pencil's sheet says what each choice does, in place of the old line on Just looking");
+    ok(/No meal selected: nothing is logged until you select a meal\. With Don't count it a photo's plate is kept in Recipes, under Served\./.test(say) && /A meal \(Breakfast, Lunch, Dinner\): your meal\. It counts in your day when you tap Eat or Ate it\. If it was under Served, it leaves Served\./.test(say) && await page.locator(".for-hint").count() === 0, "the pencil's sheet says what each choice does (changed by B150: No meal selected, and Don't count it keeps a photo's plate)");
     // back to a meal: your meal again, out of Served
     await page.locator(".meal-line-open .pcal-row").filter({ hasText: /^\s*Dinner/ }).click(); await page.waitForTimeout(600);
+    await page.locator(".meal-line .plan-line-close").click(); await page.waitForTimeout(300); // changed by B150: the X closes edit mode
     s = await st();
     ok(s.photo && s.photo.who !== "idea" && !s.photo.served && s.served.length === n274 - 1 && s.feedback.length === fb274 && s.items.length > 0, "the pencil on Dinner: your meal again, out of Served, the foods stay, nothing logged");
-    ok(await page.locator(".sv-plate").count() === 0 && await page.locator(".mp-say").getByRole("button", { name: "Ate it" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 0, "the Served card is gone and the buttons are a meal's");
-    // and to Exploring again: an Exploring plate, kept
+    ok(await page.locator(".sv-plate").count() === 0 && /Did you eat it\?/.test(await text("main")) && await page.locator(".rv-done").count() === 1 && await page.getByRole("button", { name: "Save as an idea" }).count() === 0, "the Served card is gone and the meal's read asks Did you eat it? (changed by B150 and DT318: the photo was read as yours, so its read shows)");
+    // changed by B150: No meal selected takes the meal off and keeps nothing; Don't count it keeps the plate as Served again
     await require("./just-looking.cjs")(page); await page.waitForTimeout(300);
     s = await st();
-    ok(s.photo?.who === "idea" && s.photo?.served?.byHand === true && s.served.length === n274 && s.served[0].mine === true && s.feedback.length === fb274, "the pencil on Just looking: an Just looking plate, kept as Served; nothing logged");
-    ok(await page.locator(".sv-plate").count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Ate it" }).count() === 0, "the Served card shows and the buttons are an Just looking plate's");
+    ok(s.photo && s.photo.who !== "idea" && !s.photo.served && !s.pick && s.served.length === n274 - 1, "changed by B150: the row No meal selected: no meal, and the plate is not kept as Served by it");
+    await require("./not-counted.cjs")(page);
+    s = await st();
+    ok(s.photo?.who === "idea" && s.photo?.served?.byHand === true && s.served.length === n274 && s.served[0].mine === false && s.feedback.length === fb274, "changed by B150: Don't count it: kept as Served, not counted; nothing logged");
+    ok(await page.locator(".sv-plate").count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Ate it" }).count() === 0, "the Served card shows and the buttons are a kept plate's");
     ok(await page.locator(".sv-plate .sv-by").count() === 1, "the dish was not read for this plate, so only the name says filled by Chef Mealan");
     // 0.3.126 (blind run 10 November, finding 1): a recipe as a new plate lets go of the Served plate; the kept plate keeps its foods
     const kept126 = JSON.stringify((await st()).served[0].items.map((i) => [i.food.name, i.grams]));

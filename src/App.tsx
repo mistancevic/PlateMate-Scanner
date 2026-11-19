@@ -2022,7 +2022,9 @@ export default function App() {
         // DT212 v4 (0.3.53): Read the photo again keeps the photo's time and replaces the foods, after it asked
         const at = (x?.who === "ate" || x?.replace) && x.at ? x.at : new Date().toISOString();
         // 0.3.62 (Coach Milan 20:21 to 20:55): Exploring in the pencil block makes a camera photo Exploring too
-        const who = x?.who ?? (pick === "exploring" ? "idea" : undefined);
+        // B150 (0.3.160, board B150): Just looking and no meal set are one state, No meal selected. A new photo is never an
+        // idea because of the plate before it; only Don't count it, or Scan another plate, makes one.
+        const who = x?.who;
         // DT268 (0.3.118, board Stories201): an Exploring plate is kept as Served. Read again keeps its place there; another
         // plate (x.served) or a first one gets a new one: whose it is, its visit (the sitting it was scanned at), the dish as read
         // 0.3.121 (Coach Milan 10 November 07:50 to 08:09, Go): reading the same photo again (Help Chef Mealan read it, a photo
@@ -2047,7 +2049,7 @@ export default function App() {
         const land = (how: "add" | "new") => {
           // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
           // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
-          if (who === "idea") { if (filling) { setExploreLeft(fillingName(filling)); setFilling(null); } else setExploreLeft(null); setPick("exploring"); } else setExploreLeft(null);
+          if (who === "idea") { if (filling) { setExploreLeft(fillingName(filling)); setFilling(null); } else setExploreLeft(null); setPick("exploring"); } else { setExploreLeft(null); if (pick === "exploring" && how === "new") setPick(null); }
           // DT240 (0.3.96, board Stories182; Coach Milan 10:14 and 10:32, b): a cook still open asks once
           // 0.3.121: only when a plate comes in; the same photo read again brings nothing new, so it does not ask
           if (!again && state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat")) setCookOpenAsk(true);

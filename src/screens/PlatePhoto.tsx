@@ -31,7 +31,7 @@ export function platePhotoCard(given: { p: AppApi; photoTitle: string }) {
   const { p, photoTitle } = given;
   return (
     <section className="card plate-card photo-screen">
-      <PhotoAsk key={p.photoAsk!.at + p.photoAsk!.image.length} image={p.photoAsk!.image} at={p.photoAsk!.at} taken={p.photoAsk!.taken} drop={p.dropPhotoAsk} exploring={p.pick === "exploring"}
+      <PhotoAsk key={p.photoAsk!.at + p.photoAsk!.image.length} image={p.photoAsk!.image} at={p.photoAsk!.at} taken={p.photoAsk!.taken} drop={p.dropPhotoAsk} exploring={false /* B150 (0.3.160): no meal selected is one state; a new photo is yours, and Don't count it keeps a plate out of the day */}
         mealAt={(d) => { const sl = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return sl ? sl.name.toLowerCase() : null; }}
         look={p.lookAtPhoto} read={(x) => { void p.readMealPhoto(p.photoAsk!.image, { ...x, ...(p.photoAsk!.more?.length ? { more: p.photoAsk!.more } : {}), ...(photoTitle.trim() ? { title: photoTitle.trim() } : {}) }); }} />
     </section>

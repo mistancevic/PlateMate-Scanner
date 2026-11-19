@@ -10,7 +10,8 @@
 // ago is a lunch you ate at its time). The read shows alone; Did you eat it? All of it, then Done, logs it. Just looking is
 // chosen behind the pencil, as the meal line's own question; a photo from last week is a meal of that day unless you say so.
 // Drop the photo is Remove the photo.
-// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: a photo from earlier today no longer fills in the meal line: it says Meal and day not set, and the photo's time is the guess only when you say Ate it. Just looking is the last row of the calendar behind the pencil (just-looking.cjs).
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: a photo from earlier today no longer fills in the meal line: it says No meal selected, and the photo's time is the guess only when you say Ate it. Just looking is the last row of the calendar behind the pencil (just-looking.cjs).
+// Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has the small title Meal and day and says No meal selected; Just looking is gone, and a photo read with no meal selected is a photo of yours (Don't count it makes it the kept plate, not-counted.cjs); a photo's meal is logged at the meal's time.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -95,7 +96,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   ok(await page.locator(".camera-ui").count() === 0 && await page.locator(".plate-card .pa-screen").count() === 1, "DT130, DT305: a photo from Your photos lands on the photo screen");
   ok(sent.length === 1, "DT130: nothing is read before Read the plate");
   ok(/A photo from 12:20 today, from Your photos\./.test(await text(".pa-from")) && !/Whose plate/.test(await text(".pa-from")) && await page.locator(".pa-from").count() === 1 && await page.locator(".pa-photo").count() === 1, "DT130, DT213, DT305: the photo's own time, in Chef Mealan's line, and no question: " + await text(".pa-from"));
-  ok(await page.locator(".pa-chip").count() === 0 && await page.locator(".pa-time").count() === 0 && /^Meal and day not set$/.test((await text(".plan-line")).trim()), "DT305: no chips and no time field; changed by DT308.5: the photo does not fill in the meal line: " + (await text(".plan-line")).slice(0, 40));
+  ok(await page.locator(".pa-chip").count() === 0 && await page.locator(".pa-time").count() === 0 && /^No meal selected$/.test((await text(".plan-line")).trim().replace(/^\s*meal and day\s*/i, "")), "DT305: no chips and no time field; changed by DT308.5: the photo does not fill in the meal line: " + (await text(".plan-line")).slice(0, 40));
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   const s2 = await st();
   ok(sent.length === 2 && s2.photo.who === "ate" && new Date(s2.photo.at).getHours() === 12 && new Date(s2.photo.at).getMinutes() === 20 && await page.locator(".pa").count() === 0, "DT130: Read the plate reads; the plate keeps the photo's time and who");
@@ -108,19 +109,23 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await page.locator(".rv-done").click(); await page.waitForTimeout(700);
   const s3 = await st();
   const eaten = s3.feedback.find((f) => f.status === "eaten");
-  ok(eaten && new Date(eaten.createdAt).getHours() === 12 && new Date(eaten.createdAt).getMinutes() === 20 && eaten.slot && /lunch/i.test(eaten.slot.name) && eaten.slot.date === "2026-10-25", "DT130, DT305: All of it and Done log it at 12:20, as lunch, today");
+  const hm = (x) => { const d = new Date(x); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
+  ok(eaten && (hm(eaten.createdAt) === eaten.slot.time || eaten.slot.time > hm(eaten.createdAt)) && hm(eaten.createdAt) !== "12:20" && /lunch/i.test(eaten.slot.name) && eaten.slot.date === "2026-10-25", "DT130, DT305, changed by B150: All of it and Done log it as lunch, today, at the lunch's time, or now while that time is still ahead (not the photo's 12:20): " + (eaten && hm(eaten.createdAt) + ", lunch at " + eaten.slot.time));
 
   // yesterday's photo: Ate at 19:10 starts on, as dinner; An idea instead
   await toPlate();
   await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
   await pick("2026:10:24 19:10:00");
-  ok(/A photo from yesterday, 19:10, from Your photos\./.test(await text(".pa-from")) && /^Meal and day not set$/.test((await text(".plan-line")).trim()), "DT130, DT305, changed by DT308.5: a photo from yesterday: the meal line still says Meal and day not set");
+  ok(/A photo from yesterday, 19:10, from Your photos\./.test(await text(".pa-from")) && /^No meal selected$/.test((await text(".plan-line")).trim().replace(/^\s*meal and day\s*/i, "")), "DT130, DT305, changed by DT308.5: a photo from yesterday: the meal line still says No meal selected");
   // DT305: Just looking is the meal line's own answer, behind the pencil
   await require("./just-looking.cjs")(page);
-  ok(/^Just looking/.test(await text(".plan-line")) && await page.locator(".pa-screen").count() === 1, "0.3.62, DT305: Just looking behind the pencil; the photo waits");
+  ok(/No meal selected/.test(await text(".plan-line")) && await page.locator(".pa-screen").count() === 1, "0.3.62, DT305, changed by B150: No meal selected behind the pencil; the photo waits");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
+  // changed by B150: the photo is read as yours with no meal selected; Don't count it makes it the kept plate, with the idea's buttons
+  ok(sent.length === 3 && (await st()).photo.who !== "idea" && !(await st()).pick, "changed by B150: read with no meal selected: a photo of yours, no meal");
+  await require("./not-counted.cjs")(page);
   const s4 = await st();
-  ok(sent.length === 3 && s4.photo.who === "idea" && /Just looking at a photo\. 3 foods read, amounts estimated \(~\)\. Not logged/.test(await text(".mp-big-say")) && (await st()).pick === "exploring", "0.3.62: the read lands as Just looking, said in the photo line; the pencil block is on Just looking");
+  ok(s4.photo.who === "idea" && /A photo with no meal selected\. 3 foods read, amounts estimated \(~\)\. Not logged/.test(await text(".mp-big-say")) && (await st()).pick === "exploring", "0.3.62, changed by B150: Don't count it: said in the photo line, not logged");
   const ib = (await page.locator(".mp-say .mp-idea-row button").allTextContents()).map((x) => x.trim());
   ok(ib.length === 3 && /^Fit it to my (lunch|dinner|meal)$/.test(ib[0]) && ib[1] === "Save as an idea" && ib[2] === "Put it in my plan" && (await page.locator(".mp-say .pill-primary").textContent()).trim() === ib[0], "DT130: the buttons are for cooking it, Fit first; no Ate it: " + ib.join(" | "));
   const say = await text(".mp-say small");
@@ -144,8 +149,10 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await toPlate();
   await (await require("./more.cjs")(page, "mp")).click(); await page.waitForTimeout(1500);
   await pick("2026:10:19 20:00:00");
-  ok(/A photo from Monday 19 October, 20:00, from Your photos\./.test(await text(".pa-from")) && /^Just looking/.test(await text(".plan-line")), "DT130, DT305: a photo from last week; the meal line still says Just looking, as you left it");
+  ok(/A photo from Monday 19 October, 20:00, from Your photos\./.test(await text(".pa-from")) && /No meal selected/.test(await text(".plan-line")), "DT130, DT305, changed by B150: a photo from last week; the meal line says No meal selected");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
+  ok((await st()).photo.who !== "idea" && !(await st()).pick, "changed by B150: the plate before was not counted; this new photo is read as yours, with no meal selected");
+  await require("./not-counted.cjs")(page);
   await page.getByRole("button", { name: "Save as an idea" }).click(); await page.waitForTimeout(1200);
   const s6 = await st();
   ok(s6.meals.filter((m) => m.idea && m.idea.from === "photo").length === 2 && /It waits at the top of Mine until you make it/.test(await text()), "DT130: Save as an idea keeps it in Mine, at the top until made");

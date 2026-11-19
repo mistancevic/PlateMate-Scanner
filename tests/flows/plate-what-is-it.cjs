@@ -4,7 +4,8 @@
 // savoury ones, Both nothing, and Both puts a main and a sweet finish on the plate as two parts. Nothing picked, everything is
 // offered. Sweet or DaaM in a craving sets it. On Me, the taste is chips (Vanilla and Chocolate among them) and your own words;
 // Chef Mealan gets the chips in their fixed words. Never rewrite these lines to fit a change.
-// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one (DT308.1): what the plate is (Savoury; Sweet, a DaaM; Savoury and sweet) stands under Meal and day not set or under the meal, no longer after a dot on one line. What R22 says still holds: picked, the line says it.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one (DT308.1): what the plate is (Savoury; Sweet, a DaaM; Savoury and sweet) stands under No meal selected or under the meal, no longer after a dot on one line. What R22 says still holds: picked, the line says it.
+// Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -60,7 +61,7 @@ const U = "http://127.0.0.1:3239";
     const shown = async (q) => { await search.fill(q); await page.waitForTimeout(300); return page.locator(".rows .row-food").filter({ hasText: q }).count(); };
     ok(await shown("Nutella") > 0, "nothing picked: Nutella is offered");
     await what.getByRole("button", { name: "Savoury" }).click(); await page.waitForTimeout(300);
-    const line = () => page.locator(".plan-line").textContent();
+    const line = async () => ((await page.locator(".plan-line").textContent()) ?? "").replace(/^\s*meal and day\s*/i, "");
     ok(/Savoury$/.test((await line()).trim()), "the line says Savoury");
     ok(await shown("Nutella") === 0 && /Nutella is in your foods, but it doesn't go with this dish/.test(await page.locator(".held-back").textContent()), "Savoury holds Nutella back on a plate of your own, and says so");
     await what.getByRole("button", { name: "Sweet, a DaaM" }).click(); await page.waitForTimeout(300);

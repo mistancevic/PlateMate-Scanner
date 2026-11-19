@@ -1,6 +1,6 @@
 {
   "release": "0.3.160",
-  "at": "2026-11-19T00:22:39.177Z",
+  "at": "2026-11-19T01:18:27.860Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -44301,23 +44301,6 @@
       "at": "2026-11-09T23:07:23.024Z"
     },
     {
-      "id": "screen.make.forExploring",
-      "kind": "screen",
-      "key": "make.forExploring",
-      "en": "a plate you look at. Nothing is logged. With a photo it is kept in Recipes, under Served.",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "tanjir koji samo gledaš. Ništa se ne upisuje. Sa fotografijom se čuva u Receptima, pod Posluženo.",
-      "de": "ein Teller, den du dir ansiehst. Nichts wird eingetragen. Mit einem Foto bleibt er in Rezepte, unter Serviert.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.122",
-      "order": 900001,
-      "at": "2026-11-10T09:43:46.901Z"
-    },
-    {
       "id": "screen.make.forMealHead",
       "kind": "screen",
       "key": "make.forMealHead",
@@ -50894,6 +50877,24 @@
       "release": "0.3.160",
       "order": 900035,
       "at": "2026-11-19T00:22:39.177Z"
+    },
+    {
+      "id": "screen.make.forExploring",
+      "kind": "screen",
+      "key": "make.forExploring",
+      "en": "nothing is logged until you select a meal. With Don't count it a photo's plate is kept in Recipes, under Served.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "enBefore": "a plate you look at. Nothing is logged. With a photo it is kept in Recipes, under Served.",
+      "sr": "ništa se ne upisuje dok ne izabereš obrok. Uz Ne računaj tanjir sa fotografije se čuva u Receptima, pod Posluženo.",
+      "de": "nichts wird eingetragen, bis du eine Mahlzeit wählst. Mit Nicht mitzählen bleibt der Teller eines Fotos in Rezepte, unter Serviert.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.160",
+      "order": 900000,
+      "at": "2026-11-19T01:18:27.860Z"
     }
   ]
 }

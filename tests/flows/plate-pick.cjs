@@ -1,6 +1,7 @@
 // JOURNEY (0.2.121, Tester 2, Milan 28 October 15:30): breakfast picked for the plate stays breakfast: after a reload, after
 // a trip to Plan and back; the checks speak of breakfast.
-// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: at 21:30 the Plate no longer picks dinner by the clock. It says Meal and day not set until breakfast is tapped in the calendar behind the pencil; X clears it, and the clock picks nothing.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: at 21:30 the Plate no longer picks dinner by the clock. It says No meal selected until breakfast is tapped in the calendar behind the pencil; X clears it, and the clock picks nothing.
+// Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -30,18 +31,20 @@ const PORT = "3303", U = `http://127.0.0.1:${PORT}`;
   const readout = async () => ((await page.locator(".readout").first().textContent().catch(() => "")) || "").replace(/\s+/g, " ");
   await page.goto(U + "/plate"); await page.clock.resume(); await page.waitForTimeout(1500);
   // changed by DT308.1 (0.3.157): at 21:30 the Plate picks no meal by the clock any more
-  ok(/^This plate/.test(await readout()) && /^Meal and day not set$/.test((await page.locator(".meal-line").innerText()).trim()), "21:30: no meal is guessed by the clock: Meal and day not set, This plate: " + (await readout()).slice(0, 30));
+  ok(/^This plate/.test(await readout()) && /^No meal selected$/.test((await page.locator(".meal-line").innerText()).trim().replace(/^\s*meal and day\s*/i, "")), "21:30: no meal is guessed by the clock: No meal selected, This plate: " + (await readout()).slice(0, 30));
   await page.getByRole("button", { name: "Change what this plate is" }).click(); await page.waitForTimeout(200);
   await page.locator(".meal-line-open .pcal-row").filter({ hasText: /^\s*Breakfast/ }).click(); await page.waitForTimeout(300);
-  ok(/^Breakfast/.test(await readout()) && /^Breakfast\s+Tuesday, 27 October, 07:00$/.test((await page.locator(".meal-line").innerText()).replace(/\s+/g, " ").trim()), "picked in the calendar: breakfast");
+  // changed by B150: the tap keeps edit mode open; the X in the pencil's place closes it
+  await page.locator(".meal-line .plan-line-close").click(); await page.waitForTimeout(300);
+  ok(/^Breakfast/.test(await readout()) && /^Breakfast\s+Tuesday, 27 October, 07:00$/.test((await page.locator(".meal-line").innerText()).replace(/\s+/g, " ").trim().replace(/^\s*meal and day\s*/i, "")), "picked in the calendar: breakfast");
   await page.reload(); await page.waitForTimeout(1500);
   ok(/^Breakfast/.test(await readout()), "after a reload: still breakfast: " + (await readout()).slice(0, 30));
   await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(1000);
   ok(/^Breakfast/.test(await readout()), "after Plan and back: still breakfast");
   ok(!/dinner/i.test((await page.locator("main").textContent()) || ""), "nothing on the Plate speaks of dinner");
-  await page.locator(".meal-line .plan-line-x").click(); await page.waitForTimeout(400);
-  ok(/^This plate/.test(await readout()) && /^Meal and day not set$/.test((await page.locator(".meal-line").innerText()).trim()), "X: Meal and day not set again; the clock picks nothing");
+  await require("./just-looking.cjs")(page);
+  ok(/^This plate/.test(await readout()) && /^No meal selected$/.test((await page.locator(".meal-line").innerText()).trim().replace(/^\s*meal and day\s*/i, "")), "changed by B150: the row No meal selected: No meal selected again; the clock picks nothing");
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");

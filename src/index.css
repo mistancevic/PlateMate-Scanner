@@ -3517,7 +3517,7 @@ section.photo-screen .pa-screen { border: 0; border-radius: 0; margin: 0; paddin
 .plan-line.meal-line:not(.is-set) .meal-line-text { cursor: pointer; }
 .meal-line-unset { font-size: var(--fs-card); line-height: 1.3; font-weight: 700; color: var(--ink); }
 /* B150 (0.3.160): the small title of the meal line, the reference line of a photo, and the time of the set meal as a field */
-.meal-line-title { display: block; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+.meal-line-title { display: block; font-size: var(--fs-small); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
 .plan-line.meal-line .meal-line-text { cursor: pointer; }
 .pcal-ref { margin: 0 0 10px; font-size: var(--fs-body); font-weight: 700; color: var(--ink); }
 .pcal-row-set { cursor: default; }
@@ -3576,7 +3576,7 @@ section.photo-screen .pa-screen { border: 0; border-radius: 0; margin: 0; paddin
    the words for Chef Mealan, with the microphone inside it */
 .read-view .mp-tag { cursor: pointer; text-align: left; white-space: normal; }
 .read-view .mp-tag.on { background: var(--tint); box-shadow: inset 0 0 0 1.5px var(--blue, #2a72d9); }
-.mp-tag-note { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 8px; font-size: 11px; font-weight: 700; color: #1d7a4f; background: #e2f5ea; }
+.mp-tag-note { display: inline-block; margin-left: 2px; padding: 1px 6px; border-radius: 8px; font-size: var(--fs-small); font-weight: 700; color: #1d7a4f; background: #e2f5ea; }
 .rv-tell { margin: 10px 0 4px; padding: 10px; border: 1.5px solid var(--line); border-radius: 14px; text-align: left; }
 .rv-tell > b { display: block; font-size: var(--fs-label); }
 .rv-tell > small { display: block; margin: 4px 0 0; }

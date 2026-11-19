@@ -6,6 +6,7 @@
 // Wednesday's lunch: no Fit, one button puts it in at the meal's time, no rating. Which day? behind the Plate's pencil makes a
 // plate tomorrow's lunch.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one (the meal, then the day, date and time; Goes into your plan. for a meal to come; the words Planning and Eaten are gone from it). Which day? is gone: the calendar behind the pencil makes a plate tomorrow's lunch, and that plate has no Put it in button. A meal opened from Plan keeps Put it in Friday's dinner, as before.
+// Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -44,9 +45,9 @@ const PORT = "3322", U = `http://127.0.0.1:${PORT}`;
     await toPlan(); await day(/30/);
     await page.getByRole("button", { name: /^Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(500);
     await page.getByRole("button", { name: /Create a new meal on the Plate/ }).click(); await page.waitForTimeout(1000);
-    const bar = async () => (await page.locator(".plan-line").first().innerText()).replace(/\s+/g, " ");
+    const bar = async () => (await page.locator(".plan-line").first().innerText()).replace(/\s+/g, " ").replace(/^\s*meal and day\s*/i, "");
     ok(await page.locator(".phase-bar").count() === 0 && /^Dinner Friday, 30 October, [\d:]+ Goes into your plan\.$/.test((await bar()).trim()), "DT230: no bar; changed by DT308.1: the meal line says Dinner, Friday, and that it goes into your plan: " + (await bar()).trim());
-    ok(/Dinner Friday, 30 October, 20:00 Goes into your plan\./.test(await bar()) && await page.locator(".plan-line .plan-line-x").count() === 1, "the line says the day and that it goes into your plan, with an X");
+    ok(/Dinner Friday, 30 October, 20:00 Goes into your plan\./.test(await bar()) && await page.locator(".plan-line .plan-line-x").count() === 0 && await page.locator(".plan-line .plan-line-pen").count() === 1, "the line says the day and that it goes into your plan; changed by B150: with its pencil, no X");
     await addTwo();
     const primary = async () => (await page.locator(".pill-primary").allTextContents()).map((x) => x.trim());
     ok((await primary()).includes("Put it in Friday's dinner"), "the main button: Put it in Friday's dinner, before Fit");
