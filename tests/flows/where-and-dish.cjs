@@ -38,7 +38,7 @@ seed.items = [];
   await page.getByRole("button", { name: /Lunch at .*Sarma/ }).click(); await page.waitForTimeout(600);
   if (await page.locator(".rq-slot").count()) { await page.locator(".rq-slot").getByRole("button", { name: "Change it on the Plate" }).click(); await page.waitForTimeout(600); }
   ok(await page.locator(".dish-row").count() === 1 && /1 of 8/.test(await page.locator(".dish-portions").textContent()), "the recipe is one row, 1 of 8 portions");
-  ok(/^Lunch\s/.test((await page.locator(".plan-line").innerText()).trim().replace(/^\s*meal and day\s*/i, "")) && !/A dish/.test(await page.locator(".plan-line").innerText()).replace(/^\s*meal and day\s*/i, "") && await page.locator(".plan-line .plan-line-x").count() === 0, "changed by DT308.1 and B150: the line says the meal and its day, with no X; it no longer names A dish (the dish is a row of the plate)");
+  ok(/^Lunch\s/.test((await page.locator(".plan-line").innerText()).trim().replace(/^\s*meal and day\s*/i, "")) && !/A dish/.test(await page.locator(".plan-line").innerText()) && await page.locator(".plan-line .plan-line-x").count() === 0, "changed by DT308.1 and B150: the line says the meal and its day, with no X; it no longer names A dish (the dish is a row of the plate)");
   const kcalOf = async () => { const t = await page.locator(".readout-mid small").first().textContent(); const m = t.match(/([\d,.]+)\s*kcal/); if (!m) throw new Error("no kcal in: " + t); return Number(m[1].replace(/[,.]/g, "")); };
   const kcal1 = await kcalOf();
   await page.getByRole("button", { name: "One portion more" }).click(); await page.waitForTimeout(300);
