@@ -72,8 +72,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // HC9: the page says what the clips are
   // since DT203 the note's words live in src/i18n/en.json; LandingScreen.tsx shows them by their keys
   { const en = JSON.parse(fs.readFileSync(path.join(ROOT, "src/i18n/en.json"), "utf8")), ls = fs.readFileSync(path.join(ROOT, "src/screens/LandingScreen.tsx"), "utf8");
-    const notes = Object.keys(en).filter((k) => /^home\./.test(k) && /Clips of the app on test data/.test(en[k]));
-    rule(notes.length > 0 && notes.every((k) => ls.includes(`w("${k}")`)), "HC9", `the section says the clips are the app on test data (${notes.join(", ") || "no line"})`); }
+    const notes = Object.keys(en).filter((k) => /^home\./.test(k) && /^Clips of the app, version \{version\}, on test data/.test(en[k]));
+    // DT327 AC8: the note names the version, from public/landing/clips.json (src/clips.ts)
+    rule(notes.length > 0 && notes.every((k) => ls.includes(`w("${k}", { version: CLIPS_VERSION })`)), "HC9", `the section says the clips are the app on test data (${notes.join(", ") || "no line"})`); }
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await sleep(500); } }
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "clips-"));
@@ -261,8 +262,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // DT327 (0.3.164): since 0.3.157 the empty Plate opens the camera with Photo or scan; Scan stays for an older build
   const openScan = async (page, a) => { const scan = page.getByRole("button", { name: "Scan", exact: true }); await a.tap((await scan.count()) ? scan.first() : page.locator(".mp-button").first(), 0); await page.locator(".auto-switch, .cam-modes").first().waitFor({ timeout: 4000 }).catch(() => {}); await manual(page, a); await sleep(500); };
   const toMode = async (page, a, m) => { await a.tap(page.locator(".cam-modes button").filter({ hasText: m }), 500); };
-  const saveFood = async (page, a, rest = 1600) => {
-    await a.tap(page.getByText(/I checked the values/).first(), 450);
+  const saveFood = async (page, a, rest = 1600, tick = 450) => {
+    await a.tap(page.getByText(/I checked the values/).first(), tick);
     await a.tap(page.getByRole("button", { name: /Confirm & save food/ }), rest);
   };
   const onPlate = (page, name) => page.locator(".plate-card").getByText(name).count().then((n) => n > 0).catch(() => false);
@@ -290,7 +291,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const twoSides = async (page) => {
       const btn = page.getByRole("button", { name: /^Analyze/ });
       await btn.first().waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
-      await sleep(200); await page.evaluate(() => window.__side(1)); // HC8: the clip stays under 12 s
+      await sleep(100); await page.evaluate(() => window.__side(1)); // HC8: the clip stays under 12 s
       await page.getByRole("button", { name: /^Analyze 2/ }).first().waitFor({ state: "visible", timeout: 6000 }).catch(() => {});
       await sleep(300);
       const said = ((await btn.first().textContent().catch(() => "")) || "").trim();
@@ -302,10 +303,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       // DT327 (Coach Milan 19 November 15:20): two photos, two sides: the front gives the name, the table the values. The
       // camera's auto shot takes each one; the clip turns the pack in between and taps nothing but Analyze
       const two = await twoSides(page);
-      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 1000);
+      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 700);
       await a.swipe(1360, 500);
       const energy = await page.locator("input").evaluateAll((xs) => xs.map((x) => x.value)).catch(() => []);
-      await saveFood(page, a, 400);
+      await saveFood(page, a, 200, 350); // HC8: under 12 s with two photos
       return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` }, HC3b: two };
     }, { sides: [path.join(ASSETS, "pack-front.jpg"), path.join(tmp, "label.png")] });
     await clip("group", async (page, a) => {
@@ -463,5 +464,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   if (fails.length) { console.log(`\n${fails.length} rule(s) failed; no clip was replaced:\n  ${fails.join("\n  ")}`); process.exit(1); }
   if (ONLY && !process.env.CLIPS_OUT) { console.log("\nCLIPS set: rules checked, no clip written"); process.exit(0); }
   for (const m of made) encode(m);
+  // DT327 AC8: the version the clips were recorded on, from the app that ran (dist), so the page never names another one
+  if (!ONLY) {
+    const version = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")).version;
+    const bundle = fs.readdirSync(path.join(ROOT, "dist/assets")).filter((f) => f.endsWith(".js")).some((f) => fs.readFileSync(path.join(ROOT, "dist/assets", f), "utf8").includes(version));
+    if (!bundle) { console.log(`\nthe built app is not ${version}: run npm run build first; clips.json not written`); process.exit(1); }
+    fs.writeFileSync(path.join(OUT, "clips.json"), JSON.stringify({ version, recorded: new Date().toISOString().slice(0, 10), clips: made.map((m) => m.name) }, null, 2) + "\n");
+  }
   console.log(`\nall rules passed (HC1 to HC13); ${made.length} clips written`);
 })();

@@ -2399,7 +2399,7 @@
         {
           "id": "AC8",
           "title": "The note says the version they were recorded on",
-          "text": "Given the videos recorded on 0.3.164, when I read the note under them, then it says Clips of the app, version 0.3.164, on test data, and the version comes from the recording, so it is never a version the videos were not made on."
+          "text": "Given the videos recorded on 0.3.164, when I read the note under them, then it says Clips of the app, version 0.3.164, on test data. The packs in them are made up, the meals are real. The version comes from the recording, so it is never a version the videos were not made on."
         }
       ],
       "unchanged": [

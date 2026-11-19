@@ -11154,7 +11154,7 @@
       "checked": true
     },
     "home.decideText": {
-      "text": "essen, eine Portion essen, eine Proteinbeilage dazunehmen oder Chef Mealan an dein Ziel anpassen lassen.",
+      "text": "speichern, planen oder eintragen, was du davon gegessen hast, alles oder einen Teil. Oder Chef Mealan an dein Ziel anpassen lassen.",
       "checked": true
     },
     "home.videoPlate": {
@@ -11186,7 +11186,7 @@
       "checked": true
     },
     "home.clipsPacks": {
-      "text": "Clips der App mit Testdaten. Die Packungen darin sind erfunden.",
+      "text": "Clips der App, Version {version}, mit Testdaten. Die Packungen darin sind erfunden, die Mahlzeiten sind echt.",
       "checked": true
     },
     "home.cook": {
@@ -11198,7 +11198,7 @@
       "checked": true
     },
     "home.cook1": {
-      "text": "Ein großer Schritt nach dem anderen, laut vorgelesen.",
+      "text": "Zuerst die Zutaten, die du brauchst, dann ein Schritt nach dem anderen, laut vorgelesen.",
       "checked": true
     },
     "home.cook2": {
@@ -11218,7 +11218,7 @@
       "checked": true
     },
     "home.videoCook": {
-      "text": "Kochmodus: ein Schritt nach dem anderen, laut vorgelesen",
+      "text": "Kochmodus: zuerst die Zutaten, dann ein Schritt nach dem anderen, laut vorgelesen",
       "checked": true
     },
     "home.situEyebrow": {
@@ -11274,7 +11274,7 @@
       "checked": true
     },
     "home.clipsNames": {
-      "text": "Clips der App mit Testdaten. Die Namen darin sind erfunden.",
+      "text": "Clips der App, Version {version}, mit Testdaten. Die Namen darin sind erfunden.",
       "checked": true
     },
     "home.kitchen": {
