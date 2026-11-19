@@ -236,7 +236,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   };
   // every click goes through a.tap, so every ring is counted (HC1)
   const manual = async (page, a) => { const sw = page.locator(".auto-switch"); if (await sw.count() && /Auto shot/.test(await sw.textContent())) await a.tap(sw, 200); };
-  const openScan = async (page, a) => { await a.tap(page.getByRole("button", { name: "Scan", exact: true }).first(), 0); await page.locator(".auto-switch").waitFor({ timeout: 4000 }).catch(() => {}); await manual(page, a); await sleep(500); };
+  // DT327 (0.3.164): since 0.3.157 the empty Plate opens the camera with Photo or scan; Scan stays for an older build
+  const openScan = async (page, a) => { const scan = page.getByRole("button", { name: "Scan", exact: true }); await a.tap((await scan.count()) ? scan.first() : page.locator(".mp-button").first(), 0); await page.locator(".auto-switch, .cam-modes").first().waitFor({ timeout: 4000 }).catch(() => {}); await manual(page, a); await sleep(500); };
   const toMode = async (page, a, m) => { await a.tap(page.locator(".cam-modes button").filter({ hasText: m }), 500); };
   const saveFood = async (page, a) => {
     await a.tap(page.getByText(/I checked the values/).first(), 450);
@@ -273,9 +274,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       return { HC4: { ok: found.length === 3, what: `three packs in the picture, ${found.length} named at the end` } };
     }, { feed: "group" });
     if (MEAL) await clip("meal", async (page, a) => {
-      await a.tap(page.locator(".mp-button"), 1000); a.mark(); await sleep(900);
-      await a.tap(page.locator("#camera-shutter-button"), 2600);
-      await a.swipe(650, 1500); await a.swipe(450, 1200);
+      // DT327 (0.3.164): since DT305 (0.3.151) a photo waits on the photo screen: Use this photo, then Read the plate; the read shows alone
+      await a.tap(page.locator(".mp-button"), 900); a.mark(); await sleep(600);
+      await a.tap(page.locator("#camera-shutter-button"), 700);
+      await a.tap(page.locator(".cam-analyze"), 1300);
+      await a.tap(page.locator(".pa-go .pill"), 2400);
+      await a.swipe(520, 1600);
+      return { HC3: { ok: await page.locator(".read-view .mp-tag").count() >= 2, what: "the read of the photo, its foods named" } };
     }, { feed: "meal" });
     const Fx = (id, name, calories, protein, fats, carbs, fiber) => ({ ...seed.foods[0], id, name, brand: "estimate", source: "estimate", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, table: undefined });
     const CH = Fx("sal", "Salmon, oven baked", 206, 22.1, 12.4, 0, 0), RI = Fx("pot", "Baby potatoes, with herbs", 98, 2, 1.5, 19, 1.8), SA = Fx("bro", "Broccoli, cooked", 35, 2.4, 0.4, 7.2, 3.3);
@@ -306,18 +311,20 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       "Rinse [[i:r|rice]] and bring it to the boil in 200 ml water. Cover and cook on low heat for 12 minutes.", "Cut [[i:c|chicken]] into strips. Season with salt and pepper.", "Slice [[i:g|garlic]] thin.",
       "Heat [[i:o|olive oil]] in a pan on medium high heat. Fry the chicken 6 minutes, turning once, until no pink is left inside.", "Add [[i:s|spinach]] and the garlic. Stir 2 minutes, until the spinach wilts.", "Put the rice in a bowl and the chicken and spinach on top."] };
     // the browser's voice is stood in for: nothing is read aloud in a recording
-    const voice = () => { const synth = { speak: () => {}, cancel: () => {}, getVoices: () => [] }; Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+    const voice = () => { const synth = { speak: (u) => { /* DT327: a sentence ends, as on a phone */ setTimeout(() => { try { u && u.onend && u.onend(); } catch {} }, 250); }, cancel: () => {}, getVoices: () => [] }; Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };
       Object.defineProperty(navigator, "wakeLock", { value: { request: async () => ({ release: async () => {} }) }, configurable: true }); window.__recs = [];
       window.SpeechRecognition = function () { const me = this; window.__recs.push(me); me.start = () => { me.on = true; }; me.stop = () => { me.on = false; }; };
       window.__hear = (text) => { const r = window.__recs.filter((x) => x.on).at(-1); if (!r || !r.onresult) return false; r.onresult({ results: [{ 0: { transcript: text }, isFinal: true, length: 1 }] }); return true; }; };
     await clip("cook", async (page, a) => {
       const cm = page.locator(".cook-mode");
       // one tap to turn the voice on; then only words (Coach Milan 14:06)
-      await a.tap(cm.getByRole("button", { name: "Turn voice on" }), 900);
-      await a.say("Next", 1000); await a.say("Next", 1000); await a.say("Repeat", 1100); await a.say("Next", 1100);
-      await a.say("Timer 6 minutes", 1200);
-      const t = await cm.textContent();
-      return { HC13: { ok: /4 of 6/.test(t) && /6:00|5:5\d/.test(t), what: "by voice: step 4 of 6, its 6 minute timer running" } };
+      await a.tap(cm.getByRole("button", { name: "Turn voice on" }), 500);
+      // DT327 (0.3.164): since DT251 (0.3.104) a cook from the start opens on Get it ready: next ticks a food and goes on; all
+      // ticked, All ready. Step 1 next. So the words tick the five foods, one more next is step 1, and its timer is set
+      for (let k = 0; k < 4; k++) await a.say("Next", 650);
+      await a.say("Next", 1000); await a.say("Next", 700); await a.say("Timer 6 minutes", 1200);
+      const t = await cm.textContent(), good = /1 of 6/.test(t) && /6:00|5:5\d/.test(t);
+      return { HC13: { ok: good, what: "by voice: the five foods ready, step 1 of 6, its 6 minute timer running" + (good ? "" : ": " + t.replace(/\s+/g, " ").slice(0, 300)) } };
     }, { meals: [bowl], init: voice, path: "/", time: "2026-10-30T18:40:00", setup: async (page, click) => {
       await click(page.locator("nav button").filter({ hasText: "Recipes" }), 700);
       await click(page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }), 700);
