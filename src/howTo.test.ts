@@ -51,3 +51,24 @@ test("New, the count, and the card on Today", () => {
   assert.equal(untried([{ items: { eatNow: { s: "tried", at: "" } } }])?.id, "scanAnywhere");
   assert.equal(untried([{ items: { scanAnywhere: { s: "tried", at: "" }, eatNow: { s: "tried", at: "" } } }])?.id, "photoLog");
 });
+
+// DT330 (0.3.167, board DT330): what waits for Coach Milan at the top of Clients
+import { needsYou, howtoWaiting } from "./howTo";
+test("DT330 AC2: every Didn't work, and I did it with face 1 or 2 or with words; a plain good mark does not wait", () => {
+  assert.equal(needsYou({ s: "didnt", at: "x" }), true);
+  assert.equal(needsYou({ s: "tried", at: "x", r: 2 }), true);
+  assert.equal(needsYou({ s: "tried", at: "x", r: 1 }), true);
+  assert.equal(needsYou({ s: "tried", at: "x", r: 5, note: "A line" }), true);
+  assert.equal(needsYou({ s: "tried", at: "x", r: 3 }), false);
+  assert.equal(needsYou({ s: "tried", at: "x", r: 4, note: "  " }), false);
+  assert.equal(needsYou({ s: "tried", at: "x" }), false, "a mark from before the faces, with no words");
+});
+test("DT330 AC1 and AC6: newest first, first names, opened leaves, a new mark comes back", () => {
+  const t = [{ uid: "a", name: "Ana Lee", email: "", items: { photoLog: { s: "tried" as const, at: "2026-11-19T10:00:00Z", r: 2 }, eatNow: { s: "tried" as const, at: "2026-11-19T11:00:00Z", r: 4 } } },
+    { uid: "b", name: "", email: "bo@example.com", items: { scanAnywhere: { s: "didnt" as const, at: "2026-11-19T12:00:00Z", note: "x" }, gone: { s: "didnt" as const, at: "2026-11-19T13:00:00Z" } } }];
+  const all = howtoWaiting(t, new Set());
+  assert.deepEqual(all.map((x) => `${x.name}:${x.id}`), ["bo@example.com:scanAnywhere", "Ana:photoLog"], "a situation the app no longer has does not wait");
+  assert.equal(howtoWaiting(t, new Set([all[0].key])).length, 1, "opened, it leaves");
+  t[1].items.scanAnywhere.at = "2026-11-20T09:00:00Z";
+  assert.equal(howtoWaiting(t, new Set([all[0].key])).length, 2, "a new mark on the same situation comes back");
+});

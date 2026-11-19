@@ -22852,6 +22852,14 @@
     "howto.scanAnywhere.s4": {
       "text": "Proveri vrednosti, i namirnica je na tvom tanjiru.",
       "checked": true
+    },
+    "howto.waitFrom": {
+      "text": "Kako da · {day}",
+      "checked": true
+    },
+    "howto.backClients": {
+      "text": "‹ Klijenti",
+      "checked": true
     }
   }
 }

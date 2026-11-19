@@ -1,6 +1,6 @@
 {
-  "release": "0.3.166",
-  "at": "2026-11-19T18:00:13.991Z",
+  "release": "0.3.167",
+  "at": "2026-11-19T19:43:18.548Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -51078,6 +51078,42 @@
       "release": "0.3.166",
       "order": 900002,
       "at": "2026-11-19T18:00:13.991Z"
+    },
+    {
+      "id": "screen.howto.waitFrom",
+      "kind": "screen",
+      "key": "howto.waitFrom",
+      "en": "How to · {day}",
+      "forms": "plain",
+      "slots": [
+        "day"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Kako da · {day}",
+      "de": "So geht's · {day}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.167",
+      "order": 900000,
+      "at": "2026-11-19T19:43:18.548Z"
+    },
+    {
+      "id": "screen.howto.backClients",
+      "kind": "screen",
+      "key": "howto.backClients",
+      "en": "‹ Clients",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "‹ Klijenti",
+      "de": "‹ Klienten",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.167",
+      "order": 900001,
+      "at": "2026-11-19T19:43:18.548Z"
     }
   ]
 }

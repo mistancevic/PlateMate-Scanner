@@ -5712,6 +5712,8 @@
     "screen.howto.scanAnywhere.s1": {"en":"Hold Plate in the bar at the bottom for a moment.","area":"Words used across the app","where":"Across the app","release":"0.3.166"},
     "screen.howto.scanAnywhere.s2": {"en":"A small menu opens above it: Group, Barcode, Label, Meal.","area":"Words used across the app","where":"Across the app","release":"0.3.166"},
     "screen.howto.scanAnywhere.s3": {"en":"Tap Barcode: the camera opens. Hold the pack's code in the frame.","area":"Words used across the app","where":"Across the app","release":"0.3.166"},
-    "screen.howto.scanAnywhere.s4": {"en":"Check the values, then the food is on your plate.","area":"Words used across the app","where":"Across the app","release":"0.3.166"}
+    "screen.howto.scanAnywhere.s4": {"en":"Check the values, then the food is on your plate.","area":"Words used across the app","where":"Across the app","release":"0.3.166"},
+    "screen.howto.waitFrom": {"en":"How to · {day}","area":"Words used across the app","where":"Across the app","release":"0.3.167"},
+    "screen.howto.backClients": {"en":"‹ Clients","area":"Words used across the app","where":"Across the app","release":"0.3.167"}
   }
 }
