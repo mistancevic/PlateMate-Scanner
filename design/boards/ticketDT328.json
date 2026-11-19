@@ -1,0 +1,121 @@
+{
+  "id": "DT328",
+  "title": "Label and group come back on the home page",
+  "epic": "home",
+  "state": "next",
+  "board": "Stories267",
+  "where": "Page 5",
+  "why": "Coach Milan 19 November 16:40: yes, label and group come back on the home page, as their own ticket. Found while building DT327: the home page shows ten of the twelve videos.",
+  "opportunity": {
+    "from": "Coach Milan, 19 November 2026, 16:40. DT327 (0.3.164) recorded the label and group videos again, two photos of two sides each, but no page shows them.",
+    "job": "As a visitor of chefmealan.com, see every way a food gets onto my plate before I join.",
+    "kind": "Missing: two ways the app has are not on the page, and the barcode way's line speaks for the label too.",
+    "why_now": "0.3.164 has the two videos new, on the made-up packs, recorded on today's app."
+  },
+  "problem": "Since 1 November the section Start from anything shows two ways in: A barcode or a label, and A photo of your meal. The app has four: Barcode, Label, Group and Meal, the four modes of its camera. A visitor never sees a label read from two photos, or a few packs found at once. The two videos exist and are new, but no page shows them.",
+  "story": "When I look at Start from anything, I want to see every way the camera reads a food, so that I know what I can scan before I join.",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "Four ways in",
+      "text": "Given the home page, when I reach Start from anything, then I see four ways in, in the camera's order of reading a pack and then a plate: A barcode, A label, A few packs at once, A photo of your meal, each with its line and its video."
+    },
+    {
+      "id": "AC2",
+      "title": "A label",
+      "text": "Given the way A label, when its video plays, then it shows two photos, the front of the pack and then its nutrition table, and the food on the plate."
+    },
+    {
+      "id": "AC3",
+      "title": "A few packs at once",
+      "text": "Given the way A few packs at once, when its video plays, then it shows two photos, the fronts and then the backs, and three packs found, each with values read from the label."
+    },
+    {
+      "id": "AC4",
+      "title": "The words say what each video shows",
+      "text": "Given the four ways, when I read the lead and each way's title and line, then they are the words in the table on this board, and the barcode's line no longer speaks for the label."
+    },
+    {
+      "id": "AC5",
+      "title": "On a phone, two by two",
+      "text": "Given a phone, when I scroll Start from anything, then the four ways sit two by two, each video as wide as its column, and the section is no taller than it is today."
+    },
+    {
+      "id": "AC6",
+      "title": "On a computer, four in a row",
+      "text": "Given a computer, when I see Start from anything, then the four ways sit in one row."
+    },
+    {
+      "id": "AC7",
+      "title": "In three languages",
+      "text": "Given the new and changed lines, when the home page is in Serbian or German, then each shows in that language."
+    }
+  ],
+  "unchanged": [
+    "The videos themselves: recorded in 0.3.164 under HC1 to HC13, the note with the version under them.",
+    "A photo of your meal: its title, its line, its video.",
+    "Every other section of the home page, and its order."
+  ],
+  "short": "Start from anything shows four ways in again: barcode, label, a few packs at once, a photo of your meal",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "DT328: label and group come back on the home page",
+  "text": [
+    [
+      "home.waysLead",
+      "Start from anything, under the title",
+      "Scan a barcode or a nutrition label, or take a photo of the meal in front of you. Each one lands on your plate.",
+      "Scan a barcode, a nutrition label or a few packs at once, or take a photo of the meal in front of you. Each one lands on your plate.",
+      "Names the four ways."
+    ],
+    [
+      "home.way.barcode",
+      "The first way, title",
+      "A barcode or a label",
+      "A barcode",
+      "The label gets its own way."
+    ],
+    [
+      "home.way.barcodeLine",
+      "The first way, line",
+      "The pack's values, or the label read from a photo, every side if you need. You check it.",
+      "The pack's code, read by the camera. Its values come from the food database. You check them.",
+      "What the barcode video shows."
+    ],
+    [
+      "home.way.label",
+      "New: the second way, title",
+      "",
+      "A label",
+      "New line."
+    ],
+    [
+      "home.way.labelLine",
+      "New: the second way, line",
+      "",
+      "Two photos: the front for the name, the nutrition table for the values. You check them.",
+      "What the label video shows."
+    ],
+    [
+      "home.way.group",
+      "New: the third way, title",
+      "",
+      "A few packs at once",
+      "New line."
+    ],
+    [
+      "home.way.groupLine",
+      "New: the third way, line",
+      "",
+      "The fronts, then the backs. Each pack is found, with the values from its table.",
+      "What the group video shows."
+    ]
+  ],
+  "now": "Two ways in since HP3 (1 November): A barcode or a label, and A photo of your meal. On a phone one below the other, 1,382 px tall; on a computer two side by side.",
+  "proposed": "Four ways in: A barcode, A label, A few packs at once, A photo of your meal. On a phone two by two (B, 1,227 px tall, a little shorter than today), on a computer four in a row. One below the other on a phone (A) would make the section 2,531 px tall, nearly twice today's. The lead and two lines get new words, four lines are new, in English, Serbian and German.",
+  "decision": "Open. B drawn as the proposal, A next to it for comparison. Waits for Coach Milan's choice and Go.",
+  "details": [
+    "The pictures on this board are the real page: today's 0.3.164, and a scratch build of 0.3.164 with the four ways, not committed.",
+    "On a phone in B each video is 172 px wide (today 220 px), the title 16 px, the line 13.5 px.",
+    "No new videos: label and group are the ones recorded in 0.3.164."
+  ]
+}
