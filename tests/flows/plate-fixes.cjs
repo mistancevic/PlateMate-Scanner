@@ -11,6 +11,7 @@
 // line. After a read of your own meal the read shows alone; Change the foods opens the plate.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
 // Changed by DT318 (0.3.160, board DT318; Coach Milan 19 November 01:00, Go): the link Wrong foods? Help Chef Mealan read it is gone; the form opens with one more photo of the same plate, behind ＋ Photo (one-more-photo.cjs).
+// Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -53,7 +54,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     return p;
   };
   const photo = async (p) => { await (await require("./more.cjs")(p, "mp")).click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(1500); if (await p.locator(".pa-screen").count()) { await p.locator(".pa-screen .pa-go .pill").click(); await p.waitForTimeout(2500); } };
-  const toPlate = async (p) => { if (await p.locator(".rv-change .pill").count()) { await p.locator(".rv-change .pill").click(); await p.waitForTimeout(600); } };
+  const toPlate = async (p) => { if (await p.locator(".rv-change .rv-continue").count()) { await p.locator(".rv-change .rv-continue").click(); await p.waitForTimeout(600); } };
   const saved = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1") || "{}"));
   const main = (p) => p.locator("main").innerText();
   try {

@@ -40,7 +40,11 @@ export interface AppApi {
   peekBarcode: (code: string) => Promise<DbProduct | null>;
   // DT115 (0.2.97): the members' catalogue
   lookAtPhoto: (image: string) => Promise<{ vessel: import("../mealPhoto").Vessel; course: import("../served").Dish } | null>;
-  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: import("../served").Dish; title?: string; told?: boolean }) => Promise<boolean>;
+  // DT307.1 (0.3.163, board DT307): Back to the camera from the photo screen (the photo is not kept); Back to the photo from
+  // the read (the photo screen again, with the photos and the words, and the read's foods leave the Plate)
+  backToCamera: () => void;
+  backToPhoto: () => void;
+  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; eat?: number; dish?: import("../served").Dish; title?: string; told?: boolean }) => Promise<boolean>;
   // DT268 (0.3.118): Served plates
   keepServed: (next: import("../served").Served) => void;
   servedPatch: (id: string, patch: Partial<Pick<import("../served").Served, "name" | "dish" | "mine">>) => void;
@@ -67,7 +71,7 @@ export interface AppApi {
   // DT131 (0.2.113): foods waiting to land on a plate that has foods; null when nothing waits
   plateAsk: PlateAsk | null;
   answerPlateAsk: (how: "add" | "new" | null) => void;
-  photoAsk: { image: string; at: string; taken?: boolean; more?: string[]; saved?: boolean } | null;
+  photoAsk: { image: string; at: string; taken?: boolean; more?: string[]; saved?: boolean; note?: string } | null;
   dropPhotoAsk: () => void;
   // DT219 (0.3.58, board Stories164): a read that found no foods; the Plate stays as it was and Chef Mealan says so
   photoNoFoods: boolean;

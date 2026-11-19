@@ -5,6 +5,7 @@
 // again, and what you set stays. By hand: Continue on the Plate opens the Plate's food list as it is. A chip shows the
 // food's full name. The link Wrong foods? Help Chef Mealan read it is gone from the Plate's screen.
 // The checks name the acceptance criteria of the board (DT318 AC1 to AC14).
+// Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)
 const start = require("./plate157.cjs");
 const fs = require("node:fs"), path = require("node:path");
 const PORT = "3572";
@@ -31,8 +32,8 @@ const hilde = (sd) => { const g = sd.foods.find((x) => x.name.startsWith("Greek"
   const order = await p.evaluate(() => { const y = (s) => { const e = document.querySelector(s); return e ? e.getBoundingClientRect().top : -1; }; return [y(".read-view .mp-tags"), y(".read-view .mp-ask"), y(".read-view .rv-tell"), y(".read-view .rv-change")]; });
   ok(order.every((v) => v >= 0) && order[0] < order[1] && order[1] < order[2] && order[2] < order[3], "on the read, top to bottom: the chips, his checks, the field for Chef Mealan, Continue on the Plate");
   // ---- AC12: by hand, on the Plate; and AC2: a check I do not answer goes along
-  ok((await p.locator(".read-view .rv-change button").innerText()).trim() === "Continue on the Plate" && await p.getByRole("button", { name: "Change the foods" }).count() === 0, "DT318 AC12: the button says Continue on the Plate, and there is no Change the foods");
-  await p.locator(".read-view .rv-change button").click(); await p.waitForTimeout(800);
+  ok((await p.locator(".read-view .rv-change .rv-continue").innerText()).trim() === "Continue on the Plate" && await p.getByRole("button", { name: "Change the foods" }).count() === 0, "DT318 AC12: the button says Continue on the Plate, and there is no Change the foods");
+  await p.locator(".read-view .rv-change .rv-continue").click(); await p.waitForTimeout(800);
   ok(await p.locator(".read-view").count() === 0 && (await p.locator(".name-link").allInnerTexts()).join(" | ") === "Chicken breast, grilled | Sweet potato fries, baked | Yogurt, 10% fat" && /Swipe a food left to swap it, right to remove it\./.test(await h.main(p)) && await p.locator(".add-more-open").count() === 1, "DT318 AC12: the Plate opens with its food list as it is: the foods, the swipe, + Add more to your plate");
   c = await checks(p, "main");
   ok(c.length === 2 && /is the chicken breast about 200 g or 350 g\?/.test(c[0]) && /is it yogurt, sour cream or skyr\?/.test(c[1]), "DT318 AC2: the two checks I did not answer still stand on the Plate");
@@ -85,7 +86,7 @@ const hilde = (sd) => { const g = sd.foods.find((x) => x.name.startsWith("Greek"
   await said.locator(".read-view .mp-which button.choice").filter({ hasText: /^Sour cream/ }).click(); await said.waitForTimeout(700);
   ok(/^Sour cream ~80 g estimate$/.test((await tags(said))[2]) && (await checks(said)).length === 1, "DT318 AC7: Sour cream is in no list: its chip says estimate, and no question which one follows");
   // ---- AC11: an amount typed on the Plate stays
-  await said.locator(".read-view .rv-change button").click(); await said.waitForTimeout(800);
+  await said.locator(".read-view .rv-change .rv-continue").click(); await said.waitForTimeout(800);
   const g = said.locator("input[type=number]").nth(1); await g.fill("150"); await g.blur(); await said.waitForTimeout(500);
   st = await h.st(said);
   ok(st.items[1].grams === 150 && st.items[1].amountSet === true, "DT318 AC11: an amount typed on the Plate, 150 g of fries, is kept as mine");

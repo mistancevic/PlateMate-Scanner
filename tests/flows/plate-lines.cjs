@@ -4,6 +4,7 @@
 // DT325: a plate from an earlier day, with a photo and without: the help line under Chef Mealan's question says Ate it asks
 // which meal, and saves it there, and names no time. The record stays as DT314 and B150 set it.
 // The checks name the acceptance criteria of the boards (DT324 AC1 to AC3, DT325 AC1 to AC3).
+// Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)
 const start = require("./plate157.cjs");
 const fs = require("node:fs"), path = require("node:path");
 const PORT = "3577";
@@ -15,7 +16,7 @@ const IMG = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "pl
   let p = await h.open({ foods: [] }); await h.toPhoto(p, false); await h.readIt(p);
   const onRead = await sub(p);
   ok(onRead === "Chef Mealan named it from your photo.", "the read: Chef Mealan named it from your photo. Got: " + onRead);
-  await p.locator(".rv-change button").click(); await p.waitForTimeout(800);
+  await p.locator(".rv-change .rv-continue").click(); await p.waitForTimeout(800);
   let m = await h.main(p);
   ok(/Grilled chicken with rice/.test(await p.locator(".title-input").first().inputValue().catch(() => "")) && (await sub(p)) === "Chef Mealan named it from your photo.", "DT324 AC1: after Continue on the Plate the line under the title says Chef Mealan named it from your photo. Got: " + (await sub(p)));
   ok(!/Read from your photo\. Correct an amount/.test(m), "DT324 AC1: the old line is not on the screen");

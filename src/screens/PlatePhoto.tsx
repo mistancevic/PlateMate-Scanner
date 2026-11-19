@@ -8,7 +8,7 @@ import { TriangleAlert, Mic } from "lucide-react";
 import { w, mealV } from "../words";
 import { getLang, speechLang } from "../lang";
 import { holdsMore } from "../mealPhoto";
-import { PhotoAsk, PotRows, dishWord } from "../components/PhotoAsk";
+import { PhotoAsk, PotRows, dishWord, potAsk, potShareOf, type PotShare } from "../components/PhotoAsk";
 import type { Ingredient } from "../pilot";
 import { thumbnailBase64 } from "../utils/image";
 import { slotsOn, slotAt } from "../slots";
@@ -31,7 +31,7 @@ export function platePhotoCard(given: { p: AppApi; photoTitle: string }) {
   const { p, photoTitle } = given;
   return (
     <section className="card plate-card photo-screen">
-      <PhotoAsk key={p.photoAsk!.at + p.photoAsk!.image.length} image={p.photoAsk!.image} at={p.photoAsk!.at} taken={p.photoAsk!.taken} drop={p.dropPhotoAsk} exploring={false /* B150 (0.3.160): no meal selected is one state; a new photo is yours, and Don't count it keeps a plate out of the day */}
+      <PhotoAsk key={p.photoAsk!.at + p.photoAsk!.image.length} image={p.photoAsk!.image} at={p.photoAsk!.at} note0={p.photoAsk!.note} taken={p.photoAsk!.taken} drop={p.dropPhotoAsk} exploring={false /* B150 (0.3.160): no meal selected is one state; a new photo is yours, and Don't count it keeps a plate out of the day */}
         mealAt={(d) => { const sl = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return sl ? sl.name.toLowerCase() : null; }}
         look={p.lookAtPhoto} read={(x) => { void p.readMealPhoto(p.photoAsk!.image, { ...x, ...(p.photoAsk!.more?.length ? { more: p.photoAsk!.more } : {}), ...(photoTitle.trim() ? { title: photoTitle.trim() } : {}) }); }} />
     </section>
@@ -40,7 +40,8 @@ export function platePhotoCard(given: { p: AppApi; photoTitle: string }) {
 
 // B144 (0.3.150, board Stories225): under the photo, what you chose and what you said stay in view
 export function PhotoSaid({ photo, meal }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; meal: string | null }) {
-  const how = holdsMore(photo.vessel) && photo.share ? w(photo.share === "portion" ? "photoask.myPortion" : photo.vessel === "tray" ? "photoask.wholeTray" : "photoask.wholePot") : "";
+  // DT307.5 (0.3.163): what I eat of a pot: all of it, a part of it, or a part of about so many grams
+  const how = holdsMore(photo.vessel) && photo.share ? (photo.share === "whole" && !photo.eat ? w("plate.allOfIt") : photo.eat ? w("photoask.partSaid", { grams: photo.eat }) : w("photoask.aPartOfIt")) : "";
   const what = photo.dish && meal ? w("photo.dishOfMeal", { dish: photo.dish === "main" ? w("photoask.dishMain") : dishWord(photo.dish), meal: mealV(meal, true) }) : "";
   if (!how && !what && !photo.note) return null;
   return (
@@ -56,8 +57,9 @@ export function PhotoSaid({ photo, meal }: { photo: NonNullable<import("../pilot
 // Read it again sends them all; the new read replaces the foods and the corrections, as Read the photo again did.
 // B144 (0.3.150, board Stories225): the same form as before the read: how much of a pot is yours, which dish of the meal,
 // and what is in it, with the answers given before.
-export function HelpRead({ photo, read, incoming, meal }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; read: (more: string[], note: string, pot: { share?: "whole" | "portion"; dish?: import("../served").Dish }) => void; incoming?: { file: File; at: number } | null; meal: string | null }) {
-  const [share, setShare] = useState<"whole" | "portion">(() => photo.share ?? "whole");
+export function HelpRead({ photo, read, incoming, meal }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; read: (more: string[], note: string, pot: { share?: "whole" | "portion"; eat?: number; dish?: import("../served").Dish }) => void; incoming?: { file: File; at: number } | null; meal: string | null }) {
+  const [share, setShare] = useState<PotShare>(() => potShareOf(photo).share);
+  const [grams, setGrams] = useState(() => potShareOf(photo).grams);
   const [dish, setDish] = useState<import("../served").Dish>(() => photo.dish ?? "main");
   // 0.3.65 (Coach Milan 22:53, Go): after a read it folds into one link and opens on a tap
   const [open, setOpen] = useState(false);
@@ -82,10 +84,10 @@ export function HelpRead({ photo, read, incoming, meal }: { photo: NonNullable<i
         {more.map((m, i) => <button key={i} type="button" className="mp-help-more" aria-label={w("make.removePhotoN", { n: i + 2 })} onClick={() => setMore((x) => x.filter((_, j) => j !== i))}><img src={m} alt="" /><span aria-hidden="true">✕</span></button>)}
         {more.length < 3 && <label className="pill pill-small mp-help-add">{w("plate.addPhoto")}<input type="file" accept="image/*" capture="environment" onChange={(e) => { add(e.target.files?.[0]); e.target.value = ""; }} /></label>}
       </div>
-      <PotRows vessel={photo.vessel} share={share} setShare={setShare} dish={dish} setDish={setDish} meal={meal} />
+      <PotRows vessel={photo.vessel} share={share} setShare={setShare} grams={grams} setGrams={setGrams} dish={dish} setDish={setDish} meal={meal} />
       <label className="mp-help-note"><span>{w("photoask.whatIsInIt")}</span><textarea className="search pa-words" rows={3} value={note} maxLength={300} placeholder={w("photoask.wordsPlaceholder")} onChange={(e) => setNote(e.target.value)} /></label>
       <div className="button-row">
-        <button type="button" className="pill pill-small pill-primary" onClick={() => read(more, words, { ...(holdsMore(photo.vessel) ? { share } : {}), ...(meal ? { dish } : {}) })}>{label}</button>
+        <button type="button" className="pill pill-small pill-primary" onClick={() => read(more, words, { ...(holdsMore(photo.vessel) ? potAsk(share, grams) : {}), ...(meal ? { dish } : {}) })}>{label}</button>
         {S && <button type="button" className="pill pill-small" aria-pressed={hearing} onClick={listen}>{hearing ? w("make.listening") : w("make.sayIt")}</button>}
       </div>
       <small className="muted">{w("make.thePhotosAndYourWords")}</small>

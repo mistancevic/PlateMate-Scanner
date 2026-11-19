@@ -3588,3 +3588,28 @@ section.photo-screen .pa-screen { border: 0; border-radius: 0; margin: 0; paddin
 .rv-tell-go { display: flex; justify-content: flex-end; }
 .rv-did { margin: 10px 0 0; }
 .read-view .mp-ask { margin: 10px 0; }
+/* DT307 (0.3.163, board DT307; Coach Milan, Go 18 November 19:13 and 19 November 11:36). Point 2: one box on the read, the
+   result's; the field keeps its own edge and his check its colour; the photo as wide as the column. */
+section.card.plate-card.read-view { background: none; border: 0; box-shadow: none; padding: 0; }
+.read-view .mp-big { border: 0; background: none; border-radius: 0; overflow: visible; margin: 0 0 10px; }
+.read-view .mp-big-img { border-radius: 16px; overflow: hidden; }
+.read-view .rv-tell { border: 0; padding: 0; border-radius: 0; background: none; }
+.read-view .rv-chef { border: 0; background: none; box-shadow: none; padding: 4px 0; }
+.read-view .plate-end { border: 0; background: none; box-shadow: none; padding: 8px 0 0; }
+.read-view .readout { margin-top: 14px; }
+.read-view .rv-change { padding: 0 0 12px; }
+/* Point 3: + Add more left of Continue on the Plate */
+.rv-change { justify-content: space-between; gap: 8px; } .rv-change .rv-add-more { height: 44px; min-height: 44px; }
+/* Point 4: the tick in a row of its own, then Cancel on the left and Done on the right */
+.rv-keep { display: flex; align-items: center; gap: 10px; min-height: 44px; margin: 12px 0 0; font-weight: 700; color: var(--ink); cursor: pointer; }
+.rv-keep input { width: 24px; height: 24px; margin: 0; accent-color: var(--brand); flex: none; }
+.rv-go.rv-end { justify-content: space-between; margin-top: 8px; } section.read-view .button-row.rv-go.rv-end > .pill.pill-small { flex: none; min-width: 120px; }
+section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
+.rv-back-end { margin-top: 14px; }
+/* Point 5: A part of it, with grams */
+.pa-part { margin: 10px 0 0; display: flex; flex-direction: column; gap: 4px; }
+.pa-part-g { display: flex; align-items: center; gap: 8px; font-size: var(--fs-body); color: var(--ink); }
+.pa-part-g .pa-grams { width: 90px; min-height: 44px; text-align: center; }
+/* DT306: Did you eat it? on Chef Mealan's card, Done the one button */
+.mp-say .mp-eat { margin: 10px 0 0; } .mp-say .mp-eat .pa-chips { flex-wrap: wrap; } .mp-say .mp-eat .pa-opt { flex: none; padding: 0 14px; }
+.mp-say .mp-go { justify-content: flex-end; margin-top: 10px; } .mp-say .mp-go .mp-done { min-width: 150px; height: 44px; min-height: 44px; }

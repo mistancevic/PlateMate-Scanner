@@ -12,6 +12,8 @@
 // Drop the photo is Remove the photo.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: a photo from earlier today no longer fills in the meal line: it says No meal selected, and the photo's time is the guess only when you say Ate it. Just looking is the last row of the calendar behind the pencil (just-looking.cjs).
 // Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has the small title Meal and day and says No meal selected; Just looking is gone, and a photo read with no meal selected is a photo of yours (Don't count it makes it the kept plate, not-counted.cjs); a photo's meal is logged at the meal's time.
+// Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)
+// Changed by story DT306 (0.3.163, board DT306; Coach Milan, Go 19 November 11:36): Don't count it is an answer to Did you eat it? on Chef Mealan's card, then Done; with no meal selected the card has no buttons, so not-counted.cjs sets a meal first
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -83,9 +85,9 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   const s1 = await st();
   ok(sent.length === 1 && /^data:image\/jpeg;base64,/.test(sent[0].image) && Array.isArray(sent[0].more) && sent[0].more.length === 1 && s1.photo?.more?.length === 1 && await page.locator(".camera-ui").count() === 0, "DT228: both photos go in one read; the camera closes");
   ok(s1.items.length === 3 && s1.photo && !s1.photo.who && s1.photo.view === "read" && /Your photo, 13:05\./.test(await text(".mp-big-say")), "DT130, DT305: from the camera it is the plate in front of you, shown as the read alone");
-  await page.locator(".rv-change .pill").click(); await page.waitForTimeout(500);
+  await page.locator(".rv-change .rv-continue").click(); await page.waitForTimeout(500);
   // DT278 (0.3.145): Don't count it, then Keep it ›, clears the Plate (Not mine is gone)
-  await page.locator(".mp-say").getByRole("button", { name: "Don't count it" }).click(); await page.waitForTimeout(400);
+  await require("./not-counted.cjs")(page); await page.waitForTimeout(300);
   await page.locator(".sv-plate").getByRole("button", { name: "Keep it ›" }).click(); await page.waitForTimeout(400);
 
   // the Plate: Photo of my meal opens the same camera; a photo from Your photos asks first

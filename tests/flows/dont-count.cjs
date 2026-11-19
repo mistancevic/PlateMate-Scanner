@@ -8,6 +8,8 @@
 // Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo you take
 // waits on the photo screen, and Read the plate reads it; the read shows alone, and Change the foods opens the plate this
 // story is about. The question about a second dish still comes first, alone.
+// Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)
+// Changed by story DT306 (0.3.163, board DT306; Coach Milan, Go 19 November 11:36): Chef Mealan's card asks Did you eat it? with All of it, Half, Part of it and Don't count it, and Done is its one button; with no meal selected the card is his word alone
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -45,7 +47,7 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
   };
   const photo = async (p) => { await (await require("./more.cjs")(p, "mp")).click(); await p.waitForTimeout(1500); await p.locator("#camera-shutter-button").click(); await p.waitForTimeout(400); if (await p.locator(".cam-analyze").count()) await p.locator(".cam-analyze").click(); await p.waitForTimeout(1500); if (await p.locator(".pa-screen").count()) { await p.getByRole("button", { name: "Read the plate" }).click(); await p.waitForTimeout(2500); } };
   // DT305: the read shows alone; Change the foods opens the plate
-  const toPlate = async (p) => { if (await p.locator(".rv-change .pill").count()) { await p.locator(".rv-change .pill").click(); await p.waitForTimeout(600); } };
+  const toPlate = async (p) => { if (await p.locator(".rv-change .rv-continue").count()) { await p.locator(".rv-change .rv-continue").click(); await p.waitForTimeout(600); } };
   const saved = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1") || "{}"));
   const main = (p) => p.locator("main").innerText();
   const text = async (l) => ((await l.count()) ? (await l.first().innerText()).replace(/\s+/g, " ") : "none");
@@ -75,7 +77,8 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
     // Not mine is gone from the read plate: Don't count it, a button
     p = await open({ ...seed, feedback: [] }); await photo(p);
     await toPlate(p);
-    ok(await p.locator(".mp-say").getByRole("button", { name: "Not mine" }).count() === 0 && await p.locator(".mp-say").getByRole("button", { name: "Don't count it" }).count() === 1, "on the read plate: Don't count it, no Not mine");
+    { const eat = await p.locator(".mp-say .mp-eat").count();
+      ok(await p.locator(".mp-say").getByRole("button", { name: "Not mine" }).count() === 0 && (eat ? await p.locator(".mp-eat .pa-opt").filter({ hasText: "Don't count it" }).count() === 1 : await p.locator(".mp-say button").count() === 0), "on the read plate: no Not mine; Don't count it is an answer when a meal is set, and with no meal selected the card has no buttons (DT306)"); }
     await p.context().close();
   } finally { await b.close(); server.kill(); }
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));

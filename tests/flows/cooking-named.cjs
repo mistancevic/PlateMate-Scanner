@@ -2,6 +2,7 @@
 // cooking. For cooking, not counted shows only foods my own words named. With no words from me there is no line, whatever
 // the photo's read returns, and a way of cooking (simmered, pureed) is never shown. The read is a stand-in (no AI here).
 // The checks name the acceptance criteria of the board (B145 AC1 to AC3).
+// Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)
 const start = require("./plate157.cjs");
 const PORT = "3574";
 const f = (name, grams, kcal, pr, fa, ca, fi) => ({ name, grams, low: Math.round(grams * 0.75), high: Math.round(grams * 1.3), calories: kcal, protein: pr, fats: fa, carbs: ca, fiber: fi, confidence: "medium" });
@@ -17,7 +18,7 @@ const SOUP = (cooking) => ({ dish: "Pumpkin soup", foods: [f("Pumpkin, cooked", 
   ok(/Pumpkin, cooked/.test(m) && !(await x.p.locator(".pt-cook").count()) && !/For cooking/i.test(m), "B145 AC1: no words from me: the read has no For cooking, not counted line");
   ok(!/simmered|pureed/i.test(m), "B145 AC3: simmered and pureed stand nowhere on the read");
   ok(!(await h.st(x.p)).cooking, "B145 AC1: and nothing is kept as a cooking food");
-  await x.p.locator(".rv-change button").click(); await x.p.waitForTimeout(700); m = await h.main(x.p);
+  await x.p.locator(".rv-change .rv-continue").click(); await x.p.waitForTimeout(700); m = await h.main(x.p);
   ok(!/For cooking/i.test(m) && !/simmered|pureed/i.test(m), "B145 AC1: nor on the Plate's screen, after Continue on the Plate");
   await x.p.context().close();
   // AC2: my words name olive oil

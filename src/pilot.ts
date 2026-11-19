@@ -330,7 +330,9 @@ export type PilotState = {
     served?: import("./served").OnPlate; keep?: false;
     // B144 (0.3.150, board Stories225): what the food is in, as read; the person's answers from the form: how much of a pot
     // or a tray is theirs, and which dish of the meal it is; the recipe a whole pot became
-    vessel?: import("./mealPhoto").Vessel; share?: "whole" | "portion"; dish?: import("./served").Dish; pot?: string };
+    vessel?: import("./mealPhoto").Vessel; share?: "whole" | "portion"; dish?: import("./served").Dish; pot?: string;
+    // DT307.5 (0.3.163): the grams I eat of a pot, and how the foods on the plate become the whole pot again for My recipes
+    eat?: number; potWhole?: { scale: number; serves: number } };
   // DT212 (0.3.53): a plate from an earlier meal you chose to keep working on is not asked about again (its plateAt)
   plateAsked?: string;
   // DT246 (0.3.96): the meal this plate is recorded in; while it is the same plate, its changes go there too

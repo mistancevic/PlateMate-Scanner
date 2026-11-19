@@ -752,8 +752,6 @@
     "screen.make.swapAFood": {"en":"Swap a food","area":"The Plate","where":"The Plate"},
     "screen.make.saveAsAnIdea": {"en":"Save as an idea","area":"The Plate","where":"The Plate"},
     "screen.make.putItInMyPlan": {"en":"Put it in my plan","area":"The Plate","where":"The Plate"},
-    "screen.make.ateIt": {"en":"Ate it","area":"The Plate","where":"The Plate"},
-    "screen.make.ateHalf": {"en":"Ate half","area":"The Plate","where":"The Plate"},
     "screen.make.addAFood": {"en":"Add a food","area":"The Plate","where":"The Plate"},
     "screen.make.ateOnePortion": {"en":"Ate one portion","area":"The Plate","where":"The Plate"},
     "screen.make.ateItAll": {"en":"Ate it all","area":"The Plate","where":"The Plate"},
@@ -5530,11 +5528,8 @@
     "screen.craving.chefsIdeas": {"en":"Chef Mealan's ideas","area":"The Plate","where":"The Plate","release":"0.3.149"},
     "screen.craving.saveInMyRecipes": {"en":"Save in My recipes","area":"The Plate","where":"The Plate","release":"0.3.149"},
     "screen.craving.savedInMyRecipes": {"en":"Saved in My recipes","area":"The Plate","where":"The Plate","release":"0.3.149"},
-    "screen.photoask.looksPot": {"en":"It looks like a pot. How much of it is yours?","area":"The Plate","where":"The Plate","release":"0.3.150"},
-    "screen.photoask.looksTray": {"en":"It looks like a tray. How much of it is yours?","area":"The Plate","where":"The Plate","release":"0.3.150"},
-    "screen.photoask.wholePot": {"en":"The whole pot","area":"The Plate","where":"The Plate","release":"0.3.150"},
-    "screen.photoask.wholeTray": {"en":"The whole tray","area":"The Plate","where":"The Plate","release":"0.3.150"},
-    "screen.photoask.myPortion": {"en":"My portion","area":"The Plate","where":"The Plate","release":"0.3.150"},
+    "screen.photoask.looksPot": {"en":"It looks like a pot. How much of it do you eat?","area":"The Plate","where":"The Plate","release":"0.3.163"},
+    "screen.photoask.looksTray": {"en":"It looks like a tray. How much of it do you eat?","area":"The Plate","where":"The Plate","release":"0.3.163"},
     "screen.photoask.whichDish": {"en":"Which dish of your {meal} is it?","area":"The Plate","where":"The Plate","release":"0.3.150"},
     "screen.photoask.dishMain": {"en":"Main dish","area":"The Plate","where":"The Plate","release":"0.3.150"},
     "screen.photoask.whatIsInIt": {"en":"Anything Chef Mealan should know?","area":"The Plate","where":"The Plate","release":"0.3.151"},
@@ -5686,6 +5681,13 @@
     "screen.plate.didRemoved": {"en":"I took off {foods}.","area":"The Plate","where":"The Plate","release":"0.3.160"},
     "screen.plate.didKept": {"en":"What you set stays as you set it.","area":"The Plate","where":"The Plate","release":"0.3.160"},
     "screen.plate.didSame": {"en":"I see it the same way.","area":"The Plate","where":"The Plate","release":"0.3.160"},
-    "screen.howto.photoLog.s5": {"en":"Under Did you eat it? choose All of it, Half or Part of it, then Done.","area":"Words used across the app","where":"Across the app","release":"0.3.161"}
+    "screen.howto.photoLog.s5": {"en":"Under Did you eat it? choose All of it, Half or Part of it, then Done.","area":"Words used across the app","where":"Across the app","release":"0.3.161"},
+    "screen.photoask.aPartOfIt": {"en":"A part of it","area":"The Plate","where":"The Plate","release":"0.3.163"},
+    "screen.photoask.partGrams": {"en":"About {grams} g","area":"The Plate","where":"The Plate","release":"0.3.163"},
+    "screen.photoask.partGramsAria": {"en":"Grams you eat","area":"The Plate","where":"The Plate","release":"0.3.163"},
+    "screen.photoask.partHelp": {"en":"Leave it empty and Chef Mealan takes one portion.","area":"The Plate","where":"The Plate","release":"0.3.163"},
+    "screen.photoask.partSaid": {"en":"A part of it, about {grams} g","area":"The Plate","where":"The Plate","release":"0.3.163"},
+    "screen.plate.addMoreShort": {"en":"Add more","area":"The Plate","where":"The Plate","release":"0.3.163"},
+    "screen.plate.backToCamera": {"en":"Back to the camera","area":"The Plate","where":"The Plate","release":"0.3.163"}
   }
 }
