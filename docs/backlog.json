@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.164",
     "0.3.163",
     "0.3.162",
     "0.3.161",
@@ -66,8 +67,7 @@
     "0.3.143",
     "0.3.142",
     "0.3.141",
-    "0.3.140",
-    "0.3.139"
+    "0.3.140"
   ],
   "tickets": [
     {
@@ -2348,7 +2348,7 @@
       "id": "DT327",
       "title": "The home page videos and their lines show the app as it is today",
       "epic": "home",
-      "state": "next",
+      "state": "done",
       "board": "Stories266",
       "where": "Page 5",
       "why": "Coach Milan 19 November 11:09: is it a good moment to update the home page and the videos? 14:23 to 14:26: all twelve videos on the build with DT307 and DT306, the home page text checked as its own step, on one board, then his Go. Recorded on 0.3.163 into a scratch folder; nothing on the home page is changed yet.",
@@ -2408,7 +2408,8 @@
         "The rules of the videos, HC1 to HC13 in docs/rules/home-clips.md.",
         "Test data only: the made-up packs and names."
       ],
-      "decision": "Go, Coach Milan 19 November 15:29, for AC1 to AC7. AC8 (the version in the note) drawn the same day, after his question; waits for its Go."
+      "decision": "Go, Coach Milan 19 November 15:29 for AC1 to AC7, and 15:34 for AC8. Built in 0.3.164.",
+      "version": "0.3.164"
     }
   ]
 }
