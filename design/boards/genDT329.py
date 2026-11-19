@@ -43,7 +43,7 @@ B.html.append(f'<div data-tbl style="position:absolute;left:{SX}px;top:30px;widt
   + "".join(f'<tr><td style="{td};font-weight:700">{k}</td><td style="{td}">{where}</td><td style="{td};background:#fdf0f0">{old or "<i>none</i>"}</td><td style="{td};background:#eaf1fd;font-weight:700">{new}</td><td style="{td};color:#3d4a63">{why}</td></tr>' for k, where, old, new, why in t["text"]) + '</table></div>')
 XI = SX + TW + 40
 B.html.append(f'<div data-ic style="position:absolute;left:{XI}px;top:30px;width:{W - XI - 40}px;box-sizing:border-box;border:2px solid #172742;border-radius:14px;padding:14px 16px;background:#fff">'
-  f'<div style="font-size:19px;font-weight:900;color:#123a7a">The icons, now and new</div>'
+  f'<div style="font-size:19px;font-weight:900;color:#123a7a">The icons, now and new, and the faces</div>'
   f'<div style="font-size:13.5px;color:#3d4a63;margin-top:4px">From the same set of line icons as the bar (Today, Plan, Recipes, Explorer), on the tint of the bar\'s chosen tab.</div>'
   f'<table style="margin-top:10px;width:100%;border-collapse:collapse;table-layout:fixed"><colgroup><col style="width:52%"><col style="width:14%"><col></colgroup>'
   f'<tr><th style="{th};border-radius:8px 0 0 0">Situation</th><th style="{th}">Now</th><th style="{th};border-radius:0 8px 0 0">New icon</th></tr>{ic}</table></div>')

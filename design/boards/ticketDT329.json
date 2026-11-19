@@ -5,7 +5,7 @@
   "state": "next",
   "board": "Stories268",
   "where": "Page 5",
-  "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's. 18:08: New at the top right. 18:17: it is not about trying, it is doing it; and feedback, a scale plus free text.",
+  "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's. 18:08: New at the top right. 18:17: it is not about trying, it is doing it; and feedback, a scale plus free text. 18:25: smiley faces instead of numbers, yes, as line faces.",
   "opportunity": {
     "from": "Coach Milan, 19 November 2026, 17:31 and 17:43. The twelve videos are on 0.3.165, and How to holds eight situations as steps in words.",
     "job": "As a beta tester, see a path once before I try it, and find the paths the app has that I would not guess.",
@@ -73,17 +73,17 @@
     {
       "id": "AC12",
       "title": "How did it go?",
-      "text": "Given I opened a situation, when I tap I did it, then How did it go? asks for 1 to 5, 1 hard and 5 easy, and a line of my own that I may leave empty; Send stays off until I choose a number."
+      "text": "Given I opened a situation, when I tap I did it, then How did it go? shows five line faces from the bar's icon set, from Frown (1, hard) on the left to Laugh (5, easy) on the right, each with its spoken name, and a line of my own that I may leave empty; Send stays off until I choose a face."
     },
     {
       "id": "AC13",
       "title": "What I said",
-      "text": "Given I sent 4 and a line, when I open the situation again, then I did it is on and under it You said 4 of 5 and my line; a tap on I did it takes the mark off as today."
+      "text": "Given I sent the fourth face and a line, when I open the situation again, then I did it is on and under it the face, You said 4 of 5 and my line; a tap on I did it takes the mark off as today."
     },
     {
       "id": "AC14",
       "title": "Coach Milan sees it",
-      "text": "Given a tester sent 4 and a line, when Coach Milan opens that tester under Clients, then the situation says Done, the day, 4 of 5 and the line."
+      "text": "Given a tester sent the fourth face and a line, when Coach Milan opens that tester under Clients, then the situation says Done, the day, the face with 4 of 5, and the line."
     }
   ],
   "unchanged": [
@@ -134,8 +134,8 @@
       "howto.howWent, howWentLine",
       "New: after I did it",
       "",
-      "How did it go? {title}. 1 is hard, 5 is easy. Coach Milan reads it.",
-      "The scale."
+      "How did it go? {title}. From hard on the left to easy on the right. Coach Milan reads it.",
+      "Five line faces: Frown, Annoyed, Meh, Smile, Laugh."
     ],
     [
       "howto.scaleHard, scaleEasy",
@@ -143,6 +143,13 @@
       "",
       "Hard · Easy",
       "The two ends."
+    ],
+    [
+      "howto.faceHard, faceN, faceEasy",
+      "The faces' spoken names",
+      "",
+      "1 of 5, hard · {n} of 5 · 5 of 5, easy",
+      "For screen readers."
     ],
     [
       "howto.anything",
@@ -218,10 +225,35 @@
       "A busy day",
       "📅",
       "CalendarClock"
+    ],
+    [
+      "How did it go? 1, hard",
+      "",
+      "Frown"
+    ],
+    [
+      "2",
+      "",
+      "Annoyed"
+    ],
+    [
+      "3",
+      "",
+      "Meh"
+    ],
+    [
+      "4",
+      "",
+      "Smile"
+    ],
+    [
+      "5, easy",
+      "",
+      "Laugh"
     ]
   ],
   "now": "Eight situations in words, each with an emoji. Try it, then Tried it or Didn't work; a note only when it did not work. No video. The long press on Plate is in none of them.",
-  "proposed": "Line icons from the bar's set on the tint of its chosen tab. Watch it with the home page's video on three situations. A ninth situation, Scan a pack from any screen, with a new video of the long press. Words of doing: Do it now, I did it, Done. I did it asks How did it go?, 1 hard to 5 easy, and a line of your own; Coach Milan sees both. New at the top right of the card.",
+  "proposed": "Line icons from the bar's set on the tint of its chosen tab. Watch it with the home page's video on three situations. A ninth situation, Scan a pack from any screen, with a new video of the long press. Words of doing: Do it now, I did it, Done. I did it asks How did it go?, five line faces from hard to easy, and a line of your own; Coach Milan sees both. New at the top right of the card.",
   "decision": "Open. Drawn for Coach Milan's Go, with his 18:08 and 18:17 changes.",
   "details": [
     "The pictures on this board are the real app: today's 0.3.165, and a scratch build of it with the icons, Watch it and the new situation, not committed. The long press picture is the app as it is (DT309).",
