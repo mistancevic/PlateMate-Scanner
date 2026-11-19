@@ -256,22 +256,32 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await saveFood(page, a);
       return { HC2: { ok: read.includes(CODE), what: `the scanner read the code on the pack: ${read.trim()} (pack: ${CODE})` }, HC3: { ok: await onPlate(page, "Fjell Skyr natural"), what: "the food is on the plate" } };
     }, { feed: "barcode" });
+    // DT327: the auto shot takes one photo; the clip holds 700 ms on it, then checks it is the only one.
+    const oneShot = async (page) => {
+      const btn = page.getByRole("button", { name: /^Analyze/ });
+      await btn.first().waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
+      await sleep(700);
+      const said = ((await btn.first().textContent().catch(() => "")) || "").trim();
+      return { ok: /^Analyze 1\b/.test(said), what: `one photo taken: the button says ${said || "nothing"}` };
+    };
     await clip("label", async (page, a) => {
-      await openScan(page, a); await toMode(page, a, "Label"); a.mark(); await sleep(400);
-      await a.tap(page.locator("#camera-shutter-button"), 500);
+      await openScan(page, a); await toMode(page, a, "Label"); a.mark();
+      // DT327 (Coach Milan 19 November 15:05): one photo. The camera's auto shot takes it once the picture holds still, so the
+      // clip waits for that shot instead of tapping too (a tap made a second photo).
+      const one = await oneShot(page);
       await a.tap(page.getByRole("button", { name: /^Analyze/ }), 1300);
       await a.swipe(1360, 500);
       const energy = await page.locator("input").evaluateAll((xs) => xs.map((x) => x.value)).catch(() => []);
       await saveFood(page, a);
-      return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` } };
+      return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` }, HC3b: one };
     }, { feed: "label" });
     await clip("group", async (page, a) => {
-      await openScan(page, a); await toMode(page, a, "Group"); a.mark(); await sleep(1000);
-      await a.tap(page.locator("#camera-shutter-button"), 900);
+      await openScan(page, a); await toMode(page, a, "Group"); a.mark();
+      const one = await oneShot(page); // DT327: one photo, taken by the auto shot (see the label clip)
       await a.tap(page.getByRole("button", { name: /^Analyze/ }), 3600);
       const all = (await page.locator("main").textContent().catch(() => "")) || "";
       const found = ["Fjell Skyr natural", "Kornfeld Oats", "Nusshof Peanut butter"].filter((n) => all.includes(n));
-      return { HC4: { ok: found.length === 3, what: `three packs in the picture, ${found.length} named at the end` } };
+      return { HC4: { ok: found.length === 3, what: `three packs in the picture, ${found.length} named at the end` }, HC3b: one };
     }, { feed: "group" });
     if (MEAL) await clip("meal", async (page, a) => {
       // DT327 (0.3.164): since DT305 (0.3.151) a photo waits on the photo screen: Use this photo, then Read the plate; the read shows alone
