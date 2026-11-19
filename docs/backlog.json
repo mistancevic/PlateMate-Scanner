@@ -2533,6 +2533,11 @@
           "id": "AC9",
           "title": "In three languages",
           "text": "Given the new lines, when the app is in Serbian or German, then each shows in that language."
+        },
+        {
+          "id": "AC10",
+          "title": "New at the top right",
+          "text": "Given a situation added in the last 14 days, when I see the list, then New sits at the top right of its card, and Tried or Didn't work, once marked, sits under New."
         }
       ],
       "unchanged": [

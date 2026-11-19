@@ -51,7 +51,7 @@ y = 30 + max(HT.get("tbl", 600), HT.get("ic", 600)) + 70
 X = lambda i: SX + i * (PW + G)
 bs = [shot(X(0), y, "now_list", PW, "How to, today", "draft", "Eight situations, emoji icons, no video."),
   shot(X(1), y, "now_one", PW, "One situation, today", "draft", "Steps in words only."),
-  shot(X(2), y, "new_list", PW, "How to, new", "changed", "Nine situations, line icons, Video on three, the new one first."),
+  shot(X(2), y, "new_list_tried", PW, "How to, new", "changed", "Nine situations, line icons, Video on three. New at the top right, Tried under it."),
   shot(X(3), y, "new_one", PW, "One situation, new", "changed", "Watch it under the steps."),
   shot(X(4), y, "new_watch", PW, "After Watch it", "changed", "The home page's meal video, steps 1 to 3."),
   shot(X(5), y, "new_scan", PW, "The new situation", "changed", "Scan a pack from any screen: four steps, Watch it, Try it."),

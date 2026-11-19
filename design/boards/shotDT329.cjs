@@ -30,6 +30,8 @@ const S = (dir, port) => spawn(process.execPath, ["dist/server.cjs"], { cwd: dir
   await p.locator(".ht-photoLog").click(); await p.waitForTimeout(500); await shot(p, "new_one");
   await p.locator(".ht-watch").click(); await p.waitForTimeout(2500); await shot(p, "new_watch");
   await p.locator(".ht-back").click(); await p.waitForTimeout(400); await p.locator(".ht-scanAnywhere").click(); await p.waitForTimeout(500); await shot(p, "new_scan");
+  // New at the top right, with Tried under it (Coach Milan 18:08)
+  await p.locator(".ht-tried").click(); await p.waitForTimeout(400); await p.locator(".ht-back").click(); await p.waitForTimeout(500); await shot(p, "new_list_tried");
   // the long press itself, on the app as it is (DT309)
   p = await open("3621"); await p.locator(".ht-back, .menu-close, header .menu-button").first().click().catch(() => {});
   await p.goto("http://127.0.0.1:3621/today"); await p.waitForTimeout(1000);
