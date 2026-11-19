@@ -1,6 +1,6 @@
 {
-  "release": "0.3.160",
-  "at": "2026-11-19T01:18:27.860Z",
+  "release": "0.3.161",
+  "at": "2026-11-19T07:06:39.193Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -8758,127 +8758,6 @@
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
-      "id": "screen.plate.planLineNums",
-      "kind": "screen",
-      "key": "plate.planLineNums",
-      "en": "{meal}, {time} · {nums} · By the plan",
-      "forms": "plain",
-      "slots": [
-        "meal",
-        "nums",
-        "time"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{meal}, {time} · {nums} · Po planu",
-      "de": "{meal}, {time} · {nums} · Nach Plan",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900411,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.planLine",
-      "kind": "screen",
-      "key": "plate.planLine",
-      "en": "{meal}, {time} · By the plan",
-      "forms": "plain",
-      "slots": [
-        "meal",
-        "time"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{meal}, {time} · Po planu",
-      "de": "{meal}, {time} · Nach Plan",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900412,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.snackLine",
-      "kind": "screen",
-      "key": "plate.snackLine",
-      "en": "Snack · off the plan",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Užina · van plana",
-      "de": "Snack · außerhalb des Plans",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900414,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.forHintNums",
-      "kind": "screen",
-      "key": "plate.forHintNums",
-      "en": "{meal}, {time}: {nums}, from your plan for today. It counts as your {mealLow}.",
-      "forms": "plain",
-      "slots": [
-        "meal",
-        "mealLow",
-        "nums",
-        "time"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{meal}, {time}: {nums}, iz tvog plana za danas. Računa se kao tvoj obrok ({mealLow}).",
-      "de": "{meal}, {time}: {nums}, aus deinem Plan für heute. Es zählt als {mealLow}.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900415,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.forHint",
-      "kind": "screen",
-      "key": "plate.forHint",
-      "en": "{meal}, {time}: It counts as your {mealLow}.",
-      "forms": "plain",
-      "slots": [
-        "meal",
-        "mealLow",
-        "time"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{meal}, {time}: Računa se kao tvoj obrok ({mealLow}).",
-      "de": "{meal}, {time}: Es zählt als {mealLow}.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900416,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.forHintClock",
-      "kind": "screen",
-      "key": "plate.forHintClock",
-      "en": "{meal}, by the clock: a guess, off the plan. Tap {meal} to make it your {mealLow}: it counts by the plan.",
-      "forms": "plain",
-      "slots": [
-        "meal",
-        "mealLow"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{meal}, po satu: pretpostavka, van plana. Dodirni {meal} da bude tvoj obrok ({mealLow}): računa se po planu.",
-      "de": "{meal}, nach der Uhrzeit: eine Schätzung, außerhalb des Plans. Tippe auf {meal}, damit es als {mealLow} zählt: Dann zählt es nach Plan.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900417,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
       "id": "screen.plate.noLonger",
       "kind": "screen",
       "key": "plate.noLonger",
@@ -10460,66 +10339,6 @@
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
-      "id": "screen.plate.slotLineEaten",
-      "kind": "screen",
-      "key": "plate.slotLineEaten",
-      "en": "{slot}, {time} · Eaten",
-      "forms": "plain",
-      "slots": [
-        "slot",
-        "time"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{slot}, {time} · Pojedeno",
-      "de": "{slot}, {time} · Gegessen",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900503,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.slotLinePlanning",
-      "kind": "screen",
-      "key": "plate.slotLinePlanning",
-      "en": "{slot}, {time} · Planning",
-      "forms": "plain",
-      "slots": [
-        "slot",
-        "time"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{slot}, {time} · U planiranju",
-      "de": "{slot}, {time} · In Planung",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900504,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.slotLineByPlan",
-      "kind": "screen",
-      "key": "plate.slotLineByPlan",
-      "en": "{slot}, {time} · By the plan",
-      "forms": "plain",
-      "slots": [
-        "slot",
-        "time"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{slot}, {time} · Po planu",
-      "de": "{slot}, {time} · Nach Plan",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900505,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
       "id": "screen.plate.yesterday",
       "kind": "screen",
       "key": "plate.yesterday",
@@ -10568,83 +10387,6 @@
       "beta": true,
       "release": "0.3.101",
       "order": 900508,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.dayAddsPick",
-      "kind": "screen",
-      "key": "plate.dayAddsPick",
-      "en": "{day}: adds what you ate. Pick the meal.",
-      "forms": "plain",
-      "slots": [
-        "day"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{day}: dodaje ono što je pojedeno. Izaberi obrok.",
-      "de": "{day}: trägt nach, was du gegessen hast. Wähle die Mahlzeit.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900509,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.dayPlansPick",
-      "kind": "screen",
-      "key": "plate.dayPlansPick",
-      "en": "{day}: plans what you will eat. Pick the meal.",
-      "forms": "plain",
-      "slots": [
-        "day"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{day}: planira šta ćeš jesti. Izaberi obrok.",
-      "de": "{day}: plant, was du essen wirst. Wähle die Mahlzeit.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900510,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.dayWhichMeal",
-      "kind": "screen",
-      "key": "plate.dayWhichMeal",
-      "en": "{day}, which meal",
-      "forms": "plain",
-      "slots": [
-        "day"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{day}, koji obrok",
-      "de": "{day}, welche Mahlzeit",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900511,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.plate.mealAtTime",
-      "kind": "screen",
-      "key": "plate.mealAtTime",
-      "en": "{meal}, {time}",
-      "forms": "plain",
-      "slots": [
-        "meal",
-        "time"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "{meal}, {time}",
-      "de": "{meal}, {time}",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900512,
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
@@ -26022,26 +25764,6 @@
       "at": "2026-11-07T11:00:21.692Z"
     },
     {
-      "id": "screen.app.wouldJoinPlate",
-      "kind": "screen",
-      "key": "app.wouldJoinPlate",
-      "en": "{name} would join a plate from {when}.",
-      "forms": "plain",
-      "slots": [
-        "name",
-        "when"
-      ],
-      "area": "Words used across the app",
-      "where": "Across the app",
-      "sr": "{name}: ide na tanjir od {when}.",
-      "de": "{name} käme auf einen Teller von {when}.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900462,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
       "id": "screen.app.addedServing",
       "kind": "screen",
       "key": "app.addedServing",
@@ -26752,26 +26474,6 @@
       "at": "2026-11-07T11:00:21.692Z"
     },
     {
-      "id": "screen.app.fromRecipesHas",
-      "kind": "screen",
-      "key": "app.fromRecipesHas",
-      "en": "{title} from your recipes has {n}.",
-      "forms": "plain",
-      "slots": [
-        "n",
-        "title"
-      ],
-      "area": "Words used across the app",
-      "where": "Across the app",
-      "sr": "{title} iz tvojih recepata ima {n}.",
-      "de": "{title} aus deinen Rezepten hat {n}.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900503,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
       "id": "screen.app.oldSavedForLater",
       "kind": "screen",
       "key": "app.oldSavedForLater",
@@ -26822,26 +26524,6 @@
       "beta": true,
       "release": "0.3.103",
       "order": 900506,
-      "at": "2026-11-07T11:00:21.692Z"
-    },
-    {
-      "id": "screen.app.fromPlanHas",
-      "kind": "screen",
-      "key": "app.fromPlanHas",
-      "en": "{title} from your plan has {n} food.|{title} from your plan has {n} foods.",
-      "forms": "count",
-      "slots": [
-        "n",
-        "title"
-      ],
-      "area": "Words used across the app",
-      "where": "Across the app",
-      "sr": "{title} iz tvog plana ima {n} namirnicu.|{title} iz tvog plana ima {n} namirnice.|{title} iz tvog plana ima {n} namirnica.",
-      "de": "{title} aus deinem Plan hat {n} Lebensmittel.|{title} aus deinem Plan hat {n} Lebensmittel.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.103",
-      "order": 900507,
       "at": "2026-11-07T11:00:21.692Z"
     },
     {
@@ -40305,28 +39987,6 @@
       "at": "2026-11-08T07:25:01.806Z"
     },
     {
-      "id": "chef.plateAddOrNew",
-      "kind": "chef",
-      "key": "plateAddOrNew",
-      "en": "Your plate already has {foods}: {title}. {what} Start a new plate with it, or add it to yours?",
-      "forms": "chef",
-      "slots": [
-        "foods",
-        "title",
-        "what"
-      ],
-      "later": false,
-      "area": "Chef Mealan",
-      "where": "Adding foods to a plate that has some",
-      "sr": "Tvoj tanjir već ima {foods}{title}. {what} Da počneš nov tanjir s tim, ili da ga dodaš svom?",
-      "de": "Dein Teller hat schon {foods}{title}. {what} Einen neuen Teller damit beginnen oder zu deinem hinzufügen?",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.112",
-      "order": 901227,
-      "at": "2026-11-08T07:25:24.121Z"
-    },
-    {
       "id": "chef.busyCarry",
       "kind": "chef",
       "key": "busyCarry",
@@ -48041,23 +47701,6 @@
       "at": "2026-11-16T10:49:49.150Z"
     },
     {
-      "id": "screen.plate.readSub",
-      "kind": "screen",
-      "key": "plate.readSub",
-      "en": "Read from your photo. Tap an amount to correct it.",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Pročitano sa tvoje slike. Dodirni količinu da je ispraviš.",
-      "de": "Aus deinem Foto gelesen. Tippe auf eine Menge, um sie zu korrigieren.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.151",
-      "order": 900014,
-      "at": "2026-11-16T10:49:49.150Z"
-    },
-    {
       "id": "screen.plate.didYouEatIt",
       "kind": "screen",
       "key": "plate.didYouEatIt",
@@ -48159,25 +47802,6 @@
       "beta": true,
       "release": "0.3.151",
       "order": 900021,
-      "at": "2026-11-16T10:49:49.150Z"
-    },
-    {
-      "id": "screen.plate.gramsOfFood",
-      "kind": "screen",
-      "key": "plate.gramsOfFood",
-      "en": "Grams of {food}",
-      "forms": "plain",
-      "slots": [
-        "food"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Grami: {food}",
-      "de": "Gramm: {food}",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.151",
-      "order": 900022,
       "at": "2026-11-16T10:49:49.150Z"
     },
     {
@@ -48421,24 +48045,6 @@
       "beta": true,
       "release": "0.3.151",
       "order": 900005,
-      "at": "2026-11-16T10:59:10.571Z"
-    },
-    {
-      "id": "screen.howto.photoLog.s4",
-      "kind": "screen",
-      "key": "howto.photoLog.s4",
-      "en": "Check the foods he read. Under Did you eat it? choose All of it, Half or Part of it, then Done.",
-      "forms": "plain",
-      "slots": [],
-      "area": "Words used across the app",
-      "where": "Across the app",
-      "enBefore": "Check the foods he read, then tap Ate it, or Ate half.",
-      "sr": "Proveri namirnice koje je pročitao. Pod Da li je pojedeno? izaberi Sve, Pola ili Deo, pa Gotovo.",
-      "de": "Prüf die gelesenen Lebensmittel. Wähl unter Hast du es gegessen? Alles, Die Hälfte oder Einen Teil, dann Fertig.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.151",
-      "order": 900006,
       "at": "2026-11-16T10:59:10.571Z"
     },
     {
@@ -49256,23 +48862,6 @@
       "at": "2026-11-18T11:35:04.460Z"
     },
     {
-      "id": "screen.plate.clearMeal",
-      "kind": "screen",
-      "key": "plate.clearMeal",
-      "en": "Clear the meal and the day",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Ukloni obrok i dan",
-      "de": "Mahlzeit und Tag entfernen",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.157",
-      "order": 900003,
-      "at": "2026-11-18T11:35:04.460Z"
-    },
-    {
       "id": "screen.plate.goesIntoPlan",
       "kind": "screen",
       "key": "plate.goesIntoPlan",
@@ -49996,23 +49585,6 @@
       "at": "2026-11-18T11:35:04.460Z"
     },
     {
-      "id": "screen.cal.nothingCounted",
-      "kind": "screen",
-      "key": "cal.nothingCounted",
-      "en": "nothing is counted",
-      "forms": "plain",
-      "slots": [],
-      "area": "Words used across the app",
-      "where": "Across the app",
-      "sr": "ništa se ne broji",
-      "de": "nichts wird gezählt",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.157",
-      "order": 900000,
-      "at": "2026-11-18T12:50:34.418Z"
-    },
-    {
       "id": "chef.plateArrives",
       "kind": "chef",
       "key": "plateArrives",
@@ -50241,24 +49813,6 @@
       "at": "2026-11-19T00:22:39.177Z"
     },
     {
-      "id": "screen.make.exploringNothingIsSizedFor",
-      "kind": "screen",
-      "key": "make.exploringNothingIsSizedFor",
-      "en": "No meal selected: nothing is sized for a meal. Pick a meal to see what your plan has for it.",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "enBefore": "Just looking: nothing is sized for a meal. Pick a meal to see what your plan has for it.",
-      "sr": "Obrok nije izabran: ništa nije odmereno za obrok. Izaberi obrok da vidiš šta tvoj plan ima za njega.",
-      "de": "Keine Mahlzeit gewählt: Nichts ist auf eine Mahlzeit bemessen. Wähle eine Mahlzeit, um zu sehen, was dein Plan dafür vorsieht.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.160",
-      "order": 900001,
-      "at": "2026-11-19T00:22:39.177Z"
-    },
-    {
       "id": "screen.make.forExploringHead",
       "kind": "screen",
       "key": "make.forExploringHead",
@@ -50295,44 +49849,6 @@
       "at": "2026-11-19T00:22:39.177Z"
     },
     {
-      "id": "screen.plate.exploringLine",
-      "kind": "screen",
-      "key": "plate.exploringLine",
-      "en": "No meal selected · not sized for a meal",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "enBefore": "Just looking · not sized for a meal",
-      "sr": "Obrok nije izabran · nije odmereno za obrok",
-      "de": "Keine Mahlzeit gewählt · nicht auf eine Mahlzeit bemessen",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.160",
-      "order": 900004,
-      "at": "2026-11-19T00:22:39.177Z"
-    },
-    {
-      "id": "screen.plate.exploringStays",
-      "kind": "screen",
-      "key": "plate.exploringStays",
-      "en": "No meal selected: {slot} stays as it was.",
-      "forms": "plain",
-      "slots": [
-        "slot"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "enBefore": "Just looking: {slot} stays as it was.",
-      "sr": "Obrok nije izabran: {slot} ostaje bez promene.",
-      "de": "Keine Mahlzeit gewählt: {slot} bleibt, wie es war.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.160",
-      "order": 900005,
-      "at": "2026-11-19T00:22:39.177Z"
-    },
-    {
       "id": "screen.plate.exploring",
       "kind": "screen",
       "key": "plate.exploring",
@@ -50348,26 +49864,6 @@
       "beta": true,
       "release": "0.3.160",
       "order": 900006,
-      "at": "2026-11-19T00:22:39.177Z"
-    },
-    {
-      "id": "screen.plate.exploringLeaves",
-      "kind": "screen",
-      "key": "plate.exploringLeaves",
-      "en": "No meal selected: {slot} stays as it was, and nothing is logged.",
-      "forms": "plain",
-      "slots": [
-        "slot"
-      ],
-      "area": "The Plate",
-      "where": "The Plate",
-      "enBefore": "Just looking leaves {slot}: it stays as it was, and nothing is logged.",
-      "sr": "Obrok nije izabran: {slot} ostaje bez promene, i ništa se ne upisuje.",
-      "de": "Keine Mahlzeit gewählt: {slot} bleibt, wie es war, und nichts wird eingetragen.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.160",
-      "order": 900007,
       "at": "2026-11-19T00:22:39.177Z"
     },
     {
@@ -50895,6 +50391,41 @@
       "release": "0.3.160",
       "order": 900000,
       "at": "2026-11-19T01:18:27.860Z"
+    },
+    {
+      "id": "screen.howto.photoLog.s4",
+      "kind": "screen",
+      "key": "howto.photoLog.s4",
+      "en": "Check the foods he read. Tap Ate it and the meal.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "enBefore": "Check the foods he read. Under Did you eat it? choose All of it, Half or Part of it, then Done.",
+      "sr": "Proveri namirnice koje je pročitao. Dodirni Pojeo sam i obrok.",
+      "de": "Prüf die gelesenen Lebensmittel. Tipp auf Gegessen und die Mahlzeit.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.161",
+      "order": 900000,
+      "at": "2026-11-19T07:06:39.193Z"
+    },
+    {
+      "id": "screen.howto.photoLog.s5",
+      "kind": "screen",
+      "key": "howto.photoLog.s5",
+      "en": "Under Did you eat it? choose All of it, Half or Part of it, then Done.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Pod Da li je pojedeno? izaberi Sve, Pola ili Deo, pa Gotovo.",
+      "de": "Wähl unter Hast du es gegessen? Alles, Die Hälfte oder Einen Teil, dann Fertig.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.161",
+      "order": 900001,
+      "at": "2026-11-19T07:06:39.193Z"
     }
   ]
 }

@@ -155,7 +155,8 @@ const photoAt = (d) => { const p = path.join(os.tmpdir(), `dt305-${d.getTime()}.
     t = await txt(page, ".read-view");
     ok(await page.locator(".rv-plan").count() === 1 && await page.locator(".rv-eat").count() === 0 && /Is it for the plan\?/.test(t) && /Plan it for Tuesday's dinner/.test(t) && await page.locator(".rv-chef").count() === 0, "a coming day: Is it for the plan? Plan it for Tuesday's dinner; no word about today");
     await page.locator(".rv-plan-chip").click(); await page.waitForTimeout(300);
-    ok(/✓\s*Planned for Tuesday's dinner/.test(await txt(page, ".rv-plan")), "chosen: Planned for Tuesday's dinner");
+    // Changed by story B149 (0.3.161, board B149; Coach Milan, Go 18 November 19:13): a chosen choice shows one tick, the one its look draws; the tick written into the words is gone
+    ok(/Planned for Tuesday's dinner/.test(await txt(page, ".rv-plan")) && !/✓/.test(await txt(page, ".rv-plan")) && await page.locator(".rv-plan .pa-opt.on").evaluate((e) => getComputedStyle(e, "::before").content.includes("✓")), "chosen: Planned for Tuesday's dinner, with one tick");
     await page.locator(".rv-done").click(); await page.waitForTimeout(1200);
     st = await store(page);
     ok(/\/plan$/.test(page.url()) && /Planned for Tuesday's dinner\. It's on Plan\./.test(await txt(page, "body")) && st.items.length === 0 && st.feedback.length === 0, "Done puts it on the plan: Planned for Tuesday's dinner. It's on Plan.");

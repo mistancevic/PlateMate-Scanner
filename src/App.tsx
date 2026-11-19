@@ -124,7 +124,7 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
 import { ratesOf } from "./letters";
 import { asMine, travels, toShare } from "./memberFoods";
-import { cleanRead, itemsOfRead, toldAgain, settled, holdsMore, type Vessel } from "./mealPhoto";
+import { cleanRead, cookingNamed, itemsOfRead, toldAgain, settled, holdsMore, type Vessel } from "./mealPhoto";
 import { sameKind } from "./swap";
 import { dishOf, visitFor, upsertServed, withNote, mealItems, mealTitle, cleanMenu, applyMenu, withMenuLine, withoutMenuLine, type Served, type OnPlate, type VisitMenu, type Dish } from "./served";
 import { identityTwins } from "./foodId";
@@ -2000,6 +2000,8 @@ export default function App() {
         }
         setPhotoLost(null);
         const read = cleanRead(d);
+        // B145 (0.3.161, board B145): cooking foods only as the person's own words named them; never a way of cooking
+        if (read) { const named = cookingNamed(read.cooking, note); if (named.length) read.cooking = named; else delete read.cooking; }
         const got = read ? itemsOfRead(read, state.foods, shopRegion, uid) : { items: [], fresh: [] };
         const fresh = got.fresh;
         // DT318: asked again with the person's words: what they set stays; one line says what Chef Mealan did

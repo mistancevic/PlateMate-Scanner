@@ -9,7 +9,8 @@ const { say, dayIn, mealAcc } = await import("./chefScript");
 
 const lines = () => [
   say("photoWhose", "Fotografija od danas, u 12:40."),
-  say("plateAddOrNew", 1, "", "Skyr."), say("plateAddPhoto", 2, "Doručak", "Skyr."),
+  // DT316 (0.3.161): the old question line plateAddOrNew is gone; the forms are checked on the line that took its place
+  say("plateAddPhoto", 1, "", "Skyr."), say("plateAddPhoto", 2, "Doručak", "Skyr."),
   say("busyMeal", "Lunch", "12:30", "12:00 do 14:00", "Sunday"), say("busyLate", "18:30", "Dinner", "19:00", 0, "dinner"),
   say("busyLateAhead", "18:30", "Dinner", "19:00", 30, "dinner", "Saturday"), say("busyCarry", "12:00 do 14:00", "lunch"),
   say("busyTraining", "12:30", "12:00 do 14:00", "Wednesday"), say("resume", "Pancake", ""), say("howManyAte", "4"),
@@ -23,7 +24,7 @@ test("the eight lines carry no English in Srpski or German", () => {
 test("Srpski: the words take the form the sentence needs, and her form", () => {
   ls["chefmealan-personal"] = JSON.stringify({ sex: "male" });
   const he = inLang("sr-Latn", lines);
-  assert.equal(he[1], "Tvoj tanjir već ima 1 namirnicu. Skyr. Da počneš nov tanjir s tim, ili da ga dodaš svom?");
+  assert.equal(he[1], "Tvoj tanjir već ima 1 namirnicu. Skyr. Da ih dodaš svom, ili da počneš nov tanjir s njima?");
   assert.equal(he[5], "Zauzet si do 18:30. Večera u 19:00 ostavlja 30 minuta za kuvanje. Nešto brzo za večeru, ili da skuvaš u subotu i podgreješ?");
   assert.equal(he[3], "Ručak u 12:30 pada u zauzet blok, 12:00 do 14:00. Da ga pomerim za nedelju?");
   assert.equal(he[8], "Kuvanje: Pancake. Da nastaviš gde si stao?");
@@ -37,7 +38,7 @@ test("Srpski: the words take the form the sentence needs, and her form", () => {
 
 test("German: no colon without a plate name, keine Zeit, and the cook ahead", () => {
   const de = inLang("de", lines);
-  assert.equal(de[1], "Dein Teller hat schon 1 Lebensmittel. Skyr. Einen neuen Teller damit beginnen oder zu deinem hinzufügen?");
+  assert.equal(de[1], "Dein Teller hat schon 1 Lebensmittel. Skyr. Zu deinem hinzufügen oder einen neuen Teller damit beginnen?");
   assert.match(de[4], /lässt dir keine Zeit zum Kochen\. Etwas Schnelles zum Abendessen\?$/);
   assert.match(de[5], /oder am Samstag kochen und aufwärmen\?$/);
   assert.equal(de[8], "Du hast Pancake gekocht. Da weitermachen, wo du aufgehört hast?");

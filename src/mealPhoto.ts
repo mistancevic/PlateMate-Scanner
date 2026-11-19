@@ -60,6 +60,11 @@ function whichOf(wh: any, foods: PhotoFood[], num: (x: unknown, lo?: number, hi?
 
 // a food of the read as a food of yours: the table's food when the name is a basic food (its values win), else an estimate
 // with the read's values; a food already in the library is reused
+// B145 (0.3.161, board B145): For cooking, not counted shows only foods the person's own words named. With no words from
+// the person there is no line at all, and a way of cooking (simmered, pureed) is never a food, whatever the read returns.
+const HOW = /^(simmer|pur[eé]e?|fry|fri|boil|bak|roast|grill|steam|saut[eé]|stew|brais|poach|blend|mash|sear|smok|blanch|toast|brown|reduc|whip|whipp|whisk|chop|chopp|dic|slic|minc|grat|cook|mix|stir|stirr|marinat|caramelis|carameliz|barbecu|broil|microwav|pressur|slow|deep|shallow|pan|oven|air|lightly|gently|well|done)(e|ed|d|ing|s|es)?$/i;
+export const isWayOfCooking = (name: string) => { const ws = name.toLowerCase().split(/[^a-zé]+/).filter(Boolean); return ws.length > 0 && ws.every((x) => HOW.test(x)); };
+export const cookingNamed = (cooking: string[] | undefined, words: string): string[] => (words.trim() ? (cooking ?? []).filter((c) => !isWayOfCooking(c)) : []);
 export function foodOfRead(f: PhotoFood, library: Food[], region: string | null | undefined, uid: () => string): { food: Food; fresh: boolean } {
   const same = (a: string | undefined, b: string | undefined) => !!a && !!b && a.toLowerCase() === b.toLowerCase();
   const have = library.find((x) => same(x.name, f.name) || (x.aliases ?? []).some((a) => same(a, f.name)) || same(x.name, f.local));

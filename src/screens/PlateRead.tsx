@@ -76,7 +76,7 @@ export function plateRead(given: PlateReadIn) {
   const slot = p.pick === "snack" ? null : pickSlot && mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : photoMeal ? { date: photoMeal.date, slotId: photoMeal.slot.id, name: photoMeal.slot.name, time: photoMeal.slot.time } : mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : null;
   const pick = (x: "all" | "half" | "part") => { setRvEat(x); setRvGrams(x === "all" ? String(total) : x === "half" ? String(Math.round(total / 2)) : ""); if (x === "part") window.setTimeout(() => document.querySelector<HTMLInputElement>("input.rv-grams")?.focus(), 0); };
   const chip = (on: boolean, text: string, tap: () => void, cls = "") => (
-    <div key={text} role="radio" tabIndex={0} aria-checked={on} className={`pa-opt${on ? " on" : ""}${cls}`} onClick={tap} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } }}>{on && <span aria-hidden="true">✓</span>}{text}</div>);
+    <div key={text} role="radio" tabIndex={0} aria-checked={on} className={`pa-opt${on ? " on" : ""}${cls}`} onClick={tap} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } }}>{text}</div>);
   const saved = !!ph.saved && state.meals.some((m) => m.id === ph.saved);
   const done = () => {
     if (planning) { if (!rvPlan) { clearPlate(); return; } const f = p.filling!; putInSlot(items); notify(w("plate.plannedFor", { slot: slotV(f) })); return; }

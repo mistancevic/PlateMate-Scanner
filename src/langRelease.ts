@@ -16,7 +16,7 @@ const CHEF_WHERE: Record<string, [string, string]> = {
   photoWhose: ["The Plate", "After a photo of a plate is read"], photoHere: ["The Plate", "The photo screen, before a photo is read"], plateArrives: ["The Plate", "A recipe, a meal or a food onto a plate that has foods: what arrives"], photoNoFoods: ["The Plate", "A photo where no food was found"],
   oneDish: ["The Plate", "Foods that look cooked together"], whatMoment: ["The Plate", "Saving a plate: what kind of moment"],
   plateOldAte: ["The Plate", "Opening the app with an old plate"], plateOldBeforeCook: ["The Plate", "Starting a cook with an old plate"],
-  plateSaveOrClear: ["The Plate", "A recipe starts while the plate has foods"], plateAddOrNew: ["The Plate", "Adding foods to a plate that has some"], plateHolds: ["The Plate", "A photo onto a plate that has foods: what the photo holds"], plateAddPhoto: ["The Plate", "Adding a photo's foods to a plate that has some"],
+  plateSaveOrClear: ["The Plate", "A recipe starts while the plate has foods"], plateHolds: ["The Plate", "A photo onto a plate that has foods: what the photo holds"], plateAddPhoto: ["The Plate", "Adding a photo's foods to a plate that has some"],
   whereGoes: ["The Plate", "A scanned food: where it goes"], scanWhileCooking: ["Cooking", "Scanning a food in the middle of a cook"],
   useInCook: ["Cooking", "Using a scanned food in the cook"], handsFree: ["Cooking", "Before the steps: hands free"],
   whoMadePhoto: ["Cooking", "A photo of a dish: who made it"], howCooking: ["Cooking", "After the last step"],
@@ -41,7 +41,7 @@ function chefTemplate(k: string): string {
   const D = new Date(2026, 0, 5, 9, 0), plate = () => "{plate}";
   const args: Record<string, any[]> = {
     photoWhose: ["{from}"], photoHere: ["{from}"], plateArrives: ["{what}"], plateOldAte: [D, plate], plateOldBeforeCook: [D, plate], plateSaveOrClear: [2, D, "{dish}"],
-    plateAddOrNew: [2, "{title}", "{what}"], plateAddPhoto: [2, "{title}", "{what}"], plateHolds: ["{list}"], plateRecipe: ["{title}", 2], plateRecipeFor: ["{title}", 2, "{makes}"], scanWhileCooking: ["{dish}", "{food}"], useInCook: ["{food}", "{dish}"], resume: ["{dish}", "{done}"],
+    plateAddPhoto: [2, "{title}", "{what}"], plateHolds: ["{list}"], plateRecipe: ["{title}", 2], plateRecipeFor: ["{title}", 2, "{makes}"], scanWhileCooking: ["{dish}", "{food}"], useInCook: ["{food}", "{dish}"], resume: ["{dish}", "{done}"],
     howManyAte: ["{made}"], carryNow: [7], busyMeal: ["{meal}", "{time}", "{block}", "{day}"], busyLate: ["{until}", "{meal}", "{time}", 7, "{quick}"], busyLateAhead: ["{until}", "{meal}", "{time}", 7, "{quick}", "{day}"],
     busyCarry: ["{block}", "{meal}"], busyTraining: ["{time}", "{block}", "{day}"],
     cookOpen: ["{cook}", "{dish}"], plateFills: ["{meal}", "{kcal}"], secondDish: ["{dish}", 7, "{prev}", "{meal}"], recipeOther: ["sr-Latn", "en"], cookOther: ["sr-Latn", "en"],
