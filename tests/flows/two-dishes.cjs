@@ -6,6 +6,7 @@
 // waits on the photo screen, and Read the plate reads it; the read shows alone, and Change the foods opens the plate this
 // story is about. The question about a second dish still comes first, alone.
 // Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)
+// Changed by story DT306 (0.3.163, board DT306; Coach Milan, Go 19 November 11:36): Chef Mealan's card asks Did you eat it?; All of it, then Done, logs the plate
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -66,7 +67,7 @@ const cakeCard = { id: "cake", meal: { id: "mc", title: "Brownie cheesecake", it
     ok(chips.length === 2 && /Main · Chicken salad with feta/.test(chips[0]) && /Dessert · Brownie cheesecake/.test(chips[1]), "Main and Dessert: " + chips.join(" | "));
     ok(await p.getByText(/Fit works on Brownie cheesecake and keeps Chicken salad with feta as it was served/).count() === 1, "Fit works on this dish; the other counts as it is");
     // Ate it: the cake goes into the dinner, as its dessert, with its own photo
-    await p.locator(".mp-say").getByRole("button", { name: "Ate it" }).click(); await p.waitForTimeout(1200);
+    await p.locator(".mp-eat .pa-opt").filter({ hasText: "All of it" }).click(); await p.locator(".mp-done").click(); await p.waitForTimeout(1200);
     let fb = (await saved(p)).feedback;
     const cake = fb.find((f) => f.meal.title === "Brownie cheesecake");
     ok(cake && cake.slot?.slotId === "dinner" && cake.course === "dessert" && fb.length === 2, "the cheesecake is in the dinner, as its dessert");

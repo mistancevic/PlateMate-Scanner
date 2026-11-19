@@ -10,6 +10,7 @@
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed from a photo, so this walkthrough sets the meal with the pencil (set-meal.cjs) on the photo's plate; the gates and Chef Mealan's card with Ate it and Ate half then work as before.
 // Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)
 // Changed by story DT306 (0.3.163, board DT306; Coach Milan, Go 19 November 11:36): Chef Mealan's card asks Did you eat it? with All of it, Half, Part of it and Don't count it, and Done is its one button; with no meal selected the card is his word alone
+// Changed by story DT306 (0.3.163, board DT306; Coach Milan, Go 19 November 11:36): Don't count it is an answer to Did you eat it? on Chef Mealan's card, then Done; with no meal selected the card has no buttons, so not-counted.cjs sets a meal first
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -118,7 +119,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   // DT247: again minutes after a meal: it asks once; its own snack this time
   await page.locator(".dish-ask .ca-go button").filter({ hasText: "Its own snack" }).click(); await page.waitForTimeout(400); if (await page.locator(".rv-change .rv-continue").count()) { await page.locator(".rv-change .rv-continue").click(); await page.waitForTimeout(600); }
   // DT278 (0.3.145, board Stories218): Don't count it in place of Not mine: the plate stays, not counted, kept with its day
-  await page.getByRole("button", { name: "Don't count it" }).click(); await page.waitForTimeout(500);
+  await require("./not-counted.cjs")(page); await page.waitForTimeout(300);
   const s5 = await st();
   ok(s5.items.length > 0 && s5.photo?.who === "idea" && s5.photo.served && s5.photo.served.mine === false && /Not counted in your day/.test(await page.locator(".sv-plate").innerText()), "DT278: Don't count it keeps the plate, not counted in your day");
   ok(!/Add one of these from your foods/.test(await page.locator("main").innerText()), "DT278: no coaching on a plate that is not counted");
