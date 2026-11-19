@@ -33,10 +33,18 @@ td = "padding:10px 12px;font-size:14px;line-height:1.45;color:#172742;vertical-a
 rows = "".join(f'<tr><td style="{td};font-weight:700">{where}</td><td style="{td};background:#fdf0f0">{old or "<i>none</i>"}</td><td style="{td};background:#eaf1fd;font-weight:700">{new}</td><td style="{td};color:#3d4a63">{why}</td></tr>' for _k, where, old, new, why in t["text"])
 TW = 2300
 SVG = json.load(open(f"{HERE}/iconsDT329.json"))
-FACE = {"Frown": "#f0705c", "Annoyed": "#f6b94a", "Meh": "#2a72d9", "Smile": "#35cf9e", "Laugh": "#0f7d5b"}
+FACE = {"Frown": "#a33a2b", "Annoyed": "#8a5a00", "Meh": "#1f5fc7", "Smile": "#12996c", "Laugh": "#0f7d5b"}
 tile1 = lambda i: f'<span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:#e3edfb;vertical-align:middle;margin-right:10px">{SVG[i]}</span>'
 # a face: as it stands (line), then as it looks chosen (white on its colour)
-tile = lambda i: (tile1(i) + f'<span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;background:{FACE[i]};vertical-align:middle;margin-right:10px">{SVG[i + "-white"]}</span>') if i in FACE else tile1(i)
+tile = lambda i: tile1(i)
+# Coach Milan 18:44: all five in colour, the face's line only, never a filled area; the chosen one gets a border in its colour
+pill = lambda i, on: f'<span style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:52px;border-radius:999px;border:{"2.5px solid " + FACE[i] if on else "1.5px solid #d1dcf0"};background:#fff;margin-right:8px">{SVG[i + "-c"]}</span>'
+names = ["Frown", "Annoyed", "Meh", "Smile", "Laugh"]
+faces = (f'<div data-faces style="margin-top:16px;padding-top:12px;border-top:1px solid #d1dcf0"><div style="font-size:17px;font-weight:900;color:#123a7a">The five faces, in colour</div>'
+  f'<div style="font-size:13.5px;color:#3d4a63;margin:4px 0 10px">The line of the face in its colour, no filled area. Shades that keep 3 to 1 on white, so a face can be seen by anyone: red, amber, blue, green, dark green.</div>'
+  f'<div style="font-size:13px;font-weight:800;color:#5b6b8a;margin-bottom:6px">As they stand</div><div>{"".join(pill(n, False) for n in names)}</div>'
+  f'<div style="font-size:13px;font-weight:800;color:#5b6b8a;margin:12px 0 6px">The fourth chosen: a border in its colour</div><div>{"".join(pill(n, n == "Smile") for n in names)}</div>'
+  f'<div style="display:flex;justify-content:space-between;width:352px;margin-top:4px;font-size:13px;color:#5b6b8a"><span>Hard</span><span>Easy</span></div></div>')
 ic = "".join(f'<tr><td style="{td};font-weight:700">{n}</td><td style="{td};background:#fdf0f0;font-size:20px">{e}</td><td style="{td};background:#eaf1fd;font-weight:700">{tile(i)}{i}</td></tr>' for n, e, i in t["icons"])
 B.html.append(f'<div data-tbl style="position:absolute;left:{SX}px;top:30px;width:{TW}px;box-sizing:border-box;border:2px solid #172742;border-radius:14px;padding:14px 16px;background:#fff">'
   f'<div style="font-size:19px;font-weight:900;color:#123a7a">The new lines</div>'
@@ -49,7 +57,7 @@ B.html.append(f'<div data-ic style="position:absolute;left:{XI}px;top:30px;width
   f'<div style="font-size:19px;font-weight:900;color:#123a7a">The icons, now and new, and the faces</div>'
   f'<div style="font-size:13.5px;color:#3d4a63;margin-top:4px">From the same set of line icons as the bar (Today, Plan, Recipes, Explorer), on the tint of the bar\'s chosen tab.</div>'
   f'<table style="margin-top:10px;width:100%;border-collapse:collapse;table-layout:fixed"><colgroup><col style="width:52%"><col style="width:14%"><col></colgroup>'
-  f'<tr><th style="{th};border-radius:8px 0 0 0">Situation</th><th style="{th}">Now</th><th style="{th};border-radius:0 8px 0 0">New icon</th></tr>{ic}</table></div>')
+  f'<tr><th style="{th};border-radius:8px 0 0 0">Situation</th><th style="{th}">Now</th><th style="{th};border-radius:0 8px 0 0">New icon</th></tr>{ic}</table>{faces}</div>')
 y = 30 + max(HT.get("tbl", 600), HT.get("ic", 600)) + 70
 X = lambda i: SX + i * (PW + G)
 bs = [shot(X(0), y, "now_list", PW, "How to, today", "draft", "Eight situations, emoji icons, no video."),

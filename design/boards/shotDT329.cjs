@@ -32,7 +32,7 @@ const S = (dir, port) => spawn(process.execPath, ["dist/server.cjs"], { cwd: dir
   await p.locator(".ht-back").click(); await p.waitForTimeout(400); await p.locator(".ht-scanAnywhere").click(); await p.waitForTimeout(500); await shot(p, "new_scan");
   // New at the top right, with Tried under it (Coach Milan 18:08)
   // I did it asks how it went (Coach Milan 18:17): the scale and a line of your own
-  await p.locator(".ht-tried").click(); await p.waitForTimeout(400); await p.locator(".ht-r").nth(3).click(); await p.locator(".ht-rate .ht-note").fill("Held Plate in the shop, the code read at once."); await p.waitForTimeout(300); await shot(p, "new_rate");
+  await p.locator(".ht-tried").click(); await p.waitForTimeout(400); await p.locator(".ht-scale").screenshot({ path: `${OUT}/new_scale.png` }); await p.locator(".ht-r").nth(3).click(); await p.locator(".ht-scale").screenshot({ path: `${OUT}/new_scale4.png` }); await p.locator(".ht-rate .ht-note").fill("Held Plate in the shop, the code read at once."); await p.waitForTimeout(300); await shot(p, "new_rate");
   await p.locator(".ht-send").click(); await p.waitForTimeout(600); await shot(p, "new_done");
   await p.locator(".ht-back").click(); await p.waitForTimeout(500); await shot(p, "new_list_tried");
   // the long press itself, on the app as it is (DT309)
