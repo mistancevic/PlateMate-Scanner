@@ -1911,7 +1911,7 @@
       "id": "B150",
       "title": "Setting the meal and its time on a photo: a photo from another day, logged under a meal of today, leaves two dinners on its day",
       "epic": "plate",
-      "state": "next",
+      "state": "now",
       "board": "Stories260",
       "where": "Page 5",
       "why": "Coach Milan 18 November 19:21, with a screenshot of his Plan on Tuesday 17: a photo from Tuesday 19:56, tried as today's lunch, then set to dinner with the pencil; Tuesday shows it as Dinner, 19:56 and the planned Chicken rice bowl still asks. Cause: the pencil's calendar opens on today also for a photo from another day, and the meal is logged with the photo's time under the dinner of today. Reproduced on 0.3.159 as a record with the photo's day and another day's meal. Drawn; waits for a Go. Coach Milan 19:34: also the timing, he could not change it; only the times from the settings. Added to the board: the time in the meal line is a field (AC6 to AC9). 19:43: better an edit mode where everything is set than another way of correction. Drawn again: the pencil stays when a meal is set and opens the calendar with what is set marked and a row Time (AC6 to AC11). No time field in the line. 19:49: everything is wrong. Edit mode is when the pencil is clicked and turns into an X that closes it; saved automatically, no Done. The photo's time is a reference and cannot be changed; what changes is the time in the calendar. Drawn again: one icon; the time of the marked meal's row is a field; the photo's time is one line of reference (AC1 to AC13). 20:04: yes to the six steps. 20:12: draw the new flow whole, with the screens that did not change; and no meal picked should be the status Just looking, a picked meal shows with its time, and the way back from a picked meal is Just looking. Drawn so: one status, one edit mode (AC1 to AC13).",
@@ -2017,13 +2017,14 @@
         "The days and the rows of the calendar, and What is it? and the kind of moment under it.",
         "Slots and times in the settings.",
         "A dinner logged after midnight stays with the evening before."
-      ]
+      ],
+      "go": "Go from Coach Milan, 19 November 2026, 01:00: you go with B150 and DT318. One release."
     },
     {
       "id": "DT318",
       "title": "Correcting what Chef Mealan read: his checks first, then my words, and by hand on the Plate",
       "epic": "plate",
-      "state": "next",
+      "state": "now",
       "why": "Coach Milan 18 November 19:26, from the same test: the read gave a good list and asked about the chicken (he chose 200 g). The yogurt came as 10 % fat, fixed in the food list, not on the read's chip. Swap offered no 0.2 % fat yogurt. He added words (mayo was hidden; the yogurt is 0.2 % fat); the read then asked about the chicken again, this time whether it was 220 g. The list ended right, but it was confusing where and how to correct it. Four points: the kind of a food cannot be corrected on its chip; Swap lacks the variant; a second read asks again what was already answered, with another number; no one place to correct. Not reproduced and not drawn yet.",
       "board": "Stories262",
       "opportunity": {
@@ -2112,7 +2113,8 @@
         "The Plate's food list: grams, a food's details, the swipe to change or remove a food, + Add more to your plate, Fit to my target, Group into parts.",
         "Retake and + Photo."
       ],
-      "where": "Page 5, board DT318. With B150 in one release (Coach Milan 21:36)."
+      "where": "Page 5, board DT318. With B150 in one release (Coach Milan 21:36).",
+      "go": "Go from Coach Milan, 19 November 2026, 01:00: you go with B150 and DT318. One release."
     },
     {
       "id": "B151",
