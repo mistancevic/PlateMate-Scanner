@@ -23,7 +23,7 @@
     {
       "id": "AC2",
       "title": "A label",
-      "text": "Given the way A label, when its video plays, then it shows two photos, the front of the pack and then its nutrition table, and the food on the plate."
+      "text": "Given the way A label, when its video plays, then it shows one photo, the nutrition table on the back of the pack with the product's name printed above it, the values read and checked, and the food on the plate."
     },
     {
       "id": "AC3",
@@ -92,8 +92,8 @@
       "home.way.labelLine",
       "New: the second way, line",
       "",
-      "Two photos: the front for the name, the nutrition table for the values. You check them.",
-      "What the label video shows."
+      "The nutrition table, read from one photo. You check the values.",
+      "What the label video shows: Label mode is the nutrition table (Coach Milan 17:03)."
     ],
     [
       "home.way.group",
@@ -111,11 +111,12 @@
     ]
   ],
   "now": "Two ways in since HP3 (1 November): A barcode or a label, and A photo of your meal. On a phone one below the other, 1,382 px tall; on a computer two side by side.",
-  "proposed": "Four ways in: A barcode, A label, A few packs at once, A photo of your meal. On a phone two by two (B, 1,227 px tall, a little shorter than today), on a computer four in a row. One below the other on a phone (A) would make the section 2,531 px tall, nearly twice today's. The lead and two lines get new words, four lines are new, in English, Serbian and German.",
+  "proposed": "Four ways in: A barcode, A label, A few packs at once, A photo of your meal. On a phone two by two (B, 1,227 px tall, a little shorter than today), on a computer four in a row. One below the other on a phone (A) would make the section 2,531 px tall, nearly twice today's. The lead and two lines get new words, four lines are new, the label video is recorded again with one photo of the table, in English, Serbian and German.",
   "decision": "Open. B drawn as the proposal, A next to it for comparison. Waits for Coach Milan's choice and Go.",
   "details": [
     "The pictures on this board are the real page: today's 0.3.164, and a scratch build of 0.3.164 with the four ways, not committed.",
     "On a phone in B each video is 172 px wide (today 220 px), the title 16 px, the line 13.5 px.",
-    "No new videos: label and group are the ones recorded in 0.3.164."
+    "The label video goes back to one photo (Coach Milan 17:03: a label scan is the nutrition label, not the branded pack). The drawn table gets the product's name printed above it, as a pack's back has it, so the read can name the food. Recorded again in the release.",
+    "The group video stays as recorded in 0.3.164: the fronts, then the backs."
   ]
 }

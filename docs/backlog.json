@@ -2436,7 +2436,7 @@
         {
           "id": "AC2",
           "title": "A label",
-          "text": "Given the way A label, when its video plays, then it shows two photos, the front of the pack and then its nutrition table, and the food on the plate."
+          "text": "Given the way A label, when its video plays, then it shows one photo, the nutrition table on the back of the pack with the product's name printed above it, the values read and checked, and the food on the plate."
         },
         {
           "id": "AC3",
