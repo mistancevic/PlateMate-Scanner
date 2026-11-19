@@ -181,8 +181,8 @@
       "howto.scanAnywhere",
       "The new situation",
       "",
-      "Scan a pack from any screen. Hold Plate in the bar: the camera opens, ready to scan. Four steps: hold Plate; the camera's modes; Barcode and the code; check, on your plate.",
-      "New, first under Every day."
+      "Scan a pack from any screen. Hold Plate in the bar, choose Barcode, and the camera opens. Four steps: hold Plate; a small menu opens above it, Group, Barcode, Label, Meal; tap Barcode, the camera opens, hold the code in the frame; check, on your plate.",
+      "New, first under Every day. In the build the steps say the small menu, as the long press shows it (DT309)."
     ]
   ],
   "icons": [
@@ -238,6 +238,7 @@
   "details": [
     "The pictures on this board are the real app: today's 0.3.165, and a scratch build of it with the icons, Watch it and the new situation, not committed. The long press picture is the app as it is (DT309).",
     "The new video of the long press is not recorded yet: with the Go it is recorded by scripts/record-home-clips.cjs under HC1 to HC13, as way-hold, and goes on no page but How to.",
-    "Later, as their own ticket: videos for the other five situations."
+    "Later, as their own ticket: videos for the other five situations.",
+    "In the build (0.3.166) the new situation's line and steps 2 and 3 name the small menu above Plate, as the long press shows it (DT309); the board's first words said the camera opens with its modes."
   ]
 }
