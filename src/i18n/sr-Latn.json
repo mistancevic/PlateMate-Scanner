@@ -11154,7 +11154,7 @@
       "checked": true
     },
     "home.decideText": {
-      "text": "pojedeš ga, pojedeš jednu porciju, dodaš prilog sa proteinima, ili pustiš Chef Mealana da ga uklopi u tvoj cilj.",
+      "text": "sačuvaš ga, isplaniraš ga, ili zabeležiš koliko si pojeo, sve ili deo. Ili pustiš Chef Mealana da ga uklopi u tvoj cilj.",
       "checked": true
     },
     "home.videoPlate": {
@@ -11186,7 +11186,7 @@
       "checked": true
     },
     "home.clipsPacks": {
-      "text": "Snimci aplikacije sa test podacima. Pakovanja u njima su izmišljena.",
+      "text": "Snimci aplikacije, verzija {version}, sa test podacima. Pakovanja u njima su izmišljena, obroci su pravi.",
       "checked": true
     },
     "home.cook": {
@@ -11198,7 +11198,7 @@
       "checked": true
     },
     "home.cook1": {
-      "text": "Korak po korak, krupno, i pročitan naglas.",
+      "text": "Prvo namirnice koje ti trebaju, pa korak po korak, pročitano naglas.",
       "checked": true
     },
     "home.cook2": {
@@ -11218,7 +11218,7 @@
       "checked": true
     },
     "home.videoCook": {
-      "text": "Kuvanje: korak po korak, pročitan naglas",
+      "text": "Kuvanje: prvo namirnice, pa korak po korak, pročitano naglas",
       "checked": true
     },
     "home.situEyebrow": {
@@ -11274,7 +11274,7 @@
       "checked": true
     },
     "home.clipsNames": {
-      "text": "Snimci aplikacije sa test podacima. Imena u njima su izmišljena.",
+      "text": "Snimci aplikacije, verzija {version}, sa test podacima. Imena u njima su izmišljena.",
       "checked": true
     },
     "home.kitchen": {

@@ -13,6 +13,7 @@ import { SignInPanel } from "../components/SignInPanel";
 import { pendingCode } from "../pendingCode";
 import { hit } from "../metrics";
 import { VERSION_LINE } from "../version";
+import { CLIPS_VERSION } from "../clips";
 import { w, wn, type WordKey, dec } from "../words";
 import { useLang, getLang, setLang, LANGS, langChip, type Lang } from "../lang";
 import { LangSwitch, LangAsk, pageLang, langPath } from "../components/LangAsk";
@@ -180,7 +181,7 @@ export function LandingScreen() {
             <DayVideo src="/landing/way-shop.mp4" poster="/landing/way-shop.webp" label={w("home.shopTitle")} />
           </div>
         </div>
-        <small className="l-ways-note">{w("home.clipsPacks")}</small>
+        <small className="l-ways-note">{w("home.clipsPacks", { version: CLIPS_VERSION })}</small>
       </section>
 
       {/* HP3: cook it, the day as it goes, Explorer; each with a clip of the app as it is */}
@@ -233,7 +234,7 @@ export function LandingScreen() {
           </div>
           <DayVideo src="/landing/way-languages.mp4" poster="/landing/way-languages.webp" label={w("home.videoLang")} />
         </div>
-        <small className="l-ways-note">{w("home.clipsNames")}</small>
+        <small className="l-ways-note">{w("home.clipsNames", { version: CLIPS_VERSION })}</small>
       </section>
 
       {recipes.length > 0 && (

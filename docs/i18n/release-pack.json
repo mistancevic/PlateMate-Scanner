@@ -1,6 +1,6 @@
 {
-  "release": "0.3.163",
-  "at": "2026-11-19T10:47:45.888Z",
+  "release": "0.3.164",
+  "at": "2026-11-19T14:40:50.748Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -50500,6 +50500,100 @@
       "release": "0.3.163",
       "order": 900008,
       "at": "2026-11-19T10:47:45.888Z"
+    },
+    {
+      "id": "screen.home.decideText",
+      "kind": "screen",
+      "key": "home.decideText",
+      "en": "save it, plan it, or log what you ate of it, all of it or a part. Or let Chef Mealan fit it to your target.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Home page",
+      "where": "The home page",
+      "enBefore": "eat it, eat one portion, add a protein side, or let Chef Mealan fit it to your target.",
+      "sr": "sačuvaš ga, isplaniraš ga, ili zabeležiš koliko si pojeo, sve ili deo. Ili pustiš Chef Mealana da ga uklopi u tvoj cilj.",
+      "de": "speichern, planen oder eintragen, was du davon gegessen hast, alles oder einen Teil. Oder Chef Mealan an dein Ziel anpassen lassen.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.164",
+      "order": 900000,
+      "at": "2026-11-19T14:32:19.633Z"
+    },
+    {
+      "id": "screen.home.cook1",
+      "kind": "screen",
+      "key": "home.cook1",
+      "en": "First the foods you need, then one step at a time, read aloud.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Home page",
+      "where": "Cook",
+      "enBefore": "One big step at a time, read aloud.",
+      "sr": "Prvo namirnice koje ti trebaju, pa korak po korak, pročitano naglas.",
+      "de": "Zuerst die Zutaten, die du brauchst, dann ein Schritt nach dem anderen, laut vorgelesen.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.164",
+      "order": 900001,
+      "at": "2026-11-19T14:32:19.633Z"
+    },
+    {
+      "id": "screen.home.videoCook",
+      "kind": "screen",
+      "key": "home.videoCook",
+      "en": "Cook mode: the foods first, then one step at a time, read aloud",
+      "forms": "plain",
+      "slots": [],
+      "area": "Home page",
+      "where": "The home page",
+      "enBefore": "Cook mode: one step at a time, read aloud",
+      "sr": "Kuvanje: prvo namirnice, pa korak po korak, pročitano naglas",
+      "de": "Kochmodus: zuerst die Zutaten, dann ein Schritt nach dem anderen, laut vorgelesen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.164",
+      "order": 900002,
+      "at": "2026-11-19T14:32:19.633Z"
+    },
+    {
+      "id": "screen.home.clipsPacks",
+      "kind": "screen",
+      "key": "home.clipsPacks",
+      "en": "Clips of the app, version {version}, on test data. The packs in them are made up, the meals are real.",
+      "forms": "plain",
+      "slots": [
+        "version"
+      ],
+      "area": "Home page",
+      "where": "The home page",
+      "enBefore": "Clips of the app on test data. The packs in them are made up.",
+      "sr": "Snimci aplikacije, verzija {version}, sa test podacima. Pakovanja u njima su izmišljena, obroci su pravi.",
+      "de": "Clips der App, Version {version}, mit Testdaten. Die Packungen darin sind erfunden, die Mahlzeiten sind echt.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.164",
+      "order": 900000,
+      "at": "2026-11-19T14:40:50.748Z"
+    },
+    {
+      "id": "screen.home.clipsNames",
+      "kind": "screen",
+      "key": "home.clipsNames",
+      "en": "Clips of the app, version {version}, on test data. The names in them are made up.",
+      "forms": "plain",
+      "slots": [
+        "version"
+      ],
+      "area": "Home page",
+      "where": "The home page",
+      "enBefore": "Clips of the app on test data. The names in them are made up.",
+      "sr": "Snimci aplikacije, verzija {version}, sa test podacima. Imena u njima su izmišljena.",
+      "de": "Clips der App, Version {version}, mit Testdaten. Die Namen darin sind erfunden.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.164",
+      "order": 900001,
+      "at": "2026-11-19T14:40:50.748Z"
     }
   ]
 }

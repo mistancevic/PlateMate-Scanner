@@ -2395,6 +2395,11 @@
           "id": "AC7",
           "title": "In three languages",
           "text": "Given the three changed lines, when the home page is in Serbian or German, then each shows in that language."
+        },
+        {
+          "id": "AC8",
+          "title": "The note says the version they were recorded on",
+          "text": "Given the videos recorded on 0.3.164, when I read the note under them, then it says Clips of the app, version 0.3.164, on test data. The packs in them are made up, the meals are real. The version comes from the recording, so it is never a version the videos were not made on."
         }
       ],
       "unchanged": [
@@ -2402,7 +2407,8 @@
         "Where each video sits, its file name, its poster, and its loop with the fades.",
         "The rules of the videos, HC1 to HC13 in docs/rules/home-clips.md.",
         "Test data only: the made-up packs and names."
-      ]
+      ],
+      "decision": "Go, Coach Milan 19 November 15:29, for AC1 to AC7. AC8 (the version in the note) drawn the same day, after his question; waits for its Go."
     }
   ]
 }

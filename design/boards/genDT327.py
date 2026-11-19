@@ -13,8 +13,8 @@ TOP = TT + 8 + CH + 8 + DH + 8
 t = json.load(open(f"{HERE}/ticketDT327.json")); o = t["opportunity"]
 HT = json.load(open(f"{HERE}/heightsDT327.json")) if os.path.exists(f"{HERE}/heightsDT327.json") else {}
 V = [("barcode", "A barcode", "The pack's code read from the camera, the food on the plate."),
-     ("label", "A label", "The label read from a photo, checked, the food on the plate."),
-     ("group", "A group of packs", "Three packs in one photo, each found."),
+     ("label", "A label", "New: two photos, two sides: the front gives the name, the table the values. Checked, the food on the plate."),
+     ("group", "A group of packs", "New: two photos, the fronts then the backs (made with AI, made-up brands). Names from the fronts, values from the tables."),
      ("meal", "A photo of your meal", "New: the photo screen, Read the plate, and the read with the foods named."),
      ("plate", "One plate", "PD, the letters and the numbers behind them, on today's Plate."),
      ("recipes", "Recipes for your day", "Recipes, sorted for what is left of the day."),
@@ -24,6 +24,8 @@ V = [("barcode", "A barcode", "The pack's code read from the camera, the food on
      ("explorer", "Explorer, the body", "The body, then Glycogen."),
      ("coach", "My clients", "Waiting for you at the top."),
      ("languages", "Three languages", "English, Serbian and German, one after another.")]
+CLIPS = {"old": os.environ.get("CLIPS_OLD", f"{HERE}/../../public/landing"), "new": os.environ.get("CLIPS_NEW", "/home/claude/boards/clips327")}
+PW = 200; PH = round(PW * 844 / 390)
 B = Board(); cols = 13; W = SX + cols * (SW + GAP) + 40
 def video(col0, y, n, name, what):
     hs = []
@@ -33,10 +35,18 @@ def video(col0, y, n, name, what):
             hs.append(B.screen(f"{n}{'ab'[i]}{k}", c, y, ("Today" if i == 0 else "New") + f", {['early', 'middle', 'end'][k - 1]}", f"{n}_{side}_{k}", st, (what if (i and k == 1) else "As on the home page now." if k == 1 else "")))
     B.html.append(f'<div style="position:absolute;left:{B.x(col0 + 3) - GAP + 2}px;top:{y + TOP + 120}px;width:{GAP + 0.4 * (SW + GAP)}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">→</div>')
     B.html.append(f'<div style="position:absolute;left:{B.x(col0)}px;top:{y - 34}px;font-size:17px;font-weight:900;color:#123a7a">{name}</div>')
-    return max(hs)
+    # Coach Milan 19 November 14:55: stills are random frames; he needs each video from its first to its last frame.
+    top = max(hs) + 24
+    for i, side in enumerate(("old", "new")):
+        left = B.x(col0 + i * 3 + (0.4 if i else 0)); span = 3 * SW + 2 * GAP
+        b64 = base64.b64encode(open(f"{CLIPS[side]}/way-{n}.mp4", "rb").read()).decode()
+        B.html.append(f'<div style="position:absolute;left:{left}px;top:{top}px;width:{span}px;text-align:center">'
+          f'<div style="font-size:14px;font-weight:800;color:{"#3d4a63" if i == 0 else "#2a72d9"};margin-bottom:6px">{"The video on the home page now" if i == 0 else "The video recorded on 0.3.163"}, start to end</div>'
+          f'<video src="data:video/mp4;base64,{b64}" controls muted loop playsinline autoplay preload="auto" style="width:{PW}px;height:{PH}px;border-radius:12px;border:1.5px solid {"#d1dcf0" if i == 0 else "#2a72d9"};background:#000;display:block;margin:0 auto"></video></div>')
+    return top + 26 + PH
 # row 0: the ticket card, and the lines as a table
 parts = [("Ticket", "DT327. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT327, canvas Page 5."),
-  ("How to read this board", "<b>Top right:</b> the three lines that no longer match the app, now and new. <b>Then two videos a row:</b> three stills of the video on the home page now, an arrow, three stills of the same video recorded on 0.3.163. <b>The wide block at the bottom:</b> the agreement, as Given, When, Then rows."),
+  ("How to read this board", "<b>Top right:</b> the three lines that no longer match the app, now and new. <b>Then two videos a row:</b> three stills of the video on the home page now, an arrow, three stills of the same video recorded on 0.3.163. Under the stills, both videos play from start to end: tap one to stop it, or to see it big. <b>The wide block at the bottom:</b> the agreement, as Given, When, Then rows."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]), ("In Coach Milan's words", "19 November 11:09: is it good moment to update home page and videos? 14:23: what is your take here? 14:26: yes."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
@@ -59,7 +69,7 @@ for r in range(6):
 y = max(y, 30 + HT.get("card", 1500) + 80)
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories266.dc.html", t["boardTitle"], "19 November 2026. Ticket DT327, Kanban column Next. Old stills from the videos on the home page now; new stills from the twelve videos recorded on 0.3.163 into a scratch folder. Drawn for Coach Milan's Go; nothing on the home page is changed.", B, W, Hc, "Stories265.dc.html")
+board("Stories266.dc.html", t["boardTitle"], "19 November 2026. Ticket DT327, Kanban column Next. Old stills and videos from the home page now; new stills and videos from the twelve recorded on 0.3.163 into a scratch folder. Drawn for Coach Milan's Go; nothing on the home page is changed.", B, W, Hc, "Stories265.dc.html")
 inner = B.render(W, Hc)
 json.dump({"DT327": {"file": "Stories266.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out327.json"), "w"))
 print("DT327", W, Hc + 230, "videos from", y0)

@@ -36,10 +36,9 @@ const ean13 = (code, x0, y0, m, h) => {
 const BARCODE = photo("pack-barcode.jpg");
 const LABEL_ROWS = [["Energy", "276 kJ / 66 kcal"], ["Fat", "0.3 g"], ["of which saturates", "0.2 g"], ["Carbohydrate", "3.8 g"], ["of which sugars", "3.8 g"], ["Protein", "11.6 g"], ["Salt", "0.1 g"]];
 const LABEL = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960"><rect width="720" height="960" fill="#e9e2d0"/><rect x="190" y="230" width="340" height="470" fill="#fff" stroke="#222" stroke-width="3"/><text x="206" y="272" font-family="Arial" font-weight="700" font-size="24">Nutrition declaration</text><text x="206" y="302" font-family="Arial" font-size="19">per 100 g</text>${LABEL_ROWS.map(([a, b], i) => `<line x1="206" x2="514" y1="${320 + i * 52}" y2="${320 + i * 52}" stroke="#222" stroke-width="1.5"/><text x="206" y="${354 + i * 52}" font-family="Arial" font-size="19">${a}</text><text x="514" y="${354 + i * 52}" font-family="Arial" font-size="19" text-anchor="end">${b}</text>`).join("")}</svg>`);
-// HC4: three packs in one picture
-// the camera shows the middle of the picture (x 140 to 580 of 720): the three packs stand there
-const cup = (x, top, name, line, color) => `<rect x="${x}" y="${top}" width="136" height="250" rx="16" fill="#f7f5ef" stroke="#d8d2c4" stroke-width="3"/><rect x="${x}" y="${top + 26}" width="136" height="58" fill="${color}"/><text x="${x + 68}" y="${top + 66}" font-family="Georgia" font-size="${name.length > 6 ? 22 : 28}" fill="#fff" text-anchor="middle">${name}</text><text x="${x + 68}" y="${top + 126}" font-family="Arial" font-weight="700" font-size="18" fill="${color}" text-anchor="middle">${line}</text>`;
-const GROUP = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960"><rect width="720" height="960" fill="#cdbb9f"/>${cup(146, 360, "Fjell", "SKYR", "#2e5d8f")}${cup(292, 340, "Kornfeld", "OATS", "#8a5a1f")}${cup(438, 360, "Nusshof", "PEANUT", "#b3261e")}</svg>`);
+// HC4: three packs in one picture. Coach Milan 19 November 15:14: a photo made with AI for the made-up brands (HC6),
+// placed whole on a blurred copy: the camera shows the middle of the picture (x 140 to 580 of 720), the packs stand there
+const GROUP = photo("group.jpg");
 const MEAL = photo("meal.jpg");
 const RECIPE_PHOTOS = { m1: photo("recipe-crepes.jpg"), m2: photo("recipe-pudding.jpg"), m3: photo("recipe-sarma.jpg"), "m-pr": photo("recipe-prebranac.jpg") };
 // HC11 in every language: the bar's Explorer and Clients as the app's three word files name them (Entdecken, Istraživač)
@@ -49,10 +48,13 @@ const tabWords = (k) => { const out = [JSON.parse(fs.readFileSync(path.join(ROOT
 const EXPLORER_TAB = tabWords("tab.explorer"), CLIENTS_TAB = tabWords("tab.clients");
 const SKYR = { success: true, product_name: "Fjell Skyr natural", brand: "Fjell", basis: "100g", calories: 66, protein: 11.6, fats: 0.3, carbs: 3.8, fiber: 0, notes: "", error_reason: "", table: [], source: "Product database · review required" };
 const LABEL_READ = { ...SKYR, source: "Label photo · review required", table: LABEL_ROWS.map(([name, v]) => ({ name, amount: Number(String(v).match(/([\d.]+) ?k?c?a?l?$/)?.[1] ?? 0), unit: /kcal/.test(v) ? "kcal" : "g" })) };
+// DT327 (Coach Milan 19 November 15:24): two photos, the fronts (group.jpg) and the backs (group-back.jpg), both made with AI
+// for the made-up brands. The names come from the fronts, the values from the tables on the backs, as printed (HC9): the
+// jar's table says protein 35 g
 const GROUP_READ = { entities: [
   { ...SKYR },
   { product_name: "Kornfeld Oats", brand: "Kornfeld", calories: 372, protein: 13.5, fats: 7, carbs: 58.7, fiber: 10 },
-  { product_name: "Nusshof Peanut butter", brand: "Nusshof", calories: 588, protein: 25, fats: 50, carbs: 20, fiber: 6 }] };
+  { product_name: "Nusshof Peanut butter", brand: "Nusshof", calories: 588, protein: 35, fats: 50, carbs: 20, fiber: 6 }] };
 // HP3 (Coach Milan, 1 November 12:31): the meal is Milan's real dinner of 31 October, salmon, potatoes and broccoli
 const READ = { dish: "Salmon with potatoes and broccoli", foods: [
   { name: "Salmon, oven baked", grams: 230, low: 180, high: 280, calories: 206, protein: 22.1, fats: 12.4, carbs: 0, fiber: 0, confidence: "medium" },
@@ -64,13 +66,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const fails = []; const rule = (ok, id, what) => { console.log(`${ok ? "ok  " : "FAIL"} ${id} ${what}`); if (!ok) fails.push(`${id} ${what}`); };
   // HC5 before anything: the photos must be there
   rule(Boolean(MEAL), "HC5", `the meal photo: ${path.relative(ROOT, path.join(ASSETS, "meal.jpg"))}`);
+  rule(Boolean(GROUP) && fs.existsSync(path.join(ASSETS, "group-back.jpg")), "HC5", "the group photos: design/home-clips/group.jpg and group-back.jpg");
   rule(Boolean(BARCODE), "HC5", "the pack photo: design/home-clips/pack-barcode.jpg");
   for (const [id, f] of [["m1", "recipe-crepes.jpg"], ["m2", "recipe-pudding.jpg"], ["m3", "recipe-sarma.jpg"], ["m-pr", "recipe-prebranac.jpg"]]) rule(Boolean(RECIPE_PHOTOS[id]), "HC5", `a recipe photo: design/home-clips/${f}`);
   // HC9: the page says what the clips are
   // since DT203 the note's words live in src/i18n/en.json; LandingScreen.tsx shows them by their keys
   { const en = JSON.parse(fs.readFileSync(path.join(ROOT, "src/i18n/en.json"), "utf8")), ls = fs.readFileSync(path.join(ROOT, "src/screens/LandingScreen.tsx"), "utf8");
-    const notes = Object.keys(en).filter((k) => /^home\./.test(k) && /Clips of the app on test data/.test(en[k]));
-    rule(notes.length > 0 && notes.every((k) => ls.includes(`w("${k}")`)), "HC9", `the section says the clips are the app on test data (${notes.join(", ") || "no line"})`); }
+    const notes = Object.keys(en).filter((k) => /^home\./.test(k) && /^Clips of the app, version \{version\}, on test data/.test(en[k]));
+    // DT327 AC8: the note names the version, from public/landing/clips.json (src/clips.ts)
+    rule(notes.length > 0 && notes.every((k) => ls.includes(`w("${k}", { version: CLIPS_VERSION })`)), "HC9", `the section says the clips are the app on test data (${notes.join(", ") || "no line"})`); }
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await sleep(500); } }
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "clips-"));
@@ -87,6 +91,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       execFileSync("ffmpeg", ["-y", "-loop", "1", "-i", png, "-t", "2", "-r", "15", "-vf", "scale=720:960,format=yuv420p", feeds[k]], { stdio: "ignore" });
     }
     await b0.close(); }
+  // DT327 (Coach Milan 19 November 15:20): two photos are fine, two copies of one photo are not. A clip with sides gets a
+  // camera that shows the first picture, then, on __side(n), turns to the next one (a 600 ms swing and fade): the auto shot takes
+  // one photo of each side, as on a phone when you turn the pack
+  const sideUrl = (f) => `data:image/${/\.jpe?g$/i.test(f) ? "jpeg" : "png"};base64,` + fs.readFileSync(f).toString("base64");
   const made = [], strokes = [];
   // CLIPS=shop,label records only those, to try a change; it never writes clips into public/landing. With CLIPS_OUT=<dir> it
   // writes them there (scripts/record-built-video.cjs does this for the /built video, BP1 0.3.52)
@@ -99,6 +107,21 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const b = await chromium.launch({ args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", ...(x.feed && feeds[x.feed] ? [`--use-file-for-fake-video-capture=${feeds[x.feed]}`] : [])] });
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, permissions: ["camera"], timezoneId: "Europe/Berlin", recordVideo: { dir, size: { width: 390, height: 844 } } });
     const page = await ctx.newPage();
+    if (x.sides) await page.addInitScript((urls) => {
+      const c = document.createElement("canvas"); c.width = 720; c.height = 960; const g = c.getContext("2d");
+      const ims = urls.map((u) => { const i = new Image(); i.src = u; return i; });
+      let cur = 0, prev = 0, at = 0;
+      // the turn: the picture swings a little, as a phone does while a hand turns the packs, then settles on the next side.
+      // The swing is what tells the auto shot that this is a new side (CameraView arms on a big change)
+      const draw = () => { const t = Math.min(1, (performance.now() - at) / 600), sw = Math.sin(t * Math.PI) * 90;
+        if (ims[prev].complete) { g.globalAlpha = 1; g.drawImage(ims[prev], -sw, 0, 720, 960); }
+        if (ims[cur].complete) { g.globalAlpha = t; g.drawImage(ims[cur], -sw, 0, 720, 960); g.globalAlpha = 1; } };
+      setInterval(draw, 1000 / 15);
+      window.__side = (n) => { prev = cur; cur = n; at = performance.now(); };
+      const md = navigator.mediaDevices;
+      md.getUserMedia = async () => c.captureStream(15);
+      md.enumerateDevices = async () => [{ kind: "videoinput", deviceId: "side", label: "Back camera", groupId: "g" }];
+    }, x.sides.map(sideUrl));
     await page.clock.setFixedTime(new Date(x.time || "2026-10-25T13:05:00"));
     const s = { ...seed, items: x.items ?? [], meals: x.meals ?? [], feedback: [], ...(x.state || {}) };
     await page.addInitScript(([s, plan]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
@@ -236,11 +259,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   };
   // every click goes through a.tap, so every ring is counted (HC1)
   const manual = async (page, a) => { const sw = page.locator(".auto-switch"); if (await sw.count() && /Auto shot/.test(await sw.textContent())) await a.tap(sw, 200); };
-  const openScan = async (page, a) => { await a.tap(page.getByRole("button", { name: "Scan", exact: true }).first(), 0); await page.locator(".auto-switch").waitFor({ timeout: 4000 }).catch(() => {}); await manual(page, a); await sleep(500); };
+  // DT327 (0.3.164): since 0.3.157 the empty Plate opens the camera with Photo or scan; Scan stays for an older build
+  const openScan = async (page, a) => { const scan = page.getByRole("button", { name: "Scan", exact: true }); await a.tap((await scan.count()) ? scan.first() : page.locator(".mp-button").first(), 0); await page.locator(".auto-switch, .cam-modes").first().waitFor({ timeout: 4000 }).catch(() => {}); await manual(page, a); await sleep(500); };
   const toMode = async (page, a, m) => { await a.tap(page.locator(".cam-modes button").filter({ hasText: m }), 500); };
-  const saveFood = async (page, a) => {
-    await a.tap(page.getByText(/I checked the values/).first(), 450);
-    await a.tap(page.getByRole("button", { name: /Confirm & save food/ }), 1600);
+  const saveFood = async (page, a, rest = 1600, tick = 450) => {
+    await a.tap(page.getByText(/I checked the values/).first(), tick);
+    await a.tap(page.getByRole("button", { name: /Confirm & save food/ }), rest);
   };
   const onPlate = (page, name) => page.locator(".plate-card").getByText(name).count().then((n) => n > 0).catch(() => false);
   try {
@@ -255,27 +279,52 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await saveFood(page, a);
       return { HC2: { ok: read.includes(CODE), what: `the scanner read the code on the pack: ${read.trim()} (pack: ${CODE})` }, HC3: { ok: await onPlate(page, "Fjell Skyr natural"), what: "the food is on the plate" } };
     }, { feed: "barcode" });
+    // DT327: the auto shot takes one photo; the clip holds 700 ms on it, then checks it is the only one.
+    const oneShot = async (page) => {
+      const btn = page.getByRole("button", { name: /^Analyze/ });
+      await btn.first().waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
+      await sleep(700);
+      const said = ((await btn.first().textContent().catch(() => "")) || "").trim();
+      return { ok: /^Analyze 1\b/.test(said), what: `one photo taken: the button says ${said || "nothing"}` };
+    };
+    // DT327: the first side's photo, then the pack turns, then the second side's photo; each by the auto shot
+    const twoSides = async (page) => {
+      const btn = page.getByRole("button", { name: /^Analyze/ });
+      await btn.first().waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
+      await sleep(100); await page.evaluate(() => window.__side(1)); // HC8: the clip stays under 12 s
+      await page.getByRole("button", { name: /^Analyze 2/ }).first().waitFor({ state: "visible", timeout: 6000 }).catch(() => {});
+      await sleep(300);
+      const said = ((await btn.first().textContent().catch(() => "")) || "").trim();
+      const shots = await page.locator("img").evaluateAll((xs) => xs.map((x) => x.src).filter((u) => u.startsWith("blob:") || u.startsWith("data:image/jpeg")));
+      return { ok: /^Analyze 2\b/.test(said) && new Set(shots).size >= 2, what: `two photos of two sides: the button says ${said || "nothing"}, ${new Set(shots).size} different photos in the strip` };
+    };
     await clip("label", async (page, a) => {
-      await openScan(page, a); await toMode(page, a, "Label"); a.mark(); await sleep(400);
-      await a.tap(page.locator("#camera-shutter-button"), 500);
-      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 1300);
+      await openScan(page, a); await toMode(page, a, "Label"); a.mark();
+      // DT327 (Coach Milan 19 November 15:20): two photos, two sides: the front gives the name, the table the values. The
+      // camera's auto shot takes each one; the clip turns the pack in between and taps nothing but Analyze
+      const two = await twoSides(page);
+      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 700);
       await a.swipe(1360, 500);
       const energy = await page.locator("input").evaluateAll((xs) => xs.map((x) => x.value)).catch(() => []);
-      await saveFood(page, a);
-      return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` } };
-    }, { feed: "label" });
+      await saveFood(page, a, 200, 350); // HC8: under 12 s with two photos
+      return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` }, HC3b: two };
+    }, { sides: [path.join(ASSETS, "pack-front.jpg"), path.join(tmp, "label.png")] });
     await clip("group", async (page, a) => {
-      await openScan(page, a); await toMode(page, a, "Group"); a.mark(); await sleep(1000);
-      await a.tap(page.locator("#camera-shutter-button"), 900);
+      await openScan(page, a); await toMode(page, a, "Group"); a.mark();
+      const two = await twoSides(page); // DT327: the fronts, then the backs, each by the auto shot (see the label clip)
       await a.tap(page.getByRole("button", { name: /^Analyze/ }), 3600);
       const all = (await page.locator("main").textContent().catch(() => "")) || "";
       const found = ["Fjell Skyr natural", "Kornfeld Oats", "Nusshof Peanut butter"].filter((n) => all.includes(n));
-      return { HC4: { ok: found.length === 3, what: `three packs in the picture, ${found.length} named at the end` } };
-    }, { feed: "group" });
+      return { HC4: { ok: found.length === 3, what: `three packs in the picture, ${found.length} named at the end` }, HC3b: two };
+    }, { sides: [path.join(ASSETS, "group.jpg"), path.join(ASSETS, "group-back.jpg")] });
     if (MEAL) await clip("meal", async (page, a) => {
-      await a.tap(page.locator(".mp-button"), 1000); a.mark(); await sleep(900);
-      await a.tap(page.locator("#camera-shutter-button"), 2600);
-      await a.swipe(650, 1500); await a.swipe(450, 1200);
+      // DT327 (0.3.164): since DT305 (0.3.151) a photo waits on the photo screen: Use this photo, then Read the plate; the read shows alone
+      await a.tap(page.locator(".mp-button"), 900); a.mark(); await sleep(600);
+      await a.tap(page.locator("#camera-shutter-button"), 700);
+      await a.tap(page.locator(".cam-analyze"), 1300);
+      await a.tap(page.locator(".pa-go .pill"), 2400);
+      await a.swipe(520, 1600);
+      return { HC3: { ok: await page.locator(".read-view .mp-tag").count() >= 2, what: "the read of the photo, its foods named" } };
     }, { feed: "meal" });
     const Fx = (id, name, calories, protein, fats, carbs, fiber) => ({ ...seed.foods[0], id, name, brand: "estimate", source: "estimate", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, table: undefined });
     const CH = Fx("sal", "Salmon, oven baked", 206, 22.1, 12.4, 0, 0), RI = Fx("pot", "Baby potatoes, with herbs", 98, 2, 1.5, 19, 1.8), SA = Fx("bro", "Broccoli, cooked", 35, 2.4, 0.4, 7.2, 3.3);
@@ -306,18 +355,20 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       "Rinse [[i:r|rice]] and bring it to the boil in 200 ml water. Cover and cook on low heat for 12 minutes.", "Cut [[i:c|chicken]] into strips. Season with salt and pepper.", "Slice [[i:g|garlic]] thin.",
       "Heat [[i:o|olive oil]] in a pan on medium high heat. Fry the chicken 6 minutes, turning once, until no pink is left inside.", "Add [[i:s|spinach]] and the garlic. Stir 2 minutes, until the spinach wilts.", "Put the rice in a bowl and the chicken and spinach on top."] };
     // the browser's voice is stood in for: nothing is read aloud in a recording
-    const voice = () => { const synth = { speak: () => {}, cancel: () => {}, getVoices: () => [] }; Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+    const voice = () => { const synth = { speak: (u) => { /* DT327: a sentence ends, as on a phone */ setTimeout(() => { try { u && u.onend && u.onend(); } catch {} }, 250); }, cancel: () => {}, getVoices: () => [] }; Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };
       Object.defineProperty(navigator, "wakeLock", { value: { request: async () => ({ release: async () => {} }) }, configurable: true }); window.__recs = [];
       window.SpeechRecognition = function () { const me = this; window.__recs.push(me); me.start = () => { me.on = true; }; me.stop = () => { me.on = false; }; };
       window.__hear = (text) => { const r = window.__recs.filter((x) => x.on).at(-1); if (!r || !r.onresult) return false; r.onresult({ results: [{ 0: { transcript: text }, isFinal: true, length: 1 }] }); return true; }; };
     await clip("cook", async (page, a) => {
       const cm = page.locator(".cook-mode");
       // one tap to turn the voice on; then only words (Coach Milan 14:06)
-      await a.tap(cm.getByRole("button", { name: "Turn voice on" }), 900);
-      await a.say("Next", 1000); await a.say("Next", 1000); await a.say("Repeat", 1100); await a.say("Next", 1100);
-      await a.say("Timer 6 minutes", 1200);
-      const t = await cm.textContent();
-      return { HC13: { ok: /4 of 6/.test(t) && /6:00|5:5\d/.test(t), what: "by voice: step 4 of 6, its 6 minute timer running" } };
+      await a.tap(cm.getByRole("button", { name: "Turn voice on" }), 500);
+      // DT327 (0.3.164): since DT251 (0.3.104) a cook from the start opens on Get it ready: next ticks a food and goes on; all
+      // ticked, All ready. Step 1 next. So the words tick the five foods, one more next is step 1, and its timer is set
+      for (let k = 0; k < 4; k++) await a.say("Next", 650);
+      await a.say("Next", 1000); await a.say("Next", 700); await a.say("Timer 6 minutes", 1200);
+      const t = await cm.textContent(), good = /1 of 6/.test(t) && /6:00|5:5\d/.test(t);
+      return { HC13: { ok: good, what: "by voice: the five foods ready, step 1 of 6, its 6 minute timer running" + (good ? "" : ": " + t.replace(/\s+/g, " ").slice(0, 300)) } };
     }, { meals: [bowl], init: voice, path: "/", time: "2026-10-30T18:40:00", setup: async (page, click) => {
       await click(page.locator("nav button").filter({ hasText: "Recipes" }), 700);
       await click(page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }), 700);
@@ -413,5 +464,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   if (fails.length) { console.log(`\n${fails.length} rule(s) failed; no clip was replaced:\n  ${fails.join("\n  ")}`); process.exit(1); }
   if (ONLY && !process.env.CLIPS_OUT) { console.log("\nCLIPS set: rules checked, no clip written"); process.exit(0); }
   for (const m of made) encode(m);
+  // DT327 AC8: the version the clips were recorded on, from the app that ran (dist), so the page never names another one
+  if (!ONLY) {
+    const version = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")).version;
+    const bundle = fs.readdirSync(path.join(ROOT, "dist/assets")).filter((f) => f.endsWith(".js")).some((f) => fs.readFileSync(path.join(ROOT, "dist/assets", f), "utf8").includes(version));
+    if (!bundle) { console.log(`\nthe built app is not ${version}: run npm run build first; clips.json not written`); process.exit(1); }
+    fs.writeFileSync(path.join(OUT, "clips.json"), JSON.stringify({ version, recorded: new Date().toISOString().slice(0, 10), clips: made.map((m) => m.name) }, null, 2) + "\n");
+  }
   console.log(`\nall rules passed (HC1 to HC13); ${made.length} clips written`);
 })();
