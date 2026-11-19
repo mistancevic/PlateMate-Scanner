@@ -462,11 +462,11 @@
       "checked": true
     },
     "plate.oldHelp": {
-      "text": "Pojeo sam ga pita koji obrok i upisuje ga tamo, u vreme kad je počet. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "text": "Pojeo sam ga pita koji obrok i upisuje ga tamo. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
       "checked": true
     },
     "plate.oldHelpPhoto": {
-      "text": "Pojeo sam ga pita koji obrok i upisuje ga tamo, u vreme kad je slika nastala. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "text": "Pojeo sam ga pita koji obrok i upisuje ga tamo. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
       "checked": true
     },
     "plate.cookAskHelp": {
@@ -10967,10 +10967,6 @@
     },
     "coach.spotsShown": {
       "text": "prikazuje se na početnoj stranici i stranici knjige",
-      "checked": true
-    },
-    "plate.readFromPhoto": {
-      "text": "Pročitano sa tvoje slike. Ispravi količinu ako znaš bolje; Chef Mealan ispod kaže šta da radiš s tim.",
       "checked": true
     },
     "plate.onEdge": {

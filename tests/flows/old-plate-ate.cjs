@@ -20,7 +20,8 @@ const day = (iso) => new Date(iso).toLocaleDateString("en-CA", { timeZone: "Euro
   await ate(p);
   ok(await p.locator(cal + " .pcal").count() === 1 && (await p.locator(cal + " .pcal-day.on").innerText()).trim() === "Sat 14" && /^✓?\s*Dinner/.test((await p.locator(cal + " .pcal-row.on").innerText()).trim()) && await p.locator(cal + " .pcal-row.on").count() === 1, "DT314 AC1: Ate it opens the calendar on Sat 14 with Dinner marked");
   ok((await p.locator(cal + " .pcal-q").innerText()).trim() === "Which meal? The plate was started on Saturday, 19:10:" && (await eaten(p)).length === 0 && (await h.st(p)).items.length === 2, "DT314 AC1: the line above says the plate was started on Saturday, 19:10, and nothing is logged");
-  ok(/Ate it asks which meal, and saves it there at the time it was started\./.test(await h.main(p)), "DT314 AC1: the help under the buttons says Ate it asks which meal");
+  // Changed by story DT325 (0.3.162, board DT325; Coach Milan, Go 19 November 09:48): the help line names no time
+  ok(/Ate it asks which meal, and saves it there\. Save for later/.test(await h.main(p)), "DT314 AC1: the help under the buttons says Ate it asks which meal");
   await ate(p);
   ok(await p.locator(cal).count() === 0, "a second tap on Ate it closes the calendar");
   await ate(p);

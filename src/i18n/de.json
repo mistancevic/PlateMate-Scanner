@@ -358,11 +358,11 @@
       "checked": true
     },
     "plate.oldHelp": {
-      "text": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort mit der Uhrzeit, zu der er begonnen wurde. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
+      "text": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
       "checked": true
     },
     "plate.oldHelpPhoto": {
-      "text": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort mit der Uhrzeit des Fotos. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
+      "text": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
       "checked": true
     },
     "plate.cookAskHelp": {
@@ -2103,10 +2103,6 @@
     },
     "job.typical": {
       "text": "typische Werte, prüfe deine Packung",
-      "checked": true
-    },
-    "plate.readFromPhoto": {
-      "text": "Aus deinem Foto gelesen. Korrigiere eine Menge, wenn du es besser weißt; Chef Mealan sagt dir unten, was dann zu tun ist.",
       "checked": true
     },
     "plate.onEdge": {
