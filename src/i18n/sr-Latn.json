@@ -11106,15 +11106,15 @@
       "checked": true
     },
     "home.waysLead": {
-      "text": "Skeniraj bar kod ili deklaraciju, ili slikaj obrok koji je pred tobom. Šta god izabereš, stiže na tvoj tanjir.",
+      "text": "Skeniraj bar kod, deklaraciju ili nekoliko pakovanja odjednom, ili slikaj obrok koji je pred tobom. Šta god izabereš, stiže na tvoj tanjir.",
       "checked": true
     },
     "home.way.barcode": {
-      "text": "Bar kod ili deklaracija",
+      "text": "Bar kod",
       "checked": true
     },
     "home.way.barcodeLine": {
-      "text": "Vrednosti sa pakovanja, ili deklaracija pročitana sa slike, sa svih strana ako treba. Ti proveravaš.",
+      "text": "Kod sa pakovanja, pročitan kamerom. Vrednosti dolaze iz baze namirnica. Ti ih proveravaš.",
       "checked": true
     },
     "home.way.meal": {
@@ -22755,6 +22755,22 @@
     },
     "plate.backToCamera": {
       "text": "Nazad na kameru",
+      "checked": true
+    },
+    "home.way.label": {
+      "text": "Deklaracija",
+      "checked": true
+    },
+    "home.way.labelLine": {
+      "text": "Tabela nutritivnih vrednosti, pročitana sa jedne slike. Ti proveravaš vrednosti.",
+      "checked": true
+    },
+    "home.way.group": {
+      "text": "Nekoliko pakovanja odjednom",
+      "checked": true
+    },
+    "home.way.groupLine": {
+      "text": "Prvo prednje strane, pa zadnje. Svako pakovanje je pronađeno, sa vrednostima iz svoje tabele.",
       "checked": true
     }
   }

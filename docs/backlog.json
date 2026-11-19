@@ -2470,6 +2470,76 @@
         "Every other section of the home page, and its order."
       ],
       "decision": "Open. B drawn as the proposal, A next to it for comparison. Waits for Coach Milan's choice and Go."
+    },
+    {
+      "id": "DT329",
+      "title": "How to: watch it, the bar's icons, and a scan from any screen",
+      "epic": "home",
+      "state": "next",
+      "board": "Stories268",
+      "where": "Page 5",
+      "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's.",
+      "opportunity": {
+        "from": "Coach Milan, 19 November 2026, 17:31 and 17:43. The twelve videos are on 0.3.165, and How to holds eight situations as steps in words.",
+        "job": "As a beta tester, see a path once before I try it, and find the paths the app has that I would not guess.",
+        "kind": "Missing: a path in words only is slow to follow, the long press on Plate is in no situation, and the emoji icons look like no other part of the app.",
+        "why_now": "The videos are new and recorded on today's app; How to is what the beta testers use."
+      },
+      "problem": "How to describes each situation in four or five steps of words. A tester reads them, then tries. Three of the paths already exist as videos on the home page, but the app does not show them. Holding Plate in the bar opens the camera from any screen (DT309), and no situation tells a tester it exists. The situations carry emoji icons, while the bar and the rest of the app use line icons.",
+      "story": "When I open a situation in How to, I want to see it done once, so that I try it the way it works.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "Icons like the bar's",
+          "text": "Given How to, when I see the list or open a situation, then each situation has a line icon on the tint of the bar's chosen tab, and no emoji: the icons in the table on this board."
+        },
+        {
+          "id": "AC2",
+          "title": "A row says Video",
+          "text": "Given a situation that has a video, when I see the list, then its row says Video under its title."
+        },
+        {
+          "id": "AC3",
+          "title": "Watch it",
+          "text": "Given I opened a situation with a video, when I tap Watch it, then its video plays in place from the start, with its controls, and nothing of it loads before the tap."
+        },
+        {
+          "id": "AC4",
+          "title": "A video of part of the path",
+          "text": "Given I ate something: log it with a photo, when its video plays, then the line under it says The video shows steps 1 to 3."
+        },
+        {
+          "id": "AC5",
+          "title": "The home page's videos",
+          "text": "Given I ate something, Cook hands free and A recipe in another language, when their videos play, then they are the home page's meal, cook and languages videos, the same files."
+        },
+        {
+          "id": "AC6",
+          "title": "Scan a pack from any screen",
+          "text": "Given How to, when I open Scan a pack from any screen, then it says its four steps, Try it opens the camera's modes as holding Plate does, and Watch it plays its video: Plate held in the bar, the camera's modes, Barcode, the code read, the food on the plate."
+        },
+        {
+          "id": "AC7",
+          "title": "Its video under the rules",
+          "text": "Given the videos are recorded, when the recording ends, then the new video of the long press passed HC1 to HC13 with the others, and it is not on the home page."
+        },
+        {
+          "id": "AC8",
+          "title": "Nine to try",
+          "text": "Given the beta box at the top of How to, when I read it, then it counts nine situations, and Coach Milan's list of testers counts nine."
+        },
+        {
+          "id": "AC9",
+          "title": "In three languages",
+          "text": "Given the new lines, when the app is in Serbian or German, then each shows in that language."
+        }
+      ],
+      "unchanged": [
+        "The other situations' words and steps, Try it, Tried it, Didn't work and the note to Coach Milan.",
+        "The home page and its twelve videos.",
+        "The long press on Plate itself (DT309)."
+      ],
+      "decision": "Open. Drawn for Coach Milan's Go."
     }
   ]
 }
