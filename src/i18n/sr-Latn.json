@@ -20670,11 +20670,11 @@
       "checked": true
     },
     "howto.beta": {
-      "text": "Beta: probano {n} od {total}",
+      "text": "Beta: urađeno {n} od {total}",
       "checked": true
     },
     "howto.betaLine": {
-      "text": "Probaj svaku jednom. Kad nešto ne radi, dodirni Nije uspelo. Trener Milan vidi šta je probano i tvoje beleške.",
+      "text": "Uradi svaku jednom, u svom danu, pa reci kako je prošlo. Kad nešto ne radi, dodirni Nije uspelo. Trener Milan vidi šta si uradio i tvoje beleške.",
       "checked": true
     },
     "howto.group.day": {
@@ -20690,7 +20690,7 @@
       "checked": true
     },
     "howto.tried": {
-      "text": "✓ Probano",
+      "text": "✓ Urađeno",
       "checked": true
     },
     "howto.new": {
@@ -20698,11 +20698,11 @@
       "checked": true
     },
     "howto.tryIt": {
-      "text": "Probaj ›",
+      "text": "Uradi sada ›",
       "checked": true
     },
     "howto.triedIt": {
-      "text": "✓ Probano",
+      "text": "✓ Uradio sam",
       "checked": true
     },
     "howto.didnt": {
@@ -20734,7 +20734,7 @@
       "checked": true
     },
     "howto.triedOf": {
-      "text": "probano {n} od {total}",
+      "text": "urađeno {n} od {total}",
       "checked": true
     },
     "howto.newN": {
@@ -20758,7 +20758,7 @@
       "checked": true
     },
     "howto.testerHead": {
-      "text": "{name}: probano {n} od {total}",
+      "text": "{name}: urađeno {n} od {total}",
       "checked": true
     },
     "howto.notYet": {
@@ -20766,7 +20766,7 @@
       "checked": true
     },
     "howto.triedOn": {
-      "text": "✓ Probano, {day}",
+      "text": "✓ Urađeno, {day}",
       "checked": true
     },
     "howto.didntOn": {
@@ -20778,7 +20778,7 @@
       "checked": true
     },
     "howto.noOneYet": {
-      "text": "Niko još nije probao: {title}. Dobra tema za sledeći razgovor 1:1.",
+      "text": "Niko još nije uradio: {title}. Dobra tema za sledeći razgovor 1:1.",
       "checked": true
     },
     "howto.noTesters": {
@@ -22771,6 +22771,86 @@
     },
     "home.way.groupLine": {
       "text": "Prvo prednje strane, pa zadnje. Svako pakovanje je pronađeno, sa vrednostima iz svoje tabele.",
+      "checked": true
+    },
+    "howto.howWent": {
+      "text": "Kako je prošlo?",
+      "checked": true
+    },
+    "howto.howWentLine": {
+      "text": "{title}. Od teškog levo do lakog desno. Trener Milan to čita.",
+      "checked": true
+    },
+    "howto.scaleHard": {
+      "text": "Teško",
+      "checked": true
+    },
+    "howto.scaleEasy": {
+      "text": "Lako",
+      "checked": true
+    },
+    "howto.anything": {
+      "text": "Još nešto? (nije obavezno)",
+      "checked": true
+    },
+    "howto.yourRate": {
+      "text": "Rekao si {r} od 5",
+      "checked": true
+    },
+    "howto.rated": {
+      "text": "{r} od 5",
+      "checked": true
+    },
+    "howto.faceHard": {
+      "text": "1 od 5, teško",
+      "checked": true
+    },
+    "howto.faceN": {
+      "text": "{n} od 5",
+      "checked": true
+    },
+    "howto.faceEasy": {
+      "text": "5 od 5, lako",
+      "checked": true
+    },
+    "howto.watch": {
+      "text": "Pogledaj",
+      "checked": true
+    },
+    "howto.video": {
+      "text": "Video",
+      "checked": true
+    },
+    "howto.videoSteps": {
+      "text": "Video pokazuje korake od 1 do {to}.",
+      "checked": true
+    },
+    "howto.scanAnywhere.title": {
+      "text": "Skeniraj pakovanje sa bilo kog ekrana",
+      "checked": true
+    },
+    "howto.scanAnywhere.line": {
+      "text": "Zadrži Tanjir u traci, izaberi Bar kod, i kamera se otvara.",
+      "checked": true
+    },
+    "howto.scanAnywhere.what": {
+      "text": "Imaš pakovanje u ruci, a aplikacija je otvorena na drugom ekranu. Ne moraš prvo na Tanjir.",
+      "checked": true
+    },
+    "howto.scanAnywhere.s1": {
+      "text": "Zadrži Tanjir u traci na dnu na trenutak.",
+      "checked": true
+    },
+    "howto.scanAnywhere.s2": {
+      "text": "Iznad njega se otvara mali meni: Grupa, Bar kod, Deklaracija, Obrok.",
+      "checked": true
+    },
+    "howto.scanAnywhere.s3": {
+      "text": "Dodirni Bar kod: kamera se otvara. Drži kod sa pakovanja u okviru.",
+      "checked": true
+    },
+    "howto.scanAnywhere.s4": {
+      "text": "Proveri vrednosti, i namirnica je na tvom tanjiru.",
       "checked": true
     }
   }

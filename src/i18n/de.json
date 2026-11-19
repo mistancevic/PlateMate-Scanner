@@ -20670,11 +20670,11 @@
       "checked": true
     },
     "howto.beta": {
-      "text": "Beta: {n} von {total} ausprobiert",
+      "text": "Beta: {n} von {total} erledigt",
       "checked": true
     },
     "howto.betaLine": {
-      "text": "Probier jede einmal aus. Tipp auf Hat nicht geklappt, wenn etwas nicht geht. Coach Milan sieht, was du ausprobiert hast, und deine Notizen.",
+      "text": "Mach jede einmal, in deinem eigenen Tag, und sag dann, wie es lief. Tippe Hat nicht geklappt, wenn es nicht geht. Coach Milan sieht, was du gemacht hast, und deine Notizen.",
       "checked": true
     },
     "howto.group.day": {
@@ -20690,7 +20690,7 @@
       "checked": true
     },
     "howto.tried": {
-      "text": "✓ Ausprobiert",
+      "text": "✓ Erledigt",
       "checked": true
     },
     "howto.new": {
@@ -20698,11 +20698,11 @@
       "checked": true
     },
     "howto.tryIt": {
-      "text": "Ausprobieren ›",
+      "text": "Jetzt machen ›",
       "checked": true
     },
     "howto.triedIt": {
-      "text": "✓ Ausprobiert",
+      "text": "✓ Hab ich gemacht",
       "checked": true
     },
     "howto.didnt": {
@@ -20734,7 +20734,7 @@
       "checked": true
     },
     "howto.triedOf": {
-      "text": "{n} von {total} ausprobiert",
+      "text": "{n} von {total} erledigt",
       "checked": true
     },
     "howto.newN": {
@@ -20758,7 +20758,7 @@
       "checked": true
     },
     "howto.testerHead": {
-      "text": "{name}: {n} von {total} ausprobiert",
+      "text": "{name}: {n} von {total} erledigt",
       "checked": true
     },
     "howto.notYet": {
@@ -20766,7 +20766,7 @@
       "checked": true
     },
     "howto.triedOn": {
-      "text": "✓ Ausprobiert, {day}",
+      "text": "✓ Erledigt, {day}",
       "checked": true
     },
     "howto.didntOn": {
@@ -20778,7 +20778,7 @@
       "checked": true
     },
     "howto.noOneYet": {
-      "text": "Noch niemand hat ausprobiert: {title}. Gut für das nächste 1:1.",
+      "text": "Noch niemand hat es gemacht: {title}. Gut für das nächste 1:1.",
       "checked": true
     },
     "howto.noTesters": {
@@ -22771,6 +22771,86 @@
     },
     "home.way.groupLine": {
       "text": "Erst die Vorderseiten, dann die Rückseiten. Jede Packung wird gefunden, mit den Werten aus ihrer Tabelle.",
+      "checked": true
+    },
+    "howto.howWent": {
+      "text": "Wie lief es?",
+      "checked": true
+    },
+    "howto.howWentLine": {
+      "text": "{title}. Von schwer links bis leicht rechts. Coach Milan liest es.",
+      "checked": true
+    },
+    "howto.scaleHard": {
+      "text": "Schwer",
+      "checked": true
+    },
+    "howto.scaleEasy": {
+      "text": "Leicht",
+      "checked": true
+    },
+    "howto.anything": {
+      "text": "Noch etwas? (freiwillig)",
+      "checked": true
+    },
+    "howto.yourRate": {
+      "text": "Du hast {r} von 5 gesagt",
+      "checked": true
+    },
+    "howto.rated": {
+      "text": "{r} von 5",
+      "checked": true
+    },
+    "howto.faceHard": {
+      "text": "1 von 5, schwer",
+      "checked": true
+    },
+    "howto.faceN": {
+      "text": "{n} von 5",
+      "checked": true
+    },
+    "howto.faceEasy": {
+      "text": "5 von 5, leicht",
+      "checked": true
+    },
+    "howto.watch": {
+      "text": "Ansehen",
+      "checked": true
+    },
+    "howto.video": {
+      "text": "Video",
+      "checked": true
+    },
+    "howto.videoSteps": {
+      "text": "Das Video zeigt die Schritte 1 bis {to}.",
+      "checked": true
+    },
+    "howto.scanAnywhere.title": {
+      "text": "Eine Packung von jedem Bildschirm aus scannen",
+      "checked": true
+    },
+    "howto.scanAnywhere.line": {
+      "text": "Halte Teller in der Leiste gedrückt, wähle Barcode, und die Kamera öffnet sich.",
+      "checked": true
+    },
+    "howto.scanAnywhere.what": {
+      "text": "Du hast eine Packung in der Hand und die App auf einem anderen Bildschirm offen. Du musst nicht erst zum Teller.",
+      "checked": true
+    },
+    "howto.scanAnywhere.s1": {
+      "text": "Halte Teller in der Leiste unten einen Moment gedrückt.",
+      "checked": true
+    },
+    "howto.scanAnywhere.s2": {
+      "text": "Darüber öffnet sich ein kleines Menü: Gruppe, Barcode, Etikett, Mahlzeit.",
+      "checked": true
+    },
+    "howto.scanAnywhere.s3": {
+      "text": "Tippe Barcode: Die Kamera öffnet sich. Halte den Code der Packung in den Rahmen.",
+      "checked": true
+    },
+    "howto.scanAnywhere.s4": {
+      "text": "Prüfe die Werte, dann ist das Lebensmittel auf deinem Teller.",
       "checked": true
     }
   }

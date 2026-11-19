@@ -199,6 +199,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         await travel(x, y); await sleep((90 + rnd() * 120) * quick);
         await page.evaluate(() => window.__finger.down()); await page.mouse.move(x, y); await page.mouse.down(); await sleep(70 + rnd() * 60); await page.mouse.up(); await page.evaluate(() => window.__finger.up());
         taps++; lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
+      // DT329: a long press, as on Plate in the bar: the finger presses and stays 700 ms, then lifts
+      hold: async (loc, wait = 900) => { await loc.waitFor({ timeout: 6000 }); const bb = await loc.boundingBox();
+        const x = bb.x + bb.width / 2, y = bb.y + bb.height / 2; await travel(x, y); await sleep(150 * quick);
+        await page.evaluate(() => window.__finger.down()); await page.mouse.move(x, y); await page.mouse.down(); await sleep(700); await page.mouse.up(); await page.evaluate(() => window.__finger.up());
+        taps++; lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
       // a scroll: the finger goes to the scroll side, drags up part of the way with the page under it, and the page glides on
       swipe: async (dy, wait = 1200) => { const x = hand.side + (rnd() - 0.5) * 30, y = 560 + rnd() * 140;
         await travel(x, y); await sleep((120 + rnd() * 100) * quick);
@@ -281,6 +286,21 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await saveFood(page, a);
       return { HC2: { ok: read.includes(CODE), what: `the scanner read the code on the pack: ${read.trim()} (pack: ${CODE})` }, HC3: { ok: await onPlate(page, "Fjell Skyr natural"), what: "the food is on the plate" } };
     }, { feed: "barcode" });
+    // DT329 (0.3.166, board DT329): How to's Scan a pack from any screen. On Today, Plate held in the bar opens the small menu
+    // of the camera's modes, Barcode opens the camera, the code is read, the food is on the plate. Not on the home page.
+    await clip("hold", async (page, a) => {
+      a.mark(); await sleep(200);
+      await a.hold(page.locator(".bottom-nav button").nth(2), 500);
+      const menu = await page.locator(".plate-cam-menu").isVisible().catch(() => false); a.poster(); await sleep(350);
+      await a.tap(page.locator(".plate-cam-menu button").filter({ hasText: "Barcode" }), 300);
+      await page.getByText(/Code read/).waitFor({ timeout: 8000 }).catch(() => {});
+      const read = await page.getByText(/Code read/).first().textContent().catch(() => "");
+      await sleep(250);
+      await a.tap(page.getByRole("button", { name: "Use the code only" }), 900);
+      await a.swipe(1300, 450);
+      await saveFood(page, a, 500, 350);
+      return { HC2: { ok: read.includes(CODE), what: `the scanner read the code on the pack: ${read.trim()} (pack: ${CODE})` }, HC3: { ok: menu && await onPlate(page, "Fjell Skyr natural"), what: "Plate held opened the menu of modes, then the food is on the plate" } };
+    }, { feed: "barcode", path: "/today", quick: 0.8, poster: "the menu of the camera's modes above Plate" }); // HC8: under 12 s
     // DT327: the auto shot takes one photo; the clip holds 700 ms on it, then checks it is the only one.
     const oneShot = async (page) => {
       const btn = page.getByRole("button", { name: /^Analyze/ });

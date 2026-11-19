@@ -2404,7 +2404,9 @@ app.post("/api/howto", requireUser, requireMember, async (req, res) => {
     const id = String(b.id ?? ""), s = b.s === "didnt" ? "didnt" : b.s === "tried" ? "tried" : b.s === null ? null : "";
     if (!HOWTO_ID.test(id) || s === "") return res.status(400).json({ error: "Not a situation." });
     const note = String(b.note ?? "").trim().slice(0, 600), v = String(b.v ?? "").slice(0, 20);
-    const item = s ? { s, at: new Date().toISOString(), ...(s === "didnt" && note ? { note } : {}), v } : null;
+    // DT329 (0.3.166): I did it keeps How did it go? (r, 1 to 5) and the line of your own
+    const r = Number.isInteger(b.r) && b.r >= 1 && b.r <= 5 ? b.r : null;
+    const item = s ? { s, at: new Date().toISOString(), ...(note ? { note } : {}), ...(s === "tried" && r ? { r } : {}), v } : null;
     if (!FB_PROJECT) { const r = memHowto.get(uid) ?? { uid, name: "", email: "", items: {} }; if (item) r.items[id] = item; else delete r.items[id]; r.name = String(b.name ?? "").slice(0, 80); memHowto.set(uid, r); return res.json({ ok: true }); }
     const me = await db().collection("users").doc(uid).get();
     await db().collection("howto").doc(uid).set({ name: String(me.data()?.clientName || "").slice(0, 80), email: String((req as any).email || ""), at: new Date().toISOString(), items: { [id]: item ?? FieldValue.delete() } }, { merge: true });

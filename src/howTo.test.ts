@@ -40,11 +40,14 @@ test("New, the count, and the card on Today", () => {
   assert.equal(triedCount(marks), 1, "Didn't work is not counted as tried");
   const now = d("2026-11-10");
   assert.deepEqual(newToTry({}, now).map((s) => s.id), ["handsFree", "otherLang"]);
-  assert.deepEqual(newToTry({}, d("2026-11-25")).map((s) => s.id), [], "many releases or none: after 14 days nothing is new");
+  // DT329 (0.3.166): Scan a pack from any screen came on 19 November, so the day with nothing new is 5 December
+  assert.deepEqual(newToTry({}, d("2026-12-05")).map((s) => s.id), [], "many releases or none: after 14 days nothing is new");
   assert.equal(showOnToday({}, "0.3.124", null, now), true);
   assert.equal(showOnToday({}, "0.3.124", "0.3.124", now), false, "Not now: until the next release");
   assert.equal(showOnToday({}, "0.3.125", "0.3.124", now), true, "the next release shows it again");
   assert.equal(showOnToday({}, "0.4.0", null, now), true, "a jump to 0.4.0 changes nothing: New goes by the day");
   assert.equal(showOnToday({ handsFree: { s: "tried", at: "" }, otherLang: { s: "tried", at: "" } }, "0.3.124", null, now), false, "all new ones tried");
-  assert.equal(untried([{ items: { eatNow: { s: "tried", at: "" } } }])?.id, "photoLog");
+  // DT329: Scan a pack from any screen stands first under Every day
+  assert.equal(untried([{ items: { eatNow: { s: "tried", at: "" } } }])?.id, "scanAnywhere");
+  assert.equal(untried([{ items: { scanAnywhere: { s: "tried", at: "" }, eatNow: { s: "tried", at: "" } } }])?.id, "photoLog");
 });
