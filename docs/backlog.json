@@ -2474,20 +2474,20 @@
     },
     {
       "id": "DT329",
-      "title": "How to: watch it, the bar's icons, and a scan from any screen",
+      "title": "How to: do it, watch it, say how it went, the bar's icons, and a scan from any screen",
       "epic": "home",
       "state": "next",
       "board": "Stories268",
       "where": "Page 5",
-      "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's.",
+      "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's. 18:08: New at the top right. 18:17: it is not about trying, it is doing it; and feedback, a scale plus free text.",
       "opportunity": {
         "from": "Coach Milan, 19 November 2026, 17:31 and 17:43. The twelve videos are on 0.3.165, and How to holds eight situations as steps in words.",
         "job": "As a beta tester, see a path once before I try it, and find the paths the app has that I would not guess.",
         "kind": "Missing: a path in words only is slow to follow, the long press on Plate is in no situation, and the emoji icons look like no other part of the app.",
         "why_now": "The videos are new and recorded on today's app; How to is what the beta testers use."
       },
-      "problem": "How to describes each situation in four or five steps of words. A tester reads them, then tries. Three of the paths already exist as videos on the home page, but the app does not show them. Holding Plate in the bar opens the camera from any screen (DT309), and no situation tells a tester it exists. The situations carry emoji icons, while the bar and the rest of the app use line icons.",
-      "story": "When I open a situation in How to, I want to see it done once, so that I try it the way it works.",
+      "problem": "How to describes each situation in four or five steps of words. A tester reads them, then tries. Three of the paths already exist as videos on the home page, but the app does not show them. Holding Plate in the bar opens the camera from any screen (DT309), and no situation tells a tester it exists. The situations carry emoji icons, while the bar and the rest of the app use line icons. The words speak of trying (Try it, Tried it, 1 of 8 tried), while a tester is asked to do the thing in their own day. Tried it says only that, and Coach Milan learns nothing of how it went unless it failed.",
+      "story": "When I open a situation in How to, I want to see it done once, do it in my own day, and say how it went, so that I do it the way it works and Coach Milan knows how it went.",
       "ac": [
         {
           "id": "AC1",
@@ -2538,6 +2538,26 @@
           "id": "AC10",
           "title": "New at the top right",
           "text": "Given a situation added in the last 14 days, when I see the list, then New sits at the top right of its card, and Tried or Didn't work, once marked, sits under New."
+        },
+        {
+          "id": "AC11",
+          "title": "Doing, not trying",
+          "text": "Given How to, when I read it, then it speaks of doing: Beta: 1 of 9 done, Do it now, I did it, Done, and Coach Milan's list says done, as in the table on this board."
+        },
+        {
+          "id": "AC12",
+          "title": "How did it go?",
+          "text": "Given I opened a situation, when I tap I did it, then How did it go? asks for 1 to 5, 1 hard and 5 easy, and a line of my own that I may leave empty; Send stays off until I choose a number."
+        },
+        {
+          "id": "AC13",
+          "title": "What I said",
+          "text": "Given I sent 4 and a line, when I open the situation again, then I did it is on and under it You said 4 of 5 and my line; a tap on I did it takes the mark off as today."
+        },
+        {
+          "id": "AC14",
+          "title": "Coach Milan sees it",
+          "text": "Given a tester sent 4 and a line, when Coach Milan opens that tester under Clients, then the situation says Done, the day, 4 of 5 and the line."
         }
       ],
       "unchanged": [
@@ -2545,7 +2565,7 @@
         "The home page and its twelve videos.",
         "The long press on Plate itself (DT309)."
       ],
-      "decision": "Open. Drawn for Coach Milan's Go."
+      "decision": "Open. Drawn for Coach Milan's Go, with his 18:08 and 18:17 changes."
     }
   ]
 }

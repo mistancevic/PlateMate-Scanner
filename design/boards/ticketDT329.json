@@ -1,19 +1,19 @@
 {
   "id": "DT329",
-  "title": "How to: watch it, the bar's icons, and a scan from any screen",
+  "title": "How to: do it, watch it, say how it went, the bar's icons, and a scan from any screen",
   "epic": "home",
   "state": "next",
   "board": "Stories268",
   "where": "Page 5",
-  "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's.",
+  "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's. 18:08: New at the top right. 18:17: it is not about trying, it is doing it; and feedback, a scale plus free text.",
   "opportunity": {
     "from": "Coach Milan, 19 November 2026, 17:31 and 17:43. The twelve videos are on 0.3.165, and How to holds eight situations as steps in words.",
     "job": "As a beta tester, see a path once before I try it, and find the paths the app has that I would not guess.",
     "kind": "Missing: a path in words only is slow to follow, the long press on Plate is in no situation, and the emoji icons look like no other part of the app.",
     "why_now": "The videos are new and recorded on today's app; How to is what the beta testers use."
   },
-  "problem": "How to describes each situation in four or five steps of words. A tester reads them, then tries. Three of the paths already exist as videos on the home page, but the app does not show them. Holding Plate in the bar opens the camera from any screen (DT309), and no situation tells a tester it exists. The situations carry emoji icons, while the bar and the rest of the app use line icons.",
-  "story": "When I open a situation in How to, I want to see it done once, so that I try it the way it works.",
+  "problem": "How to describes each situation in four or five steps of words. A tester reads them, then tries. Three of the paths already exist as videos on the home page, but the app does not show them. Holding Plate in the bar opens the camera from any screen (DT309), and no situation tells a tester it exists. The situations carry emoji icons, while the bar and the rest of the app use line icons. The words speak of trying (Try it, Tried it, 1 of 8 tried), while a tester is asked to do the thing in their own day. Tried it says only that, and Coach Milan learns nothing of how it went unless it failed.",
+  "story": "When I open a situation in How to, I want to see it done once, do it in my own day, and say how it went, so that I do it the way it works and Coach Milan knows how it went.",
   "ac": [
     {
       "id": "AC1",
@@ -64,6 +64,26 @@
       "id": "AC10",
       "title": "New at the top right",
       "text": "Given a situation added in the last 14 days, when I see the list, then New sits at the top right of its card, and Tried or Didn't work, once marked, sits under New."
+    },
+    {
+      "id": "AC11",
+      "title": "Doing, not trying",
+      "text": "Given How to, when I read it, then it speaks of doing: Beta: 1 of 9 done, Do it now, I did it, Done, and Coach Milan's list says done, as in the table on this board."
+    },
+    {
+      "id": "AC12",
+      "title": "How did it go?",
+      "text": "Given I opened a situation, when I tap I did it, then How did it go? asks for 1 to 5, 1 hard and 5 easy, and a line of my own that I may leave empty; Send stays off until I choose a number."
+    },
+    {
+      "id": "AC13",
+      "title": "What I said",
+      "text": "Given I sent 4 and a line, when I open the situation again, then I did it is on and under it You said 4 of 5 and my line; a tap on I did it takes the mark off as today."
+    },
+    {
+      "id": "AC14",
+      "title": "Coach Milan sees it",
+      "text": "Given a tester sent 4 and a line, when Coach Milan opens that tester under Clients, then the situation says Done, the day, 4 of 5 and the line."
     }
   ],
   "unchanged": [
@@ -73,56 +93,84 @@
   ],
   "short": "How to gets Watch it on three situations, line icons as the bar's, and a ninth situation: Scan a pack from any screen",
   "rel": "Proposed; not agreed until Coach Milan says Go",
-  "boardTitle": "DT329: How to: watch it, the bar's icons, and a scan from any screen",
+  "boardTitle": "DT329: How to: do it, watch it, say how it went, the bar's icons, and a scan from any screen",
   "text": [
     [
-      "howto.watch",
-      "A situation with a video, the button",
+      "howto.beta",
+      "The beta box",
+      "Beta: {n} of {total} tried",
+      "Beta: {n} of {total} done",
+      "Doing, not trying."
+    ],
+    [
+      "howto.betaLine",
+      "Under it",
+      "Try each once. Tap Didn't work when it doesn't. Coach Milan sees what you tried, and your notes.",
+      "Do each once, in your own day, then say how it went. Tap Didn't work when it doesn't. Coach Milan sees what you did, and your notes.",
+      "Doing, and how it went."
+    ],
+    [
+      "howto.tryIt",
+      "A situation, main button",
+      "Try it ›",
+      "Do it now ›",
+      "Opens the place in the app, as today."
+    ],
+    [
+      "howto.triedIt",
+      "A situation, the mark",
+      "✓ Tried it",
+      "✓ I did it",
+      "Opens How did it go?"
+    ],
+    [
+      "howto.tried, triedOf, testerHead, triedOn, noOneYet",
+      "The list, the Today card, Coach Milan's list",
+      "✓ Tried · {n} of {total} tried · No one tried yet",
+      "✓ Done · {n} of {total} done · No one did it yet",
+      "The same word everywhere."
+    ],
+    [
+      "howto.howWent, howWentLine",
+      "New: after I did it",
       "",
+      "How did it go? {title}. 1 is hard, 5 is easy. Coach Milan reads it.",
+      "The scale."
+    ],
+    [
+      "howto.scaleHard, scaleEasy",
+      "Under the scale",
+      "",
+      "Hard · Easy",
+      "The two ends."
+    ],
+    [
+      "howto.anything",
+      "The line of your own",
+      "",
+      "Anything to add? (optional)",
+      "Free text, up to 600 letters."
+    ],
+    [
+      "howto.yourRate",
+      "Under I did it",
+      "",
+      "You said {r} of 5",
+      "What you sent."
+    ],
+    [
+      "howto.watch, video, videoSteps",
       "Watch it",
+      "",
+      "Watch it · Video · The video shows steps 1 to 3.",
       "New."
     ],
     [
-      "howto.video",
-      "Its row in the list",
+      "howto.scanAnywhere",
+      "The new situation",
       "",
-      "Video",
-      "New."
-    ],
-    [
-      "howto.videoSteps",
-      "Under the photo video",
-      "",
-      "The video shows steps 1 to 3.",
-      "The meal video ends on the read, before Ate it."
-    ],
-    [
-      "howto.scanAnywhere.title",
-      "The new situation, title",
-      "",
-      "Scan a pack from any screen",
-      "New, under Every day, first."
-    ],
-    [
-      "howto.scanAnywhere.line",
-      "Its line in the list",
-      "",
-      "Hold Plate in the bar: the camera opens, ready to scan.",
-      "New."
-    ],
-    [
-      "howto.scanAnywhere.what",
-      "Its opening line",
-      "",
-      "You have a pack in your hand and the app open on another screen. No need to go to the Plate first.",
-      "New."
-    ],
-    [
-      "howto.scanAnywhere.s1 to s4",
-      "Its four steps",
-      "",
-      "1 Hold Plate in the bar at the bottom for a moment. 2 The camera opens with its modes: Group, Barcode, Label, Meal. 3 Choose Barcode and hold the pack's code in the frame. 4 Check the values, then the food is on your plate.",
-      "New."
+      "Scan a pack from any screen. Hold Plate in the bar: the camera opens, ready to scan. Four steps: hold Plate; the camera's modes; Barcode and the code; check, on your plate.",
+      "New, first under Every day."
     ]
   ],
   "icons": [
@@ -172,9 +220,9 @@
       "CalendarClock"
     ]
   ],
-  "now": "Eight situations in words, each with an emoji. No video. The long press on Plate is in none of them.",
-  "proposed": "Each situation gets a line icon on the tint of the bar's chosen tab, from the same icon set as the bar. Three get Watch it with the home page's video: the photo (steps 1 to 3), cook hands free, another language. A ninth situation, Scan a pack from any screen, first under Every day, with a new video of the long press recorded with the others. The video loads only on Watch it.",
-  "decision": "Open. Drawn for Coach Milan's Go.",
+  "now": "Eight situations in words, each with an emoji. Try it, then Tried it or Didn't work; a note only when it did not work. No video. The long press on Plate is in none of them.",
+  "proposed": "Line icons from the bar's set on the tint of its chosen tab. Watch it with the home page's video on three situations. A ninth situation, Scan a pack from any screen, with a new video of the long press. Words of doing: Do it now, I did it, Done. I did it asks How did it go?, 1 hard to 5 easy, and a line of your own; Coach Milan sees both. New at the top right of the card.",
+  "decision": "Open. Drawn for Coach Milan's Go, with his 18:08 and 18:17 changes.",
   "details": [
     "The pictures on this board are the real app: today's 0.3.165, and a scratch build of it with the icons, Watch it and the new situation, not committed. The long press picture is the app as it is (DT309).",
     "The new video of the long press is not recorded yet: with the Go it is recorded by scripts/record-home-clips.cjs under HC1 to HC13, as way-hold, and goes on no page but How to.",
