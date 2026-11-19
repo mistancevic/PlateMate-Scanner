@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.167",
     "0.3.166",
     "0.3.165",
     "0.3.164",
@@ -66,8 +67,7 @@
     "0.3.146",
     "0.3.145",
     "0.3.144",
-    "0.3.143",
-    "0.3.142"
+    "0.3.143"
   ],
   "tickets": [
     {
@@ -2577,7 +2577,7 @@
       "id": "DT330",
       "title": "How to feedback that needs you waits at the top of Clients",
       "epic": "coach",
-      "state": "next",
+      "state": "done",
       "board": "Stories269",
       "where": "Page 5",
       "why": "Coach Milan 19 November 20:26 to 20:30: can feedback from a beta tester trigger a notification, as Clients has for a check-in or a new beta tester application? Yes.",
@@ -2623,7 +2623,7 @@
         {
           "id": "AC7",
           "title": "Only for Coach Milan",
-          "text": "Given any other account, coaches and the coach demo included, when it opens Clients, then no row of How to feedback is there."
+          "text": "Given any other account, other coaches included, when it opens Clients, then no row of How to feedback is there: only the owner's account reads the feedback."
         },
         {
           "id": "AC8",
@@ -2636,7 +2636,8 @@
         "The beta applications first in Waiting for you, and every other row there.",
         "What a tester sees in How to."
       ],
-      "decision": "Open. Drawn for Coach Milan's Go."
+      "decision": "Go, Coach Milan 19 November 20:41. Built in 0.3.167.",
+      "version": "0.3.167"
     }
   ]
 }
