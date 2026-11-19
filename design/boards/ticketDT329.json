@@ -5,7 +5,7 @@
   "state": "next",
   "board": "Stories268",
   "where": "Page 5",
-  "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's. 18:08: New at the top right. 18:17: it is not about trying, it is doing it; and feedback, a scale plus free text. 18:25: smiley faces instead of numbers, yes, as line faces. 18:40: colour on the chosen face only, from the five steps. 18:44: a block with all five in colour; only the face coloured, not the whole area.",
+  "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's. 18:08: New at the top right. 18:17: it is not about trying, it is doing it; and feedback, a scale plus free text. 18:25: smiley faces instead of numbers, yes, as line faces. 18:40: colour on the chosen face only, from the five steps. 18:44: a block with all five in colour; only the face coloured, not the whole area. 18:51: the face itself filled with colour, like the emoji; the block on the board and the app the same.",
   "opportunity": {
     "from": "Coach Milan, 19 November 2026, 17:31 and 17:43. The twelve videos are on 0.3.165, and How to holds eight situations as steps in words.",
     "job": "As a beta tester, see a path once before I try it, and find the paths the app has that I would not guess.",
@@ -88,7 +88,7 @@
     {
       "id": "AC15",
       "title": "The faces in colour",
-      "text": "Given How did it go?, when I see the five faces, then each face's line is in its colour, red, amber, blue, green, dark green from hard to easy, with no filled area; the face I choose gets a border in its colour; the face under I did it and in Coach Milan's list has the same colour."
+      "text": "Given How did it go?, when I see the five faces, then each is drawn like an emoji: the round face filled with its colour, red, amber, blue, green, dark green from hard to easy, eyes and mouth in ink; the face I choose gets a border in its colour; the face under I did it and in Coach Milan's list is drawn the same."
     }
   ],
   "unchanged": [

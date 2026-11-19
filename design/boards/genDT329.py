@@ -40,11 +40,13 @@ tile = lambda i: tile1(i)
 # Coach Milan 18:44: all five in colour, the face's line only, never a filled area; the chosen one gets a border in its colour
 pill = lambda i, on: f'<span style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:52px;border-radius:999px;border:{"2.5px solid " + FACE[i] if on else "1.5px solid #d1dcf0"};background:#fff;margin-right:8px">{SVG[i + "-c"]}</span>'
 names = ["Frown", "Annoyed", "Meh", "Smile", "Laugh"]
-faces = (f'<div data-faces style="margin-top:16px;padding-top:12px;border-top:1px solid #d1dcf0"><div style="font-size:17px;font-weight:900;color:#123a7a">The five faces, in colour</div>'
-  f'<div style="font-size:13.5px;color:#3d4a63;margin:4px 0 10px">The line of the face in its colour, no filled area. Shades that keep 3 to 1 on white, so a face can be seen by anyone: red, amber, blue, green, dark green.</div>'
-  f'<div style="font-size:13px;font-weight:800;color:#5b6b8a;margin-bottom:6px">As they stand</div><div>{"".join(pill(n, False) for n in names)}</div>'
-  f'<div style="font-size:13px;font-weight:800;color:#5b6b8a;margin:12px 0 6px">The fourth chosen: a border in its colour</div><div>{"".join(pill(n, n == "Smile") for n in names)}</div>'
-  f'<div style="display:flex;justify-content:space-between;width:352px;margin-top:4px;font-size:13px;color:#5b6b8a"><span>Hard</span><span>Easy</span></div></div>')
+# Coach Milan 18:51: the block is the app itself (pictures of its scale), so the block and the app are the same
+_, sc0 = pic("new_scale", 480, "#ffffff"); _, sc4 = pic("new_scale4", 480, "#ffffff")
+faces = (f'<div data-faces style="margin-top:16px;padding-top:12px;border-top:1px solid #d1dcf0"><div style="font-size:17px;font-weight:900;color:#123a7a">The five faces, in colour, as the app draws them</div>'
+  f'<div style="font-size:13.5px;color:#3d4a63;margin:4px 0 10px">Like an emoji: the round face filled with its colour from the app\'s five steps, red, amber, blue, green, dark green, from hard to easy; eyes and mouth in ink. The chosen one gets a border in its colour.</div>'
+  f'<div style="font-size:13px;font-weight:800;color:#5b6b8a;margin-bottom:6px">As they stand</div>{sc0}'
+  f'<div style="font-size:13px;font-weight:800;color:#5b6b8a;margin:12px 0 6px">The fourth chosen</div>{sc4}'
+  f'<div style="display:flex;justify-content:space-between;width:480px;margin-top:4px;font-size:13px;color:#5b6b8a"><span>Hard</span><span>Easy</span></div></div>')
 ic = "".join(f'<tr><td style="{td};font-weight:700">{n}</td><td style="{td};background:#fdf0f0;font-size:20px">{e}</td><td style="{td};background:#eaf1fd;font-weight:700">{tile(i)}{i}</td></tr>' for n, e, i in t["icons"])
 B.html.append(f'<div data-tbl style="position:absolute;left:{SX}px;top:30px;width:{TW}px;box-sizing:border-box;border:2px solid #172742;border-radius:14px;padding:14px 16px;background:#fff">'
   f'<div style="font-size:19px;font-weight:900;color:#123a7a">The new lines</div>'

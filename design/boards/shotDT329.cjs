@@ -10,8 +10,8 @@ const S = (dir, port) => spawn(process.execPath, ["dist/server.cjs"], { cwd: dir
   const a = S("/home/claude/platemate-scanner", "3621"), n = S("/home/claude/work/dt328", "3622");
   for (const port of ["3621", "3622"]) for (let i = 0; i < 60; i++) { try { await fetch(`http://127.0.0.1:${port}/`); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
   const br = await chromium.launch({ args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] });
-  const open = async (port, q = "") => {
-    const ctx = await br.newContext({ viewport: { width: 390, height: 844 }, permissions: ["camera"] }); const p = await ctx.newPage();
+  const open = async (port, q = "", dsf = 1) => {
+    const ctx = await br.newContext({ viewport: { width: 390, height: 844 }, permissions: ["camera"], deviceScaleFactor: dsf }); const p = await ctx.newPage();
     await p.clock.setFixedTime(new Date("2026-11-19T17:30:00"));
     await p.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
       localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" }));
@@ -40,5 +40,9 @@ const S = (dir, port) => spawn(process.execPath, ["dist/server.cjs"], { cwd: dir
   await p.goto("http://127.0.0.1:3621/today"); await p.waitForTimeout(1000);
   const bx = await p.locator(".bottom-nav button").nth(2).boundingBox(); await p.mouse.move(bx.x + bx.width / 2, bx.y + bx.height / 2); await p.mouse.down(); await p.waitForTimeout(700); await p.mouse.up(); await p.waitForTimeout(1200);
   await shot(p, "hold_camera", false);
+  // the block of the five faces, from the app itself at twice the pixels (Coach Milan 18:51: the block and the app the same)
+  p = await open("3622", "", 2); await p.locator(".ht-scanAnywhere").click(); await p.waitForTimeout(400); await p.locator(".ht-tried").click(); await p.waitForTimeout(400);
+  const pad = async (f) => { const b = await p.locator(".ht-scale").boundingBox(); await p.screenshot({ path: `${OUT}/${f}.png`, clip: { x: b.x - 8, y: b.y - 6, width: b.width + 16, height: b.height + 12 } }); };
+  await pad("new_scale"); await p.locator(".ht-r").nth(3).click(); await p.waitForTimeout(200); await pad("new_scale4");
   await br.close(); a.kill(); n.kill();
 })();
