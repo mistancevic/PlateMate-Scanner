@@ -36,10 +36,9 @@ const ean13 = (code, x0, y0, m, h) => {
 const BARCODE = photo("pack-barcode.jpg");
 const LABEL_ROWS = [["Energy", "276 kJ / 66 kcal"], ["Fat", "0.3 g"], ["of which saturates", "0.2 g"], ["Carbohydrate", "3.8 g"], ["of which sugars", "3.8 g"], ["Protein", "11.6 g"], ["Salt", "0.1 g"]];
 const LABEL = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960"><rect width="720" height="960" fill="#e9e2d0"/><rect x="190" y="230" width="340" height="470" fill="#fff" stroke="#222" stroke-width="3"/><text x="206" y="272" font-family="Arial" font-weight="700" font-size="24">Nutrition declaration</text><text x="206" y="302" font-family="Arial" font-size="19">per 100 g</text>${LABEL_ROWS.map(([a, b], i) => `<line x1="206" x2="514" y1="${320 + i * 52}" y2="${320 + i * 52}" stroke="#222" stroke-width="1.5"/><text x="206" y="${354 + i * 52}" font-family="Arial" font-size="19">${a}</text><text x="514" y="${354 + i * 52}" font-family="Arial" font-size="19" text-anchor="end">${b}</text>`).join("")}</svg>`);
-// HC4: three packs in one picture
-// the camera shows the middle of the picture (x 140 to 580 of 720): the three packs stand there
-const cup = (x, top, name, line, color) => `<rect x="${x}" y="${top}" width="136" height="250" rx="16" fill="#f7f5ef" stroke="#d8d2c4" stroke-width="3"/><rect x="${x}" y="${top + 26}" width="136" height="58" fill="${color}"/><text x="${x + 68}" y="${top + 66}" font-family="Georgia" font-size="${name.length > 6 ? 22 : 28}" fill="#fff" text-anchor="middle">${name}</text><text x="${x + 68}" y="${top + 126}" font-family="Arial" font-weight="700" font-size="18" fill="${color}" text-anchor="middle">${line}</text>`;
-const GROUP = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960"><rect width="720" height="960" fill="#cdbb9f"/>${cup(146, 360, "Fjell", "SKYR", "#2e5d8f")}${cup(292, 340, "Kornfeld", "OATS", "#8a5a1f")}${cup(438, 360, "Nusshof", "PEANUT", "#b3261e")}</svg>`);
+// HC4: three packs in one picture. Coach Milan 19 November 15:14: a photo made with AI for the made-up brands (HC6),
+// placed whole on a blurred copy: the camera shows the middle of the picture (x 140 to 580 of 720), the packs stand there
+const GROUP = photo("group.jpg");
 const MEAL = photo("meal.jpg");
 const RECIPE_PHOTOS = { m1: photo("recipe-crepes.jpg"), m2: photo("recipe-pudding.jpg"), m3: photo("recipe-sarma.jpg"), "m-pr": photo("recipe-prebranac.jpg") };
 // HC11 in every language: the bar's Explorer and Clients as the app's three word files name them (Entdecken, Istraživač)
@@ -49,10 +48,10 @@ const tabWords = (k) => { const out = [JSON.parse(fs.readFileSync(path.join(ROOT
 const EXPLORER_TAB = tabWords("tab.explorer"), CLIENTS_TAB = tabWords("tab.clients");
 const SKYR = { success: true, product_name: "Fjell Skyr natural", brand: "Fjell", basis: "100g", calories: 66, protein: 11.6, fats: 0.3, carbs: 3.8, fiber: 0, notes: "", error_reason: "", table: [], source: "Product database · review required" };
 const LABEL_READ = { ...SKYR, source: "Label photo · review required", table: LABEL_ROWS.map(([name, v]) => ({ name, amount: Number(String(v).match(/([\d.]+) ?k?c?a?l?$/)?.[1] ?? 0), unit: /kcal/.test(v) ? "kcal" : "g" })) };
-const GROUP_READ = { entities: [
-  { ...SKYR },
-  { product_name: "Kornfeld Oats", brand: "Kornfeld", calories: 372, protein: 13.5, fats: 7, carbs: 58.7, fiber: 10 },
-  { product_name: "Nusshof Peanut butter", brand: "Nusshof", calories: 588, protein: 25, fats: 50, carbs: 20, fiber: 6 }] };
+// One photo of the fronts: the app names each pack from its front and reads values only from a table it can see (server.ts,
+// the group prompt), so the honest read has names and no values (HC9): each row asks to review or enter it
+const front = (product_name, brand) => ({ product_name, brand, basis: null, calories: null, protein: null, fats: null, carbs: null, fiber: null, notes: "", table: [] });
+const GROUP_READ = { entities: [front("Fjell Skyr natural", "Fjell"), front("Kornfeld Oats", "Kornfeld"), front("Nusshof Peanut butter", "Nusshof")] };
 // HP3 (Coach Milan, 1 November 12:31): the meal is Milan's real dinner of 31 October, salmon, potatoes and broccoli
 const READ = { dish: "Salmon with potatoes and broccoli", foods: [
   { name: "Salmon, oven baked", grams: 230, low: 180, high: 280, calories: 206, protein: 22.1, fats: 12.4, carbs: 0, fiber: 0, confidence: "medium" },
@@ -64,6 +63,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const fails = []; const rule = (ok, id, what) => { console.log(`${ok ? "ok  " : "FAIL"} ${id} ${what}`); if (!ok) fails.push(`${id} ${what}`); };
   // HC5 before anything: the photos must be there
   rule(Boolean(MEAL), "HC5", `the meal photo: ${path.relative(ROOT, path.join(ASSETS, "meal.jpg"))}`);
+  rule(Boolean(GROUP), "HC5", "the group photo: design/home-clips/group.jpg");
   rule(Boolean(BARCODE), "HC5", "the pack photo: design/home-clips/pack-barcode.jpg");
   for (const [id, f] of [["m1", "recipe-crepes.jpg"], ["m2", "recipe-pudding.jpg"], ["m3", "recipe-sarma.jpg"], ["m-pr", "recipe-prebranac.jpg"]]) rule(Boolean(RECIPE_PHOTOS[id]), "HC5", `a recipe photo: design/home-clips/${f}`);
   // HC9: the page says what the clips are
