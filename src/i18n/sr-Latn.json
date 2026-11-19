@@ -33,10 +33,6 @@
       "text": "Na tvom tanjiru je {foods}, {ago}. Novo jelo počinje na svom tanjiru: {dish}. Da sačuvam tvoj tanjir za kasnije, ili da ga ispraznim?",
       "checked": true
     },
-    "plateAddOrNew": {
-      "text": "Tvoj tanjir već ima {foods}{title}. {what} Da počneš nov tanjir s tim, ili da ga dodaš svom?",
-      "checked": true
-    },
     "whereGoes": {
       "text": "Gde ovo ide?",
       "checked": true
@@ -305,16 +301,8 @@
       "text": "{meal}, {time} po satu",
       "checked": true
     },
-    "plate.offPlan": {
-      "text": "Van plana",
-      "checked": true
-    },
     "plate.aDish": {
       "text": "Jelo",
-      "checked": true
-    },
-    "plate.aMix": {
-      "text": "Mešavina",
       "checked": true
     },
     "plate.onThePlate": {
@@ -507,10 +495,6 @@
     },
     "plate.dropPhoto": {
       "text": "Ukloni fotografiju",
-      "checked": true
-    },
-    "plate.keepMine": {
-      "text": "Zadrži moj tanjir",
       "checked": true
     },
     "plate.addOrNewHelp": {
@@ -2929,10 +2913,6 @@
       "text": "Drugi dan",
       "checked": true
     },
-    "make.whatIsItFor": {
-      "text": "Za šta je?",
-      "checked": true
-    },
     "make.whatIsIt": {
       "text": "Šta je to?",
       "checked": true
@@ -3325,10 +3305,6 @@
       "text": "Nastavi",
       "checked": true
     },
-    "make.wrongFoodsHelpChefMealan": {
-      "text": "Pogrešne namirnice? Pomozi Chef Mealanu da pročita ›",
-      "checked": true
-    },
     "make.helpChefMealanReadIt": {
       "text": "Pomozi Chef Mealanu da pročita",
       "checked": true
@@ -3375,14 +3351,6 @@
     },
     "make.changeWhatThisPlateIs": {
       "text": "Promeni šta je ovaj tanjir",
-      "checked": true
-    },
-    "make.whichDay2": {
-      "text": "Koji dan",
-      "checked": true
-    },
-    "make.whatThePlateIsFor": {
-      "text": "Za šta je tanjir",
       "checked": true
     },
     "make.noFoodsFoundOnThe": {
@@ -3509,18 +3477,6 @@
       "text": "Svaka namirnica je zaključana, pa se ništa ne pomera. Oslobodi jednu njenom tačkom.",
       "checked": true
     },
-    "make.exploringNothingIsSizedFor": {
-      "text": "Obrok nije izabran: ništa nije odmereno za obrok. Izaberi obrok da vidiš šta tvoj plan ima za njega.",
-      "checked": true
-    },
-    "make.snackOffThePlanNot": {
-      "text": "Užina: van plana, nije odmerena za obrok.",
-      "checked": true
-    },
-    "make.pickWhatItIsFor": {
-      "text": "Izaberi za šta je.",
-      "checked": true
-    },
     "make.nothingPickedEverythingIsOffered": {
       "text": "Ništa nije izabrano: sve se nudi. Svako je pun obrok sa tvojim PD; nešto malo je Užina, gore.",
       "checked": true
@@ -3571,10 +3527,6 @@
     },
     "make.theWholeRecipeAsYou": {
       "text": "Ceo recept, kako si ga uneo.|Ceo recept, kako si ga unela.",
-      "checked": true
-    },
-    "make.todayIsWhatYouEat": {
-      "text": "Danas je ono što jedeš sada. Dan ranije dodaje ono što si pojeo; dan kasnije planira šta ćeš jesti.|Danas je ono što jedeš sada. Dan ranije dodaje ono što si pojela; dan kasnije planira šta ćeš jesti.",
       "checked": true
     },
     "make.pickThePlaceAndChef": {
@@ -13741,34 +13693,6 @@
       "text": "{kcal} kcal · {protein} g proteina · {pd}",
       "checked": true
     },
-    "plate.planLineNums": {
-      "text": "{meal}, {time} · {nums} · Po planu",
-      "checked": true
-    },
-    "plate.planLine": {
-      "text": "{meal}, {time} · Po planu",
-      "checked": true
-    },
-    "plate.exploringLine": {
-      "text": "Obrok nije izabran · nije odmereno za obrok",
-      "checked": true
-    },
-    "plate.snackLine": {
-      "text": "Užina · van plana",
-      "checked": true
-    },
-    "plate.forHintNums": {
-      "text": "{meal}, {time}: {nums}, iz tvog plana za danas. Računa se kao tvoj obrok ({mealLow}).",
-      "checked": true
-    },
-    "plate.forHint": {
-      "text": "{meal}, {time}: Računa se kao tvoj obrok ({mealLow}).",
-      "checked": true
-    },
-    "plate.forHintClock": {
-      "text": "{meal}, po satu: pretpostavka, van plana. Dodirni {meal} da bude tvoj obrok ({mealLow}): računa se po planu.",
-      "checked": true
-    },
     "plate.noLonger": {
       "text": "Više nije {title}: njegove namirnice su uklonjene. Tanjir je tvoj.",
       "checked": true
@@ -14109,18 +14033,6 @@
       "text": "Iskoristi: Chef Mealan pita šta menja ili dodaje, a koraci prate. Na Tanjir: ide u obrok koji slažeš; kuvanje ide dalje kao i do sada. Zadrži: čeka u Namirnicama.",
       "checked": true
     },
-    "plate.slotLineEaten": {
-      "text": "{slot}, {time} · Pojedeno",
-      "checked": true
-    },
-    "plate.slotLinePlanning": {
-      "text": "{slot}, {time} · U planiranju",
-      "checked": true
-    },
-    "plate.slotLineByPlan": {
-      "text": "{slot}, {time} · Po planu",
-      "checked": true
-    },
     "plate.yesterday": {
       "text": "Juče",
       "checked": true
@@ -14133,32 +14045,8 @@
       "text": "Sutra",
       "checked": true
     },
-    "plate.dayAddsPick": {
-      "text": "{day}: dodaje ono što je pojedeno. Izaberi obrok.",
-      "checked": true
-    },
-    "plate.dayPlansPick": {
-      "text": "{day}: planira šta ćeš jesti. Izaberi obrok.",
-      "checked": true
-    },
-    "plate.dayWhichMeal": {
-      "text": "{day}, koji obrok",
-      "checked": true
-    },
-    "plate.mealAtTime": {
-      "text": "{meal}, {time}",
-      "checked": true
-    },
-    "plate.exploringStays": {
-      "text": "Obrok nije izabran: {slot} ostaje bez promene.",
-      "checked": true
-    },
     "plate.exploring": {
       "text": "Obrok nije izabran",
-      "checked": true
-    },
-    "plate.exploringLeaves": {
-      "text": "Obrok nije izabran: {slot} ostaje bez promene, i ništa se ne upisuje.",
       "checked": true
     },
     "plate.targetForPlate": {
@@ -17513,10 +17401,6 @@
       "text": "{day} {time}",
       "checked": true
     },
-    "app.wouldJoinPlate": {
-      "text": "{name}: ide na tanjir od {when}.",
-      "checked": true
-    },
     "app.addedServing": {
       "text": "Dodato: 1 {name}, {g} g. Podesi količinu koju stvarno imaš.",
       "checked": true
@@ -17677,10 +17561,6 @@
       "text": "Jedna porcija je zapisana. Ostale porcije ({n}) su na Danas.",
       "checked": true
     },
-    "app.fromRecipesHas": {
-      "text": "{title} iz tvojih recepata ima {n}.",
-      "checked": true
-    },
     "app.oldSavedForLater": {
       "text": "{name}: sačuvano za kasnije, na vrhu Tanjira.",
       "checked": true
@@ -17691,10 +17571,6 @@
     },
     "app.plateSavedForLater": {
       "text": "Tvoj tanjir je sačuvan za kasnije, na vrhu Tanjira.",
-      "checked": true
-    },
-    "app.fromPlanHas": {
-      "text": "{title} iz tvog plana ima {n} namirnicu.|{title} iz tvog plana ima {n} namirnice.|{title} iz tvog plana ima {n} namirnica.",
       "checked": true
     },
     "app.mixSet": {
@@ -20978,7 +20854,7 @@
       "checked": true
     },
     "howto.photoLog.s4": {
-      "text": "Proveri namirnice koje je pročitao. Pod Da li je pojedeno? izaberi Sve, Pola ili Deo, pa Gotovo.",
+      "text": "Proveri namirnice koje je pročitao. Dodirni Pojeo sam i obrok.",
       "checked": true
     },
     "howto.bigBatch.title": {
@@ -22381,10 +22257,6 @@
       "text": "juče",
       "checked": true
     },
-    "plate.readSub": {
-      "text": "Pročitano sa tvoje slike. Dodirni količinu da je ispraviš.",
-      "checked": true
-    },
     "plate.changeTheFoods": {
       "text": "Nastavi na Tanjiru",
       "checked": true
@@ -22411,10 +22283,6 @@
     },
     "plate.gOfTotal": {
       "text": "g od {total} g. Dodirni da ispraviš.",
-      "checked": true
-    },
-    "plate.gramsOfFood": {
-      "text": "Grami: {food}",
       "checked": true
     },
     "plate.isItForPlan": {
@@ -22601,10 +22469,6 @@
       "text": "Obrok nije izabran",
       "checked": true
     },
-    "plate.clearMeal": {
-      "text": "Ukloni obrok i dan",
-      "checked": true
-    },
     "plate.goesIntoPlan": {
       "text": "Ide u tvoj plan.",
       "checked": true
@@ -22765,10 +22629,6 @@
       "text": "{title}: dodato na tvoj tanjir kao jedno jelo. Sačuvano u Mojim receptima.",
       "checked": true
     },
-    "cal.nothingCounted": {
-      "text": "ništa se ne broji",
-      "checked": true
-    },
     "plate.arrRecipe": {
       "text": "Recept je {title}, iz Mojih recepata: {n} namirnica.|Recept je {title}, iz Mojih recepata: {n} namirnice.|Recept je {title}, iz Mojih recepata: {n} namirnica.",
       "checked": true
@@ -22887,6 +22747,10 @@
     },
     "plate.didSame": {
       "text": "Vidim isto kao pre.",
+      "checked": true
+    },
+    "howto.photoLog.s5": {
+      "text": "Pod Da li je pojedeno? izaberi Sve, Pola ili Deo, pa Gotovo.",
       "checked": true
     }
   }

@@ -19,8 +19,9 @@ export const dishWord = (d: Dish) => w(`served.dish.${d}` as WordKey);
 const FORM_DISHES: Dish[] = DISHES.filter((d) => d !== "drink");
 // the two rows that adapt: how much of a pot or a tray is yours; which dish of the meal it is
 export function PotRows({ vessel, share, setShare, dish, setDish, meal }: { vessel?: Vessel | null; share: "whole" | "portion"; setShare: (x: "whole" | "portion") => void; dish: Dish; setDish: (d: Dish) => void; meal: string | null }) {
+  // B149 (0.3.161, board B149): one tick, the one the look of a chosen choice draws; the tick written into the words is gone
   const chip = (on: boolean, text: string, tap: () => void) => (
-    <div key={text} role="radio" tabIndex={0} aria-checked={on} className={`pa-opt${on ? " on" : ""}`} onClick={tap} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } }}>{on && <span aria-hidden="true">✓</span>}{text}</div>);
+    <div key={text} role="radio" tabIndex={0} aria-checked={on} className={`pa-opt${on ? " on" : ""}`} onClick={tap} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } }}>{text}</div>);
   return (<>
     {holdsMore(vessel) && (
       <div className="pa-row pa-share">

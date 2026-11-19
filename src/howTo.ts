@@ -11,7 +11,8 @@ export type Situation = { id: string; icon: string; group: HowGroup; added: stri
 export const GROUPS: HowGroup[] = ["day", "cook", "week"];
 export const SITUATIONS: Situation[] = [
   { id: "eatNow", icon: "🍽️", group: "day", added: "0.3.80", on: "2026-10-01", flow: "plate-chef.cjs", steps: 4, go: { tab: "journey" } },
-  { id: "photoLog", icon: "📷", group: "day", added: "0.3.80", on: "2026-10-01", flow: "meal-photo.cjs", steps: 4, go: { tab: "journey" } },
+  // DT315 (0.3.161, board DT315): step 4 is Ate it and the meal; Did you eat it? is step 5, as the read goes since 0.3.157
+  { id: "photoLog", icon: "📷", group: "day", added: "0.3.80", on: "2026-10-01", flow: "meal-photo.cjs", steps: 5, go: { tab: "journey" } },
   { id: "bigBatch", icon: "🍲", group: "day", added: "0.3.80", on: "2026-10-01", flow: "whole-recipe-count.cjs", steps: 5, go: { tab: "recipes" } },
   { id: "screenshot", icon: "🖼️", group: "cook", added: "0.3.80", on: "2026-10-01", flow: "recipe-import.cjs", steps: 4, go: { tab: "recipes" } },
   { id: "fitTarget", icon: "🎯", group: "cook", added: "0.3.80", on: "2026-10-01", flow: "cook-mode.cjs", steps: 4, go: { tab: "recipes" } },
