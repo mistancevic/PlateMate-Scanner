@@ -1,0 +1,178 @@
+{
+  "id": "DT329",
+  "title": "How to: watch it, the bar's icons, and a scan from any screen",
+  "epic": "home",
+  "state": "next",
+  "board": "Stories268",
+  "where": "Page 5",
+  "why": "Coach Milan 19 November 17:31 to 17:43: the home page videos inside the app, in How to, the beta testers' happy paths; one scenario with the long press on Plate; icons like the bar's.",
+  "opportunity": {
+    "from": "Coach Milan, 19 November 2026, 17:31 and 17:43. The twelve videos are on 0.3.165, and How to holds eight situations as steps in words.",
+    "job": "As a beta tester, see a path once before I try it, and find the paths the app has that I would not guess.",
+    "kind": "Missing: a path in words only is slow to follow, the long press on Plate is in no situation, and the emoji icons look like no other part of the app.",
+    "why_now": "The videos are new and recorded on today's app; How to is what the beta testers use."
+  },
+  "problem": "How to describes each situation in four or five steps of words. A tester reads them, then tries. Three of the paths already exist as videos on the home page, but the app does not show them. Holding Plate in the bar opens the camera from any screen (DT309), and no situation tells a tester it exists. The situations carry emoji icons, while the bar and the rest of the app use line icons.",
+  "story": "When I open a situation in How to, I want to see it done once, so that I try it the way it works.",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "Icons like the bar's",
+      "text": "Given How to, when I see the list or open a situation, then each situation has a line icon on the tint of the bar's chosen tab, and no emoji: the icons in the table on this board."
+    },
+    {
+      "id": "AC2",
+      "title": "A row says Video",
+      "text": "Given a situation that has a video, when I see the list, then its row says Video under its title."
+    },
+    {
+      "id": "AC3",
+      "title": "Watch it",
+      "text": "Given I opened a situation with a video, when I tap Watch it, then its video plays in place from the start, with its controls, and nothing of it loads before the tap."
+    },
+    {
+      "id": "AC4",
+      "title": "A video of part of the path",
+      "text": "Given I ate something: log it with a photo, when its video plays, then the line under it says The video shows steps 1 to 3."
+    },
+    {
+      "id": "AC5",
+      "title": "The home page's videos",
+      "text": "Given I ate something, Cook hands free and A recipe in another language, when their videos play, then they are the home page's meal, cook and languages videos, the same files."
+    },
+    {
+      "id": "AC6",
+      "title": "Scan a pack from any screen",
+      "text": "Given How to, when I open Scan a pack from any screen, then it says its four steps, Try it opens the camera's modes as holding Plate does, and Watch it plays its video: Plate held in the bar, the camera's modes, Barcode, the code read, the food on the plate."
+    },
+    {
+      "id": "AC7",
+      "title": "Its video under the rules",
+      "text": "Given the videos are recorded, when the recording ends, then the new video of the long press passed HC1 to HC13 with the others, and it is not on the home page."
+    },
+    {
+      "id": "AC8",
+      "title": "Nine to try",
+      "text": "Given the beta box at the top of How to, when I read it, then it counts nine situations, and Coach Milan's list of testers counts nine."
+    },
+    {
+      "id": "AC9",
+      "title": "In three languages",
+      "text": "Given the new lines, when the app is in Serbian or German, then each shows in that language."
+    }
+  ],
+  "unchanged": [
+    "The other situations' words and steps, Try it, Tried it, Didn't work and the note to Coach Milan.",
+    "The home page and its twelve videos.",
+    "The long press on Plate itself (DT309)."
+  ],
+  "short": "How to gets Watch it on three situations, line icons as the bar's, and a ninth situation: Scan a pack from any screen",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "DT329: How to: watch it, the bar's icons, and a scan from any screen",
+  "text": [
+    [
+      "howto.watch",
+      "A situation with a video, the button",
+      "",
+      "Watch it",
+      "New."
+    ],
+    [
+      "howto.video",
+      "Its row in the list",
+      "",
+      "Video",
+      "New."
+    ],
+    [
+      "howto.videoSteps",
+      "Under the photo video",
+      "",
+      "The video shows steps 1 to 3.",
+      "The meal video ends on the read, before Ate it."
+    ],
+    [
+      "howto.scanAnywhere.title",
+      "The new situation, title",
+      "",
+      "Scan a pack from any screen",
+      "New, under Every day, first."
+    ],
+    [
+      "howto.scanAnywhere.line",
+      "Its line in the list",
+      "",
+      "Hold Plate in the bar: the camera opens, ready to scan.",
+      "New."
+    ],
+    [
+      "howto.scanAnywhere.what",
+      "Its opening line",
+      "",
+      "You have a pack in your hand and the app open on another screen. No need to go to the Plate first.",
+      "New."
+    ],
+    [
+      "howto.scanAnywhere.s1 to s4",
+      "Its four steps",
+      "",
+      "1 Hold Plate in the bar at the bottom for a moment. 2 The camera opens with its modes: Group, Barcode, Label, Meal. 3 Choose Barcode and hold the pack's code in the frame. 4 Check the values, then the food is on your plate.",
+      "New."
+    ]
+  ],
+  "icons": [
+    [
+      "Scan a pack from any screen",
+      "(new)",
+      "ScanBarcode"
+    ],
+    [
+      "What should I eat now?",
+      "🍽️",
+      "UtensilsCrossed"
+    ],
+    [
+      "I ate something: log it with a photo",
+      "📷",
+      "Camera"
+    ],
+    [
+      "I cooked a big batch",
+      "🍲",
+      "CookingPot"
+    ],
+    [
+      "A recipe from a screenshot",
+      "🖼️",
+      "Images"
+    ],
+    [
+      "Make a recipe fit my target",
+      "🎯",
+      "Target"
+    ],
+    [
+      "Cook hands free",
+      "🗣️",
+      "Mic"
+    ],
+    [
+      "A recipe in another language",
+      "🌍",
+      "Languages"
+    ],
+    [
+      "A busy day",
+      "📅",
+      "CalendarClock"
+    ]
+  ],
+  "now": "Eight situations in words, each with an emoji. No video. The long press on Plate is in none of them.",
+  "proposed": "Each situation gets a line icon on the tint of the bar's chosen tab, from the same icon set as the bar. Three get Watch it with the home page's video: the photo (steps 1 to 3), cook hands free, another language. A ninth situation, Scan a pack from any screen, first under Every day, with a new video of the long press recorded with the others. The video loads only on Watch it.",
+  "decision": "Open. Drawn for Coach Milan's Go.",
+  "details": [
+    "The pictures on this board are the real app: today's 0.3.165, and a scratch build of it with the icons, Watch it and the new situation, not committed. The long press picture is the app as it is (DT309).",
+    "The new video of the long press is not recorded yet: with the Go it is recorded by scripts/record-home-clips.cjs under HC1 to HC13, as way-hold, and goes on no page but How to.",
+    "Later, as their own ticket: videos for the other five situations."
+  ]
+}
