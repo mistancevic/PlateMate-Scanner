@@ -1,5 +1,5 @@
 import { BOOK_PAGES, BOOK_SOURCES } from "../bookPages";
-import { HowToTesters } from "../components/HowTo";
+import { HowToTesters, Face } from "../components/HowTo";
 import { getLang } from "../lang";
 import { w, wn, numLocale, phoneLoc, dateText, wIn as wordIn, type WordKey } from "../words";
 import { weekdayName } from "../weekdayWords";
@@ -50,6 +50,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   const coachName = user?.name?.split(" ")[0] || (p.demo ? "Milan" : "Coach");
   // B141: the coach's own notes on the clients; in the demo they live on the page only
   const [notesOwn, setNotesOwn] = useState<ClientNotes>({});
+  const [howOpen, setHowOpen] = useState<string | null>(null);
   useEffect(() => { if (user && !p.demo) loadClientNotes(user.uid).then(setNotesOwn).catch(() => {}); }, [user?.uid]);
   const saveNoteFor = (uid: string) => async (text: string) => {
     try { if (user && !p.demo) await saveClientNote(user.uid, uid, text); setNotesOwn((n) => { const next = { ...n }; if (text.trim()) next[uid] = { text: text.trim(), at: new Date().toISOString() }; else delete next[uid]; return next; }); notify(w("coach.noteSaved")); }
@@ -98,6 +99,8 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
       tailFor={(part) => <ClientTail part={part} row={open} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi} sendNote={(notes) => ops.sendNote(open, notes)} coachName={coachName} focusCard={p.focusCard} onAnswered={() => p.recountWaiting()}
         cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(w(on ? "coach.isCookNow" : "coach.noLongerCook", { name: open.name.split(" ")[0] }))).catch((e) => setError(e.message))} />} />
   );
+  // DT330: a feedback row opens that tester's How to on its own, Back to Clients returns
+  if (howOpen) return <HowToTesters list={p.howTesters} openUid={howOpen} onBack={() => setHowOpen(null)} />;
   const ti = todayIndex();
   const due = rows.filter((r) => r.checkinDay === ti);
   // DT189 (0.3.31, Milan 17:42): Waiting for you at the top, one row per thing; tap opens it where it is answered
@@ -110,12 +113,20 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   const toSend = due.filter((r) => !r.notes.some((n) => n.by === "coach" && n.week === weekKey)).length;
   return (
     <>
-      {(p.waiting.length > 0 || apps.length > 0) && (
+      {(p.waiting.length > 0 || apps.length > 0 || p.howWaiting.length > 0) && (
         <section className="card waiting" aria-label={w("coach.waitingForYou")}>
-          <b>{w("coach.waitingForYouN", { n: p.waiting.length + apps.length })}</b>
+          <b>{w("coach.waitingForYouN", { n: p.waiting.length + apps.length + p.howWaiting.length })}</b>
           <small className="muted">{w("coach.everythingAClientSentOr")}</small>
           {/* DT279 (0.3.140, board Stories213): a new beta tester application first, as a full card */}
           {apps.map((r) => <RequestCard key={r.id} r={r} p={p} top />)}
+          {/* DT330 (board DT330): How to feedback that needs you, after the applications; a tap opens that tester's How to */}
+          {p.howWaiting.slice(0, 12).map((h) => (
+            <button key={h.key} type="button" className="menu-row ht-wait" onClick={() => { p.waitingSeen(h.key); setHowOpen(h.uid); }}>
+              <span className="menu-row-text"><b>{h.name} · {w(`howto.${h.id}.title` as WordKey)}</b>
+                <small className="ht-wait-what">{h.m.s === "didnt" ? <span className="ht-bad">{w("howto.didnt")}</span> : h.m.r ? <span className="ht-saidface"><Face r={h.m.r} />{w("howto.rated", { r: h.m.r })}</span> : <span className="ht-done">{w("howto.tried")}</span>}</small>
+                {h.m.note && <small className="ht-wait-note">“{h.m.note.length > 70 ? h.m.note.slice(0, 70) + "…" : h.m.note}”</small>}
+                <small>{w("howto.waitFrom", { day: dateText(new Date(h.m.at), { day: "numeric", month: "short" }) })}</small></span><span aria-hidden="true">›</span></button>
+          ))}
           {p.waiting.slice(0, 12).map((wq) => (
             <button key={wq.key} type="button" className="menu-row" onClick={() => openWaiting(wq)}><span className="menu-row-text"><b>{wq.name} · {wq.what}</b><small>{wq.when}</small></span><span aria-hidden="true">›</span></button>
           ))}
@@ -147,7 +158,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
       {!p.demo && <Invites {...p} />}
       {!p.demo && <AccessRequests {...p} />}
       {/* DT260: what each tester tried under How to */}
-      {!p.demo && <HowToTesters />}
+      {!p.demo && <HowToTesters list={p.howTesters} />}
       {!p.demo && <WaitingList {...p} />}
       {!p.demo && <BookSignups {...p} />}
     </>

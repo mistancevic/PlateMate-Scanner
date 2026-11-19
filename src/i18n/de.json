@@ -22852,6 +22852,14 @@
     "howto.scanAnywhere.s4": {
       "text": "Prüfe die Werte, dann ist das Lebensmittel auf deinem Teller.",
       "checked": true
+    },
+    "howto.waitFrom": {
+      "text": "So geht's · {day}",
+      "checked": true
+    },
+    "howto.backClients": {
+      "text": "‹ Klienten",
+      "checked": true
     }
   }
 }

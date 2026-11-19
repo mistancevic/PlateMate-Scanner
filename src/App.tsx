@@ -875,13 +875,23 @@ export default function App() {
   const [focusCard, setFocusCard] = useState<string | null>(null);
   // DT279 (0.3.140, board Stories213): beta tester applications wait at the top of Clients and count in its badge
   const [requests, setRequests] = useState<any[] | null>(null);
+  // DT330 (0.3.167, board DT330; Coach Milan, Go 19 November 20:41): How to feedback that needs Coach Milan. Only the owner's account
+  // reads /api/howto; any other coach gets no answer, so the list stays empty and nothing counts
+  const [howTesters, setHowTesters] = useState<{ uid: string; name: string; email: string; items: import("./howTo").HowMarks }[] | null>(null);
+  const [howWaiting, setHowWaiting] = useState<import("./howTo").HowWaiting[]>([]);
+  const loadHowto = async (): Promise<number> => {
+    if (!coachDemoOn() && !(user && profile.role === "coach")) { setHowTesters(null); setHowWaiting([]); return 0; }
+    try { const r = await fetch("/api/howto"); const d = r.ok ? await r.json() : null; const list = d ? d.testers ?? [] : null; setHowTesters(list);
+      const hw = list ? (await import("./howTo")).howtoWaiting(list, seenWaiting(user?.uid ?? "local")) : []; setHowWaiting(hw); return hw.length; }
+    catch { setHowTesters(null); setHowWaiting([]); return 0; }
+  };
   const loadRequests = async (): Promise<number> => {
     if (!coachDemoOn() && !(user && profile.role === "coach")) { setRequests(null); return 0; }
     try { const r = await fetch("/api/access-requests"); const d = r.ok ? await r.json() : {}; const list = Array.isArray(d.requests) ? d.requests : []; setRequests(list); return openOf(list).length; }
     catch { setRequests([]); return 0; }
   };
   const recountWaiting = async () => {
-    const apps = await loadRequests();
+    const apps = (await loadRequests()) + (await loadHowto());
     const rows = coachDemoOn() ? (await import("./coachDemo")).demoRows() : user && profile.role === "coach" ? await listClients(user.uid).catch(() => null) : null;
     if (!rows) { setWaiting([]); setNewShared(apps); return; }
     const seen = seenWaiting(user?.uid ?? "local");
@@ -2436,7 +2446,7 @@ export default function App() {
     },
     dismissRecipe: async (item: InboxItem) => { if (user) { try { await clearInboxItem(user.uid, item.id); } catch {} } setInbox((x) => x.filter((i) => i.id !== item.id)); },
     newShared, markSharedSeen: () => { if (user) { try { localStorage.setItem(`chefmealan-coach-seen-${user.uid}`, new Date().toISOString()); } catch {} } },
-    waiting, waitingSeen: (key) => { markWaitingSeen(user?.uid ?? "local", key); void recountWaiting(); }, recountWaiting: () => { void recountWaiting(); }, requests, focusCard, setFocusCard,
+    waiting, howWaiting, howTesters, waitingSeen: (key) => { markWaitingSeen(user?.uid ?? "local", key); void recountWaiting(); }, recountWaiting: () => { void recountWaiting(); }, requests, focusCard, setFocusCard,
     matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,

@@ -3641,3 +3641,4 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .ht-r { color: var(--ink); } .ht-r svg circle { fill: var(--face); } .ht-r svg { width: 32px; height: 32px; }
 .ht-r.on { background: var(--surface, #fff); border: 2.5px solid var(--edge); color: var(--ink); }
 .ht-saidface svg { color: var(--ink); } .ht-said1 svg circle { fill: #f48a78; } .ht-said2 svg circle { fill: #f6b94a; } .ht-said3 svg circle { fill: #78a9f0; } .ht-said4 svg circle { fill: #35cf9e; } .ht-said5 svg circle { fill: #2fa37c; }
+.ht-wait-what { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px; }

@@ -133,16 +133,18 @@ export function HowToScreen(p: AppApi & { closeMenu: () => void }) {
 
 // for Coach Milan, under Clients: who tried what, and every Didn't work with its note
 type Tester = { uid: string; name: string; email: string; items: HowMarks };
-export function HowToTesters() {
-  const [list, setList] = useState<Tester[] | null>(null);
-  const [one, setOne] = useState<Tester | null>(null);
+// DT330: the list comes from the app (it also counts what needs you in Waiting for you); a row there opens one tester on its own
+export function HowToTesters({ list, openUid, onBack }: { list: Tester[] | null; openUid?: string | null; onBack?: () => void }) {
+  const [picked, setOne] = useState<Tester | null>(null);
+  useEffect(() => { window.scrollTo({ top: 0 }); }, [openUid]);
   // only the owner's account reads them; for anyone else the section stays away
-  useEffect(() => { fetch("/api/howto").then((r) => (r.ok ? r.json() : null)).then((d) => setList(d ? d.testers ?? [] : null)).catch(() => setList(null)); }, []);
   if (!list) return null;
+  const one = openUid ? list.find((x) => x.uid === openUid) ?? null : picked;
+  const back = () => (openUid ? onBack?.() : setOne(null));
   const name = (t: Tester) => t.name || t.email || w("howto.someone");
   if (one) return (
     <section className="card howto-tester">
-      <button className="link ht-back" onClick={() => setOne(null)}>{w("howto.backTesters")}</button>
+      <button className="link ht-back" onClick={back}>{openUid ? w("howto.backClients") : w("howto.backTesters")}</button>
       <h3>{w("howto.testerHead", { name: name(one), n: triedCount(one.items), total: SITUATIONS.length })}</h3>
       {SITUATIONS.map((s) => { const m = one.items[s.id]; return (
         <div key={s.id} className="ht-trow"><b>{w(k(`howto.${s.id}.title`))}</b>

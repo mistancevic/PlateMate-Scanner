@@ -5978,6 +5978,8 @@
   "howto.anything": "Anything to add? (optional)",
   "howto.yourRate": "You said {r} of 5",
   "howto.rated": "{r} of 5",
+  "howto.waitFrom": "How to · {day}",
+  "howto.backClients": "‹ Clients",
   "howto.faceHard": "1 of 5, hard",
   "howto.faceN": "{n} of 5",
   "howto.faceEasy": "5 of 5, easy",

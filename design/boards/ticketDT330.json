@@ -48,7 +48,7 @@
     {
       "id": "AC7",
       "title": "Only for Coach Milan",
-      "text": "Given any other account, coaches and the coach demo included, when it opens Clients, then no row of How to feedback is there."
+      "text": "Given any other account, other coaches included, when it opens Clients, then no row of How to feedback is there: only the owner's account reads the feedback."
     },
     {
       "id": "AC8",

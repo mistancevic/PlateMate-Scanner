@@ -43,3 +43,13 @@ export const showOnToday = (m: HowMarks, version: string, laterAt: string | null
 export function untried(testers: { items: HowMarks }[]): Situation | null {
   return SITUATIONS.find((s) => !testers.some((t) => t.items?.[s.id]?.s === "tried")) ?? null;
 }
+
+// DT330 (board DT330; Coach Milan 19 November 20:30): How to feedback that needs Coach Milan waits at the top of Clients and counts
+// in its badge: every Didn't work, and every I did it with a sad face (1 or 2) or with words. A plain good mark only counts in the
+// list. A row leaves when opened (seen on this phone), and comes back when that tester marks the same situation again.
+export const needsYou = (m: HowMark) => m.s === "didnt" || (m.s === "tried" && ((m.r ?? 5) <= 2 || !!m.note?.trim()));
+export type HowWaiting = { key: string; uid: string; name: string; id: string; m: HowMark };
+export const howtoWaiting = (testers: { uid: string; name: string; email: string; items: HowMarks }[], seen: Set<string>): HowWaiting[] =>
+  testers.flatMap((t) => Object.entries(t.items ?? {}).filter(([id, m]) => m && SITUATIONS.some((x) => x.id === id) && needsYou(m))
+    .map(([id, m]) => ({ key: `howto|${t.uid}|${id}|${m.at}`, uid: t.uid, name: (t.name || t.email || "").split(" ")[0], id, m })))
+    .filter((x) => !seen.has(x.key)).sort((a, b) => b.m.at.localeCompare(a.m.at));
