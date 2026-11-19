@@ -530,7 +530,7 @@
       "checked": true
     },
     "make.exploringAPhoto": {
-      "text": "Ich schaue mir das Foto nur an.",
+      "text": "Ein Foto, keine Mahlzeit gewählt.",
       "checked": true
     },
     "make.skip": {
@@ -1086,7 +1086,7 @@
       "checked": true
     },
     "make.exploringNothingIsSizedFor": {
-      "text": "Nur mal schauen: Nichts ist für eine Mahlzeit bemessen. Wähle eine Mahlzeit, um zu sehen, was dein Plan dafür vorsieht.",
+      "text": "Keine Mahlzeit gewählt: Nichts ist auf eine Mahlzeit bemessen. Wähle eine Mahlzeit, um zu sehen, was dein Plan dafür vorsieht.",
       "checked": true
     },
     "make.snackOffThePlanNot": {
@@ -12906,7 +12906,7 @@
       "checked": true
     },
     "photoask.exploring": {
-      "text": "Nur mal schauen",
+      "text": "Nicht meine Mahlzeit",
       "checked": true
     },
     "photoask.notYourMeal": {
@@ -13750,7 +13750,7 @@
       "checked": true
     },
     "plate.exploringLine": {
-      "text": "Nur mal schauen · nicht für eine Mahlzeit bemessen",
+      "text": "Keine Mahlzeit gewählt · nicht auf eine Mahlzeit bemessen",
       "checked": true
     },
     "plate.snackLine": {
@@ -14150,15 +14150,15 @@
       "checked": true
     },
     "plate.exploringStays": {
-      "text": "Nur mal schauen: {slot} bleibt, wie es war.",
+      "text": "Keine Mahlzeit gewählt: {slot} bleibt, wie es war.",
       "checked": true
     },
     "plate.exploring": {
-      "text": "Nur mal schauen",
+      "text": "Keine Mahlzeit gewählt",
       "checked": true
     },
     "plate.exploringLeaves": {
-      "text": "Nur mal schauen: {slot} bleibt, wie es war, und nichts wird eingetragen.",
+      "text": "Keine Mahlzeit gewählt: {slot} bleibt, wie es war, und nichts wird eingetragen.",
       "checked": true
     },
     "plate.targetForPlate": {
@@ -14170,11 +14170,11 @@
       "checked": true
     },
     "plate.photoLineIdea": {
-      "text": "Ich schaue mir das Foto nur an. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.|Ich schaue mir das Foto nur an. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.",
+      "text": "Ein Foto ohne gewählte Mahlzeit. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.|Ein Foto ohne gewählte Mahlzeit. {n} Lebensmittel gelesen, Mengen geschätzt (~). Nicht eingetragen: Es ist nicht deine Mahlzeit.",
       "checked": true
     },
     "plate.photoLine": {
-      "text": "Dein Foto, {time}. {n} Lebensmittel gelesen, Mengen geschätzt (~). Tippe auf eine Menge, um sie zu korrigieren.|Dein Foto, {time}. {n} Lebensmittel gelesen, Mengen geschätzt (~). Tippe auf eine Menge, um sie zu korrigieren.",
+      "text": "Dein Foto, {time}. {n} Lebensmittel gelesen, Mengen geschätzt (~).|Dein Foto, {time}. {n} Lebensmittel gelesen, Mengen geschätzt (~).",
       "checked": true
     },
     "plate.retake": {
@@ -14434,7 +14434,7 @@
       "checked": true
     },
     "plate.exploringSo": {
-      "text": "Nur mal schauen, also bleibt {slot}, wie es war.",
+      "text": "Keine Mahlzeit ist gewählt, also bleibt {slot}, wie es war.",
       "checked": true
     },
     "plate.fitItToMy": {
@@ -21602,7 +21602,7 @@
       "checked": true
     },
     "make.forExploringHead": {
-      "text": "Nur mal schauen:",
+      "text": "Keine Mahlzeit gewählt:",
       "checked": true
     },
     "make.forExploring": {
@@ -22350,7 +22350,7 @@
       "checked": true
     },
     "photoask.namesIt": {
-      "text": "Chef Mealan gibt den Namen",
+      "text": "Teller ohne Titel",
       "checked": true
     },
     "photoask.takenNow": {
@@ -22386,7 +22386,7 @@
       "checked": true
     },
     "plate.changeTheFoods": {
-      "text": "Lebensmittel ändern",
+      "text": "Weiter auf dem Teller",
       "checked": true
     },
     "plate.didYouEatIt": {
@@ -22598,7 +22598,7 @@
       "checked": true
     },
     "plate.mealNotSet": {
-      "text": "Mahlzeit und Tag nicht festgelegt",
+      "text": "Keine Mahlzeit gewählt",
       "checked": true
     },
     "plate.clearMeal": {
@@ -22799,6 +22799,94 @@
     },
     "cal.whichByPlate": {
       "text": "Welche Mahlzeit? Der Teller wurde begonnen: {day}, {time}:",
+      "checked": true
+    },
+    "plate.mealAndDay": {
+      "text": "Mahlzeit und Tag",
+      "checked": true
+    },
+    "plate.closeMealEdit": {
+      "text": "Schließen",
+      "checked": true
+    },
+    "cal.timeOf": {
+      "text": "Uhrzeit: {meal}",
+      "checked": true
+    },
+    "plate.photoTakenOn": {
+      "text": "Das Foto wurde aufgenommen: {day}, {time}.",
+      "checked": true
+    },
+    "plate.photoSavedOn": {
+      "text": "Das Foto wurde gespeichert: {day}, {time}. Wann es aufgenommen wurde, ist nicht bekannt.",
+      "checked": true
+    },
+    "plate.namedFromPhoto": {
+      "text": "Chef Mealan hat es nach deinem Foto benannt.",
+      "checked": true
+    },
+    "plate.estimate": {
+      "text": "Schätzung",
+      "checked": true
+    },
+    "plate.whichOneAria": {
+      "text": "Welches es ist",
+      "checked": true
+    },
+    "plate.whichOneIs": {
+      "text": "{food}: Welche Sorte ist es?",
+      "checked": true
+    },
+    "plate.yoursLow": {
+      "text": "eigene",
+      "checked": true
+    },
+    "plate.tagNew": {
+      "text": "neu",
+      "checked": true
+    },
+    "plate.tagChanged": {
+      "text": "geändert",
+      "checked": true
+    },
+    "plate.tellChefCheck": {
+      "text": "Sag Chef Mealan, was er prüfen soll",
+      "checked": true
+    },
+    "plate.tellAbout": {
+      "text": "Zu: {food}",
+      "checked": true
+    },
+    "plate.tellHint": {
+      "text": "Tippe oben auf ein Lebensmittel oder schreib, was fehlt.",
+      "checked": true
+    },
+    "plate.tellPlaceholder": {
+      "text": "Was es ist, was es nicht ist, was fehlt.",
+      "checked": true
+    },
+    "plate.sendToChef": {
+      "text": "An Chef Mealan senden",
+      "checked": true
+    },
+    "plate.didAdded": {
+      "text": "Ich habe hinzugefügt: {foods}.",
+      "checked": true
+    },
+    "plate.didChanged": {
+      "text": "Geändert: {from}, jetzt {to}.",
+      "checked": true
+    },
+    "plate.didRemoved": {
+      "text": "Ich habe entfernt: {foods}.",
+      "checked": true
+    },
+    "plate.didKept": {
+      "text": "Was du festgelegt hast, bleibt so.",
+      "checked": true
+    },
+    "plate.didSame": {
+      "text": "Ich sehe es genauso.",
       "checked": true
     }
   }

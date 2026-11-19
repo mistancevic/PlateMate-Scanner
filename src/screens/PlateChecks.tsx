@@ -7,6 +7,7 @@
 // A plain function the Plate screen and the read call while they draw; all state stays in the Plate screen.
 import type { Dispatch, SetStateAction } from "react";
 import { w } from "../words";
+import { getLang } from "../lang";
 import { foodOfRead } from "../mealPhoto";
 import { foodName, REFERENCE, referenceFood } from "../reference";
 import { basicOf } from "../foodId";
@@ -60,7 +61,7 @@ export function plateChecks(given: PlateChecksIn) {
       const got = keepIt ? { food: it.food, fresh: false } : foodOfRead({ name: o.name, grams: it.grams, low: it.est?.low ?? it.grams, high: it.est?.high ?? it.grams, calories: o.calories, protein: o.protein, fats: o.fats, carbs: o.carbs, fiber: o.fiber, confidence: "medium" }, state.foods, region, uid);
       const options = kindOptions(got.food, state.foods, region, uid);
       // which one follows only for a type whose kinds differ: at least two real foods of that kind
-      const one: WhichOne | null = options.length >= 2 ? { itemId: it.id, kind: o.name.split(",")[0].toLowerCase(), options } : null;
+      const one: WhichOne | null = options.length >= 2 ? { itemId: it.id, kind: foodName(got.food).split(",")[0], options } : null;
       setState((st) => unmark({ ...st, foods: got.fresh && !st.foods.some((f) => f.id === got.food.id) ? [...st.foods, got.food] : st.foods, items: st.items.map((x) => (x.id === it.id ? { ...x, food: got.food, checked: true } : x)), portion: null, photo: st.photo ? { ...st.photo, which: null, whichOne: one } : st.photo }));
       // members' foods of that kind join the answers when they arrive, after yours and before the basic foods
       void memberFoods(o.name.split(",")[0]).then((ms) => {
@@ -94,7 +95,7 @@ export function plateChecks(given: PlateChecksIn) {
     };
     return (
       <div className="mp-ask mp-which mp-which-one" role="group" aria-label={w("plate.whichOneAria")}>
-        <small><b>{w("plate.oneThingCannotTell")}</b> {w("plate.whichOneIs", { food: one.kind })}</small>
+        <small><b>{w("plate.oneThingCannotTell")}</b> {w("plate.whichOneIs", { food: getLang() === "en" ? one.kind.toLowerCase() : one.kind })}</small>
         <div className="button-row mp-which-opts">
           {one.options.map((o) => <button key={o.food.id} type="button" className={`choice${o.food.id === it.food.id ? " on" : ""}`} onClick={() => pick(o)}>{foodName(o.food)}{o.from === "yours" ? ` · ${w("plate.yoursLow")}` : ""}</button>)}
           <button type="button" className="pill pill-small pill-action" onClick={() => pick(null)}>{w("make.skip")}</button>

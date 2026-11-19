@@ -2006,7 +2006,7 @@ export default function App() {
         const told = x?.told && x.replace && read ? toldAgain(state.items, got.items, sameKind) : null;
         const items = told ? told.items : got.items;
         const did = told ? (() => { const list = (xs: string[]) => { try { return new (Intl as any).ListFormat(locOf(getLang()), { style: "long", type: "conjunction" }).format(xs); } catch { return xs.join(", "); } };
-          const nm = (i: { food: Food }) => foodName(i.food).split(",")[0].toLowerCase();
+          const nm = (i: { food: Food }) => { const n = foodName(i.food).split(",")[0]; return getLang() === "en" ? n.toLowerCase() : n; };
           const parts = [...told.changed.map((c) => w("plate.didChanged", { from: nm(c.from), to: foodName(c.to.food) })), ...(told.fresh.length ? [w("plate.didAdded", { foods: list(told.fresh.map(nm)) })] : []), ...(told.gone.length ? [w("plate.didRemoved", { foods: list(told.gone.map(nm)) })] : [])];
           return { line: [...(parts.length ? parts : [w("plate.didSame")]), ...(told.kept.length ? [w("plate.didKept")] : [])].join(" "), fresh: told.fresh.map((i) => i.id), changed: told.changed.map((c) => c.to.id) }; })() : null;
         const keptName = (n: string | undefined) => !!told && !!n && told.kept.some((k) => k.food.name.toLowerCase() === n.toLowerCase() || (k.readAs ?? "").toLowerCase() === n.toLowerCase());
