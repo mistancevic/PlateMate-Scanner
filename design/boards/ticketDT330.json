@@ -1,0 +1,91 @@
+{
+  "id": "DT330",
+  "title": "How to feedback that needs you waits at the top of Clients",
+  "epic": "coach",
+  "state": "next",
+  "board": "Stories269",
+  "where": "Page 5",
+  "why": "Coach Milan 19 November 20:26 to 20:30: can feedback from a beta tester trigger a notification, as Clients has for a check-in or a new beta tester application? Yes.",
+  "opportunity": {
+    "from": "Coach Milan, 19 November 2026, 20:26. DT329 (0.3.166) gave How to the faces and a line of your own; the feedback sits in How to: your testers, far down on Clients.",
+    "job": "As Coach Milan, see at once when a beta tester says a way did not work or went badly, so that I answer while it is fresh.",
+    "kind": "Missing: nothing tells me that new feedback came; I see it only if I scroll down to the testers.",
+    "why_now": "The beta round runs now, and 0.3.166 asks every tester how it went."
+  },
+  "problem": "A beta tester taps Didn't work, or gives a sad face with a line. It reaches the database, and it shows in How to: your testers, near the bottom of Clients. Nothing counts it and nothing points to it, unlike a beta application or a check-in, which wait at the top in Waiting for you and count in the badge on Clients.",
+  "story": "When a beta tester tells me a way did not work or went badly, I want it to wait for me at the top of Clients, so that I see it without looking for it.",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "It waits at the top",
+      "text": "Given a tester marked Didn't work on Scan a pack from any screen, when I open Clients, then Waiting for you has a row: the tester's first name and the situation, Didn't work, their line, How to and the day, after the beta applications."
+    },
+    {
+      "id": "AC2",
+      "title": "What counts",
+      "text": "Given the testers' marks, when Waiting for you is made, then every Didn't work has a row, and every I did it with face 1 or 2, or with words; I did it with face 3, 4 or 5 and no words has no row and counts only in How to: your testers."
+    },
+    {
+      "id": "AC3",
+      "title": "The face in the row",
+      "text": "Given a row for I did it, when I read it, then it shows the face in its colour, n of 5, and the line."
+    },
+    {
+      "id": "AC4",
+      "title": "It counts",
+      "text": "Given two rows of feedback and one beta application, when I look at Clients, then Waiting for you says the full count, and the badge on Clients counts them too."
+    },
+    {
+      "id": "AC5",
+      "title": "A tap opens the tester",
+      "text": "Given a row, when I tap it, then that tester's How to opens on its own, with every situation, the day, the face and their line, and ‹ Clients takes me back."
+    },
+    {
+      "id": "AC6",
+      "title": "Opened, it leaves",
+      "text": "Given I opened a row, when I am back on Clients, then that row is gone and the counts are one less; it comes back only when that tester marks the same situation again."
+    },
+    {
+      "id": "AC7",
+      "title": "Only for Coach Milan",
+      "text": "Given any other account, coaches and the coach demo included, when it opens Clients, then no row of How to feedback is there."
+    },
+    {
+      "id": "AC8",
+      "title": "In three languages",
+      "text": "Given the new lines, when the app is in Serbian or German, then each shows in that language."
+    }
+  ],
+  "unchanged": [
+    "How to: your testers, further down on Clients, as built in 0.3.166.",
+    "The beta applications first in Waiting for you, and every other row there.",
+    "What a tester sees in How to."
+  ],
+  "short": "How to feedback that needs Coach Milan waits at the top of Clients and counts in its badge",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "DT330: How to feedback that needs you waits at the top of Clients",
+  "text": [
+    [
+      "howto.waitFrom",
+      "A row in Waiting for you, its last line",
+      "",
+      "How to · {day}",
+      "Where it comes from, and when."
+    ],
+    [
+      "howto.backClients",
+      "The tester's How to, opened from a row",
+      "",
+      "‹ Clients",
+      "Back to where you came from."
+    ]
+  ],
+  "now": "Waiting for you holds beta applications and what clients sent; How to feedback sits only in How to: your testers, near the bottom of Clients, and counts nowhere.",
+  "proposed": "Feedback that needs you, every Didn't work and every sad face or line, is a row in Waiting for you after the applications, counted in its title and in the badge on Clients. A tap opens that tester's How to on its own; opened, the row leaves.",
+  "decision": "Open. Drawn for Coach Milan's Go.",
+  "details": [
+    "The pictures on this board are the real app in the coach demo: today's 0.3.166, and a scratch build of it with the rows, not committed. The testers Ana and Bo and their lines are made up.",
+    "A row is kept as seen on this phone, as the other rows of Waiting for you; a new mark on the same situation makes a new row.",
+    "No email or push to the phone: the app counts it, as it counts a beta application."
+  ]
+}
