@@ -2343,6 +2343,66 @@
       "epic": "plate",
       "state": "closed",
       "why": "From the check of 0.3.160, proposed to Coach Milan 19 November 07:50 as a part of the Served ticket. It does not fit the flow of DT323, so it has its own ticket. DT318 took the link Wrong foods? Help Chef Mealan read it off the Plate's screen, so words have one place, the read. A kept plate shows the Plate's screen, not the read, so the form for words opens only with one more photo behind + Photo. With DT323 the read comes before the plate is kept, and the field is there. Open: words for a plate that is already kept. Not drawn. Closed by Coach Milan, 19 November 09:08, like DT323: look again if beta testing shows a need. Nothing built."
+    },
+    {
+      "id": "DT327",
+      "title": "The home page videos and their lines show the app as it is today",
+      "epic": "home",
+      "state": "next",
+      "board": "Stories266",
+      "where": "Page 5",
+      "why": "Coach Milan 19 November 11:09: is it a good moment to update the home page and the videos? 14:23 to 14:26: all twelve videos on the build with DT307 and DT306, the home page text checked as its own step, on one board, then his Go. Recorded on 0.3.163 into a scratch folder; nothing on the home page is changed yet.",
+      "opportunity": {
+        "from": "Coach Milan, 19 November 2026, 11:09 and 14:26. A check on 0.3.163: eleven of the twelve videos were recorded on 1 November, the language video on 7 November.",
+        "job": "As a visitor of chefmealan.com, see what the app does before I join.",
+        "kind": "Looks broken: the videos and three lines show screens the app no longer has.",
+        "why_now": "0.3.163 closed the read of a photo (DT307, DT306), the screen the meal and plate videos end on."
+      },
+      "problem": "A visitor watches the videos on the home page and sees the app of 1 November. The photo of a meal goes from the camera straight to the plate, with Fit to my target. The cook video starts on step 1. The plate's line says eat one portion or add a protein side. Then the visitor joins, takes a photo, and gets a photo screen, a read, and What do you do with it?. What they saw is not what they get.",
+      "story": "When I watch the app on the home page, I want it to show the app I will get, so that what I try matches what I saw.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "Every video is of today's app",
+          "text": "Given the home page, when any of its twelve videos plays, then it shows the app as built in the release it ships in, and no screen older than 0.3.163."
+        },
+        {
+          "id": "AC2",
+          "title": "A photo of your meal",
+          "text": "Given the video A photo of your meal, when it plays, then it shows the camera, Use this photo, the photo screen with Read the plate, and the read with the foods named."
+        },
+        {
+          "id": "AC3",
+          "title": "Cook it, hands free",
+          "text": "Given the cook video, when it plays, then one tap turns the voice on, and words alone tick the five foods of Get it ready, go to step 1 and start its 6 minute timer."
+        },
+        {
+          "id": "AC4",
+          "title": "The rules of the videos",
+          "text": "Given the videos are recorded, when the recording ends, then every rule HC1 to HC13 has passed, and a rule that fails replaces no video."
+        },
+        {
+          "id": "AC5",
+          "title": "Then you decide",
+          "text": "Given the plate section of the home page, when I read Then you decide, then it says save it, plan it, or log what you ate of it, all of it or a part, or let Chef Mealan fit it to your target."
+        },
+        {
+          "id": "AC6",
+          "title": "The cook lines",
+          "text": "Given the cook section of the home page, when I read its first line and the video's name, then they say the foods come first and the steps after them, one at a time."
+        },
+        {
+          "id": "AC7",
+          "title": "In three languages",
+          "text": "Given the three changed lines, when the home page is in Serbian or German, then each shows in that language."
+        }
+      ],
+      "unchanged": [
+        "The home page's sections, their order, and every other line.",
+        "Where each video sits, its file name, its poster, and its loop with the fades.",
+        "The rules of the videos, HC1 to HC13 in docs/rules/home-clips.md.",
+        "Test data only: the made-up packs and names."
+      ]
     }
   ]
 }

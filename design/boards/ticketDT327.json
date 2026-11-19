@@ -1,0 +1,95 @@
+{
+ "id": "DT327",
+ "title": "The home page videos and their lines show the app as it is today",
+ "epic": "home",
+ "state": "next",
+ "board": "Stories266",
+ "where": "Page 5",
+ "why": "Coach Milan 19 November 11:09: is it a good moment to update the home page and the videos? 14:23 to 14:26: all twelve videos on the build with DT307 and DT306, the home page text checked as its own step, on one board, then his Go. Recorded on 0.3.163 into a scratch folder; nothing on the home page is changed yet.",
+ "opportunity": {
+  "from": "Coach Milan, 19 November 2026, 11:09 and 14:26. A check on 0.3.163: eleven of the twelve videos were recorded on 1 November, the language video on 7 November.",
+  "job": "As a visitor of chefmealan.com, see what the app does before I join.",
+  "kind": "Looks broken: the videos and three lines show screens the app no longer has.",
+  "why_now": "0.3.163 closed the read of a photo (DT307, DT306), the screen the meal and plate videos end on."
+ },
+ "problem": "A visitor watches the videos on the home page and sees the app of 1 November. The photo of a meal goes from the camera straight to the plate, with Fit to my target. The cook video starts on step 1. The plate's line says eat one portion or add a protein side. Then the visitor joins, takes a photo, and gets a photo screen, a read, and What do you do with it?. What they saw is not what they get.",
+ "story": "When I watch the app on the home page, I want it to show the app I will get, so that what I try matches what I saw.",
+ "ac": [
+  {
+   "id": "AC1",
+   "title": "Every video is of today's app",
+   "text": "Given the home page, when any of its twelve videos plays, then it shows the app as built in the release it ships in, and no screen older than 0.3.163."
+  },
+  {
+   "id": "AC2",
+   "title": "A photo of your meal",
+   "text": "Given the video A photo of your meal, when it plays, then it shows the camera, Use this photo, the photo screen with Read the plate, and the read with the foods named."
+  },
+  {
+   "id": "AC3",
+   "title": "Cook it, hands free",
+   "text": "Given the cook video, when it plays, then one tap turns the voice on, and words alone tick the five foods of Get it ready, go to step 1 and start its 6 minute timer."
+  },
+  {
+   "id": "AC4",
+   "title": "The rules of the videos",
+   "text": "Given the videos are recorded, when the recording ends, then every rule HC1 to HC13 has passed, and a rule that fails replaces no video."
+  },
+  {
+   "id": "AC5",
+   "title": "Then you decide",
+   "text": "Given the plate section of the home page, when I read Then you decide, then it says save it, plan it, or log what you ate of it, all of it or a part, or let Chef Mealan fit it to your target."
+  },
+  {
+   "id": "AC6",
+   "title": "The cook lines",
+   "text": "Given the cook section of the home page, when I read its first line and the video's name, then they say the foods come first and the steps after them, one at a time."
+  },
+  {
+   "id": "AC7",
+   "title": "In three languages",
+   "text": "Given the three changed lines, when the home page is in Serbian or German, then each shows in that language."
+  }
+ ],
+ "unchanged": [
+  "The home page's sections, their order, and every other line.",
+  "Where each video sits, its file name, its poster, and its loop with the fades.",
+  "The rules of the videos, HC1 to HC13 in docs/rules/home-clips.md.",
+  "Test data only: the made-up packs and names."
+ ],
+ "short": "The twelve home page videos recorded on 0.3.163, and three lines that no longer match the app",
+ "rel": "Proposed; not agreed until Coach Milan says Go",
+ "boardTitle": "DT327: the home page videos and their lines show the app as it is today",
+ "text": [
+  [
+   "home.decideText",
+   "One plate, under PD and the letters",
+   "Then you decide: eat it, eat one portion, add a protein side, or let Chef Mealan fit it to your target.",
+   "Then you decide: save it, plan it, or log what you ate of it, all of it or a part. Or let Chef Mealan fit it to your target.",
+   "Since 0.3.157 a plate ends with What do you do with it? Save it, Plan it, Ate it; Did you eat it? asks All of it, Half or Part of it. Add a food left Chef Mealan's card in 0.3.163 (DT306)."
+  ],
+  [
+   "home.cook1",
+   "Cook it, hands free, first line",
+   "One big step at a time, read aloud.",
+   "First the foods you need, then one step at a time, read aloud.",
+   "Since 0.3.104 a cook from the start opens on Get it ready, the foods one at a time (DT251)."
+  ],
+  [
+   "home.videoCook",
+   "Cook it, hands free, the video's name",
+   "Cook mode: one step at a time, read aloud",
+   "Cook mode: the foods first, then one step at a time, read aloud",
+   "The new video shows Get it ready, then step 1."
+  ]
+ ],
+ "now": "Eleven videos from 1 November and the language video from 7 November. Three lines describe the plate and cook mode as they were then.",
+ "proposed": "All twelve videos recorded again on 0.3.163 by the recording script, which checks its rules on every video. The script follows the app where its flows changed: the camera opens with Photo or scan, a photo waits on the photo screen and is read there, a cook starts with Get it ready. Three lines get new words, in English, Serbian and German. Nothing else on the page changes.",
+ "decision": "Open. Coach Milan 19 November 14:26: yes, draw it this way. No Go yet: nothing on the home page is changed.",
+ "details": [
+  "Recorded with scripts/record-home-clips.cjs on 0.3.163, every rule HC1 to HC13 passed. With the Go the files go into public/landing in the release.",
+  "Four changes to the script, none to the app: the camera button of the empty Plate, the meal video through the photo screen to the read, the cook video through Get it ready, and the stand-in voice ends its sentences as a phone does.",
+  "The stills on this board are taken from the videos: one early, one in the middle, the last settled screen.",
+  "Words only for the lines: English, Serbian, German."
+ ]
+}
