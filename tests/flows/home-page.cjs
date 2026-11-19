@@ -4,6 +4,7 @@
 // Get a coach code; two more trust lines; the beta form and the waiting list, separate; at 0 spots the waiting list comes first.
 // HP5 1d (0.3.46): the first screen is the photo carousel with the button on it; the calculator under it.
 // Local runs have no sign-in, so ?home shows the home page.
+// Changed by story DT328 (0.3.165, board DT328; Coach Milan, Go 19 November 17:16): Start from anything shows four ways in again
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path");
@@ -47,7 +48,8 @@ const PORT = "3319", U = `http://127.0.0.1:${PORT}`;
     ok((await page.locator(".l-photo-pic.on").getAttribute("data-photo")) === "waffle", "the carousel moves on by itself");
     // two ways in; the new sections
     const ways = await page.locator(".l-ways-grid .l-way h3").allTextContents();
-    ok(ways.join("|") === "A barcode or a label|A photo of your meal", "two ways in: " + ways.join(", "));
+    // Changed by story DT328 (0.3.165): four ways in again
+    ok(ways.join("|") === "A barcode|A label|A few packs at once|A photo of your meal", "four ways in: " + ways.join(", "));
     const h2 = await page.locator(".landing h2").allTextContents();
     for (const h of ["Cook it, hands free", "Your day as it really goes", "Know why, not only what", "Coach your clients' real days", "Join the beta, free", "The waiting list"]) ok(h2.includes(h), "the section: " + h);
     const vids = await page.locator(".landing video source[type='video/mp4']").evaluateAll((s) => s.map((x) => x.getAttribute("src")));
