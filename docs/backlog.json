@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.162",
     "0.3.161",
     "0.3.160",
     "0.3.159",
@@ -66,8 +67,7 @@
     "0.3.141",
     "0.3.140",
     "0.3.139",
-    "0.3.138",
-    "0.3.137"
+    "0.3.138"
   ],
   "tickets": [
     {
@@ -2259,8 +2259,8 @@
       "id": "DT324",
       "title": "The Plate's screen of a photo: the line under the title says what the read says",
       "epic": "plate",
-      "state": "next",
-      "why": "From the check of 0.3.160. Coach Milan 19 November 09:08: the same line as on the read. Board DT324 drawn 19 November; the build waits for his Go on the board.",
+      "state": "done",
+      "why": "From the check of 0.3.160. Coach Milan 19 November 09:08: the same line as on the read. Board DT324 drawn 19 November; the build waits for his Go on the board. Go 19 November 09:48. Built in 0.3.162: the line of the read, while the plate has Chef Mealan's name; the old line gone from the three files; walkthrough plate-lines.",
       "board": "Stories264",
       "where": "Page 5",
       "opportunity": {
@@ -2292,14 +2292,15 @@
         "The read and its line.",
         "Everything else on the Plate's screen of a photo: the meal line, the photo and its chips, the food list, What do you do with it?, Chef Mealan's card.",
         "A kept plate (Served) and a plate without a photo."
-      ]
+      ],
+      "version": "0.3.162"
     },
     {
       "id": "DT325",
       "title": "A plate from an earlier day: the help line says only what is always true",
       "epic": "plate",
-      "state": "next",
-      "why": "From the check of 0.3.160. Coach Milan 19 November 09:08: the record stays, and the line says only Ate it asks which meal, and saves it there. Board DT325 drawn 19 November; the build waits for his Go on the board.",
+      "state": "done",
+      "why": "From the check of 0.3.160. Coach Milan 19 November 09:08: the record stays, and the line says only Ate it asks which meal, and saves it there. Board DT325 drawn 19 November; the build waits for his Go on the board. Go 19 November 09:48. Built in 0.3.162: both help lines in three languages; the record unchanged; walkthrough plate-lines.",
       "board": "Stories265",
       "where": "Page 5",
       "opportunity": {
@@ -2330,7 +2331,8 @@
       "unchanged": [
         "The record: a meal on the plate's own day keeps the time the plate was started; a meal on another day takes that meal's time.",
         "The buttons, the calendar under Ate it (DT314), and the question before cooking (DT317)."
-      ]
+      ],
+      "version": "0.3.162"
     },
     {
       "id": "DT326",
