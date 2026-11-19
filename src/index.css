@@ -3521,7 +3521,7 @@ section.photo-screen .pa-screen { border: 0; border-radius: 0; margin: 0; paddin
 .plan-line.meal-line .meal-line-text { cursor: pointer; }
 .pcal-ref { margin: 0 0 10px; font-size: var(--fs-body); font-weight: 700; color: var(--ink); }
 .pcal-row-set { cursor: default; }
-.pcal-time { flex: none; min-height: 40px; padding: 0 10px; border: 1.5px solid var(--blue, #2a72d9); border-radius: 12px; background: #fff; font: inherit; font-weight: 700; color: var(--ink); }
+.pcal-time { flex: none; width: auto; max-width: 150px; min-height: 40px; padding: 0 10px; border: 1.5px solid var(--blue, #2a72d9); border-radius: 12px; background: #fff; font: inherit; font-weight: 700; color: var(--ink); }
 .meal-line-looking { font-size: var(--fs-card); line-height: 1.3; font-weight: 700; color: var(--ink); }
 .meal-line-meal { font-size: var(--fs-section); line-height: 1.3; font-weight: 900; color: var(--ink); }
 .meal-line-day { font-size: var(--fs-body); line-height: 1.4; font-weight: 600; color: var(--ink); }
@@ -3571,3 +3571,20 @@ section.photo-screen .pa-screen { border: 0; border-radius: 0; margin: 0; paddin
 .old-plate-acts { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
 .old-plate-open { min-height: 44px; padding: 0 4px; margin-left: -4px; font-size: var(--fs-label); font-weight: 700; background: none; border: 0; cursor: pointer; }
 .old-plate-undo.pill.pill-small { flex: none; height: 44px; min-height: 44px; padding: 0 18px; }
+
+/* DT318 (0.3.160, board DT318): on the read a chip can be marked, a chip says new, changed or estimate, and one field takes
+   the words for Chef Mealan, with the microphone inside it */
+.read-view .mp-tag { cursor: pointer; text-align: left; white-space: normal; }
+.read-view .mp-tag.on { background: var(--tint); box-shadow: inset 0 0 0 1.5px var(--blue, #2a72d9); }
+.mp-tag-note { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 8px; font-size: 11px; font-weight: 700; color: #1d7a4f; background: #e2f5ea; }
+.rv-tell { margin: 10px 0 4px; padding: 10px; border: 1.5px solid var(--line); border-radius: 14px; text-align: left; }
+.rv-tell > b { display: block; font-size: var(--fs-label); }
+.rv-tell > small { display: block; margin: 4px 0 0; }
+.rv-tell-about { color: var(--blue-ink, #1d4fa3); font-weight: 700; }
+.rv-tell-field { position: relative; margin: 6px 0; }
+.rv-tell-words { width: 100%; box-sizing: border-box; min-height: 44px; padding-right: 48px; }
+.rv-tell-mic { position: absolute; right: 4px; top: 4px; width: 40px; height: 40px; display: grid; place-items: center; border: 0; background: none; border-radius: 10px; color: var(--ink); cursor: pointer; }
+.rv-tell-mic.on { background: var(--tint); }
+.rv-tell-go { display: flex; justify-content: flex-end; }
+.rv-did { margin: 10px 0 0; }
+.read-view .mp-ask { margin: 10px 0; }

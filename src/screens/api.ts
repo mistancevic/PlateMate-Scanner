@@ -40,7 +40,7 @@ export interface AppApi {
   peekBarcode: (code: string) => Promise<DbProduct | null>;
   // DT115 (0.2.97): the members' catalogue
   lookAtPhoto: (image: string) => Promise<{ vessel: import("../mealPhoto").Vessel; course: import("../served").Dish } | null>;
-  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: import("../served").Dish; title?: string }) => Promise<boolean>;
+  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: import("../served").Dish; title?: string; told?: boolean }) => Promise<boolean>;
   // DT268 (0.3.118): Served plates
   keepServed: (next: import("../served").Served) => void;
   servedPatch: (id: string, patch: Partial<Pick<import("../served").Served, "name" | "dish" | "mine">>) => void;

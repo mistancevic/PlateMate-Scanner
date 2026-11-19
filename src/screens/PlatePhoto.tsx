@@ -4,7 +4,7 @@
 // screen calls while it draws; the photo, its title and every effect stay in the Plate screen and are handed in.
 // PhotoSaid and HelpRead were components of their own before the move and are the same components here.
 import { useState, useEffect } from "react";
-import { TriangleAlert } from "lucide-react";
+import { TriangleAlert, Mic } from "lucide-react";
 import { w, mealV } from "../words";
 import { getLang, speechLang } from "../lang";
 import { holdsMore } from "../mealPhoto";
@@ -71,7 +71,9 @@ export function HelpRead({ photo, read, incoming, meal }: { photo: NonNullable<i
   useEffect(() => { if (incoming) { setOpen(true); add(incoming.file); } }, [incoming?.at]); // eslint-disable-line react-hooks/exhaustive-deps
   const n = 1 + more.length, words = note.trim();
   const label = n > 1 ? w(words ? "make.readAgainPhotosThis" : "make.readAgainPhotos", { n }) : w(words ? "make.readAgainThis" : "make.readAgain");
-  if (!open) return <button type="button" className="link mp-again-link" onClick={() => setOpen(true)}>{w("make.wrongFoodsHelpChefMealan")}</button>;
+  // DT318 (0.3.160, board DT318): words for Chef Mealan have one place, the field on the read. This form opens only with
+  // one more photo of the same plate (＋ Photo); the link Wrong foods? Help Chef Mealan read it is gone.
+  if (!open) return null;
   return (
     <section className="mp-help" aria-label={w("make.helpChefMealanReadIt")}>
       <b>{w("make.helpChefMealanReadIt")}</b>
@@ -87,6 +89,28 @@ export function HelpRead({ photo, read, incoming, meal }: { photo: NonNullable<i
         {S && <button type="button" className="pill pill-small" aria-pressed={hearing} onClick={listen}>{hearing ? w("make.listening") : w("make.sayIt")}</button>}
       </div>
       <small className="muted">{w("make.thePhotosAndYourWords")}</small>
+    </section>
+  );
+}
+
+// DT318 (0.3.160, board DT318; Coach Milan 18 and 19 November): on the read, one field for what Chef Mealan could not see.
+// A tap on a chip first makes the words about that food; with none marked the field takes a missing food. Typed or said:
+// the microphone is inside the field. Send to Chef Mealan makes him look again with these words.
+export function TellChef({ about, send }: { about: string | null; send: (words: string) => void }) {
+  const [note, setNote] = useState("");
+  const [hearing, setHearing] = useState(false);
+  const S = typeof window !== "undefined" ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
+  const listen = () => { if (!S || hearing) return; try { const r = new S(); r.lang = speechLang(getLang()); r.interimResults = false; r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript ?? "").trim(); if (t) setNote((n) => (n ? `${n} ${t}` : t).slice(0, 300)); }; r.onend = () => setHearing(false); r.onerror = () => setHearing(false); setHearing(true); r.start(); } catch { setHearing(false); } };
+  const words = note.trim();
+  return (
+    <section className="rv-tell" aria-label={w("plate.tellChefCheck")}>
+      <b>{w("plate.tellChefCheck")}</b>
+      {about ? <small className="rv-tell-about">{w("plate.tellAbout", { food: about })}</small> : <small className="muted rv-tell-hint">{w("plate.tellHint")}</small>}
+      <div className="rv-tell-field">
+        <textarea className="search pa-words rv-tell-words" rows={2} value={note} maxLength={300} aria-label={w("plate.tellChefCheck")} placeholder={w("plate.tellPlaceholder")} onChange={(e) => setNote(e.target.value)} />
+        {S && <button type="button" className={`icon rv-tell-mic${hearing ? " on" : ""}`} aria-label={hearing ? w("make.listening") : w("make.sayIt")} aria-pressed={hearing} onClick={listen}><Mic size={20} /></button>}
+      </div>
+      <div className="rv-tell-go"><button type="button" className="pill pill-small rv-tell-send" disabled={!words} onClick={() => { send(words); setNote(""); }}>{w("plate.sendToChef")}</button></div>
     </section>
   );
 }

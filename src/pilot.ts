@@ -84,6 +84,10 @@ export type Ingredient = {
   keep?: boolean;
   // DT204 (0.3.47): read from a photo of the meal, a part of the dish on it: no portion line under it
   fromPhoto?: boolean;
+  // DT318 (0.3.160): what the food is was settled by an answer to one of Chef Mealan's checks: it stays when he looks again
+  checked?: boolean;
+  // DT318: the name the read gave this food, kept when an answer to a check changes the food
+  readAs?: string;
   id: string;
   food: Food;
   grams: number;
@@ -306,6 +310,9 @@ export type PilotState = {
     atSaved?: true;
     // B150: the name Chef Mealan gave the plate from this photo; while the title is still that name, the line under it says so
     namedAs?: string;
+    // DT318 (0.3.160): the check which one (real foods of the kind just settled), and what Chef Mealan did when asked again:
+    // his one line, and the foods he added or changed, marked on their chips until the next tap
+    whichOne?: import("./screens/PlateChecks").WhichOne | null; did?: { line: string; fresh: string[]; changed: string[] };
     // DT305 (0.3.151, boards Stories230 and Stories231): a photo just read shows as the read alone, until Done or Change the
     // foods; saved holds the recipe Save in My recipes made from it
     view?: "read"; saved?: string;

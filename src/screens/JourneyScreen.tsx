@@ -91,6 +91,7 @@ import { type CookUi, type Later, stripWords, resumeLine, cookStarted, plateSinc
 import { ChefLine } from "../components/ChefLine";
 import { PhotoPick } from "../components/PhotoPick";
 import { CookStrip } from "../components/CookStrip";
+import { plateChecks } from "./PlateChecks";
 import { plateMealLine, type MealSet } from "./PlateMealLine";
 import { plateRead } from "./PlateRead";
 import { platePhotoWaits, platePhotoCard, PhotoSaid, HelpRead } from "./PlatePhoto";
@@ -1849,7 +1850,7 @@ export function JourneyScreen(p: AppApi) {
   // coming day, Is it for the plan? Under everything the two buttons of the read: Save in My recipes, Done. Done carries out
   // what is chosen; nothing chosen, nothing is kept.
   // the read of a meal photo (0.3.156: in PlateRead.tsx); its state stays here and is handed in
-  const readCard = readView ? plateRead({ endEl, unset, autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem }) : null;
+  const readCard = readView ? plateRead({ checksEl: plateChecks({ items, memberFoods: p.memberFoods, region: p.region, setState, state, uid, updateItem }), endEl, unset, autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem }) : null;
   if (step === "in" && inQuestion) return (<>{ownHead ? null : inHead}{!p.cookOpenAsk && <CookStrip p={p} />}{inQuestion}</>);
   if (step === "in")
     return (
@@ -1964,39 +1965,8 @@ export function JourneyScreen(p: AppApi) {
         {state.photo && p.ai.on && !state.photo.image.startsWith("pf:") && <PhotoSaid photo={state.photo} meal={state.photo.who !== "idea" && mealSlot ? mealSlot.name : null} />}
         {state.photo && p.ai.on && !state.photo.image.startsWith("pf:") && <HelpRead key={state.photo.at + state.photo.image.length} photo={state.photo} incoming={morePhoto} meal={state.photo.who !== "idea" && mealSlot ? mealSlot.name : null}
           read={(more, note, pot) => { const ph = state.photo!; void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true, more, note, ...pot }); }} />}
-        {/* DT228 v2: a food whose kind the read could not tell: Chef Mealan asks once; a tap changes the food, its grams stay */}
-        {state.photo?.which && items.some((i) => i.food.name.toLowerCase() === state.photo!.which!.name.toLowerCase()) && (() => {
-          const wh = state.photo!.which!, it = items.find((i) => i.food.name.toLowerCase() === wh.name.toLowerCase())!;
-          const pick = (o: typeof wh.options[number] | null) => {
-            if (!o || o.name.toLowerCase() === it.food.name.toLowerCase()) { setState((st) => ({ ...st, photo: st.photo ? { ...st.photo, which: null } : st.photo })); return; }
-            const { food, fresh } = foodOfRead({ name: o.name, grams: it.grams, low: it.est?.low ?? it.grams, high: it.est?.high ?? it.grams, calories: o.calories, protein: o.protein, fats: o.fats, carbs: o.carbs, fiber: o.fiber, confidence: "medium" }, state.foods, p.region, uid);
-            setState((st) => ({ ...st, foods: fresh && !st.foods.some((f) => f.id === food.id) ? [...st.foods, food] : st.foods, items: st.items.map((x) => (x.id === it.id ? { ...x, food } : x)), portion: null, photo: st.photo ? { ...st.photo, which: null } : st.photo }));
-          };
-          return (
-            <div className="mp-ask mp-which" role="group" aria-label={w("make.oneThingTheReadCannot")}>
-              <small><b>{w("plate.oneThingCannotTell")}</b> {wh.question}</small>
-              <div className="button-row mp-which-opts">
-                {wh.options.map((o) => <button key={o.name} type="button" className={`choice${o.name.toLowerCase() === it.food.name.toLowerCase() ? " on" : ""}`} onClick={() => pick(o)}>{o.name.split(",")[0]}</button>)}
-                <button type="button" className="pill pill-small pill-action" onClick={() => pick(null)}>{w("make.skip")}</button>
-              </div>
-              <small className="muted">{w("make.aTapChangesTheFood")}</small>
-            </div>
-          );
-        })()}
-        {state.photo?.unsure && items.some((i) => i.food.name.toLowerCase() === state.photo!.unsure!.name.toLowerCase() && i.est) && (() => {
-          const u = state.photo!.unsure!, it = items.find((i) => i.food.name.toLowerCase() === u.name.toLowerCase())!;
-          const pick = (g: number | null) => { if (g !== null) updateItem(it.id, { grams: g, est: undefined }); setState((st) => ({ ...st, photo: st.photo ? { ...st.photo, unsure: null } : st.photo })); };
-          return (
-            <div className="mp-ask" role="group" aria-label={w("make.oneThingTheReadIs")}>
-              <small><b>{w("plate.oneThingCannotTell")}</b> {w("plate.isTheAbout", { food: it.food.name.split(",")[0].toLowerCase(), a: u.options[0], b: u.options[1] })}</small>
-              <div className="button-row">
-                <button type="button" className="choice" onClick={() => pick(u.options[0])}>~{u.options[0]} g</button>
-                <button type="button" className="choice" onClick={() => pick(u.options[1])}>~{u.options[1]} g</button>
-                <button type="button" className="pill pill-small pill-action" onClick={() => pick(null)}>{w("make.skip")}</button>
-              </div>
-            </div>
-          );
-        })()}
+        {/* DT318 (0.3.160): Chef Mealan's checks (how much, what it is, which one), shared with the read: PlateChecks.tsx */}
+        {plateChecks({ items, memberFoods: p.memberFoods, region: p.region, setState, state, uid, updateItem })}
         {/* DT308 (0.3.154): the empty plate has no heading; the small plate with its line says what the page is */}
         {(items.length > 0 || !!state.photo) && <div className="card-top"><span>{w("plate.onThePlate")}</span>{/* DT219 (0.3.58): Empty plate whenever the Plate has foods or a photo. DT311 (0.3.157, board Stories246): with foods it stands in the row above them; the card's top says only On your plate */}{items.length === 0 && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> {w("plate.empty")}</>} confirmLabel={w("plate.emptyConfirm")} onConfirm={emptyPlate} />}</div>}
         {/* DT176 (0.3.19, board Stories124): Travel mode on: the Plate says where it serves you, and what the kitchen there allows */}
