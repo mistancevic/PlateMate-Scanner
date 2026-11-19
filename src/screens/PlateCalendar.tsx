@@ -25,9 +25,13 @@ export type PlateCalIn = {
   onPick: (date: string, row: CalRow) => void;
   // one question under a row (a meal that already holds something)
   under?: { id: string | null; node: ReactNode } | null;
-  // behind the pencil only (board DT308, frames DT308.1 b and c; Coach Milan 18 November): the last row, Just looking,
-  // nothing is counted. It does what Just looking did in 0.3.156: nothing is sized or counted, a photo's plate is kept as Served
+  // behind the pencil only: the last row, No meal selected. B150 (0.3.160, board B150): it is marked while no meal is set,
+  // and a tap takes the meal off again (it took the place of the row Just looking and of the X that removed the meal)
   looking?: { on: boolean; tap: () => void };
+  // B150: one line above the days, a reference that cannot be changed: when the photo was taken, or saved
+  refLine?: string;
+  // B150: the time of the marked meal is a field: the meal's time in the calendar, for this meal on this day
+  timeEdit?: (date: string, id: string, time: string) => void;
 };
 const dayLabel = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString(locOf(getLang()), { weekday: "short", day: "numeric" }).replace(",", "");
 export const calStateText = (r: CalRow): string => {
@@ -37,13 +41,14 @@ export const calStateText = (r: CalRow): string => {
 };
 
 export function plateCal(given: PlateCalIn) {
-  const { mode, day, setDay, more, setMore, now, today, infoOf, marked, photoAt, title, only, onPick, under, looking } = given;
+  const { mode, day, setDay, more, setMore, now, today, infoOf, marked, photoAt, title, only, onPick, under, looking, refLine, timeEdit } = given;
   const days = calDays(today, day), info = infoOf(day);
   const rows = calRows({ date: day, now, slots: info.slots, eaten: info.eaten, planned: info.planned, mode, photoAt });
   const dayOff = (d: string) => (only ? d !== only : mode === "ate" ? d > today : mode === "plan" ? d < today : false);
   return (
     <div className={`pcal pcal-${mode}`}>
       {title && <b className="pcal-q">{title}</b>}
+      {refLine && <p className="pcal-ref">{refLine}</p>}
       <div className="pcal-days" role="tablist" aria-label={w("cal.days")}>
         {days.map((d) => <button key={d} type="button" role="tab" className={`pcal-day${d === day ? " on" : ""}`} aria-selected={d === day} disabled={dayOff(d)} onClick={() => { setDay(d); setMore(false); }}>{d === today ? w("cal.dayToday", { day: dayLabel(d) }) : dayLabel(d)}</button>)}
         <button type="button" className={`pcal-day pcal-more${more ? " on" : ""}`} aria-pressed={more} disabled={!!only} onClick={() => setMore(!more)}>{w("cal.more")}</button>
@@ -53,12 +58,17 @@ export function plateCal(given: PlateCalIn) {
       <div className="pcal-rows" role="group" aria-label={w("cal.meals")}>
         {rows.map((r) => { const on = !!marked && marked.date === day && marked.id === r.id; return (
           <Fragment key={r.id ?? "snack-off"}>
-            <button type="button" className={`pcal-row${on ? " on" : ""}${r.state === "eaten" ? " done" : ""}`} aria-pressed={on} disabled={r.off} onClick={() => onPick(day, r)}>
+            {on && timeEdit && r.id && r.time
+              ? <div className={`pcal-row pcal-row-set on${r.state === "eaten" ? " done" : ""}`}>
+                  <b><span aria-hidden="true">✓ </span>{mealName(r.name)}</b>
+                  <input className="pcal-time" type="time" aria-label={w("cal.timeOf", { meal: mealName(r.name) })} value={r.time} onChange={(e) => { const v = e.target.value; if (/^\d{2}:\d{2}$/.test(v)) timeEdit(day, r.id!, v); }} />
+                </div>
+              : <button type="button" className={`pcal-row${on ? " on" : ""}${r.state === "eaten" ? " done" : ""}`} aria-pressed={on} disabled={r.off} onClick={() => onPick(day, r)}>
               <b>{on && <span aria-hidden="true">✓ </span>}{mealName(r.name)}</b><span>{calStateText(r)}</span>
-            </button>
+            </button>}
             {under && under.id === r.id && under.node}
           </Fragment>); })}
-        {looking && <button type="button" className={`pcal-row pcal-looking${looking.on ? " on" : ""}`} aria-pressed={looking.on} onClick={looking.tap}><b>{looking.on && <span aria-hidden="true">✓ </span>}{w("plate.exploring")}</b><span>{w("cal.nothingCounted")}</span></button>}
+        {looking && <button type="button" className={`pcal-row pcal-looking${looking.on ? " on" : ""}`} aria-pressed={looking.on} onClick={looking.tap}><b>{looking.on && <span aria-hidden="true">✓ </span>}{w("plate.mealNotSet")}</b><span></span></button>}
       </div>
     </div>
   );

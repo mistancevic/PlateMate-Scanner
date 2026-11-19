@@ -5,7 +5,7 @@ import { ServedOnPlate } from "../components/Served";
 import { locOf, getLang, useLang } from "../lang";
 import { shownMeal } from "../recipeLang";
 import type { PlateIn } from "../chefScript";
-import { plateWhenOf, capFirst, atMeal } from "../plateMode";
+import { plateWhenOf, capFirst, atMeal, mealAt } from "../plateMode";
 import { say } from "../chefScript";
 import { ThinkingCard } from "../components/ThinkingCard";
 import { carriedLists } from "../carry";
@@ -65,7 +65,7 @@ import { sameFoods as sameRecipeFoods, diffLine as recipeDiffLine, newNameFor } 
 import { dishesOf, dishNums, mealBar, roomFor, courseOf } from "../dishes";
 import { mealShare, mealNow, routeOf, solveMeal, closedSlots, unloggedMeal, mealRange, type Add } from "../makeMeal";
 import { answersFor, setAnswer } from "../unlogged";
-import { slotsOn, slotAt, windowOf, toMin, type Slot } from "../slots";
+import { slotsOn, slotsOf, withTimeOn, slotAt, windowOf, toMin, type Slot } from "../slots";
 import { lifestyleOf } from "../personal";
 import { dayRecord } from "../record";
 import { dayLog } from "../today";
@@ -91,6 +91,7 @@ import { type CookUi, type Later, stripWords, resumeLine, cookStarted, plateSinc
 import { ChefLine } from "../components/ChefLine";
 import { PhotoPick } from "../components/PhotoPick";
 import { CookStrip } from "../components/CookStrip";
+import { plateChecks } from "./PlateChecks";
 import { plateMealLine, type MealSet } from "./PlateMealLine";
 import { plateRead } from "./PlateRead";
 import { platePhotoWaits, platePhotoCard, PhotoSaid, HelpRead } from "./PlatePhoto";
@@ -696,7 +697,7 @@ export function JourneyScreen(p: AppApi) {
   const mealSet: MealSet | null = p.filling ? { name: p.filling.name, date: p.filling.date, time: p.filling.time, plan: plateWhen === "plan" }
     : pickSlot ? { name: pickSlot.name, date: todayKey, time: pickSlot.time }
     : p.pick === "snack" ? { name: "Snack", date: todayKey, time: null }
-    : photoPick ? { name: photoMeal?.slot.name ?? "Snack", date: photoPick.date, time: state.photo ? hhmm(new Date(state.photo.at)) : null } : null;
+    : photoPick ? { name: photoMeal?.slot.name ?? "Snack", date: photoPick.date, time: photoMeal?.slot.time ?? null } : null;
   // what the calendar needs of a day: its meals, what was eaten in each, what the plan holds
   const calInfo = (date: string): CalInfo => {
     const slots = date === mealDate ? daySlots : slotsOn(lifestyleOf(p.personal), p.personal.timesOn, date);
@@ -705,18 +706,32 @@ export function JourneyScreen(p: AppApi) {
     return { slots, eaten, planned: p.planned[date] };
   };
   const fillingOn = (date: string, sl: Slot): NonNullable<typeof p.filling> => ({ date, slotId: sl.id, name: sl.name, time: sl.time, dayName: date === todayKey ? "today" : new Date(`${date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }) });
-  // a tap on a meal in the calendar behind the pencil sets the meal and the day together and closes it
+  // B150 (0.3.160, board B150): a tap on a meal in edit mode sets the meal and the day together, saved at once; edit mode
+  // stays open, and the X closes it. One meal is set at a time: the others (a meal of today, of another day, a photo's) go.
   const setMealFromLine = (date: string, r: CalRow) => {
-    if (date === todayKey) p.setPick(r.id ? `meal:${r.id}` : "snack");
-    else { const sl = calInfo(date).slots.find((x) => x.id === r.id); if (!sl) return; p.setFilling({ ...fillingOn(date, sl), by: "line" }); }
-    setLineOpen(false); setLineMore(false); setLineDay(null);
-  };
-  // X: Meal and day not set again; the moment is Regular meal again
-  const clearMeal = () => {
-    if (p.filling) p.setFilling(null); else if (p.pick) p.setPick(null);
     if (state.photo?.meal) setState((s) => (s.photo ? { ...s, photo: { ...s.photo, meal: undefined } } : s));
-    p.setMoment("regular"); setLineOpen(false);
+    if (date === todayKey) { if (p.filling) p.setFilling(null); p.setPick(r.id ? `meal:${r.id}` : "snack"); }
+    else { const sl = calInfo(date).slots.find((x) => x.id === r.id); if (!sl) return; if (p.pick) p.setPick(null); p.setFilling({ ...fillingOn(date, sl), by: "line" }); }
+    setLineDay(date);
   };
+  // the row No meal selected: the meal and the day are off again; the moment is Regular meal again. Edit mode stays open.
+  const clearMeal = () => {
+    if (p.filling) p.setFilling(null); if (p.pick) p.setPick(null);
+    if (state.photo?.meal) setState((s) => (s.photo ? { ...s, photo: { ...s.photo, meal: undefined } } : s));
+    p.setMoment("regular");
+  };
+  // B150: the set meal's time, for this meal on this day only (the usual times in Slots and times stay as they are)
+  const setMealTime = (date: string, slotId: string, time: string) => {
+    const usual = slotsOf(lifestyleOf(p.personal)).find((x) => x.id === slotId)?.time ?? "";
+    p.setPersonal({ ...p.personal, timesOn: withTimeOn(p.personal.timesOn, date, slotId, time, usual) });
+    if (p.filling && p.filling.date === date && p.filling.slotId === slotId) p.setFilling({ ...p.filling, time });
+  };
+  // B150: edit mode opens on the set meal's day, else on the photo's day, else on today
+  const photoDay = state.photo && !state.photo.joined ? ymd(new Date(state.photo.at)) : null;
+  const lineDayNow = lineDay ?? mealSet?.date ?? photoDay ?? todayKey;
+  const lineMarked = p.filling ? { date: p.filling.date, id: p.filling.slotId } : pickSlot ? { date: todayKey, id: pickSlot.id } : p.pick === "snack" ? { date: todayKey, id: null } : photoPick ? { date: photoPick.date, id: photoPick.slotId } : null;
+  const photoRef = (() => { const ph = state.photo; if (!ph || ph.joined) return undefined; const d = new Date(ph.at);
+    return w(ph.atSaved ? "plate.photoSavedOn" : "plate.photoTakenOn", { day: d.toLocaleDateString(locOf(getLang()), { weekday: "long" }), time: hhmm(d) }); })();
   // ---- a recipe from screenshots or a link (0.2.16, canvas board IM) ----
   // R6 (0.2.43): the read is the shared block, the same as on Recipes
   const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => setError(m), pdRef, fitPd: p.fitPd });
@@ -1494,8 +1509,8 @@ export function JourneyScreen(p: AppApi) {
           <button type="button" className="pill pill-small" onClick={() => blank()}><Plus size={14} /> {w("plate.addManually")}</button>
         </div>
   </>);
-  const inHead = step === "in" ? (photoScreen ? stepHead({ n, title: "", bare: true, nameField: { value: photoTitle, placeholder: w("photoask.namesIt"), onChange: (v: string) => setPhotoTitle(v) } })
-          : readView ? stepHead({ n, title: "", bare: true, sub: w("plate.readSub"), nameField: titleField(autoTitle(items)) })
+  const inHead = step === "in" ? (photoScreen ? stepHead({ n, title: "", bare: true, nameField: { value: photoTitle, placeholder: w("photoask.namesIt"), onChange: (v: string) => setPhotoTitle(v), pen: true } })
+          : readView ? stepHead({ n, title: "", bare: true, sub: state.photo?.namedAs && (state.title ?? "").trim() === state.photo.namedAs ? w("plate.namedFromPhoto") : undefined, nameField: titleField(autoTitle(items)) })
           : p.filling
           ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? w("make.asPlannedChangeWhatYou") : plateWhen === "past" ? w("plate.addingSub", { slot: slotV(p.filling) }) : plateWhen === "plan" ? w("plate.planningSub", { slot: slotV(p.filling) }) : w("make.nameItOrKeepThe") })
           : madeBy && items.length > 0
@@ -1724,7 +1739,8 @@ export function JourneyScreen(p: AppApi) {
     const slot = sl ? { date, slotId: sl.id, name: sl.name, time: sl.time } : null;
     const ph = (state.photo && state.photo.who !== "idea" ? state.photo : null) ?? joinedPhoto;
     // DT314: a plate from earlier logged on the day it was started keeps the time it was started
-    const at = started && ymd(started) === date ? started.toISOString() : today ? (ph?.who === "ate" && ymd(new Date(ph.at)) === date ? ph.at : undefined) : ph?.who === "ate" && ymd(new Date(ph.at)) === date ? ph.at : atMeal(date, sl?.time ?? "12:00");
+    // B150: a photo you ate, logged to a meal, is logged at that meal's time in the calendar
+    const at = started && ymd(started) === date ? started.toISOString() : ph?.who === "ate" && sl ? mealAt(date, sl.time) : today ? (ph?.who === "ate" && ymd(new Date(ph.at)) === date ? ph.at : undefined) : ph?.who === "ate" && ymd(new Date(ph.at)) === date ? ph.at : atMeal(date, sl?.time ?? "12:00");
     const ok = p.ateNow(plateMeal(), slot, { photo: ph?.image ?? null, at, back: today, quiet: !today, line: sl ? w("app.loggedWhere", { title, slot: slotV(fillingOn(date, sl)), kcal: fmt(kcal, 0) }) : w("app.loggedSnack", { title, kcal: fmt(kcal, 0) }) });
     if (ok === false) return;
     leavePlate();
@@ -1834,7 +1850,7 @@ export function JourneyScreen(p: AppApi) {
   // coming day, Is it for the plan? Under everything the two buttons of the read: Save in My recipes, Done. Done carries out
   // what is chosen; nothing chosen, nothing is kept.
   // the read of a meal photo (0.3.156: in PlateRead.tsx); its state stays here and is handed in
-  const readCard = readView ? plateRead({ endEl, unset, autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem }) : null;
+  const readCard = readView ? plateRead({ checksEl: plateChecks({ items, memberFoods: p.memberFoods, region: p.region, setState, state, uid, updateItem }), endEl, unset, autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem }) : null;
   if (step === "in" && inQuestion) return (<>{ownHead ? null : inHead}{!p.cookOpenAsk && <CookStrip p={p} />}{inQuestion}</>);
   if (step === "in")
     return (
@@ -1844,9 +1860,9 @@ export function JourneyScreen(p: AppApi) {
         {!p.cookOpenAsk && <CookStrip p={p} />}
         {laterBlock}
         {/* the meal line with everything behind its pencil (0.3.156: in PlateMealLine.tsx); its state stays here and is handed in */}
-        {plateMealLine({ calendar: lineOpen && !mealSet ? plateCal({ mode: "line", day: lineDay ?? todayKey, setDay: setLineDay, more: lineMore, setMore: setLineMore, now: new Date(), today: todayKey, infoOf: calInfo, onPick: setMealFromLine,
-            looking: { on: !p.filling && p.pick === "exploring", tap: () => { p.setPick(p.pick === "exploring" ? null : "exploring"); setLineOpen(false); setLineMore(false); setLineDay(null); } } }) : null,
-          clear: clearMeal, lineOpen, looking: !p.filling && p.pick === "exploring" ? w("plate.exploringLine") : null, p, pdRef, pickTaste, set: p.pick === "exploring" && !p.filling ? null : mealSet, setLineOpen, shownTaste, tasteHint })}
+        {plateMealLine({ calendar: lineOpen ? plateCal({ mode: "line", day: lineDayNow, setDay: setLineDay, more: lineMore, setMore: setLineMore, now: new Date(), today: todayKey, infoOf: calInfo, onPick: setMealFromLine,
+            marked: lineMarked, refLine: photoRef, timeEdit: setMealTime, looking: { on: !mealSet, tap: clearMeal } }) : null,
+          lineOpen, p, pdRef, pickTaste, set: p.pick === "exploring" && !p.filling ? null : mealSet, setLineOpen: (v) => { setLineOpen(v); setLineMore(false); setLineDay(null); }, shownTaste, tasteHint })}
         {/* DT308.12n (0.3.157): the one line about the plate that was there, under the meal line */}
         {oldLine}
         {/* the photo screen (0.3.156: in PlatePhoto.tsx): the warning that your plate is not empty, then the card that asks about the photo */}
@@ -1949,39 +1965,8 @@ export function JourneyScreen(p: AppApi) {
         {state.photo && p.ai.on && !state.photo.image.startsWith("pf:") && <PhotoSaid photo={state.photo} meal={state.photo.who !== "idea" && mealSlot ? mealSlot.name : null} />}
         {state.photo && p.ai.on && !state.photo.image.startsWith("pf:") && <HelpRead key={state.photo.at + state.photo.image.length} photo={state.photo} incoming={morePhoto} meal={state.photo.who !== "idea" && mealSlot ? mealSlot.name : null}
           read={(more, note, pot) => { const ph = state.photo!; void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true, more, note, ...pot }); }} />}
-        {/* DT228 v2: a food whose kind the read could not tell: Chef Mealan asks once; a tap changes the food, its grams stay */}
-        {state.photo?.which && items.some((i) => i.food.name.toLowerCase() === state.photo!.which!.name.toLowerCase()) && (() => {
-          const wh = state.photo!.which!, it = items.find((i) => i.food.name.toLowerCase() === wh.name.toLowerCase())!;
-          const pick = (o: typeof wh.options[number] | null) => {
-            if (!o || o.name.toLowerCase() === it.food.name.toLowerCase()) { setState((st) => ({ ...st, photo: st.photo ? { ...st.photo, which: null } : st.photo })); return; }
-            const { food, fresh } = foodOfRead({ name: o.name, grams: it.grams, low: it.est?.low ?? it.grams, high: it.est?.high ?? it.grams, calories: o.calories, protein: o.protein, fats: o.fats, carbs: o.carbs, fiber: o.fiber, confidence: "medium" }, state.foods, p.region, uid);
-            setState((st) => ({ ...st, foods: fresh && !st.foods.some((f) => f.id === food.id) ? [...st.foods, food] : st.foods, items: st.items.map((x) => (x.id === it.id ? { ...x, food } : x)), portion: null, photo: st.photo ? { ...st.photo, which: null } : st.photo }));
-          };
-          return (
-            <div className="mp-ask mp-which" role="group" aria-label={w("make.oneThingTheReadCannot")}>
-              <small><b>{w("plate.oneThingCannotTell")}</b> {wh.question}</small>
-              <div className="button-row mp-which-opts">
-                {wh.options.map((o) => <button key={o.name} type="button" className={`choice${o.name.toLowerCase() === it.food.name.toLowerCase() ? " on" : ""}`} onClick={() => pick(o)}>{o.name.split(",")[0]}</button>)}
-                <button type="button" className="pill pill-small pill-action" onClick={() => pick(null)}>{w("make.skip")}</button>
-              </div>
-              <small className="muted">{w("make.aTapChangesTheFood")}</small>
-            </div>
-          );
-        })()}
-        {state.photo?.unsure && items.some((i) => i.food.name.toLowerCase() === state.photo!.unsure!.name.toLowerCase() && i.est) && (() => {
-          const u = state.photo!.unsure!, it = items.find((i) => i.food.name.toLowerCase() === u.name.toLowerCase())!;
-          const pick = (g: number | null) => { if (g !== null) updateItem(it.id, { grams: g, est: undefined }); setState((st) => ({ ...st, photo: st.photo ? { ...st.photo, unsure: null } : st.photo })); };
-          return (
-            <div className="mp-ask" role="group" aria-label={w("make.oneThingTheReadIs")}>
-              <small><b>{w("plate.oneThingCannotTell")}</b> {w("plate.isTheAbout", { food: it.food.name.split(",")[0].toLowerCase(), a: u.options[0], b: u.options[1] })}</small>
-              <div className="button-row">
-                <button type="button" className="choice" onClick={() => pick(u.options[0])}>~{u.options[0]} g</button>
-                <button type="button" className="choice" onClick={() => pick(u.options[1])}>~{u.options[1]} g</button>
-                <button type="button" className="pill pill-small pill-action" onClick={() => pick(null)}>{w("make.skip")}</button>
-              </div>
-            </div>
-          );
-        })()}
+        {/* DT318 (0.3.160): Chef Mealan's checks (how much, what it is, which one), shared with the read: PlateChecks.tsx */}
+        {plateChecks({ items, memberFoods: p.memberFoods, region: p.region, setState, state, uid, updateItem })}
         {/* DT308 (0.3.154): the empty plate has no heading; the small plate with its line says what the page is */}
         {(items.length > 0 || !!state.photo) && <div className="card-top"><span>{w("plate.onThePlate")}</span>{/* DT219 (0.3.58): Empty plate whenever the Plate has foods or a photo. DT311 (0.3.157, board Stories246): with foods it stands in the row above them; the card's top says only On your plate */}{items.length === 0 && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> {w("plate.empty")}</>} confirmLabel={w("plate.emptyConfirm")} onConfirm={emptyPlate} />}</div>}
         {/* DT176 (0.3.19, board Stories124): Travel mode on: the Plate says where it serves you, and what the kitchen there allows */}
@@ -2080,12 +2065,12 @@ export function JourneyScreen(p: AppApi) {
                 </div>
                 {/* CT (0.2.24): eggs, bananas and a pack's pieces are counted; the size and the grams small */}
                 {isCounted(i) ? <CountAmount item={i} editable={!i.locked && !imported} open={sizeOpen === i.id} onToggle={countedOf(i) && !i.locked && !imported ? () => setSizeOpen(sizeOpen === i.id ? null : i.id) : undefined}
-                    onGrams={(g, c) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: g, ...(c ? { count: c } : {}) }); }} />
+                    onGrams={(g, c) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: g, ...(c ? { count: c } : {}), ...(i.fromPhoto ? { amountSet: true } : {}) }); }} />
                 : i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
                   <label className="grams">
                     {i.est && <span className="mp-est" aria-label={w("plate.estimated")}>~</span>}
                     <input aria-label={w("meal.gramsOf", { food: foodV(i.food) })} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : Math.round(i.grams * 10) / 10}
-                      onChange={(e) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) }); }}
+                      onChange={(e) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0), ...(i.fromPhoto ? { amountSet: true } : {}) }); }}
                       onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done"
                       onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: "center", behavior: "smooth" }), 250)} />
                     <span>g{servingLabel(i.food, i.grams) ? ` = ${servingLabel(i.food, i.grams)}` : ""}</span>
@@ -2303,7 +2288,7 @@ export function JourneyScreen(p: AppApi) {
           const mealOf = (): Meal => ({ id: uid(), title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
           // DT130: a photo you ate earlier logs at its time, in the meal that time belongs to
           const slot = p.pick === "snack" ? null : pickSlot && mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : photoMeal ? { date: photoMeal.date, slotId: photoMeal.slot.id, name: photoMeal.slot.name, time: photoMeal.slot.time } : mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : null;
-          const at = state.photo!.who === "ate" ? state.photo!.at : undefined;
+          const at = state.photo!.who === "ate" ? (slot ? mealAt(slot.date, slot.time) : state.photo!.at) : undefined;
           const b = {
             all: <button key="all" className={`pill pill-small ${adv.first === "all" ? "pill-primary" : ""}`} onClick={() => p.ateNow(mealOf(), slot, { photo: state.photo!.image, at })}>{w("make.ateIt")}</button>,
             half: <button key="half" className={`pill pill-small ${adv.first === "half" ? "pill-primary" : ""}`} onClick={() => p.ateNow(mealOf(), slot, { photo: state.photo!.image, half: true, at })}>{w("make.ateHalf")}</button>,
@@ -2320,7 +2305,7 @@ export function JourneyScreen(p: AppApi) {
             </section>
           );
         })()}
-        {fillsNow && mealSlot && (() => { const at = state.photo?.who === "ate" ? state.photo.at : undefined; return (
+        {fillsNow && mealSlot && (() => { const at = state.photo?.who === "ate" ? mealAt(mealDate, mealSlot.time) : undefined; return (
           <section className="chef-ask fills-ask" aria-label={w("fit.fillsAria")}>
             <ChefLine text={say("plateFills", mealSlot.name, fmt(t.calories, 0))} />
             <div className="ca-go">{!p.recordNow && <button type="button" className="pill pill-primary" onClick={() => { setFills(null); p.ateNow(plateMeal(), { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time }, { photo: state.photo?.image ?? null, at }); }}>{w("plate.ateIt")}</button>}

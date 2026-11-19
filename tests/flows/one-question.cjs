@@ -59,7 +59,7 @@ const names = (s) => s.items.map((i) => i.food.name.split(",")[0]).join(", ");
   s = await h.st(p);
   ok(names(s) === "Rice, Chicken breast" && s.meals.some((m) => m.title === "Skyr, Oats & Banana") && await p.locator(".old-plate").count() === 1 && /Dinner/.test(await h.line(p)), "DT313 AC6: Start a new plate: the meal is on the plate as today's dinner, and the old plate is kept: " + await h.line(p));
   await p.locator(".old-plate-undo").click(); await p.waitForTimeout(800);
-  ok(names(await h.st(p)) === "Skyr, Oats, Banana" && /Meal and day not set/.test(await h.line(p)), "DT313 AC6: Undo: my plate is back, with no meal set");
+  ok(names(await h.st(p)) === "Skyr, Oats, Banana" && /No meal selected/.test(await h.line(p)), "DT313 AC6: Undo: my plate is back, with no meal set");
   await p.context().close();
   // ---- AC7: Chef Mealan's idea from the chat
   p = await h.open({});

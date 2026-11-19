@@ -10,6 +10,7 @@
 // the photo screen, which has no chips, and Read the plate reads it. Just looking is chosen behind the pencil of the meal
 // line. After a read of your own meal the read shows alone; Change the foods opens the plate.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.
+// Changed by DT318 (0.3.160, board DT318; Coach Milan 19 November 01:00, Go): the link Wrong foods? Help Chef Mealan read it is gone; the form opens with one more photo of the same plate, behind ＋ Photo (one-more-photo.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -137,7 +138,7 @@ const PHOTO = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, "
     p = await open(old);
     await p.goto(U + "/plate"); await p.waitForTimeout(1200);
     ok(await p.locator(".cook-open-ask").count() === 0 && await p.locator(".cook-strip").count() === 1 && await p.locator(".sv-plate").count() === 0, "an Exploring plate from before, a cook open: the strip shows, no question, no Served block");
-    await p.locator(".mp-again-link").click(); await p.waitForTimeout(300);
+    await require("./one-more-photo.cjs")(p);
     await p.locator(".mp-help").getByLabel("Anything Chef Mealan should know?") /* B144 (0.3.150): the words box asks what is in it */.fill("egg whites with hazelnut cream and cocoa");
     await p.locator(".mp-help .pill-primary").click(); await p.waitForTimeout(2000);
     const reread = await saved(p);

@@ -5,7 +5,8 @@
 // there opens the Plate for the slot, as the row did. Everything after is unchanged.
 // Changed by story DS6 K (Milan 10:21 to 11:26, board DS6): the record box goes; the plan card's row says how the day went
 // (Today went by the plan) and Today's meals says the extras.
-// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one (a planned meal: the meal, its day and time, with an X; the Plate on its own: Meal and day not set). The meal from outside has no meal set, so Save on Eat asks; this walkthrough taps Snack, which is off the plan, and it counts as the extra as before.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one (a planned meal: the meal, its day and time, with an X; the Plate on its own: No meal selected). The meal from outside has no meal set, so Save on Eat asks; this walkthrough taps Snack, which is off the plan, and it counts as the extra as before.
+// Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -54,7 +55,7 @@ seed.items = [];
   // a row opens the Plate for that slot, in eat mode
   await page.getByRole("button", { name: /Lunch at 08:00, Morning skyr/ }).click(); await page.waitForTimeout(600);
   if (await page.locator(".rq-slot").count()) { await page.locator(".rq-slot").getByRole("button", { name: "Change it on the Plate" }).click(); await page.waitForTimeout(600); }
-  ok(/^Lunch \w+, \d+ \w+, 08:00$/.test((await page.locator(".plan-line").innerText()).replace(/\s+/g, " ").trim()) && await page.locator(".plan-line .plan-line-x").count() === 1, "changed by DT308.1: the Plate's line says Lunch, its day and 08:00, with an X: " + (await page.locator(".plan-line").innerText()).replace(/\s+/g, " "));
+  ok(/^Lunch \w+, \d+ \w+, 08:00$/.test((await page.locator(".plan-line").innerText()).replace(/\s+/g, " ").trim().replace(/^\s*meal and day\s*/i, "")) && await page.locator(".plan-line .plan-line-x").count() === 0, "changed by DT308.1 and B150: the Plate's line says Lunch, its day and 08:00, with its pencil and no X: " + (await page.locator(".plan-line").innerText()).replace(/\s+/g, " ").replace(/^\s*meal and day\s*/i, ""));
   ok(await page.locator(".title-input").inputValue() === "Morning skyr", "the meal's name is the title");
   ok(await page.getByRole("button", { name: /Put it in/ }).count() === 0, "no Put it in: this is eating, not planning");
   // a new name on the Plate reaches the recipe and the slot at once, before anything is saved (Milan, 11 October 2026)
@@ -76,7 +77,7 @@ seed.items = [];
   ok(await page.locator(".day-record").count() === 0, "no record yet, a slot is still to come");
   // a meal from outside: the Plate without a slot, saved: extra, Off the plan
   await page.getByRole("button", { name: /^Plate$/ }).first().click(); await page.waitForTimeout(500);
-  ok(/^Meal and day not set$/.test((await page.locator(".plan-line").innerText()).trim()), "changed by DT308.1: the Plate on its own has no meal set");
+  ok(/^No meal selected$/.test((await page.locator(".plan-line").innerText()).trim().replace(/^\s*meal and day\s*/i, "")), "changed by DT308.1: the Plate on its own has no meal set");
   await page.getByRole("button", { name: /^Add$/ }).first().click(); await page.waitForTimeout(300);
   await cook();
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);

@@ -77,7 +77,7 @@ export function foodOfRead(f: PhotoFood, library: Food[], region: string | null 
 }
 export function itemsOfRead(read: PhotoRead, library: Food[], region: string | null | undefined, uid: () => string): { items: Ingredient[]; fresh: Food[] } {
   const fresh: Food[] = []; const lib = [...library];
-  const items = read.foods.map((f) => { const { food, fresh: isNew } = foodOfRead(f, lib, region, uid); if (isNew) { fresh.push(food); lib.push(food); } return { id: uid(), food, grams: f.grams, locked: false, est: { low: f.low, high: f.high }, fromPhoto: true } as Ingredient; });
+  const items = read.foods.map((f) => { const { food, fresh: isNew } = foodOfRead(f, lib, region, uid); if (isNew) { fresh.push(food); lib.push(food); } return { id: uid(), food, grams: f.grams, locked: false, est: { low: f.low, high: f.high }, fromPhoto: true, readAs: f.name } as Ingredient; });
   return { items, fresh };
 }
 
@@ -126,4 +126,34 @@ export function ideaAdvice(x: { items: Ingredient[]; protein: number; mealWord: 
   if (x.big >= 2) return w("photo.ideaPortions", { kcal, prot, big: x.big, meal });
   if (!n.ok && n.why) return w("photo.ideaWhy", { why: n.why, kcal, prot, meal });
   return w("photo.idea", { meal, kcal, prot });
+}
+
+// DT318 (0.3.160, board DT318): Chef Mealan looked again with the person's words. What the person set before (an amount
+// typed or answered, a food settled by a check) stays as it is and takes the place of the read's own version of that food.
+// One line says what he did, and the foods he added or changed are named, so their chips can say so.
+const lowName = (s: string | undefined) => (s ?? "").toLowerCase();
+// what the person set on a food read from a photo: its amount (answered, or typed on the Plate) or what it is (a check)
+export const settled = (i: Ingredient) => !!i.fromPhoto && (!i.est || !!i.checked || !!i.amountSet);
+export function toldAgain(prev: Ingredient[], read: Ingredient[], sameKind: (a: { name: string }, b: { name: string }) => boolean): { items: Ingredient[]; kept: Ingredient[]; fresh: Ingredient[]; changed: { from: Ingredient; to: Ingredient }[]; gone: Ingredient[] } {
+  const kept = prev.filter(settled);
+  const isKept = (n: Ingredient) => kept.some((k) => lowName(k.food.name) === lowName(n.food.name) || lowName(k.readAs) === lowName(n.readAs ?? n.food.name) || (!!k.readAs && sameKind({ name: k.readAs }, { name: n.readAs ?? n.food.name })) || (k.food.aliases ?? []).some((a) => lowName(a) === lowName(n.food.name)));
+  const rest = read.filter((n) => !isKept(n));
+  const old = prev.filter((i) => !kept.includes(i));
+  const fresh: Ingredient[] = [], changed: { from: Ingredient; to: Ingredient }[] = [], taken = new Set<string>();
+  for (const n of rest) {
+    const sameOne = old.find((o) => lowName(o.food.name) === lowName(n.food.name));
+    if (sameOne) { taken.add(sameOne.id); continue; }
+    const kin = old.find((o) => !taken.has(o.id) && sameKind(o.food, n.food) && !rest.some((r) => lowName(r.food.name) === lowName(o.food.name)));
+    if (kin) { taken.add(kin.id); changed.push({ from: kin, to: n }); } else fresh.push(n);
+  }
+  const gone = old.filter((o) => !taken.has(o.id));
+  // the order the person saw: each food where it stood (kept, the same, or changed in its place), then what is new
+  const placed = new Set<string>(), items: Ingredient[] = [];
+  for (const o of prev) {
+    if (kept.includes(o)) { items.push(o); continue; }
+    const n = rest.find((r) => lowName(r.food.name) === lowName(o.food.name)) ?? changed.find((c) => c.from === o)?.to;
+    if (n && !placed.has(n.id)) { placed.add(n.id); items.push(n); }
+  }
+  for (const n of rest) if (!placed.has(n.id)) items.push(n);
+  return { items, kept, fresh, changed, gone };
 }

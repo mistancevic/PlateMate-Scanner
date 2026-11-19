@@ -8,7 +8,7 @@
 // button, board RS26): the day is a header with a blue line under it, in the page. Everything else is unchanged.
 // Changed by story DS7 N (Milan 11:26, board DS7): Earlier says the last two days; two day cards with the exact day, each
 // opens that day in Plan; older days are in Plan. Added: DS6 L and M checks, Next is always a card, the cards' headings inside.
-// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line says Meal and day not set, with what the plate is (Sweet, a DaaM) under it.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line says No meal selected, with what the plate is (Sweet, a DaaM) under it.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");

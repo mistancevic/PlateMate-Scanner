@@ -1,5 +1,5 @@
 // Story DT308.4 to DT308.6 (0.3.157, board Stories237; Coach Milan, Go 18 November 11:14): the end of a read with no meal
-// set. A photo is read and no meal is guessed: the line says Meal and day not set, and the read ends with What do you do
+// set. A photo is read and no meal is guessed: the line says No meal selected, and the read ends with What do you do
 // with it? Save it, Plan it, Ate it, all three white. Ate it on a photo taken now opens your calendar under the button on
 // today, with the guess from the clock marked and its reason. On an older photo it opens on the photo's day with the guess
 // from the photo's time marked (this solves B147: the photo's day, not today's clock). A tap on a meal sets it in the line,
@@ -7,15 +7,16 @@
 // tomorrow with nothing marked; the tap plans it and you land on Plan on that day, with no Did you eat it?. Save it keeps it
 // in My recipes with its photo; the plate stays and the button says Saved in My recipes.
 // The checks name the rows of the build brief (C1 to C6).
+// Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.
 const start = require("./plate157.cjs");
 const PORT = "3564";
 (async () => { const h = await start(PORT); const { ok } = h; try {
   // ---- C1, C2, C4: a photo taken now
   let p = await h.open({ foods: [] });
   await h.toPhoto(p, false);
-  ok(/^Meal and day not set$/.test(await h.line(p)), "A2: on the photo screen the line says Meal and day not set");
+  ok(/^No meal selected$/.test(await h.line(p)), "A2: on the photo screen the line says No meal selected");
   await h.readIt(p);
-  ok(await p.locator(".read-view").count() === 1 && /^Meal and day not set$/.test(await h.line(p)), "A2: the photo is read: the line did not change, no meal is guessed");
+  ok(await p.locator(".read-view").count() === 1 && /^No meal selected$/.test(await h.line(p)), "A2: the photo is read: the line did not change, no meal is guessed");
   ok(/This plate/.test(await p.locator(".read-view .readout-top").innerText()), "C1: the read's result says This plate");
   const end = p.locator(".read-view .plate-end");
   ok(await end.count() === 1 && /^What do you do with it\? Save it Plan it Ate it$/.test((await end.innerText()).replace(/\s+/g, " ").trim()) && await end.locator(".pill-primary").count() === 0, "C1: the read ends with What do you do with it? Save it, Plan it, Ate it, all three white");
@@ -23,7 +24,7 @@ const PORT = "3564";
   await p.locator(".pe-ate").click(); await p.waitForTimeout(400);
   ok(/Which meal\? Based on the current time, 18:00:/.test(await end.innerText()) && (await end.locator(".pcal-day.on").innerText()).trim() === "Sun 15, today" && /Dinner/.test(await end.locator(".pcal-row.on").innerText()), "C2: Ate it: the calendar opens under the button on today; the guess from the clock, Dinner, is marked, with its reason");
   await h.row(p, "Dinner", ".read-view").click(); await p.waitForTimeout(600);
-  ok(/^Dinner Sunday, 15 November, 20:00$/.test(await h.line(p)) && await p.locator(".meal-line .plan-line-x").count() === 1, "C4: the meal is set in the line: " + await h.line(p));
+  ok(/^Dinner Sunday, 15 November, 20:00$/.test(await h.line(p)) && await p.locator(".meal-line .plan-line-x").count() === 0, "C4: the meal is set in the line (changed by B150: no X): " + await h.line(p));
   ok(await p.locator(".read-view").count() === 1 && /Did you eat it\? All of it Half Part of it/.test((await p.locator(".rv-eat").innerText()).replace(/\s+/g, " ")) && await p.locator(".rv-done").count() === 1, "C4: the read goes on with Did you eat it? All of it, Half, Part of it, then Done");
   ok((await h.st(p)).feedback.length === 0, "C4: nothing is logged yet");
   await p.locator(".rv-eat .pa-opt").filter({ hasText: "All of it" }).click(); await p.waitForTimeout(200); await p.locator(".rv-done").click(); await p.waitForTimeout(1200);
@@ -34,16 +35,16 @@ const PORT = "3564";
   // ---- C3, C4: an older photo
   p = await h.open({ foods: [] });
   await h.toPhoto(p, true);
-  ok(/^Meal and day not set$/.test(await h.line(p)), "C3: an older photo waits: the line says Meal and day not set");
+  ok(/^No meal selected$/.test(await h.line(p)), "C3: an older photo waits: the line says No meal selected");
   await h.readIt(p);
-  ok(/^Meal and day not set$/.test(await h.line(p)) && await p.locator(".read-view .plate-end").count() === 1, "C3: the read of the older photo: no meal set, the same end");
+  ok(/^No meal selected$/.test(await h.line(p)) && await p.locator(".read-view .plate-end").count() === 1, "C3: the read of the older photo: no meal set, the same end");
   await p.locator(".pe-ate").click(); await p.waitForTimeout(400);
   const e2 = p.locator(".read-view .plate-end");
   ok(/Which meal\? From the photo, Saturday 15:57:/.test(await e2.innerText()) && (await e2.locator(".pcal-day.on").innerText()).trim() === "Sat 14", "C3: the calendar opens on the photo's day, Saturday, and says: from the photo, Saturday 15:57");
   ok((await e2.locator(".pcal-row.on").innerText()).replace(/\s+/g, " ").trim() === "✓ Lunch 13:45 · not eaten", "C3: the guess from the photo's time is marked: lunch, not eaten that day (B147)");
   ok((await h.rows(p, ".read-view")).some((t) => t === "Snack at 15:57"), "C3: the snack of that day says the photo's time");
   await h.row(p, "Lunch", ".read-view").click(); await p.waitForTimeout(600);
-  ok(/^Lunch Saturday, 14 November, 15:57$/.test(await h.line(p)), "C4: the line says Saturday's lunch at the photo's time: " + await h.line(p));
+  ok(/^Lunch Saturday, 14 November, 13:45$/.test(await h.line(p)), "C4, changed by B150: the line says Saturday's lunch at the meal's time, 13:45 (the photo's time is a reference in edit mode): " + await h.line(p));
   ok(/Did you eat it\?/.test(await p.locator(".rv-eat").innerText()), "C4: the read goes on with Did you eat it?");
   await p.locator(".rv-eat .pa-opt").filter({ hasText: "Half" }).click(); await p.waitForTimeout(200); await p.locator(".rv-done").click(); await p.waitForTimeout(1200);
   s = await h.st(p);
@@ -52,8 +53,8 @@ const PORT = "3564";
   // X after the tap clears it again
   p = await h.open({ foods: [] }); await h.toPhoto(p, true); await h.readIt(p);
   await p.locator(".pe-ate").click(); await p.waitForTimeout(300); await h.row(p, "Lunch", ".read-view").click(); await p.waitForTimeout(500);
-  await p.locator(".plan-line-x").click(); await p.waitForTimeout(400);
-  ok(/^Meal and day not set$/.test(await h.line(p)) && await p.locator(".read-view .plate-end").count() === 1 && await p.locator(".rv-eat").count() === 0, "A7: X on the read: Meal and day not set again, and the read ends with What do you do with it? again");
+  await require("./just-looking.cjs")(p);
+  ok(/^No meal selected$/.test(await h.line(p)) && await p.locator(".read-view .plate-end").count() === 1 && await p.locator(".rv-eat").count() === 0, "A7: X on the read: No meal selected again, and the read ends with What do you do with it? again");
 
   // ---- C5: Plan it
   await p.locator(".pe-plan").click(); await p.waitForTimeout(400);

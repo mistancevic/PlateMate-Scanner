@@ -124,17 +124,18 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
 import { ratesOf } from "./letters";
 import { asMine, travels, toShare } from "./memberFoods";
-import { cleanRead, itemsOfRead, holdsMore, type Vessel } from "./mealPhoto";
+import { cleanRead, itemsOfRead, toldAgain, settled, holdsMore, type Vessel } from "./mealPhoto";
+import { sameKind } from "./swap";
 import { dishOf, visitFor, upsertServed, withNote, mealItems, mealTitle, cleanMenu, applyMenu, withMenuLine, withoutMenuLine, type Served, type OnPlate, type VisitMenu, type Dish } from "./served";
 import { identityTwins } from "./foodId";
-import { referenceFood, marketFoods, foodV } from "./reference";
+import { referenceFood, marketFoods, foodV, foodName } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf } from "./foodjob";
 import { fitnessFor, SOURCES, dayName } from "./fitness";
 import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, recordDeclaration, FIXED, EMPTY_SAFETY, type Safety, type SituationId } from "./safety";
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
-import { plateWhenOf } from "./plateMode";
+import { plateWhenOf, mealAt } from "./plateMode";
 // DT305 (0.3.151): the line after a meal is logged at its photo's time; a past day is named
 const loggedLine = (d: Date): string => { const now = new Date(), y = new Date(now); y.setDate(y.getDate() - 1); const time = d.toTimeString().slice(0, 5);
   return d.toDateString() === now.toDateString() ? w("app.loggedAt", { time }) : d.toDateString() === y.toDateString() ? w("app.loggedForYesterday", { time }) : w("app.loggedForDay", { day: dateText(d, { weekday: "long", day: "numeric", month: "long" }), time }); };
@@ -314,7 +315,7 @@ export default function App() {
     // DT309 (0.3.153): the small menu a long press on Plate opens
     [camMenu, setCamMenu] = useState(false),
     // DT130 (0.2.110): a photo picked from Your photos in the meal camera, waiting on the Plate for whose plate and when
-    [photoAsk, setPhotoAsk] = useState<{ image: string; at: string; taken?: boolean; more?: string[] } | null>(null),
+    [photoAsk, setPhotoAsk] = useState<{ image: string; at: string; taken?: boolean; more?: string[]; saved?: boolean } | null>(null),
     // DT219 (0.3.58): the last photo read found no foods; nothing landed on the Plate
     [photoNoFoods, setPhotoNoFoods] = useState(false),
     // DT242 (0.3.96, board Stories182): a photo whose answer was lost twice is kept, with Try again
@@ -1976,14 +1977,16 @@ export default function App() {
     lookAtPhoto: async (image: string) => {
       try { const d: any = await api("/api/plate-look", { image: await resizeImageBase64(image, 640, 640) }); return d && typeof d.vessel === "string" ? { vessel: d.vessel as Vessel, course: dishOf(d.course) } : null; } catch { return null; }
     },
-    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: Dish; title?: string }) => {
+    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string; served?: { mine: boolean; visit?: string }; share?: "whole" | "portion"; dish?: Dish; title?: string; told?: boolean }) => {
       const more0 = (x?.more ?? []).slice(0, 3), note = (x?.note ?? "").replace(/\s+/g, " ").trim().slice(0, 300);
       setBusy(more0.length ? w("app.readingPhotos", { n: more0.length + 1 }) : w("app.readingYourPlate"));
       try {
         // DT228 v2 (0.3.63, board Stories168): the other photos of the meal and the person's words go with the photo, in one read
         const [sent, thumb, moreSent, moreThumbs] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640),
           Promise.all(more0.map((m) => resizeImageBase64(m, 1280, 1280))), Promise.all(more0.map((m) => thumbnailBase64(m, 480)))]);
-        const ask = () => api("/api/plate-photo", { image: sent, ...(moreSent.length ? { more: moreSent } : {}), ...(note ? { note } : {}), ...(x?.share ? { share: x.share } : {}), ...(x?.dish ? { course: x.dish } : {}), region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
+        const ask = () => api("/api/plate-photo", { image: sent, ...(moreSent.length ? { more: moreSent } : {}), ...(note ? { note } : {}), ...(x?.share ? { share: x.share } : {}), ...(x?.dish ? { course: x.dish } : {}), region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name),
+          // DT318 (0.3.160): what the person set before goes along, so the read keeps it and does not ask about it again
+          ...(x?.told ? { keep: state.items.filter(settled).slice(0, 12).map((i) => ({ name: i.food.name, grams: Math.round(i.grams) })) } : {}) });
         // DT242 (0.3.96, board Stories182; Coach Milan 6 November 10:16 and 10:35): the answer lost on the way (another app, no
         // signal) is asked for again once, by itself, when the app is back in front and online; only then the card, never the
         // browser's own words
@@ -1997,7 +2000,16 @@ export default function App() {
         }
         setPhotoLost(null);
         const read = cleanRead(d);
-        const { items, fresh } = read ? itemsOfRead(read, state.foods, shopRegion, uid) : { items: [], fresh: [] };
+        const got = read ? itemsOfRead(read, state.foods, shopRegion, uid) : { items: [], fresh: [] };
+        const fresh = got.fresh;
+        // DT318: asked again with the person's words: what they set stays; one line says what Chef Mealan did
+        const told = x?.told && x.replace && read ? toldAgain(state.items, got.items, sameKind) : null;
+        const items = told ? told.items : got.items;
+        const did = told ? (() => { const list = (xs: string[]) => { try { return new (Intl as any).ListFormat(locOf(getLang()), { style: "long", type: "conjunction" }).format(xs); } catch { return xs.join(", "); } };
+          const nm = (i: { food: Food }) => { const n = foodName(i.food).split(",")[0]; return getLang() === "en" ? n.toLowerCase() : n; };
+          const parts = [...told.changed.map((c) => w("plate.didChanged", { from: nm(c.from), to: foodName(c.to.food) })), ...(told.fresh.length ? [w("plate.didAdded", { foods: list(told.fresh.map(nm)) })] : []), ...(told.gone.length ? [w("plate.didRemoved", { foods: list(told.gone.map(nm)) })] : [])];
+          return { line: [...(parts.length ? parts : [w("plate.didSame")]), ...(told.kept.length ? [w("plate.didKept")] : [])].join(" "), fresh: told.fresh.map((i) => i.id), changed: told.changed.map((c) => c.to.id) }; })() : null;
+        const keptName = (n: string | undefined) => !!told && !!n && told.kept.some((k) => k.food.name.toLowerCase() === n.toLowerCase() || (k.readAs ?? "").toLowerCase() === n.toLowerCase());
         // DT219 (0.3.58, board Stories164; Coach Milan 2 November 17:53): a read with no foods leaves the Plate as it was, the photo
         // not kept; Chef Mealan says so on the Plate, with Take it again and Add the foods myself
         if (!read || !items.length) {
@@ -2010,7 +2022,9 @@ export default function App() {
         // DT212 v4 (0.3.53): Read the photo again keeps the photo's time and replaces the foods, after it asked
         const at = (x?.who === "ate" || x?.replace) && x.at ? x.at : new Date().toISOString();
         // 0.3.62 (Coach Milan 20:21 to 20:55): Exploring in the pencil block makes a camera photo Exploring too
-        const who = x?.who ?? (pick === "exploring" ? "idea" : undefined);
+        // B150 (0.3.160, board B150): Just looking and no meal set are one state, No meal selected. A new photo is never an
+        // idea because of the plate before it; only Don't count it, or Scan another plate, makes one.
+        const who = x?.who;
         // DT268 (0.3.118, board Stories201): an Exploring plate is kept as Served. Read again keeps its place there; another
         // plate (x.served) or a first one gets a new one: whose it is, its visit (the sitting it was scanned at), the dish as read
         // 0.3.121 (Coach Milan 10 November 07:50 to 08:09, Go): reading the same photo again (Help Chef Mealan read it, a photo
@@ -2027,13 +2041,15 @@ export default function App() {
         const potNow = share === "whole" && who !== "idea";
         const potId = potNow ? (again && state.photo?.pot && state.meals.some((m) => m.id === state.photo!.pot) ? state.photo.pot : uid()) : undefined;
         const course = x?.dish && x.dish !== "main" && who !== "idea" ? x.dish : undefined;
-        const photo: NonNullable<PilotState["photo"]> = { image: thumb, at, unsure: potNow ? null : read.unsure, ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}) };
+        const photo: NonNullable<PilotState["photo"]> = { image: thumb, at, unsure: potNow || keptName(read.unsure?.name) ? null : read.unsure, ...(did ? { did } : {}), ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: keptName(read.which?.name) ? null : read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}),
+          // B150 (0.3.160): the photo's time is only the time its file was saved; and the name Chef Mealan gave the plate
+          ...((photoAsk?.saved && who === "ate") || (again && state.photo?.atSaved) ? { atSaved: true as const } : {}), ...(!(x?.title ?? "").trim() && (read.dishLocal || read.dish) ? { namedAs: read.dishLocal || read.dish } : again && state.photo?.namedAs ? { namedAs: state.photo.namedAs } : {}) };
         // B146 (0.3.152): a name typed on the photo screen is kept for a new plate
         const named = (x?.title ?? "").trim();
         const land = (how: "add" | "new") => {
           // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
           // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
-          if (who === "idea") { if (filling) { setExploreLeft(fillingName(filling)); setFilling(null); } else setExploreLeft(null); setPick("exploring"); } else setExploreLeft(null);
+          if (who === "idea") { if (filling) { setExploreLeft(fillingName(filling)); setFilling(null); } else setExploreLeft(null); setPick("exploring"); } else { setExploreLeft(null); if (pick === "exploring" && how === "new") setPick(null); }
           // DT240 (0.3.96, board Stories182; Coach Milan 10:14 and 10:32, b): a cook still open asks once
           // 0.3.121: only when a plate comes in; the same photo read again brings nothing new, so it does not ask
           if (!again && state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat")) setCookOpenAsk(true);
@@ -2042,7 +2058,8 @@ export default function App() {
           setDishAsk(second && second.prev.slot && second.prev.slot.date === ymd(new Date()) ? { dish: read.dish || "", prev: second.prev.meal.title, minutes: second.minutes, dessertFirst: second.dessertFirst, slotId: second.prev.slot.slotId, meal: second.prev.slot.name } : null);
           // DT305: a new plate from a photo of your meal shows as the read alone first. Not a pot kept whole (it opens as a
           // recipe), not Just looking (kept as Served), not the same photo read again, not a planned meal you eat by the plan
-          const readView = how === "new" && !again && !potId && who !== "idea" && !(filling && plateWhenOf(filling) === "now");
+          // DT318: words sent from the read keep the read in view
+          const readView = how === "new" && (!again || !!x?.told) && !potId && who !== "idea" && !(filling && plateWhenOf(filling) === "now");
           if (readView) photo.view = "read";
           // 0.3.157 (DT308.12, board Stories244): the photo's foods join; the plate keeps its own time and its own meal line
           if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null, photo: { ...photo, joined: true as const } }));
@@ -2116,7 +2133,8 @@ export default function App() {
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
     // DT133 (0.2.113): one portion of a plate of several, the rest kept on Today
     ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback; part?: number; back?: boolean; line?: string; quiet?: boolean }) => {
-      const now = x.at ?? new Date().toISOString();
+      // B150 (0.3.160): one day per record: a time of another day than the meal's day gives way to the meal's own time
+      const now = (x.at && slot && ymd(new Date(x.at)) !== slot.date ? mealAt(slot.date, slot.time) : x.at) ?? new Date().toISOString();
       // DT285: the same photo already a meal of that day: Update that meal, or Keep both
       const earlier = !x.same && x.photo ? samePhotoMeal(state.feedback, [x.photo], now) : null;
       if (earlier) { setSameAsk({ earlier, update: () => screenProps.ateNow(meal, slot, { ...x, same: earlier }), both: () => screenProps.ateNow(meal, slot, { ...x, same: "both" }) }); return false; }
@@ -2824,11 +2842,11 @@ export default function App() {
             onModeChange={setMode}
             onCapture={(x) => scan(x)}
             meal={screenProps.ai.on}
-            onMeal={(image, at, more) => {
+            onMeal={(image, at, more, saved) => {
               setCamera(false);
               // DT305 (0.3.151, board Stories230): every photo of a meal waits on the photo screen before the read, a photo you
               // take now too: the box for what Chef Mealan should know is there, and Read the plate reads
-              setPhotoAsk(at ? { image, at } : { image, at: new Date().toISOString(), taken: true, ...(more?.length ? { more } : {}) }); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+              setPhotoAsk(at ? { image, at, ...(saved ? { saved: true } : {}) } : { image, at: new Date().toISOString(), taken: true, ...(more?.length ? { more } : {}) }); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
             }}
             processGroupScan={(x) => scan(x, true)}
             onBarcode={(x) => lookup(x)}

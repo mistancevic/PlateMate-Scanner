@@ -10,6 +10,7 @@
 // The box asks Anything Chef Mealan should know?. After a read of your own portion the read shows alone; Change the foods
 // opens the plate, where Wrong foods? still has both rows.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed from a photo, so this walkthrough sets the dinner with the pencil while the photo waits (set-meal.cjs); the pot and the dish of the dinner are then read as before.
+// Changed by DT318 (0.3.160, board DT318; Coach Milan 19 November 01:00, Go): the link Wrong foods? Help Chef Mealan read it is gone; the form opens with one more photo of the same plate, behind ＋ Photo (one-more-photo.cjs).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -80,7 +81,7 @@ const READ = (portion) => ({ dish: "Creamy mushroom vegetable soup", foods: [f("
     ok(!/This is a snack, not your dinner/.test(t) && !/More than half of this dinner's energy is fat/.test(t) && /Did you eat it\?/.test(t), "a starter is one dish of the dinner: not called a snack, not judged as the whole dinner; the card only asks");
     // Wrong foods? opens the same form, with your answers (DT305: on the plate, behind Change the foods)
     await page.locator(".rv-change .pill").click(); await page.waitForTimeout(600);
-    await page.locator(".mp-again-link").click(); await page.waitForTimeout(300);
+    await require("./one-more-photo.cjs")(page);
     const help = page.locator(".mp-help");
     ok((await on(help.locator(".pa-share"))).join() === "My portion" && (await on(help.locator(".pa-dish"))).join() === "Starter" && await help.locator("textarea").inputValue() === WORDS, "Wrong foods? opens the same form again, with your answers in it");
     await help.locator(".pa-dish .pa-opt").nth(1).click(); await help.locator(".pill-primary").click(); await page.waitForTimeout(2200);

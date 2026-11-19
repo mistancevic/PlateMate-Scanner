@@ -6,7 +6,8 @@
 // swipe to the left (Swap). An open slot still opens Pick a meal on a tap.
 // Changed by story DT74 (Milan 22 October 2026, board DT74): a meal around the target says close, not fits; fits is kept for
 // a meal within 0.2 of it. The marks are fits, close or under. DT76: the starter's numbers come from its foods (647 and 56).
-// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one: a slot opened from Plan says the meal, its day and time, and Goes into your plan; a plate with no slot says Meal and day not set.
+// 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one: a slot opened from Plan says the meal, its day and time, and Goes into your plan; a plate with no slot says No meal selected.
+// Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -53,7 +54,7 @@ seed.items = [];
   // Fit it on the Plate: the Plate opens for this slot, the line says so; Put it in fills the slot and comes back
   await bf.getByRole("button", { name: "Fit it on the Plate" }).click(); await page.waitForTimeout(600);
   // changed by DT149 (0.2.130, board Stories101 version 2): a meal of a later day is planning, and the line says so
-  ok(/^Breakfast Monday, \d+ \w+, 07:30 Goes into your plan\.$/.test((await page.locator(".plan-line").innerText()).replace(/\s+/g, " ").trim()), "changed by DT308.1: the Plate's line names the meal and its day, going into your plan: " + (await page.locator(".plan-line").innerText()).replace(/\s+/g, " "));
+  ok(/^Breakfast Monday, \d+ \w+, 07:30 Goes into your plan\.$/.test((await page.locator(".plan-line").innerText()).replace(/\s+/g, " ").trim().replace(/^\s*meal and day\s*/i, "")), "changed by DT308.1: the Plate's line names the meal and its day, going into your plan: " + (await page.locator(".plan-line").innerText()).replace(/\s+/g, " ").replace(/^\s*meal and day\s*/i, ""));
   // Changed by story DT76 (board DT76): a starter has its foods, so the Plate opens with Sarma's foods, not empty; the first
   // of Chef Mealan's lifters goes on, and the plate is made for the slot
   // DT88 (0.2.87): the plate's rows in a cook's words: Cabbage, weigh it raw
@@ -155,10 +156,10 @@ seed.items = [];
   // leaving the Plate another way drops the slot
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "Create a new meal on the Plate" }).click(); await page.waitForTimeout(500);
-  ok(/^Dinner Monday,/.test((await page.locator(".plan-line").innerText()).replace(/\s+/g, " ").trim()), "Create a new meal opens the Plate for the slot");
+  ok(/^Dinner Monday,/.test((await page.locator(".plan-line").innerText()).replace(/\s+/g, " ").trim().replace(/^\s*meal and day\s*/i, "")), "Create a new meal opens the Plate for the slot");
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Plate$/ }).first().click(); await page.waitForTimeout(300);
-  ok(/^Meal and day not set$/.test((await page.locator(".plan-line").innerText()).trim()), "leaving the Plate drops the slot: Meal and day not set");
+  ok(/^No meal selected$/.test((await page.locator(".plan-line").innerText()).trim().replace(/^\s*meal and day\s*/i, "")), "leaving the Plate drops the slot: No meal selected");
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");
   await b.close(); server.kill();
   process.exit(fail ? 1 : 0);

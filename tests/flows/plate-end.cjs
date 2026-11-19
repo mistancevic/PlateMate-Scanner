@@ -50,7 +50,7 @@ const PORT = "3562";
   ok(s.feedback.length === 0 && s.items.length === 3 && !s.pick, "D9: Undo: the meal leaves Today; the plate is back on the Plate with no meal set");
   ok(/Undone: Skyr, Oats & Banana is back on your Plate\./.test(await h.body(p)), "D9: the message says so");
   await h.tab(p, "Plate");
-  ok(/^Meal and day not set$/.test(await h.line(p)) && /Skyr[\s\S]*Oats[\s\S]*Banana/.test(await h.main(p)), "D9: on the Plate the three foods are there again, Meal and day not set");
+  ok(/^No meal selected$/.test(await h.line(p)) && /Skyr[\s\S]*Oats[\s\S]*Banana/.test(await h.main(p)), "D9: on the Plate the three foods are there again, No meal selected");
   // ---- D10: Save it
   ok(await p.locator(".step-head input").first().evaluate((e) => e.value === "" && e.placeholder === "Skyr, Oats & Banana"), "D10: no name typed: the top shows the foods' name in grey, not Meal title");
   await p.locator(".pe-save").click(); await p.waitForTimeout(500);
@@ -58,7 +58,7 @@ const PORT = "3562";
   ok(s.meals.length === 1 && s.meals[0].title === "Skyr, Oats & Banana" && s.meals[0].items.length === 3, "D10: saved in My recipes under the foods' name, with its foods and amounts");
   ok(await p.locator(".pe-save").isDisabled() && /✓ Saved in My recipes/.test(await p.locator(".pe-save").innerText()), "D10: the button says Saved in My recipes with a tick and cannot be tapped again");
   ok(/Saved as Skyr, Oats & Banana, the foods' name\. A name you type on top renames it\./.test(await p.locator(".plate-end").innerText()), "D10: a line says which name");
-  ok(s.items.length === 3 && s.feedback.length === 0 && /^Meal and day not set$/.test(await h.line(p)), "D10: the plate stays, nothing is counted, no meal is set");
+  ok(s.items.length === 3 && s.feedback.length === 0 && /^No meal selected$/.test(await h.line(p)), "D10: the plate stays, nothing is counted, no meal is set");
   await p.locator(".step-head input").first().fill("Morning bowl"); await p.locator(".step-head input").first().blur(); await p.waitForTimeout(500);
   ok((await h.st(p)).meals[0].title === "Morning bowl", "D10: a name typed on top renames the recipe");
   await p.locator(".pe-plan").click(); await p.waitForTimeout(300); await h.row(p, "Dinner", ".plate-end").click(); await p.waitForTimeout(1200);

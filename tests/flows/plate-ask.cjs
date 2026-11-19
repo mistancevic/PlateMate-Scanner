@@ -75,7 +75,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await shoot(true);
   // B146: before the read: an empty title, and the warning
   const ttl = page.locator(".step-head input.title-input");
-  ok(await ttl.inputValue() === "" && await ttl.getAttribute("placeholder") === "Chef Mealan names it", "B146: the photo screen starts with an empty title, not the plate's name");
+  ok(await ttl.inputValue() === "" && await ttl.getAttribute("placeholder") === "Untitled plate", "B146, changed by B150: the photo screen starts with an empty title, Untitled plate, not the plate's name");
   const warn = page.locator(".plate-waits");
   ok(await warn.count() === 1 && await warn.locator("svg").count() === 1 && /^Your plate is not empty\.\s?It has Chicken and rice\. After the read you choose: add the photo's foods to it, or start a new plate\.$/.test(await text(".plate-waits")) && await warn.evaluate((x) => !!(x.compareDocumentPosition(document.querySelector(".photo-screen")) & 4)), "B146: a warning before the read, with a warning sign, above the photo: " + (await text(".plate-waits")).slice(0, 60));
   ok((await st()).title === "Chicken and rice" && (await st()).items.length === 2, "B146: the plate that was there is not touched");

@@ -18,7 +18,7 @@ const names = (s) => s.items.map((i) => i.food.name.split(",")[0] + (i.est ? "~"
   let p = await h.open();
   await h.toPhoto(p, false);
   ok(/Your plate is not empty\. It has Skyr, Oats & Banana\./.test(await h.main(p)), "E1: the photo screen warns that the plate is not empty, as in 0.3.152");
-  ok(/^Meal and day not set$/.test(await h.line(p)), "E1: the meal line does not change");
+  ok(/^No meal selected$/.test(await h.line(p)), "E1: the meal line does not change");
   await h.readIt(p);
   let m = await h.main(p);
   ok(/Your plate is not empty It already has Skyr, Oats & Banana/.test(m) && /The photo holds chicken breast ~180 g and rice ~150 g\./.test(m) && await p.getByRole("button", { name: "Add to my plate" }).count() === 1 && await p.getByRole("button", { name: "Start a new plate" }).count() === 1 && await p.locator(".rows .swipe, .plate-card").count() === 0,
@@ -33,7 +33,7 @@ const names = (s) => s.items.map((i) => i.food.name.split(",")[0] + (i.est ? "~"
   s = await h.st(p); m = await h.main(p);
   ok(names(s) === "Skyr, Oats, Banana, Chicken breast~, Rice~", "E3: the photo's foods joined, marked ~: " + names(s));
   ok(await p.locator(".read-view").count() === 0 && /On your plate/.test(m) && await p.locator(".fit-top").count() === 1 && await p.locator(".add-more-open").count() === 1 && await p.locator(".prepare-it").count() === 1, "E3: I land on the Plate with foods, the one landing, not on a read");
-  ok(/^Meal and day not set$/.test(await h.line(p)) && !s.pick, "E3: the meal line is as it was");
+  ok(/^No meal selected$/.test(await h.line(p)) && !s.pick, "E3: the meal line is as it was");
   ok(!/Did you eat it\?/.test(m) && await p.locator(".chef-ask").count() === 0 && s.feedback.length === 0, "E3: no Did you eat it?");
   ok(await p.locator(".step-head input").first().evaluate((e) => /Chicken|Rice/.test(e.placeholder) && /Skyr/.test(e.placeholder)), "E3: the top shows the foods' name, now with the new foods");
   await p.context().close();
@@ -50,7 +50,7 @@ const names = (s) => s.items.map((i) => i.food.name.split(",")[0] + (i.est ? "~"
   await p.context().close();
   // no meal set, an older photo joined: its day and time are the guess only when I say Ate it
   p = await h.open(); await h.toPhoto(p, true); await h.readIt(p); await p.getByRole("button", { name: "Add to my plate" }).click(); await p.waitForTimeout(1000);
-  ok(await p.locator(".chef-ask").count() === 0 && /^Meal and day not set$/.test(await h.line(p)), "E3: an older photo joined a plate with no meal set: no question, the line as it was");
+  ok(await p.locator(".chef-ask").count() === 0 && /^No meal selected$/.test(await h.line(p)), "E3: an older photo joined a plate with no meal set: no question, the line as it was");
   await p.locator(".pe-ate").click(); await p.waitForTimeout(400);
   ok(/Which meal\? From the photo, Saturday 15:57:/.test(await p.locator(".plate-end").innerText()) && /Lunch/.test(await p.locator(".plate-end .pcal-row.on").innerText()), "E3: Ate it later: the photo's day and time are the marked guess in the calendar");
   await p.context().close();
@@ -60,7 +60,7 @@ const names = (s) => s.items.map((i) => i.food.name.split(",")[0] + (i.est ? "~"
   await p.getByRole("button", { name: "Start a new plate" }).click(); await p.waitForTimeout(1000);
   s = await h.st(p);
   ok(s.meals.length === 1 && s.meals[0].title === "Skyr, Oats & Banana" && s.meals[0].items.length === 3, "E5: the old plate is saved in My recipes, under the foods' name");
-  ok(names(s) === "Chicken breast~, Rice~" && !s.pick && /^Meal and day not set$/.test(await h.line(p)), "E5: the new plate holds only what came and has no meal set");
+  ok(names(s) === "Chicken breast~, Rice~" && !s.pick && /^No meal selected$/.test(await h.line(p)), "E5: the new plate holds only what came and has no meal set");
   ok(await p.locator(".read-view .plate-end").count() === 1, "E5: for a photo I am on its read, which ends with What do you do with it?");
   const line = p.locator(".old-plate");
   ok(await line.count() === 1 && /^Skyr, Oats & Banana is saved in My recipes\. This plate holds only the photo's foods\. Open it in My recipes › Undo$/.test((await line.innerText()).replace(/\s+/g, " ").trim()) && await line.locator(".old-plate-x").count() === 1, "E6: one line: what was saved, Open it in My recipes, Undo, X");
@@ -96,7 +96,7 @@ const names = (s) => s.items.map((i) => i.food.name.split(",")[0] + (i.est ? "~"
   s = await h.st(p);
   ok(names(s) === "Skyr, Oats, Banana, Protein pudding", "E9: a barcode: the food joins the plate: " + names(s));
   ok(/Added/.test(await p.locator(".toast").innerText().catch(() => "")) && /pot|Protein pudding|200/.test(await p.locator(".toast").innerText().catch(() => "")), "E9: the message says what was added: " + (await p.locator(".toast").innerText().catch(() => "")).replace(/\s+/g, " "));
-  ok(await p.locator(".plate-ask, .chef-ask").count() === 0 && /^Meal and day not set$/.test(await h.line(p)), "E9: no question; the meal line does not change");
+  ok(await p.locator(".plate-ask, .chef-ask").count() === 0 && /^No meal selected$/.test(await h.line(p)), "E9: no question; the meal line does not change");
   await p.context().close();
 
   // ---- E10, E11: a recipe by Recipe link
@@ -114,7 +114,7 @@ const names = (s) => s.items.map((i) => i.food.name.split(",")[0] + (i.est ? "~"
   s = await h.st(p);
   ok(names(s).startsWith("Skyr, Oats, Banana, ") && s.items.filter((i) => i.dish).length === 5 && s.items.filter((i) => !i.dish).length === 3, "E11: my foods stay; the recipe's five foods joined: " + names(s));
   ok(await p.locator(".dish-row, .dish-head, [class*=dish]").filter({ hasText: "Margherita pizza" }).count() >= 1 && new Set(s.items.filter((i) => i.dish).map((i) => i.dish.id)).size === 1 && s.items.find((i) => i.dish).dish.title === "Margherita pizza", "E11: the recipe joined as one dish row, Margherita pizza");
-  ok(/^Meal and day not set$/.test(await h.line(p)) && s.meals.some((x) => x.title === "Margherita pizza"), "E11: the meal line is as it was; the recipe is in My recipes");
+  ok(/^No meal selected$/.test(await h.line(p)) && s.meals.some((x) => x.title === "Margherita pizza"), "E11: the meal line is as it was; the recipe is in My recipes");
   await p.context().close();
   // ---- E12: Start a new plate with a recipe
   p = await h.open(); await toRead(p);

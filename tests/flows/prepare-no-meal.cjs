@@ -11,7 +11,7 @@ const toEat = async (p) => { await p.locator(".prepare-it").click(); await p.wai
 (async () => { const h = await start(PORT); const { ok } = h; try {
   // ---- D11: no meal set, to Eat, then Save
   let p = await h.open();
-  ok(/^Meal and day not set$/.test(await h.line(p)), "D11, given: foods on the plate, no meal set");
+  ok(/^No meal selected$/.test(await h.line(p)), "D11, given: foods on the plate, no meal set");
   await toEat(p);
   ok(/Eat: how was it\?/.test(await h.main(p)) && await p.locator(".pcal").count() === 0 && !(await h.st(p)).pick, "D11: Prep and Make to Eat: no meal was asked on the way");
   const note = p.locator("main textarea").first(); if (await note.count()) await note.fill("With cinnamon");

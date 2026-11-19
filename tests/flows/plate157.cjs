@@ -49,7 +49,8 @@ module.exports = async function start(PORT) {
   const body = async (p) => ((await p.locator("body").innerText()) ?? "").replace(/\s+/g, " ");
   const st = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   const plan = (p) => p.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned") || "{}"));
-  const line = async (p) => ((await p.locator(".meal-line").innerText()) ?? "").replace(/\s+/g, " ").trim();
+  // B150 (0.3.160): the meal line has a small title, Meal and day, drawn in capitals; line() gives what stands under it
+  const line = async (p) => ((await p.locator(".meal-line").innerText()) ?? "").replace(/\s+/g, " ").trim().replace(/^meal and day\s+/i, "");
   const row = (p, meal, scope = "") => p.locator(`${scope} .pcal-row`).filter({ hasText: new RegExp("^\\s*(✓\\s*)?" + meal) }).first();
   const rows = async (p, scope = "") => (await p.locator(`${scope} .pcal-row`).allInnerTexts()).map((t) => t.replace(/\s+/g, " ").trim());
   const tab = async (p, name) => { await p.locator("nav button").filter({ hasText: name }).click(); await p.waitForTimeout(700); };

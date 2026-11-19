@@ -4,7 +4,7 @@
 // the foods; + Add more to your plate, which opens the three tiles and the list in place, with an X; Prepare it under it.
 // The old row Manual, Scan, Photo of my meal, Say what you have, + Add a food and Quick picks are gone. A dish from a recipe is
 // one row with its name and weight, its foods under it. DT310: a choice is a white chip; chosen, it is light blue with a dark
-// blue border and a tick. Not in this release: the meal line Meal and day not set, the calendar, What do you do with it?
+// blue border and a tick. Not in this release: the meal line No meal selected, the calendar, What do you do with it?
 // 0.3.157 (DT308, the meal model, and DT311; Coach Milan, Go 18 November 11:14), changed by the stories: Empty plate stands in the row above the foods, and the card's top says only On your plate (DT311). The read ends with What do you do with it?, three white choices; Ate it and the marked meal bring Did you eat it? back, whose chips this walkthrough looks at (DT308.4).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");

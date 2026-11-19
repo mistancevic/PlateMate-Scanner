@@ -2954,7 +2954,7 @@
       "checked": true
     },
     "make.exploringAPhoto": {
-      "text": "Samo gledam sliku.",
+      "text": "Slika, obrok nije izabran.",
       "checked": true
     },
     "make.skip": {
@@ -3510,7 +3510,7 @@
       "checked": true
     },
     "make.exploringNothingIsSizedFor": {
-      "text": "Samo gledam: ništa nije odmereno za obrok. Izaberi obrok da vidiš šta tvoj plan ima za njega.",
+      "text": "Obrok nije izabran: ništa nije odmereno za obrok. Izaberi obrok da vidiš šta tvoj plan ima za njega.",
       "checked": true
     },
     "make.snackOffThePlanNot": {
@@ -12906,7 +12906,7 @@
       "checked": true
     },
     "photoask.exploring": {
-      "text": "Samo gledam",
+      "text": "Nije moj obrok",
       "checked": true
     },
     "photoask.notYourMeal": {
@@ -13750,7 +13750,7 @@
       "checked": true
     },
     "plate.exploringLine": {
-      "text": "Samo gledam · nije odmereno za obrok",
+      "text": "Obrok nije izabran · nije odmereno za obrok",
       "checked": true
     },
     "plate.snackLine": {
@@ -14150,15 +14150,15 @@
       "checked": true
     },
     "plate.exploringStays": {
-      "text": "Samo gledam: {slot} ostaje bez promene.",
+      "text": "Obrok nije izabran: {slot} ostaje bez promene.",
       "checked": true
     },
     "plate.exploring": {
-      "text": "Samo gledam",
+      "text": "Obrok nije izabran",
       "checked": true
     },
     "plate.exploringLeaves": {
-      "text": "Samo gledam: {slot} ostaje bez promene, i ništa se ne upisuje.",
+      "text": "Obrok nije izabran: {slot} ostaje bez promene, i ništa se ne upisuje.",
       "checked": true
     },
     "plate.targetForPlate": {
@@ -14170,11 +14170,11 @@
       "checked": true
     },
     "plate.photoLineIdea": {
-      "text": "Samo gledam sliku. {n} namirnica pročitana, količine procenjene (~). Nije upisano: nije tvoj obrok.|Samo gledam sliku. {n} namirnice pročitane, količine procenjene (~). Nije upisano: nije tvoj obrok.|Samo gledam sliku. {n} namirnica pročitano, količine procenjene (~). Nije upisano: nije tvoj obrok.",
+      "text": "Slika bez izabranog obroka. {n} namirnica pročitana, količine procenjene (~). Nije upisano: nije tvoj obrok.|Slika bez izabranog obroka. {n} namirnice pročitane, količine procenjene (~). Nije upisano: nije tvoj obrok.|Slika bez izabranog obroka. {n} namirnica pročitano, količine procenjene (~). Nije upisano: nije tvoj obrok.",
       "checked": true
     },
     "plate.photoLine": {
-      "text": "Tvoja slika, {time}. {n} namirnica pročitana, količine procenjene (~). Dodirni količinu da je ispraviš.|Tvoja slika, {time}. {n} namirnice pročitane, količine procenjene (~). Dodirni količinu da je ispraviš.|Tvoja slika, {time}. {n} namirnica pročitano, količine procenjene (~). Dodirni količinu da je ispraviš.",
+      "text": "Tvoja slika, {time}. {n} namirnica pročitana, količine procenjene (~).|Tvoja slika, {time}. {n} namirnice pročitane, količine procenjene (~).|Tvoja slika, {time}. {n} namirnica pročitano, količine procenjene (~).",
       "checked": true
     },
     "plate.retake": {
@@ -14434,7 +14434,7 @@
       "checked": true
     },
     "plate.exploringSo": {
-      "text": "Samo gledam, pa {slot} ostaje bez promene.",
+      "text": "Obrok nije izabran, pa {slot} ostaje bez promene.",
       "checked": true
     },
     "plate.fitItToMy": {
@@ -21602,11 +21602,11 @@
       "checked": true
     },
     "make.forExploringHead": {
-      "text": "Samo gledam:",
+      "text": "Obrok nije izabran:",
       "checked": true
     },
     "make.forExploring": {
-      "text": "tanjir koji samo gledaš. Ništa se ne upisuje. Sa fotografijom se čuva u Receptima, pod Posluženo.",
+      "text": "ništa se ne upisuje dok ne izabereš obrok. Uz Ne računaj tanjir sa fotografije se čuva u Receptima, pod Posluženo.",
       "checked": true
     },
     "make.forMealHead": {
@@ -22350,7 +22350,7 @@
       "checked": true
     },
     "photoask.namesIt": {
-      "text": "Chef Mealan daje ime",
+      "text": "Tanjir bez naziva",
       "checked": true
     },
     "photoask.takenNow": {
@@ -22386,7 +22386,7 @@
       "checked": true
     },
     "plate.changeTheFoods": {
-      "text": "Promeni namirnice",
+      "text": "Nastavi na Tanjiru",
       "checked": true
     },
     "plate.didYouEatIt": {
@@ -22598,7 +22598,7 @@
       "checked": true
     },
     "plate.mealNotSet": {
-      "text": "Obrok i dan nisu postavljeni",
+      "text": "Obrok nije izabran",
       "checked": true
     },
     "plate.clearMeal": {
@@ -22799,6 +22799,94 @@
     },
     "cal.whichByPlate": {
       "text": "Koji obrok? Tanjir je započet: {day}, {time}:",
+      "checked": true
+    },
+    "plate.mealAndDay": {
+      "text": "Obrok i dan",
+      "checked": true
+    },
+    "plate.closeMealEdit": {
+      "text": "Zatvori",
+      "checked": true
+    },
+    "cal.timeOf": {
+      "text": "Vreme: {meal}",
+      "checked": true
+    },
+    "plate.photoTakenOn": {
+      "text": "Slika je napravljena: {day}, {time}.",
+      "checked": true
+    },
+    "plate.photoSavedOn": {
+      "text": "Slika je sačuvana: {day}, {time}. Ne zna se kada je napravljena.",
+      "checked": true
+    },
+    "plate.namedFromPhoto": {
+      "text": "Chef Mealan je dao ime po tvojoj slici.",
+      "checked": true
+    },
+    "plate.estimate": {
+      "text": "procena",
+      "checked": true
+    },
+    "plate.whichOneAria": {
+      "text": "Koja je to namirnica",
+      "checked": true
+    },
+    "plate.whichOneIs": {
+      "text": "{food}: koja vrsta?",
+      "checked": true
+    },
+    "plate.yoursLow": {
+      "text": "tvoje",
+      "checked": true
+    },
+    "plate.tagNew": {
+      "text": "novo",
+      "checked": true
+    },
+    "plate.tagChanged": {
+      "text": "promenjeno",
+      "checked": true
+    },
+    "plate.tellChefCheck": {
+      "text": "Reci Chef Mealanu šta da proveri",
+      "checked": true
+    },
+    "plate.tellAbout": {
+      "text": "O namirnici: {food}",
+      "checked": true
+    },
+    "plate.tellHint": {
+      "text": "Dodirni namirnicu iznad, ili napiši šta nedostaje.",
+      "checked": true
+    },
+    "plate.tellPlaceholder": {
+      "text": "Šta jeste, šta nije, šta nedostaje.",
+      "checked": true
+    },
+    "plate.sendToChef": {
+      "text": "Pošalji Chef Mealanu",
+      "checked": true
+    },
+    "plate.didAdded": {
+      "text": "Dodao sam: {foods}.",
+      "checked": true
+    },
+    "plate.didChanged": {
+      "text": "Promenjeno: {from}, sada {to}.",
+      "checked": true
+    },
+    "plate.didRemoved": {
+      "text": "Uklonio sam: {foods}.",
+      "checked": true
+    },
+    "plate.didKept": {
+      "text": "Tvoje izmene ostaju kako jesu.",
+      "checked": true
+    },
+    "plate.didSame": {
+      "text": "Vidim isto kao pre.",
       "checked": true
     }
   }

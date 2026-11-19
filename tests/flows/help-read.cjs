@@ -4,6 +4,9 @@
 // A photo from Your photos has the same line before the read. The reads are stand-ins (no AI here).
 // Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): the box asks
 // Anything Chef Mealan should know?, on the photo screen and here; the photo screen has no chips.
+// Changed by story DT318 (0.3.160, board DT318; Go 19 November 01:00): the link Wrong foods? Help Chef Mealan read it is gone
+// from the Plate's screen: words have one place, the field on the read. This form opens with one more photo of the same
+// plate, behind ＋ Photo.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -51,24 +54,25 @@ const READ = { dish: "Pork schnitzel with roasted potatoes", foods: [
     await page.unroute("**/api/plate-photo");
     await page.route("**/api/plate-photo", (r) => { sent.push(r.request().postDataJSON()); r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(READ) }); });
     // 0.3.65: after a read the help folds into one link
-    ok(await page.locator(".mp-help").count() === 0 && (await page.locator(".mp-again-link").textContent()).trim() === "Wrong foods? Help Chef Mealan read it ›", "0.3.65: folded into one link after a read");
+    ok(await page.locator(".mp-help").count() === 0 && await page.locator(".mp-again-link").count() === 0 && !/Wrong foods\?/.test(await page.locator("main").textContent()), "0.3.65, changed by DT318: after a read the form is folded away, and there is no link Wrong foods? Help Chef Mealan read it");
     // 0.3.65: swapping a food read from a photo keeps its grams: no can't reach
     await swipe(page, page.locator(".swipe-fg", { hasText: "Fish fillet" }).locator(".thumb"), "left"); await page.waitForTimeout(200);
     await page.locator(".swipe-act, .swipe-bg button, button").filter({ hasText: /^Swap$/ }).first().click().catch(() => {}); await page.waitForTimeout(400);
     const pills = await page.locator(".sheet .pdpill").allTextContents();
     ok(pills.length > 0 && pills.every((x) => x.trim() === "180 g"), "0.3.65: the swap list keeps 180 g for each food, no can't reach: " + pills.slice(0, 4).join(", "));
     await page.locator(".sheet").getByRole("button", { name: "Cancel" }).click().catch(() => {}); await page.waitForTimeout(200);
-    await page.locator(".mp-again-link").click(); await page.waitForTimeout(200);
+    // changed by DT318: ＋ Photo, then One more photo of this plate, opens the form with that photo in it
+    await page.locator(".mp-add-photo").click(); await page.waitForTimeout(300);
+    await page.locator(".mp-plus-same input").setInputFiles(path.join(ROOT, "tests/flows/plate.jpg")); await page.waitForTimeout(1000);
     const help = page.locator(".mp-help");
-    ok(/Help Chef Mealan read it/.test(await help.textContent()) && await help.locator(".mp-help-photos img").count() === 1 && /＋ Photo/.test(await help.textContent()) && (await help.locator(".pill-primary").textContent()).trim() === "Read it again", "under the photo: Help Chef Mealan read it, the photo, ＋ Photo, Read it again");
-    await help.locator(".mp-help-add input").setInputFiles(path.join(ROOT, "tests/flows/plate.jpg")); await page.waitForTimeout(800);
+    ok(/Help Chef Mealan read it/.test(await help.textContent()) && await help.locator(".mp-help-photos img").count() === 2 && (await help.locator(".pill-primary").textContent()).trim() === "Read it again with 2 photos", "changed by DT318: one more photo of this plate opens Help Chef Mealan read it, with both photos and Read it again with 2 photos");
     await help.getByLabel("Anything Chef Mealan should know?") /* DT305 (0.3.151): the words box asks what he should know */.fill("pork schnitzel, breaded, Augustiner");
     ok(await help.locator(".mp-help-photos img").count() === 2 && (await help.locator(".pill-primary").textContent()).trim() === "Read it again with 2 photos and this", "＋ Photo adds one; the button says what goes: Read it again with 2 photos and this");
     await help.locator(".pill-primary").click(); await page.waitForTimeout(1800);
     const st = await store(page);
     ok(sent.length === 1 && sent[0].note === "pork schnitzel, breaded, Augustiner" && sent[0].more?.length === 1 && st.items.length === 2 && /Pork schnitzel/.test(st.items[0].food.name) && st.photo.note === "pork schnitzel, breaded, Augustiner" && st.photo.more?.length === 1, "one read with both photos and the words; the new foods replace the old");
     const ask = page.locator(".mp-which");
-    ok(/One thing I cannot tell from the photo: under the breading, is it pork, veal, chicken or fish\?/.test(await ask.textContent()) && JSON.stringify((await ask.locator(".choice").allTextContents()).map((x) => x.trim())) === JSON.stringify(["Pork schnitzel", "Veal schnitzel", "Chicken schnitzel", "Fish fillet"]), "Chef Mealan asks what the food is: four kinds, the read's guess on");
+    ok(/One thing I cannot tell from the photo: under the breading, is it pork, veal, chicken or fish\?/.test(await ask.textContent()) && JSON.stringify((await ask.locator(".choice").allTextContents()).map((x) => x.trim())) === JSON.stringify(["Pork schnitzel · estimate", "Veal schnitzel · estimate", "Chicken schnitzel · estimate", "Fish fillet · estimate"]) /* DT318 AC7: an answer that names no food of the lists says estimate */, "Chef Mealan asks what the food is: four kinds, the read's guess on");
     await ask.getByRole("button", { name: "Veal schnitzel" }).click(); await page.waitForTimeout(500);
     const s2 = await store(page), veal = s2.items.find((i) => /Veal schnitzel/.test(i.food.name));
     ok(!!veal && veal.grams === 180 && veal.food.protein === 26 && !s2.photo.which && await page.locator(".mp-which").count() === 0, "a tap changes the food to veal; its grams stay; the question goes");

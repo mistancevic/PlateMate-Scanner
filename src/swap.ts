@@ -10,6 +10,8 @@ const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,
 const STATE = /\b(cooked|raw|boiled|drained|dry|dried|uncooked|steamed|baked|fried|grilled|roasted|canned|white|brown|gekocht|roh|kuvan[ao]?|sirov[ao]?|lean|fat)\b/g;
 // the food's kind: the first word of its name without the state, "rice" in Rice, cooked and in Rice, white, raw
 export const kindOf = (name: string) => fold(name).replace(/[(),.%\d]/g, " ").replace(STATE, " ").trim().split(/\s+/)[0] ?? "";
+// the words that name the food's kind: its name up to the first comma, without the state and the numbers (sour cream; yogurt)
+export const kindWords = (name: string) => fold(name.split(",")[0]).replace(/[().%\d]/g, " ").replace(STATE, " ").trim().split(/\s+/).filter((x) => x.length > 1);
 export const sameKind = (a: Pick<Food, "name">, b: Pick<Food, "name">) => { const k = kindOf(a.name); return k.length > 1 && k === kindOf(b.name); };
 
 const round = (g: number) => (g >= 50 ? Math.round(g / 5) * 5 : Math.max(1, Math.round(g)));

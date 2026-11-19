@@ -4,7 +4,7 @@
 // every piece of state and every effect stays in the Plate screen and is handed in, so nothing here can reset.
 import type { Dispatch, SetStateAction } from "react";
 import { w, wn, type Val } from "../words";
-import { atMeal, type PlateWhen } from "../plateMode";
+import { atMeal, mealAt, type PlateWhen } from "../plateMode";
 import { photoAdvice } from "../mealPhoto";
 import { NumbersTable, type PlanNumbers } from "../components/Letters";
 import type { GateLine } from "../gates";
@@ -13,7 +13,7 @@ import { CHEF_NAME } from "../components/Mark";
 import { foodName } from "../reference";
 import type { Slot } from "../slots";
 import type { AppApi, Step, Tab } from "./api";
-import { PhotoSaid } from "./PlatePhoto";
+import { PhotoSaid, TellChef } from "./PlatePhoto";
 
 type Nutrition = ReturnType<typeof import("../pilot").aggregate>;
 export type PlateReadIn = {
@@ -24,6 +24,8 @@ export type PlateReadIn = {
   dayNums: { kcal: number; protein: number; fats: number; carbs: number };
   dishNow: { sig: string; status: "working" | "done" | "off"; makesIt?: boolean; why?: string; around?: string; betterAs?: string; holds?: string } | null;
   dishOfMeal: boolean;
+  // DT318 (0.3.160): Chef Mealan's checks, handed in by the Plate screen (PlateChecks.tsx)
+  checksEl: React.ReactNode;
   // 0.3.157 (DT308.4 to DT308.6): with no meal set the read ends with What do you do with it?, handed in by the Plate screen
   endEl: React.ReactNode;
   extrasText: (items: { food: any; grams: number }[]) => string | null;
@@ -65,7 +67,7 @@ export type PlateReadIn = {
 };
 
 export function plateRead(given: PlateReadIn) {
-  const { autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, endEl, unset, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem } = given;
+  const { checksEl, autoTitle, bigN, clearPlate, dayLine, dayNums, dishNow, dishOfMeal, endEl, unset, extrasText, items, mealDate, mealSlot, mealWord, notify, numbersOpen, nutri, p, photoMeal, photoTime, pickSlot, planNow, plateMeal, plateWhen, putInSlot, readoutEl, rvEat, rvEdit, rvGrams, rvPlan, setRvEat, setRvEdit, setRvGrams, setRvPlan, setShotAt, setState, setStep, setTab, shotAt, sizeRef, slotV, state, t, updateItem } = given;
   const ph = state.photo!;
   const total = Math.max(1, Math.round(items.reduce((k, i) => k + i.grams, 0)));
   const planning = !!p.filling && plateWhen === "plan", past = !!p.filling && plateWhen === "past";
@@ -88,22 +90,33 @@ export function plateRead(given: PlateReadIn) {
       setState((s) => ({ ...s, items: [], portion: null, title: "", photo: undefined }));
       p.setFilling(null); setStep("in"); setTab("plan"); notify(w("plate.isInEaten", { title, slot: slotV(f) })); return;
     }
-    // 0.3.157: a photo you ate then logs at its own time on its own day; set for a meal of another day, at that meal's time
-    const at = ph.who !== "ate" ? undefined : !slot || new Date(ph.at).toDateString() === new Date(`${slot.date}T12:00:00`).toDateString() ? ph.at : new Date(`${slot.date}T12:00:00`).toDateString() === new Date().toDateString() ? undefined : atMeal(slot.date, slot.time);
+    // 0.3.157: a photo you ate then logs at its own time when no meal is set
+    // B150 (0.3.160): set for a meal, it logs on that meal's day at that meal's time in the calendar
+    const at = ph.who !== "ate" ? undefined : slot ? mealAt(slot.date, slot.time) : ph.at;
     p.ateNow(plateMeal(), slot, { photo: ph.image, at, ...(frac < 1 ? { part: frac } : {}) });
   };
   const shots = [ph.image, ...(ph.more ?? [])], at = Math.min(shotAt, shots.length - 1);
+  // DT318: the food my words are about, what Chef Mealan did when asked again, and the sending of my words. What I set
+  // (an amount I typed or answered, a food settled by a check) goes along, so he keeps it and does not ask about it again.
+  const marked = rvEdit ? items.find((i) => i.id === rvEdit) ?? null : null, did = ph.did;
+  const tell = (words: string) => { const note = [ph.note, marked ? `${foodName(marked.food)}: ${words}` : words].filter(Boolean).join(" ").slice(-300);
+    setRvEdit(null);
+    void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true, more: ph.more, note, told: true, ...(ph.share ? { share: ph.share } : {}), ...(ph.dish ? { dish: ph.dish } : {}) }); };
   return (
     <section className="card plate-card read-view">
       <div className="mp-big">
         <div className="mp-big-img"><img src={shots[at]} alt={w("make.photoOfTheMeal")} /></div>
         {shots.length > 1 && <div className="mp-shots" role="group" aria-label={w("make.photosOfTheMeal")}>{shots.map((src, k) => (
           <button key={k} type="button" className={`mp-shot${k === at ? " on" : ""}`} aria-pressed={k === at} aria-label={w("make.photoN", { n: k + 1 })} onClick={() => setShotAt(k)}><img src={src} alt="" /></button>))}</div>}
-        {/* an amount is corrected here, by a tap on it */}
-        <div className="mp-tags">{items.map((i) => rvEdit === i.id
-          ? <span key={i.id} className="mp-tag-edit">{foodName(i.food).split(",")[0]} <input className="rv-amount" type="number" inputMode="numeric" min={1} autoFocus aria-label={w("plate.gramsOfFood", { food: foodName(i.food).split(",")[0] })} defaultValue={Math.round(i.grams)} onChange={(e) => { const g = Math.round(Number(e.target.value)); if (g > 0) updateItem(i.id, { grams: g }); }} onBlur={() => setRvEdit(null)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /> g</span>
-          : <button key={i.id} type="button" className="mp-tag" onClick={() => setRvEdit(i.id)}>{foodName(i.food).split(",")[0]} {i.est ? "~" : ""}{Math.round(i.grams)} g</button>)}</div>
+        {/* DT318 (0.3.160, board DT318): a chip shows the food's full name. A tap marks it: the words below are then about
+            that food. An amount is typed on the Plate, behind Continue on the Plate. */}
+        <div className="mp-tags">{items.map((i) => { const on = rvEdit === i.id, tag = did?.fresh.includes(i.id) ? w("plate.tagNew") : did?.changed.includes(i.id) ? w("plate.tagChanged") : i.checked && (i.food.source === "estimate" || i.food.brand === "estimate") ? w("plate.estimate") : "";
+          return <button key={i.id} type="button" className={`mp-tag${on ? " on" : ""}`} aria-pressed={on} onClick={() => { setRvEdit(on ? null : i.id); if (did && (did.fresh.length || did.changed.length)) setState((st) => (st.photo?.did ? { ...st, photo: { ...st.photo, did: { ...st.photo.did, fresh: [], changed: [] } } } : st)); }}>{on && <span aria-hidden="true">✓ </span>}{foodName(i.food)} {i.est ? "~" : ""}{Math.round(i.grams)} g{tag && <> <span className="mp-tag-note">{tag}</span></>}</button>; })}</div>
         <div className="mp-big-row"><small className="muted mp-big-say">{wn("plate.photoLine", items.length, { time: photoTime(ph.at) })}</small></div>
+        {/* Chef Mealan's own checks first, then the field for what he could not see, then the one way to the Plate */}
+        {p.ai.on && checksEl}
+        {p.ai.on && <TellChef key={ph.at + ph.image.length} about={marked ? foodName(marked.food) : null} send={tell} />}
+        {did?.line && <div className="bubble mealan chef-line rv-did"><p><b>{CHEF_NAME}:</b> {did.line}</p></div>}
         <div className="rv-change"><button type="button" className="pill pill-small pill-action" onClick={() => setState((s) => (s.photo ? { ...s, photo: { ...s.photo, view: undefined } } : s))}>{w("plate.changeTheFoods")}</button></div>
       </div>
       {readoutEl}
