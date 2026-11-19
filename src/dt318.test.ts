@@ -26,6 +26,11 @@ test("DT318 AC10: a food settled by a check stays, also when the read names it a
   assert.deepEqual(r.items.map((i) => i.id), ["c", "y"]);
   assert.equal(r.fresh.length + r.changed.length + r.gone.length, 0);
 });
+test("DT318 AC11: an amount typed on the Plate stays too", () => {
+  const prev = [item("b", "Sweet potato fries, baked", 150, { amountSet: true })];
+  const r = toldAgain(prev, [item("y", "Sweet potato fries, baked", 180)], sameKind);
+  assert.deepEqual(r.items.map((i) => `${i.id} ${i.grams}`), ["b 150"]);
+});
 test("DT318: a food the second look no longer sees is gone, and said so", () => {
   const prev = [item("a", "Rice, cooked", 150), item("b", "Ketchup", 20)];
   const r = toldAgain(prev, [item("x", "Rice, cooked", 150)], sameKind);
@@ -37,6 +42,9 @@ test("DT318 AC6: the same kind is found by a word of the name, also behind a bra
   assert.ok(isKin(kin, { name: "Hildebrand yogurt 0.2% fat" }));
   assert.ok(isKin(kin, { name: "Naturjoghurt", aliases: ["Yogurt, plain, whole"] }));
   assert.ok(!isKin(kin, { name: "Sour cream, 20 %" }));
+  const sour = kinWords({ name: "Sour cream" });
+  assert.ok(isKin(sour, { name: "Sour cream, 20 %" }));
+  assert.ok(!isKin(sour, { name: "Trahanas, dried (cracked wheat and sour milk)" }));
 });
 test("DT318 AC7: an answer is real when it names a food of the list or a basic food, else an estimate", () => {
   assert.ok(answerIsReal("Skyr, natural", []));

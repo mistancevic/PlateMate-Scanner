@@ -132,8 +132,10 @@ export function ideaAdvice(x: { items: Ingredient[]; protein: number; mealWord: 
 // typed or answered, a food settled by a check) stays as it is and takes the place of the read's own version of that food.
 // One line says what he did, and the foods he added or changed are named, so their chips can say so.
 const lowName = (s: string | undefined) => (s ?? "").toLowerCase();
+// what the person set on a food read from a photo: its amount (answered, or typed on the Plate) or what it is (a check)
+export const settled = (i: Ingredient) => !!i.fromPhoto && (!i.est || !!i.checked || !!i.amountSet);
 export function toldAgain(prev: Ingredient[], read: Ingredient[], sameKind: (a: { name: string }, b: { name: string }) => boolean): { items: Ingredient[]; kept: Ingredient[]; fresh: Ingredient[]; changed: { from: Ingredient; to: Ingredient }[]; gone: Ingredient[] } {
-  const kept = prev.filter((i) => i.fromPhoto && (!i.est || i.checked));
+  const kept = prev.filter(settled);
   const isKept = (n: Ingredient) => kept.some((k) => lowName(k.food.name) === lowName(n.food.name) || lowName(k.readAs) === lowName(n.readAs ?? n.food.name) || (!!k.readAs && sameKind({ name: k.readAs }, { name: n.readAs ?? n.food.name })) || (k.food.aliases ?? []).some((a) => lowName(a) === lowName(n.food.name)));
   const rest = read.filter((n) => !isKept(n));
   const old = prev.filter((i) => !kept.includes(i));

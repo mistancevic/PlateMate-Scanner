@@ -88,6 +88,8 @@ export type Ingredient = {
   checked?: boolean;
   // DT318: the name the read gave this food, kept when an answer to a check changes the food
   readAs?: string;
+  // DT318: an amount typed on the Plate for a food read from a photo: it stays when Chef Mealan looks again
+  amountSet?: boolean;
   id: string;
   food: Food;
   grams: number;

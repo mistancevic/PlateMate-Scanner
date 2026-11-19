@@ -124,7 +124,7 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
 import { ratesOf } from "./letters";
 import { asMine, travels, toShare } from "./memberFoods";
-import { cleanRead, itemsOfRead, toldAgain, holdsMore, type Vessel } from "./mealPhoto";
+import { cleanRead, itemsOfRead, toldAgain, settled, holdsMore, type Vessel } from "./mealPhoto";
 import { sameKind } from "./swap";
 import { dishOf, visitFor, upsertServed, withNote, mealItems, mealTitle, cleanMenu, applyMenu, withMenuLine, withoutMenuLine, type Served, type OnPlate, type VisitMenu, type Dish } from "./served";
 import { identityTwins } from "./foodId";
@@ -1986,7 +1986,7 @@ export default function App() {
           Promise.all(more0.map((m) => resizeImageBase64(m, 1280, 1280))), Promise.all(more0.map((m) => thumbnailBase64(m, 480)))]);
         const ask = () => api("/api/plate-photo", { image: sent, ...(moreSent.length ? { more: moreSent } : {}), ...(note ? { note } : {}), ...(x?.share ? { share: x.share } : {}), ...(x?.dish ? { course: x.dish } : {}), region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name),
           // DT318 (0.3.160): what the person set before goes along, so the read keeps it and does not ask about it again
-          ...(x?.told ? { keep: state.items.filter((i) => i.fromPhoto && (!i.est || i.checked)).slice(0, 12).map((i) => ({ name: i.food.name, grams: Math.round(i.grams) })) } : {}) });
+          ...(x?.told ? { keep: state.items.filter(settled).slice(0, 12).map((i) => ({ name: i.food.name, grams: Math.round(i.grams) })) } : {}) });
         // DT242 (0.3.96, board Stories182; Coach Milan 6 November 10:16 and 10:35): the answer lost on the way (another app, no
         // signal) is asked for again once, by itself, when the app is back in front and online; only then the card, never the
         // browser's own words

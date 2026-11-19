@@ -11,7 +11,7 @@ import { getLang } from "../lang";
 import { foodOfRead } from "../mealPhoto";
 import { foodName, REFERENCE, referenceFood } from "../reference";
 import { basicOf } from "../foodId";
-import { kindOf } from "../swap";
+import { kindWords } from "../swap";
 import { asMine, type MemberFood } from "../memberFoods";
 import type { Food, Ingredient, PilotState } from "../pilot";
 
@@ -30,12 +30,13 @@ const same = (a: string | undefined, b: string | undefined) => !!a && !!b && a.t
 const isGuess = (f: Food) => f.source === "estimate" || f.brand === "estimate";
 // would this answer land as a real food, by its name?
 export const answerIsReal = (name: string, library: Food[]) => library.some((x) => !isGuess(x) && (same(x.name, name) || (x.aliases ?? []).some((a) => same(a, name)))) || !!basicOf({ name });
-// the same kind, by a word of the name: yogurt in Yogurt, 10% fat, in Greek yogurt, 2 % and in a brand's yogurt. The kind's
-// word is the first word of the food's name without its state, in English and in the language shown.
+// the same kind, by the words of the name: yogurt in Yogurt, 10% fat, in Greek yogurt, 2 % and in a brand's yogurt; sour
+// cream only where both words stand. The kind's words are the food's name up to its first comma, without its state, in
+// English and in the language shown; a food is of that kind when its name, or another name of it, holds them all.
 const fold = (x: string) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 const wordsOf = (x: string) => fold(x).replace(/[(),.%\d]/g, " ").split(/\s+/).filter(Boolean);
-export const kinWords = (f: Pick<Food, "name" | "aliases">, shown?: string) => new Set([kindOf(f.name), ...(f.aliases ?? []).map(kindOf), ...(shown ? [kindOf(shown)] : [])].filter((k) => k.length > 2));
-export const isKin = (kin: Set<string>, c: { name: string; aliases?: string[] }) => [c.name, ...(c.aliases ?? [])].some((n) => wordsOf(n).some((x) => kin.has(x)));
+export const kinWords = (f: Pick<Food, "name" | "aliases">, shown?: string): string[][] => [f.name, ...(f.aliases ?? []), ...(shown ? [shown] : [])].map(kindWords).filter((ws) => ws.length > 0 && ws.join("").length > 2);
+export const isKin = (kin: string[][], c: { name: string; aliases?: string[] }) => [c.name, ...(c.aliases ?? [])].some((n) => { const have = wordsOf(n); return kin.some((ws) => ws.every((x) => have.includes(x))); });
 // the foods of the same kind as this one: yours first, then the app's basic foods; at most four, each name once
 export function kindOptions(food: Food, library: Food[], region: string | null | undefined, uid: () => string): WhichOne["options"] {
   const out: WhichOne["options"] = [], seen = new Set<string>(), kin = kinWords(food, foodName(food));

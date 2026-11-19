@@ -2065,12 +2065,12 @@ export function JourneyScreen(p: AppApi) {
                 </div>
                 {/* CT (0.2.24): eggs, bananas and a pack's pieces are counted; the size and the grams small */}
                 {isCounted(i) ? <CountAmount item={i} editable={!i.locked && !imported} open={sizeOpen === i.id} onToggle={countedOf(i) && !i.locked && !imported ? () => setSizeOpen(sizeOpen === i.id ? null : i.id) : undefined}
-                    onGrams={(g, c) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: g, ...(c ? { count: c } : {}) }); }} />
+                    onGrams={(g, c) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: g, ...(c ? { count: c } : {}), ...(i.fromPhoto ? { amountSet: true } : {}) }); }} />
                 : i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
                   <label className="grams">
                     {i.est && <span className="mp-est" aria-label={w("plate.estimated")}>~</span>}
                     <input aria-label={w("meal.gramsOf", { food: foodV(i.food) })} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : Math.round(i.grams * 10) / 10}
-                      onChange={(e) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) }); }}
+                      onChange={(e) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0), ...(i.fromPhoto ? { amountSet: true } : {}) }); }}
                       onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done"
                       onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: "center", behavior: "smooth" }), 250)} />
                     <span>g{servingLabel(i.food, i.grams) ? ` = ${servingLabel(i.food, i.grams)}` : ""}</span>
