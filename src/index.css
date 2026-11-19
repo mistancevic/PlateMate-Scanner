@@ -3613,3 +3613,10 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 /* DT306: Did you eat it? on Chef Mealan's card, Done the one button */
 .mp-say .mp-eat { margin: 10px 0 0; } .mp-say .mp-eat .pa-chips { flex-wrap: wrap; } .mp-say .mp-eat .pa-opt { flex: none; padding: 0 14px; }
 .mp-say .mp-go { justify-content: flex-end; margin-top: 10px; } .mp-say .mp-go .mp-done { min-width: 150px; height: 44px; min-height: 44px; }
+
+/* DT328 (Coach Milan 19 November 17:16, B): four ways in, two by two on a phone, four in a row on a computer */
+.l-ways-four { grid-template-columns: 1fr 1fr; gap: 18px 14px; }
+.l-ways-four .l-way h3 { font-size: 16px; }
+.l-ways-four .l-way p { font-size: 13.5px; min-height: 6em; }
+.l-ways-four .l-video { width: 100%; max-width: 172px; border-width: 4px; }
+@media (min-width: 760px) { .l-ways-grid.l-ways-four { grid-template-columns: repeat(4, 1fr); } }

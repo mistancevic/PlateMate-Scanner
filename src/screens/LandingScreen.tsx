@@ -148,7 +148,7 @@ export function LandingScreen() {
         <span className="l-eyebrow">{w("home.waysEyebrow")}</span>
         <h2>{w("home.waysTitle")}</h2>
         <p className="l-ways-lead">{w("home.waysLead")}</p>
-        <div className="l-ways-grid">
+        <div className="l-ways-grid l-ways-four">
           {WAYS.map((x) => (
             <div className="l-way" key={x.id}>
               <h3>{x.title}</h3>
@@ -354,8 +354,11 @@ export function LandingScreen() {
 
 // HP2 (0.2.114): the four ways in, each with its clip
 const WAYS = [
-  // HP3 (Coach Milan 1 November): two ways in, not four; the barcode and the labels are one, the group of packs leaves the page
+  // HP3 (Coach Milan 1 November): two ways in, not four. DT328 (19 November): four again, two by two on a phone
   { id: "barcode", get title() { return w("home.way.barcode"); }, get line() { return w("home.way.barcodeLine"); } },
+  // DT328 (Coach Milan 19 November 17:16): label and group come back, four ways in as the camera has them
+  { id: "label", get title() { return w("home.way.label"); }, get line() { return w("home.way.labelLine"); } },
+  { id: "group", get title() { return w("home.way.group"); }, get line() { return w("home.way.groupLine"); } },
   { id: "meal", get title() { return w("home.way.meal"); }, get line() { return w("home.way.mealLine"); } },
 ];
 export function DayVideo({ src, poster, label, big }: { src: string; poster: string; label: string; big?: boolean }) {

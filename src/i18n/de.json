@@ -11106,15 +11106,15 @@
       "checked": true
     },
     "home.waysLead": {
-      "text": "Scanne einen Barcode oder eine Nährwerttabelle, oder fotografiere die Mahlzeit vor dir. Alles landet auf deinem Teller.",
+      "text": "Scanne einen Barcode, eine Nährwerttabelle oder mehrere Packungen auf einmal, oder fotografiere die Mahlzeit vor dir. Alles landet auf deinem Teller.",
       "checked": true
     },
     "home.way.barcode": {
-      "text": "Ein Barcode oder ein Etikett",
+      "text": "Ein Barcode",
       "checked": true
     },
     "home.way.barcodeLine": {
-      "text": "Die Werte der Packung, oder das Etikett aus einem Foto gelesen, bei Bedarf von jeder Seite. Du prüfst es.",
+      "text": "Der Code der Packung, von der Kamera gelesen. Die Werte kommen aus der Lebensmitteldatenbank. Du prüfst sie.",
       "checked": true
     },
     "home.way.meal": {
@@ -22755,6 +22755,22 @@
     },
     "plate.backToCamera": {
       "text": "Zurück zur Kamera",
+      "checked": true
+    },
+    "home.way.label": {
+      "text": "Eine Nährwerttabelle",
+      "checked": true
+    },
+    "home.way.labelLine": {
+      "text": "Die Nährwerttabelle, aus einem Foto gelesen. Du prüfst die Werte.",
+      "checked": true
+    },
+    "home.way.group": {
+      "text": "Mehrere Packungen auf einmal",
+      "checked": true
+    },
+    "home.way.groupLine": {
+      "text": "Erst die Vorderseiten, dann die Rückseiten. Jede Packung wird gefunden, mit den Werten aus ihrer Tabelle.",
       "checked": true
     }
   }

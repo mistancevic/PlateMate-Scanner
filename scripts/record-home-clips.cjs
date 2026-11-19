@@ -30,12 +30,14 @@ const ean13 = (code, x0, y0, m, h) => {
   const bits = "101" + [...code.slice(1, 7)].map((d, k) => (P[k] === "L" ? L : G)[Number(d)]).join("") + "01010" + [...code.slice(7)].map((d) => Rr[Number(d)]).join("") + "101";
   return [...bits].map((b, k) => (b === "1" ? `<rect x="${x0 + k * m}" y="${y0}" width="${m}" height="${h}" fill="#111"/>` : "")).join("");
 };
+// DT328 (Coach Milan 19 November 17:03): a label scan is the nutrition table. The drawn table has the product's name printed
+// above it, as the back of a pack has it, so one photo names the food and gives its values.
 // HC6: made-up packs only. The back of a skyr cup, the barcode where the camera's barcode frame is
 // HP3 (Coach Milan, 1 November 12:31): the tub is a picture made with AI for an invented brand, Fjell; the real EAN-13
 // the app's scanner reads is drawn into its empty white label by design/home-clips/pack.py
 const BARCODE = photo("pack-barcode.jpg");
 const LABEL_ROWS = [["Energy", "276 kJ / 66 kcal"], ["Fat", "0.3 g"], ["of which saturates", "0.2 g"], ["Carbohydrate", "3.8 g"], ["of which sugars", "3.8 g"], ["Protein", "11.6 g"], ["Salt", "0.1 g"]];
-const LABEL = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960"><rect width="720" height="960" fill="#e9e2d0"/><rect x="190" y="230" width="340" height="470" fill="#fff" stroke="#222" stroke-width="3"/><text x="206" y="272" font-family="Arial" font-weight="700" font-size="24">Nutrition declaration</text><text x="206" y="302" font-family="Arial" font-size="19">per 100 g</text>${LABEL_ROWS.map(([a, b], i) => `<line x1="206" x2="514" y1="${320 + i * 52}" y2="${320 + i * 52}" stroke="#222" stroke-width="1.5"/><text x="206" y="${354 + i * 52}" font-family="Arial" font-size="19">${a}</text><text x="514" y="${354 + i * 52}" font-family="Arial" font-size="19" text-anchor="end">${b}</text>`).join("")}</svg>`);
+const LABEL = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960"><rect width="720" height="960" fill="#e9e2d0"/><rect x="190" y="200" width="340" height="500" fill="#fff" stroke="#222" stroke-width="3"/><text x="206" y="234" font-family="Arial" font-weight="700" font-size="20">Fjell Skyr natural · 450 g</text><line x1="206" x2="514" y1="248" y2="248" stroke="#222" stroke-width="3"/><text x="206" y="280" font-family="Arial" font-weight="700" font-size="22">Nutrition declaration</text><text x="206" y="306" font-family="Arial" font-size="18">per 100 g</text>${LABEL_ROWS.map(([a, b], i) => `<line x1="206" x2="514" y1="${322 + i * 52}" y2="${322 + i * 52}" stroke="#222" stroke-width="1.5"/><text x="206" y="${356 + i * 52}" font-family="Arial" font-size="19">${a}</text><text x="514" y="${356 + i * 52}" font-family="Arial" font-size="19" text-anchor="end">${b}</text>`).join("")}</svg>`);
 // HC4: three packs in one picture. Coach Milan 19 November 15:14: a photo made with AI for the made-up brands (HC6),
 // placed whole on a blurred copy: the camera shows the middle of the picture (x 140 to 580 of 720), the packs stand there
 const GROUP = photo("group.jpg");
@@ -300,15 +302,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     };
     await clip("label", async (page, a) => {
       await openScan(page, a); await toMode(page, a, "Label"); a.mark();
-      // DT327 (Coach Milan 19 November 15:20): two photos, two sides: the front gives the name, the table the values. The
-      // camera's auto shot takes each one; the clip turns the pack in between and taps nothing but Analyze
-      const two = await twoSides(page);
-      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 700);
+      // DT328: one photo, the nutrition table with the name above it; the auto shot takes it, the clip taps only Analyze
+      const one = await oneShot(page);
+      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 900); // HC8: room under 12 s
       await a.swipe(1360, 500);
       const energy = await page.locator("input").evaluateAll((xs) => xs.map((x) => x.value)).catch(() => []);
-      await saveFood(page, a, 200, 350); // HC8: under 12 s with two photos
-      return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` }, HC3b: two };
-    }, { sides: [path.join(ASSETS, "pack-front.jpg"), path.join(tmp, "label.png")] });
+      await saveFood(page, a);
+      return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` }, HC3b: one };
+    }, { feed: "label" });
     await clip("group", async (page, a) => {
       await openScan(page, a); await toMode(page, a, "Group"); a.mark();
       const two = await twoSides(page); // DT327: the fronts, then the backs, each by the auto shot (see the label clip)

@@ -2763,9 +2763,9 @@
     "screen.home.calcLine": {"en":"Pick what you crave and a food you have at home. See how much of it makes the plate fit.","area":"Home page","where":"The home page"},
     "screen.home.waysEyebrow": {"en":"Start from anything","area":"Home page","where":"Start from anything"},
     "screen.home.waysTitle": {"en":"What you eat, read in seconds","area":"Home page","where":"Start from anything"},
-    "screen.home.waysLead": {"en":"Scan a barcode or a nutrition label, or take a photo of the meal in front of you. Each one lands on your plate.","area":"Home page","where":"Start from anything"},
-    "screen.home.way.barcode": {"en":"A barcode or a label","area":"Home page","where":"Start from anything"},
-    "screen.home.way.barcodeLine": {"en":"The pack's values, or the label read from a photo, every side if you need. You check it.","area":"Home page","where":"Start from anything"},
+    "screen.home.waysLead": {"en":"Scan a barcode, a nutrition label or a few packs at once, or take a photo of the meal in front of you. Each one lands on your plate.","area":"Home page","where":"Start from anything","release":"0.3.165"},
+    "screen.home.way.barcode": {"en":"A barcode","area":"Home page","where":"Start from anything","release":"0.3.165"},
+    "screen.home.way.barcodeLine": {"en":"The pack's code, read by the camera. Its values come from the food database. You check them.","area":"Home page","where":"Start from anything","release":"0.3.165"},
     "screen.home.way.meal": {"en":"A photo of your meal","area":"Home page","where":"Start from anything"},
     "screen.home.way.mealLine": {"en":"Chef Mealan names the foods and estimates the grams. You correct what you know.","area":"Home page","where":"Start from anything"},
     "screen.home.onePlate": {"en":"One plate","area":"Home page","where":"The home page"},
@@ -5688,6 +5688,10 @@
     "screen.photoask.partHelp": {"en":"Leave it empty and Chef Mealan takes one portion.","area":"The Plate","where":"The Plate","release":"0.3.163"},
     "screen.photoask.partSaid": {"en":"A part of it, about {grams} g","area":"The Plate","where":"The Plate","release":"0.3.163"},
     "screen.plate.addMoreShort": {"en":"Add more","area":"The Plate","where":"The Plate","release":"0.3.163"},
-    "screen.plate.backToCamera": {"en":"Back to the camera","area":"The Plate","where":"The Plate","release":"0.3.163"}
+    "screen.plate.backToCamera": {"en":"Back to the camera","area":"The Plate","where":"The Plate","release":"0.3.163"},
+    "screen.home.way.label": {"en":"A label","area":"Home page","where":"The home page","release":"0.3.165"},
+    "screen.home.way.labelLine": {"en":"The nutrition table, read from one photo. You check the values.","area":"Home page","where":"The home page","release":"0.3.165"},
+    "screen.home.way.group": {"en":"A few packs at once","area":"Home page","where":"The home page","release":"0.3.165"},
+    "screen.home.way.groupLine": {"en":"The fronts, then the backs. Each pack is found, with the values from its table.","area":"Home page","where":"The home page","release":"0.3.165"}
   }
 }

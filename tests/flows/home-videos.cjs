@@ -1,9 +1,11 @@
 // Story DT327 (0.3.164, board DT327; Coach Milan 19 November, Go 15:29 for AC1 to AC7, Go 15:34 for AC8): the home page
 // videos and their lines show the app as it is today. The twelve videos are recorded on the release they ship in by
-// scripts/record-home-clips.cjs (ten of them on the page; label and group left it in HP3), which checks HC1 to HC13 on every video and writes public/landing/clips.json only when all
+// scripts/record-home-clips.cjs, which checks HC1 to HC13 on every video and writes public/landing/clips.json only when all
 // pass. Three lines follow the app (Then you decide, Cook it's first line, the cook video's name), in three languages. The
 // note under the videos names the version they were recorded on, and says the packs are made up and the meals real.
 // The checks name the acceptance criteria of the board (DT327 AC1 to AC8).
+// Changed by story DT328 (0.3.165, board DT328; Coach Milan, Go 19 November 17:16): label and group are on the page again, so all twelve videos are
+// The label video is one photo of the nutrition table (DT328 AC2), so the recorder's check of it is HC3b one photo
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -32,8 +34,7 @@ const lines = (f) => { const j = JSON.parse(fs.readFileSync(path.join(ROOT, `src
     // every video is on the page and served
     let p = await open("/?home");
     const vids = await p.locator("video source[type='video/mp4']").evaluateAll((xs) => xs.map((x) => x.getAttribute("src")));
-    // since HP3 (Coach Milan 1 November) the label and group videos are not on the page (two ways in); they are recorded and served
-    for (const v of VIDEOS) { const r = await fetch(U + `/landing/way-${v}.mp4`, { method: "HEAD" }); const on = !["label", "group"].includes(v); ok(r.ok && vids.includes(`/landing/way-${v}.mp4`) === on, `the ${v} video is served${on ? " and on the page" : ", not on the page since HP3"}`); }
+    for (const v of VIDEOS) { const r = await fetch(U + `/landing/way-${v}.mp4`, { method: "HEAD" }); ok(r.ok && vids.includes(`/landing/way-${v}.mp4`), `the ${v} video is on the page and served`); }
     // AC5, AC6, AC8 in English
     const en = lines("en");
     const main = clean(await p.locator("main, body").first().innerText());
