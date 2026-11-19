@@ -1519,8 +1519,10 @@ export function JourneyScreen(p: AppApi) {
             ? Head({ name: true, title: "", sub: way?.kind === "change" ? w("plate.changedSub", { title: rec.title, meal: mealW })
               : way?.kind === "side" ? w("plate.sideSub", { title: rec.title, pct: Math.round((kcalOfItems(way.options[way.pick].dish) / Math.max(1, kcalOfItems(rec.items) / (rec.makes?.n ?? 1))) * 100), one: oneOf(rec), side: way.options[way.pick].name, where: sideWord(way.options[way.pick].kind) })
               : w("plate.fromSub", { source: rec.source?.name || wordV(state.photo?.pot === rec.id ? "plate.yourPhoto" : rec.source?.from === "link" ? "plate.theLink" : "plate.yourScreenshot"), how: pmode === "whole" ? w("make.theWholeRecipeAsYou") : pmode === "sized" && mealNeed ? w("plate.mixSized", { meal: mealW }) : w("plate.oneAsMakes", { one: oneOf(rec) }) }) })
+          // DT324 (0.3.162, board DT324; Coach Milan, Go 19 November 09:48): the Plate's screen of a photo says what the read
+          // says, while the plate has the name Chef Mealan gave it; a name of your own has no line, as on the read
           : state.photo && items.length > 0
-            ? Head({ name: true, title: "", sub: w("plate.readFromPhoto") })
+            ? Head({ name: true, title: "", sub: state.photo.namedAs && (state.title ?? "").trim() === state.photo.namedAs ? w("plate.namedFromPhoto") : undefined })
           // DT308: a title you typed on the empty plate is yours, not a recipe's: From My recipes only when a recipe has that name
           : state.title && state.title !== "DaaM" && items.length > 0 && state.meals.some((m) => m.title === state.title)
             ? Head({ name: true, title: "", sub: w("plate.fromMyRecipes") })

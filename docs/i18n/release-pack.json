@@ -1,6 +1,6 @@
 {
-  "release": "0.3.161",
-  "at": "2026-11-19T07:06:39.193Z",
+  "release": "0.3.162",
+  "at": "2026-11-19T08:50:12.568Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -49605,42 +49605,6 @@
       "at": "2026-11-18T15:41:38.467Z"
     },
     {
-      "id": "screen.plate.oldHelp",
-      "kind": "screen",
-      "key": "plate.oldHelp",
-      "en": "Ate it asks which meal, and saves it there at the time it was started. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "enBefore": "Ate it saves it to {day}, to the meal it was set for, at the time it was started. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
-      "sr": "Pojeo sam ga pita koji obrok i upisuje ga tamo, u vreme kad je počet. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
-      "de": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort mit der Uhrzeit, zu der er begonnen wurde. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.159",
-      "order": 900001,
-      "at": "2026-11-18T15:41:38.467Z"
-    },
-    {
-      "id": "screen.plate.oldHelpPhoto",
-      "kind": "screen",
-      "key": "plate.oldHelpPhoto",
-      "en": "Ate it asks which meal, and saves it there at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "enBefore": "Ate it saves it to {day}, to the meal it was set for, at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
-      "sr": "Pojeo sam ga pita koji obrok i upisuje ga tamo, u vreme kad je slika nastala. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
-      "de": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort mit der Uhrzeit des Fotos. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.159",
-      "order": 900002,
-      "at": "2026-11-18T15:41:38.467Z"
-    },
-    {
       "id": "screen.plate.arrRecipe",
       "kind": "screen",
       "key": "plate.arrRecipe",
@@ -50426,6 +50390,42 @@
       "release": "0.3.161",
       "order": 900001,
       "at": "2026-11-19T07:06:39.193Z"
+    },
+    {
+      "id": "screen.plate.oldHelp",
+      "kind": "screen",
+      "key": "plate.oldHelp",
+      "en": "Ate it asks which meal, and saves it there. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "enBefore": "Ate it asks which meal, and saves it there at the time it was started. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+      "sr": "Pojeo sam ga pita koji obrok i upisuje ga tamo. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "de": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.162",
+      "order": 900000,
+      "at": "2026-11-19T08:50:12.568Z"
+    },
+    {
+      "id": "screen.plate.oldHelpPhoto",
+      "kind": "screen",
+      "key": "plate.oldHelpPhoto",
+      "en": "Ate it asks which meal, and saves it there. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "enBefore": "Ate it asks which meal, and saves it there at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.",
+      "sr": "Pojeo sam ga pita koji obrok i upisuje ga tamo. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "de": "Gegessen fragt, welche Mahlzeit, und speichert ihn dort. Für später speichern hebt ihn auf, damit du ihn ein andermal fertig machst, und der Teller ist wieder frei. Weiter bearbeiten öffnet ihn so, wie er ist, und nach diesem Teller wird nicht mehr gefragt. Leeren macht den Teller leer.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.162",
+      "order": 900001,
+      "at": "2026-11-19T08:50:12.568Z"
     }
   ]
 }
