@@ -1,6 +1,8 @@
 // DT260 (0.3.114, board Stories195; Coach Milan 8 November 08:53 to 09:22, Go): How to. The Menu's first row with the count;
 // the list by part of the day with New; one situation with its steps, Try it, Tried it and Didn't work with a line that goes
 // to Coach Milan; the card on Today below the title and the goal, Not now until the next release.
+// Changed by story DT329 (0.3.166, board DT329; Coach Milan, Go 19 November 18:55): nine situations, the words of doing (Do it now,
+// I did it, Done, 1 of 9 done), and I did it asks How did it go? before it counts
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -38,11 +40,11 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
     await page.locator(".ht-see").click(); await page.waitForTimeout(600);
     } else { await page.locator("header .menu-button").click(); await page.waitForTimeout(500); await page.locator(".howto-row").click(); await page.waitForTimeout(500); }
     ok(await text(".menu-title") === "How to", "See how opens How to");
-    ok(/Beta: 0 of 8 tried/.test(await text(".ht-beta")), "the beta count");
-    ok(/Coach Milan sees what you tried/.test(await text(".ht-beta")), "it says Coach Milan sees what you tried");
+    ok(/Beta: 0 of 9 done/.test(await text(".ht-beta")), "the beta count");
+    ok(/Coach Milan sees what you did/.test(await text(".ht-beta")), "it says Coach Milan sees what you did");
     const groups = await page.locator(".ht-group .label").allInnerTexts();
     ok(groups.map((x) => x.toUpperCase()).join("|") === "EVERY DAY|RECIPES AND COOKING|YOUR WEEK", "three parts of the day: " + groups.join("|"));
-    ok(await page.locator(".ht-sit").count() === 8, "eight situations");
+    ok(await page.locator(".ht-sit").count() === 9, "nine situations");
     ok(await page.locator(".ht-sit .ht-new").count() === NEW.length && (await Promise.all(NEW.map((x) => page.locator(`.ht-${x[0]} .ht-new`).count()))).every((n) => n === 1) && await page.locator(".ht-eatNow .ht-new").count() === 0, "New on the new ones only");
     // 3. one situation: steps, Tried it, Didn't work
     await page.locator(".ht-screenshot").click(); await page.waitForTimeout(400);
@@ -53,10 +55,11 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
     ok(small.length === 0, "every button at least 44 px: " + small.join(", "));
     const posted = []; page.on("request", (r) => { if (r.url().endsWith("/api/howto") && r.method() === "POST") posted.push(JSON.parse(r.postData() || "{}")); });
     await page.locator(".ht-tried").click(); await page.waitForTimeout(400);
-    ok(await page.locator(".ht-tried").getAttribute("aria-pressed") === "true", "Tried it is on");
-    ok(posted.length === 1 && posted[0].id === "screenshot" && posted[0].s === "tried", "it goes to Coach Milan: " + JSON.stringify(posted));
+    await page.locator(".ht-r").nth(3).click(); await page.locator(".ht-send").click(); await page.waitForTimeout(400);
+    ok(await page.locator(".ht-tried").getAttribute("aria-pressed") === "true", "I did it is on");
+    ok(posted.length === 1 && posted[0].id === "screenshot" && posted[0].s === "tried" && posted[0].r === 4, "it goes to Coach Milan: " + JSON.stringify(posted));
     await page.locator(".ht-back").click(); await page.waitForTimeout(300);
-    ok(/Beta: 1 of 8 tried/.test(await text(".ht-beta")) && await page.locator(".ht-screenshot .ht-done").count() === 1, "the list counts it");
+    ok(/Beta: 1 of 9 done/.test(await text(".ht-beta")) && await page.locator(".ht-screenshot .ht-done").count() === 1, "the list counts it");
     await page.locator(".ht-busyDay").click(); await page.waitForTimeout(300);
     await page.locator(".ht-didnt").click(); await page.waitForTimeout(300);
     ok(await text(".howto-ask h3") === "What happened?", "Didn't work asks what happened");
@@ -72,7 +75,7 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
     ok(/\/me\/calendar$/.test(page.url()), "Try it for A busy day opens Google Calendar: " + page.url());
     await page.goto(U + "/today"); await page.waitForTimeout(1000);
     await page.locator("header .menu-button").click(); await page.waitForTimeout(500);
-    ok(await page.locator(".menu-list .menu-row").nth(1).evaluate((x) => x.classList.contains("howto-row")) && (await text(".howto-row")).replace(/\s+/g, "") === `How to 1 of 8 tried${newN(NEW.length)}`.replace(/\s+/g, ""), "the Menu's second row, under Me (0.3.116): " + await text(".howto-row"));
+    ok(await page.locator(".menu-list .menu-row").nth(1).evaluate((x) => x.classList.contains("howto-row")) && (await text(".howto-row")).replace(/\s+/g, "") === `How to 1 of 9 done${newN(NEW.length)}`.replace(/\s+/g, ""), "the Menu's second row, under Me (0.3.116): " + await text(".howto-row"));
     await page.locator(".howto-row").click(); await page.waitForTimeout(400);
     await page.locator(".ht-eatNow").click(); await page.waitForTimeout(300);
     await page.locator(".ht-try").click(); await page.waitForTimeout(700);
@@ -90,18 +93,19 @@ const PORT = "3488", U = `http://127.0.0.1:${PORT}`;
       await page.locator("header .menu-button").click(); await page.waitForTimeout(400);
       await page.locator(".howto-row").click(); await page.waitForTimeout(400);
       ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${l}: How to fits the width`);
-      ok(!/Every day|Try it/.test(await text(".howto")), `${l}: How to in the language`);
+      ok(!/Every day|Do it now/.test(await text(".howto")), `${l}: How to in the language`);
     }
     await page.evaluate(() => localStorage.removeItem("chefmealan-lang"));
     // DT272: fifteen days after they came nothing is New, whatever the version: no card, no badge, no count
-    await page.clock.setFixedTime(new Date("2026-11-22T09:00:00"));
+    // DT329: Scan a pack from any screen came on 19 November, so the day is 5 December
+    await page.clock.setFixedTime(new Date("2026-12-05T09:00:00"));
     await page.evaluate(() => { localStorage.removeItem("chefmealan-howto-later"); });
     await page.goto(U + "/today"); await page.waitForTimeout(1000);
-    ok(await page.locator(".howto-today").count() === 0, "on 22 November nothing is new: no card on Today");
+    ok(await page.locator(".howto-today").count() === 0, "on 5 December nothing is new: no card on Today");
     await page.locator("header .menu-button").click(); await page.waitForTimeout(500);
     ok(!/new/.test(await text(".howto-row")), "the Menu's row has no new count: " + await text(".howto-row"));
     await page.locator(".howto-row").click(); await page.waitForTimeout(400);
-    ok(await page.locator(".ht-new").count() === 0 && await page.locator(".ht-sit").count() === 8, "no New badge in the list; the eight ways stay");
+    ok(await page.locator(".ht-new").count() === 0 && await page.locator(".ht-sit").count() === 9, "no New badge in the list; the nine ways stay");
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
   await b.close(); server.kill();

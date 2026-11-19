@@ -3620,3 +3620,24 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .l-ways-four .l-way p { font-size: 13.5px; min-height: 6em; }
 .l-ways-four .l-video { width: 100%; max-width: 172px; border-width: 4px; }
 @media (min-width: 760px) { .l-ways-grid.l-ways-four { grid-template-columns: repeat(4, 1fr); } }
+
+/* DT329: the situations' icons as the bar's: a line icon on the tint of the chosen tab */
+.ht-icon, .ht-big { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; border-radius: var(--r-control); background: var(--tint); color: var(--brand-text); font-size: 0; }
+.ht-icon { width: 40px; height: 40px; } .ht-big { width: 52px; height: 52px; }
+.ht-vid { display: inline-flex; align-self: flex-start; width: fit-content; align-items: center; gap: 3px; margin: 3px 0 2px; padding: 1px 7px; border-radius: 999px; background: var(--tint); color: var(--brand-text); font-size: 12px; font-weight: 800; vertical-align: 1px; }
+.ht-watch { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; }
+.ht-video { margin: 12px auto 0; width: 220px; } .ht-video video { width: 220px; border-radius: var(--r-card); border: 6px solid var(--ink); display: block; }
+.ht-video figcaption { margin-top: 6px; text-align: center; color: var(--muted); font-size: 13px; }
+.ht-sit { position: relative; }
+.ht-side { position: absolute; top: 14px; right: 14px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.ht-side .ht-new { align-self: flex-end; }
+.ht-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 12px; } .ht-r { min-height: 52px; display: inline-flex; align-items: center; justify-content: center; } .ht-r.on::before { content: none; } .ht-r.on { color: var(--brand-text); }
+.ht-saidface { display: inline-flex; align-items: center; gap: 6px; } .ht-saidface svg { color: var(--brand-text); flex: 0 0 auto; }
+.ht-ends { display: flex; justify-content: space-between; margin-top: 4px; } .ht-noteLabel { display: block; margin-top: 14px; font-weight: 700; } .ht-noteLabel textarea { margin-top: 6px; }
+/* DT329 (Coach Milan 18:51): faces like an emoji: the round face filled with its colour, the eyes and mouth in ink.
+   Fills from the app's five steps, light enough that the ink features read. The chosen one: a border in its colour */
+.ht-r1 { --face: #f48a78; --edge: var(--low-text); } .ht-r2 { --face: #f6b94a; --edge: var(--close-text); } .ht-r3 { --face: #78a9f0; --edge: var(--brand-text); }
+.ht-r4 { --face: #35cf9e; --edge: #12996c; } .ht-r5 { --face: #2fa37c; --edge: var(--top); }
+.ht-r { color: var(--ink); } .ht-r svg circle { fill: var(--face); } .ht-r svg { width: 32px; height: 32px; }
+.ht-r.on { background: var(--surface, #fff); border: 2.5px solid var(--edge); color: var(--ink); }
+.ht-saidface svg { color: var(--ink); } .ht-said1 svg circle { fill: #f48a78; } .ht-said2 svg circle { fill: #f6b94a; } .ht-said3 svg circle { fill: #78a9f0; } .ht-said4 svg circle { fill: #35cf9e; } .ht-said5 svg circle { fill: #2fa37c; }

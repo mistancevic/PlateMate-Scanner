@@ -7,21 +7,23 @@ import type { MenuSection, Tab } from "./screens/api";
 
 export type HowGroup = "day" | "cook" | "week";
 // added: the release it came in; on: that release's day, which is what New counts from (DT272); the first six were there from the start
-export type Situation = { id: string; icon: string; group: HowGroup; added: string; on: string; flow: string; steps: number; go: { tab?: Tab; menu?: MenuSection } };
+export type Situation = { id: string; icon: string; group: HowGroup; added: string; on: string; flow: string; steps: number; go: { tab?: Tab; menu?: MenuSection; hold?: boolean }; video?: { id: string; to?: number } };
 export const GROUPS: HowGroup[] = ["day", "cook", "week"];
 export const SITUATIONS: Situation[] = [
-  { id: "eatNow", icon: "🍽️", group: "day", added: "0.3.80", on: "2026-10-01", flow: "plate-chef.cjs", steps: 4, go: { tab: "journey" } },
+  { id: "scanAnywhere", icon: "ScanBarcode", group: "day", added: "0.3.166", on: "2026-11-19", flow: "plate-hold.cjs", steps: 4, go: { tab: "journey", hold: true }, video: { id: "hold" } },
+  { id: "eatNow", icon: "UtensilsCrossed", group: "day", added: "0.3.80", on: "2026-10-01", flow: "plate-chef.cjs", steps: 4, go: { tab: "journey" } },
   // DT315 (0.3.161, board DT315): step 4 is Ate it and the meal; Did you eat it? is step 5, as the read goes since 0.3.157
-  { id: "photoLog", icon: "📷", group: "day", added: "0.3.80", on: "2026-10-01", flow: "meal-photo.cjs", steps: 5, go: { tab: "journey" } },
-  { id: "bigBatch", icon: "🍲", group: "day", added: "0.3.80", on: "2026-10-01", flow: "whole-recipe-count.cjs", steps: 5, go: { tab: "recipes" } },
-  { id: "screenshot", icon: "🖼️", group: "cook", added: "0.3.80", on: "2026-10-01", flow: "recipe-import.cjs", steps: 4, go: { tab: "recipes" } },
-  { id: "fitTarget", icon: "🎯", group: "cook", added: "0.3.80", on: "2026-10-01", flow: "cook-mode.cjs", steps: 4, go: { tab: "recipes" } },
-  { id: "handsFree", icon: "🗣️", group: "cook", added: "0.3.110", on: "2026-11-07", flow: "voice-commands.cjs", steps: 5, go: { tab: "recipes" } },
-  { id: "otherLang", icon: "🌍", group: "cook", added: "0.3.99", on: "2026-11-07", flow: "recipe-lang.cjs", steps: 4, go: { tab: "recipes" } },
-  { id: "busyDay", icon: "📅", group: "week", added: "0.3.80", on: "2026-10-01", flow: "busy-times.cjs", steps: 4, go: { menu: "calendar" } },
+  { id: "photoLog", icon: "Camera", group: "day", added: "0.3.80", on: "2026-10-01", flow: "meal-photo.cjs", steps: 5, go: { tab: "journey" }, video: { id: "meal", to: 3 } },
+  { id: "bigBatch", icon: "CookingPot", group: "day", added: "0.3.80", on: "2026-10-01", flow: "whole-recipe-count.cjs", steps: 5, go: { tab: "recipes" } },
+  { id: "screenshot", icon: "Images", group: "cook", added: "0.3.80", on: "2026-10-01", flow: "recipe-import.cjs", steps: 4, go: { tab: "recipes" } },
+  { id: "fitTarget", icon: "Target", group: "cook", added: "0.3.80", on: "2026-10-01", flow: "cook-mode.cjs", steps: 4, go: { tab: "recipes" } },
+  { id: "handsFree", icon: "Mic", group: "cook", added: "0.3.110", on: "2026-11-07", flow: "voice-commands.cjs", steps: 5, go: { tab: "recipes" }, video: { id: "cook" } },
+  { id: "otherLang", icon: "Languages", group: "cook", added: "0.3.99", on: "2026-11-07", flow: "recipe-lang.cjs", steps: 4, go: { tab: "recipes" }, video: { id: "languages" } },
+  { id: "busyDay", icon: "CalendarClock", group: "week", added: "0.3.80", on: "2026-10-01", flow: "busy-times.cjs", steps: 4, go: { menu: "calendar" } },
 ];
 
-export type HowMark = { s: "tried" | "didnt"; at: string; note?: string; v?: string };
+// DT329 (0.3.166): r is How did it go?, 1 hard to 5 easy, with the note of your own
+export type HowMark = { s: "tried" | "didnt"; at: string; note?: string; r?: number; v?: string };
 export type HowMarks = Record<string, HowMark>;
 export const HOWTO_KEY = "chefmealan-howto", LATER_KEY = "chefmealan-howto-later";
 // in the beta a tester sees the count, and Coach Milan what they tried; after the beta the count goes

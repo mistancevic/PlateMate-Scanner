@@ -283,6 +283,8 @@ export interface AppApi {
   setDayType: (d: import("../personal").DayType) => void;
   formula: import("../personal").Formula | null;
   openMenu: (s?: MenuSection, from?: MenuSection) => void;
+  // DT329: How to's Scan a pack from any screen opens what holding Plate opens, the camera's modes
+  openCamMenu: () => void;
   newShared: number;
   markSharedSeen: () => void;
   // DT189 (0.3.31): Waiting for you, the coach's list; the badge on Clients is its count

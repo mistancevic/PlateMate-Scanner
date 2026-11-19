@@ -4,6 +4,7 @@
 // else happens. A short tap on Plate still opens the Plate. The camera's own row of modes has the same order. The Plate icon
 // is a plate that is also a shutter, between a fork and a knife. Closing the camera without a photo brings you back to
 // where you held the button.
+// HOWTO: scanAnywhere. DT329 (0.3.166, board DT329): How to's Scan a pack from any screen teaches this long press.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");

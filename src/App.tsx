@@ -1969,6 +1969,7 @@ export default function App() {
       storePersonal(next); setPersonalState(next);
     },
     cancelNextGoal: () => { const { nextGoal, ...rest } = getPersonal(); void nextGoal; storePersonal(rest); setPersonalState(rest); },
+    openCamMenu: () => setCamMenu(true),
     openMenu: (s?: MenuSection, from?: MenuSection) => { if (s === "explorer") { setMenuSection(null); setTalkOpen(false); setTab("explorer"); return; } setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
     foodsView, setFoodsView, saveFood, setEditFrom,
     // a product picked from the search opens the sheet titled by the button that picked it
