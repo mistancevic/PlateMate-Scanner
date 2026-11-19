@@ -4,7 +4,7 @@
 // every piece of state and every effect stays in the Plate screen and is handed in, so nothing here can reset.
 import type { Dispatch, SetStateAction } from "react";
 import { w, wn, type Val } from "../words";
-import { atMeal, type PlateWhen } from "../plateMode";
+import { atMeal, mealAt, type PlateWhen } from "../plateMode";
 import { photoAdvice } from "../mealPhoto";
 import { NumbersTable, type PlanNumbers } from "../components/Letters";
 import type { GateLine } from "../gates";
@@ -88,8 +88,9 @@ export function plateRead(given: PlateReadIn) {
       setState((s) => ({ ...s, items: [], portion: null, title: "", photo: undefined }));
       p.setFilling(null); setStep("in"); setTab("plan"); notify(w("plate.isInEaten", { title, slot: slotV(f) })); return;
     }
-    // 0.3.157: a photo you ate then logs at its own time on its own day; set for a meal of another day, at that meal's time
-    const at = ph.who !== "ate" ? undefined : !slot || new Date(ph.at).toDateString() === new Date(`${slot.date}T12:00:00`).toDateString() ? ph.at : new Date(`${slot.date}T12:00:00`).toDateString() === new Date().toDateString() ? undefined : atMeal(slot.date, slot.time);
+    // 0.3.157: a photo you ate then logs at its own time when no meal is set
+    // B150 (0.3.160): set for a meal, it logs on that meal's day at that meal's time in the calendar
+    const at = ph.who !== "ate" ? undefined : slot ? mealAt(slot.date, slot.time) : ph.at;
     p.ateNow(plateMeal(), slot, { photo: ph.image, at, ...(frac < 1 ? { part: frac } : {}) });
   };
   const shots = [ph.image, ...(ph.more ?? [])], at = Math.min(shotAt, shots.length - 1);

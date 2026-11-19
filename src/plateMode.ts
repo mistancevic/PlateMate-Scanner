@@ -25,3 +25,6 @@ export function mealOfDay(date: string, meal: string, now = new Date()): string 
 export const capFirst = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 // the moment a meal of a past day is counted at: that day, at the meal's time
 export const atMeal = (date: string, time: string) => new Date(`${date}T${time || "12:00"}:00`).toISOString();
+// B150 (0.3.160, board B150): where a photo you ate is logged to a meal, its day is the day of that meal and its time is
+// that meal's time in the calendar; a time still ahead of now (a later meal of today) is now. undefined: now.
+export const mealAt = (date: string, time: string, now = new Date()): string | undefined => { const t = atMeal(date, time); return new Date(t).getTime() > now.getTime() ? undefined : t; };

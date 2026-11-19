@@ -1,10 +1,9 @@
 // The Plate's meal line with everything behind its pencil.
-// 0.3.157 (DT308.1 and DT308.9, boards Stories236 and Stories241; Go 18 November 11:14): the line says Meal and day not set,
-// in grey, with a pencil, until you set a meal. The pencil opens your calendar (PlateCalendar.tsx): the days, that day's
-// meals; under them What is it? and Chef Mealan's What kind of moment?, as they were. A tap on a meal sets the meal and the
-// day and closes; a tap on a chip keeps it open; the pencil closes it with no meal set. Once set, the line says the meal,
-// then the day, date and time, and the moment when it is not a regular meal, and an X stands in the pencil's place: it
-// clears the meal and the day. Which day?, What is it for? and Just looking are gone: the calendar took their place.
+// B150 (0.3.160, board B150; Go 19 November 01:00): the line has a small title, Meal and day. Under it: No meal selected,
+// or the meal with its day and time. The pencil is always there. A tap opens edit mode, the calendar (PlateCalendar.tsx),
+// and the pencil turns into the X that closes it; the X does nothing else. A tap on a meal sets it, saved at once, and edit
+// mode stays open; the row No meal selected takes the meal off again. Under the calendar What is it? and Chef Mealan's
+// What kind of moment?, as they were. Just looking and the X that removed the meal are gone.
 // 0.3.156: a plain function the Plate screen calls while it draws: whether the line is open, the day shown and every other
 // piece of state stay in the Plate screen and are handed in, so nothing resets when the line opens or closes.
 import type { Dispatch, ReactNode, SetStateAction } from "react";
@@ -22,10 +21,7 @@ import type { AppApi } from "./api";
 export type MealSet = { name: string; date: string; time: string | null; plan?: boolean };
 export type PlateMealLineIn = {
   calendar: ReactNode;
-  clear: () => void;
   lineOpen: boolean;
-  // a plate kept as Just looking (a photo you said is an idea, or Don't count it): the line says so, as before
-  looking: string | null;
   p: AppApi;
   pdRef: number | null;
   pickTaste: (t: PlateTaste) => void;
@@ -42,21 +38,22 @@ export const mealDayText = (date: string, time: string | null) => {
 };
 
 export function plateMealLine(given: PlateMealLineIn) {
-  const { calendar, clear, lineOpen, looking, p, pdRef, pickTaste, set, setLineOpen, shownTaste, tasteHint } = given;
+  const { calendar, lineOpen, p, pdRef, pickTaste, set, setLineOpen, shownTaste, tasteHint } = given;
   const small = [p.moment !== "regular" ? momentOf(p.moment).name : "", shownTaste ? PLATE_TASTE_LINE[shownTaste] : "", set?.plan ? w("plate.goesIntoPlan") : ""].filter(Boolean).join(" · ");
   return (
     <>
       <div className={`plan-line meal-line${set ? " is-set" : ""}${lineOpen ? " is-open" : ""}`}>
-        <div className="meal-line-text" onClick={set ? undefined : () => setLineOpen((v) => !v)}>
+        <div className="meal-line-text" onClick={() => setLineOpen((v) => !v)}>
+          <span className="meal-line-title">{w("plate.mealAndDay")}</span>
           {set ? <><b className="meal-line-meal">{mealName(set.name)}</b><span className="meal-line-day">{mealDayText(set.date, set.time)}</span></>
-            : <b className={looking ? "meal-line-looking" : "meal-line-unset"}>{looking ?? w("plate.mealNotSet")}</b>}
+            : <b className="meal-line-unset">{w("plate.mealNotSet")}</b>}
           {small && <small className="meal-line-small">{small}</small>}
         </div>
-        {set
-          ? <button type="button" className="icon plan-line-x" aria-label={w("plate.clearMeal")} onClick={clear}><X size={22} /></button>
-          : <button type="button" className={`icon plan-line-pen${lineOpen ? " on" : ""}`} aria-label={w("make.changeWhatThisPlateIs")} aria-expanded={lineOpen} onClick={() => setLineOpen((v) => !v)}><Pencil size={20} /></button>}
+        {lineOpen
+          ? <button type="button" className="icon plan-line-pen plan-line-close on" aria-label={w("plate.closeMealEdit")} aria-expanded={true} onClick={() => setLineOpen(false)}><X size={22} /></button>
+          : <button type="button" className="icon plan-line-pen" aria-label={w("make.changeWhatThisPlateIs")} aria-expanded={false} onClick={() => setLineOpen(true)}><Pencil size={20} /></button>}
       </div>
-      {lineOpen && !set && (<div className="meal-line-open">
+      {lineOpen && (<div className="meal-line-open">
       {calendar}
       {/* DT274 (0.3.122, board Stories203): what each choice does, as it was under What is it for */}
       <p className="small for-say"><b>{w("make.forExploringHead")}</b> {w("make.forExploring")}<br /><b>{w("make.forMealHead")}</b> {w("make.forMeal")}</p>

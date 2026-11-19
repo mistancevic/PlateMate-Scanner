@@ -67,7 +67,7 @@ export interface AppApi {
   // DT131 (0.2.113): foods waiting to land on a plate that has foods; null when nothing waits
   plateAsk: PlateAsk | null;
   answerPlateAsk: (how: "add" | "new" | null) => void;
-  photoAsk: { image: string; at: string; taken?: boolean; more?: string[] } | null;
+  photoAsk: { image: string; at: string; taken?: boolean; more?: string[]; saved?: boolean } | null;
   dropPhotoAsk: () => void;
   // DT219 (0.3.58, board Stories164): a read that found no foods; the Plate stays as it was and Chef Mealan says so
   photoNoFoods: boolean;

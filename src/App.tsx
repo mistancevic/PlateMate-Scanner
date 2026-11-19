@@ -134,7 +134,7 @@ import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, rec
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
-import { plateWhenOf } from "./plateMode";
+import { plateWhenOf, mealAt } from "./plateMode";
 // DT305 (0.3.151): the line after a meal is logged at its photo's time; a past day is named
 const loggedLine = (d: Date): string => { const now = new Date(), y = new Date(now); y.setDate(y.getDate() - 1); const time = d.toTimeString().slice(0, 5);
   return d.toDateString() === now.toDateString() ? w("app.loggedAt", { time }) : d.toDateString() === y.toDateString() ? w("app.loggedForYesterday", { time }) : w("app.loggedForDay", { day: dateText(d, { weekday: "long", day: "numeric", month: "long" }), time }); };
@@ -314,7 +314,7 @@ export default function App() {
     // DT309 (0.3.153): the small menu a long press on Plate opens
     [camMenu, setCamMenu] = useState(false),
     // DT130 (0.2.110): a photo picked from Your photos in the meal camera, waiting on the Plate for whose plate and when
-    [photoAsk, setPhotoAsk] = useState<{ image: string; at: string; taken?: boolean; more?: string[] } | null>(null),
+    [photoAsk, setPhotoAsk] = useState<{ image: string; at: string; taken?: boolean; more?: string[]; saved?: boolean } | null>(null),
     // DT219 (0.3.58): the last photo read found no foods; nothing landed on the Plate
     [photoNoFoods, setPhotoNoFoods] = useState(false),
     // DT242 (0.3.96, board Stories182): a photo whose answer was lost twice is kept, with Try again
@@ -2027,7 +2027,9 @@ export default function App() {
         const potNow = share === "whole" && who !== "idea";
         const potId = potNow ? (again && state.photo?.pot && state.meals.some((m) => m.id === state.photo!.pot) ? state.photo.pot : uid()) : undefined;
         const course = x?.dish && x.dish !== "main" && who !== "idea" ? x.dish : undefined;
-        const photo: NonNullable<PilotState["photo"]> = { image: thumb, at, unsure: potNow ? null : read.unsure, ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}) };
+        const photo: NonNullable<PilotState["photo"]> = { image: thumb, at, unsure: potNow ? null : read.unsure, ...(read.vessel ? { vessel: read.vessel } : {}), ...(share ? { share } : {}), ...(x?.dish ? { dish: x.dish } : {}), ...(potId ? { pot: potId } : {}), ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null, ...(served ? { served } : {}), ...(again && state.photo?.keep === false ? { keep: false as const } : {}),
+          // B150 (0.3.160): the photo's time is only the time its file was saved; and the name Chef Mealan gave the plate
+          ...((photoAsk?.saved && who === "ate") || (again && state.photo?.atSaved) ? { atSaved: true as const } : {}), ...(!(x?.title ?? "").trim() && (read.dishLocal || read.dish) ? { namedAs: read.dishLocal || read.dish } : again && state.photo?.namedAs ? { namedAs: state.photo.namedAs } : {}) };
         // B146 (0.3.152): a name typed on the photo screen is kept for a new plate
         const named = (x?.title ?? "").trim();
         const land = (how: "add" | "new") => {
@@ -2116,7 +2118,8 @@ export default function App() {
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
     // DT133 (0.2.113): one portion of a plate of several, the rest kept on Today
     ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean; same?: "both" | Feedback; part?: number; back?: boolean; line?: string; quiet?: boolean }) => {
-      const now = x.at ?? new Date().toISOString();
+      // B150 (0.3.160): one day per record: a time of another day than the meal's day gives way to the meal's own time
+      const now = (x.at && slot && ymd(new Date(x.at)) !== slot.date ? mealAt(slot.date, slot.time) : x.at) ?? new Date().toISOString();
       // DT285: the same photo already a meal of that day: Update that meal, or Keep both
       const earlier = !x.same && x.photo ? samePhotoMeal(state.feedback, [x.photo], now) : null;
       if (earlier) { setSameAsk({ earlier, update: () => screenProps.ateNow(meal, slot, { ...x, same: earlier }), both: () => screenProps.ateNow(meal, slot, { ...x, same: "both" }) }); return false; }
@@ -2824,11 +2827,11 @@ export default function App() {
             onModeChange={setMode}
             onCapture={(x) => scan(x)}
             meal={screenProps.ai.on}
-            onMeal={(image, at, more) => {
+            onMeal={(image, at, more, saved) => {
               setCamera(false);
               // DT305 (0.3.151, board Stories230): every photo of a meal waits on the photo screen before the read, a photo you
               // take now too: the box for what Chef Mealan should know is there, and Read the plate reads
-              setPhotoAsk(at ? { image, at } : { image, at: new Date().toISOString(), taken: true, ...(more?.length ? { more } : {}) }); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+              setPhotoAsk(at ? { image, at, ...(saved ? { saved: true } : {}) } : { image, at: new Date().toISOString(), taken: true, ...(more?.length ? { more } : {}) }); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
             }}
             processGroupScan={(x) => scan(x, true)}
             onBarcode={(x) => lookup(x)}

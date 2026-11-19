@@ -33,7 +33,7 @@ interface CameraViewProps {
   // a photo from Your photos comes with its time, for whose plate and when
   meal?: boolean;
   // DT228 v2 (0.3.63): more photos of the same meal, staged like a pack's sides, read together
-  onMeal?: (image: string, takenAt: string | null, more?: string[]) => void;
+  onMeal?: (image: string, takenAt: string | null, more?: string[], saved?: boolean) => void;
 }
 
 export function CameraView({
@@ -261,8 +261,8 @@ export function CameraView({
     if (scannerMode === "meal") {
       // the photo's own time: the camera's EXIF when it has one, else the file's time
       void file.arrayBuffer().then((buf) => {
-        const at = exifTime(buf) ?? new Date(file.lastModified || Date.now());
-        const r = new FileReader(); r.onload = () => { if (r.result) onMeal?.(String(r.result), at.toISOString()); }; r.readAsDataURL(file);
+        const ex = exifTime(buf), at = ex ?? new Date(file.lastModified || Date.now());
+        const r = new FileReader(); r.onload = () => { if (r.result) onMeal?.(String(r.result), at.toISOString(), undefined, !ex); }; r.readAsDataURL(file);
       });
       return;
     }

@@ -1286,7 +1286,7 @@
     "gender": true
   },
   "make.yourPlateStaysAsIt": "Your plate stays as it was; the photo is not kept.",
-  "make.exploringAPhoto": "Just looking at a photo.",
+  "make.exploringAPhoto": "A photo, no meal selected.",
   "make.skip": "Skip",
   "make.aTapChangesTheFood": "A tap changes the food; its grams stay.",
   "make.theWholeRecipe": "The whole recipe",
@@ -1451,8 +1451,8 @@
   "make.ofWhat": "Of what",
   "make.nothingInYourFoodsLifts": "Nothing in your foods lifts it on its own.",
   "make.everyFoodIsKeptSo": "Every food is kept, so nothing moves. Free one with its dot.",
-  "make.exploringNothingIsSizedFor": "Just looking: nothing is sized for a meal. Pick a meal to see what your plan has for it.",
-  "make.forExploringHead": "Just looking:",
+  "make.exploringNothingIsSizedFor": "No meal selected: nothing is sized for a meal. Pick a meal to see what your plan has for it.",
+  "make.forExploringHead": "No meal selected:",
   "make.forExploring": "a plate you look at. Nothing is logged. With a photo it is kept in Recipes, under Served.",
   "make.forMealHead": "A meal (Breakfast, Lunch, Dinner):",
   "make.forMeal": "your meal. It counts in your day when you tap Eat or Ate it. If it was under Served, it leaves Served.",
@@ -1675,7 +1675,7 @@
   "photoask.dropThePhoto": "Remove the photo",
   "photoask.ateAtTime": "Ate at {time}",
   "photoask.eatingNow": "Eating now",
-  "photoask.exploring": "Just looking",
+  "photoask.exploring": "Not my meal",
   "photoask.notYourMeal": "Not your meal, not logged. Chef Mealan reads it: cook it, keep it as an idea, or plan it.",
   "photoask.nowAs": "As from the camera: the plate in front of you, as {meal}.",
   "photoask.now": "As from the camera: the plate in front of you.",
@@ -5075,7 +5075,7 @@
   "plate.numsOf": "{kcal} kcal · {protein} g protein · {pd}",
   "plate.planLineNums": "{meal}, {time} · {nums} · By the plan",
   "plate.planLine": "{meal}, {time} · By the plan",
-  "plate.exploringLine": "Just looking · not sized for a meal",
+  "plate.exploringLine": "No meal selected · not sized for a meal",
   "plate.snackLine": "Snack · off the plan",
   "plate.forHintNums": "{meal}, {time}: {nums}, from your plan for today. It counts as your {mealLow}.",
   "plate.forHint": "{meal}, {time}: It counts as your {mealLow}.",
@@ -5175,18 +5175,18 @@
   "plate.dayPlansPick": "{day}: plans what you will eat. Pick the meal.",
   "plate.dayWhichMeal": "{day}, which meal",
   "plate.mealAtTime": "{meal}, {time}",
-  "plate.exploringStays": "Just looking: {slot} stays as it was.",
-  "plate.exploring": "Just looking",
-  "plate.exploringLeaves": "Just looking leaves {slot}: it stays as it was, and nothing is logged.",
+  "plate.exploringStays": "No meal selected: {slot} stays as it was.",
+  "plate.exploring": "No meal selected",
+  "plate.exploringLeaves": "No meal selected: {slot} stays as it was, and nothing is logged.",
   "plate.targetForPlate": "Target for this plate: {pd}.",
   "plate.travelPlans": "Chef Mealan plans with what's sold in {place}. Use the chat to shop and cook there.",
   "plate.photoLineIdea": {
-    "one": "Just looking at a photo. {n} food read, amounts estimated (~). Not logged: it is not your meal.",
-    "other": "Just looking at a photo. {n} foods read, amounts estimated (~). Not logged: it is not your meal."
+    "one": "A photo with no meal selected. {n} food read, amounts estimated (~). Not logged: it is not your meal.",
+    "other": "A photo with no meal selected. {n} foods read, amounts estimated (~). Not logged: it is not your meal."
   },
   "plate.photoLine": {
-    "one": "Your photo, {time}. {n} food read, amounts estimated (~). Tap an amount to correct it.",
-    "other": "Your photo, {time}. {n} foods read, amounts estimated (~). Tap an amount to correct it."
+    "one": "Your photo, {time}. {n} food read, amounts estimated (~).",
+    "other": "Your photo, {time}. {n} foods read, amounts estimated (~)."
   },
   "plate.retake": "📷 Retake",
   "plate.addPhoto": "＋ Photo",
@@ -5272,7 +5272,7 @@
   "plate.askChef": "Ask Chef Mealan",
   "plate.tomorrowLow": "tomorrow",
   "plate.chefOnIdea": "Chef Mealan on the idea",
-  "plate.exploringSo": "Just looking, so {slot} stays as it was.",
+  "plate.exploringSo": "No meal is selected, so {slot} stays as it was.",
   "plate.fitItToMy": "Fit it to my {meal}",
   "plate.putInDays": "Put it in {day}'s {meal}",
   "plate.chefOnMeal": "Chef Mealan on your meal",
@@ -6180,7 +6180,7 @@
   "home.addEmail": "Add your email",
   "home.checkEmail": "Check the email: it needs an @",
   "home.tickBox": "Tick the box, so we may write to you when it opens",
-  "photoask.namesIt": "Chef Mealan names it",
+  "photoask.namesIt": "Untitled plate",
   "photoask.takenNow": "A photo taken now.",
   "photoask.fromTodayYours": "A photo from {time} today, from Your photos.",
   "photoask.fromYesterdayYours": "A photo from yesterday, {time}, from Your photos.",
@@ -6242,7 +6242,7 @@
   "chef.addDish": "Add {title} to your plate",
   "recipein.aRecipePageFromAPhoto": "A recipe page from a website. Instagram and TikTok links need a login, so they don't open for us: tap Recipe photo there.",
   "plate.addMore": "Add more to your plate",
-  "plate.mealNotSet": "Meal and day not set",
+  "plate.mealNotSet": "No meal selected",
   "plate.clearMeal": "Clear the meal and the day",
   "plate.goesIntoPlan": "Goes into your plan.",
   "cal.days": "Days",
@@ -6285,12 +6285,27 @@
   "plate.addOrNewHelpRecipe": "Add to my plate: the recipe joins your foods as one dish, and the plate keeps its name. Start a new plate: only the recipe.",
   "plate.joinedAsDish": "{title} joined your plate as one dish. Saved in My recipes.",
   "cal.nothingCounted": "nothing is counted",
-  "plate.arrRecipe": {"one": "The recipe is {title}, from My recipes: {n} food.", "other": "The recipe is {title}, from My recipes: {n} foods."},
-  "plate.arrPlan": {"one": "The meal is {title}, from your plan: {n} food.", "other": "The meal is {title}, from your plan: {n} foods."},
-  "plate.arrChat": {"one": "The idea from the chat has {n} food.", "other": "The idea from the chat has {n} foods."},
+  "plate.arrRecipe": {
+    "one": "The recipe is {title}, from My recipes: {n} food.",
+    "other": "The recipe is {title}, from My recipes: {n} foods."
+  },
+  "plate.arrPlan": {
+    "one": "The meal is {title}, from your plan: {n} food.",
+    "other": "The meal is {title}, from your plan: {n} foods."
+  },
+  "plate.arrChat": {
+    "one": "The idea from the chat has {n} food.",
+    "other": "The idea from the chat has {n} foods."
+  },
   "plate.arrFood": "The food is {name}.",
   "plate.notEmptyWhyNew": "It already has {plate}, and new foods arrive. They cannot land on the plate by themselves: you decide where they go.",
   "plate.notEmptyWhyOld": "It already has {plate}, from {when}. A new food cannot land on it by itself: you decide where it goes.",
   "plate.holdsOnlyNew": "This plate holds only the new foods.",
-  "cal.whichByPlate": "Which meal? The plate was started on {day}, {time}:"
+  "cal.whichByPlate": "Which meal? The plate was started on {day}, {time}:",
+  "plate.mealAndDay": "Meal and day",
+  "plate.closeMealEdit": "Close",
+  "cal.timeOf": "Time of {meal}",
+  "plate.photoTakenOn": "The photo was taken on {day}, {time}.",
+  "plate.photoSavedOn": "The photo was saved on {day}, {time}. When it was taken is not known.",
+  "plate.namedFromPhoto": "Chef Mealan named it from your photo."
 }

@@ -302,6 +302,10 @@ export type PilotState = {
   photo?: { image: string; at: string; unsure?: { name: string; options: [number, number] } | null;
     // DT130 (0.2.110): a photo from Your photos says whose plate and when: ate (logged at the photo's time), idea (nothing logged)
     who?: "ate" | "now" | "idea";
+    // B150 (0.3.160): the photo carries only the time its file was saved (no camera record): the reference line says so
+    atSaved?: true;
+    // B150: the name Chef Mealan gave the plate from this photo; while the title is still that name, the line under it says so
+    namedAs?: string;
     // DT305 (0.3.151, boards Stories230 and Stories231): a photo just read shows as the read alone, until Done or Change the
     // foods; saved holds the recipe Save in My recipes made from it
     view?: "read"; saved?: string;
@@ -609,7 +613,17 @@ export function repairState(v: any): any {
   if (Array.isArray(v.feedback)) v.feedback = v.feedback.map(cleanCardNames);
   if (Array.isArray(v.foods)) v.foods = v.foods.map(cleanFoodNames);
   v.title = cleanText1(v.title);
+  // B150 (0.3.160, board B150, AC12): an eaten record whose meal is on a later day than its own time (a photo from another
+  // day, logged under a meal of today) is moved to that meal of its own day. A dinner logged after midnight for the evening
+  // before has its meal on the earlier day, and stays as it is.
+  if (Array.isArray(v.feedback)) v.feedback = v.feedback.map(mealOnItsDay);
   return v;
+}
+const localDay = (iso: string) => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? null : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+export function mealOnItsDay<T extends { status?: string; createdAt?: string; slot?: { date: string } | null }>(f: T): T {
+  if (!f || f.status !== "eaten" || !f.slot || typeof f.slot.date !== "string" || typeof f.createdAt !== "string") return f;
+  const day = localDay(f.createdAt);
+  return day && day < f.slot.date ? { ...f, slot: { ...f.slot, date: day } } : f;
 }
 export function parseState(raw: string): PilotState {
   const v = repairState(JSON.parse(raw));
