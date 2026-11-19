@@ -25,6 +25,7 @@ V = [("barcode", "A barcode", "The pack's code read from the camera, the food on
      ("coach", "My clients", "Waiting for you at the top."),
      ("languages", "Three languages", "English, Serbian and German, one after another.")]
 CLIPS = {"old": os.environ.get("CLIPS_OLD", f"{HERE}/../../public/landing"), "new": os.environ.get("CLIPS_NEW", "/home/claude/boards/clips327")}
+BLOBS = json.load(open(f"{HERE}/blobsDT327.json"))
 PW = 200; PH = round(PW * 844 / 390)
 B = Board(); cols = 13; W = SX + cols * (SW + GAP) + 40
 def video(col0, y, n, name, what):
@@ -39,10 +40,12 @@ def video(col0, y, n, name, what):
     top = max(hs) + 24
     for i, side in enumerate(("old", "new")):
         left = B.x(col0 + i * 3 + (0.4 if i else 0)); span = 3 * SW + 2 * GAP
-        b64 = base64.b64encode(open(f"{CLIPS[side]}/way-{n}.mp4", "rb").read()).decode()
+        # the canvas loads media as uploaded assets (/_blob/<id>), never as data: inside the board: 24 videos inside made the
+        # board 7.9 MB and the canvas did not show it (Coach Milan 19 November 17:07). The ids: blobsDT327.json
+        src = "/_blob/" + BLOBS[side][n]
         B.html.append(f'<div style="position:absolute;left:{left}px;top:{top}px;width:{span}px;text-align:center">'
           f'<div style="font-size:14px;font-weight:800;color:{"#3d4a63" if i == 0 else "#2a72d9"};margin-bottom:6px">{"The video on the home page now" if i == 0 else "The video recorded on 0.3.163"}, start to end</div>'
-          f'<video src="data:video/mp4;base64,{b64}" controls muted loop playsinline autoplay preload="auto" style="width:{PW}px;height:{PH}px;border-radius:12px;border:1.5px solid {"#d1dcf0" if i == 0 else "#2a72d9"};background:#000;display:block;margin:0 auto"></video></div>')
+          f'<video src="{src}" controls muted loop playsinline preload="metadata" style="width:{PW}px;height:{PH}px;border-radius:12px;border:1.5px solid {"#d1dcf0" if i == 0 else "#2a72d9"};background:#000;display:block;margin:0 auto"></video></div>')
     return top + 26 + PH
 # row 0: the ticket card, and the lines as a table
 parts = [("Ticket", "DT327. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT327, canvas Page 5."),
