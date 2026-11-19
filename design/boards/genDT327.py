@@ -14,7 +14,7 @@ t = json.load(open(f"{HERE}/ticketDT327.json")); o = t["opportunity"]
 HT = json.load(open(f"{HERE}/heightsDT327.json")) if os.path.exists(f"{HERE}/heightsDT327.json") else {}
 V = [("barcode", "A barcode", "The pack's code read from the camera, the food on the plate."),
      ("label", "A label", "New: two photos, two sides: the front gives the name, the table the values. Checked, the food on the plate."),
-     ("group", "A group of packs", "New: one photo of three made-up packs (made with AI). Each pack is named from its front; with no table in the photo, each row asks Enter label."),
+     ("group", "A group of packs", "New: two photos, the fronts then the backs (made with AI, made-up brands). Names from the fronts, values from the tables."),
      ("meal", "A photo of your meal", "New: the photo screen, Read the plate, and the read with the foods named."),
      ("plate", "One plate", "PD, the letters and the numbers behind them, on today's Plate."),
      ("recipes", "Recipes for your day", "Recipes, sorted for what is left of the day."),

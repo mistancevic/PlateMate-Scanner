@@ -48,10 +48,13 @@ const tabWords = (k) => { const out = [JSON.parse(fs.readFileSync(path.join(ROOT
 const EXPLORER_TAB = tabWords("tab.explorer"), CLIENTS_TAB = tabWords("tab.clients");
 const SKYR = { success: true, product_name: "Fjell Skyr natural", brand: "Fjell", basis: "100g", calories: 66, protein: 11.6, fats: 0.3, carbs: 3.8, fiber: 0, notes: "", error_reason: "", table: [], source: "Product database · review required" };
 const LABEL_READ = { ...SKYR, source: "Label photo · review required", table: LABEL_ROWS.map(([name, v]) => ({ name, amount: Number(String(v).match(/([\d.]+) ?k?c?a?l?$/)?.[1] ?? 0), unit: /kcal/.test(v) ? "kcal" : "g" })) };
-// One photo of the fronts: the app names each pack from its front and reads values only from a table it can see (server.ts,
-// the group prompt), so the honest read has names and no values (HC9): each row asks to review or enter it
-const front = (product_name, brand) => ({ product_name, brand, basis: null, calories: null, protein: null, fats: null, carbs: null, fiber: null, notes: "", table: [] });
-const GROUP_READ = { entities: [front("Fjell Skyr natural", "Fjell"), front("Kornfeld Oats", "Kornfeld"), front("Nusshof Peanut butter", "Nusshof")] };
+// DT327 (Coach Milan 19 November 15:24): two photos, the fronts (group.jpg) and the backs (group-back.jpg), both made with AI
+// for the made-up brands. The names come from the fronts, the values from the tables on the backs, as printed (HC9): the
+// jar's table says protein 35 g
+const GROUP_READ = { entities: [
+  { ...SKYR },
+  { product_name: "Kornfeld Oats", brand: "Kornfeld", calories: 372, protein: 13.5, fats: 7, carbs: 58.7, fiber: 10 },
+  { product_name: "Nusshof Peanut butter", brand: "Nusshof", calories: 588, protein: 35, fats: 50, carbs: 20, fiber: 6 }] };
 // HP3 (Coach Milan, 1 November 12:31): the meal is Milan's real dinner of 31 October, salmon, potatoes and broccoli
 const READ = { dish: "Salmon with potatoes and broccoli", foods: [
   { name: "Salmon, oven baked", grams: 230, low: 180, high: 280, calories: 206, protein: 22.1, fats: 12.4, carbs: 0, fiber: 0, confidence: "medium" },
@@ -63,7 +66,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const fails = []; const rule = (ok, id, what) => { console.log(`${ok ? "ok  " : "FAIL"} ${id} ${what}`); if (!ok) fails.push(`${id} ${what}`); };
   // HC5 before anything: the photos must be there
   rule(Boolean(MEAL), "HC5", `the meal photo: ${path.relative(ROOT, path.join(ASSETS, "meal.jpg"))}`);
-  rule(Boolean(GROUP), "HC5", "the group photo: design/home-clips/group.jpg");
+  rule(Boolean(GROUP) && fs.existsSync(path.join(ASSETS, "group-back.jpg")), "HC5", "the group photos: design/home-clips/group.jpg and group-back.jpg");
   rule(Boolean(BARCODE), "HC5", "the pack photo: design/home-clips/pack-barcode.jpg");
   for (const [id, f] of [["m1", "recipe-crepes.jpg"], ["m2", "recipe-pudding.jpg"], ["m3", "recipe-sarma.jpg"], ["m-pr", "recipe-prebranac.jpg"]]) rule(Boolean(RECIPE_PHOTOS[id]), "HC5", `a recipe photo: design/home-clips/${f}`);
   // HC9: the page says what the clips are
@@ -88,9 +91,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     }
     await b0.close(); }
   // DT327 (Coach Milan 19 November 15:20): two photos are fine, two copies of one photo are not. A clip with sides gets a
-  // camera that shows the first picture, then, on __side(n), turns to the next one (a 400 ms fade): the auto shot takes
+  // camera that shows the first picture, then, on __side(n), turns to the next one (a 600 ms swing and fade): the auto shot takes
   // one photo of each side, as on a phone when you turn the pack
-  const sideUrl = (png) => "data:image/png;base64," + fs.readFileSync(png).toString("base64");
+  const sideUrl = (f) => `data:image/${/\.jpe?g$/i.test(f) ? "jpeg" : "png"};base64,` + fs.readFileSync(f).toString("base64");
   const made = [], strokes = [];
   // CLIPS=shop,label records only those, to try a change; it never writes clips into public/landing. With CLIPS_OUT=<dir> it
   // writes them there (scripts/record-built-video.cjs does this for the /built video, BP1 0.3.52)
@@ -107,9 +110,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       const c = document.createElement("canvas"); c.width = 720; c.height = 960; const g = c.getContext("2d");
       const ims = urls.map((u) => { const i = new Image(); i.src = u; return i; });
       let cur = 0, prev = 0, at = 0;
-      const draw = () => { const t = Math.min(1, (performance.now() - at) / 400);
-        if (ims[prev].complete) { g.globalAlpha = 1; g.drawImage(ims[prev], 0, 0, 720, 960); }
-        if (ims[cur].complete) { g.globalAlpha = t; g.drawImage(ims[cur], 0, 0, 720, 960); g.globalAlpha = 1; } };
+      // the turn: the picture swings a little, as a phone does while a hand turns the packs, then settles on the next side.
+      // The swing is what tells the auto shot that this is a new side (CameraView arms on a big change)
+      const draw = () => { const t = Math.min(1, (performance.now() - at) / 600), sw = Math.sin(t * Math.PI) * 90;
+        if (ims[prev].complete) { g.globalAlpha = 1; g.drawImage(ims[prev], -sw, 0, 720, 960); }
+        if (ims[cur].complete) { g.globalAlpha = t; g.drawImage(ims[cur], -sw, 0, 720, 960); g.globalAlpha = 1; } };
       setInterval(draw, 1000 / 15);
       window.__side = (n) => { prev = cur; cur = n; at = performance.now(); };
       const md = navigator.mediaDevices;
@@ -305,12 +310,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     }, { sides: [path.join(ASSETS, "pack-front.jpg"), path.join(tmp, "label.png")] });
     await clip("group", async (page, a) => {
       await openScan(page, a); await toMode(page, a, "Group"); a.mark();
-      const one = await oneShot(page); // DT327: one photo, taken by the auto shot (see the label clip)
+      const two = await twoSides(page); // DT327: the fronts, then the backs, each by the auto shot (see the label clip)
       await a.tap(page.getByRole("button", { name: /^Analyze/ }), 3600);
       const all = (await page.locator("main").textContent().catch(() => "")) || "";
       const found = ["Fjell Skyr natural", "Kornfeld Oats", "Nusshof Peanut butter"].filter((n) => all.includes(n));
-      return { HC4: { ok: found.length === 3, what: `three packs in the picture, ${found.length} named at the end` }, HC3b: one };
-    }, { feed: "group" });
+      return { HC4: { ok: found.length === 3, what: `three packs in the picture, ${found.length} named at the end` }, HC3b: two };
+    }, { sides: [path.join(ASSETS, "group.jpg"), path.join(ASSETS, "group-back.jpg")] });
     if (MEAL) await clip("meal", async (page, a) => {
       // DT327 (0.3.164): since DT305 (0.3.151) a photo waits on the photo screen: Use this photo, then Read the plate; the read shows alone
       await a.tap(page.locator(".mp-button"), 900); a.mark(); await sleep(600);
