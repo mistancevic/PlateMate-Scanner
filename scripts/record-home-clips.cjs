@@ -87,6 +87,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       execFileSync("ffmpeg", ["-y", "-loop", "1", "-i", png, "-t", "2", "-r", "15", "-vf", "scale=720:960,format=yuv420p", feeds[k]], { stdio: "ignore" });
     }
     await b0.close(); }
+  // DT327 (Coach Milan 19 November 15:20): two photos are fine, two copies of one photo are not. A clip with sides gets a
+  // camera that shows the first picture, then, on __side(n), turns to the next one (a 400 ms fade): the auto shot takes
+  // one photo of each side, as on a phone when you turn the pack
+  const sideUrl = (png) => "data:image/png;base64," + fs.readFileSync(png).toString("base64");
   const made = [], strokes = [];
   // CLIPS=shop,label records only those, to try a change; it never writes clips into public/landing. With CLIPS_OUT=<dir> it
   // writes them there (scripts/record-built-video.cjs does this for the /built video, BP1 0.3.52)
@@ -99,6 +103,19 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const b = await chromium.launch({ args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", ...(x.feed && feeds[x.feed] ? [`--use-file-for-fake-video-capture=${feeds[x.feed]}`] : [])] });
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, permissions: ["camera"], timezoneId: "Europe/Berlin", recordVideo: { dir, size: { width: 390, height: 844 } } });
     const page = await ctx.newPage();
+    if (x.sides) await page.addInitScript((urls) => {
+      const c = document.createElement("canvas"); c.width = 720; c.height = 960; const g = c.getContext("2d");
+      const ims = urls.map((u) => { const i = new Image(); i.src = u; return i; });
+      let cur = 0, prev = 0, at = 0;
+      const draw = () => { const t = Math.min(1, (performance.now() - at) / 400);
+        if (ims[prev].complete) { g.globalAlpha = 1; g.drawImage(ims[prev], 0, 0, 720, 960); }
+        if (ims[cur].complete) { g.globalAlpha = t; g.drawImage(ims[cur], 0, 0, 720, 960); g.globalAlpha = 1; } };
+      setInterval(draw, 1000 / 15);
+      window.__side = (n) => { prev = cur; cur = n; at = performance.now(); };
+      const md = navigator.mediaDevices;
+      md.getUserMedia = async () => c.captureStream(15);
+      md.enumerateDevices = async () => [{ kind: "videoinput", deviceId: "side", label: "Back camera", groupId: "g" }];
+    }, x.sides.map(sideUrl));
     await page.clock.setFixedTime(new Date(x.time || "2026-10-25T13:05:00"));
     const s = { ...seed, items: x.items ?? [], meals: x.meals ?? [], feedback: [], ...(x.state || {}) };
     await page.addInitScript(([s, plan]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
@@ -239,9 +256,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   // DT327 (0.3.164): since 0.3.157 the empty Plate opens the camera with Photo or scan; Scan stays for an older build
   const openScan = async (page, a) => { const scan = page.getByRole("button", { name: "Scan", exact: true }); await a.tap((await scan.count()) ? scan.first() : page.locator(".mp-button").first(), 0); await page.locator(".auto-switch, .cam-modes").first().waitFor({ timeout: 4000 }).catch(() => {}); await manual(page, a); await sleep(500); };
   const toMode = async (page, a, m) => { await a.tap(page.locator(".cam-modes button").filter({ hasText: m }), 500); };
-  const saveFood = async (page, a) => {
+  const saveFood = async (page, a, rest = 1600) => {
     await a.tap(page.getByText(/I checked the values/).first(), 450);
-    await a.tap(page.getByRole("button", { name: /Confirm & save food/ }), 1600);
+    await a.tap(page.getByRole("button", { name: /Confirm & save food/ }), rest);
   };
   const onPlate = (page, name) => page.locator(".plate-card").getByText(name).count().then((n) => n > 0).catch(() => false);
   try {
@@ -264,17 +281,28 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       const said = ((await btn.first().textContent().catch(() => "")) || "").trim();
       return { ok: /^Analyze 1\b/.test(said), what: `one photo taken: the button says ${said || "nothing"}` };
     };
+    // DT327: the first side's photo, then the pack turns, then the second side's photo; each by the auto shot
+    const twoSides = async (page) => {
+      const btn = page.getByRole("button", { name: /^Analyze/ });
+      await btn.first().waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
+      await sleep(200); await page.evaluate(() => window.__side(1)); // HC8: the clip stays under 12 s
+      await page.getByRole("button", { name: /^Analyze 2/ }).first().waitFor({ state: "visible", timeout: 6000 }).catch(() => {});
+      await sleep(300);
+      const said = ((await btn.first().textContent().catch(() => "")) || "").trim();
+      const shots = await page.locator("img").evaluateAll((xs) => xs.map((x) => x.src).filter((u) => u.startsWith("blob:") || u.startsWith("data:image/jpeg")));
+      return { ok: /^Analyze 2\b/.test(said) && new Set(shots).size >= 2, what: `two photos of two sides: the button says ${said || "nothing"}, ${new Set(shots).size} different photos in the strip` };
+    };
     await clip("label", async (page, a) => {
       await openScan(page, a); await toMode(page, a, "Label"); a.mark();
-      // DT327 (Coach Milan 19 November 15:05): one photo. The camera's auto shot takes it once the picture holds still, so the
-      // clip waits for that shot instead of tapping too (a tap made a second photo).
-      const one = await oneShot(page);
-      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 1300);
+      // DT327 (Coach Milan 19 November 15:20): two photos, two sides: the front gives the name, the table the values. The
+      // camera's auto shot takes each one; the clip turns the pack in between and taps nothing but Analyze
+      const two = await twoSides(page);
+      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 1000);
       await a.swipe(1360, 500);
       const energy = await page.locator("input").evaluateAll((xs) => xs.map((x) => x.value)).catch(() => []);
-      await saveFood(page, a);
-      return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` }, HC3b: one };
-    }, { feed: "label" });
+      await saveFood(page, a, 400);
+      return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` }, HC3b: two };
+    }, { sides: [path.join(ASSETS, "pack-front.jpg"), path.join(tmp, "label.png")] });
     await clip("group", async (page, a) => {
       await openScan(page, a); await toMode(page, a, "Group"); a.mark();
       const one = await oneShot(page); // DT327: one photo, taken by the auto shot (see the label clip)
