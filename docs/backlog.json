@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.161",
     "0.3.160",
     "0.3.159",
     "0.3.158",
@@ -66,8 +67,7 @@
     "0.3.140",
     "0.3.139",
     "0.3.138",
-    "0.3.137",
-    "0.3.136"
+    "0.3.137"
   ],
   "tickets": [
     {
@@ -1244,9 +1244,9 @@
       "id": "B145",
       "title": "The read invents cooking methods when no words were given",
       "epic": "trust",
-      "state": "now",
+      "state": "done",
       "board": "Stories254",
-      "why": "Coach Milan 15 November 20:57, his test of 0.3.150: a photo read with no words showed For cooking, not counted: simmered, pureed. Those are methods, not foods he named. Drawn on Stories226; no Go yet. The board's other bug (the form asks a snack which dish it is) is gone with DT305: the dish row left the photo screen. 18 November: drawn again on a board of its own, on the app as built in 0.3.159. Waits for a Go. Coach Milan, 18 November 19:13: Go for code.",
+      "why": "Coach Milan 15 November 20:57, his test of 0.3.150: a photo read with no words showed For cooking, not counted: simmered, pureed. Those are methods, not foods he named. Drawn on Stories226; no Go yet. The board's other bug (the form asks a snack which dish it is) is gone with DT305: the dish row left the photo screen. 18 November: drawn again on a board of its own, on the app as built in 0.3.159. Waits for a Go. Coach Milan, 18 November 19:13: Go for code. Built in 0.3.161: no words, no line; a way of cooking is never a cooking food; walkthrough cooking-named, unit test b145.",
       "where": "Page 5",
       "ac": [
         {
@@ -1264,7 +1264,8 @@
           "title": "Never a way of cooking",
           "text": "Given the photo's read comes back with simmered and pureed, when the read opens, then neither word stands anywhere on it."
         }
-      ]
+      ],
+      "version": "0.3.161"
     },
     {
       "id": "B146",
@@ -1803,10 +1804,10 @@
       "id": "DT315",
       "title": "How to, log it with a photo: step 4 says what the app does now",
       "epic": "plate",
-      "state": "now",
+      "state": "done",
       "board": "Stories256",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while 0.3.157 was built. No tester has reported it. Waits for a Go. Coach Milan, 18 November 19:13: Go for code.",
+      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while 0.3.157 was built. No tester has reported it. Waits for a Go. Coach Milan, 18 November 19:13: Go for code. Built in 0.3.161: step 4 changed, step 5 new, in three languages; walkthrough how-to-photo.",
       "problem": "Step 4 says: Check the foods he read. Under Did you eat it? choose All of it, Half or Part of it, then Done. Since 0.3.157 the read first asks What do you do with it?, and Did you eat it? comes after Ate it and the meal.",
       "story": "Words only. Step 4: Check the foods he read. Tap Ate it and the meal. Step 5, new: Under Did you eat it? choose All of it, Half or Part of it, then Done.",
       "ac": [
@@ -1818,16 +1819,17 @@
       ],
       "unchanged": [
         "The other steps and the other How to pages."
-      ]
+      ],
+      "version": "0.3.161"
     },
     {
       "id": "DT316",
       "title": "English lines no code uses are removed",
       "epic": "plate",
-      "state": "now",
+      "state": "done",
       "board": "Stories257",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as a small card beside the read. Six went in 0.3.157 with your word. The builds of 0.3.157 and 0.3.159 left more behind. Waits for a Go. Coach Milan, 18 November 19:13: Go for code. No ticking: if the sentences are not in use, they go. Only lines proven unused by hand are removed; the handover names each.",
+      "why": "Drawn 18 November 2026 as a small card beside the read. Six went in 0.3.157 with your word. The builds of 0.3.157 and 0.3.159 left more behind. Waits for a Go. Coach Milan, 18 November 19:13: Go for code. No ticking: if the sentences are not in use, they go. Only lines proven unused by hand are removed; the handover names each. Built in 0.3.161: 35 lines removed from the three files, each proven unused; the list with the English is in the handover of 19 November. One line stays, {meal}, {time} by the clock: a unit test uses it as its example.",
       "problem": "Lines no screen shows still sit in the English, Serbian and German files. Each one is a line to check and translate for nothing.",
       "story": "Remove them. Certain today, 5: the three old question lines, Keep my plate, and Chef Mealan's old question line. A first sweep finds 126 more candidates. I check each against the code by hand; a line goes only when nothing can show it. A line with any doubt stays.",
       "ac": [
@@ -1854,16 +1856,17 @@
       ],
       "unchanged": [
         "Every line a screen shows."
-      ]
+      ],
+      "version": "0.3.161"
     },
     {
       "id": "DT317",
       "title": "Start cooking with a plate from earlier: Ate it asks the meal",
       "epic": "plate",
-      "state": "now",
+      "state": "done",
       "board": "Stories258",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while DT314 was built. It was not in DT314. Waits for a Go. Coach Milan, 18 November 19:13: Go for code.",
+      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while DT314 was built. It was not in DT314. Waits for a Go. Coach Milan, 18 November 19:13: Go for code. Built in 0.3.161: the calendar of DT314 under the buttons before cooking; walkthrough cook-old-ate.",
       "problem": "A plate from Saturday is on the Plate. I open a recipe and tap Start cooking. Chef Mealan asks about the old plate: Ate it, Save for later, Clear it, Cancel. Ate it logs it at once to the meal nearest its time, with no question. On the Plate itself the same tap now asks the meal (DT314).",
       "story": "The one element: the calendar of DT314 under these buttons too. Ate it opens it on the plate's day with the nearest meal marked. A tap on a row logs the plate there, and the cooking starts.",
       "ac": [
@@ -1880,16 +1883,17 @@
       ],
       "unchanged": [
         "Save for later, Clear it and Cancel. A plate of now: Save my plate, Clear my plate."
-      ]
+      ],
+      "version": "0.3.161"
     },
     {
       "id": "B149",
       "title": "A chosen choice shows two ticks",
       "epic": "plate",
-      "state": "now",
+      "state": "done",
       "board": "Stories259",
       "where": "Page 5",
-      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while drawing the read. Seen on the app as built in 0.3.159. Waits for a Go. Coach Milan, 18 November 19:13: Go for code.",
+      "why": "Drawn 18 November 2026 as a small card beside the read. Found 18 November while drawing the read. Seen on the app as built in 0.3.159. Waits for a Go. Coach Milan, 18 November 19:13: Go for code. Built in 0.3.161: the written tick is gone in three places, the two on the board and a third found while building, Did you eat it? and Planned for on the read; walkthrough one-tick.",
       "problem": "Two places show a chosen choice with two ticks: the pot question on the photo screen (✓ ✓ The whole pot) and Good for on a recipe's page (✓ ✓ Lunch). One tick comes from the choice's look, one is written into the words.",
       "story": "One tick, the one of the look, as every other choice in the app has. No change to what is drawn on any board.",
       "ac": [
@@ -1902,11 +1906,17 @@
           "id": "AC2",
           "title": "Good for",
           "text": "Given a recipe's page with Lunch chosen under Good for, when I look at Lunch, then it shows one tick."
+        },
+        {
+          "id": "AC3",
+          "title": "Did you eat it? on the read",
+          "text": "Given a meal is set and the read asks Did you eat it?, when I choose All of it, then it shows one tick."
         }
       ],
       "unchanged": [
         "Which answer is chosen, and what a tap does."
-      ]
+      ],
+      "version": "0.3.161"
     },
     {
       "id": "B150",
@@ -2196,10 +2206,10 @@
       "id": "DT323",
       "title": "A plate I only look at: Don't count it on the read, and the kept plate starts as Mine",
       "epic": "plate",
-      "state": "next",
+      "state": "closed",
       "board": "Stories263",
       "where": "Page 5",
-      "why": "From the check of 0.3.160, told to Coach Milan in the merge report of 19 November 03:05. Since B150 a plate is kept as Served only from the Plate's screen, one screen after the read, and it starts as Someone else's with Main picked by hand. Coach Milan 19 November 07:41: draw. 07:47: yes to the proposal. Board DT323 drawn 19 November; the build waits for his Go on the board.",
+      "why": "From the check of 0.3.160, told to Coach Milan in the merge report of 19 November 03:05. Since B150 a plate is kept as Served only from the Plate's screen, one screen after the read, and it starts as Someone else's with Main picked by hand. Coach Milan 19 November 07:41: draw. 07:47: yes to the proposal. Board DT323 drawn 19 November; the build waits for his Go on the board. Closed by Coach Milan, 19 November 08:44, after his look at the board: with no meal selected nothing is counted anyway, and Empty plate serves a plate that was only looked at. Obsolete; nothing built. If beta testing brings it up, it is discussed again.",
       "opportunity": {
         "from": "Claude's check of the build of 0.3.160, told to Coach Milan in the merge report of 19 November 2026, 03:05. No tester saw it. Coach Milan, 19 November 07:41: draw.",
         "job": "Look at a plate with Chef Mealan and keep it with its numbers, without it counting in my day.",
@@ -2243,31 +2253,91 @@
         "A photo soon after a meal of today asks first; its Don't count it is as today (DT247).",
         "A plate without a photo ends with three answers and no Don't count it.",
         "The Served card: Whose plate, Name, Which dish, Scan another plate, Share the numbers, I ate this, Don't keep it, Keep it."
-      ],
-      "open": [
-        "On the Plate's screen, Don't count it in Chef Mealan's card stays as it is: its plate starts as Someone else's. Say if that one should start as Mine too."
       ]
     },
     {
       "id": "DT324",
-      "title": "The Plate's screen of a photo: the line under the title still points below",
+      "title": "The Plate's screen of a photo: the line under the title says what the read says",
       "epic": "plate",
       "state": "next",
-      "why": "From the check of 0.3.160, proposed to Coach Milan 19 November 07:50; he said to open it, 19 November. On the Plate's screen of a photo the line under the title says: Read from your photo. Correct an amount if you know better; Chef Mealan says what to do with it below. B150 AC17 changed the line on the read to Chef Mealan named it from your photo. The Plate's screen kept the old one. A words ticket. Not drawn."
+      "why": "From the check of 0.3.160. Coach Milan 19 November 09:08: the same line as on the read. Board DT324 drawn 19 November; the build waits for his Go on the board.",
+      "board": "Stories264",
+      "where": "Page 5",
+      "opportunity": {
+        "from": "Claude's check of the build of 0.3.160, told to Coach Milan 19 November 2026, 07:50. No tester saw it.",
+        "job": "Know what I am looking at when the Plate opens with the foods of my photo.",
+        "kind": "Did not understand it: the line points to something below that is no longer the next thing to do.",
+        "why_now": "B150 changed this line on the read in 0.3.160. The Plate's screen kept the old one, so two screens of one flow say two things."
+      },
+      "problem": "After a read I tap Continue on the Plate. Under the title the Plate says: Read from your photo. Correct an amount if you know better; Chef Mealan says what to do with it below. One screen before, the read said: Chef Mealan named it from your photo. The old line speaks about amounts and about something below, while the title it stands under is a name.",
+      "story": "When I move from the read to the Plate, I want the line under the plate's name to say the same thing on both screens, so that I am not made to look for something else.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "The same line as on the read",
+          "text": "Given Chef Mealan read my photo and named it Grilled chicken with rice, when I tap Continue on the Plate, then the line under the title says Chef Mealan named it from your photo."
+        },
+        {
+          "id": "AC2",
+          "title": "A name of my own, no line",
+          "text": "Given I typed my own name for that plate, when the Plate's screen shows it, then there is no line under the title, as on the read."
+        },
+        {
+          "id": "AC3",
+          "title": "The old line is gone",
+          "text": "Given the release is built, when I look in the English, Serbian and German files, then Read from your photo. Correct an amount if you know better is in none of them."
+        }
+      ],
+      "unchanged": [
+        "The read and its line.",
+        "Everything else on the Plate's screen of a photo: the meal line, the photo and its chips, the food list, What do you do with it?, Chef Mealan's card.",
+        "A kept plate (Served) and a plate without a photo."
+      ]
     },
     {
       "id": "DT325",
-      "title": "A plate from an earlier day: the help line and the saved time do not agree",
+      "title": "A plate from an earlier day: the help line says only what is always true",
       "epic": "plate",
       "state": "next",
-      "why": "From the check of 0.3.160, proposed to Coach Milan 19 November 07:50; he said to open it, 19 November. The help line of a plate from an earlier day (DT314) says: Ate it asks which meal, and saves it there at the photo's time. Checked in the code 19 November: that holds only for a meal on the day the plate was started. For a meal on another day the record takes the meal's time in the calendar. B150's rule is the meal's time. To decide: one rule for the record, and words that say it. Not drawn."
+      "why": "From the check of 0.3.160. Coach Milan 19 November 09:08: the record stays, and the line says only Ate it asks which meal, and saves it there. Board DT325 drawn 19 November; the build waits for his Go on the board.",
+      "board": "Stories265",
+      "where": "Page 5",
+      "opportunity": {
+        "from": "Claude's check of the build of 0.3.160, told to Coach Milan 19 November 2026, 07:50. No tester saw it.",
+        "job": "Decide what to do with a plate that is still on the Plate from an earlier day.",
+        "kind": "Did not understand it: the help line promises a time the record does not always take.",
+        "why_now": "B150 set the rule for a meal on another day in 0.3.160. The help line was written before it."
+      },
+      "problem": "A plate from Saturday is on the Plate and Chef Mealan asks about it. The help line under the buttons says Ate it saves it at the photo's time, or at the time it was started when there is no photo. That holds for a meal on the plate's own day. For a meal on another day the record takes that meal's time in the calendar (B150). So the line is sometimes wrong.",
+      "story": "When I am asked about a plate from earlier, I want the help line to tell me only what will happen, so that I trust where and when my meal is saved.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "A plate with a photo",
+          "text": "Given a plate with a photo from Saturday is on the Plate, when Chef Mealan asks about it, then the help line starts with Ate it asks which meal, and saves it there. and names no time."
+        },
+        {
+          "id": "AC2",
+          "title": "A plate without a photo",
+          "text": "Given a plate without a photo from Saturday is on the Plate, when Chef Mealan asks about it, then the help line starts with the same sentence and names no time."
+        },
+        {
+          "id": "AC3",
+          "title": "The rest of the line stays",
+          "text": "Given either plate, when I read on, then the sentences about Save for later, Keep working on it and Clear it are as today."
+        }
+      ],
+      "unchanged": [
+        "The record: a meal on the plate's own day keeps the time the plate was started; a meal on another day takes that meal's time.",
+        "The buttons, the calendar under Ate it (DT314), and the question before cooking (DT317)."
+      ]
     },
     {
       "id": "DT326",
       "title": "A kept plate (Served): telling Chef Mealan in words needs one more photo first",
       "epic": "plate",
-      "state": "next",
-      "why": "From the check of 0.3.160, proposed to Coach Milan 19 November 07:50 as a part of the Served ticket. It does not fit the flow of DT323, so it has its own ticket. DT318 took the link Wrong foods? Help Chef Mealan read it off the Plate's screen, so words have one place, the read. A kept plate shows the Plate's screen, not the read, so the form for words opens only with one more photo behind + Photo. With DT323 the read comes before the plate is kept, and the field is there. Open: words for a plate that is already kept. Not drawn."
+      "state": "closed",
+      "why": "From the check of 0.3.160, proposed to Coach Milan 19 November 07:50 as a part of the Served ticket. It does not fit the flow of DT323, so it has its own ticket. DT318 took the link Wrong foods? Help Chef Mealan read it off the Plate's screen, so words have one place, the read. A kept plate shows the Plate's screen, not the read, so the form for words opens only with one more photo behind + Photo. With DT323 the read comes before the plate is kept, and the field is there. Open: words for a plate that is already kept. Not drawn. Closed by Coach Milan, 19 November 09:08, like DT323: look again if beta testing shows a need. Nothing built."
     }
   ]
 }
