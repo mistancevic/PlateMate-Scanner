@@ -2019,7 +2019,8 @@
         "Slots and times in the settings.",
         "A dinner logged after midnight stays with the evening before."
       ],
-      "go": "Go from Coach Milan, 19 November 2026, 01:00: you go with B150 and DT318. One release."
+      "go": "Go from Coach Milan, 19 November 2026, 01:00: you go with B150 and DT318. One release.",
+      "version": "0.3.160"
     },
     {
       "id": "DT318",
@@ -2115,7 +2116,8 @@
         "Retake and + Photo."
       ],
       "where": "Page 5, board DT318. With B150 in one release (Coach Milan 21:36).",
-      "go": "Go from Coach Milan, 19 November 2026, 01:00: you go with B150 and DT318. One release."
+      "go": "Go from Coach Milan, 19 November 2026, 01:00: you go with B150 and DT318. One release.",
+      "version": "0.3.160"
     },
     {
       "id": "B151",
@@ -2186,9 +2188,86 @@
     {
       "id": "DT319",
       "title": "A meal I ate, opened from the Plan: what Put it on the Plate again means",
-      "epic": "plan",
+      "epic": "plate",
       "state": "next",
       "why": "Coach Milan 18 November 20:04: in the Plan he opened the What you ate card Chicken and sweet potato fries, tapped Put it on the Plate again. The foods landed right. The title was grey though the meal was saved; Meal and day were not set though it was saved as a meal. His question: is this that meal again, so a change on the Plate changes it (an edit), or a new meal that does not touch the old one (save as)? It has to be clear to everyone. As built (src/components/PastMeal.tsx, again): a copy of the foods only, no name, no photo, no meal, no link to the eaten meal; the eaten meal is edited by Change it on the same page (DT284). It also replaces a plate that has foods with no question (a way DT313 missed). Proposed to him: it stays a copy, a new plate; the button and one line say so; the name comes along; a plate with foods is asked first. Waits for his word on the meaning, then a board."
+    },
+    {
+      "id": "DT323",
+      "title": "A plate I only look at: Don't count it on the read, and the kept plate starts as Mine",
+      "epic": "plate",
+      "state": "next",
+      "board": "Stories263",
+      "where": "Page 5",
+      "why": "From the check of 0.3.160, told to Coach Milan in the merge report of 19 November 03:05. Since B150 a plate is kept as Served only from the Plate's screen, one screen after the read, and it starts as Someone else's with Main picked by hand. Coach Milan 19 November 07:41: draw. 07:47: yes to the proposal. Board DT323 drawn 19 November; the build waits for his Go on the board.",
+      "opportunity": {
+        "from": "Claude's check of the build of 0.3.160, told to Coach Milan in the merge report of 19 November 2026, 03:05. No tester saw it. Coach Milan, 19 November 07:41: draw.",
+        "job": "Look at a plate with Chef Mealan and keep it with its numbers, without it counting in my day.",
+        "kind": "Did not find it, and too many steps: the way to keep the plate is one screen after the read, at the bottom, and the kept plate then needs a correction.",
+        "why_now": "Until 0.3.160 Just looking did this job. B150 took those words out, so the job lost its short way in the last release."
+      },
+      "problem": "Until 0.3.160 I chose Just looking, read the photo, and the plate was kept under Served as mine, with the dish as Chef Mealan read it. Now a photo read with no meal selected is my own photo. The read asks What do you do with it? and offers Save it, Plan it and Ate it. None of the three keeps the plate without counting it. For that I tap Continue on the Plate, go to the bottom of the Plate's screen and tap Don't count it in Chef Mealan's card. The kept plate then says Someone else's, and Main is picked by hand, although the plate is mine and Chef Mealan read the dish.",
+      "story": "When I photograph a plate only to see what is in it, I want to keep it right where I read it, as my plate, so that it stays out of my day and I do not correct what the app already knew.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "A fourth answer on the read",
+          "text": "Given a photo of grilled chicken with rice is read and no meal is selected, when the read opens, then What do you do with it? shows Save it, Plan it and Ate it as today and, under them, Don't count it as a quiet link."
+        },
+        {
+          "id": "AC2",
+          "title": "Don't count it keeps the plate",
+          "text": "Given that read, when I tap Don't count it, then the plate is kept in Recipes under Served, nothing is logged in my day, and the Plate opens with the Served card, as it does after Don't count it today."
+        },
+        {
+          "id": "AC3",
+          "title": "The kept plate starts as Mine",
+          "text": "Given I tapped Don't count it on the read, when the Served card shows, then Mine is picked under Whose plate."
+        },
+        {
+          "id": "AC4",
+          "title": "The dish as Chef Mealan read it",
+          "text": "Given Chef Mealan read the plate as a main, when the Served card shows, then Main is picked under Which dish and the label says filled by Chef Mealan."
+        },
+        {
+          "id": "AC5",
+          "title": "Whose plate still changes it",
+          "text": "Given the kept plate is Mine, when I tap Someone else's under Whose plate, then the plate is someone else's and says Not counted in your day, as today."
+        }
+      ],
+      "unchanged": [
+        "The photo screen, and on the read: the chips, Chef Mealan's checks, Tell Chef Mealan what to check, Continue on the Plate.",
+        "Save it, Plan it, Ate it, and the calendars of Plan it and Ate it.",
+        "With a meal selected the read ends with Did you eat it?, and shows no Don't count it.",
+        "On the Plate's screen: What do you do with it? with its three answers, and Don't count it in Chef Mealan's card. A plate kept there starts as Someone else's (DT278).",
+        "A photo soon after a meal of today asks first; its Don't count it is as today (DT247).",
+        "A plate without a photo ends with three answers and no Don't count it.",
+        "The Served card: Whose plate, Name, Which dish, Scan another plate, Share the numbers, I ate this, Don't keep it, Keep it."
+      ],
+      "open": [
+        "On the Plate's screen, Don't count it in Chef Mealan's card stays as it is: its plate starts as Someone else's. Say if that one should start as Mine too."
+      ]
+    },
+    {
+      "id": "DT324",
+      "title": "The Plate's screen of a photo: the line under the title still points below",
+      "epic": "plate",
+      "state": "next",
+      "why": "From the check of 0.3.160, proposed to Coach Milan 19 November 07:50; he said to open it, 19 November. On the Plate's screen of a photo the line under the title says: Read from your photo. Correct an amount if you know better; Chef Mealan says what to do with it below. B150 AC17 changed the line on the read to Chef Mealan named it from your photo. The Plate's screen kept the old one. A words ticket. Not drawn."
+    },
+    {
+      "id": "DT325",
+      "title": "A plate from an earlier day: the help line and the saved time do not agree",
+      "epic": "plate",
+      "state": "next",
+      "why": "From the check of 0.3.160, proposed to Coach Milan 19 November 07:50; he said to open it, 19 November. The help line of a plate from an earlier day (DT314) says: Ate it asks which meal, and saves it there at the photo's time. Checked in the code 19 November: that holds only for a meal on the day the plate was started. For a meal on another day the record takes the meal's time in the calendar. B150's rule is the meal's time. To decide: one rule for the record, and words that say it. Not drawn."
+    },
+    {
+      "id": "DT326",
+      "title": "A kept plate (Served): telling Chef Mealan in words needs one more photo first",
+      "epic": "plate",
+      "state": "next",
+      "why": "From the check of 0.3.160, proposed to Coach Milan 19 November 07:50 as a part of the Served ticket. It does not fit the flow of DT323, so it has its own ticket. DT318 took the link Wrong foods? Help Chef Mealan read it off the Plate's screen, so words have one place, the read. A kept plate shows the Plate's screen, not the read, so the form for words opens only with one more photo behind + Photo. With DT323 the read comes before the plate is kept, and the field is there. Open: words for a plate that is already kept. Not drawn."
     }
   ]
 }

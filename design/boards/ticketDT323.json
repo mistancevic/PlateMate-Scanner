@@ -1,0 +1,73 @@
+{
+ "id": "DT323",
+ "title": "A plate I only look at: Don't count it on the read, and the kept plate starts as Mine",
+ "epic": "plate",
+ "state": "next",
+ "board": "Stories263",
+ "where": "Page 5",
+ "why": "From the check of 0.3.160, told to Coach Milan in the merge report of 19 November 03:05. Since B150 a plate is kept as Served only from the Plate's screen, one screen after the read, and it starts as Someone else's with Main picked by hand. Coach Milan 19 November 07:41: draw. 07:47: yes to the proposal. Board DT323 drawn 19 November; the build waits for his Go on the board.",
+ "opportunity": {
+  "from": "Claude's check of the build of 0.3.160, told to Coach Milan in the merge report of 19 November 2026, 03:05. No tester saw it. Coach Milan, 19 November 07:41: draw.",
+  "job": "Look at a plate with Chef Mealan and keep it with its numbers, without it counting in my day.",
+  "kind": "Did not find it, and too many steps: the way to keep the plate is one screen after the read, at the bottom, and the kept plate then needs a correction.",
+  "why_now": "Until 0.3.160 Just looking did this job. B150 took those words out, so the job lost its short way in the last release."
+ },
+ "problem": "Until 0.3.160 I chose Just looking, read the photo, and the plate was kept under Served as mine, with the dish as Chef Mealan read it. Now a photo read with no meal selected is my own photo. The read asks What do you do with it? and offers Save it, Plan it and Ate it. None of the three keeps the plate without counting it. For that I tap Continue on the Plate, go to the bottom of the Plate's screen and tap Don't count it in Chef Mealan's card. The kept plate then says Someone else's, and Main is picked by hand, although the plate is mine and Chef Mealan read the dish.",
+ "story": "When I photograph a plate only to see what is in it, I want to keep it right where I read it, as my plate, so that it stays out of my day and I do not correct what the app already knew.",
+ "ac": [
+  {
+   "id": "AC1",
+   "title": "A fourth answer on the read",
+   "text": "Given a photo of grilled chicken with rice is read and no meal is selected, when the read opens, then What do you do with it? shows Save it, Plan it and Ate it as today and, under them, Don't count it as a quiet link."
+  },
+  {
+   "id": "AC2",
+   "title": "Don't count it keeps the plate",
+   "text": "Given that read, when I tap Don't count it, then the plate is kept in Recipes under Served, nothing is logged in my day, and the Plate opens with the Served card, as it does after Don't count it today."
+  },
+  {
+   "id": "AC3",
+   "title": "The kept plate starts as Mine",
+   "text": "Given I tapped Don't count it on the read, when the Served card shows, then Mine is picked under Whose plate."
+  },
+  {
+   "id": "AC4",
+   "title": "The dish as Chef Mealan read it",
+   "text": "Given Chef Mealan read the plate as a main, when the Served card shows, then Main is picked under Which dish and the label says filled by Chef Mealan."
+  },
+  {
+   "id": "AC5",
+   "title": "Whose plate still changes it",
+   "text": "Given the kept plate is Mine, when I tap Someone else's under Whose plate, then the plate is someone else's and says Not counted in your day, as today."
+  }
+ ],
+ "unchanged": [
+  "The photo screen, and on the read: the chips, Chef Mealan's checks, Tell Chef Mealan what to check, Continue on the Plate.",
+  "Save it, Plan it, Ate it, and the calendars of Plan it and Ate it.",
+  "With a meal selected the read ends with Did you eat it?, and shows no Don't count it.",
+  "On the Plate's screen: What do you do with it? with its three answers, and Don't count it in Chef Mealan's card. A plate kept there starts as Someone else's (DT278).",
+  "A photo soon after a meal of today asks first; its Don't count it is as today (DT247).",
+  "A plate without a photo ends with three answers and no Don't count it.",
+  "The Served card: Whose plate, Name, Which dish, Scan another plate, Share the numbers, I ate this, Don't keep it, Keep it."
+ ],
+ "open": [
+  "On the Plate's screen, Don't count it in Chef Mealan's card stays as it is: its plate starts as Someone else's. Say if that one should start as Mine too."
+ ],
+ "short": "On the read with no meal selected, Don't count it is a fourth, quiet answer; the kept plate starts as Mine with the dish as read",
+ "rel": "The proposal has Coach Milan's yes of 19 November 07:47; the build waits for his Go on this board",
+ "boardTitle": "DT323: a plate I only look at. Don't count it on the read, and the kept plate starts as Mine",
+ "days": "The board is drawn on the app's test photo, taken with the camera on Sunday 15 November 2026 at 18:00. Chef Mealan reads it as Grilled chicken with rice: chicken breast and rice.",
+ "words": "19 November 07:41: draw. 19 November 07:47: yes to the proposal. The build still needs my Go on the board.",
+ "cause": "Replayed on the app as built in 0.3.160. Step 2: What do you do with it? has three answers. Step 3: Don't count it is on the Plate's screen, in Chef Mealan's card, after the food list. Step 4: that button keeps every plate as Someone else's and picks Main by hand; it was made for a plate that is not mine (DT278).",
+ "now": "Four steps: the photo, the read, the Plate's screen, the kept plate. The kept plate starts as Someone else's, Not counted in your day, with Main picked by hand.",
+ "proposed": "On the read with No meal selected, What do you do with it? gets a fourth, quiet answer: Don't count it, next to Save it, Plan it, Ate it. A tap keeps the plate under Served and opens the Plate with the Served card, as Don't count it does today. The kept plate starts as Mine, with the dish as Chef Mealan read it. Whose plate stays on the Served card. Nothing else changes.",
+ "not_chosen": "1. Bringing back the words Just looking: B150 took them out, because Just looking and No meal selected were one state with two names. 2. A fourth white choice like the other three: most photos are meals, so this answer stays quiet. 3. All four in one row: they do not fit on a phone 390 wide, so the link has its own line.",
+ "point3": "Point 3 of the proposed tickets, words for a kept plate, does not fit this flow. In this flow I tell Chef Mealan on the read, before Don't count it; the field is there. Words after the plate is kept are on another screen, so they have their own ticket: DT326.",
+ "decision": "Coach Milan, 19 November 2026, 07:47: yes to the proposal. No Go yet, so nothing is built.",
+ "details": [
+  "No new screen. One more answer in the block that exists.",
+  "Quiet means the app's link: blue words, no frame. It stands on its own line under the three, at the right, as high as a button so a thumb hits it.",
+  "The words are the app's own, Don't count it. No new English line, so no new line to translate.",
+  "The row DT323.1 on this board is what it looks like."
+ ]
+}
