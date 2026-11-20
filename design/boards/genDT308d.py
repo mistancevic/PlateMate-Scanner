@@ -52,6 +52,14 @@ LEGEND = ('<div style="display:flex;gap:14px;align-items:center;font-size:13px;f
 
 def board(fname, title, sub, B, W, Hc, after):
     H = min(8000, Hc + 230)
+    # Every screen carries its id, ticket.flow + letter (B151.1a), Coach Milan 20 November 2026, 19:44: a board with screen
+    # pictures and fewer ids than pictures is not drawn. Boards from before the rule set B.no_ids = True to be redrawn as they were.
+    import re as _re
+    _tid = title.split(":")[0].split(" ")[0].strip()
+    _imgs = sum(h.count("<img") for h in B.html)
+    _ids = len(set(_re.findall(_re.escape(_tid) + r"\.\d+[a-z]", "".join(B.html))))
+    if _imgs and _ids < _imgs and not getattr(B, "no_ids", False):
+        raise SystemExit(f"{_tid}: {_imgs} screens but {_ids} screen ids. Every screen needs its id, {_tid}.1a and so on (ticket form, rule 9).")
     page = f'''<!doctype html>
 <html lang="en">
 <head>
