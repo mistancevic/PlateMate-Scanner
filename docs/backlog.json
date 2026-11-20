@@ -2137,58 +2137,58 @@
     },
     {
       "id": "B151",
-      "title": "Ate it: the meal is set in one place, and the actions act at once",
+      "title": "The end of a plate: a summary, three equal actions, a question only where it is needed",
       "epic": "plate",
       "state": "now",
       "board": "Stories261",
       "where": "Page 5",
-      "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow.",
+      "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow. 18:57 to 19:21: the situations; a fixed set of actions, never a button that turns into a status; no scroll on a tap, ask where it happens; a summary of the plate before What do you do with it?; draw it.",
       "problem": "The meal is chosen in two places. At the top, Meal and day says No meal selected, with its pencil. At the end, a question, What do you do with it?, and three chips that look alike; Ate it opens a second calendar to choose the meal again. In the first drawing Ate it stayed white, so the tap changed nothing on it. And a meal I ate, opened again, says nothing about being eaten.",
       "story": "When my plate is ready, I want to say I ate it in one tap for the meal I am at, so that it counts without choosing the meal twice.",
       "ac": [
         {
           "id": "AC1",
-          "title": "The guess shows at the top",
-          "text": "Given skyr, oats and a banana on the Plate at 18:00 with no meal set, when I look at Meal and day, then it says Dinner? Sunday, 15 November, 20:00, guessed from the time."
+          "title": "A summary before the question",
+          "text": "Given skyr, oats and a banana on the Plate, when I reach the end of the plate, then above What do you do with it? it says Skyr, Oats & Banana, 563 kcal, 39 g protein, PD 7.0, and the meal it is for or No meal selected"
         },
         {
           "id": "AC2",
-          "title": "A guess counts nothing",
-          "text": "Given the guess Dinner, when I have not tapped Ate it or Plan it, then nothing is counted or planned and the plate is sized for no meal, as now."
+          "title": "Three equal actions",
+          "text": "Given the end of the plate, when I look at it, then Save it, Plan it and Ate it are white buttons of one look, whatever meal is set, and none of them turns into a status"
         },
         {
           "id": "AC3",
-          "title": "No question, three buttons",
-          "text": "Given the end of the plate, when I look at it, then there is no question and no chips: Save it, Plan it and Ate it are buttons, under one line that says For Dinner, today, 20:00."
+          "title": "A set meal, at once",
+          "text": "Given I set Dinner with the pencil, when I tap Ate it, then the plate is logged as today's Dinner and Today opens, with no question"
         },
         {
           "id": "AC4",
-          "title": "Ate it logs at once",
-          "text": "Given the guess Dinner, when I tap Ate it, then the plate is logged as today's Dinner and Today opens, with no calendar in between."
+          "title": "No meal, asked right there",
+          "text": "Given no meal is set, when I tap Ate it, then Which meal was it? opens right under it with today's meals, Dinner marked as the time suggests, and the page does not scroll"
         },
         {
           "id": "AC5",
-          "title": "The pencil decides",
-          "text": "Given I set Lunch with the pencil, when I tap Ate it, then the plate is logged as Lunch."
+          "title": "One tap logs",
+          "text": "Given the question is open, when I tap Dinner, then the plate is logged as today's Dinner and Today opens"
         },
         {
           "id": "AC6",
-          "title": "No guess, the pencil opens",
-          "text": "Given no meal set and no guess, when I tap Ate it or Plan it, then edit mode at the top opens to set the meal, and nothing is logged yet."
+          "title": "The second tap closes",
+          "text": "Given the question is open, when I tap Ate it again, then the question closes and nothing is logged"
         },
         {
           "id": "AC7",
-          "title": "The main button follows the meal",
-          "text": "Given the meal at the top is now or past, when I look at the end, then Ate it is the main button, and for a meal on a later day Plan it is"
+          "title": "Plan it the same way",
+          "text": "Given no meal is set, when I tap Plan it, then For which meal? opens right under it with the meals still ahead today and Another day"
         },
         {
           "id": "AC8",
           "title": "An eaten meal says Ate it",
-          "text": "Given I ate it as Dinner, when I open it again from Today, the Plan or a recipe's log, then Ate it is blue with a small tick on its left, before Dinner, 18:00, and a tap on it does nothing."
+          "text": "Given I ate it as Dinner, when I open it again from Today, the Plan or a recipe's log, then Ate it is blue with a small tick on its left, before Dinner, 18:00, and a tap on it does nothing"
         }
       ],
       "unchanged": [
-        "Save it, and Saved in My recipes after it.",
+        "What Save it does: the plate into My recipes.",
         "Edit mode behind the pencil: the meals, the X that closes it, No meal selected.",
         "What Ate it logs, and where it takes you: Today, or the Plan for another day.",
         "Today's meal line: Eaten, by the plan; Undo; Change or delete.",
@@ -2201,7 +2201,7 @@
         "kind": "Too many steps, and did not understand it: the meal is chosen in two places, and the tap on Ate it changes nothing you can see.",
         "why_now": "Every plate ends here, so every meal logged goes through it."
       },
-      "decision": "Coach Milan 20 November 16:13: yes to the rethought flow, drawn as two whole flows. Waits for Go.",
+      "decision": "Coach Milan 20 November 19:21: draw it, to see whether it makes sense. Waits for his look.",
       "checks": "Full: the end of the plate is shared by many flows (a plate, a recipe, a plate from earlier, Prepare it), so all walkthroughs, about 45 minutes, plus the unit tests, the build and a new walkthrough for AC1 to AC8. The walkthroughs that tap the old chips and the calendar under Ate it change with this approved board. New words, so the German sweep too."
     },
     {
