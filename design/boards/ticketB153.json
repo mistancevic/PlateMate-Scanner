@@ -1,0 +1,41 @@
+{
+  "id": "B153",
+  "title": "The coach sees a client's first two weeks on the day the client's phone last saved, not on today",
+  "epic": "coach",
+  "state": "now",
+  "board": "Stories271",
+  "where": "Page 5",
+  "why": "Coach Milan 20 November 14:30, with a screenshot of Clients: today is Friday, but the week of three clients in their first two weeks is not correct.",
+  "opportunity": {
+    "from": "Coach Milan's own look at Clients, 20 November 2026, 14:30, on the live app.",
+    "job": "As the coach on check-in day, see at a glance how far each client is and which days need a word.",
+    "kind": "Looks broken: a bug.",
+    "why_now": "Three clients are in their first two weeks and have check-ins today."
+  },
+  "problem": "On Clients, a client on day 8 of 14 shows the outline for today on day 5, a Tuesday. The two days after it look still to come. Her page says day 5 of 14. Cause: the squares are the picture the client's phone sent when it last saved. A client who has not opened the app since Tuesday leaves Tuesday's picture. The line above, day 8 of 14, is counted on the coach's today, so the card says two different things.",
+  "story": "When I open Clients on check-in day, I want each client's days drawn on today, so that I see where they are and which days nothing came in.",
+  "ac": [
+    {"id": "AC1", "title": "Today is today", "text": "Given a client on day 8 of 14 whose phone last saved on day 5, when I open Clients, then the outline is on day 8, today."},
+    {"id": "AC2", "title": "The days since are amber", "text": "Given the same client, when I look at days 6 and 7, then they are amber, not fully logged, because nothing came from the phone for them."},
+    {"id": "AC3", "title": "The days ahead stay grey", "text": "Given the same client, when I look at days 9 to 14, then they are grey, still to come."},
+    {"id": "AC4", "title": "Her page says the same", "text": "Given I open that client, when I see her measured burn, then it says day 8 of 14, with the same squares as her card."},
+    {"id": "AC5", "title": "The count follows", "text": "Given the squares are counted again, when I read the line under them, then the full days are the green squares."}
+  ],
+  "unchanged": [
+    "The client's own Today and Goal: her phone already counts on her today.",
+    "The days a phone sent: a full day stays green, a day not fully logged stays amber.",
+    "The measured burn, its numbers and Ready on: they come from her phone as before.",
+    "A client in a normal week: one row, Monday to Sunday."
+  ],
+  "short": "Clients: the first two weeks are drawn on today",
+  "rel": "Drawn; not agreed until Coach Milan says Go",
+  "boardTitle": "B153: the coach sees a client's first two weeks on today, not on the day her phone last saved",
+  "now": "The squares on the card and on the client's page are the phone's picture from the day it last saved.",
+  "proposed": "The coach's phone draws the squares again on its own today, from the days that came with the picture: today has the outline, the days since are amber, the days ahead are grey. The full days are counted again from them.",
+  "decision": "Open. Drawn for Coach Milan's Go.",
+  "details": [
+    "The pictures are the coach demo on Friday 20 November, 14:26, from one scratch build of 0.3.169, not committed. Lena is made up: day 8 of 14, her phone last saved on day 5.",
+    "The same three clients on the live app show it the same way: the outline on the day their phones last saved.",
+    "Only the coach's views change: the Clients card and the client's page."
+  ]
+}
