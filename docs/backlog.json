@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.170",
     "0.3.169",
     "0.3.168",
     "0.3.167",
@@ -2183,7 +2184,7 @@
       "id": "B153",
       "title": "The coach sees a client's first two weeks on the day the client's phone last saved, not on today",
       "epic": "coach",
-      "state": "now",
+      "state": "done",
       "board": "Stories271",
       "where": "Page 5",
       "why": "Coach Milan 20 November 14:30, with a screenshot of Clients: today is Friday, but the week of three clients in their first two weeks is not correct.",
@@ -2228,7 +2229,8 @@
         "The measured burn, its numbers and Ready on: they come from her phone as before.",
         "A client in a normal week: one row, Monday to Sunday."
       ],
-      "decision": "Open. Drawn for Coach Milan's Go."
+      "decision": "Go, Coach Milan 20 November 14:51. Built in 0.3.170.",
+      "version": "0.3.170"
     },
     {
       "id": "DT320",

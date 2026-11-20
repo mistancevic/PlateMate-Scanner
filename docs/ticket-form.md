@@ -31,3 +31,17 @@ Decided by Coach Milan on 18 November 2026, 12:41. Used from the next ticket on,
 Nothing stands twice: what is in the block is not in the card.
 
 The generators: `design/boards/genDT308d.py` (the DT311 board) and `design/boards/genKanban.py`.
+
+## Checks: agreed before the code (Coach Milan 20 November 2026, 15:38)
+
+Coach Milan, 15:38: "we should discuss about walkthroughs and testing before you start working on the code part ... Not every code change requires that deep testing as it doesn't touch every file."
+
+1. **The board's agreement block has a line "Checks"**, next to the acceptance criteria. Claude proposes the level and says in one line why. The Go agrees to it. A Go without a Checks line means: ask about the checks first, then code.
+2. **Always, whatever the level:** the unit tests, the build, and the new walkthrough for the ticket's criteria. When on-screen words change, the German sweep runs too.
+3. **Three levels:**
+   - **Light:** one screen, and nothing changes in what the app does (words, layout, a line moved). Also run the walkthroughs that open that screen. About 5 to 10 minutes. Example: DT331.
+   - **Area:** a behaviour changes in one area (Clients, the Plate, Plan, Recipes). Also run every walkthrough of that area and of the code files the change touches. About 10 to 20 minutes. Example: B153, the Clients card and the client's page.
+   - **Full:** all walkthroughs, about 41 minutes. For shared code everything uses (the plate and meal model, the culinary and nutrition rules, storage and sync, navigation, languages), and for a release with several tickets.
+4. **If something outside the agreed set looks touched while coding**, Claude stops and asks before widening the run. Claude does not widen it silently.
+5. **The merge report says the level that ran**, and the run record in `docs/qa/runs/<version>.json` says it too (`reduced` with the reason).
+6. **A full run at the end of a day when lighter runs were merged that day**, so nothing the lighter sets skipped stays unseen for long. It is proposed in one line, like any other check.
