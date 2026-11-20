@@ -2638,6 +2638,46 @@
       ],
       "decision": "Go, Coach Milan 19 November 20:41. Built in 0.3.167.",
       "version": "0.3.167"
+    },
+    {
+      "id": "DT331",
+      "title": "The version of the app at the bottom of the Menu",
+      "epic": "ops",
+      "state": "next",
+      "board": "Stories270",
+      "where": "Page 5",
+      "why": "Coach Milan 20 November 10:19: the version is one more tap away, in About, and not in the best place; put it in the Menu, between the menu block and Sign out.",
+      "opportunity": {
+        "from": "Coach Milan, 20 November 2026, 10:19.",
+        "job": "As a tester or Coach Milan, see which version I run at a glance, when I report something or check a release.",
+        "kind": "Slow: the version sits inside About, one tap further.",
+        "why_now": "Releases come several a day, and testers report against a version."
+      },
+      "problem": "To see which version runs, I open the Menu, scroll to About and open it. The version is the last line there.",
+      "story": "When I open the Menu, I want to see the version at its bottom, so that I know which release I am on without one more tap.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "In the Menu",
+          "text": "Given the Menu, when I scroll to its bottom, then under the line Who's behind it · Impressum · Privacy notice · Disclaimer it says Version and the number, then the commit, as About says it."
+        },
+        {
+          "id": "AC2",
+          "title": "Above Sign out",
+          "text": "Given I am signed in, when I see the bottom of the Menu, then the version line sits between the links and Sign out."
+        },
+        {
+          "id": "AC3",
+          "title": "The release it is",
+          "text": "Given the app of a release, when I read the version line, then it is that release's number and commit, the same as in About."
+        }
+      ],
+      "unchanged": [
+        "About keeps its version line.",
+        "The links line and Sign out.",
+        "Every row of the Menu."
+      ],
+      "decision": "Open. Drawn for Coach Milan's Go."
     }
   ]
 }
