@@ -153,6 +153,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
           <button className="menu-row" onClick={() => setSection("about")}><span className="menu-icon"><Info size={20} /></span><b>{w("menu.about")}</b><ChevronRight size={18} /></button>
         </div>
         <p className="small"><a href="/about">{w("menu.whoSBehindIt")}</a> · <a href="/impressum">{w("menu.impressum")}</a> · <a href="/privacy">{w("menu.privacyNotice")}</a> · <a href="/disclaimer">{w("menu.disclaimer")}</a></p>
+        {/* DT331: the app's version at the bottom of the Menu, between the links and Sign out, the same line as About */}
+        <p className="small muted menu-version">Version {(import.meta.env.VITE_VERSION as string | undefined) || "0"} · {(import.meta.env.VITE_COMMIT as string | undefined) || "preview"}</p>
         {p.user && <SignOut p={p} />}
       </>
     );

@@ -25,8 +25,10 @@ const lines = (f) => { const j = JSON.parse(fs.readFileSync(path.join(ROOT, `src
     const version = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")).version;
     const clips = JSON.parse(fs.readFileSync(path.join(ROOT, "public/landing/clips.json"), "utf8"));
     const rec = fs.readFileSync(path.join(ROOT, "scripts/record-home-clips.cjs"), "utf8");
-    // AC1 and AC4: recorded on this release, all twelve, written only after every rule passed
-    ok(clips.version === version && VIDEOS.every((v) => clips.clips.includes(v)), `DT327 AC1: the twelve videos were recorded on ${clips.version}, the release they ship in (${version})`);
+    // AC1 and AC4: all twelve recorded, written only after every rule passed. The videos are recorded again only
+    // for major visual changes and new features (Coach Milan, 20 November 2026), so the recording is this release or an earlier one
+    const vnum = (x) => x.split(".").map(Number).reduce((a, n) => a * 1000 + n, 0);
+    ok(vnum(clips.version) <= vnum(version) && VIDEOS.every((v) => clips.clips.includes(v)), `DT327 AC1: the twelve videos were recorded on ${clips.version}, this release (${version}) or an earlier one`);
     ok(/fs\.writeFileSync\(path\.join\(OUT, "clips\.json"\)/.test(rec) && rec.indexOf('writeFileSync(path.join(OUT, "clips.json")') > rec.indexOf("no clip was replaced"), "DT327 AC4: the recorder writes clips.json after its rules, and a rule that fails replaces no video");
     // AC2 and AC3: the recorder walks those paths and checks them
     ok(/\.cam-analyze/.test(rec) && /\.pa-go \.pill/.test(rec) && /the read of the photo, its foods named/.test(rec), "DT327 AC2: the meal video goes camera, Use this photo, Read the plate, the read with its foods named");
@@ -43,8 +45,8 @@ const lines = (f) => { const j = JSON.parse(fs.readFileSync(path.join(ROOT, `src
     const cookLabel = await p.locator("video[aria-label^='Cook mode']").first().getAttribute("aria-label").catch(() => "");
     ok(main.includes("First the foods you need, then one step at a time, read aloud.") && cookLabel === "Cook mode: the foods first, then one step at a time, read aloud", "DT327 AC6: Cook it's first line and the video's name put the foods first. Got: " + cookLabel);
     const notes = (await p.locator(".l-ways-note").allInnerTexts()).map(clean);
-    ok(notes.includes(`Clips of the app, version ${version}, on test data. The packs in them are made up, the meals are real.`), `DT327 AC8: the note under the videos names ${version}, made-up packs and real meals. Got: ${notes.join(" | ")}`);
-    ok(notes.includes(`Clips of the app, version ${version}, on test data. The names in them are made up.`) && notes.every((n) => n.includes(clips.version)), "DT327 AC8: every note names the version from the recording");
+    ok(notes.includes(`Clips of the app, version ${clips.version}, on test data. The packs in them are made up, the meals are real.`), `DT327 AC8: the note under the videos names ${clips.version}, the recording, made-up packs and real meals. Got: ${notes.join(" | ")}`);
+    ok(notes.includes(`Clips of the app, version ${clips.version}, on test data. The names in them are made up.`) && notes.every((n) => n.includes(clips.version)), "DT327 AC8: every note names the version from the recording");
     // AC7 and AC8 in Serbian and German
     for (const [where, f] of [["/sr?home", "sr-Latn"], ["/de?home", "de"]]) {
       const l = lines(f); p = await open(where);
@@ -52,7 +54,7 @@ const lines = (f) => { const j = JSON.parse(fs.readFileSync(path.join(ROOT, `src
       const lab = await p.locator("video[aria-label]").evaluateAll((xs) => xs.map((x) => x.getAttribute("aria-label")));
       ok(t.includes(clean(l("home.decideText"))) && t.includes(clean(l("home.cook1"))) && lab.includes(l("home.videoCook")), `DT327 AC7: ${where} shows the three lines in its language`);
       const ns = (await p.locator(".l-ways-note").allInnerTexts()).map(clean);
-      ok(ns.includes(clean(l("home.clipsPacks").replace("{version}", version))), `DT327 AC8: ${where} names the version in the note: ${ns[0]}`);
+      ok(ns.includes(clean(l("home.clipsPacks").replace("{version}", clips.version))), `DT327 AC8: ${where} names the version in the note: ${ns[0]}`);
     }
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough stopped: " + e.message); }
