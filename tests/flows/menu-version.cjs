@@ -1,7 +1,7 @@
-// DT331 (0.3.168, board DT331): the app's version at the bottom of the Menu, between the links line and Sign out, the same line as
-// About shows. AC1 the line is in the Menu under the links; AC2 it stands between the links and Sign out (a local run has no
-// sign-in, so the order against Sign out is read from the Menu's code); AC3 it is this release's number and commit, the same as About.
-// Unchanged: About keeps its line, the links and every Menu row stay.
+// DT331 (0.3.168, redrawn and built in 0.3.169, board DT331): the app's version moves from About to the bottom of the Menu, between
+// the links line and Sign out. AC1 the line is in the Menu under the links; AC2 it stands between the links and Sign out (a local run
+// has no sign-in, so the order against Sign out is read from the Menu's code); AC3 it is this release's number and commit; AC4 About
+// has it no more. Unchanged: About's other lines, the links and every Menu row stay.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -42,12 +42,14 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
       ok(look.fs === look.lfs, `${tag}: DT331, the line is the links' size (${look.fs})`);
       // AC3: this release's number and commit, the same as About
       ok(new RegExp(`^Version ${version.replace(/\./g, "\\.")} · \\S+$`).test(text), `${tag}: DT331 AC3, the line reads Version ${version} and the commit: ${text}`);
-      // Unchanged: every Menu row is there, About keeps its line, and both say the same
+      // Unchanged: every Menu row is there
       const rows = (await p.locator(".menu-row").allInnerTexts()).map(clean);
       ok(rows.some((r) => r.startsWith("About")) && rows.length >= 4, `${tag}: DT331 unchanged, the Menu rows are there (${rows.length})`);
+      // AC4: About has no version line; its other lines stay
       await p.locator(".menu-row").filter({ hasText: "About" }).click(); await p.waitForTimeout(500);
-      const about = (await p.locator("section.card p.small").allInnerTexts()).map(clean).find((t) => t.startsWith("Version "));
-      ok(about === text, `${tag}: DT331 AC3 and unchanged, About keeps its line and the Menu says the same: ${about}`);
+      const about = (await p.locator("section.card p.small").allInnerTexts()).map(clean);
+      ok(!about.some((t) => /^Version /.test(t)) && await p.locator(".menu-version").count() === 0, `${tag}: DT331 AC4, About has no version line: ${about.slice(-1)[0]}`);
+      ok(about.some((t) => t.includes("hello@chefmealan.com")) && about.some((t) => t.includes("Disclaimer")), `${tag}: DT331 unchanged, About keeps the email and the links`);
       await ctx.close();
     }
     // AC2: in the Menu's code the line stands after the links and before Sign out
