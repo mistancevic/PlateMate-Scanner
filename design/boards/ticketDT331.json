@@ -1,8 +1,8 @@
 {
   "id": "DT331",
-  "title": "The version of the app at the bottom of the Menu",
+  "title": "The version of the app moves from About to the bottom of the Menu",
   "epic": "ops",
-  "state": "next",
+  "state": "now",
   "board": "Stories270",
   "where": "Page 5",
   "why": "Coach Milan 20 November 10:19: the version is one more tap away, in About, and not in the best place; put it in the Menu, between the menu block and Sign out.",
@@ -13,12 +13,12 @@
     "why_now": "Releases come several a day, and testers report against a version."
   },
   "problem": "To see which version runs, I open the Menu, scroll to About and open it. The version is the last line there.",
-  "story": "When I open the Menu, I want to see the version at its bottom, so that I know which release I am on without one more tap.",
+  "story": "When I open the Menu, I want to see the version at its bottom, so that I know which release I am on without one more tap, and find it in one place only.",
   "ac": [
     {
       "id": "AC1",
       "title": "In the Menu",
-      "text": "Given the Menu, when I scroll to its bottom, then under the line Who's behind it · Impressum · Privacy notice · Disclaimer it says Version and the number, then the commit, as About says it."
+      "text": "Given the Menu, when I scroll to its bottom, then the line under Who's behind it · Impressum · Privacy notice · Disclaimer says Version, the number and the commit."
     },
     {
       "id": "AC2",
@@ -28,23 +28,29 @@
     {
       "id": "AC3",
       "title": "The release it is",
-      "text": "Given the app of a release, when I read the version line, then it is that release's number and commit, the same as in About."
+      "text": "Given the app of a release, when I read the version line, then it is that release's number and commit."
+    },
+    {
+      "id": "AC4",
+      "title": "Not in About any more",
+      "text": "Given About, when I open it, then the version line is not there: About ends with the links line, and the version is only in the Menu."
     }
   ],
   "unchanged": [
-    "About keeps its version line.",
-    "The links line and Sign out.",
+    "About's other lines: the name, what the app does, the data note, the email and the links.",
+    "The links line and Sign out in the Menu.",
     "Every row of the Menu."
   ],
-  "short": "The version line under the links at the bottom of the Menu",
-  "rel": "Proposed; not agreed until Coach Milan says Go",
-  "boardTitle": "DT331: the version of the app at the bottom of the Menu",
+  "short": "The version line moves from About to the bottom of the Menu",
+  "rel": "Redrawn; not agreed until Coach Milan says Go",
+  "boardTitle": "DT331: the version of the app moves from About to the bottom of the Menu",
   "now": "The version is the last line of About, one tap away from the Menu.",
-  "proposed": "The same line, Version and the number · the commit, at the bottom of the Menu, under the links, above Sign out. About keeps it too.",
-  "decision": "Open. Drawn for Coach Milan's Go.",
+  "proposed": "The line Version and the number · the commit moves to the bottom of the Menu, under the links, above Sign out. About has it no more.",
+  "decision": "Go 20 November 10:43; built in 0.3.168 with the line in the Menu and in About. Redrawn 20 November 11:01 on Coach Milan's word: the line moves, so About drops it. Waits for Go.",
   "details": [
-    "The pictures are the real app, all from one scratch build of 0.3.167 with the line, not committed, built with the commit as the live app shows it (d1b274d). A local run has no sign-in and no commit, so the scratch shows Sign out as a signed-in phone has it, and the commit as a release has it.",
-    "Preview and production look the same: both show the release number and its commit. Only a build made on a computer without its commit says preview there.",
-    "The line in small muted text, as the links above it."
+    "The pictures are the real app, all from one scratch build of 0.3.167, not committed, built with the commit as the live app shows it (d1b274d). A local run has no sign-in, so the scratch shows Sign out as a signed-in phone has it.",
+    "Preview and production look the same: both show the release number and its commit.",
+    "The line in small muted text, as the links above it.",
+    "0.3.168 has the line in both places; this change takes it out of About."
   ]
 }

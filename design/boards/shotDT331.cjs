@@ -28,7 +28,14 @@ const seed = JSON.parse(fs.readFileSync("/home/claude/platemate-scanner/tests/fl
   p = await open(false);
   await p.evaluate(() => { const v = document.querySelector(".menu-version"); v.style.cssText += ";outline:3px solid #2a72d9;outline-offset:3px;border-radius:6px";
     const n = document.createElement("div"); n.style.cssText = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px;background:#fff8d6;padding:8px 10px;margin:14px 0;font-size:14px;line-height:1.45;color:#172742;font-family:Nunito,system-ui,sans-serif";
-    n.innerHTML = "<b>New:</b> the version, the same line as in About, between the links and Sign out. Small and grey, as the links."; v.insertAdjacentElement("afterend", n); window.scrollTo(0, document.body.scrollHeight); });
+    n.innerHTML = "<b>New:</b> the version line, moved here from About, between the links and Sign out. Small and grey, as the links."; v.insertAdjacentElement("afterend", n); window.scrollTo(0, document.body.scrollHeight); });
   await p.waitForTimeout(400); await p.screenshot({ path: `${OUT}/new_menu.png` });
+  // About new: the version line is gone; the note sits where it was
+  await p.evaluate(() => document.querySelectorAll("div").forEach((d) => { if (d.innerHTML.startsWith("<b>New:</b>")) d.remove(); }));
+  await p.locator(".menu-row").filter({ hasText: "About" }).click(); await p.waitForTimeout(500);
+  await p.evaluate(() => { const links = [...document.querySelectorAll("section.card p.small")].find((x) => x.querySelector('a[href="/disclaimer"]'));
+    const n = document.createElement("div"); n.style.cssText = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px;background:#fff8d6;padding:8px 10px;margin:14px 0 4px;font-size:14px;line-height:1.45;color:#172742;font-family:Nunito,system-ui,sans-serif";
+    n.innerHTML = "<b>New:</b> the version line is no longer here. It moved to the bottom of the Menu."; links.insertAdjacentElement("afterend", n); });
+  await p.waitForTimeout(400); await p.screenshot({ path: `${OUT}/new_about.png` });
   await br.close(); n.kill(); console.log("ok");
 })();

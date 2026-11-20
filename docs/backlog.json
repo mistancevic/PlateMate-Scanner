@@ -2642,9 +2642,9 @@
     },
     {
       "id": "DT331",
-      "title": "The version of the app at the bottom of the Menu",
+      "title": "The version of the app moves from About to the bottom of the Menu",
       "epic": "ops",
-      "state": "done",
+      "state": "now",
       "board": "Stories270",
       "where": "Page 5",
       "why": "Coach Milan 20 November 10:19: the version is one more tap away, in About, and not in the best place; put it in the Menu, between the menu block and Sign out.",
@@ -2655,12 +2655,12 @@
         "why_now": "Releases come several a day, and testers report against a version."
       },
       "problem": "To see which version runs, I open the Menu, scroll to About and open it. The version is the last line there.",
-      "story": "When I open the Menu, I want to see the version at its bottom, so that I know which release I am on without one more tap.",
+      "story": "When I open the Menu, I want to see the version at its bottom, so that I know which release I am on without one more tap, and find it in one place only.",
       "ac": [
         {
           "id": "AC1",
           "title": "In the Menu",
-          "text": "Given the Menu, when I scroll to its bottom, then under the line Who's behind it · Impressum · Privacy notice · Disclaimer it says Version and the number, then the commit, as About says it."
+          "text": "Given the Menu, when I scroll to its bottom, then the line under Who's behind it · Impressum · Privacy notice · Disclaimer says Version, the number and the commit."
         },
         {
           "id": "AC2",
@@ -2670,16 +2670,21 @@
         {
           "id": "AC3",
           "title": "The release it is",
-          "text": "Given the app of a release, when I read the version line, then it is that release's number and commit, the same as in About."
+          "text": "Given the app of a release, when I read the version line, then it is that release's number and commit."
+        },
+        {
+          "id": "AC4",
+          "title": "Not in About any more",
+          "text": "Given About, when I open it, then the version line is not there: About ends with the links line, and the version is only in the Menu."
         }
       ],
       "unchanged": [
-        "About keeps its version line.",
-        "The links line and Sign out.",
+        "About's other lines: the name, what the app does, the data note, the email and the links.",
+        "The links line and Sign out in the Menu.",
         "Every row of the Menu."
       ],
-      "decision": "Go, Coach Milan 20 November 10:43. Built in 0.3.168.",
-      "version": "0.3.168"
+      "decision": "Go 20 November 10:43; built in 0.3.168 with the line in the Menu and in About. Redrawn 20 November 11:01 on Coach Milan's word: the line moves, so About drops it. Waits for Go.",
+      "built": "0.3.168 put the line in the Menu and kept it in About."
     }
   ]
 }
