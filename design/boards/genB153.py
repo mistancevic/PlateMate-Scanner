@@ -22,7 +22,7 @@ def shot(x, y, name, w, title, status, note):
 B = Board(); PW = 390; G = 70
 W = SX + 4 * PW + 3 * G + 40
 parts = [("Ticket", "B153. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: B153, canvas Page 5."),
-  ("How to read this board", "<b>Left to right:</b> the step being debugged is Clients on check-in day. The client card today and her page today, an arrow, then the card new and her page new. Yellow notes say what is wrong today and what changes; the changes have a blue outline."),
+  ("How to read this board", "<b>Left to right:</b> the step being debugged is Clients on check-in day. The client card today and her page today, an arrow, then the card new and her page new. Yellow notes say what is wrong today and what changes; the changes have a blue outline. Every screen is drawn on Friday 20 November 2026, day 8 (the strip on top); the yellow labels under the bars and squares give each day its date, today in bold. The labels are on the board only, not in the app."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]), ("In Coach Milan's words", "20 November 14:30: I noticed something and it seems like a bug. Today is Friday but the week for three clients is not correct."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]

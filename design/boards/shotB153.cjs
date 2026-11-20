@@ -28,17 +28,34 @@ const NOTE = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px;ba
   const note = async (p, sel, html, mark, markSel) => p.evaluate(([sel, html, mark, NOTE, markSel]) => { const el = document.querySelector(sel); if (mark) document.querySelector(markSel || sel).style.cssText += ";outline:3px solid #2a72d9;outline-offset:4px;border-radius:10px";
     const d = document.createElement("div"); d.style.cssText = NOTE; d.innerHTML = html; el.insertAdjacentElement("afterend", d); }, [sel, html, mark, NOTE, markSel]);
   const toLena = async (p) => { const c = p.locator(".client-row").filter({ hasText: "Lena" }).first(); await c.evaluate((e) => { e.setAttribute("data-lena", "1"); e.scrollIntoView({ block: "start" }); window.scrollBy(0, -70); }); await p.waitForTimeout(400); return c; };
+  // board-only labels (not in the app): the date of every day under the bars and squares, today in bold, and the day of the drawing on top
+  const days = Array.from({ length: 14 }, (_, i) => { const d = new Date(2026, 10, 13 + i); return { wd: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"][d.getDay()], n: d.getDate(), today: d.getDate() === 20 }; });
+  const label = (p, sel, short) => p.evaluate(([sel, days, short]) => {
+    const host = document.querySelector(sel); const cells = [...host.querySelectorAll(short ? ".ft-sq" : ".db-cell")];
+    const box = host.getBoundingClientRect(); host.style.position = "relative";
+    const rows = [...new Set(cells.map((c) => Math.round(c.getBoundingClientRect().top)))];
+    cells.forEach((c, i) => { const r = c.getBoundingClientRect(); const t = document.createElement("div"); const d = days[i];
+      t.textContent = short ? String(d.n) : `${d.wd} ${d.n}`;
+      t.style.cssText = `position:absolute;left:${r.left - box.left}px;top:${r.bottom - box.top + (short ? 9 : 1)}px;width:${r.width}px;text-align:center;font:${d.today ? 900 : 700} ${short ? 9.5 : 10.5}px Nunito,system-ui,sans-serif;color:${d.today ? "#123a7a" : "#7a5b00"};background:#fff8d6;border-radius:4px;line-height:13px;z-index:6`;
+      host.appendChild(t); });
+    if (!short) host.querySelectorAll(".db-row").forEach((r) => (r.style.marginBottom = "16px")); else host.style.marginBottom = "18px";
+  }, [sel, days, short]);
+  const day = (p) => p.evaluate(() => { const h = document.querySelector("header") || document.body; const d = document.createElement("div");
+    d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:50;background:#fff8d6;border-bottom:3px solid #2a72d9;padding:5px 10px;font:800 13px Nunito,system-ui,sans-serif;color:#172742;text-align:center";
+    d.textContent = "Drawn on Friday 20 November 2026, 14:26. Today is day 8."; document.body.appendChild(d); });
   for (const now of [true, false]) {
     const tag = now ? "now" : "new";
     let p = await open(now); const c = await toLena(p);
     await note(p, "[data-lena] .db-rows", now ? "<b>Today is Friday, day 8,</b> but the outline is on day 5, Tuesday: the day her phone last saved. Wednesday and Thursday show as still to come."
       : "<b>New:</b> the outline is on today, day 8. Wednesday and Thursday are amber: nothing came from her phone for them. The count under it is counted again too.", !now);
+    await label(p, "[data-lena] .db-rows", false); await day(p);
     await p.waitForTimeout(300); await p.screenshot({ path: `${OUT}/${tag}_card.png` });
     await p.reload(); await p.waitForTimeout(1500); await p.locator(".bottom-nav button").last().click(); await p.waitForTimeout(1200);
     await (await toLena(p)).locator(".client-open").click(); await p.waitForTimeout(1200);
     await p.locator(".ft-burn").first().evaluate((e) => { e.scrollIntoView({ block: "start" }); window.scrollBy(0, -80); }); await p.waitForTimeout(300);
     await note(p, ".ft-burn .ft-ends", now ? "<b>The same picture on her page:</b> it says day 5 of 14, and the squares stop at Tuesday."
       : "<b>New:</b> her page says day 8 of 14, with the same squares as her card.", !now, ".ft-burn .ft-squares");
+    await label(p, ".ft-burn .ft-squares", true); await day(p);
     await p.waitForTimeout(300); await p.screenshot({ path: `${OUT}/${tag}_page.png` });
     console.log(tag);
   }
