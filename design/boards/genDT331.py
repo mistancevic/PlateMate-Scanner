@@ -20,7 +20,7 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-B = Board(); PW = 390; G = 40
+B = Board(); PW = 390; G = 70
 W = SX + 3 * PW + 2 * G + 40
 parts = [("Ticket", "DT331. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT331, canvas Page 5."),
   ("How to read this board", "<b>Then:</b> the bottom of the Menu today and About today, then the bottom of the Menu new, with the version line above Sign out. <b>The wide block at the bottom:</b> the agreement, as Given, When, Then rows."),
@@ -36,6 +36,8 @@ X = lambda i: SX + i * (PW + G)
 bs = [shot(X(0), y, "now_menu", PW, "The bottom of the Menu, today", "draft", "The links, then Sign out. No version."),
   shot(X(1), y, "now_about", PW, "About, today", "draft", "The version is its last line. It stays there."),
   shot(X(2), y, "new_menu", PW, "The bottom of the Menu, new", "changed", "Under the links: Version 0.3.167 · d1b274d, then Sign out.")]
+# Now leads to New: an arrow between the two
+B.html.append(f'<div style="position:absolute;left:{X(2) - G + 2}px;top:{y + 360}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">→</div>')
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40

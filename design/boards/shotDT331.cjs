@@ -24,6 +24,11 @@ const seed = JSON.parse(fs.readFileSync("/home/claude/platemate-scanner/tests/fl
   };
   let p = await open(true); await p.screenshot({ path: `${OUT}/now_menu.png` });
   await p.locator(".menu-row").filter({ hasText: "About" }).click(); await p.waitForTimeout(500); await p.screenshot({ path: `${OUT}/now_about.png` });
-  p = await open(false); await p.screenshot({ path: `${OUT}/new_menu.png` });
+  // the house style of a board: the change drawn into the new screen, blue outline and a yellow note (as B150, DT308)
+  p = await open(false);
+  await p.evaluate(() => { const v = document.querySelector(".menu-version"); v.style.cssText += ";outline:3px solid #2a72d9;outline-offset:3px;border-radius:6px";
+    const n = document.createElement("div"); n.style.cssText = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px;background:#fff8d6;padding:8px 10px;margin:14px 0;font-size:14px;line-height:1.45;color:#172742;font-family:Nunito,system-ui,sans-serif";
+    n.innerHTML = "<b>New:</b> the version, the same line as in About, between the links and Sign out. Small and grey, as the links."; v.insertAdjacentElement("afterend", n); window.scrollTo(0, document.body.scrollHeight); });
+  await p.waitForTimeout(400); await p.screenshot({ path: `${OUT}/new_menu.png` });
   await br.close(); n.kill(); console.log("ok");
 })();
