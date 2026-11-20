@@ -24,6 +24,8 @@ def acTable(B, y, w, t):
       f'<div style="{hd};margin-top:14px">ACCEPTANCE CRITERIA, WHAT IS NEW</div>'
       f'<table style="margin-top:6px;width:100%;border-collapse:collapse;table-layout:fixed"><colgroup><col style="width:58px"><col style="width:20%"><col style="width:24%"><col style="width:22%"><col></colgroup>'
       f'<tr><th style="{th};border-radius:8px 0 0 0">#</th><th style="{th}">Scenario</th><th style="{th}">Given</th><th style="{th}">When</th><th style="{th};border-radius:0 8px 0 0">Then</th></tr>{rows}</table>'
+      # Checks, agreed with the Go (Coach Milan 20 November 2026, 15:38): the level of tests and walkthroughs, and why
+      + (f'<div style="{hd};margin-top:14px">CHECKS, AGREED WITH THE GO</div>' + li(t["checks"]) if t.get("checks") else "") +
       f'<div style="display:flex;gap:40px;margin-top:16px"><div style="flex:1.4"><div style="{hd}">ALREADY WORKS, MUST NOT CHANGE</div>' + "".join(li(x) for x in t["unchanged"])
       + f'</div><div style="flex:1"><div style="{hd}">DESIGN DETAILS FOR THE BUILD</div>' + "".join(li(x) for x in t["details"]) + '</div></div></div>')
 def parts(t):

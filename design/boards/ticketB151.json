@@ -1,44 +1,68 @@
 {
- "id": "B151",
- "title": "Ate it and Plan it turn blue while their calendar is open: an action looks like a chosen choice",
- "short": "An action stays white; blue with a tick is for what is chosen",
- "epic": "plate",
- "rel": "Proposed; not agreed until Coach Milan says Go",
- "boardTitle": "B151: Ate it turns blue while its calendar is open, so an action looks like a status",
- "from": "Coach Milan, 18 November 2026, 19:51, looking at the boards and the app.",
- "words": "I see Ate it as a blue chip. Is it a button or a status? If it is eaten, then it should be with a checkmark, and if it is to be selected it should be with a white background.",
- "problem": "At the end of a plate I tap Ate it. Its calendar opens and the button turns blue. Blue is the look of a chosen choice, and there is no tick. It reads as eaten, and nothing is eaten yet. Plan it does the same.",
- "rule": "Your rule from the board DT310: a choice is white until chosen, then blue with a tick. An action is a button and stays as it is. Ate it and Plan it are actions.",
- "proposed": "Ate it and Plan it stay white, also while their calendar is open. The calendar under the buttons shows what is open. Nothing else changes.",
- "ac": [
-  {
-   "id": "AC1",
-   "title": "Ate it stays white",
-   "text": "Given a plate with no meal set, when I tap Ate it and its calendar opens, then Ate it has the same white look as before the tap."
+  "id": "B151",
+  "title": "Ate it: white while you choose, blue with a tick once eaten",
+  "epic": "plate",
+  "state": "now",
+  "board": "Stories261",
+  "where": "Page 5",
+  "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? Eaten would need a checkmark, to be selected would be white. 20 November 15:52 to 15:57: also the moment it is really eaten, blue with a small tick on its left; drawn where the eaten meal opens again.",
+  "opportunity": {
+    "from": "Coach Milan's own look at the boards and the app, 18 November 2026, 19:51, and 20 November, 15:52.",
+    "job": "At the end of a plate, log what I ate, and later see at a glance that a meal is eaten.",
+    "kind": "Did not understand it: an action looks like a status, and a status is missing where it is true.",
+    "why_now": "The meal model is new (0.3.157), and Ate it is how every plate ends up counted."
   },
-  {
-   "id": "AC2",
-   "title": "Plan it stays white",
-   "text": "Given the same plate, when I tap Plan it and its calendar opens, then Plan it has the same white look as before the tap."
-  },
-  {
-   "id": "AC3",
-   "title": "The second tap still closes",
-   "text": "Given Ate it's calendar is open, when I tap Ate it again, then the calendar closes."
-  },
-  {
-   "id": "AC4",
-   "title": "Blue with a tick is for the chosen",
-   "text": "Given the calendar is open with Dinner as the guess, when I look at it, then Dinner's row is blue with a tick, and no button above it is blue."
-  }
- ],
- "unchanged": [
-  "What Save it, Plan it and Ate it do.",
-  "The marked meal in the calendar: blue with a tick.",
-  "Ate it on Did you eat it? for a plate from earlier: it is the main button there, filled blue, and stays so."
- ],
- "details": [
-  "A look only. No new element and no new words.",
-  "The screen B151b is what it looks like."
- ]
+  "problem": "At the end of a plate I tap Ate it. Its calendar opens and the button turns blue, with no tick. Blue is the look of a chosen choice, so it reads as eaten, and nothing is eaten yet. Plan it does the same. Then, when I open a meal I ate again, from Today or the Plan, nothing on it says it is eaten.",
+  "story": "When I log a plate, I want what I still choose to look open and what is done to look done, so that I never wonder whether a meal counts.",
+  "now": "Ate it and Plan it turn blue while their calendar is open. A meal opened again after Ate it shows its meal and time, and no status.",
+  "proposed": "Ate it and Plan it stay white while their calendar is open; the chosen meal in the calendar is blue with a tick. A meal I ate, opened again from Today, the Plan or a recipe's log, shows Ate it blue with a small tick on its left, next to its meal and time. It is a status: a tap on it does nothing. After Ate it the app still goes to Today, as now.",
+  "looked_at": "Keeping the plate open after Ate it, with Ate it blue and ticked there, was weighed. Not chosen: the job ends on Today, where the day's numbers move, and the plate would sit there finished with nothing left to do.",
+  "decision": "Coach Milan 20 November 15:57: draw both moments. Waits for Go.",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "Ate it stays white while you choose",
+      "text": "Given a plate with no meal set, when I tap Ate it and its calendar opens, then Ate it has the same white look as before the tap."
+    },
+    {
+      "id": "AC2",
+      "title": "Plan it stays white while you choose",
+      "text": "Given the same plate, when I tap Plan it and its calendar opens, then Plan it has the same white look as before the tap."
+    },
+    {
+      "id": "AC3",
+      "title": "The second tap still closes",
+      "text": "Given Ate it's calendar is open, when I tap Ate it again, then the calendar closes."
+    },
+    {
+      "id": "AC4",
+      "title": "Blue with a tick is for the chosen",
+      "text": "Given the calendar is open with Dinner as the guess, when I look at it, then Dinner's row is blue with a tick, and no button above it is blue."
+    },
+    {
+      "id": "AC5",
+      "title": "An eaten meal says Ate it",
+      "text": "Given I ate skyr, oats and a banana as Dinner, when I open it again from Today, then Ate it is blue with a small tick on its left, before Dinner, 18:00, and a tap on it does nothing."
+    },
+    {
+      "id": "AC6",
+      "title": "The same from the Plan and a recipe",
+      "text": "Given the same meal, when I open it from the Plan or from a recipe's Every time you ate it, then it shows the same Ate it with its tick."
+    }
+  ],
+  "unchanged": [
+    "What Save it, Plan it and Ate it do, and that Ate it takes you to Today (or to the Plan for another day).",
+    "Today's line under the meal: Eaten, by the plan.",
+    "The eaten meal's buttons: Save in My recipes, Put it on the Plate again, Change it, Delete this meal.",
+    "Ate it on Did you eat it? for a plate from earlier: it is the main button there, filled blue, and stays so."
+  ],
+  "checks": "Area: the unit tests, the build, a new walkthrough for AC1 to AC6, and the walkthroughs of the Plate's end and of a meal opened again (Today, Plan, a recipe's log). About 15 minutes. No words change, so no German sweep.",
+  "short": "Ate it: white while you choose, blue with a tick once eaten",
+  "rel": "Redrawn; not agreed until Coach Milan says Go",
+  "boardTitle": "B151: Ate it is white while you choose, and blue with a tick once the meal is eaten",
+  "details": [
+    "The pictures are the real app on Sunday 15 November 2026, 18:00 (the walkthroughs' day), from one scratch build of 0.3.170, not committed.",
+    "The tick look is the app's chosen look (a pale blue chip with a tick on its left), the same as Dinner's row in the calendar.",
+    "An action stays an action: white, a button. A status is never a button."
+  ]
 }
