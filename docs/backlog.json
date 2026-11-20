@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.169",
     "0.3.168",
     "0.3.167",
     "0.3.166",
@@ -2644,7 +2645,7 @@
       "id": "DT331",
       "title": "The version of the app moves from About to the bottom of the Menu",
       "epic": "ops",
-      "state": "now",
+      "state": "done",
       "board": "Stories270",
       "where": "Page 5",
       "why": "Coach Milan 20 November 10:19: the version is one more tap away, in About, and not in the best place; put it in the Menu, between the menu block and Sign out.",
@@ -2683,8 +2684,9 @@
         "The links line and Sign out in the Menu.",
         "Every row of the Menu."
       ],
-      "decision": "Go 20 November 10:43; built in 0.3.168 with the line in the Menu and in About. Redrawn 20 November 11:01 on Coach Milan's word: the line moves, so About drops it. Waits for Go.",
-      "built": "0.3.168 put the line in the Menu and kept it in About."
+      "decision": "Go 20 November 10:43; built in 0.3.168 with the line in the Menu and in About. Redrawn 11:01 on Coach Milan's word: the line moves, so About drops it. Go 11:13. Built in 0.3.169.",
+      "built": "0.3.168 put the line in the Menu and kept it in About.",
+      "version": "0.3.169"
     }
   ]
 }
