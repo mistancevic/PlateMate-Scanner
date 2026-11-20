@@ -2137,12 +2137,12 @@
     },
     {
       "id": "B151",
-      "title": "The end of a plate: a summary, three equal actions, a question only where it is needed",
+      "title": "The end of a plate: a summary, Now and Later, a question only where it is needed",
       "epic": "plate",
       "state": "now",
       "board": "Stories261",
       "where": "Page 5",
-      "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow. 18:57 to 19:21: the situations; a fixed set of actions, never a button that turns into a status; no scroll on a tap, ask where it happens; a summary of the plate before What do you do with it?; draw it.",
+      "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow. 18:57 to 19:21: the situations; a fixed set of actions, never a button that turns into a status; no scroll on a tap, ask where it happens; a summary of the plate before What do you do with it?; draw it. 20:02 to 20:08: Now (Prepare it, Ate it) and Later (Save it); Plan it from My recipes, its own ticket DT332; the meal chip only chooses, Log it logs; Eaten on the meal line, not a tag.",
       "problem": "The meal is chosen in two places. At the top, Meal and day says No meal selected, with its pencil. At the end, a question, What do you do with it?, and three chips that look alike; Ate it opens a second calendar to choose the meal again. In the first drawing Ate it stayed white, so the tap changed nothing on it. And a meal I ate, opened again, says nothing about being eaten.",
       "story": "When my plate is ready, I want to say I ate it in one tap for the meal I am at, so that it counts without choosing the meal twice.",
       "ac": [
@@ -2153,8 +2153,8 @@
         },
         {
           "id": "AC2",
-          "title": "Three equal actions",
-          "text": "Given the end of the plate, when I look at it, then Save it, Plan it and Ate it are white buttons of one look, whatever meal is set, and none of them turns into a status"
+          "title": "Now and Later",
+          "text": "Given the end of the plate, when I look at it, then Now holds Prepare it and Ate it, Later holds Save it, all white buttons of one look, and Plan it is not there"
         },
         {
           "id": "AC3",
@@ -2168,32 +2168,42 @@
         },
         {
           "id": "AC5",
-          "title": "One tap logs",
-          "text": "Given the question is open, when I tap Dinner, then the plate is logged as today's Dinner and Today opens"
+          "title": "A chip only chooses",
+          "text": "Given the question is open, when I tap Lunch, then Lunch is marked in place of Dinner and nothing is logged"
         },
         {
           "id": "AC6",
+          "title": "Log it logs",
+          "text": "Given Dinner is marked, when I tap Log it, then the plate is logged as today's Dinner and Today opens"
+        },
+        {
+          "id": "AC7",
           "title": "The second tap closes",
           "text": "Given the question is open, when I tap Ate it again, then the question closes and nothing is logged"
         },
         {
-          "id": "AC7",
-          "title": "Plan it the same way",
-          "text": "Given no meal is set, when I tap Plan it, then For which meal? opens right under it with the meals still ahead today and Another day"
+          "id": "AC8",
+          "title": "Prepare it as before",
+          "text": "Given the end of the plate, when I tap Prepare it, then it goes on to cooking as Prepare it does today"
         },
         {
-          "id": "AC8",
-          "title": "An eaten meal says Ate it",
-          "text": "Given I ate it as Dinner, when I open it again from Today, the Plan or a recipe's log, then Ate it is on the right of the meal's name, blue with a small tick on its left, and a tap on it does nothing"
+          "id": "AC9",
+          "title": "Save it stays a button",
+          "text": "Given I tap Save it, when the plate is in My recipes, then Save it stays a white button and a line under the buttons says Saved in My recipes as Skyr, Oats & Banana"
+        },
+        {
+          "id": "AC10",
+          "title": "Eaten on the meal line",
+          "text": "Given I ate it as Dinner, when I open it again from Today, the Plan or a recipe's log, then its meal line says ✓ Eaten · Dinner, 18:00, as Today says it"
         }
       ],
       "unchanged": [
-        "What Save it does: the plate into My recipes.",
+        "A plate opened from an empty meal in the Plan: it ends with putting it into that meal, as now.",
         "Edit mode behind the pencil: the meals, the X that closes it, No meal selected.",
-        "What Ate it logs, and where it takes you: Today, or the Plan for another day.",
+        "What Ate it logs, and that Today opens after it.",
+        "What Prepare it does, and what Save it puts into My recipes.",
         "Today's meal line: Eaten, by the plan; Undo; Change or delete.",
-        "A plate from a photo: the read and Did you eat it?, as now.",
-        "A plate from earlier: it asks as it does (DT314)."
+        "A plate from a photo (the read and Did you eat it?) and a plate from earlier (DT314), as now."
       ],
       "opportunity": {
         "from": "Coach Milan's own look at the B151 board and the app, 18 and 20 November 2026.",
@@ -2201,8 +2211,8 @@
         "kind": "Too many steps, and did not understand it: the meal is chosen in two places, and the tap on Ate it changes nothing you can see.",
         "why_now": "Every plate ends here, so every meal logged goes through it."
       },
-      "decision": "Coach Milan 20 November 19:21: draw it, to see whether it makes sense. Waits for his look.",
-      "checks": "Full: the end of the plate is shared by many flows (a plate, a recipe, a plate from earlier, Prepare it), so all walkthroughs, about 45 minutes, plus the unit tests, the build and a new walkthrough for AC1 to AC8. The walkthroughs that tap the old chips and the calendar under Ate it change with this approved board. New words, so the German sweep too."
+      "decision": "Coach Milan 20 November 20:08: yes to Now and Later, Plan it off the Plate into its own ticket, Log it under the meal question, Eaten on the meal line. Waits for his look.",
+      "checks": "Full: the end of the plate is shared by many flows (a plate, a recipe, a plate from earlier, Prepare it), so all walkthroughs, about 45 minutes, plus the unit tests, the build and a new walkthrough for AC1 to AC10. The walkthroughs that tap the old chips and the calendar under Ate it change with this approved board. New words, so the German sweep too."
     },
     {
       "id": "B152",
@@ -2771,6 +2781,22 @@
       "decision": "Go 20 November 10:43; built in 0.3.168 with the line in the Menu and in About. Redrawn 11:01 on Coach Milan's word: the line moves, so About drops it. Go 11:13. Built in 0.3.169.",
       "built": "0.3.168 put the line in the Menu and kept it in About.",
       "version": "0.3.169"
+    },
+    {
+      "id": "DT332",
+      "title": "Plan it on a recipe page",
+      "epic": "recipes",
+      "state": "next",
+      "why": "Coach Milan 20 November 20:02 to 20:08, on B151: Plan it leaves the Plate; Save it puts the plate into My recipes, and there Plan it alongside putting it on the Plate or Prepare it closes the loop. Its own ticket by the scope rule.",
+      "opportunity": {
+        "from": "Coach Milan's own look at the B151 board, 20 November 2026, 20:02.",
+        "job": "Plan a dish I saved for a meal of a coming day.",
+        "kind": "Could not do it, the feature is missing: a recipe page has no way to plan it.",
+        "why_now": "B151 takes Plan it off the Plate, so a saved plate needs another way into the Plan."
+      },
+      "problem": "A recipe page offers Change it first, Start cooking and Edit recipe. To plan a saved dish for Thursday's lunch I have to go to the Plan and look for it there.",
+      "story": "When I look at a recipe I saved, I want to put it on a coming meal from there, so that the dish I kept turns into a plan without searching for it again.",
+      "decision": "Open. To be drawn after B151."
     }
   ]
 }

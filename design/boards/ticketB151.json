@@ -1,11 +1,11 @@
 {
   "id": "B151",
-  "title": "The end of a plate: a summary, three equal actions, a question only where it is needed",
+  "title": "The end of a plate: a summary, Now and Later, a question only where it is needed",
   "epic": "plate",
   "state": "now",
   "board": "Stories261",
   "where": "Page 5",
-  "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow. 18:57 to 19:21: the situations; a fixed set of actions, never a button that turns into a status; no scroll on a tap, ask where it happens; a summary of the plate before What do you do with it?; draw it.",
+  "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow. 18:57 to 19:21: the situations; a fixed set of actions, never a button that turns into a status; no scroll on a tap, ask where it happens; a summary of the plate before What do you do with it?; draw it. 20:02 to 20:08: Now (Prepare it, Ate it) and Later (Save it); Plan it from My recipes, its own ticket DT332; the meal chip only chooses, Log it logs; Eaten on the meal line, not a tag.",
   "opportunity": {
     "from": "Coach Milan's own look at the B151 board and the app, 18 and 20 November 2026.",
     "job": "At the end of a plate, log what I ate in one tap, and later see at a glance that the meal is eaten.",
@@ -15,9 +15,9 @@
   "problem": "The meal is chosen in two places. At the top, Meal and day says No meal selected, with its pencil. At the end, a question, What do you do with it?, and three chips that look alike; Ate it opens a second calendar to choose the meal again. In the first drawing Ate it stayed white, so the tap changed nothing on it. And a meal I ate, opened again, says nothing about being eaten.",
   "story": "When my plate is ready, I want to say I ate it in one tap for the meal I am at, so that it counts without choosing the meal twice.",
   "now": "The top line says No meal selected. The end asks What do you do with it? with three chips; Ate it turns blue and opens a calendar; a tap on a meal logs it and Today opens. The meal opened again shows no status.",
-  "proposed": "The meal is set at the top (the pencil). At the end, before What do you do with it?, a summary of the plate: its name, its numbers, and the meal it is for, or No meal selected. Then Save it, Plan it and Ate it: three equal white actions that never change their look. With a meal set, a tap acts at once. With none, a short question opens right under the tapped button, joined to it: Which meal was it? with today's meals, the one the time suggests marked; one tap logs it and the summary and the top line show the same meal. No scrolling on a tap. Ate it logs and Today opens, as now; the meal opened again shows Ate it blue with a tick on its left.",
-  "looked_at": "A guess shown at the top: not chosen, the meal stays set only by you (DT308.1). A main, filled button that follows the meal: not chosen, a button that changes its look by the state is a status. Scrolling up to the top line on a tap: not chosen, by the time it gets there the person has lost what it was about. An open look for Ate it with a second calendar: not chosen, two places for one choice.",
-  "decision": "Coach Milan 20 November 19:21: draw it, to see whether it makes sense. Waits for his look.",
+  "proposed": "At the end of the plate: a summary (name, numbers, the meal it is for or No meal selected), then What do you do with it? in two groups of equal white buttons. Now: Prepare it, Ate it. Later: Save it, to My recipes. Plan it leaves the Plate: you plan from My recipes (DT332) or from the Plan. With a meal set at the top, Ate it logs at once. With none, a short question opens right under Ate it, pointing at it: today's meals as chips, the one the time suggests marked; a chip only changes the choice, and Log it logs. Ate it then opens Today, as now. The meal opened again says it on its meal line: ✓ Eaten · Dinner, 18:00, as Today says it.",
+  "looked_at": "A guess shown at the top: not chosen, the meal stays set only by you (DT308.1). A main, filled button that follows the meal: not chosen, a button that changes its look by the state is a status. Scrolling up to the top line on a tap: not chosen, by the time it gets there the person has lost what it was about. An open look for Ate it with a second calendar: not chosen, two places for one choice. Ate it as a tag beside the meal's name, 19:44: not chosen, a long name pushes it, and the status belongs to the meal line. A meal chip that logs on the tap: not chosen, a chip is a choice, not an action.",
+  "decision": "Coach Milan 20 November 20:08: yes to Now and Later, Plan it off the Plate into its own ticket, Log it under the meal question, Eaten on the meal line. Waits for his look.",
   "ac": [
     {
       "id": "AC1",
@@ -26,8 +26,8 @@
     },
     {
       "id": "AC2",
-      "title": "Three equal actions",
-      "text": "Given the end of the plate, when I look at it, then Save it, Plan it and Ate it are white buttons of one look, whatever meal is set, and none of them turns into a status"
+      "title": "Now and Later",
+      "text": "Given the end of the plate, when I look at it, then Now holds Prepare it and Ate it, Later holds Save it, all white buttons of one look, and Plan it is not there"
     },
     {
       "id": "AC3",
@@ -41,40 +41,50 @@
     },
     {
       "id": "AC5",
-      "title": "One tap logs",
-      "text": "Given the question is open, when I tap Dinner, then the plate is logged as today's Dinner and Today opens"
+      "title": "A chip only chooses",
+      "text": "Given the question is open, when I tap Lunch, then Lunch is marked in place of Dinner and nothing is logged"
     },
     {
       "id": "AC6",
+      "title": "Log it logs",
+      "text": "Given Dinner is marked, when I tap Log it, then the plate is logged as today's Dinner and Today opens"
+    },
+    {
+      "id": "AC7",
       "title": "The second tap closes",
       "text": "Given the question is open, when I tap Ate it again, then the question closes and nothing is logged"
     },
     {
-      "id": "AC7",
-      "title": "Plan it the same way",
-      "text": "Given no meal is set, when I tap Plan it, then For which meal? opens right under it with the meals still ahead today and Another day"
+      "id": "AC8",
+      "title": "Prepare it as before",
+      "text": "Given the end of the plate, when I tap Prepare it, then it goes on to cooking as Prepare it does today"
     },
     {
-      "id": "AC8",
-      "title": "An eaten meal says Ate it",
-      "text": "Given I ate it as Dinner, when I open it again from Today, the Plan or a recipe's log, then Ate it is on the right of the meal's name, blue with a small tick on its left, and a tap on it does nothing"
+      "id": "AC9",
+      "title": "Save it stays a button",
+      "text": "Given I tap Save it, when the plate is in My recipes, then Save it stays a white button and a line under the buttons says Saved in My recipes as Skyr, Oats & Banana"
+    },
+    {
+      "id": "AC10",
+      "title": "Eaten on the meal line",
+      "text": "Given I ate it as Dinner, when I open it again from Today, the Plan or a recipe's log, then its meal line says ✓ Eaten · Dinner, 18:00, as Today says it"
     }
   ],
   "unchanged": [
-    "What Save it does: the plate into My recipes.",
+    "A plate opened from an empty meal in the Plan: it ends with putting it into that meal, as now.",
     "Edit mode behind the pencil: the meals, the X that closes it, No meal selected.",
-    "What Ate it logs, and where it takes you: Today, or the Plan for another day.",
+    "What Ate it logs, and that Today opens after it.",
+    "What Prepare it does, and what Save it puts into My recipes.",
     "Today's meal line: Eaten, by the plan; Undo; Change or delete.",
-    "A plate from a photo: the read and Did you eat it?, as now.",
-    "A plate from earlier: it asks as it does (DT314)."
+    "A plate from a photo (the read and Did you eat it?) and a plate from earlier (DT314), as now."
   ],
-  "checks": "Full: the end of the plate is shared by many flows (a plate, a recipe, a plate from earlier, Prepare it), so all walkthroughs, about 45 minutes, plus the unit tests, the build and a new walkthrough for AC1 to AC8. The walkthroughs that tap the old chips and the calendar under Ate it change with this approved board. New words, so the German sweep too.",
-  "short": "The end of a plate: a summary, three equal actions, a question only where it is needed",
+  "checks": "Full: the end of the plate is shared by many flows (a plate, a recipe, a plate from earlier, Prepare it), so all walkthroughs, about 45 minutes, plus the unit tests, the build and a new walkthrough for AC1 to AC10. The walkthroughs that tap the old chips and the calendar under Ate it change with this approved board. New words, so the German sweep too.",
+  "short": "The end of a plate: a summary, Now and Later, a question only where it is needed",
   "rel": "Redrawn; not agreed until Coach Milan says Go",
-  "boardTitle": "B151: the end of a plate. A summary, three equal actions, and a question only where it is needed",
+  "boardTitle": "B151: the end of a plate. A summary, Now and Later, and a question only where it is needed",
   "details": [
-    "The pictures are the real app on Sunday 15 November 2026, 18:00, from one scratch build of 0.3.170, not committed. The new words are English drafts: No meal selected: nothing counts yet. Which meal was it? Today, 18:00. Marked: the meal the time suggests. One tap logs it.",
-    "Plan it's question (AC7) is not drawn: it works as Ate it's, with the meals ahead and Another day.",
-    "Save it stays a white button; after it, a line under the buttons says Saved in My recipes, with the name."
+    "The pictures are the real app on Sunday 15 November 2026, 18:00, from one scratch build of 0.3.170, not committed. The new words are English drafts: No meal selected: nothing counts yet. Which meal was it? Today, 18:00. Marked: the meal the time suggests. Tap another to change it. Now. Later. Saved in My recipes as ... . ✓ Eaten · Dinner, 18:00.",
+    "Log it is the app's word for counting (Today's Log it).",
+    "Plan it on a recipe page is DT332, its own ticket."
   ]
 }
