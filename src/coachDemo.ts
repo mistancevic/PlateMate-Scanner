@@ -52,9 +52,14 @@ export function demoRows(): ClientRow[] {
   const dStart = ymd(since), lStartD = new Date(now.getTime() - 5 * 864e5), lStart = ymd(lStartD);
   const dMeasured = { ...measure({ days: daysFromLines(days), weighIns, today, start: startOf({ setAt: since.toISOString() }, []) }), formulaKcal: 2000 };
   void dStart;
-  const lDays = Object.fromEntries([1, 2, 3, 4, 5].map((k) => [addDays(lStart, k - 1), { kcal: 2600, full: k !== 3, logged: true }]));
-  const lWeighIns = [{ date: addDays(lStart, 4), kg: 64.2 }, { date: addDays(lStart, 5), kg: 64.1 }];
-  const lMeasured = { ...measure({ days: lDays, weighIns: lWeighIns, today, start: lStart }), formulaKcal: 2450 };
+  // B153 (0.3.170): Lena's day lines come with her picture of the days, as from a phone. With chefmealan-coach-demo-stale set to N,
+  // her phone last saved N days ago: the picture is from that day and nothing came after it (for the walkthrough of B153)
+  const stale = (() => { try { return Math.max(0, Math.min(5, Number(localStorage.getItem("chefmealan-coach-demo-stale")) || 0)); } catch { return 0; } })();
+  const saved = addDays(today, -stale);
+  const lDays: Record<string, { kcal: number; full: boolean; logged: boolean }> = Object.fromEntries([1, 2, 3, 4, 5].map((k) => [addDays(lStart, k - 1), { kcal: 2600, full: k !== 3, logged: true }] as const).filter(([d]) => d < saved));
+  const lLines: Record<string, DayLine> = Object.fromEntries(Object.entries(lDays).map(([d, x]) => [d, { date: d, when: "past", planned: 3, byPlan: x.full ? 3 : 2, swapped: 0, skipped: 0, missed: x.full ? 0 : 1, open: 0, kcal: x.kcal, protein: 150, target: { kcal: 2700, protein: 150 }, lived: x.full, slots: [], extras: [], training: null, slotCount: 3, full: x.full } satisfies DayLine]));
+  const lWeighIns = [{ date: addDays(lStart, 4), kg: 64.2 }, { date: addDays(lStart, 5), kg: 64.1 }].filter((x) => x.date <= saved);
+  const lMeasured = { ...measure({ days: lDays, weighIns: lWeighIns, today: saved, start: lStart }), formulaKcal: 2450 };
   // DT167 (0.3.9): Nina shares her profile; two answers changed two days ago, after the coach's last look
   const share = sharedParts(undefined);
   const dP = (wake: "early" | "mid"): Personal => ({ sex: "female", birthYear: 1985, heightCm: 168, weightKg: 78, lifestyle: { weekdays: "work", hours: "fixed", slot: "8-4", move: "sitting", meals: 3, wake, bed: "mid", where: ["Cook at home", "Canteen at work"], diet: "Everything", alcohol: "On weekends" }, tasteChips: { like: ["Creamy", "Fresh herbs"], not: ["Fishy"], how: [] }, kitchens: ["Balkan"] });
@@ -66,7 +71,7 @@ export function demoRows(): ClientRow[] {
   const profileShare: SharedProfile = nextShared(sp0, m1.en, share, new Date(now.getTime() - 2 * 864e5), { rowsSr: m1.sr, lang: "sr-Latn" }) ?? sp0;
   return [
     { ...base, uid: "demo-nina", measured: dMeasured, profileShare, name: "Nina", email: "nina@example.com", named: true, via: { kind: "form" as const, from: "", src: "qr", at: new Date(since.getTime() - 2 * 864e5).toISOString() }, goal: { band: "fatloss", setBy: "coach", coachName: "Milan", setAt: since.toISOString(), source: "coach" }, goalsNow: { calories: 2200, protein: 180 }, days, feedback: shared, notes, checkinDay: (now.getDay() + 6) % 7, weightKg: 78, weighIns },
-    { ...base, uid: "demo-lena", measured: lMeasured, name: "Lena", email: "lena@example.com", named: true, via: { kind: "invite" as const, at: new Date(now.getTime() - 6 * 864e5).toISOString() }, goal: { band: "gainsteady", setBy: "you", setAt: new Date(now.getTime() - 5 * 864e5).toISOString(), source: "profile" }, goalsNow: { calories: 2700, protein: 150 }, days: {}, feedback: [], notes: [], checkinDay: 0, weightKg: undefined, weighIns: [],
+    { ...base, uid: "demo-lena", measured: lMeasured, name: "Lena", email: "lena@example.com", named: true, via: { kind: "invite" as const, at: new Date(now.getTime() - 6 * 864e5).toISOString() }, goal: { band: "gainsteady", setBy: "you", setAt: new Date(now.getTime() - 5 * 864e5).toISOString(), source: "profile" }, goalsNow: { calories: 2700, protein: 150 }, days: lLines, feedback: [], notes: [], checkinDay: 0, weightKg: undefined, weighIns: [],
       // DT172: Lena shares no body data: her coach sees the trend in percent and the days weighed, no kilogram
       weightTrend: pctTrend(trendOf(lWeighIns, "gainsteady", 64), 64), weighDates: lWeighIns.map((w) => w.date), weightAt: today },
   ];

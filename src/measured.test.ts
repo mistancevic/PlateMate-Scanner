@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { measure, gapOf, startOf, addDays, fullOf, daysFromLines, kgText, spanOf, type DayIn } from "./measured";
+import { measure, gapOf, startOf, addDays, fullOf, daysFromLines, kgText, spanOf, freshMeasured, type DayIn } from "./measured";
 import type { DayLine } from "./dayLines";
 
 // board FT, FT4: the first two weeks from Saturday 10 October; ate 2,380 on 12 full days, weight down 0.25 kg in 14 days
@@ -83,4 +83,31 @@ test("the start is the first goal's date; a full day closes every planned meal a
   assert.equal(kgText(-0.25), "0.25 kg");
   assert.equal(kgText(0.3), "0.3 kg");
   assert.equal(spanOf("2026-10-10", "2026-10-23"), "10 to 23 October");
+});
+
+// B153 (0.3.170): the coach sees the first two weeks on the coach's today. The phone last saved on day 5 (Tuesday 17 November);
+// the coach looks on day 8 (Friday 20 November)
+test("B153: a picture from day 5, read on day 8: today has the outline, the days since are amber, the days ahead grey", () => {
+  const start = "2026-11-13", saved = addDays(start, 4), today = addDays(start, 7);
+  const line = (d: string, full: boolean) => ({ date: d, when: "past", planned: 3, byPlan: full ? 3 : 2, swapped: 0, skipped: 0, missed: full ? 0 : 1, open: 0, kcal: 2600, protein: 150, target: null, lived: full, slots: [], extras: [], training: null, slotCount: 3, full } as DayLine);
+  const lines = Object.fromEntries([1, 2, 3, 4].map((k) => [addDays(start, k - 1), line(addDays(start, k - 1), k !== 3)]));
+  const snap = measure({ days: daysFromLines(lines), weighIns: [{ date: addDays(start, 3), kg: 64.2 }], today: saved, start });
+  assert.equal(snap.squares.findIndex((x) => x.state === "today"), 4, "the phone's picture has today on day 5");
+  const m = freshMeasured(snap, today, lines);
+  const st = m.squares.map((x) => x.state);
+  assert.equal(st.indexOf("today"), 7, "AC1: the outline is on day 8, today");
+  assert.deepEqual(st.slice(0, 7), ["full", "full", "part", "full", "part", "part", "part"], "AC2: days 5 to 7, after the phone saved, are not fully logged");
+  assert.ok(st.slice(8).every((x) => x === "todo"), "AC3: days 9 to 14 are still to come");
+  assert.equal(m.day, 8, "AC4: day 8 of 14");
+  assert.equal(m.fullDays, st.filter((x) => x === "full").length, "AC5: the full days are the green squares");
+  assert.ok(m.squares[3].weighed, "a weigh-in keeps its dot");
+  assert.equal(m.kcal, snap.kcal); assert.equal(m.readyOn, snap.readyOn); assert.equal(m.ready, snap.ready);
+});
+test("B153: a picture from today stays as it is; no start, nothing to draw", () => {
+  const start = "2026-11-13", today = addDays(start, 5);
+  const lines = {} as Record<string, DayLine>;
+  const snap = measure({ days: {}, weighIns: [], today, start });
+  assert.deepEqual(freshMeasured(snap, today, lines).squares, snap.squares);
+  const none = measure({ days: {}, weighIns: [], today, start: null });
+  assert.equal(freshMeasured(none, today, lines), none);
 });
