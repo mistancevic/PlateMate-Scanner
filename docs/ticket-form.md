@@ -32,6 +32,19 @@ Nothing stands twice: what is in the block is not in the card.
 
 The generators: `design/boards/genDT308d.py` (the DT311 board) and `design/boards/genKanban.py`.
 
+## How the screens are drawn (the house style; Coach Milan 20 November 2026, 10:37)
+
+Coach Milan, 10:37: "From what we have Now leads towards what is the plan to be New, with remarks in yellow and arrows showing what leads to what and where to." It had to be said many times because each new board was made by copying the nearest recent board script, and the recent ones had lost the style. From now on every board follows this list, whatever script it starts from.
+
+1. **Two whole flows, one under the other, like a prototype** (Coach Milan 20 November 2026, 16:08: "Note that as a rule!"). Top row: the current flow from its beginning to its end, every screen, left to right. Under it: the new flow, also from its beginning to its end. A screen that stays the same is drawn again in the new flow and labelled No change. A screen that changes is changed there. A screen the new flow needs is inserted where it comes in the flow. Read left to right, each row is one path a person taps through, so it can be followed like a prototype. Never only the changed screens, never Now, New, Now.
+2. **Arrows between the steps of each row**, showing what was tapped and where it leads. The first screen of each row is the step before, the screen where the person starts.
+3. **The change is drawn into the New screen**: a blue outline around what changes, and a yellow note (background #fff8d6, blue outline) next to it, saying in one or two plain lines what is new. Helpers: MARK and NOTE in `design/boards/shotB150e.cjs`; the DT331 board is the newest example.
+4. **The screens are the real app** (the release as it is, and a scratch build for New), never a mockup, at 390 px, with what a signed-in phone shows (Sign out, the real commit). When a local run cannot show something, the scratch build shows it as the phone does, and the board says so in Design details.
+5. **Labels on each screen**: As it is today (grey), New, drawn for your approval (blue), No change (grey).
+6. **Media go in as canvas assets**, never inside the board file (a 7.9 MB board did not show on the phone, 19 November).
+7. **Move means move** (20 November, DT331): when something moves, the board also shows the old place new, without it.
+8. **When the day matters, the board says which day it is drawn on** (20 November, B153): a yellow strip on top of every screen with the date and time, and yellow date labels under days and bars. The labels are on the board only.
+
 ## Checks: agreed before the code (Coach Milan 20 November 2026, 15:38)
 
 Coach Milan, 15:38: "we should discuss about walkthroughs and testing before you start working on the code part ... Not every code change requires that deep testing as it doesn't touch every file."
