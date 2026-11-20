@@ -2785,7 +2785,7 @@
     {
       "id": "DT332",
       "title": "Plan it on a recipe page",
-      "epic": "recipes",
+      "epic": "plate",
       "state": "next",
       "why": "Coach Milan 20 November 20:02 to 20:08, on B151: Plan it leaves the Plate; Save it puts the plate into My recipes, and there Plan it alongside putting it on the Plate or Prepare it closes the loop. Its own ticket by the scope rule.",
       "opportunity": {
