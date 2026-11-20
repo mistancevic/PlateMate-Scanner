@@ -23,7 +23,7 @@ def shot(x, y, name, w, title, status, note):
 B = Board(); PW = 390; G = 40
 W = SX + 3 * PW + 2 * G + 40
 parts = [("Ticket", "DT331. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT331, canvas Page 5."),
-  ("How to read this board", "<b>Then:</b> the bottom of the Menu today, the same with the version line, and About today, which keeps its line. <b>The wide block at the bottom:</b> the agreement, as Given, When, Then rows."),
+  ("How to read this board", "<b>Then:</b> the bottom of the Menu today and About today, then the bottom of the Menu new, with the version line above Sign out. <b>The wide block at the bottom:</b> the agreement, as Given, When, Then rows."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]), ("In Coach Milan's words", "20 November 10:19: I propose to move the version of the app to be in Menu on the bottom. Currently it is one more click away and not in the best place, in About. I would put it in the space between Sign out and the menu block."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
@@ -34,8 +34,8 @@ rows = "".join(f'<tr><td style="{td};font-weight:700">{where}</td><td style="{td
 y = 30
 X = lambda i: SX + i * (PW + G)
 bs = [shot(X(0), y, "now_menu", PW, "The bottom of the Menu, today", "draft", "The links, then Sign out. No version."),
-  shot(X(1), y, "new_menu", PW, "The bottom of the Menu, new", "changed", "Under the links: Version 0.3.167 · the commit. Signed in, Sign out sits right under it."),
-  shot(X(2), y, "now_about", PW, "About", "same", "Keeps its version line.")]
+  shot(X(1), y, "now_about", PW, "About, today", "draft", "The version is its last line. It stays there."),
+  shot(X(2), y, "new_menu", PW, "The bottom of the Menu, new", "changed", "Under the links: Version 0.3.167 · d1b274d, then Sign out.")]
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
