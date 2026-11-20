@@ -44,6 +44,7 @@ Coach Milan, 10:37: "From what we have Now leads towards what is the plan to be 
 6. **Media go in as canvas assets**, never inside the board file (a 7.9 MB board did not show on the phone, 19 November).
 7. **Move means move** (20 November, DT331): when something moves, the board also shows the old place new, without it.
 8. **When the day matters, the board says which day it is drawn on** (20 November, B153): a yellow strip on top of every screen with the date and time, and yellow date labels under days and bars. The labels are on the board only.
+9. **Every screen carries its id** (Coach Milan 20 November 2026, 19:44: "IDs of each screen, we had it before"): the ticket id, the flow's number and a letter, in the screen's title: B151.1a, B151.1b for the current flow, B151.2a for the first new flow, and so on. The row's title carries the flow's id (B151.2). So a screen can be named in one word when something on it needs a change.
 
 ## Checks: agreed before the code (Coach Milan 20 November 2026, 15:38)
 

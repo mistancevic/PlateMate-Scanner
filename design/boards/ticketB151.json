@@ -37,7 +37,7 @@
     {
       "id": "AC4",
       "title": "No meal, asked right there",
-      "text": "Given no meal is set, when I tap Ate it, then Which meal was it? opens right under it with today's meals, Dinner marked as the time suggests, and the page does not scroll"
+      "text": "Given no meal is set, when I tap Ate it, then Which meal was it? opens right under it, pointing at it, with today's meals and Dinner marked as the time suggests, and the page does not scroll"
     },
     {
       "id": "AC5",
@@ -57,7 +57,7 @@
     {
       "id": "AC8",
       "title": "An eaten meal says Ate it",
-      "text": "Given I ate it as Dinner, when I open it again from Today, the Plan or a recipe's log, then Ate it is blue with a small tick on its left, before Dinner, 18:00, and a tap on it does nothing"
+      "text": "Given I ate it as Dinner, when I open it again from Today, the Plan or a recipe's log, then Ate it is on the right of the meal's name, blue with a small tick on its left, and a tap on it does nothing"
     }
   ],
   "unchanged": [

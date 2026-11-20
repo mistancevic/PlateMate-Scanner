@@ -44,7 +44,7 @@ const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-siz
     await note(".log-card-open", "<b>No change:</b> logged as Dinner, and Today opens. I tap Change or delete to open it.");
     await shot(`${flow}4`); await clean();
     await p.locator(".meal-change").first().click(); await p.waitForTimeout(1000); await p.evaluate(() => window.scrollTo(0, 0)); await toast();
-    await note(".pm-when", "<b>New:</b> Ate it, blue with a small tick on its left: this meal is eaten. A status, not a button.", [".pm-ate"]);
+    await note(".pm-head", "<b>New:</b> Ate it, on the right of the meal's name: blue with a small tick on its left. This meal is eaten. A status, not a button.", [".pm-ate"]);
     await shot(`${flow}5`);
     await p.context().close();
   }
