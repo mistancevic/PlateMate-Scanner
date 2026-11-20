@@ -111,3 +111,16 @@ export const longDate = (ymd: string) => { const d = new Date(`${ymd}T12:00:00`)
 export const shortDate = (ymd: string) => { const d = new Date(`${ymd}T12:00:00`); return sr() ? d.toLocaleDateString(locOf(getLang()), { weekday: "short", day: "numeric", month: "short" }) : `${WDn(d).slice(0, 3)} ${d.getDate()} ${MOn(d).slice(0, 3)}`; };
 export const spanOf = (from: string, to: string) => { const a = new Date(`${from}T12:00:00`), b = new Date(`${to}T12:00:00`); if (sr()) return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()}. ${srMonth(b)}` : `${a.getDate()}. ${srMonth(a)} – ${b.getDate()}. ${srMonth(b)}`; return a.getMonth() === b.getMonth() ? `${a.getDate()} to ${b.getDate()} ${MOn(b)}` : `${a.getDate()} ${MOn(a)} to ${b.getDate()} ${MOn(b)}`; };
 export const kgText = (x: number) => `${dec(Math.abs(wIn(x)), 2).replace(/0$/, "").replace(/[.,]0$/, "")} ${wUnit()}`;
+
+// B153 (0.3.170, board B153, Coach Milan's Go 20 November 2026, 14:51): the coach's views read the first two weeks on the coach's
+// own today. The client's phone sends its picture of the days when it saves; a client who has not opened the app since leaves the
+// picture of that day. The squares are counted again from the day lines that came with it: today has the outline, the days since
+// are not fully logged (nothing came for them), the days ahead are still to come, and the full days are counted again.
+// The measured burn itself (its numbers, ready, Ready on) stays as the phone sent it.
+export function freshMeasured<T extends Measured>(m: T, today: string, lines: Record<string, DayLine> | undefined, weighDates: string[] = []): T {
+  if (!m.start || !m.squares?.length) return m;
+  const dates = [...new Set([...m.squares.filter((s) => s.weighed).map((s) => s.date), ...weighDates])];
+  const re = measure({ days: daysFromLines(lines), weighIns: dates.map((date) => ({ date, kg: 0 })) as WeighIn[], today, start: m.start });
+  if (!re.squares.length) return m;
+  return { ...m, day: re.day, from: re.from, to: re.to, squares: re.squares, fullDays: re.fullDays };
+}

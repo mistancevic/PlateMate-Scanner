@@ -4,7 +4,7 @@ import { BurnCard } from "../components/Measured";
 import { weekCells, phaseCells, rowsOf, keysOf, type DayCell, type DayKey } from "../dayBars";
 import { fmtKg } from "../weight";
 import { wIn, wText } from "../units";
-import { shortDate } from "../measured";
+import { shortDate, freshMeasured } from "../measured";
 import { useState, type ReactNode } from "react";
 import type { ClientRow } from "../cloud";
 import { wordsOf, type DayLine, type SlotMark } from "../dayLines";
@@ -64,6 +64,13 @@ function DayBars({ cells, phase, label, foot, footOn }: { cells: DayCell[]; phas
     </div>
   );
 }
+// the first two weeks on a card, drawn on the coach's today (B153)
+const isWeighed = (x: { weighed: boolean }) => x.weighed;
+function PhaseBars({ m }: { m: NonNullable<ClientRow["measured"]> }) {
+  const weighed = m.squares.filter(isWeighed).length, cells = phaseCells(m.squares);
+  return <DayBars cells={cells} phase="phase" label={w("measured.squaresAria", { full: m.fullDays, weighed })}
+    foot={`${wn("clientweek.fullDays", m.fullDays)} · ${w("clientweek.weighInsN", { n: weighed })} · ${m.readyOn ? w("clientweek.readyOn", { date: shortDate(m.readyOn).slice(4) }) : w("clientweek.notReadyYet")}`} />;
+}
 export function WeekBars({ row }: { row: ClientRow }) {
   const wq = weekOf(row);
   const weighed = [...(row.weighIns ?? []).map((x: any) => String(x.date)), ...(row.weighDates ?? [])];
@@ -72,6 +79,8 @@ export function WeekBars({ row }: { row: ClientRow }) {
 }
 const weekNo = (row: ClientRow) => { const at = row.goal?.setAt ? Date.parse(row.goal.setAt) : NaN; return Number.isFinite(at) ? Math.floor((Date.now() - at) / (7 * DAY)) + 1 : null; };
 // in the first two weeks (0.2.7, board FT, FT6): the day of 14, counted from the start the client's phone sent
+// B153 (0.3.170): the first two weeks on the coach's today, not on the day the client's phone last saved
+export const measuredNow = (row: ClientRow) => (row.measured ? freshMeasured(row.measured, ymd(new Date()), row.days, [...(row.weighIns ?? []).map((x: any) => String(x.date)), ...(row.weighDates ?? [])]) : null);
 export const phaseDay = (row: ClientRow) => { const m = row.measured; if (!m?.phase || !m.start) return null; const d = Math.floor((Date.parse(`${ymd(new Date())}T12:00:00`) - Date.parse(`${m.start}T12:00:00`)) / DAY) + 1; return d >= 1 && d <= 28 ? d : null; };
 export function clientLine(row: ClientRow, today: boolean) {
   const wk = weekNo(row), pd = phaseDay(row);
@@ -89,10 +98,7 @@ export function ClientRowCard({ row, today, open, note, saveNote }: { row: Clien
           {row.email && row.email !== row.name && <small className="client-email">{row.email}</small>}
           {from && <small className="client-from">{from}</small>}
           <small>{clientLine(row, today)}</small>{newProfileChanges(row) > 0 && <small className="profile-new">{wn("clientweek.profileChanges", newProfileChanges(row))}</small>}</div></div>
-        {phaseDay(row) && row.measured ? (
-          <DayBars cells={phaseCells(row.measured.squares)} phase="phase" label={w("measured.squaresAria", { full: row.measured.fullDays, weighed: row.measured.squares.filter((x) => x.weighed).length })}
-            foot={`${wn("clientweek.fullDays", row.measured.fullDays)} · ${w("clientweek.weighInsN", { n: row.measured.squares.filter((x) => x.weighed).length })} · ${row.measured.readyOn ? w("clientweek.readyOn", { date: shortDate(row.measured.readyOn).slice(4) }) : w("clientweek.notReadyYet")}`} />
-        ) : <WeekBars row={row} />}
+        {phaseDay(row) && row.measured ? <PhaseBars m={measuredNow(row)!} /> : <WeekBars row={row} />}
       </button>
       {saveNote && !today && (
         <div className="client-note-own" onClick={stop}>
@@ -235,7 +241,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
         </section>
       )}
       {/* the measured burn, as the client sees it (0.2.7, board FT, FT7) */}
-      {row.measured && !row.flags.some((f) => f.situation === "eating") && <BurnCard m={row.measured} formulaKcal={row.measured.formulaKcal} name={name} />}
+      {row.measured && !row.flags.some((f) => f.situation === "eating") && <BurnCard m={measuredNow(row)!} formulaKcal={row.measured.formulaKcal} name={name} />}
       <section className="card cw-mini">
         <div><small>{w("clientweek.daamGoodThisWeek")}</small><small>{wn("clientweek.meals", daam.length)}</small></div>
         <small className="cw-mini-strong">{daam.length ? daam.map((f: any) => f.meal?.title).join(" · ") : w("clientweek.noneShared", { name })}</small>
