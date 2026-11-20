@@ -47,7 +47,8 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.locator(".menu-button").click(); await page.waitForTimeout(300);
   await page.getByText("About", { exact: true }).first().click(); await page.waitForTimeout(300);
   // DT231 (0.3.70): the measured numbers left About for Settings, Dev data, which only the admin account sees
-  ok(await page.locator(".open-line").count() === 0 && /Version /.test(await page.locator("main").textContent()), "About: the version, no measured numbers (they are in Dev data, for the admin)");
+  // DT331 AC4 (0.3.169, board DT331, Coach Milan's Go 20 November 11:13): the version moved to the bottom of the Menu, so About has it no more
+  ok(await page.locator(".open-line").count() === 0 && !/Version \d/.test(await page.locator("main").textContent()), "About: no version (it is at the bottom of the Menu, DT331) and no measured numbers (they are in Dev data, for the admin)");
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;
 })();
