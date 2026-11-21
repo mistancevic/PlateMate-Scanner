@@ -36,7 +36,7 @@ const PORT = "3303", U = `http://127.0.0.1:${PORT}`;
   await page.locator(".meal-line-open .pcal-row").filter({ hasText: /^\s*Breakfast/ }).click(); await page.waitForTimeout(300);
   // changed by B150: the tap keeps edit mode open; the X in the pencil's place closes it
   await page.locator(".meal-line .plan-line-close").click(); await page.waitForTimeout(300);
-  ok(/^Breakfast/.test(await readout()) && /^Breakfast\s+Tuesday, 27 October, 07:00$/.test((await page.locator(".meal-line").innerText()).replace(/\s+/g, " ").trim().replace(/^\s*meal and day\s*/i, "")), "picked in the calendar: breakfast");
+  ok(/^Breakfast/.test(await readout()) && /^Breakfast\s+Tuesday, 27 October, 07:00 Eaten\. Changes to this plate change this meal\.$/.test((await page.locator(".meal-line").innerText()).replace(/\s+/g, " ").trim().replace(/^\s*meal and day\s*/i, "")), "picked in the calendar: breakfast; changed by B151: at 21:30 a breakfast of 07:00 is logging, so the line says Eaten");
   await page.reload(); await page.waitForTimeout(1500);
   ok(/^Breakfast/.test(await readout()), "after a reload: still breakfast: " + (await readout()).slice(0, 30));
   await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(800);

@@ -6,7 +6,8 @@
 // them up. Fit to my target works on the dish you are on, and the other dish counts as it is.
 import type { Feedback, Ingredient } from "./pilot";
 
-export type Recorded = { cardId: string; date: string; slot: string | null; at: string };
+// B151 (0.3.171): live: the plate was logged by setting its meal with the pencil, and the Plate stays on it
+export type Recorded = { cardId: string; date: string; slot: string | null; at: string; live?: true };
 
 // the plate follows its record while it is still the same plate: at least one of its rows came from the record. A new plate
 // (a new photo, a recipe, a cleared plate) shares none, so the record stays as it was and the plate stops following it.

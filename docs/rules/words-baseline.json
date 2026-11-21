@@ -103,7 +103,7 @@
  "src/screens/PlateCalendar.tsx": 1,
  "src/screens/PlateChecks.tsx": 3,
  "src/screens/PlateEnd.tsx": 0,
- "src/screens/PlateMealLine.tsx": 1,
+ "src/screens/PlateMealLine.tsx": 0,
  "src/screens/PlatePhoto.tsx": 2,
  "src/screens/PlateRead.tsx": 3,
  "src/screens/RecipePages.tsx": 58,

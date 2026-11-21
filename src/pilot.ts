@@ -337,6 +337,8 @@ export type PilotState = {
   plateAsked?: string;
   // DT246 (0.3.96): the meal this plate is recorded in; while it is the same plate, its changes go there too
   recorded?: import("./dishes").Recorded;
+  // B151 (0.3.171): where this plate stands in the plan while it is planned from the pencil (src/plateLive.ts)
+  plannedAt?: import("./plateLive").PlannedAt;
   // DT247 (0.3.96): this plate is the dessert of its meal
   // B144 (0.3.150): any dish of a meal (it was dessert alone); main is left out
   course?: import("./served").Dish;

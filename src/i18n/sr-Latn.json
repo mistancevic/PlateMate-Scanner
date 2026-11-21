@@ -22860,6 +22860,42 @@
     "howto.backClients": {
       "text": "‹ Klijenti",
       "checked": true
+    },
+    "plate.liveCounts": {
+      "text": "Ovo se računa u: {slot}. Tvoj dan se ponovo izračunava.",
+      "checked": false
+    },
+    "plate.livePlan": {
+      "text": "Ovo ide u tvoj plan: {slot}. Još se ništa ne računa. Danas će pitati da li je pojedeno.",
+      "checked": false
+    },
+    "plate.liveLooking": {
+      "text": "Ništa se ne računa. Samo gledaš.",
+      "checked": false
+    },
+    "plate.liveBack": {
+      "text": "Ponovo izvađeno. Ništa se ne računa. Samo gledaš.",
+      "checked": false
+    },
+    "plate.liveEaten": {
+      "text": "Pojedeno. Izmene na ovom tanjiru menjaju ovaj obrok.",
+      "checked": false
+    },
+    "plate.livePlanned": {
+      "text": "Isplanirano",
+      "checked": false
+    },
+    "plate.liveHolds": {
+      "text": "{meal} već ima: {title}.",
+      "checked": false
+    },
+    "plate.prepareAgain": {
+      "text": "Pripremi ponovo ›",
+      "checked": false
+    },
+    "plate.saveToMyRecipes": {
+      "text": "Sačuvaj u Moje recepte",
+      "checked": false
     }
   }
 }

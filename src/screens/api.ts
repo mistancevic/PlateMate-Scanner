@@ -85,7 +85,9 @@ export interface AppApi {
   // DT250 (0.3.99): Chef Mealan translates a recipe into the app's language, once; false when it did not work
   translateRecipe: (id: string, auto?: boolean) => Promise<boolean>;
   // DT246 (0.3.96): the meal this plate is recorded in, while it follows the Plate
-  recordNow: { cardId: string; at: string; slot: { date: string; slotId: string; name: string; time: string } | null } | null;
+  recordNow: { cardId: string; at: string; slot: { date: string; slotId: string; name: string; time: string } | null; live?: boolean } | null;
+  // B151 (0.3.171): the plate logged where the pencil set it, at that meal's time; the Plate stays on it and its changes follow
+  liveLog: (meal: Meal, slot: Feedback["slot"] | null, at: string) => void;
   // DT240 (0.3.96): a new plate came in while a cook is open
   cookOpenAsk: boolean;
   answerCookOpen: (how: "go" | "end") => void;

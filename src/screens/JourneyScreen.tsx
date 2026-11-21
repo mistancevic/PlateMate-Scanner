@@ -1,5 +1,6 @@
 import { w, wn, wIn, dec, mealV, mealName, wordV, dateV, dateText, type Val, type WordKey } from "../words";
-import { samePhotoMeal, updateWith } from "../pastMeal";
+import { samePhotoMeal, updateWith, deleteCard as deleteCardIn } from "../pastMeal";
+import { liveStatus, minutesOf, type LiveStatus } from "../plateLive";
 import { SamePhotoAsk } from "../components/SamePhotoAsk";
 import { ServedOnPlate } from "../components/Served";
 import { locOf, getLang, useLang } from "../lang";
@@ -606,6 +607,10 @@ export function JourneyScreen(p: AppApi) {
   const oldPhoto = useRef<typeof state.photo>(undefined);
   const eatSlot = useRef<{ slot: Feedback["slot"] | null } | null>(null);
   const [endCal, setEndCal] = useState<{ kind: "plan" | "ate"; day: string; more: boolean; ask?: { date: string; id: string | null } | null; old?: boolean } | null>(null);
+  // B151 (0.3.171): the meal the pencil just set already holds a dish, so the block asks: Replace it, or Add a dish. And
+  // whether No meal selected just took the plate out again, for the line that says so
+  const [liveAsk, setLiveAsk] = useState<{ date: string; id: string; holds: string } | null>(null);
+  const [liveBack, setLiveBack] = useState(false);
   // DT150: No, separate foods, for these foods
   const [dishNo, setDishNo] = useState("");
   useEffect(() => setSwapMore(false), [swapId]);
@@ -713,9 +718,13 @@ export function JourneyScreen(p: AppApi) {
     if (date === todayKey) { if (p.filling) p.setFilling(null); p.setPick(r.id ? `meal:${r.id}` : "snack"); }
     else { const sl = calInfo(date).slots.find((x) => x.id === r.id); if (!sl) return; if (p.pick) p.setPick(null); p.setFilling({ ...fillingOn(date, sl), by: "line" }); }
     setLineDay(date);
+    // B151: the tap is the whole decision. The plate counts in that meal or goes into the plan, by the clock
+    liveTap(date, r.id ? calInfo(date).slots.find((x) => x.id === r.id) ?? null : null);
   };
   // the row No meal selected: the meal and the day are off again; the moment is Regular meal again. Edit mode stays open.
   const clearMeal = () => {
+    // B151 AC8: No meal selected takes the plate out of the meal, or out of the plan, again
+    if (liveRec || livePlan) { liveUndo(); setLiveBack(true); } setLiveAsk(null);
     if (p.filling) p.setFilling(null); if (p.pick) p.setPick(null);
     if (state.photo?.meal) setState((s) => (s.photo ? { ...s, photo: { ...s.photo, meal: undefined } } : s));
     p.setMoment("regular");
@@ -725,6 +734,12 @@ export function JourneyScreen(p: AppApi) {
     const usual = slotsOf(lifestyleOf(p.personal)).find((x) => x.id === slotId)?.time ?? "";
     p.setPersonal({ ...p.personal, timesOn: withTimeOn(p.personal.timesOn, date, slotId, time, usual) });
     if (p.filling && p.filling.date === date && p.filling.slotId === slotId) p.setFilling({ ...p.filling, time });
+    // B151 AC4: a new time for the set meal decides again: now or earlier counts at that time, still ahead is a plan
+    const sl = liveBase && liveSet && liveSet.date === date ? liveSlot : null;
+    if (sl && sl.id === slotId && items.length > 0) {
+      const next = liveStatus({ date, time }, todayKey, minutesOf(new Date()));
+      if (next === "eaten" || liveIs !== next) liveCommit(date, sl, time, livePlan?.add ? "add" : "set");
+    }
   };
   // B150: edit mode opens on the set meal's day, else on the photo's day, else on today
   const photoDay = state.photo && !state.photo.joined ? ymd(new Date(state.photo.at)) : null;
@@ -1251,7 +1266,9 @@ export function JourneyScreen(p: AppApi) {
   // DT129 (0.2.109, board Stories86): the numbers behind the four letters, under the PD block; the meal planned in this slot
   const [numbersOpen, setNumbersOpen] = useState(false);
   const planNow: PlanNumbers | null = (() => {
-    const m = mealSlot ? p.planned[mealDate]?.[mealSlot.id] : undefined;
+    // B151 (0.3.171): a plate planned with the pencil stands in that slot itself; the meal planned there is what the slot held before
+    const mine = stateAll.plannedAt && mealSlot && stateAll.plannedAt.date === mealDate && stateAll.plannedAt.slotId === mealSlot.id ? stateAll.plannedAt : null;
+    const m = mine ? mine.was ?? undefined : mealSlot ? p.planned[mealDate]?.[mealSlot.id] : undefined;
     if (!m || m.skipped || !(m.kcal > 0)) return null;
     const portion = plannedPortion(m, "plan", "");
     if (portion) { const a = aggregate(portion.items); return { word: mealWord, kcal: Math.round(a.calories ?? m.kcal), grams: Math.round(a.weight ?? 0) || null, protein: Math.round(a.protein ?? m.protein) }; }
@@ -1425,6 +1442,99 @@ export function JourneyScreen(p: AppApi) {
     }).catch(() => {});
     r.readAsDataURL(file);
   };
+  // ---- B151 (0.3.171, board B151; Coach Milan 21 November, Go 11:26): the pencil is the whole decision ----
+  // The plate you build yourself (no photo, not a recipe as mapped, not a dish opened from a meal) is logged or planned by
+  // setting its meal: a meal whose time is now or earlier counts, a meal still ahead is a plan (src/plateLive.ts). It is
+  // decided when you tap the meal or change its time, and when the first food lands on a plate whose meal is set; never by
+  // the clock moving on. A plate from a photo, from earlier, or opened from the Plan keeps its own way.
+  // It stands here, before the first early return (Chef Mealan's ideas, below), because it holds an effect.
+  // a photo that joins a plate already logged or planned this way leaves it as it is: the plate stays that meal
+  const liveBound = !!stateAll.recorded?.live || !!stateAll.plannedAt;
+  const liveBase = (!stateAll.photo || liveBound) && !(imported && rec) && !(p.recordNow && !p.recordNow.live);
+  const liveOn = liveBase && p.pick !== "exploring" && (!p.filling || p.filling.by === "line");
+  const liveSet = liveOn ? mealSet : null;
+  const liveSlot: Slot | null = !liveSet ? null : p.filling ? daySlots.find((x) => x.id === p.filling!.slotId) ?? null : pickSlot;
+  const liveRec = liveBase && p.recordNow?.live ? p.recordNow : null;
+  const livePlan = liveBase ? stateAll.plannedAt ?? null : null;
+  // what holds now: the plate is in a meal as eaten, or in the plan
+  const liveIs: LiveStatus | null = liveRec ? "eaten" : livePlan ? "planned" : null;
+  const liveTitle = () => (state.title && state.title !== "DaaM" ? state.title.trim() : "") || autoTitle(items);
+  const liveMine = (): PlannedMeal => { const t = aggregate(items); return { title: liveTitle(), kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), source: "plate", items: structuredClone(items).map((i) => ({ ...i, est: undefined })), portion: items.reduce((n, i) => n + i.grams, 0) }; };
+  // out of the meal, or out of the plan with what the slot held before back in it
+  const liveUndo = () => {
+    if (liveRec) { const id = liveRec.cardId; setState((s) => ({ ...deleteCardIn(s, id), recorded: undefined })); }
+    if (livePlan) { p.fill(livePlan.date, livePlan.slotId, livePlan.was); setState((s) => ({ ...s, plannedAt: undefined })); }
+  };
+  // set: next to what is there (a dish more); replace: in its place
+  const liveCommit = (date: string, sl: Slot | null, time: string | null, how: "set" | "add" | "replace") => {
+    liveUndo();
+    if (!items.length) return;
+    const st = liveStatus({ date, time: sl ? time ?? sl.time : null }, todayKey, minutesOf(new Date()));
+    if (st === "eaten") {
+      if (how === "replace" && sl) { const gone = dishesOf(state.feedback, date, sl.id, liveRec?.cardId).map((f) => f.id); setState((s) => gone.reduce((x, id) => deleteCardIn(x, id), s)); }
+      const at = sl ? atMeal(date, time ?? sl.time) : new Date().toISOString();
+      p.liveLog({ id: uid(), title: liveTitle(), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() }, sl ? { date, slotId: sl.id, name: sl.name, time: time ?? sl.time } : null, at);
+    } else if (st === "planned" && sl) {
+      const was = livePlan && livePlan.date === date && livePlan.slotId === sl.id ? livePlan.was : p.planned[date]?.[sl.id] ?? null;
+      const add = how !== "replace" && !!was && !was.skipped;
+      p.fill(date, sl.id, add ? withDish(was!, liveMine()) : liveMine());
+      const at = { date, slotId: sl.id, was: was ? structuredClone(was) : null, ...(add ? { add: true as const } : {}), had: dishesOf(state.feedback, date, sl.id, null).length };
+      setState((s) => ({ ...s, plannedAt: at }));
+    }
+  };
+  const liveTap = (date: string, sl: Slot | null) => {
+    setLiveBack(false);
+    if (!liveBase) { setLiveAsk(null); return; }
+    const st = liveStatus({ date, time: sl ? sl.time : null }, todayKey, minutesOf(new Date()));
+    // the same meal tapped again: it stands as it is
+    if (liveRec && st === "eaten" && liveRec.slot?.date === date && (liveRec.slot?.slotId ?? null) === (sl?.id ?? null) && (sl || !liveRec.slot)) return;
+    if (livePlan && st === "planned" && sl && livePlan.date === date && livePlan.slotId === sl.id) return;
+    const held = !sl || !items.length ? "" : st === "eaten" ? dishesOf(state.feedback, date, sl.id, liveRec?.cardId).map((f) => f.meal.title).join(", ") : (() => { const m = p.planned[date]?.[sl.id]; return m && !m.skipped ? m.title : ""; })();
+    liveCommit(date, sl, sl ? sl.time : null, "add");
+    setLiveAsk(held && sl ? { date, id: sl.id, holds: held } : null);
+  };
+  const livePlanAte = livePlan ? dishesOf(state.feedback, livePlan.date, livePlan.slotId, null).length : 0;
+  const liveSig = `${items.map((i) => `${i.id}:${i.food.id}:${Math.round(i.grams)}`).join("|")}~${items.length ? liveTitle() : ""}`;
+  useEffect(() => {
+    // an emptied plate is a new plate: what was logged or planned stays where it is, and no meal is set
+    if (!stateAll.items.length) {
+      if (stateAll.recorded?.live || stateAll.plannedAt) {
+        setState((s) => ({ ...s, recorded: s.recorded?.live ? undefined : s.recorded, plannedAt: undefined }));
+        if (p.pick && p.pick !== "exploring") p.setPick(null); if (p.filling?.by === "line") p.setFilling(null);
+        setLiveAsk(null);
+      }
+      return;
+    }
+    // other foods altogether (a recipe put on the Plate, an idea taken): a new plate too, the meal it was logged in stays
+    if (stateAll.recorded?.live && !p.recordNow) {
+      setState((s) => ({ ...s, recorded: s.recorded?.live ? undefined : s.recorded }));
+      if (p.pick && p.pick !== "exploring") p.setPick(null); if (p.filling?.by === "line") p.setFilling(null);
+      return;
+    }
+    // Today asked about the planned meal and it was eaten there: the plate is no longer the plan's, and no meal is set
+    if (livePlan && livePlanAte > livePlan.had) {
+      setState((s) => ({ ...s, plannedAt: undefined }));
+      if (p.pick && p.pick !== "exploring") p.setPick(null); if (p.filling?.by === "line") p.setFilling(null);
+      return;
+    }
+    // a plan needs its meal: with no meal set (a new plate was started) the plate is no longer the plan's
+    if (stateAll.plannedAt && !p.filling && !p.pick?.startsWith("meal:")) { setState((s) => ({ ...s, plannedAt: undefined })); return; }
+    if (!liveOn || !liveSet) return;
+    // the first food on a plate whose meal is already set
+    if (!liveRec && !livePlan) { liveCommit(liveSet.date, liveSlot, liveSlot ? liveSlot.time : null, "add"); return; }
+    // the name the foods give follows into the meal, as the foods do (DT246)
+    if (liveRec) {
+      const id = liveRec.cardId, title = liveTitle(), card = state.feedback.find((f) => f.id === id);
+      if (card && card.meal.title !== title) setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, meal: { ...f.meal, title } } : f)) }));
+    }
+    // a planned plate is in the plan as it stands now
+    if (livePlan) {
+      const cur = p.planned[livePlan.date]?.[livePlan.slotId];
+      if (!cur) setState((s) => ({ ...s, plannedAt: undefined }));
+      else p.fill(livePlan.date, livePlan.slotId, livePlan.add && livePlan.was ? withDish(livePlan.was, liveMine()) : liveMine());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveSig, liveOn, liveSet?.date, liveSet?.name, !!liveRec, !!livePlan, !!p.recordNow, livePlanAte]);
   if (step === "in" && chef) {
     const t = aggregate(items), pd0 = density(t.protein, t.calories), kit = (p.personal.kitchens ?? []).length > 0;
     const opts = chef.status === "done" ? chef.options : [];
@@ -1722,6 +1832,33 @@ export function JourneyScreen(p: AppApi) {
   const plateTitle = () => (state.title && state.title !== "DaaM" ? state.title.trim() : "") || autoTitle(items);
   const kcalNow = () => Math.round(aggregate(items).calories ?? 0);
   const leavePlate = () => { p.setPick(null); if (p.filling) p.setFilling(null); if (p.moment !== "regular") p.setMoment("regular"); setEndCal(null); setLineOpen(false); setStep("in"); };
+
+  // the line under the meals: what the tap did. What holds comes first; with nothing on the plate yet, what it will do
+  const liveSays: LiveStatus | null = liveSet ? liveIs ?? liveStatus({ date: liveSet.date, time: liveSlot ? liveSet.time : null }, todayKey, minutesOf(new Date())) : null;
+  const liveWhere: Val = (l) => { if (!liveSet) return ""; const f = liveSlot ? fillingOn(liveSet.date, liveSlot) : { ...fillingOn(todayKey, { id: "snack", name: "Snack", time: "12:00" } as Slot) }; return l === "en" ? `${f.dayName === "today" ? "today's" : `${f.dayName}'s`} ${f.name}` : (slotV(f) as (x: typeof l) => string | null)(l); };
+  const liveLine = !liveOn ? null : !liveSet ? w(liveBack ? "plate.liveBack" : "plate.liveLooking") : liveSays === "planned" ? w("plate.livePlan", { slot: liveWhere }) : w("plate.liveCounts", { slot: liveWhere });
+  const liveHeld = liveAsk && liveSet && liveSlot && liveAsk.date === liveSet.date && liveAsk.id === liveSlot.id && items.length > 0 ? (() => {
+    const txt = w("plate.liveHolds", { meal: mealV(liveSlot.name), title: "\u0001" }).split("\u0001"), a = liveAsk, sl = liveSlot;
+    return (
+      <div className="pcal-held live-held" role="group" aria-label={w("cal.addDish")}>
+        <div className="pcal-held-q">{txt[0]}<b>{a.holds}</b>{txt[1] ?? ""}</div>
+        <div className="pcal-held-btns">
+          <button type="button" className="pill pill-small live-replace" onClick={() => { liveCommit(a.date, sl, sl.time, "replace"); setLiveAsk(null); }}>{w("cal.replaceIt")}</button>
+          <button type="button" className="pill pill-small pill-primary live-add" onClick={() => setLiveAsk(null)}>{w("cal.addDish")}</button>
+        </div>
+      </div>); })() : null;
+  // AC10: Prepare it for a plate with no meal or a planned one; Prepare it again for an eaten one. Cooking the eaten plate is
+  // a new cook: the logged meal stays as it is and the plate is no longer that meal. A plate planned for another day is
+  // cooked now and stays in the plan.
+  const livePrepare = () => {
+    setChef(null);
+    if (liveIs === "eaten") { setState((s) => ({ ...s, recorded: undefined })); if (p.pick) p.setPick(null); if (p.filling) p.setFilling(null); }
+    else if (p.filling) { setState((s) => ({ ...s, plannedAt: undefined })); p.setFilling(null); }
+    setLiveAsk(null); setLineOpen(false);
+    setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null);
+    if (cooksPlate(items) && stepsHold(items)) { setStep("made"); return; }
+    setStep("make"); startPlateSteps();
+  };
   // Plan it: the plate into a meal of the plan. set: the meal is free; add: one more dish in it; replace: in its place.
   // The plate is saved in My recipes as today (the same foods under the same name are that recipe, no copy).
   const planPlate = (f: NonNullable<typeof p.filling>, how: "set" | "add" | "replace") => {
@@ -1841,13 +1978,17 @@ export function JourneyScreen(p: AppApi) {
   const savedAsName = plateSaved && !(state.title && state.title !== "DaaM" && state.title.trim()) ? state.meals.find((m) => m.id === savedId)?.title ?? null : null;
   lateCal.el = endCalendar;
   const endEl = plateEnd({ calendar: endCal?.old ? null : endCalendar, open: endCal?.old ? null : endCal?.kind ?? null, saved: plateSaved, savedAs: savedAsName, onSave: saveIt, onPlan: () => endOpen("plan"), onAte: () => endOpen("ate") });
+  // B151: the end of a plate you build yourself has no question: Prepare it (or Prepare it again), and Save it to My recipes
+  const liveEndShown = liveOn && step === "in" && items.length > 0;
+  const liveEndEl = plateEnd({ calendar: null, open: null, saved: plateSaved, savedAs: savedAsName, onSave: saveIt, onPlan: () => {}, onAte: () => {},
+    live: { prepare: madeBy && items.length > 0 ? null : livePrepare, again: liveIs === "eaten" } });
   // the photo's own card with Ate it and Ate half is for a plate whose meal is set, as in 0.3.156
   const mpSay = !!state.photo && state.photo.who !== "idea" && items.length > 0 && !p.filling && !p.recordNow && !unset;
   // with no meal set his card keeps his word, Add a food and Don't count it; Ate it is the end's, which asks for the meal first
   const mpSayLite = !!state.photo && state.photo.who !== "idea" && items.length > 0 && !p.filling && !p.recordNow && unset;
   // the end shows on a plate with foods that is yours to decide: no meal set, or set with the pencil. Not a recipe as
   // mapped, a plate kept as Just looking, a plate already recorded, or a meal opened from Plan (those keep their buttons)
-  const endShown = step === "in" && items.length > 0 && !(imported && rec) && state.photo?.who !== "idea" && p.pick !== "exploring" && !p.recordNow && (!p.filling || p.filling.by === "line") && !mpSay;
+  const endShown = !liveOn && step === "in" && items.length > 0 && !(imported && rec) && state.photo?.who !== "idea" && p.pick !== "exploring" && !p.recordNow && (!p.filling || p.filling.by === "line") && !mpSay;
   const readoutEl = items.length > 0 ? (
     <section className={`readout readout-fit-${p.fitPd(pd)}`}>
       <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? w("make.theWholeRecipe") : mealSlot ? mealName(mealSlot.name) : madeBy || (imported && mealNeed) ? w("plate.thisMeal", { meal: mealW }) : unset ? w("plate.thisPlate") : w("plate.asItStands")}</span><span>{pdTag()}</span></div>
@@ -1883,7 +2024,7 @@ export function JourneyScreen(p: AppApi) {
         {/* the meal line with everything behind its pencil (0.3.156: in PlateMealLine.tsx); its state stays here and is handed in */}
         {plateMealLine({ calendar: lineOpen ? plateCal({ mode: "line", day: lineDayNow, setDay: setLineDay, more: lineMore, setMore: setLineMore, now: new Date(), today: todayKey, infoOf: calInfo, onPick: setMealFromLine,
             marked: lineMarked, refLine: photoRef, timeEdit: setMealTime, looking: { on: !mealSet, tap: clearMeal } }) : null,
-          lineOpen, p, pdRef, pickTaste, set: p.pick === "exploring" && !p.filling ? null : mealSet, setLineOpen: (v) => { setLineOpen(v); setLineMore(false); setLineDay(null); }, shownTaste, tasteHint })}
+          lineOpen, p, pdRef, pickTaste, set: p.pick === "exploring" && !p.filling ? null : mealSet, live: liveLine !== null ? { is: liveSet ? liveIs : null, line: liveLine, held: liveHeld } : undefined, setLineOpen: (v) => { setLineOpen(v); setLineMore(false); setLineDay(null); }, shownTaste, tasteHint })}
         {/* DT308.12n (0.3.157): the one line about the plate that was there, under the meal line */}
         {oldLine}
         {/* the photo screen (0.3.156: in PlatePhoto.tsx): the warning that your plate is not empty, then the card that asks about the photo */}
@@ -1892,7 +2033,7 @@ export function JourneyScreen(p: AppApi) {
         {/* DT308.3 (0.3.154, board Stories236): What are you craving? is gone from the page; Chef Mealan is asked through his round icon */}
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
         {/* DT246 (0.3.96, board Stories182): a plate already recorded says where it went; its changes go there too */}
-        {p.recordNow && items.length > 0 && (() => { const r = p.recordNow!, d = new Date(r.at); return (
+        {p.recordNow && !liveRec && items.length > 0 && (() => { const r = p.recordNow!, d = new Date(r.at); return (
           <p className="small recorded-line"><b>{w("plate.recordedIn", { day: (l) => dayIn(l, d), meal: r.slot ? mealV(r.slot.name, true) : wordV("meal.snack"), time: d.toTimeString().slice(0, 5) })}</b> {w("plate.recordedFollows")}</p>); })()}
         {/* DT247 (0.3.96, board Stories183): one meal, more dishes; tap a dish to work on it; the meal adds them up */}
         {otherDishes.length > 0 && wholeMeal && mealSlot && (() => {
@@ -2180,9 +2321,10 @@ export function JourneyScreen(p: AppApi) {
               </div>
             ) : <button type="button" className="pill pill-wide pill-action add-more-open" onClick={() => { setQ(""); setMoreOpen(true); }}>+ {w("plate.addMore")}</button>)}
             {/* DT308.7: Prepare it stands right under + Add more to your plate */}
-            {plainWays && items.length > 0 && !partsMode && !(finishedDish && (!p.filling || p.filling.mode === "eat")) && <button className="pill pill-wide prepare-it" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? w("plate.putItIn", { slot: slotV(p.filling) }) : w("plate.keepAsIs")) : w("plate.prepare")}</button>}
+            {!liveOn && plainWays && items.length > 0 && !partsMode && !(finishedDish && (!p.filling || p.filling.mode === "eat")) && <button className="pill pill-wide prepare-it" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? w("plate.putItIn", { slot: slotV(p.filling) }) : w("plate.keepAsIs")) : w("plate.prepare")}</button>}
             {/* DT308.11 (0.3.157, board Stories242): the plate ends with What do you do with it? */}
             {endShown && !partsMode && endEl}
+            {liveEndShown && !partsMode && liveEndEl}
             {/* IM12: a dish without parts: its optional foods in one list under the foods */}
             {!grouped && !partsMode && opts.length > 0 && (
               <div className="pt-optlist" aria-label={w("make.optionalNotOnThePlate")}>

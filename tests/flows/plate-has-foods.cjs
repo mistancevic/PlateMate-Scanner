@@ -42,10 +42,10 @@ const names = (s) => s.items.map((i) => i.food.name.split(",")[0] + (i.est ? "~"
   p = await h.open();
   await p.locator(".plan-line-pen").click(); await h.row(p, "Dinner", ".meal-line-open").click(); await p.waitForTimeout(500);
   await h.toPhoto(p, true);
-  ok(/^Dinner Sunday, 15 November, 20:00$/.test(await h.line(p)), "E4: an older photo (Saturday 15:57) on the photo screen: the meal line still says Sunday's dinner");
+  ok(/^Dinner Sunday, 15 November, 20:00 Planned$/.test(await h.line(p)), "E4: an older photo (Saturday 15:57) on the photo screen: the meal line still says Sunday's dinner; changed by B151: and Planned");
   await h.readIt(p); await p.getByRole("button", { name: "Add to my plate" }).click(); await p.waitForTimeout(1000);
   s = await h.st(p);
-  ok(/^Dinner Sunday, 15 November, 20:00$/.test(await h.line(p)) && s.pick === "meal:dinner", "E4: after Add to my plate the meal line still says the meal I set");
+  ok(/^Dinner Sunday, 15 November, 20:00 Planned$/.test(await h.line(p)) && s.pick === "meal:dinner" && (await h.plan(p))["2026-11-15"]?.dinner?.items.length === 5, "E4: after Add to my plate the meal line still says the meal I set; changed by B151: the planned Dinner holds the joined foods too");
   ok(await p.locator(".chef-ask").count() === 0 && !/Did you eat it\?|Saturday/.test(await h.main(p)) && names(s) === "Skyr, Oats, Banana, Chicken breast~, Rice~", "E4: nothing asks about the photo's day; the foods joined");
   await p.context().close();
   // no meal set, an older photo joined: its day and time are the guess only when I say Ate it

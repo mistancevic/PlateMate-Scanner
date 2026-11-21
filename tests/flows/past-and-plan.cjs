@@ -88,7 +88,7 @@ const PORT = "3322", U = `http://127.0.0.1:${PORT}`;
     ok(/nothing planned|planned:/.test(await page.locator(".meal-line-open .pcal-rows").innerText()), "tomorrow's meals say what is planned");
     await page.locator(".meal-line-open .pcal-row").filter({ hasText: /^\s*Lunch/ }).click(); await page.waitForTimeout(500);
     ok(/^Lunch Friday, 30 October, [\d:]+ Goes into your plan\.$/.test((await bar()).trim()), "the plate is now Friday's lunch, going into your plan: " + (await bar()).trim());
-    ok(await page.getByRole("button", { name: /^Put it in/ }).count() === 0, "a meal set with the pencil has no Put it in button: Plan it at the plate's end plans it");
+    ok(await page.getByRole("button", { name: /^Put it in/ }).count() === 0, "a meal set with the pencil has no Put it in button; changed by B151: the pencil itself plans the plate once it has foods");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
   await b.close(); server.kill();

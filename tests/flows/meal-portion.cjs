@@ -72,7 +72,11 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await put([["pasta2", 800], ["yeast3", 20]], "Pasta");
   l = await lines();
   ok(l.some((x) => /^20 g is over a portion of dry yeast, 3 to 10 g\./.test(x)), "DT135: yeast keeps 3 to 10 g: " + l.join(" | "));
+  // changed by B151 (0.3.171): the pencil logged the plate in its meal, and an emptied plate is a new plate with no meal set.
+  // So the plate is taken out of the meal first (No meal selected), emptied, and the meal is set again for the new plate.
+  await require("./just-looking.cjs")(page);
   await put([], "");
+  await require("./set-meal.cjs")(page);
   await (await require("./more.cjs")(page)).fill("Penne"); await page.waitForTimeout(600);
   await page.locator(".row-food").filter({ hasText: "Penne, dry" }).first().getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(800);
   const pen = (await st()).items.find((i) => i.food.id === "penne3");

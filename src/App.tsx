@@ -2207,7 +2207,16 @@ export default function App() {
     photoAsk, dropPhotoAsk: () => setPhotoAsk(null),
     photoNoFoods, dropNoFoods: () => setPhotoNoFoods(false), exploreLeft,
     photoLost, dropPhotoLost: () => setPhotoLost(null),
-    recordNow: recordNow ? { cardId: recordNow.id, at: recordNow.createdAt, slot: recordNow.slot ?? null } : null,
+    recordNow: recordNow ? { cardId: recordNow.id, at: recordNow.createdAt, slot: recordNow.slot ?? null, live: state.recorded?.cardId === recordNow.id && !!state.recorded.live } : null,
+    // B151 (0.3.171, board B151): the pencil set a meal whose time is now or earlier, so the plate counts there. The same
+    // record as Ate it made, at the meal's time; the plate stays on the Plate and follows into it (DT246)
+    liveLog: (meal: Meal, slot: Feedback["slot"] | null, at: string) => {
+      const cardId = uid(), today = ymd(new Date(at)) === ymd(new Date());
+      setState((s) => ({ ...s,
+        feedback: [{ id: cardId, meal: structuredClone({ ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })) }), status: "eaten" as const, taste: "", notes: "", createdAt: at, ...(slot ? { slot } : {}), ...(s.course ? { course: s.course } : {}),
+          ...(today && dayModeOf(personal) === "each" && day.type ? { dayType: day.type } : {}), moment } as Feedback, ...s.feedback],
+        recorded: { cardId, date: slot?.date ?? ymd(new Date(at)), slot: slot?.name ?? null, at, live: true } }));
+    },
     cookOpenAsk: cookOpenAsk && !!state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat"),
     answerCookOpen: (how: "go" | "end") => { setCookOpenAsk(false); if (how === "end") { setState((s) => cooking.closeCook(s)); setCarryNow(null); } else screenProps.goOnCook(); },
     dishAsk, answerDishAsk: (how: "dessert" | "snack" | "notCounted" | null) => {

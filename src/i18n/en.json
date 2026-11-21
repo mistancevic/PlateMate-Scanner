@@ -6311,5 +6311,14 @@
   "plate.didChanged": "I changed {from} to {to}.",
   "plate.didRemoved": "I took off {foods}.",
   "plate.didKept": "What you set stays as you set it.",
-  "plate.didSame": "I see it the same way."
+  "plate.didSame": "I see it the same way.",
+  "plate.liveCounts": "This counts in {slot}. Your day is calculated again.",
+  "plate.livePlan": "This goes into {slot} in your plan. Nothing counts yet. Today will ask if you ate it.",
+  "plate.liveLooking": "Nothing counts. You are just looking.",
+  "plate.liveBack": "Taken out again. Nothing counts. You are just looking.",
+  "plate.liveEaten": "Eaten. Changes to this plate change this meal.",
+  "plate.livePlanned": "Planned",
+  "plate.liveHolds": "{meal} already holds {title}.",
+  "plate.prepareAgain": "Prepare it again ›",
+  "plate.saveToMyRecipes": "Save it to My recipes"
 }
