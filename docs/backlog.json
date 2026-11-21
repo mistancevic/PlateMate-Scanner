@@ -1661,7 +1661,10 @@
         "Timing: before the first public Explorer or blog page, or together with it."
       ],
       "checks": "Full, when built: every walkthrough opens the app by address, so all of them run, plus a new one for the redirects.",
-      "decision": "Direction agreed 21 November 2026. To be drawn (the address map, now and new) before any code."
+      "decision": "Direction agreed 21 November 2026. To be drawn (the address map, now and new) before any code.",
+      "notes": [
+        "21 November 2026, Coach Milan thinking aloud, not a request: a second label for women on its own domain. A coloured theme alone makes no sense, and Chef Mealan in pink is not appealing. If ever needed it is another character, maybe a second chef, Chef Mealena, or some other way to a pink theme. No ticket. What it asks of OP8, if anything: the app does not name its own brand or domain in code."
+      ]
     },
     {
       "id": "DT313",
