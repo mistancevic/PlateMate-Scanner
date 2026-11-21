@@ -17,7 +17,7 @@
  "now": "An eaten plate says Prepare it again. The tap takes the plate off its meal and starts a new cook with no meal. Save on Eat asks Which meal?, and the cook is logged as one more dish.",
  "proposed": "Logging and cooking are two facts of one meal. The pencil says where the plate counts; cooking is how that same meal gets made. An eaten plate says Prepare it, like every other plate. The cook stays on the meal already logged: Prep, Make and Eat run as now. Save on Eat asks nothing about the meal: the taste, the words, the photos and the amount eaten go onto the logged meal. One record, and the day counts it once. Prepare it again leaves the app. The same foods another time start from the recipe (My recipes) or from the eaten meal (Cook again, Put it on the Plate again), as today: a new plate with no meal set.",
  "looked_at": "Keeping Prepare it again for a logged meal that was already cooked once: not chosen, 13:41, a second cook is rare and such meals are in My recipes or in their day, one tap away. Asking Replace it or Add as another dish under Save: not chosen, it keeps a question the pencil already answered.",
- "decision": "Open. Drawn 21 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+ "decision": "Go, Coach Milan 21 November 23:43, checks: Area. A portion stays as the app has it; the weight on Eat is DT333.",
  "ac": [
   {
    "id": "AC1",

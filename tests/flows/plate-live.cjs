@@ -3,7 +3,8 @@
 // the meal's time, and the Plate stays on it); a meal still ahead is a plan. One line under the meals says which. The top
 // line says Planned, or Eaten with Changes to this plate change this meal, and there is no second line. No meal selected
 // takes it back. A meal that already holds a dish asks right there: Replace it, or Add as another dish. The end of the plate
-// has no question, no Plan it and no Ate it: Prepare it (Prepare it again for an eaten plate) and Save it to My recipes.
+// has no question, no Plan it and no Ate it: Prepare it and Save it to My recipes.
+// Changed by B154 (0.3.172, board B154): Prepare it again is gone; the cook of a logged plate is plate-live-cook.cjs.
 // The phone's clock: Sunday 15 November 2026, 18:00. Lunch was at 13:45, Dinner is at 20:00. The checks name AC1 to AC10.
 const start = require("./plate157.cjs");
 const PORT = "3571";
@@ -34,7 +35,7 @@ const PORT = "3571";
   ok(/Lunch Sunday, 15 November, 13:45 Eaten\. Changes to this plate change this meal\./.test(await h.line(p)), "AC7: the top line says Eaten. Changes to this plate change this meal.");
   ok(await p.locator(".recorded-line").count() === 0, "AC7: there is no second line under it");
   end = p.locator(".plate-end");
-  ok(/^Prepare it again › Save it to My recipes$/.test((await end.innerText()).replace(/\s+/g, " ").trim()), "AC10: an eaten plate: Prepare it again, and Save it to My recipes");
+  ok(/^Prepare it › Save it to My recipes$/.test((await end.innerText()).replace(/\s+/g, " ").trim()), "AC10, changed by B154 (0.3.172): an eaten plate says Prepare it too, and Save it to My recipes");
   await h.addFood(p, "Egg"); await h.closeMore(p); await p.waitForTimeout(600);
   e = await eaten(p);
   ok(e.length === 1 && e[0].meal.items.length === 4 && /Egg/.test(e[0].meal.items.map((i) => i.food.name).join()), "AC7: a food added on the Plate is in Lunch too, still one record");
@@ -95,11 +96,11 @@ const PORT = "3571";
   ok(await says(p) === "This counts in Saturday's Dinner. Your day is calculated again.", "AC6: Saturday and Dinner: the line says it counts in Saturday's Dinner");
   e = await eaten(p); plan = await h.plan(p);
   ok(e.length === 1 && e[0].slot?.date === "2026-11-14" && e[0].slot.slotId === "dinner" && e[0].createdAt.slice(0, 10) === "2026-11-14" && !plan["2026-11-16"]?.lunch, "AC6: it is counted on Saturday at Dinner, and Monday's Lunch is free again");
-  // ---- AC10: Prepare it again cooks the same foods as a new cook; the logged meal stays
+  // ---- AC10, changed by B154: a plate logged on a past day is cooked today as a cook of its own; the logged meal stays
   await p.locator(".plan-line-close").click(); await p.waitForTimeout(400);
   await p.locator(".plate-end .prepare-it").click(); await p.waitForTimeout(1200);
   e = await eaten(p);
-  ok(e.length === 1 && e[0].slot?.date === "2026-11-14" && (await h.st(p)).items.length === 5 && !(await h.st(p)).recorded, "AC10: Prepare it again: the cook starts with the same foods, and Saturday's Dinner stays as logged");
+  ok(e.length === 1 && e[0].slot?.date === "2026-11-14" && (await h.st(p)).items.length === 5 && !(await h.st(p)).recorded, "AC10, changed by B154: Prepare it on a plate logged on a past day: the cook starts with the same foods as a cook of its own, and Saturday's Dinner stays as logged");
   ok(!/What do you do with it/.test(await h.main(p)) && !/Meal and day/i.test(await h.main(p)), "AC10: I am on How to make it");
   // ---- AC9: a meal that holds a dish asks
   // Lunch gets a dish first: an egg, logged with the pencil; then the plate is emptied and the new plate is built

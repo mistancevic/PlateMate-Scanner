@@ -1,6 +1,6 @@
 {
-  "release": "0.3.171",
-  "at": "2026-11-21T10:42:45.049Z",
+  "release": "0.3.172",
+  "at": "2026-11-21T22:45:08.469Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -51239,23 +51239,6 @@
       "beta": true,
       "release": "0.3.171",
       "order": 900006,
-      "at": "2026-11-21T10:42:45.049Z"
-    },
-    {
-      "id": "screen.plate.prepareAgain",
-      "kind": "screen",
-      "key": "plate.prepareAgain",
-      "en": "Prepare it again ›",
-      "forms": "plain",
-      "slots": [],
-      "area": "The Plate",
-      "where": "The Plate",
-      "sr": "Pripremi ponovo ›",
-      "de": "Noch einmal zubereiten ›",
-      "checked": false,
-      "beta": true,
-      "release": "0.3.171",
-      "order": 900007,
       "at": "2026-11-21T10:42:45.049Z"
     },
     {

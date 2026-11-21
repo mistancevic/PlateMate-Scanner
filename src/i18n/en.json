@@ -6319,6 +6319,5 @@
   "plate.liveEaten": "Eaten. Changes to this plate change this meal.",
   "plate.livePlanned": "Planned",
   "plate.liveHolds": "{meal} already holds {title}.",
-  "plate.prepareAgain": "Prepare it again ›",
   "plate.saveToMyRecipes": "Save it to My recipes"
 }

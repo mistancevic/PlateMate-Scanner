@@ -22889,10 +22889,6 @@
       "text": "{meal} hat schon: {title}.",
       "checked": true
     },
-    "plate.prepareAgain": {
-      "text": "Noch einmal zubereiten ›",
-      "checked": true
-    },
     "plate.saveToMyRecipes": {
       "text": "In Meine Rezepte speichern",
       "checked": true
