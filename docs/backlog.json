@@ -1630,6 +1630,30 @@
       ]
     },
     {
+      "id": "OP8",
+      "title": "The app under chefmealan.com/app; everything outside it is public",
+      "epic": "ops",
+      "state": "next",
+      "why": "Coach Milan 21 November 2026, 10:56 and 11:12: chefmealan.com is the main domain and the app is still under it; recipes are public, Explorer content and blog pages may become public; should the app sit in a folder or on app.chefmealan.com? Agreed direction: a folder. Prepare the ticket.",
+      "opportunity": {
+        "from": "Coach Milan's own question, 21 November 2026, 10:56.",
+        "job": "Grow the public side of chefmealan.com (recipes, Explorer, a blog) next to the app, with one clear line between what anyone can read and what needs an account.",
+        "kind": "Could not do it, the feature is missing: public pages and app screens share one level of addresses, so the line between them is not visible and every new public page needs its own exception.",
+        "why_now": "Public Explorer pages and a blog are coming; the address plan should stand before they are built and before more people keep app links."
+      },
+      "problem": "Today /today, /plate, /recipes (in the app) and the public pages (/, /about, /built, the public recipe pages) all sit side by side on chefmealan.com. A search engine, a visitor and the code cannot tell from an address whether a page is public or part of the app.",
+      "story": "When I add public content to chefmealan.com, I want the app to live under one address of its own, so that everything outside it is public by rule and nothing in the app is found or indexed by accident.",
+      "proposed": "Public pages stay at the top level in folders: /, /recipes and a recipe's page, /explorer, /blog, /about, /built, the legal pages. The app moves under /app: /app/today, /app/plan, /app/plate, /app/recipes, /app/explorer, /app/clients, with the Menu. The old app addresses redirect to the new ones. Search engines are told to leave /app alone. A folder, not app.chefmealan.com: the phones keep their sign-in, the photos kept on the phone and the home-screen icon, one sign-in serves both sides, and it stays one server and one deploy. A subdomain stays possible later with a redirect.",
+      "open": [
+        "Which Explorer pages become public, and at which addresses (their own ticket when decided).",
+        "The blog: where its pages are written and kept (its own ticket).",
+        "The installed app on a phone's home screen: check that its start address and scope move to /app without a reinstall.",
+        "Links already sent to testers and clients (invites, recipe links, the coach code link): each needs its redirect checked."
+      ],
+      "checks": "Full, when built: every walkthrough opens the app by address, so all of them run, plus a new one for the redirects.",
+      "decision": "Direction agreed 21 November 2026. To be drawn (the address map, now and new) before any code."
+    },
+    {
       "id": "DT313",
       "title": "Whatever arrives on a plate with foods gets the question a photo gets",
       "epic": "plate",
@@ -2142,7 +2166,7 @@
       "state": "now",
       "board": "Stories261",
       "where": "Page 5",
-      "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow. 18:57 to 19:21: the situations; a fixed set of actions, never a button that turns into a status; no scroll on a tap, ask where it happens; a summary of the plate before What do you do with it?; draw it. 20:02 to 20:08: Now (Prepare it, Ate it) and Later (Save it); Plan it from My recipes, its own ticket DT332; the meal chip only chooses, Log it logs; Eaten on the meal line, not a tag. 20:21: horrible, literal, circling. Change where the question is asked; the meal and date already say plan, log or eaten; set it in the pencil block. 20:23: Already eaten, then we tell it will count there and the math recalculates. Yes, draw. 20:37 to 20:50: much better; the question becomes When do you eat it? with eaten, now, later; nothing counts without a tap that says so; the Recorded line, taking it back, a meal that already holds something. Draw and we will see. 20:59 to 21:03: Dinner showed Planned before anything was said; the chips depend on the day and the meal; one possible answer is a conclusion, not a chip; the date and time on every screen. 22:56: the strip must say the time the meals are compared with; a meal still ahead cannot be Already ate it; an eaten plate keeps Prepare it, as Prepare it again. 21 November 10:46 to 10:53: a meal in the past is logging, so no other answer; what is the purpose of the question and of a window around now? None. Time alone decides; a plan is asked about on Today when its time comes. Yes, redraw.",
+      "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow. 18:57 to 19:21: the situations; a fixed set of actions, never a button that turns into a status; no scroll on a tap, ask where it happens; a summary of the plate before What do you do with it?; draw it. 20:02 to 20:08: Now (Prepare it, Ate it) and Later (Save it); Plan it from My recipes, its own ticket DT332; the meal chip only chooses, Log it logs; Eaten on the meal line, not a tag. 20:21: horrible, literal, circling. Change where the question is asked; the meal and date already say plan, log or eaten; set it in the pencil block. 20:23: Already eaten, then we tell it will count there and the math recalculates. Yes, draw. 20:37 to 20:50: much better; the question becomes When do you eat it? with eaten, now, later; nothing counts without a tap that says so; the Recorded line, taking it back, a meal that already holds something. Draw and we will see. 20:59 to 21:03: Dinner showed Planned before anything was said; the chips depend on the day and the meal; one possible answer is a conclusion, not a chip; the date and time on every screen. 22:56: the strip must say the time the meals are compared with; a meal still ahead cannot be Already ate it; an eaten plate keeps Prepare it, as Prepare it again. 21 November 10:46 to 10:53: a meal in the past is logging, so no other answer; what is the purpose of the question and of a window around now? None. Time alone decides; a plan is asked about on Today when its time comes. Yes, redraw. 11:10 to 11:12: the blue Recorded box repeats the line above in undefined words, remove it; when Prepare it holds.",
       "problem": "At the end of a plate the app asks What do you do with it? and Ate it or Plan it open a second calendar. But the meal and the day already say most of it: a coming meal is a plan, a past one was eaten. The question is asked in the wrong place, and the meal is chosen twice.",
       "story": "When I set the meal, the day and the time of my plate, I want that to be the whole decision, so that the plate is logged or planned without being asked anything.",
       "ac": [
@@ -2178,8 +2202,8 @@
         },
         {
           "id": "AC7",
-          "title": "Changes follow, and the app says so",
-          "text": "Given the plate counts in today's Lunch, when I close the pencil, then under the top line it says Recorded: today, Lunch, 13:45. Your changes here go there too, and a change of the banana changes Lunch on Today"
+          "title": "Changes follow, and the top line says so",
+          "text": "Given the plate counts in today's Lunch, when I close the pencil, then the top line says Eaten. Changes to this plate change this meal, there is no second line under it, and a change of the banana changes Lunch on Today"
         },
         {
           "id": "AC8",
@@ -2193,8 +2217,8 @@
         },
         {
           "id": "AC10",
-          "title": "The end of the plate",
-          "text": "Given any plate, when I reach its end, then there is Prepare it and Save it to My recipes, and no question, no Ate it and no Plan it; given the plate is eaten, then the button says Prepare it again"
+          "title": "Prepare it, by the plate's status",
+          "text": "Given a plate with no meal or a planned one, when I reach its end, then the button says Prepare it; given an eaten plate, then it says Prepare it again, it cooks the same foods as a new cook and the logged meal stays; in both there is Save it to My recipes and no question, no Ate it and no Plan it"
         }
       ],
       "unchanged": [
@@ -2210,7 +2234,7 @@
         "kind": "Too many steps, and did not understand it: the meal is chosen in two places, and the tap on Ate it changes nothing you can see.",
         "why_now": "Every plate ends here, so every meal logged goes through it."
       },
-      "decision": "Coach Milan 21 November 10:53: yes, redraw with no question; the clock decides. Waits for his look.",
+      "decision": "Coach Milan 21 November 11:12: yes, without the Recorded box and with the Prepare it rule. Waits for his look.",
       "checks": "Full: this changes how every plate is planned and logged, so all walkthroughs, about 45 minutes, plus the unit tests, the build and a new walkthrough for AC1 to AC10. The walkthroughs that tap the old chips and the calendar under Ate it change with this approved board. New words, so the German sweep too."
     },
     {
