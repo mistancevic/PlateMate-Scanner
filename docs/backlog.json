@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.172",
     "0.3.171",
     "0.3.170",
     "0.3.169",
@@ -2849,7 +2850,7 @@
       "id": "B154",
       "title": "A plate logged with the pencil and then cooked is one meal, not two",
       "epic": "plate",
-      "state": "next",
+      "state": "done",
       "board": "Stories272",
       "where": "Page 5",
       "why": "Found while building B151 (0.3.171), 21 November 2026. Coach Milan 13:20: ticket, yes, with the approach and the resolution in words. 13:39: what is your take? 13:41: such meals are saved anyway and should be taken from there, so Prepare it is just a click away because it is in the recipe. 13:48: yes, write it into B154 and draw.",
@@ -2916,8 +2917,9 @@
         "A plate from a photo, and a dish opened from a meal on Today.",
         "Cook again and Put it on the Plate again on an eaten meal: a new plate."
       ],
-      "decision": "Go, Coach Milan 21 November 23:43, checks: Area. A portion stays as the app has it; the weight on Eat is DT333.",
-      "checks": "Area: the Plate and the cook. The unit tests, the build, new checks for AC1 to AC9 in the pencil's walkthrough, and every walkthrough that goes through Prepare it, Make or Eat, about 15 minutes. One line leaves the app (Prepare it again) and none is new, so no German sweep."
+      "decision": "Go, Coach Milan 21 November 23:43, checks: Area. Built in 0.3.172. A portion stays as the app has it; the weight on Eat is DT333.",
+      "checks": "Area: the Plate and the cook. The unit tests, the build, new checks for AC1 to AC9 in the pencil's walkthrough, and every walkthrough that goes through Prepare it, Make or Eat, about 15 minutes. One line leaves the app (Prepare it again) and none is new, so no German sweep.",
+      "version": "0.3.172"
     }
   ]
 }

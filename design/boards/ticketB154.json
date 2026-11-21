@@ -2,7 +2,7 @@
  "id": "B154",
  "title": "A plate logged with the pencil and then cooked is one meal, not two",
  "epic": "plate",
- "state": "next",
+ "state": "done",
  "board": "Stories272",
  "where": "Page 5",
  "why": "Found while building B151 (0.3.171), 21 November 2026. Coach Milan 13:20: ticket, yes, with the approach and the resolution in words. 13:39: what is your take? 13:41: such meals are saved anyway and should be taken from there, so Prepare it is just a click away because it is in the recipe. 13:48: yes, write it into B154 and draw.",
@@ -17,7 +17,7 @@
  "now": "An eaten plate says Prepare it again. The tap takes the plate off its meal and starts a new cook with no meal. Save on Eat asks Which meal?, and the cook is logged as one more dish.",
  "proposed": "Logging and cooking are two facts of one meal. The pencil says where the plate counts; cooking is how that same meal gets made. An eaten plate says Prepare it, like every other plate. The cook stays on the meal already logged: Prep, Make and Eat run as now. Save on Eat asks nothing about the meal: the taste, the words, the photos and the amount eaten go onto the logged meal. One record, and the day counts it once. Prepare it again leaves the app. The same foods another time start from the recipe (My recipes) or from the eaten meal (Cook again, Put it on the Plate again), as today: a new plate with no meal set.",
  "looked_at": "Keeping Prepare it again for a logged meal that was already cooked once: not chosen, 13:41, a second cook is rare and such meals are in My recipes or in their day, one tap away. Asking Replace it or Add as another dish under Save: not chosen, it keeps a question the pencil already answered.",
- "decision": "Go, Coach Milan 21 November 23:43, checks: Area. A portion stays as the app has it; the weight on Eat is DT333.",
+ "decision": "Go, Coach Milan 21 November 23:43, checks: Area. Built in 0.3.172. A portion stays as the app has it; the weight on Eat is DT333.",
  "ac": [
   {
    "id": "AC1",
@@ -75,13 +75,15 @@
  ],
  "checks": "Area: the Plate and the cook. The unit tests, the build, new checks for AC1 to AC9 in the pencil's walkthrough, and every walkthrough that goes through Prepare it, Make or Eat, about 15 minutes. One line leaves the app (Prepare it again) and none is new, so no German sweep.",
  "short": "A logged plate that is cooked stays one meal",
- "rel": "Proposed; not agreed until Coach Milan says Go",
+ "rel": "Built in 0.3.172",
  "boardTitle": "B154: a plate logged with the pencil and then cooked is one meal, not two",
  "details": [
   "The pictures are the real app with the phone's clock at Sunday 15 November 2026, 13:50 (the strip on every screen): Lunch is at 13:45. One scratch build of 0.3.171, not committed. B154.1 is the app as it is. B154.2 is the same build with the new behaviour turned on.",
   "In the new flow the screen that asked Which meal? (B154.1f) is gone, so B154.2 has one screen less.",
   "After Save the app opens the recipe page, as today; Today is drawn as the last screen because the count shows there.",
   "B154.3 to B154.5 are branches from B154.2e: the other answers to How much did you eat? The Eat screen is today's; what Save writes is new.",
-  "The line Prepare it again › leaves the language files."
- ]
+  "The line Prepare it again › leaves the language files.",
+  "Built in 0.3.172 as drawn. One thing the board did not show: a plate logged on a past day is cooked today as a cook of its own, and that day's meal stays as logged."
+ ],
+ "version": "0.3.172"
 }
