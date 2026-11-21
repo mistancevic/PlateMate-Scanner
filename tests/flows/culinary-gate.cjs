@@ -66,7 +66,7 @@ const U = "http://127.0.0.1:3262";
   ok(/These foods top out at PD 4\.7 within their portions/.test(await ways.textContent()) && await ways.getByRole("button", { name: "Add foods for a lunch" }).count() === 1 && await ways.getByRole("button", { name: "Swap a food" }).count() === 1 && await ways.getByRole("button", { name: "Ask Chef Mealan", exact: true }).count() === 1, "DT93: the foods top out: Add foods, Swap a food, Ask Chef Mealan");
   // changed by DT105 (0.2.92): the yeast on the plate gets its own line and buttons in the same card
   ok(/Active dry yeast is an ingredient, not a food/.test(await ways.textContent()) && await ways.getByRole("button", { name: "Ask Chef Mealan for a dish around it" }).count() === 1, "DT105: the yeast is named as an ingredient, with its own Ask");
-  ok(await page.getByRole("button", { name: "Fit again" }).count() === 1 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›/ }).count() === 1, "DT94, DT230: Fit again and Prepare it › on the Plate");
+  ok(await page.getByRole("button", { name: "Fit again" }).count() === 1 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Prepare it again ›/ }).count() === 1, "DT94, DT230: Fit again and Prepare it › on the Plate; changed by B151: the lunch is set at a time past 13:45, so the plate is logged and the button says Prepare it again ›");
   // Ask Chef Mealan opens the chat with the plate in the first question
   await ways.getByRole("button", { name: "Ask Chef Mealan", exact: true }).click(); await page.waitForTimeout(900);
   const talk = await text(".talk-overlay");
@@ -91,7 +91,7 @@ const U = "http://127.0.0.1:3262";
   ok(await page.locator(".pt-cook .pt-chip").count() === 2, "DT98: For cooking as two chips");
   await page.getByRole("button", { name: "Take out lemon zest" }).click(); await page.waitForTimeout(300);
   ok(JSON.stringify((await st()).cooking) === JSON.stringify(["ground cinnamon"]) && await page.locator(".pt-cook .pt-chip").count() === 1, "DT98: x takes the lemon zest out, the cinnamon stays");
-  await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›/ }).click(); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Prepare it again ›/ }).click(); await page.waitForTimeout(900);
   // a mix of ready foods: the ways, inside Craft, ending with Lock the recipe
   ok(JSON.stringify(await page.locator(".phase-bar span").allTextContents()) === JSON.stringify(["Prep", "Make", "Eat"]) && await page.locator(".phase-bar span.on").count() === 1 && /How do you want to eat it\?/.test(await text()), "DT230: Prepare it starts Prep, Make, Eat: the ways to eat a mix are Prep");
   await page.locator(".way").first().click(); await page.getByRole("button", { name: "Make it this way ›" }).click(); await page.waitForTimeout(900);
@@ -103,6 +103,11 @@ const U = "http://127.0.0.1:3262";
   await page.getByRole("button", { name: /^Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(800);
   ok(await page.locator(".phase-bar span.on").count() === 3 && /Eat: how was it\?/.test(await text("h2")) && /Peanut banana toast · named in Craft/.test(await text()) && await page.getByLabel("Name it").count() === 0, "DT94: Feedback, the name from Craft, no Name it");
   await page.getByRole("button", { name: "DaaM good" }).click(); await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
+  // changed by B151 (0.3.171): Prepare it again is a new cook with no meal set, so Save asks which meal under the button
+  // (as for any plate with no meal, prepare-no-meal.cjs); the lunch already holds the logged plate, so the cook is a snack
+  ok(await page.locator(".eat-cal").count() === 1, "B151: a new cook of an eaten plate has no meal set, so Save asks which meal");
+  await page.locator(".eat-cal .pcal-row").filter({ hasText: /^\s*(✓\s*)?Snack/ }).first().click(); await page.waitForTimeout(1200);
+  ok((await st()).feedback.filter((f) => f.status === "eaten").length === 2, "B151: the lunch logged with the pencil stays, and the cook is logged on its own");
   ok((await st()).meals[0]?.title === "Peanut banana toast", "DT94: saved under the name from Craft");
   // 0.2.96 (Milan 02:11): the bowl way chosen at Lock is saved as the recipe's steps, with the way's name
   ok(((await st()).meals[0]?.steps ?? []).length >= 2 && typeof (await st()).meals[0]?.way === "string", "0.2.96: the way's steps are saved with the recipe: " + JSON.stringify((await st()).meals[0]?.way));

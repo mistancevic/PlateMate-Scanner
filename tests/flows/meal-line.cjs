@@ -45,7 +45,7 @@ const PORT = "3561";
   await p.locator(".plan-line-pen").click(); await p.waitForTimeout(300);
   await h.row(p, "Dinner", ".meal-line-open").click(); await p.waitForTimeout(500);
   ok(await p.locator(".meal-line-open .pcal").count() === 1, "A4, changed by B150: a tap on Dinner: edit mode stays open");
-  ok(/^Dinner Sunday, 15 November, 20:00 Before training/.test(await h.line(p)), "A4: the line says the meal, then day, date and time, and the moment: " + await h.line(p));
+  ok(/^Dinner Sunday, 15 November, 20:00 Planned · Before training/.test(await h.line(p)), "A4: the line says the meal, then day, date and time, changed by B151: then Planned (20:00 is still ahead), and the moment: " + await h.line(p));
   ok(await p.locator(".meal-line .plan-line-x").count() === 0 && await p.locator(".meal-line .plan-line-close").count() === 1, "A4, changed by B150: no X that clears the meal; the X in the pencil's place only closes");
   // ---- A8: the plate works for that meal as in 0.3.156
   ok(/Dinner/.test(await p.locator(".readout-top").innerText()) && (await h.st(p)).pick === "meal:dinner", "A8: the result is for the dinner, as in 0.3.156");
@@ -59,7 +59,7 @@ const PORT = "3561";
   rows = await h.rows(p, ".meal-line-open");
   ok(rows.join(" | ") === "Breakfast 07:30 · nothing planned | Lunch 13:45 · nothing planned | Dinner 20:00 · nothing planned | ✓ No meal selected", "A3: Monday's meals as they stand in the plan; no Snack row on a coming day with no snack among its meals: " + rows.join(" | "));
   await h.row(p, "Lunch", ".meal-line-open").click(); await p.waitForTimeout(500);
-  ok(/^Lunch Monday, 16 November, 13:45/.test(await h.line(p)) && /Goes into your plan\./.test(await h.line(p)), "A4: Monday's lunch is set: " + await h.line(p));
+  ok(/^Lunch Monday, 16 November, 13:45 Planned/.test(await h.line(p)) && !/Goes into your plan\./.test(await h.line(p)), "A4: Monday's lunch is set; changed by B151: the line says Planned: " + await h.line(p));
   ok(await p.getByRole("button", { name: /^Put it in/ }).count() === 0, "D2: the button Put it in Monday's lunch no longer exists");
   await p.locator(".meal-line-open .pcal-looking").click(); await p.waitForTimeout(400);
   ok(/^No meal selected/.test(await h.line(p)) && !(await h.st(p)).pick, "A7, changed by B150: the row No meal selected clears a meal of another day too");

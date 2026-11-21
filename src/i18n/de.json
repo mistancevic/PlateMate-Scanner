@@ -22860,6 +22860,42 @@
     "howto.backClients": {
       "text": "‹ Klienten",
       "checked": true
+    },
+    "plate.liveCounts": {
+      "text": "Das zählt für: {slot}. Dein Tag wird neu berechnet.",
+      "checked": true
+    },
+    "plate.livePlan": {
+      "text": "Das kommt in deinen Plan: {slot}. Noch zählt nichts. Heute fragt später, ob du es gegessen hast.",
+      "checked": true
+    },
+    "plate.liveLooking": {
+      "text": "Nichts zählt. Du schaust nur.",
+      "checked": true
+    },
+    "plate.liveBack": {
+      "text": "Wieder herausgenommen. Nichts zählt. Du schaust nur.",
+      "checked": true
+    },
+    "plate.liveEaten": {
+      "text": "Gegessen. Änderungen an diesem Teller ändern diese Mahlzeit.",
+      "checked": true
+    },
+    "plate.livePlanned": {
+      "text": "Geplant",
+      "checked": true
+    },
+    "plate.liveHolds": {
+      "text": "{meal} hat schon: {title}.",
+      "checked": true
+    },
+    "plate.prepareAgain": {
+      "text": "Noch einmal zubereiten ›",
+      "checked": true
+    },
+    "plate.saveToMyRecipes": {
+      "text": "In Meine Rezepte speichern",
+      "checked": true
     }
   }
 }

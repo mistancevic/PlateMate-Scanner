@@ -3642,3 +3642,10 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .ht-r.on { background: var(--surface, #fff); border: 2.5px solid var(--edge); color: var(--ink); }
 .ht-saidface svg { color: var(--ink); } .ht-said1 svg circle { fill: #f48a78; } .ht-said2 svg circle { fill: #f6b94a; } .ht-said3 svg circle { fill: #78a9f0; } .ht-said4 svg circle { fill: #35cf9e; } .ht-said5 svg circle { fill: #2fa37c; }
 .ht-wait-what { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+
+/* B151 (0.3.171, board B151): the line under the meals that says what the tap did, the ask when the meal holds a dish, and
+   the end of a plate you build yourself: Prepare it, then Save it to My recipes */
+.live-says { margin: 10px 0; } .live-says .live-line { margin: 8px 0 0; font-weight: 700; color: var(--navy); line-height: 1.45; }
+.live-says .live-held { margin-top: 8px; border: 1px solid var(--line); border-radius: var(--r-control); }
+.plate-end.plate-end-live { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.plate-card .plate-end-live .prepare-it { margin: 0; }

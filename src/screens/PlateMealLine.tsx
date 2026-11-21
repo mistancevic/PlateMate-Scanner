@@ -26,6 +26,9 @@ export type PlateMealLineIn = {
   pdRef: number | null;
   pickTaste: (t: PlateTaste) => void;
   set: MealSet | null;
+  // B151 (0.3.171, board B151): a plate you build yourself. is: what holds (it counts in the meal, or it is in the plan);
+  // line: the one line under the meals that says what the tap did; held: the meal already holds a dish, Replace it or Add a dish
+  live?: { is: "eaten" | "planned" | null; line: string; held: ReactNode };
   setLineOpen: Dispatch<SetStateAction<boolean>>;
   shownTaste: PlateTaste;
   tasteHint: string;
@@ -38,8 +41,9 @@ export const mealDayText = (date: string, time: string | null) => {
 };
 
 export function plateMealLine(given: PlateMealLineIn) {
-  const { calendar, lineOpen, p, pdRef, pickTaste, set, setLineOpen, shownTaste, tasteHint } = given;
-  const small = [p.moment !== "regular" ? momentOf(p.moment).name : "", shownTaste ? PLATE_TASTE_LINE[shownTaste] : "", set?.plan ? w("plate.goesIntoPlan") : ""].filter(Boolean).join(" · ");
+  const { calendar, lineOpen, p, pdRef, pickTaste, set, live, setLineOpen, shownTaste, tasteHint } = given;
+  const liveWord = live?.is === "eaten" ? w("plate.liveEaten") : live?.is === "planned" ? w("plate.livePlanned") : "";
+  const small = [liveWord, p.moment !== "regular" ? momentOf(p.moment).name : "", shownTaste ? PLATE_TASTE_LINE[shownTaste] : "", set?.plan && !live?.is ? w("plate.goesIntoPlan") : ""].filter(Boolean).join(" · ");
   return (
     <>
       <div className={`plan-line meal-line${set ? " is-set" : ""}${lineOpen ? " is-open" : ""}`}>
@@ -56,7 +60,8 @@ export function plateMealLine(given: PlateMealLineIn) {
       {lineOpen && (<div className="meal-line-open">
       {calendar}
       {/* DT274 (0.3.122, board Stories203): what each choice does, as it was under What is it for */}
-      <p className="small for-say"><b>{w("make.forExploringHead")}</b> {w("make.forExploring")}<br /><b>{w("make.forMealHead")}</b> {w("make.forMeal")}</p>
+      {live ? <div className="live-says"><p className="small live-line" role="status">{live.line}</p>{live.held}</div>
+        : <p className="small for-say"><b>{w("make.forExploringHead")}</b> {w("make.forExploring")}<br /><b>{w("make.forMealHead")}</b> {w("make.forMeal")}</p>}
       <div className="meal-line-ask">
       {/* R22 (0.2.50, board RS21): What is it? in place of Meal or Dessert; a small thing is a Snack, in the calendar */}
       <p className="label">{w("make.whatIsIt")}</p>
