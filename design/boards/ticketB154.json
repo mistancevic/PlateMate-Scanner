@@ -1,0 +1,82 @@
+{
+ "id": "B154",
+ "title": "A plate logged with the pencil and then cooked is one meal, not two",
+ "epic": "plate",
+ "state": "next",
+ "board": "Stories272",
+ "where": "Page 5",
+ "why": "Found while building B151 (0.3.171), 21 November 2026. Coach Milan 13:20: ticket, yes, with the approach and the resolution in words. 13:39: what is your take? 13:41: such meals are saved anyway and should be taken from there, so Prepare it is just a click away because it is in the recipe. 13:48: yes, write it into B154 and draw.",
+ "opportunity": {
+  "from": "The build of B151 and its walkthroughs (culinary-gate), 21 November 2026.",
+  "job": "Set my lunch, build the plate, cook it and eat it, and have it counted once.",
+  "kind": "A wrong result: the same plate counts twice in one meal, and a button says again for a plate never cooked.",
+  "why_now": "Setting the meal a few minutes after its time and then cooking is an everyday case."
+ },
+ "problem": "A meal set a few minutes after its time is logged at once (B151). The button then says Prepare it again, although the plate was never cooked. That cook is a new cook with no meal, so Save on Eat asks which meal. A tap on the same meal asks nothing more, and the meal holds the plate twice: the day counts 1,125 kcal for 563 kcal eaten.",
+ "story": "When I log my plate with the pencil and then cook it, I want the cooking to belong to the meal already logged, so that my day counts it once and I am not asked which meal again.",
+ "now": "An eaten plate says Prepare it again. The tap takes the plate off its meal and starts a new cook with no meal. Save on Eat asks Which meal?, and the cook is logged as one more dish.",
+ "proposed": "Logging and cooking are two facts of one meal. The pencil says where the plate counts; cooking is how that same meal gets made. An eaten plate says Prepare it, like every other plate. The cook stays on the meal already logged: Prep, Make and Eat run as now. Save on Eat asks nothing about the meal: the taste, the words, the photos and the amount eaten go onto the logged meal. One record, and the day counts it once. Prepare it again leaves the app. The same foods another time start from the recipe (My recipes) or from the eaten meal (Cook again, Put it on the Plate again), as today: a new plate with no meal set.",
+ "looked_at": "Keeping Prepare it again for a logged meal that was already cooked once: not chosen, 13:41, a second cook is rare and such meals are in My recipes or in their day, one tap away. Asking Replace it or Add as another dish under Save: not chosen, it keeps a question the pencil already answered.",
+ "decision": "Open. Drawn 21 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+ "ac": [
+  {
+   "id": "AC1",
+   "title": "An eaten plate says Prepare it",
+   "text": "Given it is 13:50 and the pencil logged my plate in today's Lunch at 13:45, when I reach the end of the plate, then the button says Prepare it, nothing says Prepare it again, and Save it to My recipes is under it"
+  },
+  {
+   "id": "AC2",
+   "title": "The cook stays on its meal",
+   "text": "Given the plate is logged in today's Lunch, when I tap Prepare it and go through Prep and Make, then the plate is still today's Lunch and nothing is taken out of the meal"
+  },
+  {
+   "id": "AC3",
+   "title": "Save asks nothing about the meal",
+   "text": "Given I am on Eat with All of it and DaaM good, when I tap Save, then no Which meal? opens and no second meal is logged"
+  },
+  {
+   "id": "AC4",
+   "title": "One record, counted once",
+   "text": "Given I saved the cook, when I open Today, then Lunch holds the plate once, at 13:45, with the taste and the photos of the cook, and the day counts 563 kcal"
+  },
+  {
+   "id": "AC5",
+   "title": "A portion changes the logged meal",
+   "text": "Given the plate is logged in Lunch as a whole, when I choose A portion on Eat and tap Save, then Lunch holds the portion I ate, and the rest waits on Today as it does for any cook"
+  },
+  {
+   "id": "AC6",
+   "title": "Not eaten after all",
+   "text": "Given the plate is logged in Lunch, when I choose Later today or Not after all on Eat and tap Save, then the plate is out of Lunch again, and the cook is kept as it is for any cook"
+  },
+  {
+   "id": "AC7",
+   "title": "The recipe is saved as today",
+   "text": "Given Yes, save it is chosen on Eat, when I tap Save, then the recipe is in My recipes with its steps and this cook, as for any cook"
+  },
+  {
+   "id": "AC8",
+   "title": "The same foods another time",
+   "text": "Given Lunch is eaten and saved, when I open it on Today and tap Cook again, then the foods are on the Plate as a new plate with no meal set, as today"
+  }
+ ],
+ "unchanged": [
+  "The pencil: a meal whose time is now or earlier counts, a meal still ahead is a plan (B151).",
+  "A planned plate and a plate with no meal: Prepare it, as today. A plate with no meal is still asked Which meal? at Save.",
+  "Prep, Make and Eat: their screens, questions and words.",
+  "Save in My recipes on Eat, the recipe page after Save, and Chef Mealan's question on Today 30 minutes later.",
+  "A plate from a photo, and a dish opened from a meal on Today.",
+  "Cook again and Put it on the Plate again on an eaten meal: a new plate."
+ ],
+ "checks": "Area: the Plate and the cook. The unit tests, the build, new checks for AC1 to AC8 in the pencil's walkthrough, and every walkthrough that goes through Prepare it, Make or Eat, about 15 minutes. One line leaves the app (Prepare it again) and none is new, so no German sweep.",
+ "short": "A logged plate that is cooked stays one meal",
+ "rel": "Proposed; not agreed until Coach Milan says Go",
+ "boardTitle": "B154: a plate logged with the pencil and then cooked is one meal, not two",
+ "details": [
+  "The pictures are the real app with the phone's clock at Sunday 15 November 2026, 13:50 (the strip on every screen): Lunch is at 13:45. One scratch build of 0.3.171, not committed. B154.1 is the app as it is. B154.2 is the same build with the new behaviour turned on.",
+  "In the new flow the screen that asked Which meal? (B154.1f) is gone, so B154.2 has one screen less.",
+  "After Save the app opens the recipe page, as today; Today is drawn as the last screen because the count shows there.",
+  "Not drawn: A portion, Later today and Not after all (AC5, AC6); the screens are today's, only what Save writes changes.",
+  "The line Prepare it again › leaves the language files."
+ ]
+}

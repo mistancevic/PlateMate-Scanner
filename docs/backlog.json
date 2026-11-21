@@ -2844,21 +2844,69 @@
       "title": "A plate logged with the pencil and then cooked is one meal, not two",
       "epic": "plate",
       "state": "next",
-      "why": "Found while building B151 (0.3.171), 21 November 2026; Coach Milan 13:20: ticket, yes, with the approach and the resolution in words.",
+      "board": "Stories272",
+      "where": "Page 5",
+      "why": "Found while building B151 (0.3.171), 21 November 2026. Coach Milan 13:20: ticket, yes, with the approach and the resolution in words. 13:39: what is your take? 13:41: such meals are saved anyway and should be taken from there, so Prepare it is just a click away because it is in the recipe. 13:48: yes, write it into B154 and draw.",
       "opportunity": {
-        "from": "The build of B151 and its walkthroughs (culinary-gate).",
+        "from": "The build of B151 and its walkthroughs (culinary-gate), 21 November 2026.",
         "job": "Set my lunch, build the plate, cook it and eat it, and have it counted once.",
-        "kind": "A wrong result: the same plate can count twice in one meal.",
+        "kind": "A wrong result: the same plate counts twice in one meal, and a button says again for a plate never cooked.",
         "why_now": "Setting the meal a few minutes after its time and then cooking is an everyday case."
       },
-      "problem": "A meal set a few minutes after its time is logged at once (B151). The button then says Prepare it again, although the plate was never cooked. That cook is a new cook with no meal, so Save on Eat asks which meal. If I choose the same meal and do not tap Replace it, the meal holds the plate twice.",
+      "problem": "A meal set a few minutes after its time is logged at once (B151). The button then says Prepare it again, although the plate was never cooked. That cook is a new cook with no meal, so Save on Eat asks which meal. A tap on the same meal asks nothing more, and the meal holds the plate twice: the day counts 1,125 kcal for 563 kcal eaten.",
       "story": "When I log my plate with the pencil and then cook it, I want the cooking to belong to the meal already logged, so that my day counts it once and I am not asked which meal again.",
-      "proposed": "Logging and cooking are two facts of one meal. Prepare it on an eaten plate that has not been cooked yet keeps the plate on its meal: Prep, Make and Eat run as now, and Save on Eat asks nothing about the meal and adds the rating, the words and the photo to the meal already logged. One record. The button says Prepare it for that plate. Prepare it again is only for a logged meal that has already been cooked once; that one is a new cook, as in B151 AC10, and Save asks which meal with Replace it and Add as another dish.",
-      "open": [
-        "Is a second cook of the same logged meal a real case, or should Prepare it again go away and every cook of an eaten plate belong to its meal?",
-        "Save on Eat for the first cook: does the amount eaten (all of it, half) change the logged meal? It touches DT333."
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "An eaten plate says Prepare it",
+          "text": "Given it is 13:50 and the pencil logged my plate in today's Lunch at 13:45, when I reach the end of the plate, then the button says Prepare it, nothing says Prepare it again, and Save it to My recipes is under it"
+        },
+        {
+          "id": "AC2",
+          "title": "The cook stays on its meal",
+          "text": "Given the plate is logged in today's Lunch, when I tap Prepare it and go through Prep and Make, then the plate is still today's Lunch and nothing is taken out of the meal"
+        },
+        {
+          "id": "AC3",
+          "title": "Save asks nothing about the meal",
+          "text": "Given I am on Eat with All of it and DaaM good, when I tap Save, then no Which meal? opens and no second meal is logged"
+        },
+        {
+          "id": "AC4",
+          "title": "One record, counted once",
+          "text": "Given I saved the cook, when I open Today, then Lunch holds the plate once, at 13:45, with the taste and the photos of the cook, and the day counts 563 kcal"
+        },
+        {
+          "id": "AC5",
+          "title": "A portion changes the logged meal",
+          "text": "Given the plate is logged in Lunch as a whole, when I choose A portion on Eat and tap Save, then Lunch holds the portion I ate, and the rest waits on Today as it does for any cook"
+        },
+        {
+          "id": "AC6",
+          "title": "Not eaten after all",
+          "text": "Given the plate is logged in Lunch, when I choose Later today or Not after all on Eat and tap Save, then the plate is out of Lunch again, and the cook is kept as it is for any cook"
+        },
+        {
+          "id": "AC7",
+          "title": "The recipe is saved as today",
+          "text": "Given Yes, save it is chosen on Eat, when I tap Save, then the recipe is in My recipes with its steps and this cook, as for any cook"
+        },
+        {
+          "id": "AC8",
+          "title": "The same foods another time",
+          "text": "Given Lunch is eaten and saved, when I open it on Today and tap Cook again, then the foods are on the Plate as a new plate with no meal set, as today"
+        }
       ],
-      "checks": "Area, proposed: the Plate and the cook flow. To agree with the board."
+      "unchanged": [
+        "The pencil: a meal whose time is now or earlier counts, a meal still ahead is a plan (B151).",
+        "A planned plate and a plate with no meal: Prepare it, as today. A plate with no meal is still asked Which meal? at Save.",
+        "Prep, Make and Eat: their screens, questions and words.",
+        "Save in My recipes on Eat, the recipe page after Save, and Chef Mealan's question on Today 30 minutes later.",
+        "A plate from a photo, and a dish opened from a meal on Today.",
+        "Cook again and Put it on the Plate again on an eaten meal: a new plate."
+      ],
+      "decision": "Open. Drawn 21 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "checks": "Area: the Plate and the cook. The unit tests, the build, new checks for AC1 to AC8 in the pencil's walkthrough, and every walkthrough that goes through Prepare it, Make or Eat, about 15 minutes. One line leaves the app (Prepare it again) and none is new, so no German sweep."
     }
   ]
 }
