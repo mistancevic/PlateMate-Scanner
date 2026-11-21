@@ -2838,6 +2838,27 @@
       "epic": "plate",
       "state": "later",
       "why": "From the B151 talk, 20 November 2026, 20:37: Already ate it assumes all of it; an amount (all of it, or the part you ate) as a field, its own ticket to keep B151 in scope. Coach Milan has not asked for it yet."
+    },
+    {
+      "id": "B154",
+      "title": "A plate logged with the pencil and then cooked is one meal, not two",
+      "epic": "plate",
+      "state": "next",
+      "why": "Found while building B151 (0.3.171), 21 November 2026; Coach Milan 13:20: ticket, yes, with the approach and the resolution in words.",
+      "opportunity": {
+        "from": "The build of B151 and its walkthroughs (culinary-gate).",
+        "job": "Set my lunch, build the plate, cook it and eat it, and have it counted once.",
+        "kind": "A wrong result: the same plate can count twice in one meal.",
+        "why_now": "Setting the meal a few minutes after its time and then cooking is an everyday case."
+      },
+      "problem": "A meal set a few minutes after its time is logged at once (B151). The button then says Prepare it again, although the plate was never cooked. That cook is a new cook with no meal, so Save on Eat asks which meal. If I choose the same meal and do not tap Replace it, the meal holds the plate twice.",
+      "story": "When I log my plate with the pencil and then cook it, I want the cooking to belong to the meal already logged, so that my day counts it once and I am not asked which meal again.",
+      "proposed": "Logging and cooking are two facts of one meal. Prepare it on an eaten plate that has not been cooked yet keeps the plate on its meal: Prep, Make and Eat run as now, and Save on Eat asks nothing about the meal and adds the rating, the words and the photo to the meal already logged. One record. The button says Prepare it for that plate. Prepare it again is only for a logged meal that has already been cooked once; that one is a new cook, as in B151 AC10, and Save asks which meal with Replace it and Add as another dish.",
+      "open": [
+        "Is a second cook of the same logged meal a real case, or should Prepare it again go away and every cook of an eaten plate belong to its meal?",
+        "Save on Eat for the first cook: does the amount eaten (all of it, half) change the logged meal? It touches DT333."
+      ],
+      "checks": "Area, proposed: the Plate and the cook flow. To agree with the board."
     }
   ]
 }
