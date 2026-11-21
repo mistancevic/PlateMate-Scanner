@@ -66,7 +66,7 @@ const U = "http://127.0.0.1:3262";
   ok(/These foods top out at PD 4\.7 within their portions/.test(await ways.textContent()) && await ways.getByRole("button", { name: "Add foods for a lunch" }).count() === 1 && await ways.getByRole("button", { name: "Swap a food" }).count() === 1 && await ways.getByRole("button", { name: "Ask Chef Mealan", exact: true }).count() === 1, "DT93: the foods top out: Add foods, Swap a food, Ask Chef Mealan");
   // changed by DT105 (0.2.92): the yeast on the plate gets its own line and buttons in the same card
   ok(/Active dry yeast is an ingredient, not a food/.test(await ways.textContent()) && await ways.getByRole("button", { name: "Ask Chef Mealan for a dish around it" }).count() === 1, "DT105: the yeast is named as an ingredient, with its own Ask");
-  ok(await page.getByRole("button", { name: "Fit again" }).count() === 1 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Prepare it again ›/ }).count() === 1, "DT94, DT230: Fit again and Prepare it › on the Plate; changed by B151: the lunch is set at a time past 13:45, so the plate is logged and the button says Prepare it again ›");
+  ok(await page.getByRole("button", { name: "Fit again" }).count() === 1 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Prepare it again ›/ }).count() === 1, "DT94, DT230: Fit again and Prepare it › on the Plate; changed by B151 and B154: the lunch is set at a time past 13:45, so the plate is logged, and the button still says Prepare it ›");
   // Ask Chef Mealan opens the chat with the plate in the first question
   await ways.getByRole("button", { name: "Ask Chef Mealan", exact: true }).click(); await page.waitForTimeout(900);
   const talk = await text(".talk-overlay");
@@ -103,11 +103,9 @@ const U = "http://127.0.0.1:3262";
   await page.getByRole("button", { name: /^Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(800);
   ok(await page.locator(".phase-bar span.on").count() === 3 && /Eat: how was it\?/.test(await text("h2")) && /Peanut banana toast · named in Craft/.test(await text()) && await page.getByLabel("Name it").count() === 0, "DT94: Feedback, the name from Craft, no Name it");
   await page.getByRole("button", { name: "DaaM good" }).click(); await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
-  // changed by B151 (0.3.171): Prepare it again is a new cook with no meal set, so Save asks which meal under the button
-  // (as for any plate with no meal, prepare-no-meal.cjs); the lunch already holds the logged plate, so the cook is a snack
-  ok(await page.locator(".eat-cal").count() === 1, "B151: a new cook of an eaten plate has no meal set, so Save asks which meal");
-  await page.locator(".eat-cal .pcal-row").filter({ hasText: /^\s*(✓\s*)?Snack/ }).first().click(); await page.waitForTimeout(1200);
-  ok((await st()).feedback.filter((f) => f.status === "eaten").length === 2, "B151: the lunch logged with the pencil stays, and the cook is logged on its own");
+  // changed by B154 (0.3.172): the lunch was logged with the pencil, so the cook stays on it: Save asks nothing about the
+  // meal and writes into the lunch already logged, one record
+  ok(await page.locator(".eat-cal").count() === 0 && (await st()).feedback.filter((f) => f.status === "eaten").length === 1, "B154: Save asks nothing about the meal, and the lunch is logged once");
   ok((await st()).meals[0]?.title === "Peanut banana toast", "DT94: saved under the name from Craft");
   // 0.2.96 (Milan 02:11): the bowl way chosen at Lock is saved as the recipe's steps, with the way's name
   ok(((await st()).meals[0]?.steps ?? []).length >= 2 && typeof (await st()).meals[0]?.way === "string", "0.2.96: the way's steps are saved with the recipe: " + JSON.stringify((await st()).meals[0]?.way));

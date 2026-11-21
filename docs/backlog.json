@@ -2840,7 +2840,10 @@
       "title": "How much of the plate you ate, in the pencil block",
       "epic": "plate",
       "state": "later",
-      "why": "From the B151 talk, 20 November 2026, 20:37: Already ate it assumes all of it; an amount (all of it, or the part you ate) as a field, its own ticket to keep B151 in scope. Coach Milan has not asked for it yet."
+      "why": "From the B151 talk, 20 November 2026, 20:37: Already ate it assumes all of it; an amount (all of it, or the part you ate) as a field, its own ticket to keep B151 in scope. Coach Milan has not asked for it yet.",
+      "notes": [
+        "21 November 2026, 23:35 to 23:42, from the B154 talk: the app asks how much you ate in two ways. The read of a meal photo asks by weight (All of it, Half, Part of it, with the grams in one field; All of it fills in the whole weight, another number is Part of it). Eat after a cook asks A portion and how many the cook makes, equal shares, no grams. Coach Milan pointed at the weight as the way already built. Claude's take: the weight says what was eaten and covers unequal shares; It makes N is a fact about the recipe and could stay as its own line. To decide here, for Eat and for the pencil. Also seen: with the It makes field left empty, A portion logged half, although the line says Empty: one plate; not looked into."
+      ]
     },
     {
       "id": "B154",
@@ -2913,7 +2916,7 @@
         "A plate from a photo, and a dish opened from a meal on Today.",
         "Cook again and Put it on the Plate again on an eaten meal: a new plate."
       ],
-      "decision": "Open. Drawn 21 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Go, Coach Milan 21 November 23:43, checks: Area. A portion stays as the app has it; the weight on Eat is DT333.",
       "checks": "Area: the Plate and the cook. The unit tests, the build, new checks for AC1 to AC9 in the pencil's walkthrough, and every walkthrough that goes through Prepare it, Make or Eat, about 15 minutes. One line leaves the app (Prepare it again) and none is new, so no German sweep."
     }
   ]

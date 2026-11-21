@@ -1847,12 +1847,14 @@ export function JourneyScreen(p: AppApi) {
           <button type="button" className="pill pill-small pill-primary live-add" onClick={() => setLiveAsk(null)}>{w("cal.addDish")}</button>
         </div>
       </div>); })() : null;
-  // AC10: Prepare it for a plate with no meal or a planned one; Prepare it again for an eaten one. Cooking the eaten plate is
-  // a new cook: the logged meal stays as it is and the plate is no longer that meal. A plate planned for another day is
-  // cooked now and stays in the plan.
+  // B154 (0.3.172, board B154; Coach Milan, Go 21 November 23:43): logging and cooking are two facts of one meal. A plate
+  // the pencil logged in a meal of today says Prepare it like every other plate, and its cook stays on that meal: Save on
+  // Eat asks nothing and writes into the meal already logged (liveSave, below). Prepare it again is gone. A plate logged
+  // on a past day, or planned for another day, is cooked now as a cook of its own: today's cook cannot be that day's meal.
   const livePrepare = () => {
     setChef(null);
-    if (liveIs === "eaten") { setState((s) => ({ ...s, recorded: undefined })); if (p.pick) p.setPick(null); if (p.filling) p.setFilling(null); }
+    if (liveIs === "eaten" && p.filling) { setState((s) => ({ ...s, recorded: undefined })); p.setFilling(null); }
+    else if (liveIs === "eaten") { /* B154: the cook stays on the meal already logged */ }
     else if (p.filling) { setState((s) => ({ ...s, plannedAt: undefined })); p.setFilling(null); }
     setLiveAsk(null); setLineOpen(false);
     setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null);
@@ -1981,7 +1983,7 @@ export function JourneyScreen(p: AppApi) {
   // B151: the end of a plate you build yourself has no question: Prepare it (or Prepare it again), and Save it to My recipes
   const liveEndShown = liveOn && step === "in" && items.length > 0;
   const liveEndEl = plateEnd({ calendar: null, open: null, saved: plateSaved, savedAs: savedAsName, onSave: saveIt, onPlan: () => {}, onAte: () => {},
-    live: { prepare: madeBy && items.length > 0 ? null : livePrepare, again: liveIs === "eaten" } });
+    live: { prepare: madeBy && items.length > 0 ? null : livePrepare } });
   // the photo's own card with Ate it and Ate half is for a plate whose meal is set, as in 0.3.156
   const mpSay = !!state.photo && state.photo.who !== "idea" && items.length > 0 && !p.filling && !p.recordNow && !unset;
   // with no meal set his card keeps his word, Add a food and Don't count it; Ate it is the end's, which asks for the meal first
@@ -3001,6 +3003,15 @@ export function JourneyScreen(p: AppApi) {
     marked: (() => { const info = calInfo(todayKey), id = calGuess(info.slots, info.eaten, new Date()); return id === undefined ? null : { date: todayKey, id }; })(),
     title: w("cal.whichByClock", { time: hhmm(new Date()) }),
     onPick: (_d, r) => { const sl = r.id ? daySlots.find((x) => x.id === r.id) ?? null : null; eatSlot.current = { slot: sl ? { date: todayKey, slotId: sl.id, name: sl.name, time: sl.time } : null }; setEndCal(null); saveEat(); } }) : null;
+  // B154: Save on Eat for a cook whose plate the pencil already logged. Eaten (all of it, or a portion): the cook is written
+  // into that meal, so it is one record at the meal's time. Later today or Not after all: it was not eaten, so the plate
+  // comes out of the meal first, and the cook is kept as any cook is.
+  const liveSave = () => {
+    const card = p.recordNow?.live ? state.feedback.find((f) => f.id === p.recordNow!.cardId && f.status === "eaten") : undefined;
+    if (!card) { saveEat(); return; }
+    if (eatLater) { const id = card.id; setState((s0) => ({ ...deleteCardIn(s0, id), recorded: undefined })); saveEat(); return; }
+    saveEat(false, card);
+  };
   const saveEat = (bigOk = false, same?: "both" | Feedback) => {
     if (eatLater) {
       log("made", { went, ate, photos: cookPhotos.length });
@@ -3228,7 +3239,7 @@ export function JourneyScreen(p: AppApi) {
       )}
       </>}
       {p.sameAsk && <SamePhotoAsk ask={p.sameAsk} answer={p.answerSameAsk} />}
-      {!bigAsk && !p.sameAsk && <button className={`pill pill-primary pill-wide eat-save${eatCal ? " is-asking" : ""}`} disabled={!eatLater && (good === null || (sharing && !shareWhy))} onClick={() => { if (eatCal) { setEndCal(null); return; } saveEat(); }}>{sharing && !eatLater ? w("make.saveShare", { coach: p.coachLabel }) : w("make.save")}</button>}
+      {!bigAsk && !p.sameAsk && <button className={`pill pill-primary pill-wide eat-save${eatCal ? " is-asking" : ""}`} disabled={!eatLater && (good === null || (sharing && !shareWhy))} onClick={() => { if (eatCal) { setEndCal(null); return; } liveSave(); }}>{sharing && !eatLater ? w("make.saveShare", { coach: p.coachLabel }) : w("make.save")}</button>}
       {!bigAsk && !p.sameAsk && eatCal && <div className="eat-cal">{eatCal}</div>}
 
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>{w("make.shareWith", { coach: p.coachLabel })}</button>}

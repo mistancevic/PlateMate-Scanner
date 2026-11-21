@@ -14,9 +14,10 @@ export type PlateEndIn = {
   savedAs: string | null;
   onSave: () => void; onPlan: () => void; onAte: () => void;
   // B151 (0.3.171, board B151): the end of a plate you build yourself. The pencil already said whether it counts or is a
-  // plan, so there is no question, no Plan it and no Ate it: Prepare it (Prepare it again once it is eaten; null when the
+  // plan, so there is no question, no Plan it and no Ate it: Prepare it (null when the
   // plate has its own button to prepare it) and Save it to My recipes as the last step
-  live?: { prepare: (() => void) | null; again: boolean };
+  // B154 (0.3.172): Prepare it says the same on every plate; Prepare it again is gone
+  live?: { prepare: (() => void) | null };
 };
 
 export function plateEnd(given: PlateEndIn) {
@@ -24,7 +25,7 @@ export function plateEnd(given: PlateEndIn) {
   const as = savedAs ? w("plate.savedAs", { title: "\u0001" }).split("\u0001") : null;
   if (live) return (
     <div className="plate-end plate-end-live">
-      {live.prepare && <button type="button" className="pill pill-wide prepare-it" onClick={live.prepare}>{live.again ? w("plate.prepareAgain") : w("plate.prepare")}</button>}
+      {live.prepare && <button type="button" className="pill pill-wide prepare-it" onClick={live.prepare}>{w("plate.prepare")}</button>}
       <button type="button" className="pill pill-wide pe-save" disabled={saved} onClick={onSave}>{saved ? w("recipes.savedInMyRecipes") : w("plate.saveToMyRecipes")}</button>
       {saved && as && <small className="plate-end-saved">{as[0]}<b>{savedAs}</b>{as[1] ?? ""}</small>}
     </div>);

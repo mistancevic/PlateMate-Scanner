@@ -22889,10 +22889,6 @@
       "text": "{meal} već ima: {title}.",
       "checked": false
     },
-    "plate.prepareAgain": {
-      "text": "Pripremi ponovo ›",
-      "checked": false
-    },
     "plate.saveToMyRecipes": {
       "text": "Sačuvaj u Moje recepte",
       "checked": false
