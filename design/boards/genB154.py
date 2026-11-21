@@ -30,7 +30,7 @@ def shot(x, y, name, w, title, status, note):
 B = Board(); PW = 390; G = 70
 W = SX + 7 * PW + 6 * G + 40
 parts = [("Ticket", "B154. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: B154, canvas Page 5."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> The yellow strip on every screen is the time on the phone, the time the meals are compared with: Sunday 15 November 2026, 13:50. Lunch is at 13:45. B154.1: the flow as it is today, from the tap on Lunch to Today. B154.2: the same flow, new, every screen. A screen that stays is marked No change; a blue outline marks what is new."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> The yellow strip on every screen is the time on the phone, the time the meals are compared with: Sunday 15 November 2026, 13:50. Lunch is at 13:45. B154.1: the flow as it is today, from the tap on Lunch to Today. B154.2: the same flow, new, every screen. B154.3 to B154.5: the other answers on Eat, as branches from B154.2e. A screen that stays is marked No change; a blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "21 November 13:41: such meals are anyway saved and should be taken from there. So Prepare it is just a click away because it is in the recipe."),
@@ -66,6 +66,18 @@ bs = [shot(X(0), y2, "2a", PW, "B154.2a Lunch tapped", "same", "The pencil logs 
   shot(X(4), y2, "2e", PW, "B154.2e Eat", "same", "All of it, DaaM good, Save."),
   shot(X(5), y2, "2f", PW, "B154.2f Today", "changed", "Lunch holds the plate once.")]
 for i in range(1, 6): arrow(X(i) - G + 2, y2 + 540)
+y3 = max(bs) + 70
+label(y3, "B154.3 New, A portion", "branch from B154.2e", 0, 2)
+label(y3, "B154.4 New, Later today", "branch from B154.2e", 2, 2)
+label(y3, "B154.5 New, Not after all", "branch from B154.2e", 4, 2)
+y3 += 60
+bs = [shot(X(0), y3, "3a", PW, "B154.3a Eat, A portion", "same", "It makes 2. Save."),
+  shot(X(1), y3, "3b", PW, "B154.3b Today", "changed", "Lunch holds the portion I ate."),
+  shot(X(2), y3, "4a", PW, "B154.4a Eat, Later today", "same", "Save."),
+  shot(X(3), y3, "4b", PW, "B154.4b Today", "changed", "Out of Lunch; the cook waits."),
+  shot(X(4), y3, "5a", PW, "B154.5a Eat, Not after all", "same", "Save."),
+  shot(X(5), y3, "5b", PW, "B154.5b Today", "changed", "Out of Lunch; nothing logged.")]
+for i in (1, 3, 5): arrow(X(i) - G + 2, y3 + 540)
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40

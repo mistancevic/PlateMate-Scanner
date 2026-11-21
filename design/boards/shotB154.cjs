@@ -9,7 +9,40 @@ const R = process.env.BOARDS_SHOTS || "/home/claude/boards/rs154";
 const MARK = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px";
 const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-size:14px;line-height:1.45;color:#172742;font-family:Nunito,system-ui,sans-serif;font-weight:400;text-align:left;position:relative;z-index:5`;
 (async () => { const h = await start("3688"); try {
-  for (const flow of (process.env.ONLY || "1,2").split(",")) {
+  // B154.3 to B154.5: the other answers to How much did you eat?, on the new flow, branches from B154.2e
+  for (const [id, ch] of (process.env.ONLY && process.env.ONLY !== "b" ? [] : [["3", "A portion"], ["4", "Later today"], ["5", "Not after all"]])) {
+    const p = await h.open({ time: "2026-11-15T13:50:00+01:00" });
+    await p.evaluate(() => localStorage.setItem("board-new", "1")); await p.reload(); await p.waitForTimeout(1500);
+    await p.addStyleTag({ content: ".chat-fab { display: none !important }" });
+    const note = (sel, html, marks = []) => p.evaluate(([sel, html, marks, MARK, NOTE]) => { for (const m of marks) document.querySelector(m).style.cssText += ";" + MARK; const n = document.createElement("div"); n.className = "board-note"; n.style.cssText = NOTE; n.innerHTML = html; document.querySelector(sel).insertAdjacentElement("afterend", n); }, [sel, html, marks, MARK, NOTE]);
+    const clean = () => p.evaluate(() => { document.querySelectorAll(".board-note").forEach((n) => n.remove()); document.querySelectorAll("[style*='outline: 3px']").forEach((e) => (e.style.outline = "")); });
+    const at = (sel, off = 120) => p.evaluate(([sel, off]) => { const e = document.querySelector(sel); window.scrollTo(0, Math.max(0, e.getBoundingClientRect().top + scrollY - off)); }, [sel, off]);
+    const shot = async (name) => { await p.waitForTimeout(350); await p.screenshot({ path: `${R}/${name}.png` }); console.log(name); };
+    await p.locator(".plan-line-pen").first().click(); await p.waitForTimeout(600);
+    await p.locator(".meal-line-open .pcal-row").filter({ hasText: "Lunch" }).first().click(); await p.waitForTimeout(600); await p.locator(".plan-line-close").first().click(); await p.waitForTimeout(400);
+    await p.locator(".plate-end .prepare-it").click(); await p.waitForTimeout(1200);
+    await p.locator(".way").first().click(); await p.getByRole("button", { name: "Make it this way ›" }).click(); await p.waitForTimeout(900);
+    await p.getByRole("button", { name: /^Cooked\. Next: Eat/ }).click(); await p.waitForTimeout(800);
+    const btn = p.getByRole("button", { name: ch, exact: true });
+    await btn.evaluate((e) => e.id = "board-ch"); await p.locator("#board-ch").click(); await p.waitForTimeout(500);
+    if (id === "3") { await p.getByRole("button", { name: "DaaM good" }).click(); await p.waitForTimeout(300); const mk = p.locator(".rq-makes input").first(); if (await mk.count()) await mk.fill("2"); await p.waitForTimeout(400); }
+    await p.evaluate(() => window.scrollTo(0, 0));
+    const lines = { "3": "<b>No change on the screen:</b> I choose A portion, and say it makes 2. I tap Save.", "4": "<b>No change on the screen:</b> I cooked it and eat it later today. I tap Save.", "5": "<b>No change on the screen:</b> I did not eat it after all. I tap Save." };
+    await p.evaluate(([html, MARK, NOTE]) => { const b = document.getElementById("board-ch"); b.style.cssText += ";" + MARK; const n = document.createElement("div"); n.className = "board-note"; n.style.cssText = NOTE; n.innerHTML = html; b.parentElement.insertAdjacentElement("afterend", n); }, [lines[id], MARK, NOTE]);
+    await shot(`${id}a`); await clean();
+    await p.locator(".eat-save").click(); await p.waitForTimeout(1200);
+    await h.tab(p, "Today"); await p.waitForTimeout(600); await p.evaluate(() => window.scrollTo(0, 0));
+    console.log(id, (await h.main(p)).slice(150, 800)); console.log((await h.st(p)).feedback.map((f) => [f.status, f.slot?.slotId, f.meal.title, Math.round(f.meal.items.reduce((n, i) => n + i.grams, 0)), f.left]));
+    const find = { "3": "^Today's meals", "4": "^Or one from your batch", "5": "^Nothing planned or eaten yet today" }[id];
+    await p.evaluate((re) => { const all = [...document.querySelectorAll("main *")].filter((x) => new RegExp(re).test((x.textContent || "").trim())); const e = all[all.length - 1]; if (e) (e.closest("section") || e.parentElement).id = "board-at"; }, find);
+    const says = { "3": "<b>New:</b> Lunch holds the one portion I ate, 281 kcal, at 13:45. The recipe says it makes 2, as for any cook.", "4": "<b>New:</b> the plate is out of Lunch again: nothing is logged. The cooked meal waits here with I ate it, as for any cook kept for later.", "5": "<b>New:</b> the plate is out of Lunch again: nothing is logged, and nothing waits." }[id];
+    if (id === "4") { await p.evaluate(() => { const o = document.getElementById("board-at"); if (o) o.removeAttribute("id"); }); const b = p.getByRole("button", { name: "I ate it" }).first(); if (await b.count()) await b.evaluate((e) => { (e.closest("section") || e.closest(".card") || e.parentElement.parentElement).id = "board-at"; }); }
+    await p.waitForTimeout(4500);
+    if (await p.locator("#board-at").count()) { await at("#board-at", id === "3" ? 330 : 200); await note("#board-at", says, ["#board-at"]); } else { await note("main", says); }
+    await shot(`${id}b`); await clean();
+    await p.context().close();
+  }
+  for (const flow of (process.env.ONLY === "b" ? [] : (process.env.ONLY || "1,2").split(","))) {
     const p = await h.open({ time: "2026-11-15T13:50:00+01:00" });
     await p.evaluate((f) => { if (f === "2") localStorage.setItem("board-new", "1"); else localStorage.removeItem("board-new"); }, flow); await p.reload(); await p.waitForTimeout(1500);
     await p.addStyleTag({ content: ".chat-fab { display: none !important }" });

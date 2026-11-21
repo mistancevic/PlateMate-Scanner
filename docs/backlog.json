@@ -2879,20 +2879,25 @@
         {
           "id": "AC5",
           "title": "A portion changes the logged meal",
-          "text": "Given the plate is logged in Lunch as a whole, when I choose A portion on Eat and tap Save, then Lunch holds the portion I ate, and the rest waits on Today as it does for any cook"
+          "text": "Given the plate is logged in Lunch as a whole, when I choose A portion on Eat, say it makes 2 and tap Save, then Lunch holds the one portion I ate, and the recipe says it makes 2 as for any cook"
         },
         {
           "id": "AC6",
-          "title": "Not eaten after all",
-          "text": "Given the plate is logged in Lunch, when I choose Later today or Not after all on Eat and tap Save, then the plate is out of Lunch again, and the cook is kept as it is for any cook"
+          "title": "Later today",
+          "text": "Given the plate is logged in Lunch, when I choose Later today on Eat and tap Save, then the plate is out of Lunch again, and the cooked meal waits on Today with I ate it as for any cook kept for later"
         },
         {
           "id": "AC7",
+          "title": "Not after all",
+          "text": "Given the plate is logged in Lunch, when I choose Not after all on Eat and tap Save, then the plate is out of Lunch again, and nothing is logged and nothing waits"
+        },
+        {
+          "id": "AC8",
           "title": "The recipe is saved as today",
           "text": "Given Yes, save it is chosen on Eat, when I tap Save, then the recipe is in My recipes with its steps and this cook, as for any cook"
         },
         {
-          "id": "AC8",
+          "id": "AC9",
           "title": "The same foods another time",
           "text": "Given Lunch is eaten and saved, when I open it on Today and tap Cook again, then the foods are on the Plate as a new plate with no meal set, as today"
         }
@@ -2906,7 +2911,7 @@
         "Cook again and Put it on the Plate again on an eaten meal: a new plate."
       ],
       "decision": "Open. Drawn 21 November 2026 for Coach Milan's look. No Go, so nothing is built.",
-      "checks": "Area: the Plate and the cook. The unit tests, the build, new checks for AC1 to AC8 in the pencil's walkthrough, and every walkthrough that goes through Prepare it, Make or Eat, about 15 minutes. One line leaves the app (Prepare it again) and none is new, so no German sweep."
+      "checks": "Area: the Plate and the cook. The unit tests, the build, new checks for AC1 to AC9 in the pencil's walkthrough, and every walkthrough that goes through Prepare it, Make or Eat, about 15 minutes. One line leaves the app (Prepare it again) and none is new, so no German sweep."
     }
   ]
 }
