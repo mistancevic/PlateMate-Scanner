@@ -1,90 +1,92 @@
 {
-  "id": "B151",
-  "title": "The pencil sets the meal, the day and the time; the clock decides whether it counts or is a plan",
-  "epic": "plate",
-  "state": "now",
-  "board": "Stories261",
-  "where": "Page 5",
-  "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow. 18:57 to 19:21: the situations; a fixed set of actions, never a button that turns into a status; no scroll on a tap, ask where it happens; a summary of the plate before What do you do with it?; draw it. 20:02 to 20:08: Now (Prepare it, Ate it) and Later (Save it); Plan it from My recipes, its own ticket DT332; the meal chip only chooses, Log it logs; Eaten on the meal line, not a tag. 20:21: horrible, literal, circling. Change where the question is asked; the meal and date already say plan, log or eaten; set it in the pencil block. 20:23: Already eaten, then we tell it will count there and the math recalculates. Yes, draw. 20:37 to 20:50: much better; the question becomes When do you eat it? with eaten, now, later; nothing counts without a tap that says so; the Recorded line, taking it back, a meal that already holds something. Draw and we will see. 20:59 to 21:03: Dinner showed Planned before anything was said; the chips depend on the day and the meal; one possible answer is a conclusion, not a chip; the date and time on every screen. 22:56: the strip must say the time the meals are compared with; a meal still ahead cannot be Already ate it; an eaten plate keeps Prepare it, as Prepare it again. 21 November 10:46 to 10:53: a meal in the past is logging, so no other answer; what is the purpose of the question and of a window around now? None. Time alone decides; a plan is asked about on Today when its time comes. Yes, redraw. 11:10 to 11:12: the blue Recorded box repeats the line above in undefined words, remove it; when Prepare it holds.",
-  "opportunity": {
-    "from": "Coach Milan's own look at the B151 board and the app, 18 and 20 November 2026.",
-    "job": "At the end of a plate, log what I ate in one tap, and later see at a glance that the meal is eaten.",
-    "kind": "Too many steps, and did not understand it: the meal is chosen in two places, and the tap on Ate it changes nothing you can see.",
-    "why_now": "Every plate ends here, so every meal logged goes through it."
+ "id": "B151",
+ "title": "The pencil sets the meal, the day and the time; the clock decides whether it counts or is a plan",
+ "epic": "plate",
+ "state": "done",
+ "board": "Stories261",
+ "where": "Page 5",
+ "why": "Coach Milan 18 November 19:51: Ate it shows as a blue chip; is it a button or a status? 20 November 16:05: Ate it is clicked and nothing changed. 16:08: the flow with the question and the chips is not UX; rethink the flow and the design. 16:13: yes to the rethought flow. 18:57 to 19:21: the situations; a fixed set of actions, never a button that turns into a status; no scroll on a tap, ask where it happens; a summary of the plate before What do you do with it?; draw it. 20:02 to 20:08: Now (Prepare it, Ate it) and Later (Save it); Plan it from My recipes, its own ticket DT332; the meal chip only chooses, Log it logs; Eaten on the meal line, not a tag. 20:21: horrible, literal, circling. Change where the question is asked; the meal and date already say plan, log or eaten; set it in the pencil block. 20:23: Already eaten, then we tell it will count there and the math recalculates. Yes, draw. 20:37 to 20:50: much better; the question becomes When do you eat it? with eaten, now, later; nothing counts without a tap that says so; the Recorded line, taking it back, a meal that already holds something. Draw and we will see. 20:59 to 21:03: Dinner showed Planned before anything was said; the chips depend on the day and the meal; one possible answer is a conclusion, not a chip; the date and time on every screen. 22:56: the strip must say the time the meals are compared with; a meal still ahead cannot be Already ate it; an eaten plate keeps Prepare it, as Prepare it again. 21 November 10:46 to 10:53: a meal in the past is logging, so no other answer; what is the purpose of the question and of a window around now? None. Time alone decides; a plan is asked about on Today when its time comes. Yes, redraw. 11:10 to 11:12: the blue Recorded box repeats the line above in undefined words, remove it; when Prepare it holds.",
+ "opportunity": {
+  "from": "Coach Milan's own look at the B151 board and the app, 18 and 20 November 2026.",
+  "job": "At the end of a plate, log what I ate in one tap, and later see at a glance that the meal is eaten.",
+  "kind": "Too many steps, and did not understand it: the meal is chosen in two places, and the tap on Ate it changes nothing you can see.",
+  "why_now": "Every plate ends here, so every meal logged goes through it."
+ },
+ "problem": "At the end of a plate the app asks What do you do with it? and Ate it or Plan it open a second calendar. But the meal and the day already say most of it: a coming meal is a plan, a past one was eaten. The question is asked in the wrong place, and the meal is chosen twice.",
+ "story": "When I set the meal, the day and the time of my plate, I want that to be the whole decision, so that the plate is logged or planned without being asked anything.",
+ "now": "The pencil block sets meal and day only. The end asks What do you do with it? with Save it, Plan it, Ate it; Plan it and Ate it open a second calendar.",
+ "proposed": "The pencil block sets the day, the meal and its time, and asks nothing. The clock on the phone decides. A meal whose time is now or earlier, today or on a past day, is logging: the plate counts in that meal and the day is calculated again. A meal still ahead, today or on a coming day, is a plan: nothing counts yet, and Today asks if you ate it when its time comes, as it does now. One line under the meals says which of the two. To eat a meal earlier than set, change its time in the field next to it. Edit mode saves by itself, so the tap on the meal alone logs or plans the plate; No meal selected takes it back. The top line repeats it: Planned, or Eaten with the words Changes to this plate change this meal. No second line under it. A meal that already holds a dish asks right there: Replace it, or Add a dish. The end of the plate has no question, no Ate it and no Plan it: Prepare it for a plate with no meal or a planned one; Prepare it again for an eaten plate, which cooks the same foods as a new cook and leaves the logged meal as it is; no button for a finished dish with nothing to cook, as today. Save it to My recipes is the last step.",
+ "looked_at": "Earlier drawings of this ticket, all set aside 20:21: a guess at the top; a summary with Now and Later groups; a meal question under Ate it with Log it. Time alone deciding, with a question only for the meal that is now: not chosen, a late lunch eaten now needs a way to say so. An Eaten switch on the meal's row: not chosen, one fixed row reads clearer. Is it eaten? with Planned, Eating now, Already eaten, then with Not yet and Yes: not chosen, eating now did not fit a yes or no. A pre-set that counts by itself for the meal the clock is in: not chosen, a tap on a meal would count the plate before the row is read. Every meal of today starting on Later: not chosen, the app said Planned for a dinner already eaten. A single chip where one answer is possible: not chosen, that is a conclusion, not a question. Already ate it for a meal still ahead (a dinner eaten early): not chosen, 22:56, a meal in the future cannot be eaten; the time field or Now covers it. The question When do you eat it? with its chips, in every form: not chosen, 21 November, the time already answers it. A window around now (an hour before, or 90 minutes after): not chosen, now and past do the same thing, so the window gives nothing. The app's Recorded line under the top line: not chosen, 21 November 11:10, it repeats the line above and says here and there.",
+ "decision": "Go, Coach Milan 21 November 11:26, checks: Full. Built in 0.3.171.",
+ "ac": [
+  {
+   "id": "AC1",
+   "title": "A meal in the past counts",
+   "text": "Given it is Sunday 18:00 and skyr, oats and a banana are on the Plate, when I open the pencil and tap today's Lunch at 13:45, then there is no question, the line says This counts in today's Lunch. Your day is calculated again, and Lunch on Today holds the plate at 13:45"
   },
-  "problem": "At the end of a plate the app asks What do you do with it? and Ate it or Plan it open a second calendar. But the meal and the day already say most of it: a coming meal is a plan, a past one was eaten. The question is asked in the wrong place, and the meal is chosen twice.",
-  "story": "When I set the meal, the day and the time of my plate, I want that to be the whole decision, so that the plate is logged or planned without being asked anything.",
-  "now": "The pencil block sets meal and day only. The end asks What do you do with it? with Save it, Plan it, Ate it; Plan it and Ate it open a second calendar.",
-  "proposed": "The pencil block sets the day, the meal and its time, and asks nothing. The clock on the phone decides. A meal whose time is now or earlier, today or on a past day, is logging: the plate counts in that meal and the day is calculated again. A meal still ahead, today or on a coming day, is a plan: nothing counts yet, and Today asks if you ate it when its time comes, as it does now. One line under the meals says which of the two. To eat a meal earlier than set, change its time in the field next to it. Edit mode saves by itself, so the tap on the meal alone logs or plans the plate; No meal selected takes it back. The top line repeats it: Planned, or Eaten with the words Changes to this plate change this meal. No second line under it. A meal that already holds a dish asks right there: Replace it, or Add a dish. The end of the plate has no question, no Ate it and no Plan it: Prepare it for a plate with no meal or a planned one; Prepare it again for an eaten plate, which cooks the same foods as a new cook and leaves the logged meal as it is; no button for a finished dish with nothing to cook, as today. Save it to My recipes is the last step.",
-  "looked_at": "Earlier drawings of this ticket, all set aside 20:21: a guess at the top; a summary with Now and Later groups; a meal question under Ate it with Log it. Time alone deciding, with a question only for the meal that is now: not chosen, a late lunch eaten now needs a way to say so. An Eaten switch on the meal's row: not chosen, one fixed row reads clearer. Is it eaten? with Planned, Eating now, Already eaten, then with Not yet and Yes: not chosen, eating now did not fit a yes or no. A pre-set that counts by itself for the meal the clock is in: not chosen, a tap on a meal would count the plate before the row is read. Every meal of today starting on Later: not chosen, the app said Planned for a dinner already eaten. A single chip where one answer is possible: not chosen, that is a conclusion, not a question. Already ate it for a meal still ahead (a dinner eaten early): not chosen, 22:56, a meal in the future cannot be eaten; the time field or Now covers it. The question When do you eat it? with its chips, in every form: not chosen, 21 November, the time already answers it. A window around now (an hour before, or 90 minutes after): not chosen, now and past do the same thing, so the window gives nothing. The app's Recorded line under the top line: not chosen, 21 November 11:10, it repeats the line above and says here and there.",
-  "decision": "Coach Milan 21 November 11:12: yes, without the Recorded box and with the Prepare it rule. Waits for his look.",
-  "ac": [
-    {
-      "id": "AC1",
-      "title": "A meal in the past counts",
-      "text": "Given it is Sunday 18:00 and skyr, oats and a banana are on the Plate, when I open the pencil and tap today's Lunch at 13:45, then there is no question, the line says This counts in today's Lunch. Your day is calculated again, and Lunch on Today holds the plate at 13:45"
-    },
-    {
-      "id": "AC2",
-      "title": "A meal still ahead is a plan",
-      "text": "Given it is Sunday 18:00, when I tap today's Dinner at 20:00, then there is no question, the line says it goes into today's Dinner in my plan and Today will ask if I ate it, and nothing counts"
-    },
-    {
-      "id": "AC3",
-      "title": "Today asks when the time comes",
-      "text": "Given the plate is planned for today's Dinner at 20:00, when it is past 20:00, then Today asks if I ate it, as it does for any planned meal"
-    },
-    {
-      "id": "AC4",
-      "title": "Changing the time changes it",
-      "text": "Given today's Dinner at 20:00 is a plan, when I set its time to 18:00 in the field, then the line says it counts in today's Dinner and it is counted at 18:00"
-    },
-    {
-      "id": "AC5",
-      "title": "A coming day is a plan",
-      "text": "Given I tap Monday and Lunch, when I read the line, then it says the plate goes into Monday's Lunch in my plan, and it is in the Plan"
-    },
-    {
-      "id": "AC6",
-      "title": "A past day counts",
-      "text": "Given I tap Saturday and Dinner, when I read the line, then it says it counts in Saturday's Dinner, and it is counted there"
-    },
-    {
-      "id": "AC7",
-      "title": "Changes follow, and the top line says so",
-      "text": "Given the plate counts in today's Lunch, when I close the pencil, then the top line says Eaten. Changes to this plate change this meal, there is no second line under it, and a change of the banana changes Lunch on Today"
-    },
-    {
-      "id": "AC8",
-      "title": "Taking it back",
-      "text": "Given the plate counts in today's Lunch, when I tap No meal selected, then it is out of Lunch again and the line says Taken out again. Nothing counts"
-    },
-    {
-      "id": "AC9",
-      "title": "A meal that holds a dish asks",
-      "text": "Given today's Lunch already holds chicken, rice and greens, when I tap Lunch, then the block says so and offers Replace it and Add a dish"
-    },
-    {
-      "id": "AC10",
-      "title": "Prepare it, by the plate's status",
-      "text": "Given a plate with no meal or a planned one, when I reach its end, then the button says Prepare it; given an eaten plate, then it says Prepare it again, it cooks the same foods as a new cook and the logged meal stays; in both there is Save it to My recipes and no question, no Ate it and no Plan it"
-    }
-  ],
-  "unchanged": [
-    "The days, the meals, the meal's time field and No meal selected in the pencil block; the X closes it.",
-    "What is it? and the moment, under the block.",
-    "What Prepare it does, and what Save it puts into My recipes.",
-    "Today and the Plan: how an eaten and a planned meal show there, and Today's question about a planned meal whose time has come.",
-    "A plate from a photo (the read and Did you eat it?) and a plate from earlier (DT314), as now."
-  ],
-  "checks": "Full: this changes how every plate is planned and logged, so all walkthroughs, about 45 minutes, plus the unit tests, the build and a new walkthrough for AC1 to AC10. The walkthroughs that tap the old chips and the calendar under Ate it change with this approved board. New words, so the German sweep too.",
-  "short": "The pencil sets the meal, the day and the time; the clock decides",
-  "rel": "Redrawn; not agreed until Coach Milan says Go",
-  "boardTitle": "B151: the pencil sets the meal, the day and the time. The clock decides: it counts, or it is a plan",
-  "details": [
-    "The pictures are the real app with the phone's clock at Sunday 15 November 2026, 18:00 (the strip on every screen): Lunch was at 13:45, Dinner is at 20:00. One scratch build of 0.3.170, not committed. The scratch shows the lines; the counting and planning behind them are not built, so Today (B151.2f) is shown from a record put in by hand, and the dish Lunch already holds (B151.7b) is put in by a flag.",
-    "The new words are English drafts: This counts in today's Lunch. Your day is calculated again. This goes into today's Dinner in your plan. Nothing counts yet. Today will ask if you ate it. Taken out again. Nothing counts. You are just looking. Eaten. Changes to this plate change this meal. Lunch already holds ... . Prepare it again. Save it to My recipes.",
-    "Snack has no time of its own, so it counts as now.",
-    "Not drawn: Today's question for a planned meal whose time has come (AC3); it is the app's own, unchanged."
-  ]
+  {
+   "id": "AC2",
+   "title": "A meal still ahead is a plan",
+   "text": "Given it is Sunday 18:00, when I tap today's Dinner at 20:00, then there is no question, the line says it goes into today's Dinner in my plan and Today will ask if I ate it, and nothing counts"
+  },
+  {
+   "id": "AC3",
+   "title": "Today asks when the time comes",
+   "text": "Given the plate is planned for today's Dinner at 20:00, when it is past 20:00, then Today asks if I ate it, as it does for any planned meal"
+  },
+  {
+   "id": "AC4",
+   "title": "Changing the time changes it",
+   "text": "Given today's Dinner at 20:00 is a plan, when I set its time to 18:00 in the field, then the line says it counts in today's Dinner and it is counted at 18:00"
+  },
+  {
+   "id": "AC5",
+   "title": "A coming day is a plan",
+   "text": "Given I tap Monday and Lunch, when I read the line, then it says the plate goes into Monday's Lunch in my plan, and it is in the Plan"
+  },
+  {
+   "id": "AC6",
+   "title": "A past day counts",
+   "text": "Given I tap Saturday and Dinner, when I read the line, then it says it counts in Saturday's Dinner, and it is counted there"
+  },
+  {
+   "id": "AC7",
+   "title": "Changes follow, and the top line says so",
+   "text": "Given the plate counts in today's Lunch, when I close the pencil, then the top line says Eaten. Changes to this plate change this meal, there is no second line under it, and a change of the banana changes Lunch on Today"
+  },
+  {
+   "id": "AC8",
+   "title": "Taking it back",
+   "text": "Given the plate counts in today's Lunch, when I tap No meal selected, then it is out of Lunch again and the line says Taken out again. Nothing counts"
+  },
+  {
+   "id": "AC9",
+   "title": "A meal that holds a dish asks",
+   "text": "Given today's Lunch already holds chicken, rice and greens, when I tap Lunch, then the block says so and offers Replace it and Add a dish"
+  },
+  {
+   "id": "AC10",
+   "title": "Prepare it, by the plate's status",
+   "text": "Given a plate with no meal or a planned one, when I reach its end, then the button says Prepare it; given an eaten plate, then it says Prepare it again, it cooks the same foods as a new cook and the logged meal stays; in both there is Save it to My recipes and no question, no Ate it and no Plan it"
+  }
+ ],
+ "unchanged": [
+  "The days, the meals, the meal's time field and No meal selected in the pencil block; the X closes it.",
+  "What is it? and the moment, under the block.",
+  "What Prepare it does, and what Save it puts into My recipes.",
+  "Today and the Plan: how an eaten and a planned meal show there, and Today's question about a planned meal whose time has come.",
+  "A plate from a photo (the read and Did you eat it?) and a plate from earlier (DT314), as now."
+ ],
+ "checks": "Full: this changes how every plate is planned and logged, so all walkthroughs, about 45 minutes, plus the unit tests, the build and a new walkthrough for AC1 to AC10. The walkthroughs that tap the old chips and the calendar under Ate it change with this approved board. New words, so the German sweep too.",
+ "short": "The pencil sets the meal, the day and the time; the clock decides",
+ "rel": "Built in 0.3.171",
+ "boardTitle": "B151: the pencil sets the meal, the day and the time. The clock decides: it counts, or it is a plan",
+ "details": [
+  "The pictures are the real app with the phone's clock at Sunday 15 November 2026, 18:00 (the strip on every screen): Lunch was at 13:45, Dinner is at 20:00. One scratch build of 0.3.170, not committed. The scratch shows the lines; the counting and planning behind them are not built, so Today (B151.2f) is shown from a record put in by hand, and the dish Lunch already holds (B151.7b) is put in by a flag.",
+  "The new words are English drafts: This counts in today's Lunch. Your day is calculated again. This goes into today's Dinner in your plan. Nothing counts yet. Today will ask if you ate it. Taken out again. Nothing counts. You are just looking. Eaten. Changes to this plate change this meal. Lunch already holds ... . Prepare it again. Save it to My recipes.",
+  "Snack has no time of its own, so it counts as now.",
+  "Not drawn: Today's question for a planned meal whose time has come (AC3); it is the app's own, unchanged.",
+  "Built in 0.3.171 as drawn. Two things the build added where the board was silent: until Replace it or Add as another dish is tapped, the plate is one more dish in that meal; an emptied plate is a new plate with no meal set, and what was logged or planned stays."
+ ],
+ "version": "0.3.171"
 }
