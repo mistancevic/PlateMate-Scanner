@@ -1645,10 +1645,19 @@
       "story": "When I add public content to chefmealan.com, I want the app to live under one address of its own, so that everything outside it is public by rule and nothing in the app is found or indexed by accident.",
       "proposed": "Public pages stay at the top level in folders: /, /recipes and a recipe's page, /explorer, /blog, /about, /built, the legal pages. The app moves under /app: /app/today, /app/plan, /app/plate, /app/recipes, /app/explorer, /app/clients, with the Menu. The old app addresses redirect to the new ones. Search engines are told to leave /app alone. A folder, not app.chefmealan.com: the phones keep their sign-in, the photos kept on the phone and the home-screen icon, one sign-in serves both sides, and it stays one server and one deploy. A subdomain stays possible later with a redirect.",
       "open": [
-        "Which Explorer pages become public, and at which addresses (their own ticket when decided).",
-        "The blog: where its pages are written and kept (its own ticket).",
-        "The installed app on a phone's home screen: check that its start address and scope move to /app without a reinstall.",
-        "Links already sent to testers and clients (invites, recipe links, the coach code link): each needs its redirect checked."
+        "Explorer: which pages become public, at which addresses, and whether a public Explorer page is the same page as in the app or a version of its own.",
+        "The blog: where its pages are written and kept, who writes them, and in which languages.",
+        "Recipes: /recipes is the public list and a recipe's public page; the app's own Recipes moves to /app/recipes. Is one word for both places clear enough?",
+        "Languages: today the language is in the address (/sr, /de). How it combines with the folder: /sr/app, /app with the language from the settings, or both.",
+        "The first address: where chefmealan.com sends a signed-in person, the home page or straight to /app/today.",
+        "The installed app on a phone's home screen: whether its start address and scope move to /app without a reinstall.",
+        "Links already out: invites, the coach code link, the join form's emails, shared recipe links, the Share QR codes. Each needs its redirect, and a decision on how long redirects stay.",
+        "Sign-in and connections: the return addresses of the sign-in provider and of the Google Calendar connection have to name the new addresses.",
+        "Search engines: the sitemap, which public pages are listed, /app marked as not to be indexed, and what happens to app addresses already indexed.",
+        "Metrics: whether page counts are split into public and app.",
+        "How to texts and the walkthroughs that name or open addresses: all change with the move.",
+        "Preview: the same address plan there, so a release can be checked before it is promoted.",
+        "Timing: before the first public Explorer or blog page, or together with it."
       ],
       "checks": "Full, when built: every walkthrough opens the app by address, so all of them run, plus a new one for the redirects.",
       "decision": "Direction agreed 21 November 2026. To be drawn (the address map, now and new) before any code."
