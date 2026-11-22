@@ -22863,87 +22863,87 @@
     },
     "plate.liveCounts": {
       "text": "Ovo se računa u: {slot}. Tvoj dan se ponovo izračunava.",
-      "checked": false
+      "checked": true
     },
     "plate.livePlan": {
       "text": "Ovo ide u tvoj plan: {slot}. Još se ništa ne računa. Danas će pitati da li je pojedeno.",
-      "checked": false
+      "checked": true
     },
     "plate.liveLooking": {
       "text": "Ništa se ne računa. Samo gledaš.",
-      "checked": false
+      "checked": true
     },
     "plate.liveBack": {
       "text": "Ponovo izvađeno. Ništa se ne računa. Samo gledaš.",
-      "checked": false
+      "checked": true
     },
     "plate.liveEaten": {
       "text": "Pojedeno. Izmene na ovom tanjiru menjaju ovaj obrok.",
-      "checked": false
+      "checked": true
     },
     "plate.livePlanned": {
       "text": "Isplanirano",
-      "checked": false
+      "checked": true
     },
     "plate.liveHolds": {
       "text": "{meal} već ima: {title}.",
-      "checked": false
+      "checked": true
     },
     "plate.saveToMyRecipes": {
       "text": "Sačuvaj u Moje recepte",
-      "checked": false
+      "checked": true
     },
     "coach.reqClient": {
       "text": "Već je klijent",
-      "checked": false
+      "checked": true
     },
     "coach.reqInvitedOpen": {
       "text": "Poziv poslat {date}. Kod još nije iskorišćen.",
-      "checked": false
+      "checked": true
     },
     "coach.reqSendCode": {
       "text": "Pošalji kod ponovo",
-      "checked": false
+      "checked": true
     },
     "coach.reqSendSignIn": {
       "text": "Pošalji kako se prijaviti",
-      "checked": false
+      "checked": true
     },
     "app.zeroTea": {
       "text": "Čaj nema skoro nimalo kalorija, pa se čuva sa 0 kcal.",
-      "checked": false
+      "checked": true
     },
     "app.zeroCoffee": {
       "text": "Kafa nema skoro nimalo kalorija, pa se čuva sa 0 kcal.",
-      "checked": false
+      "checked": true
     },
     "app.zeroWater": {
       "text": "Voda nema kalorija, pa se čuva sa 0 kcal.",
-      "checked": false
+      "checked": true
     },
     "app.zeroSalt": {
       "text": "So nema kalorija, pa se čuva sa 0 kcal.",
-      "checked": false
+      "checked": true
     },
     "app.noPdZero": {
       "text": "Nema PD: ima 0 kcal.",
-      "checked": false
+      "checked": true
     },
     "app.noValuesOnPack": {
       "text": "Na pakovanju nema vrednosti.",
-      "checked": false
+      "checked": true
     },
     "app.dbNoValues": {
       "text": "Barkod nema vrednosti za ovaj proizvod. Zatvori ovo, pa kamerom na Deklaraciji skeniraj tabelu nutritivnih vrednosti.",
-      "checked": false
+      "checked": true
     },
     "plate.kcalGramsPd": {
       "text": "{kcal} kcal · {grams} g · {pd}",
-      "checked": false
+      "checked": true
     },
     "plate.whichMealFirst": {
       "text": "Koji je ovo obrok? Izaberi ga, i Chef Mealan nalazi ideje za njega.",
-      "checked": false
+      "checked": true
     }
   }
 }
