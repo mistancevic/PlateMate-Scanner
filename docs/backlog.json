@@ -2931,7 +2931,7 @@
       "title": "A tea, coffee or water with no values on its pack is saved as 0, without a question",
       "epic": "plate",
       "state": "next",
-      "why": "Coach Milan 22 November 2026, 16:22 to 17:35, after an onboarding call: a tester scanned a tea; the barcode was read right, but it could not be saved because there were no values. A zero food is already a real food (sweeteners, 0.2.21; zero cola). Drinks and spices can be part of a dish, not only on the side (his brownie with zero cola). 17:35: for a food that is obviously 0 kcal like a tea, no question and no other check; it is noted as a tea or similar and saved; asking to confirm would sound weird.",
+      "why": "Coach Milan 22 November 2026, 16:22 to 17:35, after an onboarding call: a tester scanned a tea; the barcode was read right, but it could not be saved because there were no values. A zero food is already a real food (sweeteners, 0.2.21; zero cola). Drinks and spices can be part of a dish, not only on the side (his brownie with zero cola). 17:35: for a food that is obviously 0 kcal like a tea, no question and no other check; it is noted as a tea or similar and saved; asking to confirm would sound weird. Later on 22 November: a product that is read but has no values gets no heads-up today; the person should be told it cannot be saved yet, and that the values can be typed by hand.",
       "opportunity": {
         "from": "An onboarding call, 22 November 2026.",
         "job": "Scan my tea and use it, on the side or in a dish.",
@@ -2940,7 +2940,7 @@
       },
       "problem": "EU label law does not require a nutrition table on tea, herbal tea, coffee, water, salt, herbs and spices. Their values come back empty, not zero. The app treats empty as unknown and refuses to save: Energy and protein are required.",
       "story": "When I scan a tea, I want it saved at once, so that I can add it to my snack or use it in a recipe like any other food.",
-      "proposed": "A product read from a barcode or a pack, with no values, whose category or name says tea, herbal tea, coffee, water or salt, is saved as 0 kcal and 0 protein with no question, marked no values on the pack. From then on it is like zero cola: a drink on the side, or an ingredient in a dish with its grams and no energy. No protein density is shown for it. Any other product with no values keeps today's way: type the values from the pack, or scan the table.",
+      "proposed": "A product read from a barcode or a pack, with no values, whose category or name says tea, herbal tea, coffee, water or salt, is saved as 0 kcal and 0 protein with no question, marked no values on the pack. From then on it is like zero cola: a drink on the side, or an ingredient in a dish with its grams and no energy. No protein density is shown for it. Any other product with no values gets a heads-up line: the name is read, the database has no values, type them from the pack. Saving it empty still stops, as today.",
       "open": [
         "Which words or categories make a product obviously 0: from the product database's category first, then the name in English, German and Serbian."
       ],
@@ -2983,8 +2983,8 @@
         },
         {
           "id": "AC7",
-          "title": "Any other product with no values is as today",
-          "text": "Given I scan a biscuit whose database entry has no values, when the label check opens, then the values are empty, the box I checked the values is there, and saving it empty still stops with the same lines as today"
+          "title": "Any other product with no values gets a heads-up",
+          "text": "Given I scan a biscuit whose database entry has a name and no values, when the label check opens, then one line says The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save. The values are empty, the box I checked the values is there, and saving it empty still stops with the same lines as today"
         },
         {
           "id": "AC8",
@@ -2995,7 +2995,6 @@
       "unchanged": [
         "The barcode flow, the photos of the pack and the credit.",
         "A product with values, of any kind.",
-        "A product with no values that is not tea, coffee, water or salt: type the values, or scan the table.",
         "Zero foods with a printed 0 (zero cola, sweeteners) stay as they are.",
         "Herbs and spices used For cooking stay named and not counted."
       ],
@@ -3095,6 +3094,27 @@
       ],
       "checks": "To agree with the board.",
       "decision": "Direction agreed 22 November 18:59 to 19:03, with the full-day rule, Last active and Quiet for 3 days. Not drawn yet."
+    },
+    {
+      "id": "DT341",
+      "title": "Drinks in millilitres: shown and typed in ml, calculated in grams",
+      "epic": "plate",
+      "state": "later",
+      "why": "Coach Milan 22 November 2026, 19:58 to 20:01, while looking at DT336: what do we do with liquids and their weight, grams or litres. Millilitres; a ticket, not urgent.",
+      "opportunity": {
+        "from": "The board DT336, 22 November 2026.",
+        "job": "Log a drink the way I measure it: a 250 ml glass, a 300 ml cup.",
+        "kind": "Too many steps: a label per 100 ml has to be converted to grams by the person.",
+        "why_now": "Not urgent (Coach Milan 20:01)."
+      },
+      "problem": "Every food is stored and shown per 100 g. Most drink packs print their table per 100 ml, and the label check asks the person to convert it to grams: Do not assume ml equals g. On the Plate a drink is set in grams.",
+      "story": "When I log a drink, I want to see and type millilitres and take the pack's table per 100 ml as it is, so that I do not have to convert anything.",
+      "proposed": "Inside, grams stay, so every number is calculated as today. A drink is shown and typed in millilitres, litres only for large amounts (1.5 l). A label per 100 ml is taken as printed and converted with the drink's weight per millilitre: water, tea and coffee 1 g; milk about 1.03 g; juice and soft drinks about 1.04 g; an unknown drink 1 g, and the app says so. Oil stays in grams and spoons, as cooks measure it.",
+      "open": [
+        "The weights per millilitre to take from a source before drawing."
+      ],
+      "checks": "To agree with the board.",
+      "decision": "Direction agreed 22 November 20:01. Later, not urgent."
     },
     {
       "id": "B154",

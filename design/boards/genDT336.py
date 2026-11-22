@@ -23,7 +23,7 @@ def shot(x, y, name, w, title, status, note):
 B = Board(); PW = 390; G = 70
 W = SX + 5 * PW + 4 * G + 40
 parts = [("Ticket", "DT336. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT336, canvas Page 5."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT336.1: the flow as it is today, from the barcode to the save that stops. DT336.2: the same flow, new, to the tea on a plate. DT336.3: a biscuit with no values, as today. A screen that stays is marked No change; a blue outline marks what is new."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT336.1: the flow as it is today, from the barcode to the save that stops. DT336.2: the same flow, new, to the tea on a plate. DT336.3: a biscuit with no values, with a new heads-up. A screen that stays is marked No change; a blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "22 November 17:35: For the food that is obviously 0 kcal like a tea, there is no reason for such questions or any other check. We note it as a tea or similar and enable it to be saved. If I ask anything to confirm, it may sound weird."),
@@ -55,10 +55,10 @@ RB = [shot(X(0), y2, "2a", PW, "DT336.2a The barcode", "same", "I tap Use the co
   shot(X(4), y2, "2e", PW, "DT336.2e On the Plate", "changed", "Energy and protein stay.")]
 for i in range(1, 5): arrow(X(i) - G + 2, y2 + 540)
 y3 = max(RB) + 70
-label(y3, "DT336.3 Any other product with no values", "a biscuit: as today", 0, 2)
+label(y3, "DT336.3 Any other product with no values", "a biscuit: a heads-up, then type the values", 0, 2)
 y3 += 60
 bs = [shot(X(0), y3, "3a", PW, "DT336.3a The barcode", "same", "I tap Use the code only."),
-  shot(X(1), y3, "3b", PW, "DT336.3b The label check", "same", "Empty: type the values or scan the table.")]
+  shot(X(1), y3, "3b", PW, "DT336.3b The label check", "changed", "New heads-up. Empty: type the values from the pack.")]
 arrow(X(1) - G + 2, y3 + 540)
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)

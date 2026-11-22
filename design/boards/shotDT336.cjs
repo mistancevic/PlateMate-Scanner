@@ -37,11 +37,12 @@ const BISCUIT = { product_name: "Oat biscuits", brand: "Bake & Co", barcode: "40
   try {
     for (const flow of ["1", "2", "3"]) {
       const N = flow === "2", prod = flow === "3" ? BISCUIT : TEA;
-      const p = await open(N, prod);
+      const p = await open(N || flow === "3", prod);
       await note(p, 'input[aria-label="Type the barcode"]', flow === "3" ? "<b>No change:</b> a biscuit, its barcode typed. I tap Use the code only." : `${N ? "<b>No change:</b> " : ""}A tea, its barcode typed. I tap Use the code only.`, ['input[aria-label="Type the barcode"]']);
       await shot(p, `${flow}a`); await clean(p);
       await p.getByRole("button", { name: "Use the code only" }).click(); await p.waitForTimeout(1800);
-      if (N) { await at(p, ".zero-line", 260); await note(p, ".zero-line", "<b>New:</b> the name says tea and the database has no values. One line says it counts as 0. No question.", [".zero-line"]); }
+      if (flow === "3") { await at(p, ".none-line", 200); await note(p, ".none-line", "<b>New:</b> a heads-up: the name is read, the database has no values, and I can type them from the pack. Saving it empty still stops, as today.", [".none-line"]); }
+      else if (N) { await at(p, ".zero-line", 260); await note(p, ".zero-line", "<b>New:</b> the name says tea and the database has no values. One line says it counts as 0. No question.", [".zero-line"]); }
       else { await at(p, ".label-table", 200); await note(p, ".label-table", flow === "3" ? "<b>No change:</b> the name is read, and every value is empty. I type them from the pack, or scan the table." : "The name and brand are read right. Every value is empty: the pack has no table.", [".label-table"], "beforebegin"); }
       await shot(p, `${flow}b`); await clean(p);
       if (flow === "3") { await p.context().close(); continue; }
