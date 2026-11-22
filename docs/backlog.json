@@ -2900,12 +2900,60 @@
       "problem": "There is no limit on the kitchens you cook. People pick what they like to eat, often 10 of 16. The server sends only the first 8 to Chef Mealan, so the rest are dropped without a word. With so many, the rule that ideas come from your kitchens filters almost nothing, each kitchen adds its dishes to every request (longer, slower, more expensive), Members sorts almost everything as yours, and Profile gets a block per kitchen.",
       "story": "When I set up the kitchens I cook, I want to pick the few I really cook and say separately that I like trying new things, so that Chef Mealan's ideas feel like my kitchen and still bring something new now and then.",
       "proposed": "The kitchens you cook: up to 3, in setup and in Profile. The line above says why: Chef Mealan cooks in these first. Pick up to 3. With 3 picked, a fourth needs one tapped off first. The server takes the same 3, so nothing is dropped without a word. A new chip under How I eat: I like trying new kitchens. With it on, one of Chef Mealan's three ideas may come from a kitchen outside the 3; the other two stay in them.",
-      "open": [
-        "Existing profiles with more than 3: no code. Coach Milan asks those testers to reduce. Until then the app keeps their list as it is; the server then takes their first 3 in the order tapped (today it takes 8).",
-        "The exact words of the line and the chip, in three languages."
+      "open": [],
+      "checks": "Area: setup's step 5 and Me (Where I shop and cook, Lifestyle), and what Chef Mealan is sent. The unit tests with new ones for the cap and the chip, the build, a new walkthrough for AC1 to AC6, the walkthroughs that open setup's step 5, Me's shop and lifestyle pages, and those that check what Chef Mealan is sent (setup-shop, kitchens-and-steps, make-meal, chef-dinner and the rest), about 10 to 15 minutes. New words on screen, so the German sweep too.",
+      "decision": "Direction agreed 22 November 15:41 and 15:43: 3, and the chip. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "now": "Setup, 5. Where you shop and cook, and Me, Where I shop and cook: the line says Pick one or more. Any number can be picked; a tester picked 10. Each kitchen gets its block of three dishes below. The server sends only the first 8 to Chef Mealan.",
+      "looked_at": "A second list for the kitchens you like to eat: not chosen, 15:43, a chip says it. Changing the profiles that already have more than 3: not chosen, Coach Milan asks those testers himself.",
+      "board": "Stories278",
+      "where": "Page 6",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "The line says up to 3",
+          "text": "Given setup's step 5 or Me, Where I shop and cook, when the kitchens you cook show, then the line says Chef Mealan cooks in these first: the tastes, the herbs, how a meal is put together. Pick up to 3"
+        },
+        {
+          "id": "AC2",
+          "title": "A fourth is not picked",
+          "text": "Given Balkan, Italian and Greek are picked, when I tap Indian, then Indian is not picked and one line says Up to 3. Tap one off first"
+        },
+        {
+          "id": "AC3",
+          "title": "One off, then another",
+          "text": "Given three are picked and the line shows, when I tap Greek off and then Indian, then Balkan, Italian and Indian are picked and the line is gone"
+        },
+        {
+          "id": "AC4",
+          "title": "Chef Mealan gets 3",
+          "text": "Given a profile from before with 10 kitchens, when Chef Mealan is asked for ideas, then he gets the first 3 in the order they were tapped, and the profile keeps its list as it is"
+        },
+        {
+          "id": "AC5",
+          "title": "The chip",
+          "text": "Given Me, Lifestyle, Taste, when I look at How I eat, then a chip says Trying new kitchens and a tap turns it on"
+        },
+        {
+          "id": "AC6",
+          "title": "With the chip on, one idea may be new",
+          "text": "Given the chip is on, when Chef Mealan is asked for three ideas, then he is told one of them may come from a kitchen outside the 3 and the other two stay in them; with the chip off, all three stay in them"
+        }
       ],
-      "checks": "To agree with the board.",
-      "decision": "Direction agreed 22 November 15:41 and 15:43: 3, and the chip. Not drawn yet."
+      "unchanged": [
+        "Each kitchen's block of three dishes, Another and Undo.",
+        "What you cook with.",
+        "A plate that already has a kitchen keeps it.",
+        "The other taste chips."
+      ],
+      "details": [
+        "The same component serves setup's step 5 and Me, Where I shop and cook, so the cap holds in both.",
+        "The pictures are the real app on one scratch build of main, not committed.",
+        "The chip goes to Chef Mealan with How I eat, as the other How I eat chips do; the server reads it in every ask that takes the kitchens.",
+        "Profiles with more than 3 from before: no code; the app keeps their list, the server takes the first 3."
+      ],
+      "short": "Up to 3 kitchens you cook, and a chip for trying new kitchens",
+      "rel": "Proposed; not agreed until Coach Milan says Go",
+      "boardTitle": "DT334: up to 3 kitchens you cook, and a chip for trying new kitchens"
     },
     {
       "id": "DT335",
