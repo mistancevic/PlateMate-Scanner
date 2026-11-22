@@ -1,6 +1,6 @@
 {
-  "release": "0.3.175",
-  "at": "2026-11-22T20:58:51.669Z",
+  "release": "0.3.176",
+  "at": "2026-11-22T22:51:02.979Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -51447,6 +51447,44 @@
       "release": "0.3.175",
       "order": 900000,
       "at": "2026-11-22T20:58:51.669Z"
+    },
+    {
+      "id": "screen.plate.kcalGramsPd",
+      "kind": "screen",
+      "key": "plate.kcalGramsPd",
+      "en": "{kcal} kcal · {grams} g · {pd}",
+      "forms": "plain",
+      "slots": [
+        "grams",
+        "kcal",
+        "pd"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "{kcal} kcal · {grams} g · {pd}",
+      "de": "{kcal} kcal · {grams} g · {pd}",
+      "checked": false,
+      "beta": true,
+      "release": "0.3.176",
+      "order": 900000,
+      "at": "2026-11-22T22:51:02.979Z"
+    },
+    {
+      "id": "screen.plate.whichMealFirst",
+      "kind": "screen",
+      "key": "plate.whichMealFirst",
+      "en": "Which meal is it? Pick it, and Chef Mealan finds ideas for it.",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Koji je ovo obrok? Izaberi ga, i Chef Mealan nalazi ideje za njega.",
+      "de": "Welche Mahlzeit ist es? Wähl sie aus, und Chef Mealan findet Ideen dafür.",
+      "checked": false,
+      "beta": true,
+      "release": "0.3.176",
+      "order": 900001,
+      "at": "2026-11-22T22:51:02.979Z"
     }
   ]
 }

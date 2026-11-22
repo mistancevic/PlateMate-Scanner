@@ -72,7 +72,9 @@ const PORT = "3561";
   await p.context().close();
 
   // ---- B1, B2: Fit to my target with no meal set
-  p = await h.open({ foods: ["Oats", "Banana", "Skyr"] });
+  // changed by DT337 (0.3.176, board Stories277, AC6): with the AI on, Fit with no meal set asks which meal first
+  // (fit-range.cjs); B1 and B2 now hold with the AI off
+  p = await h.open({ foods: ["Oats", "Banana", "Skyr"], aiOff: true });
   const inp = p.locator(".plate-card .rows .swipe, .plate-card .rows .row").filter({ hasText: "Skyr" }).first().locator("input").first(); await inp.fill("30"); await inp.blur(); await p.waitForTimeout(600);
   const before = await h.st(p), g0 = Object.fromEntries(before.items.map((i) => [i.food.name.split(",")[0], Math.round(i.grams)]));
   ok(/under your/i.test(await p.locator(".readout").innerText()) && /^No meal selected$/.test(await h.line(p)), "B1: the plate is under the PD target and no meal is set");

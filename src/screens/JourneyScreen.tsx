@@ -64,7 +64,7 @@ import { referenceFood, foodName, foodV } from "../reference";
 import { identityOf, basicOf } from "../foodId";
 import { sameFoods as sameRecipeFoods, diffLine as recipeDiffLine, newNameFor } from "../recipeDiff";
 import { dishesOf, dishNums, mealBar, roomFor, courseOf } from "../dishes";
-import { mealShare, mealNow, routeOf, solveMeal, closedSlots, unloggedMeal, mealRange, type Add } from "../makeMeal";
+import { mealShare, mealNow, routeOf, solveMeal, closedSlots, unloggedMeal, mealRange, aboveRange, missingOf, ABOVE_RANGE, QUICK_BASE, type Add } from "../makeMeal";
 import { answersFor, setAnswer } from "../unlogged";
 import { slotsOn, slotsOf, withTimeOn, slotAt, windowOf, toMin, type Slot } from "../slots";
 import { lifestyleOf } from "../personal";
@@ -471,7 +471,14 @@ export function JourneyScreen(p: AppApi) {
     log("fit_used");
     let ready = items.map((i) => ({ ...i, food: { ...i.food, readyToEat: true } }));
     if (ready.length === 1) {
-      const partner = [...state.foods].filter((f) => f.id !== ready[0].food.id).sort((a, b) => (density(b.protein, b.calories) ?? -1) - (density(a.protein, a.calories) ?? -1))[0];
+      // DT337 (0.3.176, AC8): a food above the target's range gets a base from your foods, never a protein food: the base with a
+      // PD under the target closest to it first; else, as before, the food with the most protein
+      const pool = [...state.foods].filter((f) => f.id !== ready[0].food.id);
+      function quickBase(f: Food) { return QUICK_BASE.test(f.name) && pdRef! - (density(f.protein, f.calories) ?? 99) > 0; }
+      const byPd = (a: Food, b: Food) => (density(b.protein, b.calories) ?? -1) - (density(a.protein, a.calories) ?? -1);
+      const partner = aboveRange(density(ready[0].food.protein, ready[0].food.calories), pdRef)
+        ? pool.filter(quickBase).sort(byPd)[0]
+        : pool.sort(byPd)[0];
       if (!partner) { setError(w("fit.addAFoodFirst")); return; }
       ready = [{ ...ready[0], locked: true }, { id: uid(), food: { ...partner, readyToEat: true }, grams: 100, locked: false }];
     }
@@ -1126,8 +1133,16 @@ export function JourneyScreen(p: AppApi) {
   const [fills, setFills] = useState<string | null>(null);
   const plateSigNow = items.map((i) => `${i.id}:${Math.round(i.grams)}`).join("|");
   const fillsNow = fills !== null && fills === plateSigNow && !!share;
+  // DT337 (0.3.176, AC6): with no meal set and the AI on, Fit asks which meal first, in the meal line; once it is picked, the ideas
+  // come for that meal
+  const [fitWaits, setFitWaits] = useState(false);
+  useEffect(() => { if (fitWaits && share && mealSlot) { setFitWaits(false); setLineOpen(false); window.setTimeout(() => makeAMeal(), 300); } // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fitWaits, share, mealSlot]);
   function makeAMeal() {
+    if (p.ai.on && !mealSlot && p.kind !== "dessert" && items.length > 0) { setLineOpen(true); setFitWaits(true); notify(w("plate.whichMealFirst")); return; }
     if (chefable && share && !madeBy && !imported && partsOf(items).length < 2) { const k = aggregate(items).calories ?? 0, [lo, hi] = mealRange(share.kcal); if (k >= lo && k <= hi) { setFills(plateSigNow); return; } }
+    // DT337 (AC7): a plate above the target's range goes to Chef Mealan's ideas whenever the AI is on, near its meal's size or not
+    if (p.ai.on && chefable && share && partsOf(items).length < 2) { const t0 = aggregate(items); if (aboveRange(density(t0.protein, t0.calories), pdRef)) { log("fit_used"); void askChef(items, []); return; } }
     // C52 (DT150): a dish in parts is sized by its parts, by code, before any idea replaces it
     if (!chefable || !share || partsOf(items).length >= 2) return askMealan();
     const t = aggregate(items), pd0 = density(t.protein, t.calories);
@@ -1151,6 +1166,7 @@ export function JourneyScreen(p: AppApi) {
     { key: "check", text: w(pdRef !== null ? "plate.stepCheckPd" : "plate.stepCheck", { what: share ? w("plate.kcalRange", { low: fmt(mealRange(share.kcal)[0], 0), high: fmt(mealRange(share.kcal)[1], 0) }) : w("plate.theMeal"), pd: pdVal(pdRef) }) },
     { key: "again", text: w("make.askingAgainForAnIdea") },
   ];
+  function isAbove(f: { why: string }) { return ABOVE_RANGE.test(f.why); }
   async function askChef(base: Ingredient[], avoid: string[], failedIn: Missed[] = [], kept: MealOption[] = [], small = false) {
     if (!share) return;
     // DT102 (0.2.91): Other ideas: the last dish's cooking foods go before the new ideas come
@@ -1160,7 +1176,9 @@ export function JourneyScreen(p: AppApi) {
     try {
       const res = await fetch("/api/meal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         plate: base.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein, ...(isDrink(i.food) ? { drink: true } : {}) })), meal: mealWord, need: share.kcal, target: pdRef,
-        kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), region: p.region, avoid: [...avoid, ...kept.map((k) => k.title)], failed: failedIn.map((f) => ({ title: f.title, why: f.why })), ...(small ? { small: true } : {}), carried: carriedLists(state.meals, state.feedback), tastes: tasteForReq(p.personal.tasteChips, state.preferences), what: shownTaste }) });
+        kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), region: p.region, avoid: [...avoid, ...kept.map((k) => k.title)], failed: failedIn.map((f) => ({ title: f.title, why: f.why })), ...(small ? { small: true } : {}),
+        // DT337 (AC3, AC4): the plate's PD against the range, and what the meal is missing in carbs and fat
+        plate_pd: density(aggregate(base).protein, aggregate(base).calories), missing: missingOf(dayNums, share.kcal, aggregate(base)), very_low_carb: p.personal.carbsFat?.split === "low", carried: carriedLists(state.meals, state.feedback), tastes: tasteForReq(p.personal.tasteChips, state.preferences), what: shownTaste }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || w("make.couldNotAnswer"));
       const good = [...kept], failed: Missed[] = [];
@@ -1176,10 +1194,12 @@ export function JourneyScreen(p: AppApi) {
         else failed.push({ title: o.title, why: (sol as { why: string }).why, kitchen: o.kitchen, items: [...base, ...adds.map((a) => ({ id: uid(), food: a.food, grams: Math.round(a.grams), locked: false }))] });
       }
       // an idea that fails the checks goes back once, with the reason; a second miss is left out
+      // DT337 (AC2): an idea above the range is never shown: he is asked once more with the reason, and a second miss is left out
+      if (failed.some(isAbove) && !failedIn.length) return askChef(base, avoid, failed, good, small);
       if (good.length < 2 && failed.length && !failedIn.length) return askChef(base, avoid, failed, good, small);
       // DT91: an idea that still misses is shown with why, not dropped in silence
       // an idea that clashes with an allergy is never shown, not even as a miss
-      const missed = [...failedIn, ...failed].filter((f) => !/allergy/.test(f.why)).filter((f, k, all) => !good.some((g) => g.title.toLowerCase() === f.title.toLowerCase()) && all.findIndex((x) => x.title.toLowerCase() === f.title.toLowerCase()) === k).slice(0, 3);
+      const missed = [...failedIn, ...failed].filter((f) => !/allergy/.test(f.why) && !ABOVE_RANGE.test(f.why)).filter((f, k, all) => !good.some((g) => g.title.toLowerCase() === f.title.toLowerCase()) && all.findIndex((x) => x.title.toLowerCase() === f.title.toLowerCase()) === k).slice(0, 3);
       setChef(good.length ? { status: "done", options: good, tried: [...avoid, ...good.map((g) => g.title)], failed: missed, small } : { status: "none", tried: [...avoid, ...failed.map((f) => f.title)], failed: missed, small });
     } catch (e: any) { setChef(null); notify(`${e.message} ${w("plate.hereQuickFit")}`); askMealan(); }
   }
@@ -1552,7 +1572,7 @@ export function JourneyScreen(p: AppApi) {
         {chef.status === "working" && <div className="mm-working"><WaitSteps steps={chefSteps()} at={chefStage.at} done={chefStage.done} /></div>}
         {opts.map((o) => (
           <section className="card mm-card" key={o.title}>
-            <div className="mm-top"><small className="mm-kitchen">{o.kitchen.toUpperCase()}</small><small className="mm-nums">{w("plate.kcalPd", { kcal: fmt(o.kcal, 0), pd: pdText(o.pd) })}</small></div>
+            <div className="mm-top"><small className="mm-kitchen">{o.kitchen.toUpperCase()}</small><small className="mm-nums">{w("plate.kcalGramsPd", { kcal: fmt(o.kcal, 0), grams: fmt(o.items.reduce((n, i) => n + i.grams, 0), 0), pd: pdText(o.pd) })}</small></div>
             <b className="mm-title">{o.title}</b>
             <div className="mm-adds">{o.adds.map(chip)}</div>
             {o.cooking.length > 0 && <small className="mm-why mm-cook">{wx("plate.forCookingLine", { label: <b>{w("plate.forCooking")}</b>, foods: o.cooking.join(", ") })}</small>}

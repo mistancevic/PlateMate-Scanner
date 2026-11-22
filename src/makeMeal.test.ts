@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mealShare, mealNow, routeOf, solveMeal, type Add } from "./makeMeal";
+import { mealShare, mealNow, routeOf, solveMeal, rangeTop, aboveRange, missingOf, QUICK_BASE, RANGE_HIGH, ABOVE_RANGE, type Add } from "./makeMeal";
+import { BAND_EDGES } from "./goal";
 import { slotsOf } from "./slots";
 import type { Food } from "./pilot";
 
@@ -39,8 +40,10 @@ test("which way the plate goes: the quick fit when maths does it, Chef Mealan wh
 test("CH3: Chef Mealan's Balkan lunch lands on 927 kcal at PD 10.1; the bread's grams are the app's", () => {
   const plate = [{ id: "a", food: CH, grams: 200, locked: false }, { id: "b", food: CO, grams: 150, locked: false }];
   const adds: Add[] = [{ food: BR, grams: 100, base: true, have: true }, { food: TO, grams: 150, base: false, have: false }, { food: CU, grams: 150, base: false, have: false }, { food: OI, grams: 10, base: false, have: false }];
-  const s = solveMeal(plate, adds, 933, 6.4, () => false, uid);
+  // changed by DT337 (0.3.176): PD 10.1 is above the range of 6.4 (to 9.6), so the grams are checked against a target of 7.0 (to 10.5)
+  const s = solveMeal(plate, adds, 933, 7.0, () => false, uid);
   assert.ok(s.ok);
+  assert.match((solveMeal(plate, adds, 933, 6.4, () => false, uid) as any).why, /^PD 10\.1 above your range, which goes up to 9\.6$/);
   if (s.ok) { assert.equal(s.baseGrams, 125); assert.equal(s.kcal, 927); assert.equal(Math.round(s.pd! * 10) / 10, 10.1); assert.equal(s.items.filter((i) => !i.locked).length, 1); }
   assert.match((solveMeal(plate, adds, 933, 6.4, (f) => f.name === "Tomato", uid) as any).why, /allergy/);
   // DT91 (0.2.88): too much oil stays too much even at half its amount and the smallest bread: it says so
@@ -109,4 +112,30 @@ test("DT135: an idea for one meal a day grows with the meal", () => {
   const s = solveMeal(plate, adds, 2400, 5, () => false, uid, 3);
   assert.ok(s.ok, (s as any).why);
   if (s.ok) assert.ok(s.baseGrams > 150 && s.baseGrams <= 450);
+});
+
+test("DT337: the range is the On plan chip's, 0.9 to 1.5 times the target", () => {
+  assert.equal(RANGE_HIGH, BAND_EDGES.high);
+  assert.equal(rangeTop(5.3), 8);
+  assert.ok(aboveRange(8.4, 5.3) && !aboveRange(8.0, 5.3) && !aboveRange(null, 5.3) && !aboveRange(9, null));
+});
+test("DT337 AC1, AC2: one egg for breakfast; an idea above the range is refused, one in it lands", () => {
+  const EG = food("Eggs", 155, 13), SK = food("Skyr, natural", 63, 11), PO = food("Potatoes, boiled", 77, 2), AJ = food("Ajvar", 60, 1.3);
+  const plate = [{ id: "e", food: EG, grams: 52, locked: false }];
+  const high = solveMeal(plate, [{ food: CO, grams: 200, base: false, have: true }, { food: SK, grams: 200, base: false, have: true }, { food: BR, grams: 50, base: true, have: true }], 667, 5.3, () => false, uid);
+  assert.ok(!high.ok && ABOVE_RANGE.test((high as any).why), (high as any).why);
+  const ok = solveMeal(plate, [{ food: PO, grams: 300, base: true, have: false }, { food: AJ, grams: 60, base: false, have: false }, { food: CO, grams: 100, base: false, have: true }], 667, 5.3, () => false, uid);
+  assert.ok(ok.ok && ok.pd! >= 5.25 && ok.pd! <= 8.05, JSON.stringify(ok.ok ? ok.pd : ok));
+});
+test("DT337 AC3, AC4: what the meal is missing, by the day's carbs and fat", () => {
+  const m = missingOf({ kcal: 2000, carbs: 250, fats: 67 }, 667, { carbs: 0.6, fats: 5.5 })!;
+  assert.deepEqual(m, { meal: { carbs: 83, fats: 22 }, plate: { carbs: 1, fats: 6 }, missing: { carbs: 82, fats: 16 } });
+  // a very low carb day: the carbs are few, so what is missing is fat
+  const low = missingOf({ kcal: 2000, carbs: 40, fats: 140 }, 667, { carbs: 0.6, fats: 5.5 })!;
+  assert.ok(low.missing.fats > low.missing.carbs);
+  assert.equal(missingOf(null, 667, { carbs: 0, fats: 0 }), null);
+});
+test("DT337 AC8: the bases the quick fit may add, as whole words", () => {
+  for (const n of ["Wholegrain bread", "Oats", "Rice, cooked", "Potatoes, boiled", "Pasta, dry", "Brot", "Haferflocken", "Pirinač", "Krompir"]) assert.ok(QUICK_BASE.test(n), n);
+  for (const n of ["Whey protein powder", "Skyr, natural", "Eggs", "Ricotta"]) assert.ok(!QUICK_BASE.test(n), n);
 });

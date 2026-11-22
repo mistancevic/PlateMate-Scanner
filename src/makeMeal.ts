@@ -69,6 +69,21 @@ export function routeOf(o: { pd: number | null; target: number | null; kcal: num
 export type Add = { food: Food; grams: number; base: boolean; have: boolean };
 export type Solved = { ok: true; items: Ingredient[]; kcal: number; protein: number; pd: number | null; baseGrams: number } | { ok: false; why: string };
 export const RANGE = 0.1;
+// DT337: the range of the target, as the On plan chip of Foods has it: 0.9 to 1.5 times the target
+export const RANGE_HIGH = 1.5; // = BAND_EDGES.high in src/goal.ts (kept here so this file imports no goal code); src/makeMeal.test.ts checks they match
+export const rangeTop = (target: number) => Math.round(target * RANGE_HIGH * 10) / 10;
+export const aboveRange = (pd: number | null, target: number | null) => pd !== null && target !== null && pd > rangeTop(target) + 0.05;
+export const ABOVE_RANGE = /above your range/;
+// DT337 (AC8): the bases the quick fit may add to a plate above the range
+export const QUICK_BASE = /(?<!\p{L})(bread|toast|oats|rice|potato(es)?|pasta|brot|haferflocken|reis|kartoffeln|nudeln|hleb|ovsene|pirinač|krompir|testenina)(?!\p{L})/iu;
+// DT337: what the meal is missing: its share of the day's carbs and fat, against what the plate already holds, in grams
+export function missingOf(day: { kcal: number; carbs: number; fats: number } | null, mealKcal: number, plate: { carbs: number | null; fats: number | null }) {
+  if (!day || !(day.kcal > 0) || !(mealKcal > 0)) return null;
+  const f = mealKcal / day.kcal;
+  const meal = { carbs: Math.round(day.carbs * f), fats: Math.round(day.fats * f) };
+  const has = { carbs: Math.round(plate.carbs ?? 0), fats: Math.round(plate.fats ?? 0) };
+  return { meal, plate: has, missing: { carbs: Math.max(0, meal.carbs - has.carbs), fats: Math.max(0, meal.fats - has.fats) } };
+}
 const r5 = (g: number) => Math.round(g / 5) * 5;
 // small amounts (garlic, oil) to the gram, the rest to 5 g
 const rg = (g: number) => (g < 20 ? Math.max(1, Math.round(g)) : r5(g));
@@ -97,5 +112,8 @@ export function solveMeal(plate: Ingredient[], adds: Add[], need: number, target
   if (kcal < min) return { ok: false, why: `${Math.round(kcal)} kcal, under the ${min} to ${max} kcal of this meal, even with ${baseGrams} g ${bn}` };
   if (kcal > max) return { ok: false, why: `${Math.round(kcal)} kcal, over the ${min} to ${max} kcal of this meal, even with ${baseGrams} g ${bn}` };
   if (target !== null && pd !== null && pd < target - 0.05) return { ok: false, why: `PD ${pd.toFixed(1)} under the target ${target.toFixed(1)}` };
+  // DT337 (0.3.176, board Stories277; Go 22 November 2026, 23:44): the meal lands in the target's range, never above it. An
+  // idea above the range is never shown: Chef Mealan is asked once more with this reason (Coach Milan 23:10)
+  if (target !== null && pd !== null && pd > rangeTop(target) + 0.05) return { ok: false, why: `PD ${pd.toFixed(1)} above your range, which goes up to ${rangeTop(target).toFixed(1)}` };
   return { ok: true, items, kcal: Math.round(kcal), protein: Math.round((t.protein ?? 0) * 10) / 10, pd, baseGrams };
 }
