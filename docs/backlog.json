@@ -2940,13 +2940,75 @@
       },
       "problem": "EU label law does not require a nutrition table on tea, herbal tea, coffee, water, salt, herbs and spices. Their values come back empty, not zero. The app treats empty as unknown and refuses to save: Energy and protein are required.",
       "story": "When I scan a tea, I want it saved at once, so that I can add it to my snack or use it in a recipe like any other food.",
-      "proposed": "A product read from a barcode or a pack, with no values, whose category or name says tea, herbal tea, coffee, water or salt (and herbs and spices, see open), is saved as 0 kcal and 0 protein with no question, marked no values on the pack. From then on it is like zero cola: a drink on the side, or an ingredient in a dish with its grams and no energy. No protein density is shown for it. Any other product with no values keeps today's way: type the values from the pack, or scan the table.",
+      "proposed": "A product read from a barcode or a pack, with no values, whose category or name says tea, herbal tea, coffee, water or salt, is saved as 0 kcal and 0 protein with no question, marked no values on the pack. From then on it is like zero cola: a drink on the side, or an ingredient in a dish with its grams and no energy. No protein density is shown for it. Any other product with no values keeps today's way: type the values from the pack, or scan the table.",
       "open": [
-        "Herbs and spices: dried ones carry real energy per 100 g (paprika is about 280 kcal per 100 g), small in a pinch, a little more in two spoons in a goulash. 0 too, or kept as For cooking, not counted, as today.",
         "Which words or categories make a product obviously 0: from the product database's category first, then the name in English, German and Serbian."
       ],
-      "checks": "To agree with the board.",
-      "decision": "Direction agreed 22 November 17:35. Not drawn yet."
+      "checks": "Area: Foods and the scan. The unit tests with new ones for the rule, the build, a new walkthrough for AC1 to AC8, and every walkthrough that scans or saves a food, about 10 minutes. New lines, so the German sweep too.",
+      "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "board": "Stories274",
+      "where": "Page 5",
+      "now": "A barcode is read and the database answers with a name and no values. The label check shows every value empty and the box I checked the values. Confirm & save stops: Energy and protein are required to calculate PD, and Confirm the label and per-100-g basis before saving.",
+      "looked_at": "A line the person taps to count it as 0: not chosen, 17:35, for a food that is obviously 0 a question sounds weird. Offering 0 for any product with no values: not chosen, a biscuit with a missing entry must not become 0 by mistake.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "A tea with no values counts as 0",
+          "text": "Given I scan a tea whose database entry has a name and no values, when the label check opens, then one line says A tea has no values on its pack. It counts as 0, energy, fat, carbohydrate and protein show 0, and there is no box I checked the values"
+        },
+        {
+          "id": "AC2",
+          "title": "Saved with no question",
+          "text": "Given the label check of that tea, when I tap Confirm & save, then it is saved with 0 kcal and 0 protein, its notes say No values on the pack, and nothing else is asked"
+        },
+        {
+          "id": "AC3",
+          "title": "Coffee, herbal tea, water and salt too",
+          "text": "Given the database's category or the name says coffee, herbal tea, water or salt, in English, German or Serbian, when it has no values, then it is handled as the tea in AC1 and AC2"
+        },
+        {
+          "id": "AC4",
+          "title": "No PD, in words",
+          "text": "Given such a food is saved, when its card or its label check shows protein density, then it says No PD: it brings no energy, never a question mark and never On plan"
+        },
+        {
+          "id": "AC5",
+          "title": "On the plate it counts as 0",
+          "text": "Given skyr, oats and a banana are on the Plate, when I add 300 g of the tea, then the plate's energy and protein stay as they were and its weight grows by 300 g"
+        },
+        {
+          "id": "AC6",
+          "title": "In a dish too",
+          "text": "Given a recipe uses the tea or a zero drink as an ingredient, when it is saved or cooked, then the ingredient keeps its grams and adds no energy, as zero cola does today"
+        },
+        {
+          "id": "AC7",
+          "title": "Any other product with no values is as today",
+          "text": "Given I scan a biscuit whose database entry has no values, when the label check opens, then the values are empty, the box I checked the values is there, and saving it empty still stops with the same lines as today"
+        },
+        {
+          "id": "AC8",
+          "title": "A tea with values is as today",
+          "text": "Given I scan a tea whose database entry has values, when the label check opens, then the values are the database's and the box I checked the values is there, as today"
+        }
+      ],
+      "unchanged": [
+        "The barcode flow, the photos of the pack and the credit.",
+        "A product with values, of any kind.",
+        "A product with no values that is not tea, coffee, water or salt: type the values, or scan the table.",
+        "Zero foods with a printed 0 (zero cola, sweeteners) stay as they are.",
+        "Herbs and spices used For cooking stay named and not counted."
+      ],
+      "details": [
+        "The pictures are the real app on one scratch build of main, not committed. The database's answer is given in place of it. A board for food scanning needs no time on the phone, so the screens carry no time strip.",
+        "The server also asks the product database for the product's category (categories_tags), so the rule does not rest on the name alone.",
+        "The line names what it is: A tea, A coffee, A water, Salt.",
+        "Herbs and spices are not in this ticket: dried ones carry real energy per 100 g. They stay as today.",
+        "The plate's weight grows by the tea's grams, as for any drink on a plate."
+      ],
+      "short": "A tea with no values is saved as 0",
+      "rel": "Proposed; not agreed until Coach Milan says Go",
+      "boardTitle": "DT336: a tea, coffee or water with no values on its pack is saved as 0, without a question"
     },
     {
       "id": "DT337",
