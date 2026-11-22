@@ -1686,13 +1686,20 @@
         "Which service. Looked up 22 November 2026: Resend has a permanent free plan, 3,000 emails a month and at most 100 a day, no card needed; its first paid step is 20 dollars a month for 50,000. Others have free plans that move (Amazon SES has none for new accounts since July 2026). Check the prices again before choosing.",
         "Where the service keeps the data: EU or not, and what the privacy page then has to say.",
         "The sender address, for example hello@chefmealan.com, and who reads the replies.",
-        "The records in the domain settings of chefmealan.com so the mail is trusted (SPF, DKIM, DMARC): Coach Milan sets them; how the domain is hosted is not checked yet.",
+        "The records in the domain settings of chefmealan.com so the mail is trusted (SPF, DKIM, DMARC): Coach Milan sets them. The domain is registered at Namecheap (Coach Milan, 22 November 2026). Records go in under Domain List, Manage, Advanced DNS, as long as the domain uses Namecheap's own name servers; to check on his account before the step.",
         "Does Invite also send by itself then, or stay in my mail app so I can add my own words.",
         "The mails in three languages: which language a mail takes when the person has no account yet.",
         "A limit so the form cannot be used to send mail to a stranger's inbox again and again."
       ],
       "checks": "To agree with the board.",
-      "decision": "Open. In Next. No board yet."
+      "decision": "Open. In Next. No board yet.",
+      "steps": [
+        "Coach Milan: choose the service and make the account; add the domain chefmealan.com there.",
+        "Coach Milan: copy the three records the service shows into the domain's DNS at Namecheap; wait until the service confirms them.",
+        "Coach Milan: make a key in the service and put it into the server's settings.",
+        "Together: the sender address and where replies go; the texts of the two mails in three languages.",
+        "Claude: the board (from the form to the inbox), the code with a limit against flooding an inbox, one line on the privacy page."
+      ]
     },
     {
       "id": "DT313",
