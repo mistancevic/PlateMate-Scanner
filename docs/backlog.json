@@ -2971,6 +2971,27 @@
       "decision": "Direction agreed 22 November 17:47. Not drawn yet."
     },
     {
+      "id": "DT338",
+      "title": "What the PD colours mean: one scale on the Goal page and behind the PD number on the Plate",
+      "epic": "setup",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 17:57 to 18:01: add the ranges and their colours where users see them, so they know what the colour of their numbers means; today the colour changes as PD moves from one range to another. 18:01: both places.",
+      "opportunity": {
+        "from": "An onboarding call, 22 November 2026.",
+        "job": "Understand at a glance whether my plate is where my target wants it.",
+        "kind": "Did not understand it: colours that change with no key.",
+        "why_now": "New testers see the colour on their first plate."
+      },
+      "problem": "Five bands around the person's own target colour the PD block: Low−, Low, On plan, High, High+ (0.6, 0.9, 1.5 and 2.5 times the target). The only place that says the ranges is a line under the filter chips in Foods, after a chip is tapped.",
+      "story": "When I see the colour of my PD, I want to see what it means in my own numbers, so that I know what to change.",
+      "proposed": "One scale: five coloured parts, each with its name and its range in the person's own numbers (for a target of 5.3: under 3.2, 3.2 to 4.8, 4.8 to 8.0, 8.0 to 13.3, above 13.3). On the Goal page under the PD target. On the Plate, a tap on the PD number opens the same scale with a mark where this plate sits.",
+      "open": [
+        "Check while drawing that every place showing PD uses the same five colours."
+      ],
+      "checks": "To agree with the board.",
+      "decision": "Direction agreed 22 November 18:01: both places. Not drawn yet."
+    },
+    {
       "id": "B154",
       "title": "A plate logged with the pencil and then cooked is one meal, not two",
       "epic": "plate",
