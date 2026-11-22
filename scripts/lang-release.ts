@@ -2,7 +2,9 @@
 //   npx tsx scripts/lang-release.ts                 what this release brings: docs/i18n/release-todo.json (new lines, and lines
 //                                                   whose English changed since their translation)
 //   npx tsx scripts/lang-release.ts apply <drafts>  drafts: {"<id>": {"sr": "...", "de": "..."}} for every line of the todo.
-//     Srpski goes in as a draft, not confirmed: the app shows the English until Coach Milan confirms it in his table.
+//     Srpski goes in confirmed: Claude translates and confirms it, and the app shows it at once (Coach Milan 23 November 2026,
+//     00:19: "we agreed you to do it ... do it just by you and apply immediately"). Coach Milan can still change a line in his
+//     table; his edits come back at the next export. (Until 0.3.176 Srpski went in as a draft, shown in English until he confirmed.)
 //     German goes in as Beta. The English each was made for is kept in src/i18n/made-for.json. The tables' group
 //     "New in <version>" comes from docs/i18n/release-pack.json, published as a file of both table pages (release-pack.json).
 // A line with a wrong slot or form stops it, and nothing is written.
@@ -41,11 +43,11 @@ for (const { row, enBefore } of todo) {
     if (p.length) bad.push(`${row.id} (${l}): ${p.join("; ")}`);
     if (/[–—]| - /.test(t)) bad.push(`${row.id} (${l}): a dash as punctuation`);
   }
-  rows.push({ ...row, ...areaOf(row, made), ...(enBefore !== undefined ? { enBefore } : {}), sr: d.sr, de: d.de, checked: false, beta: true, release: version, order: order++ });
+  rows.push({ ...row, ...areaOf(row, made), ...(enBefore !== undefined ? { enBefore } : {}), sr: d.sr, de: d.de, checked: true, beta: true, release: version, order: order++ });
 }
 if (bad.length) { console.error("STOP, nothing written:\n" + bad.join("\n")); process.exit(1); }
 for (const r of rows) {
-  partOf(sr, r.kind)[r.key] = { text: r.sr, checked: false };
+  partOf(sr, r.kind)[r.key] = { text: r.sr, checked: true };
   partOf(de, r.kind)[r.key] = { text: r.de, checked: true };
   made[r.id] = { en: r.en, area: r.area, where: r.where, release: version };
 }
@@ -65,4 +67,4 @@ const at = new Date().toISOString();
 const keep = (before?.rows ?? []).filter((r: any) => !rows.some((x) => x.id === r.id) && live.has(r.id));
 write("docs/i18n/release-pack.json", { release: version, at, rows: [...keep, ...rows.map((r) => ({ ...r, at }))] });
 write("docs/i18n/release-todo.json", []);
-console.log(`${version}: ${rows.length} lines in. Srpski waits for Coach Milan's Confirm; German is in as Beta. Publish docs/i18n/release-pack.json to both tables.`);
+console.log(`${version}: ${rows.length} lines in. Srpski is in, confirmed by Claude; German is in as Beta. Publish docs/i18n/release-pack.json to both tables.`);
