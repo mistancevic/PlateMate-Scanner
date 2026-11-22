@@ -2949,6 +2949,28 @@
       "decision": "Direction agreed 22 November 17:35. Not drawn yet."
     },
     {
+      "id": "DT337",
+      "title": "Fit to my target lands in the target's range and adds what the meal is missing",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 17:41 to 17:47, after an onboarding call: a tester scanned eggs (PD about 8.5) and asked Fit to my target; Chef Mealan added whey protein, PD 17 against her target 5.3, where a cook would add carbs and balance the meal. 17:47: follow the range of the user's target, no new formula; take the food preferences into account and add what is missing to balance it; several options, as in the chat (eggs with toast, fruit), carbs when the diet has them; a keto-like diet would add fat instead.",
+      "opportunity": {
+        "from": "An onboarding call, 22 November 2026.",
+        "job": "Turn what I have into a balanced meal for my target.",
+        "kind": "A wrong result: more protein on a plate that already has too much.",
+        "why_now": "Fit to my target is the first thing a new tester tries on the Plate."
+      },
+      "problem": "The instruction to Chef Mealan says keep the meal at or above the protein target, and the app's check only refuses an idea under the target. There is no upper side, so an idea far above passes. Nothing tells him the plate is already above the target and needs energy, not protein.",
+      "story": "When my plate already has more protein than my target, I want Fit to my target to add what the meal is missing, in foods I like, so that the meal lands in my range and is balanced.",
+      "proposed": "The range already in the app: the chip Fits your plan covers 0.9 to 1.5 times the target (for a target of 5.3: about 4.8 to 8.0). Fit to my target aims into that range. The check refuses an idea above it and asks Chef Mealan once more with the reason, as it already does for an idea under the target. Chef Mealan is told what the meal is missing: the meal's share of the day's carbs and fat, against what the plate already holds, so he adds the kind of food that is short. When the plate is already above the range, he is told the protein is there and to add no protein food. Diet, taste, kitchens and the library keep working as today. Three options, as today.",
+      "open": [
+        "A diet with few carbs (not in the app today; Paleo has no grains): the missing part then comes from fat by the day's split. To check with the diets that exist when drawing.",
+        "Small additions (Ideas anyway when the plate already fills the meal) follow the same range."
+      ],
+      "checks": "To agree with the board. The model evals for the meal ideas get cases for a plate above the range.",
+      "decision": "Direction agreed 22 November 17:47. Not drawn yet."
+    },
+    {
       "id": "B154",
       "title": "A plate logged with the pencil and then cooked is one meal, not two",
       "epic": "plate",
