@@ -21,10 +21,20 @@ const NAME: [ZeroKind, string[]][] = [
   ["salt", ["salt", "salz", "morska so", "kuhinjska so"]],
 ];
 const BLOCK = [
-  "iced tea", "eistee", "ledeni čaj", "latte", "cappuccino", "3in1", "milk", "milch", "mleko", "sugar", "zucker", "šećer",
-  "syrup", "juice", "saft", "sok", "flavoured", "geschmack", "crisps", "chips", "biscuits", "kekse", "keks", "cake",
-  "kuchen", "kolač", "chocolate", "schokolade", "čokolada", "cream", "sahne", "nuts", "vinegar",
+  "iced tea", "eistee", "latte", "cappuccino", "3in1", "milk", "milch", "sugar", "zucker",
+  "syrup", "juice", "saft", "flavoured", "geschmack", "crisps", "chips", "biscuits", "kekse", "cake",
+  "kuchen", "chocolate", "schokolade", "cream", "sahne", "nuts", "vinegar",
+  // B157 (0.3.175, board Stories275; Go 22 November 2026, 21:57): Ice Tea, written without the d
+  "ice tea", "icetea",
 ];
+// B157: Serbian changes the end of a word (sa šećerom, bez šećera, sa mlekom), so a Serbian block word blocks every word that
+// starts with it, in Latin and Cyrillic; and leden before čaj (ledeni čaj, ledenog čaja)
+const SR_STEMS = [
+  "šećer", "mlek", "mleč", "čokolad", "kolač", "keks", "sok", "sirup", "krem", "pavlak", "šlag", "čips", "sirć", "tort", "orah", "oras", "ukus",
+  "шећер", "млек", "млеч", "чоколад", "колач", "кекс", "сок", "сируп", "крем", "павлак", "шлаг", "чипс", "сирћ", "торт", "орах", "орас", "укус",
+];
+const srBlocks = (t: string[]) => t.some((x, i) => SR_STEMS.some((s) => x.startsWith(s))
+  || (x.startsWith("leden") && (t[i + 1] ?? "").startsWith("čaj")) || (x.startsWith("леден") && (t[i + 1] ?? "").startsWith("чај")));
 
 const words = (s: string) => s.toLowerCase().normalize("NFC").split(/[^\p{L}\p{N}]+/u).filter(Boolean);
 function has(tokens: string[], phrase: string) {
@@ -36,7 +46,7 @@ function has(tokens: string[], phrase: string) {
 export function obviousZero(name: string, categories?: unknown): ZeroKind | null {
   const tokens = words(name || "");
   const cats = Array.isArray(categories) ? categories.filter((c): c is string => typeof c === "string").map((c) => c.toLowerCase()) : [];
-  if (BLOCK.some((b) => has(tokens, b)) || cats.some((c) => BLOCK_CATEGORY.includes(c))) return null;
+  if (BLOCK.some((b) => has(tokens, b)) || srBlocks(tokens) || cats.some((c) => BLOCK_CATEGORY.includes(c))) return null;
   if (cats.length) {
     for (const c of cats) if (CATEGORY[c]) return CATEGORY[c];
     return null;

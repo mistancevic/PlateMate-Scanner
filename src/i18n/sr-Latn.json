@@ -22934,7 +22934,7 @@
       "checked": false
     },
     "app.dbNoValues": {
-      "text": "Naziv je pročitan, ali baza nema vrednosti za ovaj proizvod. Upiši ih iz tabele nutritivnih vrednosti sa pakovanja, pa sačuvaj.",
+      "text": "Barkod nema vrednosti za ovaj proizvod. Zatvori ovo, pa kamerom na Deklaraciji skeniraj tabelu nutritivnih vrednosti.",
       "checked": false
     }
   }

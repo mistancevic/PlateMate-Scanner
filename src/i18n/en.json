@@ -3374,7 +3374,7 @@
   "app.zeroSalt": "Salt has no calories, so it is saved as 0 kcal.",
   "app.noPdZero": "No PD: it has 0 kcal.",
   "app.noValuesOnPack": "No values on the pack.",
-  "app.dbNoValues": "The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save.",
+  "app.dbNoValues": "The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label.",
   "app.perMlNote": "For a per-100-ml or per-serving label, convert from a known mass before saving. Do not assume ml equals g. Leave undeclared nutrients blank.",
   "app.mixCooking": "cooking",
   "app.mixFromStarter": "from the starter set",

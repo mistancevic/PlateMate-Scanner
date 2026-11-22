@@ -2,6 +2,8 @@
 // values in the product database is saved as 0 with no question: one line says so, the values show 0, there is no box to
 // tick, and its PD is said in words. On the Plate it adds its grams and no energy. Any other product with no values gets an
 // amber heads-up, and saving it empty still stops, as today. A tea with values is as today.
+// B157 (0.3.175, board Stories275): Serbian word forms, in Latin and Cyrillic, and Ice Tea block the 0. B158 (0.3.175, board
+// Stories276): the heads-up says the barcode has no values: close this, then scan the nutrition table with the camera on Label.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -13,6 +15,7 @@ const TEA = { product_name: "Peppermint tea", brand: "Herbal & Co", barcode: "40
 const COFFEE = { product_name: "Gold", brand: "Roast & Co", barcode: "4009300000003", ...none, categories: ["en:beverages", "en:coffees", "en:instant-coffees"] };
 const BISCUIT = { product_name: "Oat biscuits", brand: "Bake & Co", barcode: "4009300000002", ...none };
 const CRISPS = { product_name: "Salt and vinegar crisps", brand: "Crunch & Co", barcode: "4009300000005", ...none };
+const SR = (name, barcode) => ({ product_name: name, brand: "Bašta & Co", barcode, ...none });
 const TEA_VALUES = { product_name: "Green tea", brand: "Leaf & Co", barcode: "4009300000004", ...none, calories: 1, protein: 0, fats: 0, carbs: 0.2, fiber: null, noValues: false };
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
@@ -87,7 +90,7 @@ const TEA_VALUES = { product_name: "Green tea", brand: "Leaf & Co", barcode: "40
     // AC7: a biscuit with no values
     page = await open(BISCUIT);
     const heads = page.locator(".none-line");
-    ok(await heads.count() === 1 && (await heads.innerText()).trim() === "The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save.", "DT336 AC7: one amber line says the database has no values, type them from the pack");
+    ok(await heads.count() === 1 && (await heads.innerText()).trim() === "The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label.", "DT336 AC7, B158 AC1: one amber line says the barcode has no values: close this, then scan the table on Label");
     ok(await heads.locator("svg").count() === 1 && /warn-box/.test(await heads.getAttribute("class")), "DT336 AC7: the warn-box look, with the warning triangle");
     ok((await Promise.all(["Energy", "Protein"].map((n) => value(page, n)))).every((v) => v === ""), "DT336 AC7: the values are empty");
     ok(await box(page) === 1, "DT336 AC7: the box I checked the values is there");
@@ -102,6 +105,31 @@ const TEA_VALUES = { product_name: "Green tea", brand: "Leaf & Co", barcode: "40
     // the words that block the 0: salt and vinegar crisps are never 0
     page = await open(CRISPS);
     ok(await page.locator(".zero-line").count() === 0 && await page.locator(".none-line").count() === 1, "DT336: salt and vinegar crisps get the heads-up, never 0");
+    await page.context().close();
+    // B157: the Serbian forms, Cyrillic, Ice Tea, a sugar free tea, and a plain tea as in 0.3.174
+    const headsUp = async (prod) => { const p = await open(prod); const r = { heads: await p.locator(".none-line").count(), zero: await p.locator(".zero-line:not(.fit-none)").count(), box: await box(p) }; return [p, r]; };
+    let r;
+    [page, r] = await headsUp(SR("Čaj sa šećerom", "8600000000011"));
+    ok(r.heads === 1 && r.zero === 0 && r.box === 1 && await value(page, "Energy") === "", "B157 AC1: Čaj sa šećerom gets the heads-up, the values empty and the box there");
+    await page.context().close();
+    for (const [n, code] of [["Чај са шећером", "8600000000012"], ["Kafa sa mlekom", "8600000000013"], ["Čaj s ukusom breskve", "8600000000014"]]) {
+      [page, r] = await headsUp(SR(n, code));
+      ok(r.heads === 1 && r.zero === 0, `B157 AC2: ${n} gets the heads-up, never 0`);
+      await page.context().close();
+    }
+    [page, r] = await headsUp({ ...SR("Ice Tea Peach", "4009300000021"), brand: "Cool & Co" });
+    ok(r.heads === 1 && r.zero === 0, "B157 AC3: Ice Tea Peach gets the heads-up, never 0");
+    await page.context().close();
+    [page, r] = await headsUp(SR("Čaj bez šećera", "8600000000015"));
+    ok(r.heads === 1 && r.zero === 0, "B157 AC4: Čaj bez šećera gets the heads-up");
+    for (const n of ["Energy", "Fat", "Carbohydrate", "Protein"]) await page.getByLabel(n, { exact: true }).fill("0");
+    await page.getByLabel(/I checked the values/).check();
+    await page.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(1300);
+    const sf = await stored(page, "Čaj bez šećera");
+    ok(sf && sf.calories === 0 && sf.protein === 0 && !sf.zeroKind, "B157 AC4: the 0 typed from the pack is saved as typed");
+    await page.context().close();
+    [page, r] = await headsUp(SR("Čaj od nane", "8600000000016"));
+    ok(r.zero === 1 && r.heads === 0 && (await page.locator(".zero-line").first().innerText()) === "Tea has almost no calories, so it is saved as 0 kcal.", "B157 AC5: Čaj od nane is saved as 0, as in 0.3.174");
     await page.context().close();
     // AC8: a tea with values
     page = await open(TEA_VALUES);

@@ -1,6 +1,6 @@
 {
-  "release": "0.3.174",
-  "at": "2026-11-22T19:52:36.043Z",
+  "release": "0.3.175",
+  "at": "2026-11-22T20:58:51.669Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -51434,18 +51434,19 @@
       "id": "screen.app.dbNoValues",
       "kind": "screen",
       "key": "app.dbNoValues",
-      "en": "The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save.",
+      "en": "The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label.",
       "forms": "plain",
       "slots": [],
       "area": "Words used across the app",
       "where": "Across the app",
-      "sr": "Naziv je pročitan, ali baza nema vrednosti za ovaj proizvod. Upiši ih iz tabele nutritivnih vrednosti sa pakovanja, pa sačuvaj.",
-      "de": "Der Name ist erkannt, aber die Datenbank hat keine Werte für dieses Produkt. Trag sie aus der Nährwerttabelle auf der Packung ein und speichere dann.",
+      "enBefore": "The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save.",
+      "sr": "Barkod nema vrednosti za ovaj proizvod. Zatvori ovo, pa kamerom na Deklaraciji skeniraj tabelu nutritivnih vrednosti.",
+      "de": "Der Barcode liefert keine Werte für dieses Produkt. Schließ das hier und scanne dann die Nährwerttabelle mit der Kamera auf Etikett.",
       "checked": false,
       "beta": true,
-      "release": "0.3.174",
-      "order": 900006,
-      "at": "2026-11-22T19:52:36.043Z"
+      "release": "0.3.175",
+      "order": 900000,
+      "at": "2026-11-22T20:58:51.669Z"
     }
   ]
 }
