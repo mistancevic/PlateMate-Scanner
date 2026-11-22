@@ -41,8 +41,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 ### Tickets from the onboarding call (all in docs/backlog.json)
 
-- DT336 done in 0.3.174 (Go 20:47, checks Area plus the German sweep, 21 of 21 walkthroughs, docs/qa/runs/0.3.174.json). The rule is in src/obvious0.ts, with the list settled at 20:32. The server sends `categories` and `noValues` (the database has no energy, protein, fat or carbohydrate at all, so a per-100-ml record the app leaves empty is not "no values"). candidateFood marks `zeroKind` (tea, coffee, water, salt) or `dbEmpty`. The label check sets 0, drops the box, shows "Tea has almost no calories, so it is saved as 0 kcal." and "No PD: it has 0 kcal."; the card shows the same PD words. New walkthrough tests/flows/tea-zero.cjs (PORT 3601). Seen while building, not asked yet: on the Plate a tea makes the fibre letter read fi?, because its fibre stays empty, as drawn. (The Serbian forms and Ice Tea were fixed in B157.)
-- DT337 Next: Fit to my target lands in the target's range and adds what the meal is missing. Follow the user's target range, no new formula.
+- DT336 done in 0.3.174 (Go 20:47, checks Area plus the German sweep, 21 of 21 walkthroughs, docs/qa/runs/0.3.174.json). The rule is in src/obvious0.ts, with the list settled at 20:32. The server sends `categories` and `noValues` (the database has no energy, protein, fat or carbohydrate at all, so a per-100-ml record the app leaves empty is not "no values"). candidateFood marks `zeroKind` (tea, coffee, water, salt) or `dbEmpty`. The label check sets 0, drops the box, shows "Tea has almost no calories, so it is saved as 0 kcal." and "No PD: it has 0 kcal."; the card shows the same PD words. New walkthrough tests/flows/tea-zero.cjs (PORT 3601). On the Plate a food with no fibre value makes the plate read fi?; Coach Milan 22:31: fibre is super important. Proposed as DT342, waiting for his answer: 0 where it is a fact (tea, coffee, water, salt, oil, sugar, meat, fish, eggs, milk products); the rest counts what is known and says at least X g, N foods without a value.
+- DT337 Next, drawn, board Stories277 on Page 6 (22:29). The ideas land in the range 0.9 to 1.5 times the target; an idea above it is refused like one under it; Chef Mealan is told what the meal is missing (carbs, or fat on Very low carb) and to add no protein food when the plate is above the range; Ideas anyway follows the range. Open on the board: the quick fit without the AI also adds protein (eggs plus whey, PD 13.4); the readout says fits your plan for any PD at or above the target. make-meal.cjs (lunch at PD 10.1 against 6.4) changes with it. Scratch build /home/claude/work/dt337 (board-new in src/makeMeal.ts). Waiting for Go. Checks proposed: Area, the Plate, about 15 minutes.
 - DT334 Next: up to 3 kitchens you cook, plus a chip for trying new kitchens. Coach Milan asks testers who picked 4 or more to reduce; no code for that.
 - DT338 Next: what the PD colours mean, one scale on the Goal page and behind the PD number on the Plate.
 - DT339 Next: a nutrition table printed in several languages shows the app's own names.
@@ -61,7 +61,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - Page 5 (page-v31x6j) is full. Page 6 is page-p475ue. On Page 6: an empty Artboard 1 (Artboard-9s4q, x 0 y 0, 800 x 600; leave it unless Coach Milan says), and Stories274 DT336 at x 0, y 720, h 4592 (taller since the list of what counts as 0).
 - Stories275 B157 at x 0, y 5432, h 4341.
 - Stories276 B158 at x 0, y 9893, h 2862.
-- The next board on Page 6 goes at x 0, y 12875.
+- Stories277 DT337 at x 0, y 12875, h 3142.
+- The next board on Page 6 goes at x 0, y 16137.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.174; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json. Seven new lines, Srpski as drafts waiting for Confirm, German in Beta.
 
