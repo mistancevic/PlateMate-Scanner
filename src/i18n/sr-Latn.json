@@ -22892,6 +22892,22 @@
     "plate.saveToMyRecipes": {
       "text": "Sačuvaj u Moje recepte",
       "checked": false
+    },
+    "coach.reqClient": {
+      "text": "Već je klijent",
+      "checked": false
+    },
+    "coach.reqInvitedOpen": {
+      "text": "Poziv poslat {date}. Kod još nije iskorišćen.",
+      "checked": false
+    },
+    "coach.reqSendCode": {
+      "text": "Pošalji kod ponovo",
+      "checked": false
+    },
+    "coach.reqSendSignIn": {
+      "text": "Pošalji kako se prijaviti",
+      "checked": false
     }
   }
 }

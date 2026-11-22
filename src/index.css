@@ -3649,3 +3649,9 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .live-says .live-held { margin-top: 8px; border: 1px solid var(--line); border-radius: var(--r-control); }
 .plate-end.plate-end-live { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
 .plate-card .plate-end-live .prepare-it { margin: 0; }
+
+/* B155 (0.3.173, board B155): a request closed by an invite says what happened; one that came after the invite keeps its
+   full colour and has one button to answer it by mail */
+.card.request .request-state { display: block; margin-top: 6px; }
+.card.request .request-answer { margin-top: 8px; } .card.request .request-answer a { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.request.handled:has(.request-answer) { opacity: 1; }
