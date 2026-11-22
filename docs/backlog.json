@@ -2947,7 +2947,7 @@
       "checks": "Area: Foods and the scan. The unit tests with new ones for the rule, the build, a new walkthrough for AC1 to AC8, and every walkthrough that scans or saves a food, about 10 minutes. New lines, so the German sweep too.",
       "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
       "board": "Stories274",
-      "where": "Page 5",
+      "where": "Page 6",
       "now": "A barcode is read and the database answers with a name and no values. The label check shows every value empty and the box I checked the values. Confirm & save stops: Energy and protein are required to calculate PD, and Confirm the label and per-100-g basis before saving.",
       "looked_at": "A line the person taps to count it as 0: not chosen, 17:35, for a food that is obviously 0 a question sounds weird. Offering 0 for any product with no values: not chosen, a biscuit with a missing entry must not become 0 by mistake.",
       "ac": [
