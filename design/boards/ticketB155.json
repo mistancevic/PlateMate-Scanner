@@ -1,0 +1,71 @@
+{
+ "id": "B155",
+ "title": "An application comes back to Waiting for you although the person was invited and already joined",
+ "epic": "coach",
+ "state": "now",
+ "board": "Stories273",
+ "where": "Page 5",
+ "why": "Coach Milan 22 November 2026, 10:40, with a screenshot of Clients: a tester already asked for the code and used it, but the message is still waiting for me, and it says 2 requests. 10:59: yes to a bug ticket and the board.",
+ "opportunity": {
+  "from": "Coach Milan's own Clients screen, 22 November 2026.",
+  "job": "See in Waiting for you only what still needs me.",
+  "kind": "Did not understand it: a card with Invite for a person who is already a client, and a count of requests with no explanation.",
+  "why_now": "New testers are joining now, and each one who sends the form twice leaves a card behind."
+ },
+ "problem": "Invite and Mark as handled close one request only: the one the card shows. When the same person sends the form again, the second request is new and the card is back, with Invite. The app does not look at what my invites already say about that email: that a code went out, or that the person joined with it.",
+ "story": "When a person I already invited sends the form again, I want the app to know what I already did for that email, so that Waiting for you only holds people who still need an answer from me.",
+ "now": "One card per email, showing the newest request and how many there were. Only that newest request is closed by Invite or Mark as handled. Joining with a code closes nothing.",
+ "proposed": "The app reads my invites next to the requests, by email. A person who joined with a code never waits: the request is closed by itself and says Already a client further down. Invite and Mark as handled close every request of that email, not only the newest. A request older than a code that is out is closed and says Invited on that date. Only one case still waits: the person has a code, has not used it, and sends the form again. That card says so in one line, because she is asking again.",
+ "looked_at": "Refusing a second form on the home page: not chosen, the public form must not tell a stranger whether an email is known. Hiding the count of requests: not chosen, it tells me the person asked more than once.",
+ "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+ "ac": [
+  {
+   "id": "AC1",
+   "title": "A person who joined does not wait",
+   "text": "Given a person joined with my invite, when the same email sends the form once more, then no application of that email is in Waiting for you, and the badge on Clients does not count it"
+  },
+  {
+   "id": "AC2",
+   "title": "Her request says why",
+   "text": "Given a person joined with my invite and sent the form twice, when I look under Access requests further down, then her request says Already a client and 2 requests, and it has no Invite and no Mark as handled"
+  },
+  {
+   "id": "AC3",
+   "title": "Invite closes every request of that email",
+   "text": "Given a person sent the form twice before I answered, when I tap Invite or Mark as handled on the card, then both requests are closed and the card does not come back"
+  },
+  {
+   "id": "AC4",
+   "title": "Asking again with a code not used",
+   "text": "Given I invited a person on 20 November and the code is not used, when she sends the form once more, then the card waits and one line says Invited on 20 Nov. The code is not used yet"
+  },
+  {
+   "id": "AC5",
+   "title": "An invite made by hand closes the request",
+   "text": "Given an application waits, when I make an invite for that email with the invite form and not from the card, then the application leaves Waiting for you and says Invited on that date further down"
+  },
+  {
+   "id": "AC6",
+   "title": "A first request is as today",
+   "text": "Given a person sends the form for the first time, when I open Clients, then the card New beta tester application waits with Invite and Mark as handled, as today"
+  }
+ ],
+ "unchanged": [
+  "The card New beta tester application: its words, Invite on the right, Mark as handled with a second tap.",
+  "What Invite does: a code, the mail with it, one beta spot less.",
+  "The count of requests on a card.",
+  "The home page form: it takes every request and says the same to everyone.",
+  "Everything else in Waiting for you and its order."
+ ],
+ "checks": "Area: Clients. The unit tests with new ones for the rule, the build, the walkthrough of the applications with new checks for AC1 to AC6, and every walkthrough that opens Clients, about 10 minutes. Three new lines, so the German sweep too. The server part (reading the invites next to the requests, closing every request of an email) cannot be reached by a walkthrough; it gets unit tests on the rule it uses.",
+ "short": "A request waits only while it still needs the coach",
+ "rel": "Proposed; not agreed until Coach Milan says Go",
+ "boardTitle": "B155: an application comes back to Waiting for you although the person already joined",
+ "details": [
+  "The pictures are the real app in the coach demo, with the phone's clock at Sunday 22 November 2026, 10:38 (the strip on every screen). One scratch build of 0.3.172, not committed. The person is the demo client Nina, not a real tester: she sent the form on 20 November, was invited that day, and sent the form once more on 21 November.",
+  "Access requests is not shown in the coach demo today; the scratch shows it for these pictures only.",
+  "The mail with the code opens outside the app, so it is not drawn; B155.1b and B155.2b are Clients after the mail was sent.",
+  "The new words are English drafts: Already a client. Invited on 20 Nov. Invited on 20 Nov. The code is not used yet.",
+  "AC3 and AC5 have no picture of their own: the screens are B155.2b and B155.2d with other words in the grey line."
+ ]
+}
