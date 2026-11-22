@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.173",
     "0.3.172",
     "0.3.171",
     "0.3.170",
@@ -2959,7 +2960,7 @@
       "id": "B155",
       "title": "A request from a person already invited or already a client is not a new request",
       "epic": "coach",
-      "state": "now",
+      "state": "done",
       "board": "Stories273",
       "where": "Page 5",
       "why": "Coach Milan 22 November 2026, 10:40, with a screenshot of Clients: a tester already asked for the code and used it, but the message is still waiting for me, and it says 2 requests. 10:59: yes to a bug ticket and the board. 13:40: the question is more on the user's end: the form does the same for everyone; if the email is in the system, the answer goes to their inbox with the steps and the code; on my end that is not counted as a new request. 13:46: then the solution in between is me sending it again; the mail server is another solution. 13:47: yes, redraw with the in-between solution and open the mail service as its own ticket.",
@@ -3020,8 +3021,9 @@
         "The count of requests on a request.",
         "Everything else in Waiting for you and its order."
       ],
-      "decision": "Open. Redrawn 22 November 2026, 13:50, for Coach Milan's look. No Go, so nothing is built.",
-      "checks": "Area: Clients. The unit tests with new ones for the rule, the build, the walkthrough of the applications with new checks for AC1 to AC8, and every walkthrough that opens Clients, about 10 minutes. Four new lines, so the German sweep too. The server part (reading the invites next to the requests, closing every request of an email) cannot be reached by a walkthrough; it gets unit tests on the rule it uses."
+      "decision": "Go, Coach Milan 22 November 14:21, checks: Area. Built in 0.3.173. The buttons stay as the backup once OP9 sends the mail by itself.",
+      "checks": "Area: Clients. The unit tests with new ones for the rule, the build, the walkthrough of the applications with new checks for AC1 to AC8, and every walkthrough that opens Clients, about 10 minutes. Four new lines, so the German sweep too. The server part (reading the invites next to the requests, closing every request of an email) cannot be reached by a walkthrough; it gets unit tests on the rule it uses.",
+      "version": "0.3.173"
     }
   ]
 }

@@ -2,7 +2,7 @@
  "id": "B155",
  "title": "A request from a person already invited or already a client is not a new request",
  "epic": "coach",
- "state": "now",
+ "state": "done",
  "board": "Stories273",
  "where": "Page 5",
  "why": "Coach Milan 22 November 2026, 10:40, with a screenshot of Clients: a tester already asked for the code and used it, but the message is still waiting for me, and it says 2 requests. 10:59: yes to a bug ticket and the board. 13:40: the question is more on the user's end: the form does the same for everyone; if the email is in the system, the answer goes to their inbox with the steps and the code; on my end that is not counted as a new request. 13:46: then the solution in between is me sending it again; the mail server is another solution. 13:47: yes, redraw with the in-between solution and open the mail service as its own ticket.",
@@ -17,7 +17,7 @@
  "now": "One card per email, showing the newest request and how many there were. Only that newest request is closed by Invite or Mark as handled. Joining with a code closes nothing.",
  "proposed": "The form on the home page stays the same for everyone and says the same words. On my side the app reads my invites next to the requests, by email. A request from an email that is already invited or already a client is not a new request: no card in Waiting for you, and the badge does not count it. Further down, under Access requests, I see that she asked again: the number of requests and what I already did (Invited on that date and the code not used yet, or Already a client). One button there answers her by mail: Send the code again, or Send how to sign in. It opens my mail app with the text filled in, as Invite does today. Invite and Mark as handled close every request of that email. This is the solution in between. The full one is OP9: the app sends that mail by itself, at once, and I do nothing.",
  "looked_at": "A card that still waits with one line, for a person who asks again with a code not used (the first drawing): not chosen, 13:40, on my end it is not a new request. Telling the person on the form that the email is known: not chosen, the public form must not tell a stranger whether an email is in the system; the answer belongs in the inbox. Hiding the count of requests: not chosen, it tells me the person asked more than once.",
- "decision": "Open. Redrawn 22 November 2026, 13:50, for Coach Milan's look. No Go, so nothing is built.",
+ "decision": "Go, Coach Milan 22 November 14:21, checks: Area. Built in 0.3.173. The buttons stay as the backup once OP9 sends the mail by itself.",
  "ac": [
   {
    "id": "AC1",
@@ -69,7 +69,7 @@
  ],
  "checks": "Area: Clients. The unit tests with new ones for the rule, the build, the walkthrough of the applications with new checks for AC1 to AC8, and every walkthrough that opens Clients, about 10 minutes. Four new lines, so the German sweep too. The server part (reading the invites next to the requests, closing every request of an email) cannot be reached by a walkthrough; it gets unit tests on the rule it uses.",
  "short": "A request from a known email is not a new request",
- "rel": "Proposed; not agreed until Coach Milan says Go",
+ "rel": "Built in 0.3.173",
  "boardTitle": "B155: a request from a person already invited or already a client is not a new request",
  "details": [
   "The pictures are the real app in the coach demo, with the phone's clock at Sunday 22 November 2026, 10:38 (the strip on every screen). One scratch build of 0.3.172, not committed. The person is the demo client Nina, not a real tester: she sent the form on 20 November, was invited that day, and sent the form once more on 21 November.",
@@ -78,6 +78,8 @@
   "The new words are English drafts: Already a client. Invited on 20 Nov. The code is not used yet. Send the code again. Send how to sign in.",
   "The button shows only on a request that came after the invite; a request closed by its own invite has no button.",
   "AC6 and AC7 have no picture of their own: the screens are B155.2b and B155.3c with other words in the grey line.",
-  "OP9 takes over later: the app sends the mail by itself when such a request comes in."
- ]
+  "OP9 takes over later: the app sends the mail by itself when such a request comes in.",
+  "Built in 0.3.173 as drawn. A revoked or an expired code says nothing about the email, so a request after it is a new request again."
+ ],
+ "version": "0.3.173"
 }
