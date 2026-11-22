@@ -28,7 +28,7 @@ parts = [("Ticket", "DT337. This board is the ticket: everything about it is her
   ("How to read this board", "<b>Whole flows, like a prototype.</b> DT337.1 and DT337.2: the flows as they are in main, 0.3.175, not on Preview yet: with no meal set the quick fit adds whey; with a meal set Chef Mealan adds protein. DT337.3: new, Fit asks which meal, and only ideas in the range are shown. DT337.4: new, the quick fit with the AI off adds a base. A screen that stays is marked No change; a blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "22 November 23:10: The app should show correct suggestions. Because it was asked very precisely. 22:46: Interesting feature. I like it. How to make it more often available? 22:51: Redraw. 17:47: Follow the range of the user's target, no new formula. Take the food preferences into account and add what is missing to balance it, with several options, as in the chat: eggs with toast, fruit. Carbs when the diet has them; a keto-like diet would add fat instead."),
+  ("In Coach Milan's words", "22 November 23:40: We need weight next to kcal and PDs on the line with the kitchen country. 23:10: The app should show correct suggestions. Because it was asked very precisely. 22:46: Interesting feature. I like it. How to make it more often available? 22:51: Redraw. 17:47: Follow the range of the user's target, no new formula. Take the food preferences into account and add what is missing to balance it, with several options, as in the chat: eggs with toast, fruit. Carbs when the diet has them; a keto-like diet would add fat instead."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Open", "<br>".join(t["open"])), ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "DT337", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -56,7 +56,7 @@ label(y3, "DT337.3 New", "no meal set: Fit asks which meal, then ideas in the ra
 y3 += 60
 RC = [shot(X(0), y3, "3a", PW, "DT337.3a The Plate", "same", "One egg, no meal set. I tap Fit."),
   shot(X(1), y3, "3b", PW, "DT337.3b Which meal is it?", "changed", "The meal line opens: one tap."),
-  shot(X(2), y3, "3c", PW, "DT337.3c Chef Mealan's ideas", "changed", "Three ideas, each in the range."),
+  shot(X(2), y3, "3c", PW, "DT337.3c Chef Mealan's ideas", "changed", "Three ideas in the range, each with its weight."),
   shot(X(3), y3, "3d", PW, "DT337.3d On the plate", "changed", "PD 6.3, in the range.")]
 for i in range(1, 4): arrow(X(i) - G + 2, y3 + 540)
 y4 = max(RC) + 70

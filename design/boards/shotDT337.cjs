@@ -57,7 +57,8 @@ const NEW = { options: [
   const cards = async (p, n, isNew, missName) => { // missName: a tall picture of the whole list
     console.log("CARDS", (await p.locator(".mm-card").allInnerTexts()).map((t) => t.replace(/\s+/g, " ").slice(0, 80)).join(" || "));
     await top(p, ".mm-card", 140);
-    await note(p, ".mm-card", isNew ? "<b>New:</b> Chef Mealan is told the plate has the protein and the meal is missing carbs: toast, porridge, potatoes. Each lands in the range. An idea above the range is never shown: he is asked once more, and the new idea replaces it." : "Chef Mealan adds more protein: whey, cottage cheese, quark. The check only refuses an idea under the target, so ideas far above pass.", [".mm-card"], "beforebegin");
+    if (isNew) await p.evaluate((M) => document.querySelectorAll(".mm-nums").forEach((e) => (e.style.cssText += ";" + M + ";padding:2px 6px")), MARK);
+    await note(p, ".mm-card", isNew ? "<b>New:</b> Chef Mealan is told the plate has the protein and the meal is missing carbs: toast, porridge, potatoes. Each lands in the range. An idea above the range is never shown: he is asked once more, and the new idea replaces it. Each idea shows its weight next to kcal and PD." : "Chef Mealan adds more protein: whey, cottage cheese, quark. The check only refuses an idea under the target, so ideas far above pass.", [".mm-card"], "beforebegin");
     if (missName) { await p.setViewportSize({ width: 390, height: 1330 }); await top(p, ".mm-card", 140); }
     await shot(p, n); await clean(p);
     if (missName) await p.setViewportSize({ width: 390, height: 844 });
