@@ -68,7 +68,7 @@ arrow(X(1) - G + 2, y4 + 540)
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories277.dc.html", t["boardTitle"], "Drawn 22 November 2026. Ticket DT337, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.175 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories276.dc.html")
+board("Stories277.dc.html", t["boardTitle"], "Drawn 22 November 2026. Ticket DT337, Kanban column Done, v0.3.176. Pictures from the real app on a scratch build of main, 0.3.175 and new. Go 22 November 23:44; built in 0.3.176.", B, W, Hc, "Stories276.dc.html")
 inner = B.render(W, Hc)
 json.dump({"DT337": {"file": "Stories277.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out337.json"), "w"))
 print("DT337", W, Hc + 230)
