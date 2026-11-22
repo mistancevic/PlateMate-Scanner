@@ -36,7 +36,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ## State, 22 November 2026, 21:10
 
 - 0.3.174 (DT336) is merged into main and tagged v0.3.174 (local tag). Main is at the handover commit after it. Coach Milan starts Preview and Promote.
-- Release plan (agreed): R1 DT336 (done in 0.3.174), B157 (the clean-up of DT336, first), DT337, DT334. R2 DT338, DT339. R3 B156, DT340. R4 DT335.
+- Release plan (agreed): R1 DT336 (done in 0.3.174), B157 and B158 (the clean-up of DT336, first), DT337, DT334. R2 DT338, DT339. R3 B156, DT340. R4 DT335.
 - The tsc typing error in src/applications.test.ts is fixed in 0.3.174 (`npx tsc --noEmit` passes).
 
 ### Tickets from the onboarding call (all in docs/backlog.json)
@@ -50,6 +50,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - DT340 Next: the client's card shows activity: opened, active, full, last active; a client quiet for 3 days waits.
 - DT335 Next: Gain healthy weight as a goal; goals that do not fit are greyed; a target body weight (roughly 1 kg a month).
 - B157 Next, drawn, board Stories275 on Page 6 (Coach Milan 21:11 to 21:12). The words that block the 0 of DT336 also match Serbian forms by how the word starts (šećer blocks šećerom), in Latin and Cyrillic, with the Serbian words added for syrup, cream, chips, vinegar, cake, nuts and flavour; Ice Tea and Icetea block it too. A sugar free tea gets the heads-up and is typed from its pack. Waiting for Go. Checks proposed: Area, the DT336 set, no German sweep (no new words). Scratch build /home/claude/work/b157 (board-new in src/obvious0.ts).
+- B158 Next, drawn, board Stories276 on Page 6 (Coach Milan 21:27 to 21:48). The heads-up of DT336 AC7 gets new words: "The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label." Words only; a button that opens the camera from the heads-up is left for later (21:46, an edge case). Waiting for Go. Checks proposed: Light plus the German sweep. Can ride in the build of B157; the scratch build /home/claude/work/b157 holds both behind board-new.
 - DT341 Later: drinks in millilitres, shown and typed in ml, calculated in grams. Not urgent.
 - A cook mode issue a tester saw: not reproduced; Coach Milan checks with the tester. No ticket.
 
@@ -59,7 +60,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - project/canvas.json is pretty-printed, one key per line. Add a board as an entry in "boards" and its file name in "order".
 - Page 5 (page-v31x6j) is full. Page 6 is page-p475ue. On Page 6: an empty Artboard 1 (Artboard-9s4q, x 0 y 0, 800 x 600; leave it unless Coach Milan says), and Stories274 DT336 at x 0, y 720, h 4592 (taller since the list of what counts as 0).
 - Stories275 B157 at x 0, y 5432, h 4341.
-- The next board on Page 6 goes at x 0, y 9893.
+- Stories276 B158 at x 0, y 9893, h 2862.
+- The next board on Page 6 goes at x 0, y 12875.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.174; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json. Seven new lines, Srpski as drafts waiting for Confirm, German in Beta.
 

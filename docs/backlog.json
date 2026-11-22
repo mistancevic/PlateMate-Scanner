@@ -3433,6 +3433,50 @@
       "short": "Serbian word forms and Ice Tea block the 0",
       "rel": "Proposed; not agreed until Coach Milan says Go",
       "boardTitle": "B157: a sweet tea or coffee named in Serbian, or an Ice Tea, is never saved as 0"
+    },
+    {
+      "id": "B158",
+      "title": "The heads-up for a product with no values says what to do: close this, then scan the table on Label",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 21:27 to 21:48, while looking at B157: a pack with sugar has to print a nutrition table, so the values are on the pack; the database is what lacks them. 21:29: yes, the heads-up should say the photo too. 21:46: leave a new button for later, an edge case; easier to say barcode reading does not return values, close, and open the camera for the nutrition label; better and universal. 21:48: yes, draw it.",
+      "opportunity": {
+        "from": "Coach Milan's own look at B157, 22 November 2026.",
+        "job": "Get the values of a product whose barcode brings none.",
+        "kind": "Too many steps: typing a whole table by hand, when a photo of it is read for me.",
+        "why_now": "0.3.174 brought the heads-up; its words point only to typing."
+      },
+      "problem": "When the product database has the name and no values, the heads-up says to type the values from the pack. The app can read the nutrition table from a photo, on Label, but the heads-up does not say so, and the camera is already closed.",
+      "story": "When my barcode brings no values, I want to be told how to get them with the least work, so that I scan the table instead of typing it.",
+      "now": "Oat biscuits, scanned by its barcode with a name and no values: the amber heads-up says The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save.",
+      "proposed": "The same heads-up, new words: The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label. Nothing else changes: the values stay empty, the box stays, saving it empty still stops, and typing the values still works.",
+      "looked_at": "A button under the heads-up that opens the camera for the table and fills this label check: not chosen now, 21:46, an edge case; later if it proves needed.",
+      "open": [],
+      "checks": "Light: one screen, words only. The unit tests, the build, the DT336 walkthrough (it checks the heads-up's words), and the walkthroughs that open the label check, about 5 to 10 minutes. The words change, so the German sweep too.",
+      "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "board": "Stories276",
+      "where": "Page 6",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "The heads-up says what to do",
+          "text": "Given I scan a biscuit whose database entry has a name and no values, when the label check opens, then the amber heads-up says The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label"
+        }
+      ],
+      "unchanged": [
+        "The heads-up's look, the warning triangle, and when it shows (DT336 AC7).",
+        "Saving it empty still stops with the same lines.",
+        "Close, Photo or scan, Label and the read of the table, as today.",
+        "A tea, coffee, water or salt with no values is still saved as 0 (DT336)."
+      ],
+      "details": [
+        "The pictures are the real app on one scratch build of main, not committed, shared with B157. The database's answer and the read of the table are given in place of them.",
+        "Srpski and German get the new line in the release, Srpski as a draft for Coach Milan's Confirm.",
+        "It can ride in the same build as B157."
+      ],
+      "short": "The heads-up says: close this, then scan the table on Label",
+      "rel": "Proposed; not agreed until Coach Milan says Go",
+      "boardTitle": "B158: the heads-up for a product with no values says what to do: close this, then scan the table on Label"
     }
   ]
 }
