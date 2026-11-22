@@ -3024,6 +3024,27 @@
       "decision": "Go, Coach Milan 22 November 14:21, checks: Area. Built in 0.3.173. The buttons stay as the backup once OP9 sends the mail by itself.",
       "checks": "Area: Clients. The unit tests with new ones for the rule, the build, the walkthrough of the applications with new checks for AC1 to AC8, and every walkthrough that opens Clients, about 10 minutes. Four new lines, so the German sweep too. The server part (reading the invites next to the requests, closing every request of an email) cannot be reached by a walkthrough; it gets unit tests on the rule it uses.",
       "version": "0.3.173"
+    },
+    {
+      "id": "B156",
+      "title": "Clients keeps the names it knew when the invites do not load",
+      "epic": "coach",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 15:23: a client showed as No on Clients. 15:28: after reopening Clients the name was back; a promote ran at the same time, and the other names were right. 15:35: yes, a ticket in Next, not drawn yet.",
+      "opportunity": {
+        "from": "Coach Milan's own Clients screen during a promote, 22 November 2026.",
+        "job": "See every client under the right name, every time I open Clients.",
+        "kind": "A wrong result for a moment: it looks like broken data when it is not.",
+        "why_now": "It shows each time a promote runs while Clients is open."
+      },
+      "problem": "Clients reads the clients and, in a second request, the coach's invites. A client whose Profile name is empty gets the invite's name, email and where she came from (B141). When the invites request fails (a promote, a weak connection, a server waking up), the app says nothing and draws the cards without it, keeps nothing from before, and does not try again. The fallback No name yet is then cut to its first word, No, like a first name.",
+      "story": "When the names from my invites cannot be loaded for a moment, I want Clients to keep the names it already knew and fill in the rest as soon as it can, so that a client is never shown under a wrong name.",
+      "proposed": "1. The app keeps the last good answer of the invites on the coach's phone and uses it when the request fails. 2. A failed request is tried once more a moment later, and the names fill in when the answer arrives. 3. A card with no name at all shows the whole line No name yet, never its first word.",
+      "open": [
+        "Not covered: a client who joined while the request fails and whom the phone has never seen shows No name yet until the second try succeeds."
+      ],
+      "checks": "To agree with the board; likely Light: Clients only.",
+      "decision": "Open. In Next. Not drawn yet."
     }
   ]
 }
