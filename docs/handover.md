@@ -33,15 +33,15 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 22 November 2026, 21:10
+## State, 22 November 2026, 22:15
 
-- 0.3.174 (DT336) is merged into main and tagged v0.3.174 (local tag). Main is at the handover commit after it. Coach Milan starts Preview and Promote.
-- Release plan (agreed): R1 DT336 (done in 0.3.174), B157 and B158 (the clean-up of DT336, first), DT337, DT334. R2 DT338, DT339. R3 B156, DT340. R4 DT335.
-- The tsc typing error in src/applications.test.ts is fixed in 0.3.174 (`npx tsc --noEmit` passes).
+- 0.3.175 (B157 and B158) is merged into main and tagged v0.3.175 (local tag). 0.3.174 (DT336) before it. Main is at the handover commit after it. Coach Milan starts Preview and Promote. Coach Milan 21:56: 0.3.173 is on Preview and live.
+- Release plan (agreed): R1 DT336 (0.3.174), B157 and B158 (0.3.175), DT337, DT334. R2 DT338, DT339. R3 B156, DT340. R4 DT335.
+- A board says what the flow before is, by its version and where it is: "In main, 0.3.174, not on Preview yet", never "Today" (Coach Milan 21:56: today on a board meant main, which he had not seen).
 
 ### Tickets from the onboarding call (all in docs/backlog.json)
 
-- DT336 done in 0.3.174 (Go 20:47, checks Area plus the German sweep, 21 of 21 walkthroughs, docs/qa/runs/0.3.174.json). The rule is in src/obvious0.ts, with the list settled at 20:32. The server sends `categories` and `noValues` (the database has no energy, protein, fat or carbohydrate at all, so a per-100-ml record the app leaves empty is not "no values"). candidateFood marks `zeroKind` (tea, coffee, water, salt) or `dbEmpty`. The label check sets 0, drops the box, shows "Tea has almost no calories, so it is saved as 0 kcal." and "No PD: it has 0 kcal."; the card shows the same PD words. New walkthrough tests/flows/tea-zero.cjs (PORT 3601). Seen while building, not asked yet: Serbian forms like šećerom, mlekom, kafe are not whole-word matches of the list, and "Ice Tea" (without d) is not a block word; on the Plate a tea makes the fibre letter read fi?, because its fibre stays empty, as drawn.
+- DT336 done in 0.3.174 (Go 20:47, checks Area plus the German sweep, 21 of 21 walkthroughs, docs/qa/runs/0.3.174.json). The rule is in src/obvious0.ts, with the list settled at 20:32. The server sends `categories` and `noValues` (the database has no energy, protein, fat or carbohydrate at all, so a per-100-ml record the app leaves empty is not "no values"). candidateFood marks `zeroKind` (tea, coffee, water, salt) or `dbEmpty`. The label check sets 0, drops the box, shows "Tea has almost no calories, so it is saved as 0 kcal." and "No PD: it has 0 kcal."; the card shows the same PD words. New walkthrough tests/flows/tea-zero.cjs (PORT 3601). Seen while building, not asked yet: on the Plate a tea makes the fibre letter read fi?, because its fibre stays empty, as drawn. (The Serbian forms and Ice Tea were fixed in B157.)
 - DT337 Next: Fit to my target lands in the target's range and adds what the meal is missing. Follow the user's target range, no new formula.
 - DT334 Next: up to 3 kitchens you cook, plus a chip for trying new kitchens. Coach Milan asks testers who picked 4 or more to reduce; no code for that.
 - DT338 Next: what the PD colours mean, one scale on the Goal page and behind the PD number on the Plate.
@@ -49,8 +49,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - B156 Next: Clients keeps the names it knew when the invites do not load.
 - DT340 Next: the client's card shows activity: opened, active, full, last active; a client quiet for 3 days waits.
 - DT335 Next: Gain healthy weight as a goal; goals that do not fit are greyed; a target body weight (roughly 1 kg a month).
-- B157 Next, drawn, board Stories275 on Page 6 (Coach Milan 21:11 to 21:12). The words that block the 0 of DT336 also match Serbian forms by how the word starts (šećer blocks šećerom), in Latin and Cyrillic, with the Serbian words added for syrup, cream, chips, vinegar, cake, nuts and flavour; Ice Tea and Icetea block it too. A sugar free tea gets the heads-up and is typed from its pack. Waiting for Go. Checks proposed: Area, the DT336 set, no German sweep (no new words). Scratch build /home/claude/work/b157 (board-new in src/obvious0.ts).
-- B158 Next, drawn, board Stories276 on Page 6 (Coach Milan 21:27 to 21:48). The heads-up of DT336 AC7 gets new words: "The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label." Words only; a button that opens the camera from the heads-up is left for later (21:46, an edge case). Waiting for Go. Checks proposed: Light plus the German sweep. Can ride in the build of B157; the scratch build /home/claude/work/b157 holds both behind board-new.
+- B157 done in 0.3.175 (Go 21:57 with B158). A Serbian block word blocks every word that starts with it, in Latin and Cyrillic (SR_STEMS in src/obvious0.ts), leden before čaj; Ice Tea and Icetea block the 0.
+- B158 done in 0.3.175. The heads-up says "The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label." A button that opens the camera from the heads-up is left for later (21:46, an edge case). Checks: Area plus the German sweep, 21 of 21 walkthroughs (docs/qa/runs/0.3.175.json).
 - DT341 Later: drinks in millilitres, shown and typed in ml, calculated in grams. Not urgent.
 - A cook mode issue a tester saw: not reproduced; Coach Milan checks with the tester. No ticket.
 
