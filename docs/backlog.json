@@ -3013,6 +3013,28 @@
       "decision": "Direction agreed 22 November 18:46. Not drawn yet."
     },
     {
+      "id": "DT340",
+      "title": "The client's squares show activity: opened, active, full, and today as it goes",
+      "epic": "coach",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 18:46 to 18:59: the squares on a client's card give him an overview of the client's activity, but today never has a colour and he wants to see whether there was activity today. He asked what is tracked. 18:54: what can show that the client opened the app, even when they only planned and looked; maybe a minimum activity that counts. 18:59: for now it is ok, to be seen in the future.",
+      "opportunity": {
+        "from": "Coach Milan's own Clients screen, 22 November 2026.",
+        "job": "See at a glance which clients are using the app, today and in the last two weeks.",
+        "kind": "Missing: the squares show only full days for the measurement; today and days with nothing logged look like the rest.",
+        "why_now": "New testers joined; the first days decide whether they stay."
+      },
+      "problem": "The squares are the first two weeks of measuring the burn. Green: a day over with a plan, every planned meal answered and the meals of the day reached. Amber: any other day over, including a day with nothing at all. Today is only an outline until it is over. Opening the app is counted only in the anonymous app counts on Metrics, not on the client's card, and opening alone changes nothing in her data, so nothing reaches the coach.",
+      "story": "When I look at my clients, I want to see on which days each one opened the app or did something, today included, so that I know who is there and who went quiet.",
+      "proposed": "Three levels per day. Opened: the app was opened that day. Active: at least one thing that shapes her food day: a meal logged, the plan changed, a weigh-in, or a question from the coach or Chef Mealan answered. Full: as today. The squares: empty, not opened; light grey, opened only; amber, active and not full; green, full; the weigh-in dot stays. Today fills in as the day goes. The legend says the same. The phone writes the day's level into the day line it already sends. The privacy notice gets one line: your coach sees on which days you opened the app.",
+      "open": [
+        "A full day needs a plan today: a client who logs every meal from the Plate and plans nothing never gets green, and her two weeks may never be ready. Asked 18:50, not answered yet.",
+        "The minimum for Active may change later (Coach Milan 18:59: for now it is ok)."
+      ],
+      "checks": "To agree with the board.",
+      "decision": "Direction agreed 22 November 18:59. Not drawn yet."
+    },
+    {
       "id": "B154",
       "title": "A plate logged with the pencil and then cooked is one meal, not two",
       "epic": "plate",
