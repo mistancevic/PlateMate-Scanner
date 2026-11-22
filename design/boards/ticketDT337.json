@@ -3,7 +3,7 @@
   "title": "Fit to my target lands in the target's range and adds what the meal is missing",
   "epic": "plate",
   "state": "next",
-  "why": "Coach Milan 22 November 2026, 17:41 to 17:47, after an onboarding call: a tester scanned eggs (PD about 8.5) and asked Fit to my target; Chef Mealan added whey protein, PD 17 against her target 5.3, where a cook would add carbs and balance the meal. 17:47: follow the range of the user's target, no new formula; take the food preferences into account and add what is missing to balance it; several options, as in the chat (eggs with toast, fruit), carbs when the diet has them; a keto-like diet would add fat instead.",
+  "why": "Coach Milan 22 November 2026, 17:41 to 17:47, after an onboarding call: a tester scanned eggs (PD about 8.5) and asked Fit to my target; Chef Mealan added whey protein, PD 17 against her target 5.3, where a cook would add carbs and balance the meal. 17:47: follow the range of the user's target, no new formula; take the food preferences into account and add what is missing to balance it; several options, as in the chat (eggs with toast, fruit), carbs when the diet has them; a keto-like diet would add fat instead. 22:46: the cards are an interesting feature, I like it; make them more often available. 22:51: redraw with the route changed.",
   "opportunity": {
     "from": "An onboarding call, 22 November 2026.",
     "job": "Turn what I have into a balanced meal for my target.",
@@ -12,15 +12,14 @@
   },
   "problem": "The instruction to Chef Mealan says keep the meal at or above the protein target, and the app's check only refuses an idea under the target. There is no upper side, so an idea far above passes. Nothing tells him the plate is already above the target and needs energy, not protein.",
   "story": "When my plate already has more protein than my target, I want Fit to my target to add what the meal is missing, in foods I like, so that the meal lands in my range and is balanced.",
-  "proposed": "The range already in the app: the chip Fits your plan covers 0.9 to 1.5 times the target (for a target of 5.3: about 4.8 to 8.0). Fit to my target aims into that range. The check refuses an idea above it and asks Chef Mealan once more with the reason, as it already does for an idea under the target. Chef Mealan is told what the meal is missing: the meal's share of the day's carbs and fat, against what the plate already holds, so he adds the kind of food that is short. When the plate is already above the range, he is told the protein is there and to add no protein food. Diet, taste, kitchens and the library keep working as today. Three options, as today.",
+  "proposed": "The range already in the app: the On plan chip of Foods covers 0.9 to 1.5 times the target (for a target of 5.3: 4.8 to 8.0). With the AI on, a plate with no meal set makes Fit ask which meal first, in the meal line, with one tap; then the ideas come for that meal. A plate above the range goes to Chef Mealan's ideas, also when it is near the meal's size. Fit to my target aims into the range: the check refuses an idea above it and asks once more with the reason, as for an idea under the target. Chef Mealan is told what the meal is missing: the meal's share of the day's carbs and fat, against what the plate holds, and, when the plate is above the range, that the protein is there and to add no protein food. The quick fit, when the AI is off, adds a base from your foods to a plate above the range, never a protein food. Diet, taste, kitchens and the library keep working as today.",
   "open": [
-    "The quick fit, used when the AI is off or the plate is near the meal's size, also adds protein to a plate above the range (three eggs plus 40 g whey, PD 13.4). It is not in this ticket unless Coach Milan says so.",
     "The readout says fits your plan for any PD at or above the target, 13.4 included. DT338 shows the range; the words stay as they are here."
   ],
-  "checks": "Area: the Plate. The unit tests with new ones for the range check and for what Chef Mealan is told, the build, a new walkthrough for AC1 to AC5, and every Plate walkthrough that asks Chef Mealan for ideas (make-meal, chef-dinner, two-breakfasts, plate-fixes, kitchens-and-steps and the rest), about 15 minutes. make-meal's lunch at PD 10.1 against 6.4 is above the range, so that walkthrough changes with this ticket. The model evals for the meal ideas get cases for a plate above the range.",
-  "decision": "Direction agreed 22 November 17:47. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
-  "now": "Three eggs for breakfast, PD 8.4, against the target 5.3: already above its range, 4.8 to 8.0. Fit to my target asks Chef Mealan for a breakfast; he is told to keep the meal at or above the protein target, and he adds whey, cottage cheese, skyr or quark. The app's check refuses only an idea under the target, so all three pass, PD 8.8 to 10.1, and the plate says fits your plan.",
-  "looked_at": "A new formula for a balanced meal: not chosen, 17:47, follow the range the app already has. Leaving the check as it is and only changing what Chef Mealan is told: not chosen, the check is what stops an idea that is still above the range.",
+  "checks": "Area: the Plate. The unit tests with new ones for the range check, the route and what Chef Mealan is told, the build, a new walkthrough for AC1 to AC8, and every Plate walkthrough that uses Fit to my target, the ideas or the quick fit (make-meal, chef-dinner, two-breakfasts, plate-fixes, kitchens-and-steps, fab-and-fit and the rest), about 15 to 20 minutes. make-meal's lunch at PD 10.1 against 6.4 is above the range, so that walkthrough changes with this ticket. One new line on screen, so the German sweep too. The model evals for the meal ideas get cases for a plate above the range.",
+  "decision": "Direction agreed 22 November 17:47; route asked for 22:46 and 22:51. Drawn again 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "now": "Three eggs, PD 8.4, against the target 5.3: already above its range, 4.8 to 8.0. With no meal set (since 0.3.157 no meal is guessed), Fit uses the quick fit: it adds the food with the most protein in your foods, whey, PD 13.4. With a meal set, and the plate far from the meal's size, Chef Mealan's ideas come; he is told to keep the meal at or above the protein target and adds whey, cottage cheese or quark, PD 8.8 to 10.1, and the check lets them pass. The plate says fits your plan either way.",
+  "looked_at": "A new formula for a balanced meal: not chosen, 17:47, follow the range the app already has. Leaving the check as it is and only changing what Chef Mealan is told: not chosen, the check is what stops an idea that is still above the range. Guessing the meal again when none is set: not chosen, 0.3.157 stopped guessing; one tap asks it.",
   "board": "Stories277",
   "where": "Page 6",
   "ac": [
@@ -48,19 +47,36 @@
       "id": "AC5",
       "title": "Ideas anyway follows the range",
       "text": "Given the plate already fills the meal and I tap Ideas anyway, when the small additions come, then they land in the range too"
+    },
+    {
+      "id": "AC6",
+      "title": "No meal set: Fit asks which meal",
+      "text": "Given three eggs on the Plate with no meal set and the AI on, when I tap Fit to my target, then the meal line opens and one line says Which meal is it? Pick it, and Chef Mealan finds ideas for it; once I pick Breakfast, the ideas come for a breakfast"
+    },
+    {
+      "id": "AC7",
+      "title": "Above the range goes to Chef Mealan",
+      "text": "Given a breakfast set and a plate above the range, near the meal's size or not, when I tap Fit to my target with the AI on, then Chef Mealan's ideas come, not the quick fit"
+    },
+    {
+      "id": "AC8",
+      "title": "The quick fit adds no protein above the range",
+      "text": "Given the AI is off and three eggs for breakfast, PD 8.4, when I tap Fit to my target, then the quick fit adds a base from my foods, for example 150 g wholegrain bread, PD 5.5, never whey"
     }
   ],
   "unchanged": [
     "Diet, taste, the kitchens you cook, allergies and the foods in your library steer the ideas as today.",
     "Three ideas, Put it on the plate, Other ideas, and a miss shown with why.",
     "An idea under the target is refused as today.",
-    "The meal's size: within 10 % of what the meal should be."
+    "The meal's size: within 10 % of what the meal should be.",
+    "With the AI off, or a plate near its meal's size and in the range, Fit uses the quick fit as today."
   ],
   "details": [
     "The range is the one the app already has: 0.9 to 1.5 times the target (BAND_EDGES in src/goal.ts), the On plan chip of Foods.",
     "What the meal is missing: the meal's share of the day's carbs and fat (the day's split on Me), against what the plate already holds. The kind of food that is short is the one he adds.",
+    "A food Chef Mealan names that is not in your foods has no fibre value, so the plate shows fi? (DT342, if Coach Milan says so).",
     "The pictures are the real app on one scratch build of main, not committed. Chef Mealan's answers are given in place of the AI: before, the kind of answer the tester got; new, the answer once he is told what the meal is missing, with one idea still above the range to show the check.",
-    "A food Chef Mealan names that is not in your foods has no fibre value, so the plate shows fi? (DT342, if Coach Milan says so)."
+    "The quick fit's base: from your foods, bread, oats, rice, potatoes or pasta, with a PD under the target; the one closest to the target first."
   ],
   "short": "Fit to my target lands in the range and adds what the meal is missing",
   "rel": "Proposed; not agreed until Coach Milan says Go",

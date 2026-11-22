@@ -27,20 +27,20 @@ const NEW = { options: [
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
   const b = await chromium.launch();
-  const open = async (isNew) => {
+  const open = async (isNew, o = {}) => {
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, timezoneId: "Europe/Berlin" }); const p = await ctx.newPage();
     await p.clock.setFixedTime(new Date("2026-11-22T08:00:00+01:00"));
     await p.route("**/api/meal", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(isNew ? NEW : BEFORE) }));
     await p.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "" }) }));
-    await p.addInitScript(([s, isNew]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+    await p.addInitScript(([s, isNew, aiOff]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
       localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "exact" }));
       localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "female", birthYear: 1995, heightCm: 168, weightKg: 62, kitchens: ["German", "Balkan", "Mediterranean"], plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
-      localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z" }));
-      if (isNew) localStorage.setItem("board-new", "1"); localStorage.setItem("seeded", "1"); }, [seed, isNew]);
+      localStorage.setItem("chefmealan-safety", JSON.stringify(aiOff ? { situations: [], flags: [], allergies: [], none: false, adultAt: "2026-10-06T09:00:00Z" } : { situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z" }));
+      if (isNew) localStorage.setItem("board-new", "1"); localStorage.setItem("seeded", "1"); }, [seed, isNew, !!o.aiOff]);
     await require(path.join(ROOT, "tests/flows/adult.cjs"))(p);
     await p.goto(U + "/plate"); await p.waitForTimeout(1300);
     await p.addStyleTag({ content: ".chat-fab { display: none !important }" });
-    await require(path.join(ROOT, "tests/flows/set-meal.cjs"))(p, "Breakfast"); await p.waitForTimeout(500);
+    if (!o.noMeal) { await require(path.join(ROOT, "tests/flows/set-meal.cjs"))(p, "Breakfast"); await p.waitForTimeout(500); }
     return p;
   };
   const note = (p, sel, html, marks = [], where = "afterend") => p.evaluate(([sel, html, marks, MARK, NOTE, where]) => { for (const m of marks) { const e = document.querySelector(m); if (e) e.style.cssText += ";" + MARK; }
@@ -48,26 +48,49 @@ const NEW = { options: [
   const clean = (p) => p.evaluate(() => { document.querySelectorAll(".board-note").forEach((n) => n.remove()); document.querySelectorAll("[style*='outline: 3px']").forEach((e) => (e.style.outline = "")); });
   const top = (p, sel, off = 70) => p.evaluate(([sel, off]) => { const e = document.querySelector(sel); if (!e) return; e.scrollIntoView({ block: "start" }); window.scrollBy(0, -off); }, [sel, off]);
   const shot = async (p, name) => { await p.waitForTimeout(400); await p.screenshot({ path: `${R}/${name}.png` }); console.log(name); };
+  const fit = async (p) => { await p.getByRole("button", { name: "Fit to my target" }).first().click(); await p.waitForTimeout(2500); };
+  const log = async (p, tag) => console.log(tag, (await p.locator(".readout").first().innerText().catch(() => "")).replace(/\s+/g, " "));
+  const cards = async (p, n, isNew, missName) => {
+    console.log("CARDS", (await p.locator(".mm-card").allInnerTexts()).map((t) => t.replace(/\s+/g, " ").slice(0, 80)).join(" || "));
+    await top(p, ".mm-card", 140);
+    await note(p, ".mm-card", isNew ? "<b>New:</b> Chef Mealan is told the plate has the protein and the meal is missing carbs: toast, porridge. Each lands in the range." : "Chef Mealan adds more protein: whey, cottage cheese, quark. The check only refuses an idea under the target, so ideas far above pass.", [".mm-card"], "beforebegin");
+    await shot(p, n); await clean(p);
+    if (missName && await p.locator(".mm-fail").count()) { await top(p, ".mm-fail", 160); await note(p, ".mm-fail", "<b>New:</b> an idea above the range is refused, with why, and shown as a miss.", [".mm-fail"], "beforebegin"); await shot(p, missName); await clean(p); }
+    await p.locator(".mm-card").first().getByRole("button", { name: "Put it on the plate" }).click(); await p.waitForTimeout(900);
+  };
   try {
-    for (const flow of ["1", "2"]) {
-      const N = flow === "2"; const p = await open(N);
-      console.log("READOUT", (await p.locator(".readout").first().innerText()).replace(/\s+/g, " "));
-      await top(p, ".readout", 70);
-      await note(p, ".readout", `${N ? "<b>No change:</b> " : ""}Three eggs for breakfast, PD 8.4: already above the range of the target 5.3 (4.8 to 8.0). I tap Fit to my target.`, [".readout"]);
-      await shot(p, `${flow}a`); await clean(p);
-      await p.getByRole("button", { name: "Fit to my target" }).first().click(); await p.waitForTimeout(2500);
-      console.log("HEAD", (await p.locator(".step-head").first().innerText().catch(() => "")).replace(/\s+/g, " ").slice(0, 300));
-      console.log("CARDS", (await p.locator(".mm-card").allInnerTexts()).map((t) => t.replace(/\s+/g, " ").slice(0, 90)).join(" || "));
-      console.log("FAILS", (await p.locator(".mm-fail").allInnerTexts()).map((t) => t.replace(/\s+/g, " ").slice(0, 160)).join(" || "));
-      await top(p, ".mm-card", 140);
-      await note(p, ".mm-card", N ? "<b>New:</b> Chef Mealan is told the plate has the protein and the meal is missing carbs: toast, porridge. Each lands in the range." : "Chef Mealan adds more protein: whey, cottage cheese, quark. The check only refuses an idea under the target, so ideas far above pass.", [".mm-card"], "beforebegin");
-      await shot(p, `${flow}b`); await clean(p);
-      if (N && await p.locator(".mm-fail").count()) { await top(p, ".mm-fail", 160); await note(p, ".mm-fail", "<b>New:</b> an idea above the range is refused, with why, and shown as a miss.", [".mm-fail"], "beforebegin"); await shot(p, "2c"); await clean(p); }
-      await p.locator(".mm-card").first().getByRole("button", { name: "Put it on the plate" }).click(); await p.waitForTimeout(900);
-      console.log("AFTER", (await p.locator(".readout").first().innerText()).replace(/\s+/g, " "));
-      await top(p, ".readout", 70);
-      await note(p, ".readout", N ? "<b>New:</b> the breakfast lands in the range: fits your plan." : "On the plate: PD far above the target, a breakfast with protein and little else.", [".readout"]);
-      await shot(p, N ? "2d" : "1c"); await clean(p); await p.context().close();
-    }
+    // DT337.1, main: no meal set, the quick fit adds whey (the path the tester took)
+    let p = await open(false, { noMeal: true }); await log(p, "1a");
+    await top(p, ".meal-line", 70);
+    await note(p, ".readout", "Three eggs, no meal set. PD 8.4, above the range of the target 5.3 (4.8 to 8.0). I tap Fit to my target.", [".meal-line"]);
+    await shot(p, "1a"); await clean(p);
+    await fit(p); await log(p, "1b");
+    await top(p, ".readout", 70); await note(p, ".readout", "No meal set: Fit uses the quick fit. It adds the food with the most protein in my foods: whey. PD far above, and it says fits your plan.", [".readout"]);
+    await shot(p, "1b"); await clean(p); await p.context().close();
+    // DT337.2, main: a meal set, Chef Mealan's ideas add protein
+    p = await open(false); await log(p, "2a");
+    await top(p, ".readout", 70); await note(p, ".readout", "Breakfast set. Three eggs, PD 8.4, above the range. I tap Fit to my target.", [".readout"]);
+    await shot(p, "2a"); await clean(p);
+    await fit(p); await cards(p, "2b", false); await log(p, "2c");
+    await top(p, ".readout", 70); await note(p, ".readout", "On the plate: PD 10.1, a breakfast with protein and little else, and it says fits your plan.", [".readout"]);
+    await shot(p, "2c"); await clean(p); await p.context().close();
+    // DT337.3, new: no meal set, Fit asks which meal, then Chef Mealan's ideas in the range
+    p = await open(true, { noMeal: true });
+    await top(p, ".meal-line", 70); await note(p, ".readout", "<b>No change:</b> three eggs, no meal set. I tap Fit to my target.", [".meal-line"]);
+    await shot(p, "3a"); await clean(p);
+    await fit(p);
+    await top(p, ".meal-line-open", 250); await note(p, ".meal-line-open", "<b>New:</b> with no meal set, Fit asks which meal first, in the meal line, with one tap. A plate above the range goes to Chef Mealan's ideas.", [".meal-line-open"], "beforebegin");
+    await shot(p, "3b"); await clean(p);
+    await require(path.join(ROOT, "tests/flows/set-meal.cjs"))(p, "Breakfast"); await p.waitForTimeout(3000);
+    await cards(p, "3c", true, "3d"); await log(p, "3e");
+    await top(p, ".readout", 70); await note(p, ".readout", "<b>New:</b> the breakfast lands in the range: fits your plan.", [".readout"]);
+    await shot(p, "3e"); await clean(p); await p.context().close();
+    // DT337.4, new: the AI off, the quick fit adds a base, never protein, to a plate above the range
+    p = await open(true, { aiOff: true });
+    await top(p, ".readout", 70); await note(p, ".readout", "<b>No change:</b> the AI is off for this account. Breakfast, three eggs, PD 8.4. I tap Fit to my target.", [".readout"]);
+    await shot(p, "4a"); await clean(p);
+    await fit(p); await log(p, "4b");
+    await top(p, ".readout", 70); await note(p, ".readout", "<b>New:</b> the quick fit adds a base from my foods, wholegrain bread, never a protein food: the plate comes down into the range.", [".readout"]);
+    await shot(p, "4b"); await clean(p); await p.context().close();
   } catch (e) { console.log("ERR", e.message); } finally { await b.close(); server.kill(); }
 })();
