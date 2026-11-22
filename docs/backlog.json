@@ -2882,6 +2882,28 @@
       ]
     },
     {
+      "id": "DT334",
+      "title": "Up to 3 kitchens you cook, and a chip for trying new kitchens",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 15:35 to 15:43, after an onboarding call: a tester picked 10 kitchens in setup, another tester earlier picked many and narrowed them down later. 15:41: limit the kitchens you cook to 3. 15:43: taste is covered by a chip, not a second list. The testers who already have more than 3 are asked by Coach Milan himself; no code for them.",
+      "opportunity": {
+        "from": "An onboarding call, 22 November 2026, and an earlier tester.",
+        "job": "Get ideas from Chef Mealan that feel like my kitchen, and sometimes something new.",
+        "kind": "Did not understand it: the chips ask which kitchens you cook, people answer which food they like.",
+        "why_now": "Every new tester goes through this step in setup."
+      },
+      "problem": "There is no limit on the kitchens you cook. People pick what they like to eat, often 10 of 16. The server sends only the first 8 to Chef Mealan, so the rest are dropped without a word. With so many, the rule that ideas come from your kitchens filters almost nothing, each kitchen adds its dishes to every request (longer, slower, more expensive), Members sorts almost everything as yours, and Profile gets a block per kitchen.",
+      "story": "When I set up the kitchens I cook, I want to pick the few I really cook and say separately that I like trying new things, so that Chef Mealan's ideas feel like my kitchen and still bring something new now and then.",
+      "proposed": "The kitchens you cook: up to 3, in setup and in Profile. The line above says why: Chef Mealan cooks in these first. Pick up to 3. With 3 picked, a fourth needs one tapped off first. The server takes the same 3, so nothing is dropped without a word. A new chip under How I eat: I like trying new kitchens. With it on, one of Chef Mealan's three ideas may come from a kitchen outside the 3; the other two stay in them.",
+      "open": [
+        "Existing profiles with more than 3: no code. Coach Milan asks those testers to reduce. Until then the app keeps their list as it is; the server then takes their first 3 in the order tapped (today it takes 8).",
+        "The exact words of the line and the chip, in three languages."
+      ],
+      "checks": "To agree with the board.",
+      "decision": "Direction agreed 22 November 15:41 and 15:43: 3, and the chip. Not drawn yet."
+    },
+    {
       "id": "B154",
       "title": "A plate logged with the pencil and then cooked is one meal, not two",
       "epic": "plate",
