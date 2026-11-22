@@ -20,10 +20,12 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
+# Coach Milan 22 November 2026, 21:56: "today" on a board meant main, which he had not seen on Preview; the label says so
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.174")}
 B = Board(); PW = 390; G = 70
 W = SX + 5 * PW + 4 * G + 40
 parts = [("Ticket", "B158. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: B158, canvas Page 6."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> B158.1: the flow as it is today in 0.3.174, to the heads-up. B158.2: the same flow, new words in the heads-up, then what the person does: close, the camera on Label, the table read. A screen that stays is marked No change; a blue outline marks what is new."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> B158.1: the flow as it is in main, 0.3.174, not on Preview yet, to the heads-up. B158.2: the same flow, new words in the heads-up, then what the person does: close, the camera on Label, the table read. A screen that stays is marked No change; a blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "22 November 21:28: But tea with sugar on the pack has to have nutrition label with sugar listed there. 21:46: It would be easier to say, barcode reading currently doesn't return values. Close, and open camera for nutrition label reading. That is better and universal."),
@@ -36,7 +38,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
-label(y, "B158.1 Today, 0.3.174", "Oat biscuits, a name and no values in the database", 0, 2)
+label(y, "B158.1 In main, 0.3.174, not on Preview yet", "Oat biscuits, a name and no values in the database", 0, 2)
 y += 60
 RA = [shot(X(0), y, "1a", PW, "B158.1a The barcode", "draft", "I tap Use the code only."),
   shot(X(1), y, "1b", PW, "B158.1b The label check", "draft", "The heads-up says to type the values.")]
@@ -53,7 +55,7 @@ for i in range(1, 5): arrow(X(i) - G + 2, y2 + 540)
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories276.dc.html", t["boardTitle"], "Drawn 22 November 2026. Ticket B158, Kanban column Next. Pictures from the real app on a scratch build of main, today and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories275.dc.html")
+board("Stories276.dc.html", t["boardTitle"], "Drawn 22 November 2026. Ticket B158, Kanban column Done, v0.3.175. Pictures from the real app on a scratch build of main, 0.3.174 and new. Go 22 November 21:57; built in 0.3.175.", B, W, Hc, "Stories275.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B158": {"file": "Stories276.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out158.json"), "w"))
 print("B158", W, Hc + 230)

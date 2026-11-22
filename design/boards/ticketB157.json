@@ -2,7 +2,7 @@
   "id": "B157",
   "title": "A sweet tea or coffee named in Serbian, or an Ice Tea, is never saved as 0",
   "epic": "plate",
-  "state": "next",
+  "state": "done",
   "why": "Coach Milan 22 November 2026, 21:11 to 21:12, after DT336 was built (0.3.174): the words that block the 0 miss Serbian word forms and Ice Tea; yes, clean this one before the next ticket. 21:12: a sweet tea with a zero calorie sweetener gets the heads-up; its pack prints a table, so the values are typed from it and it saves as 0 like zero cola.",
   "opportunity": {
     "from": "Claude's own look while building DT336, 22 November 2026.",
@@ -16,8 +16,8 @@
   "proposed": "The Serbian words that block the 0 are matched by how the word starts, in Latin and Cyrillic, so šećer also blocks šećera, šećerom and šećerni. The Serbian words for the other block words are added: sirup, krem, pavlaka, šlag, čips, sirće, torta, orasi, ukus. Ice Tea and Icetea block the 0 too. A product they block gets the amber heads-up of DT336 AC7. The list of what counts as 0 stays as it is.",
   "looked_at": "Matching the Serbian forms of tea, coffee and water too: not chosen, a product name says Čaj or Kafa as it is, and a missed 0 only costs a heads-up. Asking whether a sweet tea has sugar: not chosen, the pack of a sweetened tea prints a table, so the values are typed from it.",
   "open": [],
-  "checks": "Area: Foods and the scan, the same set as DT336, about 5 minutes. The rule changes what the app does, so Light is not enough. The unit tests with new ones for the words, the build, the DT336 walkthrough with a new part for AC1 to AC4. No new words on screen, so no German sweep.",
-  "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "checks": "Area plus the German sweep (with B158): 21 of 21 walkthroughs passed (docs/qa/runs/0.3.175.json).",
+  "decision": "Go, Coach Milan 22 November 2026, 21:57, built with B158. Built in 0.3.175.",
   "board": "Stories275",
   "where": "Page 6",
   "ac": [
@@ -59,6 +59,7 @@
     "No new words on screen."
   ],
   "short": "Serbian word forms and Ice Tea block the 0",
-  "rel": "Proposed; not agreed until Coach Milan says Go",
-  "boardTitle": "B157: a sweet tea or coffee named in Serbian, or an Ice Tea, is never saved as 0"
+  "rel": "0.3.175",
+  "boardTitle": "B157: a sweet tea or coffee named in Serbian, or an Ice Tea, is never saved as 0",
+  "version": "0.3.175"
 }

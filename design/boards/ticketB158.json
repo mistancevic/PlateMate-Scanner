@@ -2,7 +2,7 @@
   "id": "B158",
   "title": "The heads-up for a product with no values says what to do: close this, then scan the table on Label",
   "epic": "plate",
-  "state": "next",
+  "state": "done",
   "why": "Coach Milan 22 November 2026, 21:27 to 21:48, while looking at B157: a pack with sugar has to print a nutrition table, so the values are on the pack; the database is what lacks them. 21:29: yes, the heads-up should say the photo too. 21:46: leave a new button for later, an edge case; easier to say barcode reading does not return values, close, and open the camera for the nutrition label; better and universal. 21:48: yes, draw it.",
   "opportunity": {
     "from": "Coach Milan's own look at B157, 22 November 2026.",
@@ -16,8 +16,8 @@
   "proposed": "The same heads-up, new words: The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label. Nothing else changes: the values stay empty, the box stays, saving it empty still stops, and typing the values still works.",
   "looked_at": "A button under the heads-up that opens the camera for the table and fills this label check: not chosen now, 21:46, an edge case; later if it proves needed.",
   "open": [],
-  "checks": "Light: one screen, words only. The unit tests, the build, the DT336 walkthrough (it checks the heads-up's words), and the walkthroughs that open the label check, about 5 to 10 minutes. The words change, so the German sweep too.",
-  "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "checks": "Area plus the German sweep (with B157): 21 of 21 walkthroughs passed (docs/qa/runs/0.3.175.json).",
+  "decision": "Go, Coach Milan 22 November 2026, 21:57, built with B157. Built in 0.3.175.",
   "board": "Stories276",
   "where": "Page 6",
   "ac": [
@@ -39,6 +39,7 @@
     "It can ride in the same build as B157."
   ],
   "short": "The heads-up says: close this, then scan the table on Label",
-  "rel": "Proposed; not agreed until Coach Milan says Go",
-  "boardTitle": "B158: the heads-up for a product with no values says what to do: close this, then scan the table on Label"
+  "rel": "0.3.175",
+  "boardTitle": "B158: the heads-up for a product with no values says what to do: close this, then scan the table on Label",
+  "version": "0.3.175"
 }
