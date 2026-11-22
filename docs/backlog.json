@@ -3369,6 +3369,70 @@
       ],
       "checks": "To agree with the board; likely Light: Clients only.",
       "decision": "Open. In Next. Not drawn yet."
+    },
+    {
+      "id": "B157",
+      "title": "A sweet tea or coffee named in Serbian, or an Ice Tea, is never saved as 0",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 21:11 to 21:12, after DT336 was built (0.3.174): the words that block the 0 miss Serbian word forms and Ice Tea; yes, clean this one before the next ticket. 21:12: a sweet tea with a zero calorie sweetener gets the heads-up; its pack prints a table, so the values are typed from it and it saves as 0 like zero cola.",
+      "opportunity": {
+        "from": "Claude's own look while building DT336, 22 November 2026.",
+        "job": "Scan a sweet tea or a coffee with milk and get its real values.",
+        "kind": "A wrong result: a sweet drink with no values in the database is saved as 0.",
+        "why_now": "0.3.174 brought the 0. A wrong 0 is saved with no question, and nobody sees it."
+      },
+      "problem": "The words that block the 0 are matched as whole words, in the one form they are written. Serbian changes the end of a word: sa šećerom, bez šećera, sa mlekom, s ukusom breskve. None of them is šećer, mleko or ukus, so Čaj sa šećerom and Kafa sa mlekom count as 0 when the product database has no category and no values. The block words have no Cyrillic form at all, so Чај са шећером counts as 0 too. Ice Tea, written without the d, is not a block word, so Ice Tea Peach counts as 0.",
+      "story": "When I scan a sweet tea or a coffee with milk, I want to type its values from the pack, so that my day does not count it as 0.",
+      "now": "Čaj sa šećerom, scanned by its barcode, with a name and no category and no values in the database: the label check says Tea has almost no calories, so it is saved as 0 kcal. Confirm & save saves it with 0 kcal and 0 protein, and its card says No PD: it has 0 kcal.",
+      "proposed": "The Serbian words that block the 0 are matched by how the word starts, in Latin and Cyrillic, so šećer also blocks šećera, šećerom and šećerni. The Serbian words for the other block words are added: sirup, krem, pavlaka, šlag, čips, sirće, torta, orasi, ukus. Ice Tea and Icetea block the 0 too. A product they block gets the amber heads-up of DT336 AC7. The list of what counts as 0 stays as it is.",
+      "looked_at": "Matching the Serbian forms of tea, coffee and water too: not chosen, a product name says Čaj or Kafa as it is, and a missed 0 only costs a heads-up. Asking whether a sweet tea has sugar: not chosen, the pack of a sweetened tea prints a table, so the values are typed from it.",
+      "open": [],
+      "checks": "Area: Foods and the scan, the same set as DT336, about 5 minutes. The rule changes what the app does, so Light is not enough. The unit tests with new ones for the words, the build, the DT336 walkthrough with a new part for AC1 to AC4. No new words on screen, so no German sweep.",
+      "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "board": "Stories275",
+      "where": "Page 6",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "A Serbian form blocks the 0",
+          "text": "Given I scan Čaj sa šećerom whose database entry has a name, no category and no values, when the label check opens, then it gets the amber heads-up of DT336 AC7, the values are empty and the box I checked the values is there"
+        },
+        {
+          "id": "AC2",
+          "title": "In Cyrillic, and the other Serbian words",
+          "text": "Given the name is Чај са шећером, Kafa sa mlekom or Čaj s ukusom breskve, with no category and no values, when the label check opens, then it gets the heads-up, never 0"
+        },
+        {
+          "id": "AC3",
+          "title": "Ice Tea",
+          "text": "Given I scan Ice Tea Peach with no category and no values, when the label check opens, then it gets the heads-up, never 0"
+        },
+        {
+          "id": "AC4",
+          "title": "A sugar free tea",
+          "text": "Given I scan Čaj bez šećera with no category and no values, when the label check opens, then it gets the heads-up, and the values I type from the pack are saved as typed, 0 included"
+        },
+        {
+          "id": "AC5",
+          "title": "A plain tea is as in 0.3.174",
+          "text": "Given I scan Čaj od nane with no category and no values, when the label check opens, then one line says Tea has almost no calories, so it is saved as 0 kcal, as today"
+        }
+      ],
+      "unchanged": [
+        "What counts as 0: the categories and names of DT336.",
+        "The heads-up's words and look (DT336 AC7), and saving it empty still stops.",
+        "A product with values, of any kind.",
+        "The English and German block words, as whole words."
+      ],
+      "details": [
+        "The pictures are the real app on one scratch build of main, not committed. The database's answer is given in place of it.",
+        "A Serbian block word matches every word that starts with it: šećer, mlek, mleč, čokolad, kolač, keks, sok, sirup, krem, pavlak, šlag, čips, sirć, tort, orah, oras, ukus, and leden before čaj. The same in Cyrillic.",
+        "No new words on screen."
+      ],
+      "short": "Serbian word forms and Ice Tea block the 0",
+      "rel": "Proposed; not agreed until Coach Milan says Go",
+      "boardTitle": "B157: a sweet tea or coffee named in Serbian, or an Ice Tea, is never saved as 0"
     }
   ]
 }
