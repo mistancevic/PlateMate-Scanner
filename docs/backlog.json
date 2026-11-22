@@ -2927,6 +2927,28 @@
       "decision": "Direction agreed 22 November 15:54 and 16:01. Not drawn yet."
     },
     {
+      "id": "DT336",
+      "title": "A tea, coffee or water with no values on its pack is saved as 0, without a question",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 16:22 to 17:35, after an onboarding call: a tester scanned a tea; the barcode was read right, but it could not be saved because there were no values. A zero food is already a real food (sweeteners, 0.2.21; zero cola). Drinks and spices can be part of a dish, not only on the side (his brownie with zero cola). 17:35: for a food that is obviously 0 kcal like a tea, no question and no other check; it is noted as a tea or similar and saved; asking to confirm would sound weird.",
+      "opportunity": {
+        "from": "An onboarding call, 22 November 2026.",
+        "job": "Scan my tea and use it, on the side or in a dish.",
+        "kind": "A bug: a product read correctly cannot be saved.",
+        "why_now": "Every new tester scans what is in the kitchen, and tea and coffee are there."
+      },
+      "problem": "EU label law does not require a nutrition table on tea, herbal tea, coffee, water, salt, herbs and spices. Their values come back empty, not zero. The app treats empty as unknown and refuses to save: Energy and protein are required.",
+      "story": "When I scan a tea, I want it saved at once, so that I can add it to my snack or use it in a recipe like any other food.",
+      "proposed": "A product read from a barcode or a pack, with no values, whose category or name says tea, herbal tea, coffee, water or salt (and herbs and spices, see open), is saved as 0 kcal and 0 protein with no question, marked no values on the pack. From then on it is like zero cola: a drink on the side, or an ingredient in a dish with its grams and no energy. No protein density is shown for it. Any other product with no values keeps today's way: type the values from the pack, or scan the table.",
+      "open": [
+        "Herbs and spices: dried ones carry real energy per 100 g (paprika is about 280 kcal per 100 g), small in a pinch, a little more in two spoons in a goulash. 0 too, or kept as For cooking, not counted, as today.",
+        "Which words or categories make a product obviously 0: from the product database's category first, then the name in English, German and Serbian."
+      ],
+      "checks": "To agree with the board.",
+      "decision": "Direction agreed 22 November 17:35. Not drawn yet."
+    },
+    {
       "id": "B154",
       "title": "A plate logged with the pencil and then cooked is one meal, not two",
       "epic": "plate",
