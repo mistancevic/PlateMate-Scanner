@@ -2992,6 +2992,27 @@
       "decision": "Direction agreed 22 November 18:01: both places. Not drawn yet."
     },
     {
+      "id": "DT339",
+      "title": "A nutrition table printed in several languages shows the app's own names",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 18:43 to 18:46, from an onboarding call: a scanned label showed Greek food names; the pack prints each line in Czech, Croatian, Bulgarian and Greek, joined with slashes, and the app keeps the table as printed. 18:46: yes, a ticket in Next.",
+      "opportunity": {
+        "from": "An onboarding call, 22 November 2026.",
+        "job": "Check the values of a pack I scanned.",
+        "kind": "Did not understand it: rows named in four languages, Greek among them.",
+        "why_now": "Packs sold across Europe print their table in several languages."
+      },
+      "problem": "The label read keeps every line of the table exactly as printed, with its printed name in the label's language. A pack sold in several countries prints each line in several languages (Tuky/Masti/Мазнини/Λιπαρά for fat). The rows become long and hard to read, although the app knows what most of them are.",
+      "story": "When I check the values of a pack I scanned, I want each line named in my language, so that I can read the table at a glance.",
+      "proposed": "A line the app recognises (energy, fat, saturates, carbohydrate, sugars, fibre, protein, salt, and vitamins and minerals it knows) shows the app's own name in the app's language. The printed name stays stored as the record and shows small under it or on a tap. A line the app does not recognise keeps its printed name, as today.",
+      "open": [
+        "Small under the name, or on a tap."
+      ],
+      "checks": "To agree with the board.",
+      "decision": "Direction agreed 22 November 18:46. Not drawn yet."
+    },
+    {
       "id": "B154",
       "title": "A plate logged with the pencil and then cooked is one meal, not two",
       "epic": "plate",
