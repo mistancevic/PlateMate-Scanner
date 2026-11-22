@@ -33,14 +33,15 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 22 November 2026, 20:40
+## State, 22 November 2026, 21:10
 
-- App 0.3.173 - fa1d659. No new version since. Main has only docs and board commits after it.
-- Release plan (agreed): R1 DT336, DT337, DT334. R2 DT338, DT339. R3 B156, DT340. R4 DT335.
+- 0.3.174 (DT336) is merged into main and tagged v0.3.174 (local tag). Main is at the handover commit after it. Coach Milan starts Preview and Promote.
+- Release plan (agreed): R1 DT336 (done in 0.3.174), DT337, DT334. R2 DT338, DT339. R3 B156, DT340. R4 DT335.
+- The tsc typing error in src/applications.test.ts is fixed in 0.3.174 (`npx tsc --noEmit` passes).
 
 ### Tickets from the onboarding call (all in docs/backlog.json)
 
-- DT336 Next, drawn, board Stories274 on Page 6. A tea, coffee, herbal tea, water or salt with no values is saved as 0 with no question. Any other product with no values gets an amber heads-up (the warn-box look of The plate is not empty, with the warning triangle): "The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save." Saving it empty still stops. AC7 matches. The open point is settled (Coach Milan 20:32): which products count as 0 is a table in the board's agreement block and `obvious0` in docs/backlog.json. The category first; the name only when there is no category, as a whole word; block words and block categories always win (crisps, biscuits, cake, cream, Sahne, nuts, vinegar and more), so salt and vinegar crisps, tea biscuits, coffee cake and Kaffee Sahne get the heads-up, never 0. Waiting for Go. Checks proposed: Area plus the German sweep.
+- DT336 done in 0.3.174 (Go 20:47, checks Area plus the German sweep, 21 of 21 walkthroughs, docs/qa/runs/0.3.174.json). The rule is in src/obvious0.ts, with the list settled at 20:32. The server sends `categories` and `noValues` (the database has no energy, protein, fat or carbohydrate at all, so a per-100-ml record the app leaves empty is not "no values"). candidateFood marks `zeroKind` (tea, coffee, water, salt) or `dbEmpty`. The label check sets 0, drops the box, shows "Tea has almost no calories, so it is saved as 0 kcal." and "No PD: it has 0 kcal."; the card shows the same PD words. New walkthrough tests/flows/tea-zero.cjs (PORT 3601). Seen while building, not asked yet: Serbian forms like šećerom, mlekom, kafe are not whole-word matches of the list, and "Ice Tea" (without d) is not a block word; on the Plate a tea makes the fibre letter read fi?, because its fibre stays empty, as drawn.
 - DT337 Next: Fit to my target lands in the target's range and adds what the meal is missing. Follow the user's target range, no new formula.
 - DT334 Next: up to 3 kitchens you cook, plus a chip for trying new kitchens. Coach Milan asks testers who picked 4 or more to reduce; no code for that.
 - DT338 Next: what the PD colours mean, one scale on the Goal page and behind the PD number on the Plate.
@@ -57,13 +58,11 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - project/canvas.json is pretty-printed, one key per line. Add a board as an entry in "boards" and its file name in "order".
 - Page 5 (page-v31x6j) is full. Page 6 is page-p475ue. On Page 6: an empty Artboard 1 (Artboard-9s4q, x 0 y 0, 800 x 600; leave it unless Coach Milan says), and Stories274 DT336 at x 0, y 720, h 4592 (taller since the list of what counts as 0).
 - The next board on Page 6 goes at x 0, y 5432.
-- Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. Pictures need a scratch build of main with the new screens behind localStorage "board-new"; rebuild it if the work folder is gone.
-
-### To fix in the next build
-
-- `tsc --noEmit` fails in src/applications.test.ts (Property 'invite' does not exist). Test typing only.
+- Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
+- The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.174; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json. Seven new lines, Srpski as drafts waiting for Confirm, German in Beta.
 
 ### Still open
 
 - OP9 (the app sends mail), OP8 (needs a board), DT333 (later), DT332 (to draw), B152 (board), DT319 (answer).
 - Asked, no answer yet: whether the empty It makes field on Eat gets its own ticket.
+- The repo tracks `node_modules` as a symlink; after `npm ci` git shows it deleted. Never commit that: add files by name.
