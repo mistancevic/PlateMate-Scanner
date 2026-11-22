@@ -4,6 +4,7 @@ import srFile from "./src/i18n/sr-Latn.json" with { type: "json" };
 import deFile from "./src/i18n/de.json" with { type: "json" };
 import "dotenv/config";
 import { TASTE_CHIPS } from "./src/tasteChips";
+import { withInvites } from "./src/applications";
 import express from "express";
 import path from "node:path";
 import fs from "node:fs";
@@ -2295,14 +2296,24 @@ app.get("/api/access-requests", requireUser, requireMember, requireCoach, async 
   try {
     if (!ownerOnly(req)) return notOwner(res);
     const snap = await db().collection("accessRequests").orderBy("createdAt", "desc").limit(50).get();
-    res.json({ requests: snap.docs.map((d) => ({ id: d.id, ...(d.data() as any), ipHash: undefined, ua: undefined })) });
+    // B155 (0.3.173): what the owner's invites say about each email: a code is out, or the person joined with one
+    const inv = await db().collection("invites").where("coachId", "==", (req as any).uid).get();
+    res.json({ requests: withInvites(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any), ipHash: undefined, ua: undefined })), inv.docs.map((d) => d.data() as any)) });
   } catch (e) { fail(res, e); }
 });
 app.post("/api/access-requests/:id", requireUser, requireMember, requireCoach, async (req, res) => {
   try {
     if (!ownerOnly(req)) return notOwner(res);
     const status = req.body?.status === "handled" ? "handled" : "new";
-    await db().collection("accessRequests").doc(String(req.params.id).slice(0, 80)).update({ status, handledAt: FieldValue.serverTimestamp() });
+    const ref = db().collection("accessRequests").doc(String(req.params.id).slice(0, 80));
+    await ref.update({ status, handledAt: FieldValue.serverTimestamp() });
+    // B155 (0.3.173): Invite and Mark as handled close every request of that email, not only the one the card shows
+    if (status === "handled") {
+      const email = String((await ref.get()).data()?.email ?? "");
+      if (email) { const same = await db().collection("accessRequests").where("email", "==", email).get(); const batch = db().batch(); let n = 0;
+        for (const d of same.docs) if (d.id !== ref.id && d.data()?.status !== "handled") { batch.update(d.ref, { status, handledAt: FieldValue.serverTimestamp() }); n++; }
+        if (n) await batch.commit(); }
+    }
     res.json({ ok: true });
   } catch (e) { fail(res, e); }
 });

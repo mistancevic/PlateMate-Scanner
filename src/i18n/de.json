@@ -22892,6 +22892,22 @@
     "plate.saveToMyRecipes": {
       "text": "In Meine Rezepte speichern",
       "checked": true
+    },
+    "coach.reqClient": {
+      "text": "Schon Klient",
+      "checked": true
+    },
+    "coach.reqInvitedOpen": {
+      "text": "Eingeladen am {date}, der Code ist noch nicht eingelöst.",
+      "checked": true
+    },
+    "coach.reqSendCode": {
+      "text": "Code noch einmal senden",
+      "checked": true
+    },
+    "coach.reqSendSignIn": {
+      "text": "Senden, wie man sich anmeldet",
+      "checked": true
     }
   }
 }

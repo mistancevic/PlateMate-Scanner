@@ -4,7 +4,7 @@ import { getLang } from "../lang";
 import { w, wn, numLocale, phoneLoc, dateText, wIn as wordIn, type WordKey } from "../words";
 import { weekdayName } from "../weekdayWords";
 import { waLink } from "../phone";
-import { peopleOf, openOf, handledAt, type Application } from "../applications";
+import { peopleOf, openOf, isOpen, askedAgain, signInMail, handledAt, type Application, type InviteOf } from "../applications";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
 import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
@@ -156,7 +156,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
       {!p.demo && <WaitingRecipes notify={notify} setError={setError} />}
       {!p.demo && <p className="label coach-static">{w("coach.codesAndSignUps")}</p>}
       {!p.demo && <Invites {...p} />}
-      {!p.demo && <AccessRequests {...p} />}
+      <AccessRequests {...p} />
       {/* DT260: what each tester tried under How to */}
       {!p.demo && <HowToTesters list={p.howTesters} />}
       {!p.demo && <WaitingList {...p} />}
@@ -298,13 +298,13 @@ export function AccessRequests(p: AppApi) {
   const list = p.requests;
   if (!list || list.length === 0) return null;
   const people = peopleOf(list);
-  const open = people.filter((r) => r.status !== "handled");
+  const open = people.filter(isOpen);
   // DT279 (0.3.140): the open ones wait at the top, in Waiting for you; here the handled ones stay, with their date
   return (
     <>
       <p className="label">{w("coach.accessRequests", { n: open.length })}</p>
       <BetaSpots />
-      {people.filter((r) => r.status === "handled").slice(0, 20).map((r) => <RequestCard key={r.id} r={r} p={p} />)}
+      {people.filter((r) => !isOpen(r)).slice(0, 20).map((r) => <RequestCard key={r.id} r={r} p={p} />)}
     </>
   );
 }
@@ -313,7 +313,9 @@ export function AccessRequests(p: AppApi) {
 // own line, away from Invite, with a second tap. A handled one shows its date.
 function RequestCard({ r, p, top = false }: { r: Application; p: AppApi; top?: boolean }) {
   const [sure, setSure] = useState(false);
-  const handled = r.status === "handled", at = handledAt(r);
+  // B155: closed by what the coach's invites say about this email, or handled by hand
+  const inv = (r.invite ?? null) as InviteOf | null, handled = !isOpen(r), at = handledAt(r), again = askedAgain(r);
+  const coach = inv?.coachName || p.coachLabel || "";
   const mark = () => fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) });
   const invite = async () => {
     const res = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: r.name, email: r.email, via: { kind: "form", from: r.from ?? "", src: r.src ?? "", at: r.createdAt ?? "" } }) });
@@ -327,7 +329,10 @@ function RequestCard({ r, p, top = false }: { r: Application; p: AppApi; top?: b
       <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
       {r.phone ? <a href={waLink(String(r.phone))} target="_blank" rel="noreferrer">WhatsApp {String(r.phone)}</a> : null}
       {r.note ? <p className="client-note">“{String(r.note)}”</p> : null}
-      {handled ? (at && <small className="muted">{w("coach.handledOn", { date: dateText(at, { day: "numeric", month: "short" }) })}</small>) : (
+      {handled ? (inv ? <>
+          <small className="muted request-state">{inv.status === "used" ? w("coach.reqClient") : w("coach.reqInvitedOpen", { date: dateText(new Date(inv.at), { day: "numeric", month: "short" }) })}</small>
+          {again && <div className="request-answer"><a className="pill pill-small pill-action" href={inv.status === "used" ? signInMail({ email: r.email, name: r.name }, coach) : inviteMail({ email: r.email, name: r.name, code: inv.code ?? "", coachName: coach })}><Send size={14} /> {inv.status === "used" ? w("coach.reqSendSignIn") : w("coach.reqSendCode")}</a></div>}
+        </> : at && <small className="muted">{w("coach.handledOn", { date: dateText(at, { day: "numeric", month: "short" }) })}</small>) : (
         <>
           <div className="request-invite"><button type="button" className="pill pill-primary" onClick={invite}><Send size={16} /> {w("coach.invite")}</button></div>
           <div className="request-handle">
@@ -396,7 +401,7 @@ export function Invites(p: AppApi) {
   useEffect(() => { load(); }, []);
   const create = async (n: string, e: string) => {
     setBusy(true);
-    try { const r = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: n, email: e }) }); const d = await r.json(); if (!r.ok) throw new Error(d.error); setMade(d); setName(""); setEmail(""); load(); return d; }
+    try { const r = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: n, email: e }) }); const d = await r.json(); if (!r.ok) throw new Error(d.error); setMade(d); setName(""); setEmail(""); load(); p.recountWaiting(); return d; }
     catch (err: any) { p.setError(err.message || w("coach.couldnTCreateTheInvite")); return null; } finally { setBusy(false); }
   };
   return (

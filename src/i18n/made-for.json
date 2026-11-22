@@ -5722,6 +5722,10 @@
     "screen.plate.liveEaten": {"en":"Eaten. Changes to this plate change this meal.","area":"The Plate","where":"The Plate","release":"0.3.171"},
     "screen.plate.livePlanned": {"en":"Planned","area":"The Plate","where":"The Plate","release":"0.3.171"},
     "screen.plate.liveHolds": {"en":"{meal} already holds {title}.","area":"The Plate","where":"The Plate","release":"0.3.171"},
-    "screen.plate.saveToMyRecipes": {"en":"Save it to My recipes","area":"The Plate","where":"The Plate","release":"0.3.171"}
+    "screen.plate.saveToMyRecipes": {"en":"Save it to My recipes","area":"The Plate","where":"The Plate","release":"0.3.171"},
+    "screen.coach.reqClient": {"en":"Already a client","area":"Clients","where":"Clients","release":"0.3.173"},
+    "screen.coach.reqInvitedOpen": {"en":"Invited on {date}. The code is not used yet.","area":"Clients","where":"Clients","release":"0.3.173"},
+    "screen.coach.reqSendCode": {"en":"Send the code again","area":"Clients","where":"Clients","release":"0.3.173"},
+    "screen.coach.reqSendSignIn": {"en":"Send how to sign in","area":"Clients","where":"Clients","release":"0.3.173"}
   }
 }
