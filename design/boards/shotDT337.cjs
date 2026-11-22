@@ -54,8 +54,11 @@ const NEW = { options: [
     console.log("CARDS", (await p.locator(".mm-card").allInnerTexts()).map((t) => t.replace(/\s+/g, " ").slice(0, 80)).join(" || "));
     await top(p, ".mm-card", 140);
     await note(p, ".mm-card", isNew ? "<b>New:</b> Chef Mealan is told the plate has the protein and the meal is missing carbs: toast, porridge. Each lands in the range." : "Chef Mealan adds more protein: whey, cottage cheese, quark. The check only refuses an idea under the target, so ideas far above pass.", [".mm-card"], "beforebegin");
+    // DT337.3c (Coach Milan 23:00): the ideas and the miss are one screen, so one tall picture, the miss under the ideas
+    if (missName && await p.locator(".mm-fail").count()) { await note(p, ".mm-fail", "<b>New:</b> further down the same screen, an idea above the range is refused, with why, and shown as a miss.", [".mm-fail"], "beforebegin");
+      await p.setViewportSize({ width: 390, height: 1330 }); await top(p, ".mm-card", 140); }
     await shot(p, n); await clean(p);
-    if (missName && await p.locator(".mm-fail").count()) { await top(p, ".mm-fail", 160); await note(p, ".mm-fail", "<b>New:</b> an idea above the range is refused, with why, and shown as a miss.", [".mm-fail"], "beforebegin"); await shot(p, missName); await clean(p); }
+    if (missName) await p.setViewportSize({ width: 390, height: 844 });
     await p.locator(".mm-card").first().getByRole("button", { name: "Put it on the plate" }).click(); await p.waitForTimeout(900);
   };
   try {
@@ -82,9 +85,9 @@ const NEW = { options: [
     await top(p, ".meal-line-open", 250); await note(p, ".meal-line-open", "<b>New:</b> with no meal set, Fit asks which meal first, in the meal line, with one tap. A plate above the range goes to Chef Mealan's ideas.", [".meal-line-open"], "beforebegin");
     await shot(p, "3b"); await clean(p);
     await require(path.join(ROOT, "tests/flows/set-meal.cjs"))(p, "Breakfast"); await p.waitForTimeout(3000);
-    await cards(p, "3c", true, "3d"); await log(p, "3e");
+    await cards(p, "3c", true, true); await log(p, "3d");
     await top(p, ".readout", 70); await note(p, ".readout", "<b>New:</b> the breakfast lands in the range: fits your plan.", [".readout"]);
-    await shot(p, "3e"); await clean(p); await p.context().close();
+    await shot(p, "3d"); await clean(p); await p.context().close();
     // DT337.4, new: the AI off, the quick fit adds a base, never protein, to a plate above the range
     p = await open(true, { aiOff: true });
     await top(p, ".readout", 70); await note(p, ".readout", "<b>No change:</b> the AI is off for this account. Breakfast, three eggs, PD 8.4. I tap Fit to my target.", [".readout"]);

@@ -56,10 +56,9 @@ label(y3, "DT337.3 New", "no meal set: Fit asks which meal, then ideas in the ra
 y3 += 60
 RC = [shot(X(0), y3, "3a", PW, "DT337.3a The Plate", "same", "Three eggs, no meal set. I tap Fit."),
   shot(X(1), y3, "3b", PW, "DT337.3b Which meal is it?", "changed", "The meal line opens: one tap."),
-  shot(X(2), y3, "3c", PW, "DT337.3c Chef Mealan's ideas", "changed", "Toast, porridge: each in the range."),
-  shot(X(3), y3, "3d", PW, "DT337.3d An idea above the range", "changed", "Refused, with why, shown as a miss."),
-  shot(X(4), y3, "3e", PW, "DT337.3e On the plate", "changed", "PD 6.4, in the range.")]
-for i in range(1, 5): arrow(X(i) - G + 2, y3 + 540)
+  shot(X(2), y3, "3c", PW, "DT337.3c Chef Mealan's ideas", "changed", "Toast, porridge in the range; below them, a miss."),
+  shot(X(3), y3, "3d", PW, "DT337.3d On the plate", "changed", "PD 6.4, in the range.")]
+for i in range(1, 4): arrow(X(i) - G + 2, y3 + 540)
 y4 = max(RC) + 70
 label(y4, "DT337.4 New", "the AI off: the quick fit adds a base, never protein", 0, 2)
 y4 += 60
