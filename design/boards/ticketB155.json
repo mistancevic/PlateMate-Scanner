@@ -1,71 +1,83 @@
 {
  "id": "B155",
- "title": "An application comes back to Waiting for you although the person was invited and already joined",
+ "title": "A request from a person already invited or already a client is not a new request",
  "epic": "coach",
  "state": "now",
  "board": "Stories273",
  "where": "Page 5",
- "why": "Coach Milan 22 November 2026, 10:40, with a screenshot of Clients: a tester already asked for the code and used it, but the message is still waiting for me, and it says 2 requests. 10:59: yes to a bug ticket and the board.",
+ "why": "Coach Milan 22 November 2026, 10:40, with a screenshot of Clients: a tester already asked for the code and used it, but the message is still waiting for me, and it says 2 requests. 10:59: yes to a bug ticket and the board. 13:40: the question is more on the user's end: the form does the same for everyone; if the email is in the system, the answer goes to their inbox with the steps and the code; on my end that is not counted as a new request. 13:46: then the solution in between is me sending it again; the mail server is another solution. 13:47: yes, redraw with the in-between solution and open the mail service as its own ticket.",
  "opportunity": {
   "from": "Coach Milan's own Clients screen, 22 November 2026.",
   "job": "See in Waiting for you only what still needs me.",
   "kind": "Did not understand it: a card with Invite for a person who is already a client, and a count of requests with no explanation.",
   "why_now": "New testers are joining now, and each one who sends the form twice leaves a card behind."
  },
- "problem": "Invite and Mark as handled close one request only: the one the card shows. When the same person sends the form again, the second request is new and the card is back, with Invite. The app does not look at what my invites already say about that email: that a code went out, or that the person joined with it.",
- "story": "When a person I already invited sends the form again, I want the app to know what I already did for that email, so that Waiting for you only holds people who still need an answer from me.",
+ "problem": "A person who is already invited, or already a client, sends the form on the home page once more, most likely because the mail or the code is lost. On my side that shows as a new application with Invite, and it counts in the badge. The app does not look at what my invites already say about that email. And the person gets no answer until I act.",
+ "story": "When a person I already invited sends the form again, I want it not to count as a new request and still be able to send her the code again in one tap, so that Waiting for you holds only people who are new to me and she is not left without an answer.",
  "now": "One card per email, showing the newest request and how many there were. Only that newest request is closed by Invite or Mark as handled. Joining with a code closes nothing.",
- "proposed": "The app reads my invites next to the requests, by email. A person who joined with a code never waits: the request is closed by itself and says Already a client further down. Invite and Mark as handled close every request of that email, not only the newest. A request older than a code that is out is closed and says Invited on that date. Only one case still waits: the person has a code, has not used it, and sends the form again. That card says so in one line, because she is asking again.",
- "looked_at": "Refusing a second form on the home page: not chosen, the public form must not tell a stranger whether an email is known. Hiding the count of requests: not chosen, it tells me the person asked more than once.",
- "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+ "proposed": "The form on the home page stays the same for everyone and says the same words. On my side the app reads my invites next to the requests, by email. A request from an email that is already invited or already a client is not a new request: no card in Waiting for you, and the badge does not count it. Further down, under Access requests, I see that she asked again: the number of requests and what I already did (Invited on that date and the code not used yet, or Already a client). One button there answers her by mail: Send the code again, or Send how to sign in. It opens my mail app with the text filled in, as Invite does today. Invite and Mark as handled close every request of that email. This is the solution in between. The full one is OP9: the app sends that mail by itself, at once, and I do nothing.",
+ "looked_at": "A card that still waits with one line, for a person who asks again with a code not used (the first drawing): not chosen, 13:40, on my end it is not a new request. Telling the person on the form that the email is known: not chosen, the public form must not tell a stranger whether an email is in the system; the answer belongs in the inbox. Hiding the count of requests: not chosen, it tells me the person asked more than once.",
+ "decision": "Open. Redrawn 22 November 2026, 13:50, for Coach Milan's look. No Go, so nothing is built.",
  "ac": [
   {
    "id": "AC1",
-   "title": "A person who joined does not wait",
+   "title": "Already a client: not a new request",
    "text": "Given a person joined with my invite, when the same email sends the form once more, then no application of that email is in Waiting for you, and the badge on Clients does not count it"
   },
   {
    "id": "AC2",
-   "title": "Her request says why",
-   "text": "Given a person joined with my invite and sent the form twice, when I look under Access requests further down, then her request says Already a client and 2 requests, and it has no Invite and no Mark as handled"
+   "title": "Already invited: not a new request",
+   "text": "Given I invited a person and the code is not used, when the same email sends the form once more, then no application of that email is in Waiting for you, and the badge on Clients does not count it"
   },
   {
    "id": "AC3",
+   "title": "I still see that she asked again",
+   "text": "Given a person already invited or already a client sent the form once more, when I look under Access requests further down, then her request says 2 requests and either Already a client or Invited on 20 Nov. The code is not used yet"
+  },
+  {
+   "id": "AC4",
+   "title": "Send the code again",
+   "text": "Given her request says Invited on 20 Nov. The code is not used yet, when I tap Send the code again, then my mail app opens with a mail to her that holds the same code and the steps, and no new code is made"
+  },
+  {
+   "id": "AC5",
+   "title": "Send how to sign in",
+   "text": "Given her request says Already a client, when I tap Send how to sign in, then my mail app opens with a mail to her that says she already has access and how to sign in"
+  },
+  {
+   "id": "AC6",
    "title": "Invite closes every request of that email",
    "text": "Given a person sent the form twice before I answered, when I tap Invite or Mark as handled on the card, then both requests are closed and the card does not come back"
   },
   {
-   "id": "AC4",
-   "title": "Asking again with a code not used",
-   "text": "Given I invited a person on 20 November and the code is not used, when she sends the form once more, then the card waits and one line says Invited on 20 Nov. The code is not used yet"
-  },
-  {
-   "id": "AC5",
+   "id": "AC7",
    "title": "An invite made by hand closes the request",
    "text": "Given an application waits, when I make an invite for that email with the invite form and not from the card, then the application leaves Waiting for you and says Invited on that date further down"
   },
   {
-   "id": "AC6",
+   "id": "AC8",
    "title": "A first request is as today",
    "text": "Given a person sends the form for the first time, when I open Clients, then the card New beta tester application waits with Invite and Mark as handled, as today"
   }
  ],
  "unchanged": [
-  "The card New beta tester application: its words, Invite on the right, Mark as handled with a second tap.",
-  "What Invite does: a code, the mail with it, one beta spot less.",
-  "The count of requests on a card.",
   "The home page form: it takes every request and says the same to everyone.",
+  "The card New beta tester application: its words, Invite on the right, Mark as handled with a second tap.",
+  "What Invite does: a code, the mail with it in my mail app, one beta spot less.",
+  "The count of requests on a request.",
   "Everything else in Waiting for you and its order."
  ],
- "checks": "Area: Clients. The unit tests with new ones for the rule, the build, the walkthrough of the applications with new checks for AC1 to AC6, and every walkthrough that opens Clients, about 10 minutes. Three new lines, so the German sweep too. The server part (reading the invites next to the requests, closing every request of an email) cannot be reached by a walkthrough; it gets unit tests on the rule it uses.",
- "short": "A request waits only while it still needs the coach",
+ "checks": "Area: Clients. The unit tests with new ones for the rule, the build, the walkthrough of the applications with new checks for AC1 to AC8, and every walkthrough that opens Clients, about 10 minutes. Four new lines, so the German sweep too. The server part (reading the invites next to the requests, closing every request of an email) cannot be reached by a walkthrough; it gets unit tests on the rule it uses.",
+ "short": "A request from a known email is not a new request",
  "rel": "Proposed; not agreed until Coach Milan says Go",
- "boardTitle": "B155: an application comes back to Waiting for you although the person already joined",
+ "boardTitle": "B155: a request from a person already invited or already a client is not a new request",
  "details": [
   "The pictures are the real app in the coach demo, with the phone's clock at Sunday 22 November 2026, 10:38 (the strip on every screen). One scratch build of 0.3.172, not committed. The person is the demo client Nina, not a real tester: she sent the form on 20 November, was invited that day, and sent the form once more on 21 November.",
   "Access requests is not shown in the coach demo today; the scratch shows it for these pictures only.",
-  "The mail with the code opens outside the app, so it is not drawn; B155.1b and B155.2b are Clients after the mail was sent.",
-  "The new words are English drafts: Already a client. Invited on 20 Nov. Invited on 20 Nov. The code is not used yet.",
-  "AC3 and AC5 have no picture of their own: the screens are B155.2b and B155.2d with other words in the grey line."
+  "The mails open outside the app, in my mail app, so they are not drawn. Send the code again: the invite mail of today with the same code. Send how to sign in, a draft: You already have access to Chef Mealan. Open chefmealan.com and sign in with this email address.",
+  "The new words are English drafts: Already a client. Invited on 20 Nov. The code is not used yet. Send the code again. Send how to sign in.",
+  "The button shows only on a request that came after the invite; a request closed by its own invite has no button.",
+  "AC6 and AC7 have no picture of their own: the screens are B155.2b and B155.3c with other words in the grey line.",
+  "OP9 takes over later: the app sends the mail by itself when such a request comes in."
  ]
 }

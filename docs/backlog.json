@@ -1668,6 +1668,33 @@
       ]
     },
     {
+      "id": "OP9",
+      "title": "The app sends mail by itself",
+      "epic": "ops",
+      "state": "next",
+      "why": "Coach Milan 22 November 2026, 13:40 to 13:47, from B155: when a person whose email is already in the system sends the form again, the answer should go to their inbox with the steps and the code, and I do nothing. The app cannot send mail today: Invite opens my own mail app.",
+      "opportunity": {
+        "from": "B155, a tester who asked for a code twice.",
+        "job": "A person who lost the mail or the code gets it again at once, without waiting for me.",
+        "kind": "Missing: the server has no mail service.",
+        "why_now": "New testers are joining; B155 is the solution in between and still needs my tap."
+      },
+      "problem": "Every mail the app wants to send goes through my own mail app and my tap. A person who asks again waits until I look.",
+      "story": "When a person whose email is already in the system asks again, I want the app to answer into their inbox by itself, so that they are not left waiting and I am not the step in between.",
+      "proposed": "A mail service the server calls. First use: the answer to a repeated request (the same code again, or how to sign in). Later, to decide: the invite mail itself. The form on the home page says the same to everyone; only the inbox gets the answer.",
+      "open": [
+        "Which service. Looked up 22 November 2026: Resend has a permanent free plan, 3,000 emails a month and at most 100 a day, no card needed; its first paid step is 20 dollars a month for 50,000. Others have free plans that move (Amazon SES has none for new accounts since July 2026). Check the prices again before choosing.",
+        "Where the service keeps the data: EU or not, and what the privacy page then has to say.",
+        "The sender address, for example hello@chefmealan.com, and who reads the replies.",
+        "The records in the domain settings of chefmealan.com so the mail is trusted (SPF, DKIM, DMARC): Coach Milan sets them; how the domain is hosted is not checked yet.",
+        "Does Invite also send by itself then, or stay in my mail app so I can add my own words.",
+        "The mails in three languages: which language a mail takes when the person has no account yet.",
+        "A limit so the form cannot be used to send mail to a stranger's inbox again and again."
+      ],
+      "checks": "To agree with the board.",
+      "decision": "Open. In Next. No board yet."
+    },
+    {
       "id": "DT313",
       "title": "Whatever arrives on a plate with foods gets the question a photo gets",
       "epic": "plate",
@@ -2923,61 +2950,71 @@
     },
     {
       "id": "B155",
-      "title": "An application comes back to Waiting for you although the person was invited and already joined",
+      "title": "A request from a person already invited or already a client is not a new request",
       "epic": "coach",
       "state": "now",
       "board": "Stories273",
       "where": "Page 5",
-      "why": "Coach Milan 22 November 2026, 10:40, with a screenshot of Clients: a tester already asked for the code and used it, but the message is still waiting for me, and it says 2 requests. 10:59: yes to a bug ticket and the board.",
+      "why": "Coach Milan 22 November 2026, 10:40, with a screenshot of Clients: a tester already asked for the code and used it, but the message is still waiting for me, and it says 2 requests. 10:59: yes to a bug ticket and the board. 13:40: the question is more on the user's end: the form does the same for everyone; if the email is in the system, the answer goes to their inbox with the steps and the code; on my end that is not counted as a new request. 13:46: then the solution in between is me sending it again; the mail server is another solution. 13:47: yes, redraw with the in-between solution and open the mail service as its own ticket.",
       "opportunity": {
         "from": "Coach Milan's own Clients screen, 22 November 2026.",
         "job": "See in Waiting for you only what still needs me.",
         "kind": "Did not understand it: a card with Invite for a person who is already a client, and a count of requests with no explanation.",
         "why_now": "New testers are joining now, and each one who sends the form twice leaves a card behind."
       },
-      "problem": "Invite and Mark as handled close one request only: the one the card shows. When the same person sends the form again, the second request is new and the card is back, with Invite. The app does not look at what my invites already say about that email: that a code went out, or that the person joined with it.",
-      "story": "When a person I already invited sends the form again, I want the app to know what I already did for that email, so that Waiting for you only holds people who still need an answer from me.",
+      "problem": "A person who is already invited, or already a client, sends the form on the home page once more, most likely because the mail or the code is lost. On my side that shows as a new application with Invite, and it counts in the badge. The app does not look at what my invites already say about that email. And the person gets no answer until I act.",
+      "story": "When a person I already invited sends the form again, I want it not to count as a new request and still be able to send her the code again in one tap, so that Waiting for you holds only people who are new to me and she is not left without an answer.",
       "ac": [
         {
           "id": "AC1",
-          "title": "A person who joined does not wait",
+          "title": "Already a client: not a new request",
           "text": "Given a person joined with my invite, when the same email sends the form once more, then no application of that email is in Waiting for you, and the badge on Clients does not count it"
         },
         {
           "id": "AC2",
-          "title": "Her request says why",
-          "text": "Given a person joined with my invite and sent the form twice, when I look under Access requests further down, then her request says Already a client and 2 requests, and it has no Invite and no Mark as handled"
+          "title": "Already invited: not a new request",
+          "text": "Given I invited a person and the code is not used, when the same email sends the form once more, then no application of that email is in Waiting for you, and the badge on Clients does not count it"
         },
         {
           "id": "AC3",
+          "title": "I still see that she asked again",
+          "text": "Given a person already invited or already a client sent the form once more, when I look under Access requests further down, then her request says 2 requests and either Already a client or Invited on 20 Nov. The code is not used yet"
+        },
+        {
+          "id": "AC4",
+          "title": "Send the code again",
+          "text": "Given her request says Invited on 20 Nov. The code is not used yet, when I tap Send the code again, then my mail app opens with a mail to her that holds the same code and the steps, and no new code is made"
+        },
+        {
+          "id": "AC5",
+          "title": "Send how to sign in",
+          "text": "Given her request says Already a client, when I tap Send how to sign in, then my mail app opens with a mail to her that says she already has access and how to sign in"
+        },
+        {
+          "id": "AC6",
           "title": "Invite closes every request of that email",
           "text": "Given a person sent the form twice before I answered, when I tap Invite or Mark as handled on the card, then both requests are closed and the card does not come back"
         },
         {
-          "id": "AC4",
-          "title": "Asking again with a code not used",
-          "text": "Given I invited a person on 20 November and the code is not used, when she sends the form once more, then the card waits and one line says Invited on 20 Nov. The code is not used yet"
-        },
-        {
-          "id": "AC5",
+          "id": "AC7",
           "title": "An invite made by hand closes the request",
           "text": "Given an application waits, when I make an invite for that email with the invite form and not from the card, then the application leaves Waiting for you and says Invited on that date further down"
         },
         {
-          "id": "AC6",
+          "id": "AC8",
           "title": "A first request is as today",
           "text": "Given a person sends the form for the first time, when I open Clients, then the card New beta tester application waits with Invite and Mark as handled, as today"
         }
       ],
       "unchanged": [
-        "The card New beta tester application: its words, Invite on the right, Mark as handled with a second tap.",
-        "What Invite does: a code, the mail with it, one beta spot less.",
-        "The count of requests on a card.",
         "The home page form: it takes every request and says the same to everyone.",
+        "The card New beta tester application: its words, Invite on the right, Mark as handled with a second tap.",
+        "What Invite does: a code, the mail with it in my mail app, one beta spot less.",
+        "The count of requests on a request.",
         "Everything else in Waiting for you and its order."
       ],
-      "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
-      "checks": "Area: Clients. The unit tests with new ones for the rule, the build, the walkthrough of the applications with new checks for AC1 to AC6, and every walkthrough that opens Clients, about 10 minutes. Three new lines, so the German sweep too. The server part (reading the invites next to the requests, closing every request of an email) cannot be reached by a walkthrough; it gets unit tests on the rule it uses."
+      "decision": "Open. Redrawn 22 November 2026, 13:50, for Coach Milan's look. No Go, so nothing is built.",
+      "checks": "Area: Clients. The unit tests with new ones for the rule, the build, the walkthrough of the applications with new checks for AC1 to AC8, and every walkthrough that opens Clients, about 10 minutes. Four new lines, so the German sweep too. The server part (reading the invites next to the requests, closing every request of an email) cannot be reached by a walkthrough; it gets unit tests on the rule it uses."
     }
   ]
 }

@@ -14,16 +14,18 @@ const r1h = { ...r1, status: "handled", handledAt: "2026-11-20T10:00:00.000Z" };
 const r2 = { ...r1, id: "r2", createdAt: "2026-11-21T18:30:00.000Z", status: "new" };
 const INV = "2026-11-20T10:00:00.000Z";
 // name: [requests, invite of that email or null, where to look, note, what to mark]
+const USED = { status: "used", at: INV }, OPEN = { status: "open", at: INV, code: "ABC123" };
 const scenes = {
   "1a": [[r1], null, "top", "A new application waits. I tap Invite: the mail with her code opens.", [".request-top .request-invite"]],
   "1b": [[r1h], null, "list", "After Invite the application left Waiting for you. Further down it says Handled.", []],
   "1c": [[r2, r1h], null, "top", "She joined with the code. She also sent the form once more. The card is back as new, with Invite, although she is already a client.", [".request-top"]],
   "2a": [[r1], null, "top", "<b>No change:</b> a new application waits. I tap Invite.", []],
-  "2b": [[{ ...r1h, invite: { status: "open", at: INV } }], { status: "open", at: INV }, "list", "<b>No change:</b> after Invite the application left Waiting for you. Further down it says Handled.", []],
-  "2c": [[r2, r1h].map((r) => ({ ...r, invite: { status: "used", at: INV } })), null, "top", "<b>New:</b> she joined, so her second form does not wait for me. The badge on Clients does not count it.", []],
-  "2d": [[r2, r1h].map((r) => ({ ...r, invite: { status: "used", at: INV } })), null, "list", "<b>New:</b> further down her request says Already a client, with 2 requests. No Invite, nothing to handle.", [".request .request-state"]],
-  "3a": [[r2, r1h], null, "top", "She has the code but did not use it, and sent the form once more. The card looks like a first request.", [".request-top"]],
-  "3b": [[r2, r1h].map((r) => ({ ...r, invite: { status: "open", at: INV } })), null, "top", "<b>New:</b> it still waits, because she is asking again. One line says she was invited and the code is not used yet.", [".request-top .request-again"]],
+  "2b": [[r1h], null, "list", "<b>No change:</b> after Invite the application left Waiting for you. Further down it says Handled.", []],
+  "2c": [[r2, r1h].map((r) => ({ ...r, invite: USED })), null, "top", "<b>New:</b> she is already a client, so her second form is not a new request. No card, and the badge on Clients does not count it.", []],
+  "2d": [[r2, r1h].map((r) => ({ ...r, invite: USED })), null, "list", "<b>New:</b> further down I see that she asked again: 2 requests, Already a client. One button answers her by mail with how to sign in. It opens my mail app, as Invite does.", [".request .request-state", ".request .request-answer"]],
+  "3a": [[r2, r1h], null, "top", "She has the code but did not use it, and sent the form once more. The card is back and looks like a first request.", [".request-top"]],
+  "3b": [[r2, r1h].map((r) => ({ ...r, invite: OPEN })), null, "top", "<b>New:</b> she is already invited, so her second form is not a new request. No card, no badge.", []],
+  "3c": [[r2, r1h].map((r) => ({ ...r, invite: OPEN })), null, "list", "<b>New:</b> further down: 2 requests, invited on 20 Nov, the code is not used yet. One button sends her the same code again by mail.", [".request .request-state", ".request .request-answer"]],
 };
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });

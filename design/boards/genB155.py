@@ -53,23 +53,24 @@ RA = [shot(X(0), y, "1a", PW, "B155.1a The application waits", "draft", "I tap I
   shot(X(2), y, "1c", PW, "B155.1c She joined, and asked again", "draft", "The card is back, with Invite.")]
 for i in range(1, 3): arrow(X(i) - G + 2, y + 540)
 y2 = max(RA) + 70
-label(y2, "B155.2 New", "the same flow: a person who joined does not wait")
+label(y2, "B155.2 New", "the same flow: her second form is not a new request, and I can still answer it")
 y2 += 60
 RB = [shot(X(0), y2, "2a", PW, "B155.2a The application waits", "same", "I tap Invite."),
   shot(X(1), y2, "2b", PW, "B155.2b After Invite", "same", "It left Waiting for you: Handled."),
-  shot(X(2), y2, "2c", PW, "B155.2c She joined, and asked again", "changed", "Nothing waits for me."),
-  shot(X(3), y2, "2d", PW, "B155.2d Further down", "changed", "Her request: Already a client.")]
+  shot(X(2), y2, "2c", PW, "B155.2c She joined, and asked again", "changed", "Not a new request: nothing waits."),
+  shot(X(3), y2, "2d", PW, "B155.2d Further down", "changed", "Already a client. Send how to sign in.")]
 for i in range(1, 4): arrow(X(i) - G + 2, y2 + 540)
 y3 = max(RB) + 70
-label(y3, "B155.3 Asking again with a code not used", "branch from B155.2b: today on the left, new on the right", 0, 2)
+label(y3, "B155.3 Asking again with a code not used", "branch from B155.2b: today on the left, then new", 0, 3)
 y3 += 60
-bs = [shot(X(0), y3, "3a", PW, "B155.3a Today", "draft", "It looks like a first request."),
-  shot(X(1), y3, "3b", PW, "B155.3b New", "changed", "It waits, and says she was invited.")]
-arrow(X(1) - G + 2, y3 + 540)
+bs = [shot(X(0), y3, "3a", PW, "B155.3a Today", "draft", "The card is back, as a first request."),
+  shot(X(1), y3, "3b", PW, "B155.3b New", "changed", "Not a new request: nothing waits."),
+  shot(X(2), y3, "3c", PW, "B155.3c New, further down", "changed", "Invited, code not used. Send the code again.")]
+arrow(X(2) - G + 2, y3 + 540)
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories273.dc.html", t["boardTitle"], "Drawn 22 November 2026. Ticket B155, Kanban column Now. Pictures from the real app in the coach demo on a scratch build of 0.3.172, today and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories272.dc.html")
+board("Stories273.dc.html", t["boardTitle"], "Redrawn 22 November 2026, 13:50. Ticket B155, Kanban column Now. Pictures from the real app in the coach demo on a scratch build of 0.3.172, today and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories272.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B155": {"file": "Stories273.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out155.json"), "w"))
 print("B155", W, Hc + 230)
