@@ -22934,7 +22934,7 @@
       "checked": true
     },
     "app.dbNoValues": {
-      "text": "Der Name ist erkannt, aber die Datenbank hat keine Werte für dieses Produkt. Trag sie aus der Nährwerttabelle auf der Packung ein und speichere dann.",
+      "text": "Der Barcode liefert keine Werte für dieses Produkt. Schließ das hier und scanne dann die Nährwerttabelle mit der Kamera auf Etikett.",
       "checked": true
     }
   }

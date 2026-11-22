@@ -72,3 +72,15 @@ test("DT336 AC6: in a dish the tea keeps its grams and adds no energy", async ()
   assert.equal(both.rows.find((r) => r.key === "energy")!.all, alone.rows.find((r) => r.key === "energy")!.all);
   assert.equal(both.rows.find((r) => r.key === "protein")!.all, alone.rows.find((r) => r.key === "protein")!.all);
 });
+test("B157 AC1, AC2: a Serbian block word blocks every word that starts with it, in Latin and Cyrillic", () => {
+  for (const n of ["Čaj sa šećerom", "Čaj bez šećera", "Чај са шећером", "Kafa sa mlekom", "Mlečna kafa", "Čaj s ukusom breskve", "Ledeni čaj breskva",
+    "Ledenog čaja limun", "Ледени чај", "Kafa sa čokoladom", "Kafa sa sirupom", "Kafa sa šlagom", "Čaj sa kremom", "Kafa i keksi", "Čaj sa sokom", "Вода са укусом лимуна"])
+    assert.equal(obviousZero(n), null, n);
+});
+test("B157 AC3: Ice Tea and Icetea block the 0", () => {
+  for (const n of ["Ice Tea Peach", "ICE TEA Zitrone", "Icetea lemon"]) assert.equal(obviousZero(n), null, n);
+});
+test("B157 AC5: a plain tea, coffee or water in Serbian is as in 0.3.174", () => {
+  for (const [n, k] of [["Čaj od nane", "tea"], ["Domaća kafa", "coffee"], ["Чај од нане", "tea"], ["Prirodna mineralna voda", "water"], ["Morska so", "salt"]] as const)
+    assert.equal(obviousZero(n), k, n);
+});

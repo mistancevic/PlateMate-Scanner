@@ -5733,6 +5733,6 @@
     "screen.app.zeroSalt": {"en":"Salt has no calories, so it is saved as 0 kcal.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
     "screen.app.noPdZero": {"en":"No PD: it has 0 kcal.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
     "screen.app.noValuesOnPack": {"en":"No values on the pack.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
-    "screen.app.dbNoValues": {"en":"The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save.","area":"Words used across the app","where":"Across the app","release":"0.3.174"}
+    "screen.app.dbNoValues": {"en":"The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label.","area":"Words used across the app","where":"Across the app","release":"0.3.175"}
   }
 }
