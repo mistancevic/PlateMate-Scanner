@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.174",
     "0.3.173",
     "0.3.172",
     "0.3.171",
@@ -2930,7 +2931,7 @@
       "id": "DT336",
       "title": "A tea, coffee or water with no values on its pack is saved as 0, without a question",
       "epic": "plate",
-      "state": "next",
+      "state": "done",
       "why": "Coach Milan 22 November 2026, 16:22 to 17:35, after an onboarding call: a tester scanned a tea; the barcode was read right, but it could not be saved because there were no values. A zero food is already a real food (sweeteners, 0.2.21; zero cola). Drinks and spices can be part of a dish, not only on the side (his brownie with zero cola). 17:35: for a food that is obviously 0 kcal like a tea, no question and no other check; it is noted as a tea or similar and saved; asking to confirm would sound weird. Later on 22 November: a product that is read but has no values gets no heads-up today; the person should be told it cannot be saved yet, and that the values can be typed by hand.",
       "opportunity": {
         "from": "An onboarding call, 22 November 2026.",
@@ -2942,8 +2943,8 @@
       "story": "When I scan a tea, I want it saved at once, so that I can add it to my snack or use it in a recipe like any other food.",
       "proposed": "A product read from a barcode or a pack, with no values, whose category or name says tea, herbal tea, coffee, water or salt, is saved as 0 kcal and 0 protein with no question, marked no values on the pack. From then on it is like zero cola: a drink on the side, or an ingredient in a dish with its grams and no energy. No protein density is shown for it. Any other product with no values gets a heads-up line: the name is read, the database has no values, type them from the pack. Saving it empty still stops, as today.",
       "open": [],
-      "checks": "Area: Foods and the scan. The unit tests with new ones for the rule, the build, a new walkthrough for AC1 to AC8, and every walkthrough that scans or saves a food, about 10 minutes. New lines, so the German sweep too.",
-      "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "checks": "Area: Foods and the scan. Ran 21 walkthroughs, all passed, with the German sweep (docs/qa/runs/0.3.174.json).",
+      "decision": "Go, Coach Milan 22 November 20:47, checks: Area plus the German sweep. Built in 0.3.174.",
       "board": "Stories274",
       "where": "Page 6",
       "now": "A barcode is read and the database answers with a name and no values. The label check shows every value empty and the box I checked the values. Confirm & save stops: Energy and protein are required to calculate PD, and Confirm the label and per-100-g basis before saving.",
@@ -3004,7 +3005,7 @@
         "The plate's weight grows by the tea's grams, as for any drink on a plate."
       ],
       "short": "A tea with no values is saved as 0",
-      "rel": "Proposed; not agreed until Coach Milan says Go",
+      "rel": "0.3.174",
       "boardTitle": "DT336: a tea, coffee or water with no values on its pack is saved as 0, without a question",
       "obvious0": {
         "settled": "Coach Milan 22 November 2026, 20:32",
@@ -3094,7 +3095,8 @@
           "sweetened drinks"
         ],
         "rule": "The category first. The name only when there is no category, as a whole word. A block word or block category always wins, over the category and over the name. Salt and vinegar crisps, tea biscuits, coffee cake and Kaffee Sahne get the heads-up of AC7, never 0."
-      }
+      },
+      "version": "0.3.174"
     },
     {
       "id": "DT337",
