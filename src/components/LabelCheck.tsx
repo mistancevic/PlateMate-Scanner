@@ -1,5 +1,5 @@
 // 0.3.156: moved out of App.tsx as it was.
-import { Check, Globe, MessageCircle } from "lucide-react";
+import { Check, Globe, MessageCircle, TriangleAlert } from "lucide-react";
 import { type DayType } from "../personal";
 import { Food, KEYS, density, lessThanFromNotes, numberInput, servingOf, servingsFor, snapToServing, validateFood } from "../pilot";
 import { KNOWN, type LabelRow, type Unit, displayRows, knownOf, sortEuropean, tidy } from "../labeltable";
@@ -25,6 +25,8 @@ import { inputValue } from "./nutrientFields";
 // DT243: a food's source is kept as English words; the label check shows the ones it knows in the app's language
 const SOURCE_WORDS: Record<string, WordKey> = { "Reference table": "app.referenceTable", "Manual entry": "app.srcManual", "Photos · review required": "app.srcPhotos", "Barcode and photos · review required": "app.srcBarcodePhotos", "Label photo · review required": "app.srcLabelPhoto", "Product database · review required": "app.srcDatabase", "Product database and photos · review required": "app.srcDatabasePhotos" };
 const sourceWord = (s: string) => (SOURCE_WORDS[s] ? w(SOURCE_WORDS[s]) : s);
+// DT336 (0.3.174): the line for a product with no values that is obviously 0, named for what it is
+const ZERO_LINE: Record<NonNullable<Food["zeroKind"]>, WordKey> = { tea: "app.zeroTea", coffee: "app.zeroCoffee", water: "app.zeroWater", salt: "app.zeroSalt" };
 // The label check: the model read it, the person checks it against the pack, then saves. Named after the person's job.
 export function LabelCheck({
   food,
@@ -80,6 +82,8 @@ export function LabelCheck({
     [reviewed, setReviewed] = useState(false),
     [errors, setErrors] = useState<string[]>([]);
   const [values, setValues] = useState(() => {
+    // DT336: a tea, coffee, water or salt with no values starts at 0; fibre stays empty, as the pack says nothing
+    if (food.zeroKind) return Object.fromEntries(KEYS.map((k) => [k, k === "fiber" ? "" : "0"])) as Record<string, string>;
     // a blank field with a less-than in the notes gets the printed bound, so the number can be calculated; the note keeps the printed text
     const bounds = lessThanFromNotes(food.notes ?? "");
     return Object.fromEntries(KEYS.map((k) => [k, food[k] === null && bounds[k] !== undefined ? String(bounds[k]) : inputValue(food[k], k)])) as Record<string, string>;
@@ -101,6 +105,8 @@ export function LabelCheck({
   // readyToEat is true for the tip: the box starts unticked because it is unconfirmed, not because the food needs cooking
   const servingNow = () => servingOf({ grams: numberInput(servingGrams), name: servingName.trim() || "serving" });
   const draft = (): Food => ({ ...food, name: name.trim() || food.name, brand: brand.trim(), readyToEat: true, serving: servingNow(), ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food);
+  // DT336: still 0 as long as no value is typed over the 0; a value typed makes it an ordinary food, checked as any other
+  const zero = food.zeroKind && KEYS.every((k) => values[k].trim() === "" || numberInput(values[k]) === 0) && values.calories.trim() !== "" && values.protein.trim() !== "" ? food.zeroKind : null;
   const pendingMix = useRef<Mix | null>(null);
   const [askError, setAskError] = useState("");
   // the title is the word the person tapped: Type, Barcode, Scan; the small line above says where the food goes
@@ -132,14 +138,17 @@ export function LabelCheck({
     onAsk(f, tip);
   }
   function submit() {
+    const { dbEmpty: _e, zeroKind: _z, ...base } = food;
+    const noValues = w("app.noValuesOnPack");
     const f = {
-      ...food,
+      ...base,
+      ...(zero ? { zeroKind: zero } : {}),
       ...(refPicked ? { source: "Reference table" } : {}),
       ...(/^\d{8,14}$/.test(code.trim()) ? { barcode: code.trim() } : {}),
       name: name.trim(),
       brand: brand.trim(),
       serving: servingNow(),
-      notes,
+      notes: zero && !notes.includes(noValues) ? (notes.trim() ? notes.trim() + " " : "") + noValues : notes,
       readyToEat: ready,
       reviewedAt: new Date().toISOString(),
       ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])),
@@ -154,7 +163,7 @@ export function LabelCheck({
       e.push(
         w("app.useNonNegative"),
       );
-    if (!reviewed)
+    if (!reviewed && !zero)
       e.push(w("app.confirmLabelBasis"));
     setErrors(e);
     if (e.length) return;
@@ -274,6 +283,10 @@ export function LabelCheck({
         {packLine({ pack: food.pack, name: name || food.name }) && <small className="pack-line">{packLine({ pack: food.pack, name: name || food.name })}</small>}
       </div>
       <p className="label">{w("app.nutritionTablePerGAs")}</p>
+      {zero && <p className="zero-line">{w(ZERO_LINE[zero])}</p>}
+      {food.dbEmpty && KEYS.every((k) => values[k].trim() === "") && (
+        <div className="warn-box none-line" role="note"><TriangleAlert size={18} aria-hidden="true" /><b>{w("app.dbNoValues")}</b></div>
+      )}
       <div className="label-table">
         {rows.map((r, i) => {
           const core = knownOf(r.key)?.core;
@@ -294,6 +307,7 @@ export function LabelCheck({
       {(() => {
         const d = draft();
         if (d.calories === null || d.protein === null) return null;
+        if (zero) return <p className="zero-line fit-none">{w("app.noPdZero")}</p>;
         const pb = playbookFor(d), pd = density(d.protein, d.calories);
         const fit = fitnessFor(d, day?.weightKg ?? null, day?.type ?? "passive");
         const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
@@ -357,14 +371,14 @@ export function LabelCheck({
         />{" "}
         {w("app.readyCold")}
       </label>
-      <label className="check">
+      {!zero && <label className="check">
         <input
           type="checkbox"
           checked={reviewed}
           onChange={(e) => setReviewed(e.target.checked)}
         />{" "}
         {w("app.iChecked")}
-      </label>
+      </label>}
       <p className="small">
         {w("app.perMlNote")}
       </p>

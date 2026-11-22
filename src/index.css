@@ -3655,3 +3655,9 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .card.request .request-state { display: block; margin-top: 6px; }
 .card.request .request-answer { margin-top: 8px; } .card.request .request-answer a { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
 .request.handled:has(.request-answer) { opacity: 1; }
+
+/* DT336 (0.3.174): a tea, coffee, water or salt with no values, saved as 0; any other product with no values gets a heads-up */
+.zero-line { background: var(--tint); color: var(--ink); border-radius: 14px; padding: 10px 14px; margin: 8px 0; font-weight: 600; line-height: 1.45; }
+.none-line { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; } .none-line svg { flex: none; margin-top: 2px; color: var(--close-text); }
+.readout.readout-none { background: #fff; color: var(--ink, #172742); border: 1px solid var(--line, #d1dcf0); }
+.readout.readout-none > b { display: block; margin-top: 8px; font-size: 17px; }
