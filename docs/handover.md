@@ -25,7 +25,7 @@ The latest handover lives here, in the repo, so a new chat can start from it wit
 
 ## Release steps (short)
 
-Branch pmNNN, bump package.json; words via `npx tsx scripts/lang-release.ts` then `apply <drafts>`; built-facts, words-baseline, app-sr scripts; `npm test`; `npm run build`; walkthroughs `LANES=n node scripts/run-flows.cjs [names]` (REDUCED="why" for Area); commit the qa run separately; push the branch; `git merge --no-ff` into main; tag; a line in docs/versions.md (10-character hash); docs/backlog.json (version first in the list, ticket done with its version); Kanban `KANBAN_H=17330 python3 design/boards/genKanban.py`; publish Kanban and boards to the canvas; Srpski and Deutsch tables; this handover.
+Branch pmNNN, bump package.json; words via `npx tsx scripts/lang-release.ts` then `apply <drafts>` (Srpski goes in confirmed: Claude translates and confirms it, the app shows it at once; Coach Milan 23 November 00:19); built-facts, words-baseline, app-sr scripts; `npm test`; `npm run build`; walkthroughs `LANES=n node scripts/run-flows.cjs [names]` (REDUCED="why" for Area); commit the qa run separately; push the branch; `git merge --no-ff` into main; tag; a line in docs/versions.md (10-character hash); docs/backlog.json (version first in the list, ticket done with its version); Kanban `KANBAN_H=17330 python3 design/boards/genKanban.py`; publish Kanban and boards to the canvas; Srpski and Deutsch tables; this handover.
 
 Commit trailer:
 
@@ -33,9 +33,9 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 23 November 2026, 00:20
+## State, 23 November 2026, 00:35
 
-- 0.3.176 (DT337) is merged into main and tagged v0.3.176 (local tag); 0.3.175 (B157, B158) and 0.3.174 (DT336) before it. Main is at the handover commit after it. Coach Milan starts Preview and Promote. Coach Milan 21:56: 0.3.173 is on Preview and live.
+- 0.3.177 (the 21 Srpski lines Coach Milan confirmed on 22 November, confirmed in the app; Light, 10 of 10) is merged into main and tagged v0.3.177; 0.3.176 (DT337), 0.3.175 (B157, B158) and 0.3.174 (DT336) before it. Main is at the handover commit after it. Coach Milan starts Preview and Promote. Coach Milan 21:56: 0.3.173 is on Preview and live.
 - Release plan (agreed): R1 DT336 (0.3.174), B157 and B158 (0.3.175), DT337 (0.3.176), DT334. R2 DT338, DT339. R3 B156, DT340. R4 DT335. DT342 (fibre) in Next, not drawn.
 - A board says what the flow before is, by its version and where it is: "In main, 0.3.176, not on Preview yet", never "Today" (ticket form, rule 5). Every arrow is a tap; a screen scrolled is one tall picture (rule 2).
 
