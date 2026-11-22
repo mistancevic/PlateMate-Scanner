@@ -24,7 +24,7 @@
     {
       "id": "AC1",
       "title": "A tea with no values counts as 0",
-      "text": "Given I scan a tea whose database entry has a name and no values, when the label check opens, then one line says A tea has no values on its pack. It counts as 0, energy, fat, carbohydrate and protein show 0, and there is no box I checked the values"
+      "text": "Given I scan a tea whose database entry has a name and no values, when the label check opens, then one line says Tea has almost no calories, so it is saved as 0 kcal. Energy, fat, carbohydrate and protein show 0, and there is no box I checked the values"
     },
     {
       "id": "AC2",
@@ -39,7 +39,7 @@
     {
       "id": "AC4",
       "title": "No PD, in words",
-      "text": "Given such a food is saved, when its card or its label check shows protein density, then it says No PD: it brings no energy, never a question mark and never On plan"
+      "text": "Given such a food is saved, when its card or its label check shows protein density, then it says No PD: it has 0 kcal, never a question mark and never On plan"
     },
     {
       "id": "AC5",
@@ -71,7 +71,7 @@
   "details": [
     "The pictures are the real app on one scratch build of main, not committed. The database's answer is given in place of it. A board for food scanning needs no time on the phone, so the screens carry no time strip.",
     "The server also asks the product database for the product's category (categories_tags), so the rule does not rest on the name alone.",
-    "The line names what it is: A tea, A coffee, A water, Salt.",
+    "The line names what it is: Tea has almost no calories, so it is saved as 0 kcal. Coffee the same. Water and Salt: no calories. The PD line says No PD: it has 0 kcal.",
     "Herbs and spices are not in this ticket: dried ones carry real energy per 100 g. They stay as today.",
     "The plate's weight grows by the tea's grams, as for any drink on a plate."
   ],
