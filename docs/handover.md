@@ -33,14 +33,14 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 22 November 2026, 20:15
+## State, 22 November 2026, 20:40
 
-- Main at 9af1820. App 0.3.173 - fa1d659. No new version since.
+- App 0.3.173 - fa1d659. No new version since. Main has only docs and board commits after it.
 - Release plan (agreed): R1 DT336, DT337, DT334. R2 DT338, DT339. R3 B156, DT340. R4 DT335.
 
 ### Tickets from the onboarding call (all in docs/backlog.json)
 
-- DT336 Next, drawn, board Stories274 on Page 6. A tea, coffee, herbal tea, water or salt with no values is saved as 0 with no question. Any other product with no values gets an amber heads-up (the warn-box look of The plate is not empty, with the warning triangle): "The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save." Saving it empty still stops. AC7 matches. Open point on the ticket: which words or categories make a product obviously 0. Waiting for Go. Checks proposed: Area plus the German sweep.
+- DT336 Next, drawn, board Stories274 on Page 6. A tea, coffee, herbal tea, water or salt with no values is saved as 0 with no question. Any other product with no values gets an amber heads-up (the warn-box look of The plate is not empty, with the warning triangle): "The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save." Saving it empty still stops. AC7 matches. The open point is settled (Coach Milan 20:32): which products count as 0 is a table in the board's agreement block and `obvious0` in docs/backlog.json. The category first; the name only when there is no category, as a whole word; block words and block categories always win (crisps, biscuits, cake, cream, Sahne, nuts, vinegar and more), so salt and vinegar crisps, tea biscuits, coffee cake and Kaffee Sahne get the heads-up, never 0. Waiting for Go. Checks proposed: Area plus the German sweep.
 - DT337 Next: Fit to my target lands in the target's range and adds what the meal is missing. Follow the user's target range, no new formula.
 - DT334 Next: up to 3 kitchens you cook, plus a chip for trying new kitchens. Coach Milan asks testers who picked 4 or more to reduce; no code for that.
 - DT338 Next: what the PD colours mean, one scale on the Goal page and behind the PD number on the Plate.
@@ -55,8 +55,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 
 - Design artifact e64aff2b-3860-4382-bfce-7c39eba82b65 (https://claude.ai/artifact/VSNwRoRQqpi7S6NXdCnFhe). Always read the live version first; Coach Milan edits it too.
 - project/canvas.json is pretty-printed, one key per line. Add a board as an entry in "boards" and its file name in "order".
-- Page 5 (page-v31x6j) is full. Page 6 is page-p475ue. On Page 6: an empty Artboard 1 (Artboard-9s4q, x 0 y 0, 800 x 600; leave it unless Coach Milan says), and Stories274 DT336 at x 0, y 720, h 4312.
-- The next board on Page 6 goes at x 0, y 5152.
+- Page 5 (page-v31x6j) is full. Page 6 is page-p475ue. On Page 6: an empty Artboard 1 (Artboard-9s4q, x 0 y 0, 800 x 600; leave it unless Coach Milan says), and Stories274 DT336 at x 0, y 720, h 4592 (taller since the list of what counts as 0).
+- The next board on Page 6 goes at x 0, y 5432.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. Pictures need a scratch build of main with the new screens behind localStorage "board-new"; rebuild it if the work folder is gone.
 
 ### To fix in the next build

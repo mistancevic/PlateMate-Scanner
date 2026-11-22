@@ -13,9 +13,7 @@
   "problem": "EU label law does not require a nutrition table on tea, herbal tea, coffee, water, salt, herbs and spices. Their values come back empty, not zero. The app treats empty as unknown and refuses to save: Energy and protein are required.",
   "story": "When I scan a tea, I want it saved at once, so that I can add it to my snack or use it in a recipe like any other food.",
   "proposed": "A product read from a barcode or a pack, with no values, whose category or name says tea, herbal tea, coffee, water or salt, is saved as 0 kcal and 0 protein with no question, marked no values on the pack. From then on it is like zero cola: a drink on the side, or an ingredient in a dish with its grams and no energy. No protein density is shown for it. Any other product with no values gets a heads-up line: the name is read, the database has no values, type them from the pack. Saving it empty still stops, as today.",
-  "open": [
-    "Which words or categories make a product obviously 0: from the product database's category first, then the name in English, German and Serbian."
-  ],
+  "open": [],
   "checks": "Area: Foods and the scan. The unit tests with new ones for the rule, the build, a new walkthrough for AC1 to AC8, and every walkthrough that scans or saves a food, about 10 minutes. New lines, so the German sweep too.",
   "decision": "Open. Drawn 22 November 2026 for Coach Milan's look. No Go, so nothing is built.",
   "board": "Stories274",
@@ -79,5 +77,94 @@
   ],
   "short": "A tea with no values is saved as 0",
   "rel": "Proposed; not agreed until Coach Milan says Go",
-  "boardTitle": "DT336: a tea, coffee or water with no values on its pack is saved as 0, without a question"
+  "boardTitle": "DT336: a tea, coffee or water with no values on its pack is saved as 0, without a question",
+  "obvious0": {
+    "settled": "Coach Milan 22 November 2026, 20:32",
+    "category": [
+      "teas",
+      "green teas",
+      "black teas",
+      "herbal teas",
+      "infusions",
+      "coffees",
+      "ground coffees",
+      "coffee beans",
+      "instant coffees",
+      "waters",
+      "mineral waters",
+      "spring waters",
+      "salts",
+      "sea salts"
+    ],
+    "name": {
+      "tea": [
+        "tea",
+        "Tee",
+        "Kräutertee",
+        "čaj",
+        "чај"
+      ],
+      "coffee": [
+        "coffee",
+        "Kaffee",
+        "kafa",
+        "кафа"
+      ],
+      "water": [
+        "water",
+        "Wasser",
+        "Mineralwasser",
+        "voda",
+        "вода"
+      ],
+      "salt": [
+        "salt",
+        "Salz",
+        "morska so",
+        "kuhinjska so"
+      ]
+    },
+    "block": [
+      "iced tea",
+      "Eistee",
+      "ledeni čaj",
+      "latte",
+      "cappuccino",
+      "3in1",
+      "milk",
+      "Milch",
+      "mleko",
+      "sugar",
+      "Zucker",
+      "šećer",
+      "syrup",
+      "juice",
+      "Saft",
+      "sok",
+      "flavoured",
+      "Geschmack",
+      "crisps",
+      "chips",
+      "biscuits",
+      "Kekse",
+      "keks",
+      "cake",
+      "Kuchen",
+      "kolač",
+      "chocolate",
+      "Schokolade",
+      "čokolada",
+      "cream",
+      "Sahne",
+      "nuts",
+      "vinegar"
+    ],
+    "blockCategory": [
+      "iced teas",
+      "coffee drinks",
+      "flavoured waters",
+      "sweetened drinks"
+    ],
+    "rule": "The category first. The name only when there is no category, as a whole word. A block word or block category always wins, over the category and over the name. Salt and vinegar crisps, tea biscuits, coffee cake and Kaffee Sahne get the heads-up of AC7, never 0."
+  }
 }
