@@ -127,7 +127,14 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
             {job.mine && <button className="pill pill-small pill-action" onClick={() => { insight.setJob(null); setPicking(false); }}>{w("foodcard.useChefMealanSLabel")}</button>}
           </div>
         )}
-        <section className={`readout readout-fit-${fit}`}>
+{/* DT336 (0.3.174): a tea, coffee, water or salt saved as 0: its PD in words, never a question mark or On plan */}
+        {food.zeroKind && food.calories === 0 ? (
+          <section className="readout readout-none">
+            <div className="readout-top"><span>{w("foodcard.proteinDensity")}</span></div>
+            <b>{w("app.noPdZero")}</b>
+          </section>
+        ) : (
+                <section className={`readout readout-fit-${fit}`}>
           <div className="readout-top"><span>{w("foodcard.proteinDensity")}</span><span>{pdTag()}</span></div>
           <div className="readout-mid">
             <b>{pdVal(pd)}</b>
@@ -136,6 +143,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
           {/* DT108 (0.2.92): the four letters, F C Fi P, with a line each on a tap */}
           {rates && food.calories ? <Letters n={food} rates={rates} who={food.name} table={<NumbersTable n={food} rates={rates} weight={100} day={null} plan={null} />} /> : null}
         </section>
+        )}
         <p className="insight">{plainLine(food, target)}</p>
         {mix && mix.tip.case !== "fits" && mix.tip.case !== "unknown" && (
           <section className="mix-tip">

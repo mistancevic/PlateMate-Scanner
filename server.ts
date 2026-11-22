@@ -1142,7 +1142,7 @@ app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) =>
         source: "Members' foods · checked by a member", members: true, seenIn: Object.keys(m.markets ?? {}) });
     } catch {}
     const response = await fetch(
-      `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments,nutrition_data_per,quantity,countries_tags,image_front_url,image_nutrition_url`,
+      `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments,nutrition_data_per,quantity,countries_tags,image_front_url,image_nutrition_url,categories_tags`,
       {
         headers: {
           "User-Agent":
@@ -1188,6 +1188,10 @@ app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) =>
       // the pack's photos people put in Open Food Facts (canvas board C8): the front and the nutrition table, CC BY-SA
       photos: ([["front", p.image_front_url], ["nutrition", p.image_nutrition_url]] as [string, unknown][])
         .filter(([, u]) => typeof u === "string" && OFF_IMAGE.test(u as string)).map(([kind, url]) => ({ kind, url })),
+      // DT336 (0.3.174): the category, so the rule for an obviously 0 product (a tea, coffee, water or salt) does not rest on
+      // the name alone; and whether the database has no values at all (not a per-100-ml record the app leaves empty)
+      categories: Array.isArray(p.categories_tags) ? p.categories_tags.filter((c: unknown) => typeof c === "string").slice(0, 40) : [],
+      noValues: ["energy-kcal_100g", "energy-kj_100g", "energy_100g", "proteins_100g", "fat_100g", "carbohydrates_100g"].every((k) => numberInput(n[k]) === null),
       source: `Open Food Facts · ${new Date().toISOString().slice(0, 10)}`,
       notes: `Verify product variant, actual label basis and carbohydrate convention. ${perVolume ? "Volume-based record: enter confirmed per-100-g values." : ""} Markets: ${(p.countries_tags || []).slice(0, 6).join(", ")}`,
     });

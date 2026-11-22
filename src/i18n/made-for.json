@@ -5726,6 +5726,13 @@
     "screen.coach.reqClient": {"en":"Already a client","area":"Clients","where":"Clients","release":"0.3.173"},
     "screen.coach.reqInvitedOpen": {"en":"Invited on {date}. The code is not used yet.","area":"Clients","where":"Clients","release":"0.3.173"},
     "screen.coach.reqSendCode": {"en":"Send the code again","area":"Clients","where":"Clients","release":"0.3.173"},
-    "screen.coach.reqSendSignIn": {"en":"Send how to sign in","area":"Clients","where":"Clients","release":"0.3.173"}
+    "screen.coach.reqSendSignIn": {"en":"Send how to sign in","area":"Clients","where":"Clients","release":"0.3.173"},
+    "screen.app.zeroTea": {"en":"Tea has almost no calories, so it is saved as 0 kcal.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
+    "screen.app.zeroCoffee": {"en":"Coffee has almost no calories, so it is saved as 0 kcal.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
+    "screen.app.zeroWater": {"en":"Water has no calories, so it is saved as 0 kcal.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
+    "screen.app.zeroSalt": {"en":"Salt has no calories, so it is saved as 0 kcal.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
+    "screen.app.noPdZero": {"en":"No PD: it has 0 kcal.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
+    "screen.app.noValuesOnPack": {"en":"No values on the pack.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
+    "screen.app.dbNoValues": {"en":"The name is read, but the database has no values for this product. Type them from the nutrition table on the pack, then save.","area":"Words used across the app","where":"Across the app","release":"0.3.174"}
   }
 }

@@ -1,4 +1,5 @@
 import { countOf, gramsOfOne, KINDS } from "./counted";
+import { obviousZero } from "./obvious0";
 import { cleanMealNames, cleanCardNames, cleanFoodNames, cleanText1 } from "./entities";
 import { rowsFromRaw } from "./labeltable";
 import { packOf } from "./canned";
@@ -79,6 +80,10 @@ export type Food = Nutrition & {
   icon?: string;
   // DT136 (0.2.120): where the food is sold, as place ids (limassol, belgrade); empty: sold everywhere. See src/places.ts
   places?: string[];
+  // DT336 (0.3.174): a tea, coffee, water or salt with no values on its pack, saved as 0 with no question; its PD is said in words
+  zeroKind?: import("./obvious0").ZeroKind;
+  // DT336: read from the product database with a name and no values at all; only while the label check is open, never saved
+  dbEmpty?: boolean;
 };
 export type Ingredient = {
   keep?: boolean;
@@ -716,5 +721,13 @@ export function candidateFood(input: any, source: string): Food {
     readyToEat: false,
     ...Object.fromEntries(KEYS.map((k) => [k, numberInput(input[k])])),
     table: Array.isArray(input.table) && input.table.length ? rowsFromRaw(input.table, /Open Food Facts/i.test(source) ? "database" : "label") : undefined,
+    ...emptyOf(input),
   } as Food;
+}
+// DT336 (0.3.174): the database answered with a name and no values, and nothing filled them since (a photo of the table)
+function emptyOf(input: any): Partial<Food> {
+  if (input?.noValues !== true || typeof input.product_name !== "string" || !input.product_name.trim()) return {};
+  if (KEYS.some((k) => numberInput(input[k]) !== null)) return {};
+  const zero = obviousZero(input.product_name, input.categories);
+  return zero ? { zeroKind: zero } : { dbEmpty: true };
 }

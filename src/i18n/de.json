@@ -22908,6 +22908,34 @@
     "coach.reqSendSignIn": {
       "text": "Senden, wie man sich anmeldet",
       "checked": true
+    },
+    "app.zeroTea": {
+      "text": "Tee hat fast keine Kalorien, deshalb wird er mit 0 kcal gespeichert.",
+      "checked": true
+    },
+    "app.zeroCoffee": {
+      "text": "Kaffee hat fast keine Kalorien, deshalb wird er mit 0 kcal gespeichert.",
+      "checked": true
+    },
+    "app.zeroWater": {
+      "text": "Wasser hat keine Kalorien, deshalb wird es mit 0 kcal gespeichert.",
+      "checked": true
+    },
+    "app.zeroSalt": {
+      "text": "Salz hat keine Kalorien, deshalb wird es mit 0 kcal gespeichert.",
+      "checked": true
+    },
+    "app.noPdZero": {
+      "text": "Keine PD: es hat 0 kcal.",
+      "checked": true
+    },
+    "app.noValuesOnPack": {
+      "text": "Keine Werte auf der Packung.",
+      "checked": true
+    },
+    "app.dbNoValues": {
+      "text": "Der Name ist erkannt, aber die Datenbank hat keine Werte für dieses Produkt. Trag sie aus der Nährwerttabelle auf der Packung ein und speichere dann.",
+      "checked": true
     }
   }
 }

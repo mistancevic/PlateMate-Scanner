@@ -22908,6 +22908,34 @@
     "coach.reqSendSignIn": {
       "text": "Pošalji kako se prijaviti",
       "checked": false
+    },
+    "app.zeroTea": {
+      "text": "Čaj nema skoro nimalo kalorija, pa se čuva sa 0 kcal.",
+      "checked": false
+    },
+    "app.zeroCoffee": {
+      "text": "Kafa nema skoro nimalo kalorija, pa se čuva sa 0 kcal.",
+      "checked": false
+    },
+    "app.zeroWater": {
+      "text": "Voda nema kalorija, pa se čuva sa 0 kcal.",
+      "checked": false
+    },
+    "app.zeroSalt": {
+      "text": "So nema kalorija, pa se čuva sa 0 kcal.",
+      "checked": false
+    },
+    "app.noPdZero": {
+      "text": "Nema PD: ima 0 kcal.",
+      "checked": false
+    },
+    "app.noValuesOnPack": {
+      "text": "Na pakovanju nema vrednosti.",
+      "checked": false
+    },
+    "app.dbNoValues": {
+      "text": "Naziv je pročitan, ali baza nema vrednosti za ovaj proizvod. Upiši ih iz tabele nutritivnih vrednosti sa pakovanja, pa sačuvaj.",
+      "checked": false
     }
   }
 }
