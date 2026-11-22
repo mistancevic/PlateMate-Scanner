@@ -1,0 +1,1141 @@
+{
+ "version": "0.3.177",
+ "commit": "abf31a1",
+ "at": "2026-11-22T23:25:03.997Z",
+ "minutes": 3,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 70,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "ask-in-language.cjs",
+   "about": "B137 (0.3.140; Coach Milan 12 November 13:30, Go 13:33): opened from a scanned food, Chef Mealan on the Plate writes the question into the field in the app's language, never in English. Srpski and German.",
+   "pass": true,
+   "seconds": 17,
+   "checks": [
+    {
+     "ok": true,
+     "text": "sr-Latn: Nutella's card has Mix it"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the question in the field: Skenirano: Nutella (regularan obrok). Tvoj predlog: uz Skyr, natural; uz Skyr, natural + Oats; uz Skyr, natural + Oats + Apple. Moja izmena: "
+    },
+    {
+     "ok": true,
+     "text": "de: Nutella's card has Mix it"
+    },
+    {
+     "ok": true,
+     "text": "de: the question in the field: Gescannt: Nutella (Normale Mahlzeit). Dein Vorschlag: mit Skyr, natural; mit Skyr, natural + Oats; mit Skyr, natural + Oats + Apple. Was ich ändern würde: "
+    },
+    {
+     "ok": true,
+     "text": "en: Nutella's card has Mix it"
+    },
+    {
+     "ok": true,
+     "text": "en: the question in the field: I scanned Nutella for regular meal. You suggested with Skyr, natural; with Skyr, natural + Oats; with Skyr, natural + Oats + Apple. What I'd change: "
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "ate-it-undo.cjs",
+   "about": "B139 (0.3.141, board Stories214; Coach Milan 12 November 14:02 to 14:41, Go 14:45): a ✓ only on what is done. Next on Today: Change it on the left, I ate it on the right, no ✓. After I ate it the meal is in Today's meals with ✓ Eaten, by the plan, and on its card Undo (while you stay on Today) and Change or delete ›, which opens the meal with Change it and a red-border Delete this meal. Serbian and German.",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Next: Change it on the left, I ate it on the right: Change it | I ate it"
+    },
+    {
+     "ok": true,
+     "text": "I ate it has no ✓"
+    },
+    {
+     "ok": true,
+     "text": "no I ate it button on Today carries a ✓"
+    },
+    {
+     "ok": true,
+     "text": "the meal says ✓ Eaten, by the plan"
+    },
+    {
+     "ok": true,
+     "text": "on its card: Undo and Change or delete ›"
+    },
+    {
+     "ok": true,
+     "text": "both are 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "Undo: nothing logged, lunch is next again"
+    },
+    {
+     "ok": true,
+     "text": "back on Today later: no Undo, Change or delete stays"
+    },
+    {
+     "ok": true,
+     "text": "it opens the meal: ‹ Today, Change it"
+    },
+    {
+     "ok": true,
+     "text": "Delete this meal is a button with a border, 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "deleted: back on Today, lunch is next again"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: ✓ Pojedeno, po planu, the buttons in the language, fits 390 px"
+    },
+    {
+     "ok": true,
+     "text": "de: ✓ Gegessen, nach Plan, the buttons in the language, fits 360 px"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 80 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "beta-application.cjs",
+   "about": "DT279 (0.3.140, board Stories213; Coach Milan 11 November, 12 November 13:24 and 13:44, Go 13:49): a new beta tester application is the first thing in Waiting for you on Clients, as a full card, and counts in Waiting for you and the Clients badge. Invite sits on the right; Mark as handled sits on its own line below and needs a second tap. Handled, it leaves the top. Srpski and German. Changed by B155 (0.3.173, board B155; Coach Milan, Go 22 November 14:21): a request from a person already invited or already a client is not a new request: no card in Waiting for you, and the badge does not count it. Further down, under Access requests, it says what happened (Already a client, or Invited on that date and the code not used yet), and a request that came after the invite has one button that opens the mail app: Send how to sign in, or Send the code again. The server adds what the invites say to each request; here its answer is given in place of the server, and the rule itself has unit tests (src/applications.test.ts). New checks at the end, B155 AC1 to AC8.",
+   "pass": true,
+   "seconds": 49,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the application is the first thing in Waiting for you"
+    },
+    {
+     "ok": true,
+     "text": "it says New beta tester application"
+    },
+    {
+     "ok": true,
+     "text": "a full card: name, email, WhatsApp, their words"
+    },
+    {
+     "ok": true,
+     "text": "it counts in Waiting for you and the badge: 7, badge 7, 6 other rows"
+    },
+    {
+     "ok": true,
+     "text": "the handled one is not at the top"
+    },
+    {
+     "ok": true,
+     "text": "Invite is on the right"
+    },
+    {
+     "ok": true,
+     "text": "Mark as handled is on its own line, below and away from Invite"
+    },
+    {
+     "ok": true,
+     "text": "every button is 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "one tap: Sure? Tap again, nothing handled yet"
+    },
+    {
+     "ok": true,
+     "text": "Keep it: back, nothing handled"
+    },
+    {
+     "ok": true,
+     "text": "the second tap: handled, it leaves the top"
+    },
+    {
+     "ok": true,
+     "text": "Waiting for you and the badge drop by one"
+    },
+    {
+     "ok": true,
+     "text": "Invite: the invite is made and the request handled"
+    },
+    {
+     "ok": true,
+     "text": "after Invite the card leaves the top"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: Nova prijava za beta testiranje, fits 390 px"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the second tap in the language: Sigurno? Dodirni ponovo da označiš kao rešeno Zadrži Nestaje iz liste Čeka te, bez pozivnice."
+    },
+    {
+     "ok": true,
+     "text": "de: Neue Bewerbung für den Betatest, fits 360 px"
+    },
+    {
+     "ok": true,
+     "text": "de: the second tap in the language: Sicher? Noch einmal tippen, um als erledigt zu markieren Behalten Sie verschwindet aus Wartet auf dich, ohne Einladung."
+    },
+    {
+     "ok": true,
+     "text": "B155 AC8: a first request waits as a card with Invite and Mark as handled"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC1: she joined with my invite and sent the form once more: no card in Waiting for you, and the badge does not count it"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC3: further down her request says 2 requests and Already a client: Nina · from the home page · 2 requests 11/21/2026 nina@example.com WhatsApp +490000000 “I want to help test it.” Already"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC3: it has no Invite and no Mark as handled"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC5: Send how to sign in opens a mail to her that says she already has access and how to sign in"
+    },
+    {
+     "ok": true,
+     "text": "B155: the button is 44 px high, and the request is not greyed out"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC2: she is invited, the code is not used, and she sent the form once more: no card, and the badge does not count it"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC3: further down: 2 requests, Invited on 20 Nov. The code is not used yet."
+    },
+    {
+     "ok": true,
+     "text": "B155 AC4: Send the code again opens a mail to her with the same code and the steps"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC4: no new code is made"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC7: a request that waited when the invite was made by hand left Waiting for you and says Invited on 20 Nov; no button, she did not ask again"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC6: two requests before I answered: one card, 2 requests"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC6: Invite closes the card, and it does not come back"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 360: Schon Klient, Senden, wie man sich anmeldet, fits"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 360: the invited line and Code noch einmal senden, fits: st it.” Eingeladen am 20. Nov., der Code ist noch nicht eingelöst. Code noch einmal senden"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 390: Schon Klient, Senden, wie man sich anmeldet, fits"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 390: the invited line and Code noch einmal senden, fits: st it.” Eingeladen am 20. Nov., der Code ist noch nicht eingelöst. Code noch einmal senden"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 312 account writes from 13 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 14,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "fit-range.cjs",
+   "about": "DT337 (0.3.176, board Stories277; Go 22 November 2026, 23:44): Fit to my target lands in the target's range and adds what the meal is missing. One egg, PD 8.4, target 5.3, range 4.8 to 8.0. With no meal set and the AI on, Fit asks which meal first; a plate above the range goes to Chef Mealan's ideas; an idea above the range is never shown, he is asked once more; he is told what the meal is missing; each idea shows its weight; with the AI off, the quick fit adds a base, never protein. Chef Mealan's answers are fixed here (no AI in the walkthroughs).",
+   "pass": true,
+   "seconds": 39,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT337 AC6: with no meal set, Fit opens the meal line"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC6: one line says Which meal is it? Pick it, and Chef Mealan finds ideas for it."
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC6: nothing is asked and nothing added before the meal is picked"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC6: once Breakfast is picked, the ideas are asked for a breakfast: breakfast"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC1: every idea shown lands in the range 4.8 to 8.0: 6.3, 6.4, 6.1"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC2: the idea above the range goes back once, with the reason: [{\"title\":\"Eggs with cottage cheese and skyr\",\"why\":\"PD 9.4 above your range, which goes up to 8.0\"}]"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC2: the idea above the range is never shown; the new one takes its place"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC2: no miss is shown for it"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC3: he is told the plate's PD and the target: 8.38709677419355 against 5.3"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC3: what the meal is missing: {\"meal\":{\"carbs\":83,\"fats\":22},\"plate\":{\"carbs\":1,\"fats\":6},\"missing\":{\"carbs\":82,\"fats\":16}}"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC9: the kitchen's line says kcal, weight and PD: 666 kcal · 662 g · PD 6.3"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC1: on the plate the breakfast lands in the range: Breakfast PD 6.3 fits your plan Energy 666 kcal Weight 662 g Protein 42 g f C fi"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC4: a very low carb day: he is told the missing part is fat: {\"meal\":{\"carbs\":13,\"fats\":47},\"plate\":{\"carbs\":1,\"fats\":6},\"missing\":{\"carbs\":12,\"fats\":41}}"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC7: five eggs, near the meal's size, above the range: Chef Mealan's ideas come"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC7: not the quick fit"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC5: eight eggs fill the breakfast: Ideas anyway is offered"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC5: the small addition above the range is not shown; the one in it is: GERMAN 689 kcal · 466 g · PD 7.9 Eggs with a banana + 50 g banana Fixed for the walkthrough. Put it on the plate"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC8: the quick fit adds wholegrain bread, never whey: Eggs, Wholegrain bread"
+    },
+    {
+     "ok": true,
+     "text": "DT337 AC8: the plate comes down into the range: Breakfast PD 5.3 fits your plan Energy 228 kcal Weight 111 g"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 125 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "home-languages.cjs",
+   "about": "DT236 v3 (0.3.93, boards Stories177 and Stories180; Coach Milan 5 November 11:36, Go): the home page in English, Srpski and Deutsch (Beta). chefmealan.com stays English; /sr and /de carry their own language, title and search line; the switch in the header shows the language that is on and opens all three; a phone in Serbian or German sees the box once; the choice is the app's too. The header fits on a phone in every language. The clips stay English (Coach Milan 11:26).",
+   "pass": true,
+   "seconds": 17,
+   "checks": [
+    {
+     "ok": true,
+     "text": "/de says lang=de, with its German title"
+    },
+    {
+     "ok": true,
+     "text": "/sr says lang=sr-Latn"
+    },
+    {
+     "ok": true,
+     "text": "chefmealan.com stays English and names the three addresses"
+    },
+    {
+     "ok": true,
+     "text": "an English phone sees no box"
+    },
+    {
+     "ok": true,
+     "text": "the switch shows EN"
+    },
+    {
+     "ok": true,
+     "text": "the switch is 44 px"
+    },
+    {
+     "ok": true,
+     "text": "it opens English, Srpski (latinica), Deutsch (Beta): ✓English · Srpski (latinica) · Deutsch (Beta)"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch goes to chefmealan.com/de"
+    },
+    {
+     "ok": true,
+     "text": "the page is in German: Lebe deinen Ernährungsplan, Tag für Tag."
+    },
+    {
+     "ok": true,
+     "text": "the app takes the same choice"
+    },
+    {
+     "ok": true,
+     "text": "in German the header fits a 390 px phone"
+    },
+    {
+     "ok": true,
+     "text": "the clips stay as they are"
+    },
+    {
+     "ok": true,
+     "text": "in German the languages block still names English, Srpski, Deutsch · Beta"
+    },
+    {
+     "ok": true,
+     "text": "a German phone sees the box above the English page"
+    },
+    {
+     "ok": true,
+     "text": "Auf Deutsch opens /de, the box goes"
+    },
+    {
+     "ok": true,
+     "text": "chefmealan.com opens the German page for this phone from now on"
+    },
+    {
+     "ok": true,
+     "text": "a Serbian phone sees the box in Srpski"
+    },
+    {
+     "ok": true,
+     "text": "Continue in English: English stays, the box does not come back"
+    },
+    {
+     "ok": true,
+     "text": "English: the header fits a 360 px phone"
+    },
+    {
+     "ok": true,
+     "text": "English: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "Srpski: the header fits a 360 px phone"
+    },
+    {
+     "ok": true,
+     "text": "Srpski: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "German: the header fits a 360 px phone"
+    },
+    {
+     "ok": true,
+     "text": "German: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "save check: 20 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "meal-line.cjs",
+   "about": "Story DT308.1, DT308.9 and DT308.10 (0.3.157, boards Stories236 and Stories241; Coach Milan, Go 18 November 11:14): the meal line and Fit with no meal set. A new plate says No meal selected, in grey, with a pencil, and nothing is counted or planned. No meal is guessed when a food lands. The pencil opens your calendar: the days on top, that day's meals with their time and state, as the last row Just looking, and under them What is it? and Chef Mealan's What kind of moment?, as they were. A tap on a meal sets the meal and the day and closes it; a tap on a chip keeps it open; the pencil closes it with no meal set. Once set, the line says the meal, then the day, date and time, and the moment when it is not a regular meal, and an X stands in the pencil's place: it clears the meal and the day, and the moment is Regular meal again. With no meal set, Fit to my target aims only at your PD target: the result says This plate, and Chef Mealan says first what Fit aimed at. The checks name the rows of the build brief (A1 to A8, B1, B2). Changed by B150 (0.3.160, board B150; Go 19 November 01:00): the line says No meal selected under the small title Meal and day, in ink; the pencil is always there and is the X that closes while edit mode is open; a tap on a meal keeps edit mode open; the row No meal selected, marked while no meal is set, took the place of Just looking and of the X that cleared.",
+   "pass": true,
+   "seconds": 29,
+   "checks": [
+    {
+     "ok": true,
+     "text": "A1, changed by B150: an empty plate: the line says No meal selected, with a pencil"
+    },
+    {
+     "ok": true,
+     "text": "A1, changed by B150: the line is in ink, under its small grey title"
+    },
+    {
+     "ok": true,
+     "text": "A2: three foods from the list landed: the line did not change, no meal is guessed"
+    },
+    {
+     "ok": true,
+     "text": "A1: the result says This plate, sized for no meal"
+    },
+    {
+     "ok": true,
+     "text": "A1: nothing is counted or planned"
+    },
+    {
+     "ok": true,
+     "text": "A3: the days on top: Sat 14, Sun 15 today, Mon 16, Tue 17, More: Sat 14 | Sun 15, today | Mon 16 | Tue 17 | More"
+    },
+    {
+     "ok": true,
+     "text": "A3, changed by B150: today's meals with their time and state, and as the last row No meal selected, marked: Breakfast 07:30 · not eaten | Lunch 13:45 · not eaten | Dinner 20:00 · next | Snack now | ✓ No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "A3, changed by B150: no meal is marked; the row No meal selected is"
+    },
+    {
+     "ok": true,
+     "text": "A3: under the meals What is it? and What kind of moment?, as in 0.3.156"
+    },
+    {
+     "ok": true,
+     "text": "A3: Which day? and What is it for? are gone: the calendar took their place"
+    },
+    {
+     "ok": true,
+     "text": "A5: Before training is chosen with a tick, and the calendar stays open"
+    },
+    {
+     "ok": true,
+     "text": "A5: a taste chip is chosen and the calendar stays open"
+    },
+    {
+     "ok": true,
+     "text": "A6, changed by B150: the X in the pencil's place: closed, no meal set"
+    },
+    {
+     "ok": true,
+     "text": "A5: a moment chosen with no meal set holds for the plate: the line names it"
+    },
+    {
+     "ok": true,
+     "text": "A4, changed by B150: a tap on Dinner: edit mode stays open"
+    },
+    {
+     "ok": true,
+     "text": "A4: the line says the meal, then day, date and time, changed by B151: then Planned (20:00 is still ahead), and the moment: Dinner Sunday, 15 November, 20:00 Planned · Before training · Savoury"
+    },
+    {
+     "ok": true,
+     "text": "A4, changed by B150: no X that clears the meal; the X in the pencil's place only closes"
+    },
+    {
+     "ok": true,
+     "text": "A8: the result is for the dinner, as in 0.3.156"
+    },
+    {
+     "ok": true,
+     "text": "A7, changed by B150: the row No meal selected: no meal is set again: No meal selected Savoury"
+    },
+    {
+     "ok": true,
+     "text": "A7: the moment is Regular meal again"
+    },
+    {
+     "ok": true,
+     "text": "A3: Monday's meals as they stand in the plan; no Snack row on a coming day with no snack among its meals: Breakfast 07:30 · nothing planned | Lunch 13:45 · nothing planned | Dinner 20:00 · nothing planned | ✓ No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "A4: Monday's lunch is set; changed by B151: the line says Planned: Lunch Monday, 16 November, 13:45 Planned · Savoury"
+    },
+    {
+     "ok": true,
+     "text": "D2: the button Put it in Monday's lunch no longer exists"
+    },
+    {
+     "ok": true,
+     "text": "A7, changed by B150: the row No meal selected clears a meal of another day too"
+    },
+    {
+     "ok": true,
+     "text": "A3, changed by B150: the last row says No meal selected and is marked; nothing says Just looking"
+    },
+    {
+     "ok": true,
+     "text": "A3: More: another day joins the days and its meals show"
+    },
+    {
+     "ok": true,
+     "text": "B1: the plate is under the PD target and no meal is set"
+    },
+    {
+     "ok": true,
+     "text": "B1: Fit moved my own foods only: skyr 30 g to 100 g, oats and banana as they were"
+    },
+    {
+     "ok": true,
+     "text": "B1: the plate reaches the PD target; the energy is what the foods give"
+    },
+    {
+     "ok": true,
+     "text": "B2: the result says This plate"
+    },
+    {
+     "ok": true,
+     "text": "B2: Chef Mealan says first what Fit aimed at: No meal is set, so Fit aimed at your PD target only: 4.8 or more. The energy is what your foods give."
+    },
+    {
+     "ok": true,
+     "text": "B2: under it what Fit did, with Undo: Fit set 100 g skyr, natural, the most for a portion (it asked for 95 g). Undo"
+    },
+    {
+     "ok": true,
+     "text": "A2, changed by B150: after Fit the line still says No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "A8: with a meal set, Fit works for that meal as in 0.3.156: no line about no meal"
+    },
+    {
+     "ok": true,
+     "text": "save check: 48 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "tea-zero.cjs",
+   "about": "DT336 (0.3.174, board Stories274; Go 22 November 2026, 20:47): a tea, coffee, water or salt read from a barcode with no values in the product database is saved as 0 with no question: one line says so, the values show 0, there is no box to tick, and its PD is said in words. On the Plate it adds its grams and no energy. Any other product with no values gets an amber heads-up, and saving it empty still stops, as today. A tea with values is as today. B157 (0.3.175, board Stories275): Serbian word forms, in Latin and Cyrillic, and Ice Tea block the 0. B158 (0.3.175, board Stories276): the heads-up says the barcode has no values: close this, then scan the nutrition table with the camera on Label.",
+   "pass": true,
+   "seconds": 96,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT336 AC1: one line says Tea has almost no calories, so it is saved as 0 kcal."
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC1: energy, fat, carbohydrate and protein show 0"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC1: there is no box I checked the values"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC1: no heads-up for the tea"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC4: the label check says No PD: it has 0 kcal."
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC2: nothing else is asked"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC2: saved with 0 kcal and 0 protein"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC2: its notes say No values on the pack"
+    },
+    {
+     "ok": true,
+     "text": "DT336: saved as a tea with no values; nothing of the check is kept"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC4: its card says No PD: it has 0 kcal."
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC4: never a question mark and never On plan"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC5: the tea is on the plate, 300 g"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC5: the plate's energy and protein stay (This plate PD 7.0 fits your plan Energy 563 kcal Weight 448 g Protein 39 g f- C Fi P › / This plate PD 7.0 fits your plan Energy 563 kcal Weight 748 g Protein 39 g f- C fi? P ›)"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC5: its weight grows by the tea's grams"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC3: a coffee by its category is handled as the tea"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC3: no box for the coffee"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC3: the coffee is saved as 0, with no question"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7, B158 AC1: one amber line says the barcode has no values: close this, then scan the table on Label"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: the warn-box look, with the warning triangle"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: the values are empty"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: the box I checked the values is there"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: the biscuit is never 0"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: saving it empty still stops with the same lines as today"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: nothing is saved"
+    },
+    {
+     "ok": true,
+     "text": "DT336: the heads-up goes once a value is typed"
+    },
+    {
+     "ok": true,
+     "text": "DT336: salt and vinegar crisps get the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC1: Čaj sa šećerom gets the heads-up, the values empty and the box there"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC2: Чај са шећером gets the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC2: Kafa sa mlekom gets the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC2: Čaj s ukusom breskve gets the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC3: Ice Tea Peach gets the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC4: Čaj bez šećera gets the heads-up"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC4: the 0 typed from the pack is saved as typed"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC5: Čaj od nane is saved as 0, as in 0.3.174"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC8: a tea with values shows the database's values and the box, as today"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC8: no new line for a tea with values"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 291 account writes from 12 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "Light, words only (Srpski confirmed), Coach Milan 23 November 00:19: apply immediately. The walkthroughs that show the app in Srpski and the screens of the lines"
+}
