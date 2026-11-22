@@ -5128,6 +5128,8 @@
   "plate.ideasTitle": "A {meal} around your {foods}",
   "plate.onThePlateList": "On the plate: {foods}.",
   "plate.kcalPd": "{kcal} kcal · {pd}",
+  "plate.kcalGramsPd": "{kcal} kcal · {grams} g · {pd}",
+  "plate.whichMealFirst": "Which meal is it? Pick it, and Chef Mealan finds ideas for it.",
   "plate.forCookingLine": "{label} {foods}.",
   "plate.forCooking": "For cooking, not counted:",
   "plate.didNotFit": "Did not fit: {why}.",

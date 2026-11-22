@@ -22936,6 +22936,14 @@
     "app.dbNoValues": {
       "text": "Barkod nema vrednosti za ovaj proizvod. Zatvori ovo, pa kamerom na Deklaraciji skeniraj tabelu nutritivnih vrednosti.",
       "checked": false
+    },
+    "plate.kcalGramsPd": {
+      "text": "{kcal} kcal · {grams} g · {pd}",
+      "checked": false
+    },
+    "plate.whichMealFirst": {
+      "text": "Koji je ovo obrok? Izaberi ga, i Chef Mealan nalazi ideje za njega.",
+      "checked": false
     }
   }
 }

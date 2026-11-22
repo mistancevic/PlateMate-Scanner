@@ -5733,6 +5733,8 @@
     "screen.app.zeroSalt": {"en":"Salt has no calories, so it is saved as 0 kcal.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
     "screen.app.noPdZero": {"en":"No PD: it has 0 kcal.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
     "screen.app.noValuesOnPack": {"en":"No values on the pack.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
-    "screen.app.dbNoValues": {"en":"The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label.","area":"Words used across the app","where":"Across the app","release":"0.3.175"}
+    "screen.app.dbNoValues": {"en":"The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label.","area":"Words used across the app","where":"Across the app","release":"0.3.175"},
+    "screen.plate.kcalGramsPd": {"en":"{kcal} kcal · {grams} g · {pd}","area":"The Plate","where":"The Plate","release":"0.3.176"},
+    "screen.plate.whichMealFirst": {"en":"Which meal is it? Pick it, and Chef Mealan finds ideas for it.","area":"The Plate","where":"The Plate","release":"0.3.176"}
   }
 }

@@ -22936,6 +22936,14 @@
     "app.dbNoValues": {
       "text": "Der Barcode liefert keine Werte für dieses Produkt. Schließ das hier und scanne dann die Nährwerttabelle mit der Kamera auf Etikett.",
       "checked": true
+    },
+    "plate.kcalGramsPd": {
+      "text": "{kcal} kcal · {grams} g · {pd}",
+      "checked": true
+    },
+    "plate.whichMealFirst": {
+      "text": "Welche Mahlzeit ist es? Wähl sie aus, und Chef Mealan findet Ideen dafür.",
+      "checked": true
     }
   }
 }

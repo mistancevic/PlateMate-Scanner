@@ -1,7 +1,7 @@
 {
   "name": "chefmealan",
   "private": true,
-  "version": "0.3.175",
+  "version": "0.3.176",
   "type": "module",
   "scripts": {
     "dev": "node --import tsx server.ts",
@@ -19,7 +19,8 @@
     "eval:photo": "node --import tsx evals/run-photo.ts",
     "eval:model": "node --import tsx evals/run-model.ts",
     "eval:align": "node --import tsx evals/align.ts",
-    "eval:numbers": "node --import tsx evals/run-numbers.ts"
+    "eval:numbers": "node --import tsx evals/run-numbers.ts",
+    "eval:meal": "node --import tsx evals/run-meal.ts"
   },
   "dependencies": {
     "@fontsource/nunito": "^5.3.0",

@@ -1,7 +1,8 @@
 // Helper for the walkthroughs of 0.3.157 (the meal model, DT308, and DT311): the app on a phone 390 wide on Sunday
 // 15 November 2026, 18:00 in Berlin (the day and the time the boards Stories241 to 246 are drawn on), a person with three
 // meals a day (07:30, 13:45, 20:00), no recipes, nothing logged, and the reads of a meal photo and of a recipe link answered
-// in place of the AI. open() gives a page on the Plate with skyr, oats and a banana on it, or the foods asked for.
+// in place of the AI. open() gives a page on the Plate with skyr, oats and a banana on it, or the foods asked for; aiOff:
+// true leaves the AI off (no safety questions answered), DT337 (0.3.176).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -27,11 +28,11 @@ module.exports = async function start(PORT) {
     if (o.seed) o.seed(seed);
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, timezoneId: "Europe/Berlin", permissions: ["camera"] }); const p = await ctx.newPage(); p.on("pageerror", (e) => errs.push(e.message));
     await p.clock.install({ time: new Date(o.time || "2026-11-15T18:00:00+01:00") });
-    await p.addInitScript(({ s, planned, meals }) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+    await p.addInitScript(({ s, planned, meals, aiOff }) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
       localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" }));
       localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals } }));
       if (planned) localStorage.setItem("chefmealan-planned", JSON.stringify(planned));
-      localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z", aiConfirmedAt: "2026-10-06T09:00:00Z" })); localStorage.setItem("seeded", "1"); }, { s: seed, planned: o.planned || null, meals: o.meals || 3 });
+      localStorage.setItem("chefmealan-safety", JSON.stringify(aiOff ? { situations: [], flags: [], allergies: [], none: false, adultAt: "2026-10-06T09:00:00Z" } : { situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z", aiConfirmedAt: "2026-10-06T09:00:00Z" })); localStorage.setItem("seeded", "1"); }, { s: seed, planned: o.planned || null, meals: o.meals || 3 , aiOff: !!o.aiOff });
     await require("./adult.cjs")(p);
     await p.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "", around: "", betterAs: "meal", holds: "" }) }));
     await p.route("**/api/members/foods**", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, foods: [] }) }));

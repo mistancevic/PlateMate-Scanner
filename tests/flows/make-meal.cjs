@@ -10,7 +10,9 @@ const ROOT = path.resolve(__dirname, "../..");
 const seed = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/flows/seed.json"), "utf8"));
 const ch = seed.foods.find((f) => /Chicken breast/.test(f.name)), co = seed.foods.find((f) => /Cottage/.test(f.name));
 seed.items = [{ id: "a", food: ch, grams: 200, locked: false }, { id: "b", food: co, grams: 150, locked: false }];
-seed.goals = { ...seed.goals, calories: 2800, protein: 180, fats: 93, carbs: 300 };
+// changed by DT337 (0.3.176, board Stories277): the lunch of the story lands at PD 10.1, above the range of a target of 6.4 (to 9.6),
+// so the day has 200 g protein: a target of 7.1, range to 10.7
+seed.goals = { ...seed.goals, calories: 2800, protein: 200, fats: 93, carbs: 300 };
 const U = "http://127.0.0.1:3204";
 const answer = { options: [
   { kitchen: "Balkan", title: "Šopska plate with bread", why: "The cottage cheese stands in for sirene over a tomato and cucumber salad.", adds: [{ name: "Wholegrain bread", grams: 100, calories: 250, protein: 9, base: true }, { name: "Tomato", grams: 150, calories: 18, protein: 0.9, base: false }, { name: "Cucumber", grams: 150, calories: 15, protein: 0.7, base: false }, { name: "Olive oil", grams: 10, calories: 884, protein: 0, base: false }] },
@@ -36,14 +38,14 @@ const answer = { options: [
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
   await require("./set-meal.cjs")(page);
   ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).count() === 1, "CH1, DT87 (0.2.87): Fit to my target, and Keep it as it is");
-  ok(/Lunch is about 933 kcal of your 2,800, at PD 6\.4 or more\. Chef Mealan adds what it needs to land your lunch in its range\./.test(await page.locator(".plate-card").textContent()), "CH1: lunch is about 933 kcal: what is left of the day over the three meals to come");
+  ok(/Lunch is about 933 kcal of your 2,800, at PD 7\.1 or more\. Chef Mealan adds what it needs to land your lunch in its range\./.test(await page.locator(".plate-card").textContent()), "CH1: lunch is about 933 kcal: what is left of the day over the three meals to come");
   // CH2: PD above the target, half a lunch: maths cannot make it a meal, so Chef Mealan
   await page.getByRole("button", { name: "Fit to my target" }).click(); await page.waitForTimeout(900);
   ok(calls === 1 && asked.meal === "lunch" && asked.need === 933 && asked.kitchens.join(",") === "Balkan,Italian,Mediterranean" && asked.plate.length === 2, "CH2: Chef Mealan is asked for a lunch of 933 kcal, in the three kitchens, with the plate");
   const cards = page.locator(".mm-card");
   ok(await cards.count() === 2 && await page.locator(".mm-fail").count() === 0, "CH2: the idea that fails the checks (peanut, a declared allergy) is left out, not even shown as a miss: " + await cards.count());
-  const c1 = (await cards.first().textContent()).replace(/\s+/g, " ");
-  ok(/^BALKAN927 kcal · PD 10\.1Šopska plate with bread/.test(c1) && /\+ 125 g wholegrain bread/.test(c1) && /\+ 150 g tomato/.test(c1), "CH2: the Balkan lunch, 927 kcal, PD 10.1, the bread's grams set by the app: " + c1.slice(0, 140));
+  const c1 = (await cards.first().textContent()).replace(/\s+/g, " "); // changed by DT337 (0.3.176, AC9): the weight stands next to kcal and PD
+  ok(/^BALKAN927 kcal · 785 g · PD 10\.1Šopska plate with bread/.test(c1) && /\+ 125 g wholegrain bread/.test(c1) && /\+ 150 g tomato/.test(c1), "CH2: the Balkan lunch, 927 kcal, PD 10.1, the bread's grams set by the app: " + c1.slice(0, 140));
   ok(await cards.first().locator(".mm-add.have").count() === 1, "CH2: bread is in your foods; the rest is new");
   ok(/Your plate has the protein: 80 g, PD 16\.8\. Lunch is 840 to 1,026 kcal, about 456 more than the plate\. Two ways from your kitchens, each in that range\./.test(await page.locator(".step-head").textContent()), "CH2: the line on top says what the plate has and what lunch needs");
   // CH3: on the plate
