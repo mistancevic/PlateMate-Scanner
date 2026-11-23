@@ -71,6 +71,8 @@ export const PERSONAL_MAP: { [K in keyof Required<Personal>]: SettingLine } = {
   steps: S("day", "numbers", "sumdo.personal.steps"),
   trainingAge: S("goal", "numbers", "sumdo.personal.trainingAge"),
   weighIns: S("body", "numbers", "sumdo.personal.weighIns"),
+  // DT335 (0.3.184): the target body weight for Gain healthy weight or Lose fat, and the weight it was set at
+  targetKg: S("body", null, "sumdo.personal.targetKg"), targetFromKg: I("The weight when the target was set: where the progress counts from."), targetFor: I("The goal the target weight belongs to."),
   kept: I("Findings kept on purpose: shown again when a number changes."),
   dayMode: S("week", "numbers", "sumdo.personal.dayMode"), ownDays: S("week", "numbers", "sumdo.personal.ownDays"),
   activity: I("Older accounts' activity answers."), dayKcal: I("Older accounts' day energy."),
@@ -146,7 +148,8 @@ export function summaryOf(x: SummaryIn): SummaryPart[] {
   const age = p.birthYear ? (x.now ?? new Date()).getFullYear() - p.birthYear : null;
   const body = [p.sex === "male" ? w("sum.male") : p.sex === "female" ? w("sum.female") : p.sex ? cap(p.sex) : "", p.birthYear ? w("sum.born", { year: p.birthYear }) : "", p.heightCm ? `${p.heightCm} cm` : "", p.weightKg ? `${p.weightKg} kg` : "", p.bodyFatPct ? w("sum.bodyFat", { n: p.bodyFatPct }) : ""].filter(Boolean).join(", ");
   push("you", w("sum.you"), w("me.rowProfile"), [body ? row("body", PERSONAL_MAP.weightKg, w("sum.body"), body, x.burn ? w("sum.bodyDoesBurn", { kcal: n0(Math.round(x.burn / 10) * 10) }) : w("sum.bodyDoes"), false) : null,
-    p.weighIns?.length ? row("weighIns", PERSONAL_MAP.weighIns, w("sum.weighIns"), w("sum.weighInsValue", { n: p.weighIns.length, date: dayV(p.weighIns[p.weighIns.length - 1].date + "T12:00:00") })) : null]);
+    p.weighIns?.length ? row("weighIns", PERSONAL_MAP.weighIns, w("sum.weighIns"), w("sum.weighInsValue", { n: p.weighIns.length, date: dayV(p.weighIns[p.weighIns.length - 1].date + "T12:00:00") })) : null,
+    p.targetKg ? row("targetKg", PERSONAL_MAP.targetKg, w("goalsheet.target"), `${p.targetKg} kg`) : null]);
   void age;
   // Goal and numbers
   const kc = x.days.map((d) => d.kcal).filter((v) => v > 0), cb = x.days.map((d) => d.carbs).filter((v) => v > 0);

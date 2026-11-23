@@ -338,7 +338,9 @@ function GoalPanel(p: AppApi) {
   const o = ownWay ? ownDayNumbers(p.personal, band?.id ?? "maintain", p.formula) : null;
   // the goal sheet (canvas board K2): what you and your coach agree on
   const approved = p.review?.status === "approved" ? { approvedBy: p.review.by || p.coachLabel, approvedAt: p.review.at } : {};
-  const sheet = sheetOf(goal, { weightKg: p.personal.weightKg, trainingAge: p.personal.trainingAge, coachLabel: p.coachLabel, ...approved });
+  const wis = [...(p.personal.weighIns ?? [])].sort((a, b) => (a.date < b.date ? -1 : 1)), lastKg = wis.length ? wis[wis.length - 1].kg : p.personal.weightKg;
+  const sheet = sheetOf(goal, { weightKg: p.personal.weightKg, trainingAge: p.personal.trainingAge, coachLabel: p.coachLabel, ...approved,
+    ...(p.personal.targetKg && p.personal.targetFor === goal?.band && !weighInsOff(p.safety) ? { target: { kg: p.personal.targetKg, fromKg: p.personal.targetFromKg ?? p.personal.weightKg, nowKg: lastKg } } : {}) });
   const [about, setAbout] = useState(false);
   return (
     <>

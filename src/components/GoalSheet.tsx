@@ -13,6 +13,7 @@ export function GoalSheet({ sheet, title = false }: { sheet: Sheet; title?: bool
       <div className="sheet-row"><small>{w("goalsheet.weightToExpect")}</small><b>{sheet.weight}</b></div>
       <div className="sheet-row"><small>{w("goalsheet.countedAs")}</small><b>{sheet.counted}</b></div>
       <div className="sheet-row"><small>{w("goalsheet.progressMeans")}</small><b>{sheet.progress}</b></div>
+      {sheet.target && <div className="sheet-row target-row"><small>{w("goalsheet.target")}</small><b>{sheet.target}</b></div>}
       <div className="sheet-row"><small>{w("goalsheet.nextCheckIn")}</small><b>{sheet.checkIn}</b></div>
     </section>
   );

@@ -35,7 +35,8 @@ const PORT = "3318", U = `http://127.0.0.1:${PORT}`;
       await page.getByRole("group", { name: `${d}, when` }).getByRole("button", { name: "Evening" }).click(); await page.waitForTimeout(150);
     }
     await page.locator(".calc-way").getByRole("button", { name: /^Done$/ }).last().click(); await page.waitForTimeout(400);
-    await page.locator(".goal-pick").nth(3).click(); await page.waitForTimeout(400);
+    // DT335 (0.3.184): Gain healthy weight is the fourth card now; Anna's goal is Build muscle, picked by its name
+    await page.locator(".goal-pick").filter({ hasText: /^Build muscle/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "Each day its own" }).click(); await page.waitForTimeout(400);
     // DT144: each day's PD in setup's table
     const pds = await page.locator(".day-table .dt-pd").allTextContents();

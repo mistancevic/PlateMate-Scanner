@@ -64,7 +64,7 @@ export function goalLines(l: Lenses, meal: string, need: Meal, pdTarget: number 
   if (f && f.g >= 1 && f.closes >= 25) out.push({ mark: f.sat > f.satMeal ? "note" : "part", family: "fats", text: `Fats: ${f.g} g, ${f.closes} % of your ${meal}'s ${need.fat} g; ${f.sat} g saturated, ${Math.round((100 * f.sat) / f.satMeal)} % of its limit${f.sat > f.satMeal ? ": over it" : ""}.` });
   else if (f && f.g < 1) out.push({ mark: "note", family: "fats", text: `Fats: almost none, ${f.g} g.` });
   // the goal decides which family leads among lines of the same strength
-  const lead: Record<string, string[]> = { gain: ["protein", "carbs"], gainsteady: ["protein", "carbs"], performance: ["carbs", "protein"], fatloss: ["protein", "micros"], recomp: ["protein", "micros"] };
+  const lead: Record<string, string[]> = { gain: ["protein", "carbs"], gainsteady: ["protein", "carbs"], healthy: ["protein", "carbs"], performance: ["carbs", "protein"], fatloss: ["protein", "micros"], recomp: ["protein", "micros"] };
   const order = lead[band] ?? [];
   const rank = (g: GoalLine) => ({ ok: 0, part: 1, note: 2 })[g.mark] * 10 + (order.includes(g.family) ? order.indexOf(g.family) : 5);
   return out.sort((a, b) => rank(a) - rank(b));

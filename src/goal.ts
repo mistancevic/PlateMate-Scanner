@@ -22,7 +22,13 @@ export const BANDS: Band[] = [
 export type Pace = "steady" | "faster";
 export const STEADY: Band = { id: "gainsteady", name: "Build muscle", range: "PD 4 to 5", kcal: [2300, 2900], protein: [110, 150], who: "steady progress in strength; your weight goes up slowly",
   points: ["More food than you burn, about 5 % more.", "Your lifts go up first; your weight follows slowly."] };
-export const ALL_BANDS: Band[] = [...BANDS, STEADY];
+// DT335 (0.3.184, board Stories284; Go 23 November 2026, 14:13): Gain healthy weight, the goal for a person who is light and
+// wants to gain, muscle and some fat too; training welcome, not required. It has a target body weight (goalFit.ts). It shows
+// after Maintain on the goal step and on the coach's goal card; the recipe fits keep the five goals they were made with.
+export const HEALTHY: Band = { id: "healthy", name: "Gain healthy weight", range: "PD 4 to 5", kcal: [2100, 2600], protein: [90, 130], who: "your weight goes up slowly, to a weight you choose",
+  points: ["A little more food than you burn, about 10 % more.", "Your weight goes up slowly, roughly 1 kg a month, to the weight you choose.", "Protein in your range. Training is welcome, not required."] };
+export const GOALS: Band[] = [...BANDS.slice(0, 3), HEALTHY, ...BANDS.slice(3)];
+export const ALL_BANDS: Band[] = [...BANDS, STEADY, HEALTHY];
 // DT243: what a goal card says, in the app's language (goal.point.<band>.<n>); the band's own points stay the English the prompts read
 export const pointsOf = (b: Band): string[] => b.points.map((x, i) => w(`goal.point.${b.id}.${i + 1}` as WordKey));
 export const PACES: { id: Pace; band: string; name: string; hint: string }[] = [
@@ -34,7 +40,7 @@ export const paceOf = (id?: string): Pace | null => (id === "gainsteady" ? "stea
 // the goal's name with its pace: "Build muscle · Steady"
 export const goalLabel = (id?: string) => { const b = bandOf(id); if (!b) return ""; const pc = paceOf(b.id); return pc ? `${b.name} · ${pc === "steady" ? "Steady" : "Faster"}` : b.name; };
 // DT203 phase 9 (0.3.86): the goal's name on the screens, in the language chosen; goalLabel stays English for Chef Mealan's prompts
-const BAND_WORD: Record<string, WordKey> = { recomp: "goal.band.recomp", fatloss: "goal.band.fatloss", maintain: "goal.band.maintain", gain: "goal.band.gain", gainsteady: "goal.band.gain", performance: "goal.band.performance" };
+const BAND_WORD: Record<string, WordKey> = { recomp: "goal.band.recomp", fatloss: "goal.band.fatloss", maintain: "goal.band.maintain", gain: "goal.band.gain", gainsteady: "goal.band.gain", performance: "goal.band.performance", healthy: "goal.band.healthy" };
 export const goalName = (id?: string) => { const b = bandOf(id); if (!b) return ""; const pc = paceOf(b.id), n = BAND_WORD[b.id] ? w(BAND_WORD[b.id]) : b.name; return pc ? `${n} · ${pc === "steady" ? w("goal.pace.steady") : w("goal.pace.faster")}` : n; };
 // a goal card's own name, without its pace: Build muscle
 export const bandName = (id: string) => (BAND_WORD[id] ? w(BAND_WORD[id]) : bandOf(id)?.name ?? "");

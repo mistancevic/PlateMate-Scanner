@@ -21,9 +21,10 @@ const path = require("node:path");
   await require("./goal-open.cjs")(page);
   // Calculate for me
   ok(await page.getByRole("button", { name: "Calculate for me" }).count() === 1 && await page.getByText("Work it out for me").count() === 0, "Calculate for me, not Work it out");
-  // the five goals as cards, Recomposition first (approved 6 October 2026, canvas board G1); each explains itself
+  // the goals as cards, Recomposition first (approved 6 October 2026, canvas board G1); each explains itself. DT335 (0.3.184,
+  // board Stories284): Gain healthy weight is the sixth, after Maintain
   const goals = await page.locator(".calc-way .goal-pick .goal-pick-head b").allTextContents();
-  ok(goals.join("|") === "Recomposition|Lose fat|Maintain|Build muscle|Performance", "the five goals: " + goals.join(", "));
+  ok(goals.join("|") === "Recomposition|Lose fat|Maintain|Gain healthy weight|Build muscle|Performance", "the six goals: " + goals.join(", "));
   ok((await page.locator(".calc-way .goal-pick").first().locator("li").count()) >= 3, "each goal says what happens to your weight and food");
   await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(200); await require("./door.cjs")(page);
   await page.getByRole("button", { name: /^Female$/ }).click();
