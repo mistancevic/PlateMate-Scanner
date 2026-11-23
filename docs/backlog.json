@@ -3432,6 +3432,28 @@
       "decision": "Direction agreed 22 November 22:51. Not drawn yet."
     },
     {
+      "id": "DT343",
+      "title": "The printed name in my language: match the line to the local language",
+      "epic": "plate",
+      "state": "later",
+      "why": "Coach Milan 23 November 2026, 12:11 to 12:20, after DT339: so far, what is on the pack is what we show; that is important. Later, as a smart function, match the local language: for travel mode, and for foods sold on a local market without a translated label.",
+      "opportunity": {
+        "from": "The board DT339, 23 November 2026.",
+        "job": "Read a pack's table in a language I know, at home or travelling.",
+        "kind": "Did not understand it: a line printed in four languages, or only in the local one.",
+        "why_now": "Later (Coach Milan 12:20). DT339 shows the pack as printed first."
+      },
+      "problem": "Since DT339 (0.3.180) each line shows the app's name with the printed name under it, exactly as on the pack: all the languages it prints, or only the local one. The app does not know which part between the slashes is which language, and some languages share a word (Masti is Croatian and Serbian).",
+      "story": "When I read a pack printed in languages I do not read, I want the printed part in my language picked out, so that I can match the line to the pack without reading the rest.",
+      "proposed": "Not drawn. A first idea: when the app is sure which part is in the person's language or the market's, it marks that part; the whole printed name stays.",
+      "open": [
+        "What is shown when the app is not sure which part is which language.",
+        "How this meets travel mode."
+      ],
+      "checks": "To agree with the board.",
+      "decision": "Later, Coach Milan 23 November 12:20. Not drawn."
+    },
+    {
       "id": "B154",
       "title": "A plate logged with the pencil and then cooked is one meal, not two",
       "epic": "plate",

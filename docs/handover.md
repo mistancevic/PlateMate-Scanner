@@ -52,6 +52,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - DT335 Next: Gain healthy weight as a goal; goals that do not fit are greyed; a target body weight (roughly 1 kg a month).
 - B157 done in 0.3.175 (Go 21:57 with B158). A Serbian block word blocks every word that starts with it, in Latin and Cyrillic (SR_STEMS in src/obvious0.ts), leden before čaj; Ice Tea and Icetea block the 0.
 - B158 done in 0.3.175. The heads-up says "The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label." A button that opens the camera from the heads-up is left for later (21:46, an edge case). Checks: Area plus the German sweep, 21 of 21 walkthroughs (docs/qa/runs/0.3.175.json).
+- DT343 Later (12:20): the printed name in my language, matched to the local language, for travel mode and for local packs without translations. Until then what is on the pack is what the app shows (DT339).
 - DT341 Later: drinks in millilitres, shown and typed in ml, calculated in grams. Not urgent.
 - A cook mode issue a tester saw: not reproduced; Coach Milan checks with the tester. No ticket.
 
