@@ -1,0 +1,809 @@
+{
+ "version": "0.3.183",
+ "commit": "c2f5207",
+ "at": "2026-11-23T13:20:37.431Z",
+ "minutes": 2,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 69,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "design-rules.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 20 October 2026, 07:06 to 07:30, boards DS1 and DS2): the design system's button rules. A: one filled, wide button per screen, the main step; every other action is outlined. B: a card's buttons share one row under everything else in the card, the card's full width. C: an answer is a chip, never a button. D: Today has no wide button; a next meal with nothing planned is a card with Pick a meal and Make it on the Plate. E: Back sits top left, above the step bar, and says where it goes. Never rewrite these lines to fit a change. Added by stories DS4 G and DS5 H (Milan 08:49 to 09:30, boards DS4 and DS5): a page's title comes first, under Back: a recipe's name before its photo. On /built a link inside a sentence is underlined, and each part has one filled button. Added by story DT305 (Coach Milan 16 November 2026, 10:04 to 10:49, boards Stories230 and Stories231; written down in docs/rules/design.md as D6 and D7): an answer to tick sits under its question in its own block; the buttons of a section sit under the whole section in one row. Guarded on the read of a photo, in photo-read.cjs.",
+   "pass": true,
+   "seconds": 32,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B: I ate it and Change it share one row, the card's full width, equal widths"
+    },
+    {
+     "ok": true,
+     "text": "B: Did you have it? I ate it, Change it, Skipped it, one row, edge to edge"
+    },
+    {
+     "ok": true,
+     "text": "C: How did it carry you? answers are chips"
+    },
+    {
+     "ok": true,
+     "text": "A: Sarma has no steps yet: Start cooking is grey, nothing else is filled: "
+    },
+    {
+     "ok": true,
+     "text": "A, B: Write my own is a button next to the other way, not a link"
+    },
+    {
+     "ok": true,
+     "text": "E: the recipe page's Back, Recipes, sits top left above the photo"
+    },
+    {
+     "ok": true,
+     "text": "G: the recipe's name comes first, under Back, before the photo"
+    },
+    {
+     "ok": true,
+     "text": "A: on the Plate no Add in the food list is filled: "
+    },
+    {
+     "ok": true,
+     "text": "E: Back sits top left, above the step bar: Back to the plate"
+    },
+    {
+     "ok": true,
+     "text": "E: no Back at the bottom of the step"
+    },
+    {
+     "ok": true,
+     "text": "D: in the evening Today has no wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: the Tomorrow card still opens tomorrow's plan"
+    },
+    {
+     "ok": true,
+     "text": "D: lunch with nothing planned is a card, not a wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: Pick a meal, Make it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "D: Make it on the Plate opens the Plate for lunch"
+    },
+    {
+     "ok": true,
+     "text": "F: 11+ of 93 g fat, and the note: Why the +: Protein bar has no fat or carbs value, so fat and carbs are counted without it."
+    },
+    {
+     "ok": true,
+     "text": "F: its name opens it in Foods"
+    },
+    {
+     "ok": true,
+     "text": "H: a link inside a sentence is underlined"
+    },
+    {
+     "ok": true,
+     "text": "H: one filled button per part: [[\"Try it: the calculator on the home page\",true],[\"See it work\",false],[\"Read Worth Building\",false],[\"Notify me\",true],[\"Email Milan\",true],[\"Connect on LinkedIn\",false]]"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 118 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 17,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 14,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "past-and-plan.cjs",
+   "about": "JOURNEY (0.2.130, DT149, board Stories101 version 2; Tester 3, UX4; Coach Milan 29 October 00:14 and 00:58 Go): \"The past is recording what I ate. The future is planning what I will eat. In the moment is what I eat.\" A meal for tomorrow from Plan is planning: the bar says Planning Friday's dinner, the line says Planning, the main button is Put it in Friday's dinner before Fit and after it, there is no Make it, nothing is logged or rated. A recipe planned for Friday says Change it on the Plate. A day gone by on Plan lists each meal: a planned one is I ate it, at its time; Add what you ate opens the Plate, Adding Wednesday's lunch: no Fit, one button puts it in at the meal's time, no rating. Which day? behind the Plate's pencil makes a plate tomorrow's lunch. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one (the meal, then the day, date and time; Goes into your plan. for a meal to come; the words Planning and Eaten are gone from it). Which day? is gone: the calendar behind the pencil makes a plate tomorrow's lunch, and that plate has no Put it in button. A meal opened from Plan keeps Put it in Friday's dinner, as before. Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.",
+   "pass": true,
+   "seconds": 27,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT230: no bar; changed by DT308.1: the meal line says Dinner, Friday, and that it goes into your plan: Dinner Friday, 30 October, 20:00 Goes into your plan."
+    },
+    {
+     "ok": true,
+     "text": "the line says the day and that it goes into your plan; changed by B150: with its pencil, no X"
+    },
+    {
+     "ok": true,
+     "text": "the main button: Put it in Friday's dinner, before Fit"
+    },
+    {
+     "ok": true,
+     "text": "after Fit: still Put it in, no Make it"
+    },
+    {
+     "ok": true,
+     "text": "the plate says it is planned, not eaten"
+    },
+    {
+     "ok": true,
+     "text": "Friday's dinner is planned; nothing logged, nothing to rate"
+    },
+    {
+     "ok": true,
+     "text": "a recipe for Friday: Change it on the Plate, no Make it"
+    },
+    {
+     "ok": true,
+     "text": "it opens as Friday's breakfast, going into your plan"
+    },
+    {
+     "ok": true,
+     "text": "yesterday: each meal can be added; the planned dinner is I ate it"
+    },
+    {
+     "ok": true,
+     "text": "I ate it adds it on Wednesday at 20:00, nothing rated"
+    },
+    {
+     "ok": true,
+     "text": "the day shows it as eaten at dinner"
+    },
+    {
+     "ok": true,
+     "text": "Adding Wednesday's lunch; changed by DT308.1: the line says Lunch, Wednesday, 28 October, 13:45"
+    },
+    {
+     "ok": true,
+     "text": "no Fit, no Make: it is what you ate"
+    },
+    {
+     "ok": true,
+     "text": "added on Wednesday at 13:45, nothing rated"
+    },
+    {
+     "ok": true,
+     "text": "your calendar sits behind the pencil: the days on top (Which day? is gone)"
+    },
+    {
+     "ok": true,
+     "text": "tomorrow's meals say what is planned"
+    },
+    {
+     "ok": true,
+     "text": "the plate is now Friday's lunch, going into your plan: Lunch Friday, 30 October, 13:45 Goes into your plan."
+    },
+    {
+     "ok": true,
+     "text": "a meal set with the pencil has no Put it in button; changed by B151: the pencil itself plans the plate once it has foods"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 28 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "past-meal.cjs",
+   "about": "DT267 (0.3.117, board Stories200; Coach Milan 9 November, Go; from a tester): a meal eaten on a past day keeps its picture on Plan. The row shows the picture, the whole row opens the meal: the photo large, its other photos, the numbers, the foods with grams. Cook again only for a meal from a recipe; any other says Open, and inside Put it on the Plate again.",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "two eaten meals on Saturday"
+    },
+    {
+     "ok": true,
+     "text": "the meal read from a photo shows its picture"
+    },
+    {
+     "ok": true,
+     "text": "a meal with no recipe says Open, not Cook again"
+    },
+    {
+     "ok": true,
+     "text": "a meal from a recipe keeps Cook again"
+    },
+    {
+     "ok": true,
+     "text": "the row's buttons are at least 44 px"
+    },
+    {
+     "ok": true,
+     "text": "the day fits the width"
+    },
+    {
+     "ok": true,
+     "text": "a tap on the row opens the meal"
+    },
+    {
+     "ok": true,
+     "text": "the photo, large"
+    },
+    {
+     "ok": true,
+     "text": "its other photos under it"
+    },
+    {
+     "ok": true,
+     "text": "a tap on a small photo shows it large"
+    },
+    {
+     "ok": true,
+     "text": "the foods with their grams: Sourdough bread 120 g | Cooked ham 60 g | Fried egg 55 g"
+    },
+    {
+     "ok": true,
+     "text": "the numbers: 477 kcal 30 g protein PD 6.4"
+    },
+    {
+     "ok": true,
+     "text": "Put it on the Plate again, and Save in My recipes"
+    },
+    {
+     "ok": true,
+     "text": "every button at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "back returns to Saturday"
+    },
+    {
+     "ok": true,
+     "text": "the Plate holds its three foods; nothing new is logged"
+    },
+    {
+     "ok": true,
+     "text": "a recipe's meal: Cook again, no Save in My recipes"
+    },
+    {
+     "ok": true,
+     "text": "one photo or none: no row of small photos"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the row in the language: Otvori ›"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the meal in the language"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: fits the width"
+    },
+    {
+     "ok": true,
+     "text": "de: the row in the language: Öffnen ›"
+    },
+    {
+     "ok": true,
+     "text": "de: the meal in the language"
+    },
+    {
+     "ok": true,
+     "text": "de: fits the width"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 27 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "plate-again.cjs",
+   "about": "DT319 (0.3.183, board Stories283; Go 23 November 2026, 14:13): a meal I ate, opened from Plan: Put it on the Plate again is a copy for a new meal. One line says so (AC1); a plate that holds foods is asked first, Keep my plate changes nothing (AC2); an empty plate goes straight on (AC3); the copy has the meal's name, no meal set, and a change on it leaves the meal eaten as it was (AC4). Saturday's lunch, 21 November; the clock is Monday 23 November, 13:15.",
+   "pass": true,
+   "seconds": 15,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT319 AC1: one line says it is a copy for a new meal"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC2: the plate has foods, so it asks: Your plate holds 2 foods: Skyr, Banana. Put Chicken and sweet potato fries in their place?"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC2: still on the meal, not the Plate"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC2: Keep my plate changes nothing"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: the Plate holds the meal's three foods"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: the copy comes with its name: Chicken and sweet potato fries"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: no meal set, bound to nothing: MEAL AND DAY No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: the copy changed on the Plate: 250"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: Saturday's lunch is as it was, and nothing new is logged"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC3: an empty plate: no question, the Plate with the foods and the name"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 50 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "plate-live-cook.cjs",
+   "about": "B154 (0.3.172, board B154; Coach Milan, Go 21 November 23:43): a plate logged with the pencil and then cooked is one meal, not two. On the phone it is Sunday 15 November 2026, 13:50, and Lunch is at 13:45, so a tap on Lunch logs the plate. The button then says Prepare it (Prepare it again is gone). The cook stays on Lunch through Prep, Make and Eat. Save on Eat asks nothing about the meal and writes into the Lunch already logged: one record at 13:45, counted once. A portion makes Lunch the portion eaten. Later today and Not after all take the plate out of Lunch again, and the cook is kept as any cook is. The same foods another time start from the eaten meal, as a new plate. The checks name AC1 to AC9.",
+   "pass": true,
+   "seconds": 79,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Given: it is 13:50 and the pencil logged the plate in today's Lunch at 13:45"
+    },
+    {
+     "ok": true,
+     "text": "AC1: the end of the eaten plate says Prepare it, with Save it to My recipes under it"
+    },
+    {
+     "ok": true,
+     "text": "AC1: nothing says Prepare it again"
+    },
+    {
+     "ok": true,
+     "text": "AC2: Prepare it opens Prep, and the plate is still today's Lunch"
+    },
+    {
+     "ok": true,
+     "text": "AC2: on Make nothing is taken out of the meal"
+    },
+    {
+     "ok": true,
+     "text": "AC3: Save asks nothing about the meal: no Which meal?"
+    },
+    {
+     "ok": true,
+     "text": "AC3: no second meal is logged"
+    },
+    {
+     "ok": true,
+     "text": "AC4: Lunch holds the plate once, at 13:45, with the taste of the cook"
+    },
+    {
+     "ok": true,
+     "text": "AC8: Yes, save it: the recipe is in My recipes with its steps, as for any cook"
+    },
+    {
+     "ok": true,
+     "text": "AC4: Today counts 563 kcal, one meal by the plan"
+    },
+    {
+     "ok": true,
+     "text": "AC9: the eaten Lunch opened from Today has its button to cook it again"
+    },
+    {
+     "ok": true,
+     "text": "AC9: the foods are on the Plate as a new plate with no meal set, and Lunch stays as logged"
+    },
+    {
+     "ok": true,
+     "text": "AC5: A portion of 2: Lunch holds the one portion I ate, 224 g, at 13:45"
+    },
+    {
+     "ok": true,
+     "text": "AC5: the recipe says it makes 2, as for any cook"
+    },
+    {
+     "ok": true,
+     "text": "AC6: Later today: the plate is out of Lunch again, and the cooked meal is kept for later"
+    },
+    {
+     "ok": true,
+     "text": "AC6: Today has nothing logged, and the cooked meal waits with I ate it"
+    },
+    {
+     "ok": true,
+     "text": "AC7: Not after all: the plate is out of Lunch again, and nothing is logged"
+    },
+    {
+     "ok": true,
+     "text": "AC7: Today has nothing logged, and nothing waits"
+    },
+    {
+     "ok": true,
+     "text": "unchanged: a plate with no meal set is asked Which meal? under Save"
+    },
+    {
+     "ok": true,
+     "text": "a plate logged on Saturday says Prepare it too"
+    },
+    {
+     "ok": true,
+     "text": "its cook today is a cook of its own: Saturday's Dinner stays as logged"
+    },
+    {
+     "ok": true,
+     "text": "save check: 151 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "why"
+}
