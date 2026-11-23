@@ -2,8 +2,8 @@
   "id": "DT340",
   "title": "The client's card shows activity: opened, active, full, last active, and a quiet client waits",
   "epic": "coach",
-  "state": "next",
-  "why": "Coach Milan 22 November 2026, 18:46 to 18:59: the squares on a client's card give him an overview of the client's activity, but today never has a colour and he wants to see whether there was activity today. He asked what is tracked. 18:54: what can show that the client opened the app, even when they only planned and looked; maybe a minimum activity that counts. 18:59: for now it is ok, to be seen in the future. 19:02 to 19:03: resolve the open point: a full day is a day fully logged, with or without a plan; yes. And yes to Last active on the card and Quiet for 3 days in Waiting for you. 23 November 13:00: Draw.",
+  "state": "done",
+  "why": "Coach Milan 22 November 2026, 18:46 to 18:59: the squares on a client's card give him an overview of the client's activity, but today never has a colour and he wants to see whether there was activity today. He asked what is tracked. 18:54: what can show that the client opened the app, even when they only planned and looked; maybe a minimum activity that counts. 18:59: for now it is ok, to be seen in the future. 19:02 to 19:03: resolve the open point: a full day is a day fully logged, with or without a plan; yes. And yes to Last active on the card and Quiet for 3 days in Waiting for you. 23 November 13:00: Draw. 13:15: Go.",
   "opportunity": {
     "from": "Coach Milan's own Clients screen, 22 November 2026.",
     "job": "See at a glance which clients are using the app, today and in the last two weeks.",
@@ -15,11 +15,10 @@
   "proposed": "Three levels per day. Opened: the app was opened that day. Active: at least one thing that shapes her food day: a meal logged, the plan changed, a weigh-in, or a question from the coach or Chef Mealan answered. Full: as today. The squares: empty, not opened; light grey, opened only; amber, active and not full; green, full; the weigh-in dot stays. Today fills in as the day goes. The legend says the same. The phone writes the day's level into the day line it already sends. The privacy notice gets one line: your coach sees on which days you opened the app. A full day, new rule: the day is over and every meal of her day is accounted for, logged (as planned, swapped or built on the Plate) or skipped on purpose; extras count on top; with or without a plan. A day with a plan where a planned meal was left unanswered is still not full. A skip can be recorded for any meal of her day, not only a planned one. On the card one line: Last active, today 13:05, or 3 days ago. In Waiting for you: Quiet for 3 days, when a client has not opened the app for 3 days in a row; it leaves the list when she is active again.",
   "open": [
     "The minimum for Active may change later (Coach Milan 18:59: for now it is ok).",
-    "Check while building: whether days already passed are counted again under the new full-day rule, or only from the release on.",
-    "Today's page: the same I skipped it for a meal not planned, as on Plan for a day gone by (drawn on Plan only)."
+    "Today's page: the same I skipped it for a meal not planned, as on Plan for a day gone by (built on Plan only)."
   ],
   "checks": "Middle: Clients, the day line the phone sends, Plan's day gone by, and the full-day rule in the first two weeks. The unit tests with new ones for the levels, the full-day rule, Last active and Quiet for 3 days; the build; a new walkthrough for AC1 to AC7; and the walkthroughs that open Clients, Plan's past days and the first two weeks, about 10 to 15 minutes. New words on screen, so the German sweep too.",
-  "decision": "Direction agreed 22 November 18:59 to 19:03, with the full-day rule, Last active and Quiet for 3 days. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "decision": "Direction agreed 22 November 18:59 to 19:03. Go 23 November 2026, 13:15, checks Middle plus the German sweep, 26 of 26. Built in 0.3.182.",
   "now": "Clients: Waiting for you lists what clients sent or asked. Each card has squares: in a normal week green is a day lived by the plan and amber a day changed from it; in the first two weeks green is a full day and amber any other day gone by, two meals logged or nothing at all. Today is an outline until it is over. Opening the app shows nowhere for the coach. On Plan, a day gone by: only a planned meal can be skipped on purpose.",
   "looked_at": "Opening the app counted on Metrics only: not enough, it is anonymous and the coach needs it per client. A colour for every kind of action: not chosen, four levels are enough to see who is there.",
   "board": "Stories282",
@@ -71,9 +70,12 @@
     "Active: at least one thing that shapes her food day: a meal logged, the plan changed, a weigh-in, or a question from the coach or Chef Mealan answered.",
     "Quiet counts days the app was not opened, from the coach's today; Last active shows the last active time, not the last opening.",
     "A meal skipped with nothing planned is kept like a planned meal marked skipped; Undo removes it.",
-    "The pictures are the real app on one scratch build of main, not committed, with the clock on Thursday 26 November 2026, 13:30, so the week has days gone by. Waiting for you repeats Nina's items: that is the example coach's own data, as in main."
+    "The pictures are the real app on one scratch build of main, not committed, with the clock on Thursday 26 November 2026, 13:30, so the week has days gone by. Waiting for you repeats Nina's items: that is the example coach's own data, as in main.",
+    "Built: every day line is drawn from the data again at each save, so the days of the first two weeks already gone by are counted again by the new full-day rule.",
+    "Built: the week's line under the squares counts full days (was the days lived by the plan), as the green now means a full day.",
+    "Built: a client whose phone has not sent activity yet shows her days with nothing logged as not opened, until her app updates."
   ],
   "short": "Activity on the client's card: opened, active, full, last active; a quiet client waits",
-  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "rel": "Built in 0.3.182; Go 23 November 2026, 13:15",
   "boardTitle": "DT340: the client's card shows activity: opened, active, full, last active, and a quiet client waits"
 }
