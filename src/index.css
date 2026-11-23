@@ -633,6 +633,9 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .label-table-read .lt-row { grid-template-columns: 1fr auto 34px; padding: 8px 12px; } .lt-val { font-size: var(--fs-body); text-align: right; }
 .readout-extra { display: block; margin-top: 8px; opacity: .9; font-size: var(--fs-small); font-weight: 700; color: var(--surface); }
 .readout small, .readout p { color: var(--surface); }
+/* B166 (0.3.192, board Stories293): the numbers inside a PD card keep the table's own colours, as on the Plate */
+.readout .nt small, .readout .nt p { color: var(--ink); }
+.readout .nt .nt-note, .readout .nt .nt-sub, .readout .nt small.muted { color: var(--muted); }
 .lt-add-row select { width: 90px; } .lt-add-row input { width: 120px; }
 
 .fav { margin-left: auto; flex: none; border: 0; background: none; font-size: var(--fs-title); line-height: 1; color: var(--muted); padding: 4px 2px; }
@@ -1447,11 +1450,13 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .st { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
 .st-row { display: flex; gap: 8px; align-items: flex-start; }
 .st-n { flex: none; width: 24px; height: 24px; margin-top: 8px; border-radius: var(--r-control); background: var(--brand); color: var(--surface); font-weight: 900; font-size: var(--fs-label); display: grid; place-items: center; }
-.st-field { flex: 1; min-width: 0; min-height: 40px; border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 7px 10px; font-size: var(--fs-body); line-height: 1.75; background: var(--surface, var(--surface)); outline: none; white-space: pre-wrap; overflow-wrap: anywhere; }
+.st-field { flex: 1; min-width: 0; min-height: 40px; border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 7px 10px; font-size: var(--fs-body); line-height: 2.1; background: var(--surface, var(--surface)); outline: none; white-space: pre-wrap; overflow-wrap: anywhere; }
 .st-field:focus { border-color: var(--brand); }
 .st-field:empty::before { content: attr(data-placeholder); color: var(--muted); }
 .st-food, .st-amt { color: var(--brand-text); font-weight: 900; }
-.st-food { display: inline-block; background: var(--base); border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 0 7px; line-height: 22px; white-space: nowrap; }
+/* B165 (0.3.192, board Stories293): a chip flows like a word; one too long for the line (st-long) goes on like text, open where it breaks; 250 g Körniger stays together (st-keep) */
+.st-food { display: inline; background: var(--base); border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 2px 7px; white-space: nowrap; -webkit-box-decoration-break: slice; box-decoration-break: slice; }
+.st-food.st-long { white-space: normal; overflow-wrap: anywhere; } .st-food .st-keep { white-space: nowrap; }
 .st-food.gone, .st-amt.gone { color: var(--close-text); background: var(--close-soft); border-color: var(--mid); }
 .st-add { align-self: flex-start; font-weight: 900; }
 .st-foods { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; } .st-foods small { font-weight: 900; color: var(--muted); }

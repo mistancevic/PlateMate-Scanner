@@ -1,0 +1,405 @@
+{
+ "version": "0.3.192",
+ "commit": "3adb77d",
+ "at": "2026-11-23T23:21:27.007Z",
+ "minutes": 1,
+ "flows": [
+  {
+   "file": "chip-lines.cjs",
+   "about": "B165 and B166 (0.3.192, board Stories293; Coach Milan, Go 24 November 2026, 00:13). B165: a food chip in a step flows like a word; one too long for the line goes on to the next line like text, open where it breaks, with the comma straight after it and 250 g kept with Körniger; a chip that fits moves down whole; lines of chips do not touch; the page stays 390 px wide; a tap on the food under the steps still takes the whole chip out; the publish sheet's steps do the same. B166: inside a recipe's PD card, the numbers' note, the fibre line and Per 100 kcal's lines read in the table's colours, never white on white.",
+   "pass": true,
+   "seconds": 15,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B165 AC1: the page stays 390 px wide (390)"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC1: the long chip goes on to the next line inside the field (2 lines)"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC3: 150 g Feta Leicht and 2 eggs (L) stay whole, one line each"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC6: the comma is right after 2,5% Fett, on the same line"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC7: 250 g stays on the same line as Körniger"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC5: space between 2 eggs (L) and 150 g Feta Leicht on the line under it (6 px)"
+    },
+    {
+     "ok": true,
+     "text": "B165: the step reads as before: Preheat your oven to 200 °C. Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 2 eggs (L) and 150 g Feta Leicht in a bowl."
+    },
+    {
+     "ok": true,
+     "text": "B165 AC2: a tap on its food takes the whole long chip out of the step"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC2: put back, it lands in the step and the page stays 390 px wide"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC4: in the publish sheet the long chip goes on to the next line too"
+    },
+    {
+     "ok": true,
+     "text": "B166 AC1: the note under Total reads in grey, not white (rgb(83, 98, 127))"
+    },
+    {
+     "ok": true,
+     "text": "B166 AC2: Per 100 kcal's 5 lines read in the table's colours"
+    },
+    {
+     "ok": true,
+     "text": "B166 AC3: the fibre line reads in dark text: * Fibre: at least 0 g. 1 food without a value: Granola Crunchy Mix."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 62 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "fibre.cjs",
+   "about": "JOURNEY INVARIANT (DT342, 0.3.185, board Stories285; Coach Milan, Go 23 November 2026, 16:21): fibre, 0 where it is a fact. Olive oil from a pack with no fibre value counts as 0 (none by nature): the plate has a real fibre letter, the numbers say fibre in grams and one line names the oil; the oil's own row reads fi-, and its own values stay as on its pack. With a food that has no fibre value and is not on the list (a muesli bar), the plate counts what is known: fibre 6* g, a * line says at least 6 g and names the food, and the letter has a * (fi*, never fi-*). The muesli bar's card says to add the fibre from the pack in Review the label. No guessed number.",
+   "pass": true,
+   "seconds": 16,
+   "checks": [
+    {
+     "ok": true,
+     "text": "AC1: the plate has a real fibre letter, fi: fi"
+    },
+    {
+     "ok": true,
+     "text": "AC7: the oil's row reads fi-: F+ c- fi- p-"
+    },
+    {
+     "ok": true,
+     "text": "AC1: the numbers say fibre 6 g: 6"
+    },
+    {
+     "ok": true,
+     "text": "AC3: one line names the oil: Olive oil counts as 0 fibre: none by nature."
+    },
+    {
+     "ok": true,
+     "text": "AC1: the oil's own values stay as on its pack, fibre empty"
+    },
+    {
+     "ok": true,
+     "text": "AC5: the letter has a *, fi*, never fi-*: fi*"
+    },
+    {
+     "ok": true,
+     "text": "AC4: the numbers say fibre 6*: 6*"
+    },
+    {
+     "ok": true,
+     "text": "AC4: the * line: * Fibre: at least 6 g. 1 food without a value: Muesli bar. Olive oil counts as 0 fibre: none by nature."
+    },
+    {
+     "ok": true,
+     "text": "AC6: the muesli bar's card says where to add it: No fibre on this food's values. If the pack gives it, add it in Review the label; until then your plate's fibre has a *: at least what the other foods have."
+    },
+    {
+     "ok": true,
+     "text": "AC6: the oil's card says it counts as 0"
+    },
+    {
+     "ok": true,
+     "text": "AC5: no food with a fibre value: fi?: fi?"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 104 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "pd-scale.cjs",
+   "about": "DT338 (0.3.179, board Stories279; Go 23 November 2026, 10:42): what the PD colours mean. One scale, five colours with their names and ranges in the person's own numbers, under the PD target on Me, Goal (AC1); on the Plate a tap on the PD number opens it with a mark where the plate sits (AC2), a second tap closes it (AC3); the words under the number say the band above On plan (AC4); the ranges follow the goal: Recomposition and Build muscle, Steady (AC5).",
+   "pass": true,
+   "seconds": 21,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT338 AC1: five colours with their names: Low−, Low, On plan, High, High+"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC1: the ranges in my numbers: under 3.2 | 3.2 to 4.8 | 4.8 to 8.0 | 8.0 to 13.3 | 13.3 and up"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC1: the scale says it is for my target 5.3"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC1: on the Goal page there is no mark"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: the scale is closed until I tap"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC4: at PD 8.4 the words say High, above your plan: High, above your plan"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: the PD number is 8.4"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: the scale opens with a mark over High: High"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: inside the PD block the title and ranges are dark on white, readable"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: it says This plate: 8.4."
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: the number tells a screen reader it is open"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC3: a second tap closes it"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: Enter on the number opens it too"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC4: far above, the words say High+, far above your plan: High+, far above your plan"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC4: on plan the words say fits your plan, as before: fits your plan"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC5: Recomposition, the egg at PD 8.4 is On plan: On plan"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC5: Recomposition, target 6.3, On plan 5.7 to 9.5: under 3.8 | 3.8 to 5.7 | 5.7 to 9.5 | 9.5 to 15.8 | 15.8 and up"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC5: Build muscle, target 5.0, On plan 4.5 to 7.5: under 3.0 | 3.0 to 4.5 | 4.5 to 7.5 | 7.5 to 12.5 | 12.5 and up"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC5: Build muscle, the same egg is High: High"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 100 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-changed.cjs",
+   "about": "B160 (0.3.187, board Stories287; Coach Milan, Go 23 November 2026, 20:03): a recipe changed after a meal was logged from it. Cheese pie, eaten tonight at 18:00 (and at lunch, for the once-for-all case), or on Friday. Save changes with the foods changed asks once for all the meals from it today or yesterday; Update gives each the new foods at the share it had; Keep leaves them; older meals are not asked and one line says how many keep their foods; a change of the steps alone asks nothing; Save as a new recipe keeps this one as it is. The clock is Monday 23 November 2026, 19:00.",
+   "pass": true,
+   "seconds": 20,
+   "checks": [
+    {
+     "ok": true,
+     "text": "AC1: asked once: The meal of Monday 23 November, 18:00 was made from this recipe. Was it made this way?"
+    },
+    {
+     "ok": true,
+     "text": "AC1: nothing saved before the answer"
+    },
+    {
+     "ok": true,
+     "text": "AC2: the recipe is saved; the dinner takes the new foods at its share: q63 p94 s1 e31"
+    },
+    {
+     "ok": true,
+     "text": "AC2: one line says it follows the change"
+    },
+    {
+     "ok": true,
+     "text": "once for all: The meals of Monday 23 November, 13:00 and Monday 23 November, 18:00 were made from this recipe. Were they made this way?"
+    },
+    {
+     "ok": true,
+     "text": "AC3: the recipe is saved; both meals keep their foods"
+    },
+    {
+     "ok": true,
+     "text": "AC3: one line says so"
+    },
+    {
+     "ok": true,
+     "text": "AC4: an older meal is not asked about and keeps its foods"
+    },
+    {
+     "ok": true,
+     "text": "AC4: one line: 1 meal eaten before keeps its foods: what you ate stays as it was."
+    },
+    {
+     "ok": true,
+     "text": "AC5: a change of the steps alone asks nothing"
+    },
+    {
+     "ok": true,
+     "text": "AC6: a new recipe with the change; the first stays; no meal asked about: Cheese pie, changed"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 152 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "step-names.cjs",
+   "about": "B163 (0.3.189, board Stories290; Coach Milan, Go 23 November 2026, 20:57): a food's name in a step is cut only at a comma with a space after it, so Körniger Frischkäse Tworog 2,5% Fett stays whole; a pack's name (a barcode, or read from a label) stays as printed, with its capitals; a basic food is in small letters (2 eggs); the name comes from the food each time, so steps written before read right, on the recipe, in Edit recipe and in Start cooking.",
+   "pass": true,
+   "seconds": 5,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B163 AC1: the decimal comma stays: Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 3 g Alpen JodSalz and 2 eggs (L)."
+    },
+    {
+     "ok": true,
+     "text": "B163 AC2: a pack's name as printed"
+    },
+    {
+     "ok": true,
+     "text": "B163 AC3: basic foods in small letters, cut at a comma with a space"
+    },
+    {
+     "ok": true,
+     "text": "B163 AC4: steps written before, in Edit recipe: Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 3 g Alpen JodSalz and 2 eggs (L)."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 29 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "step-typing.cjs",
+   "about": "B161 (0.3.190, board Stories291; Coach Milan 23 November 2026, 21:39: implement it and we will see): with Samsung Keyboard a space at the end of a step dropped the cursor. The keyboard builds each word in a draft (composition); nothing is read while a word is built, the steps go up a moment after the last key or when the field is left. Typed here with the browser's own keyboard commands, a space then a word built letter by letter: the cursor stays, the word is kept, Save changes keeps it.",
+   "pass": true,
+   "seconds": 6,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B161 AC1: after a space at the end, the cursor is still in step 2"
+    },
+    {
+     "ok": true,
+     "text": "B161 AC1: words built by the keyboard, the cursor stays"
+    },
+    {
+     "ok": true,
+     "text": "B161 AC1: the step holds the new words: Put baking paper and lay out 375 g Frischer Blätterteig on the tray."
+    },
+    {
+     "ok": true,
+     "text": "B161 AC3: the food's button keeps its tick"
+    },
+    {
+     "ok": true,
+     "text": "B161 AC2: Save changes keeps it: Put baking paper and lay out [[i:b|frischer blätterteig]] on the tray."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "steps-and-parts.cjs",
+   "about": "DT345 and B162 (0.3.188, boards Stories289 and Stories288; Coach Milan, Go 23 November 2026, 20:36), from his recipe Lazy burek: in Edit recipe, + Step here between two steps puts an empty step there with the cursor in it, saved in its place; + Add a step still adds at the end; an empty step goes on save. The recipe page shows each part once, in the order the parts first come; foods with no part last, under Other; a recipe with no parts shows no heading.",
+   "pass": true,
+   "seconds": 8,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B162 AC1, AC2: each part once, no part last under Other: #Filling | Grainy cream cheese | Salt | Eggs | Feta, light | Avocado oil | #Base | Puff pastry | #Other | Sesame seeds"
+    },
+    {
+     "ok": true,
+     "text": "B162: nothing stored changes"
+    },
+    {
+     "ok": true,
+     "text": "DT345: + Step here between each two of five steps: 4"
+    },
+    {
+     "ok": true,
+     "text": "DT345: 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "DT345 AC1: an empty step 4, the cursor in it: Step 4"
+    },
+    {
+     "ok": true,
+     "text": "DT345 AC1: six steps now"
+    },
+    {
+     "ok": true,
+     "text": "DT345 AC2, AC3, AC4: saved in its place, the end step at the end, the empty one gone: 7"
+    },
+    {
+     "ok": true,
+     "text": "B162 AC3: no parts, no heading"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 66 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "Light for B165 and B166 (layout only: the chips in the steps and the colours of the numbers in a PD card); Go 24 November 00:13"
+}

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { stepText, stepParts, tokenOf, missingFoods, usedIds } from "./steps";
+import { stepText, stepParts, tokenOf, missingFoods, usedIds, chipKeep } from "./steps";
 
 const food = (name: string) => ({ id: name, name, brand: "", calories: 100, protein: 10, carbs: 1, fats: 1, fiber: 0 } as any);
 const items = [{ id: "a", food: food("Eggs"), grams: 120 }, { id: "b", food: food("Milk 1.5%"), grams: 100 }, { id: "c", food: food("Chicken breast, cooked"), grams: 80 }] as any[];
@@ -26,4 +26,11 @@ test("a food in no step is named, once any step names a food (R13a)", () => {
   assert.deepEqual(missingFoods(steps, items).map((i) => i.id), ["c"]);
   assert.deepEqual([...usedIds(steps)], ["a", "b"]);
   assert.deepEqual(missingFoods(["Whisk everything."], items), [], "plain steps from before are left alone");
+});
+
+test("B165: a chip keeps its amount with the food's first word; the rest may go on to the next line", () => {
+  assert.deepEqual(chipKeep("250 g Körniger Frischkäse Tworog 2,5% Fett"), ["250 g Körniger", " Frischkäse Tworog 2,5% Fett"]);
+  assert.deepEqual(chipKeep("2 eggs (L)"), ["2 eggs (L)", ""]);
+  assert.deepEqual(chipKeep("salt"), ["salt", ""]);
+  assert.equal(chipKeep("150 g Feta Leicht").join(""), "150 g Feta Leicht");
 });
