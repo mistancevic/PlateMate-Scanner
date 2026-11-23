@@ -20,15 +20,15 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.186, not on Preview yet")}
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.186")}
 B = Board(); PW = 390; G = 70
 W = SX + 3 * PW + 2 * G + 40
 parts = [("Ticket", "B160. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: B160, canvas Page 6."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> B160.1: the recipe page as it is in main, 0.3.186, not on Preview yet: Cheese pie, eaten tonight at 18:00, fixed, then its meal. B160.2: the same, new. B160.3: eaten on Friday, new. Every arrow is a tap; a scrolled screen is one tall picture. A blue outline marks what is new."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> B160.1: the recipe page as it was in 0.3.186: Cheese pie, eaten tonight at 18:00, fixed, then its meal. B160.2: the same, new. B160.3: eaten on Friday, new. Every arrow is a tap; a scrolled screen is one tall picture. A blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "23 November 19:03: I see that PD was not updated in the end; you see the first value of 6.2. 19:11: if the recipe changes, that should trigger the question for the meal, or a warning; maybe it changes again; what to do with so many variations of the recipe. 19:12: makes sense. 19:35: draw it."),
-  ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Open", " ".join(t["open"])), ("Looked at, not chosen", t["looked_at"]),
+  ("In Coach Milan's words", "23 November 19:03: I see that PD was not updated in the end; you see the first value of 6.2. 19:11: if the recipe changes, that should trigger the question for the meal, or a warning; maybe it changes again; what to do with so many variations of the recipe. 19:12: makes sense. 19:35: draw it. 20:03: once for all; Go."),
+  ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "B160", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
 y = 30
@@ -38,7 +38,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
-label(y, "B160.1 In main, 0.3.186", "not on Preview yet: Edit recipe, Save changes, then the meal", 0, 2)
+label(y, "B160.1 Before, 0.3.186", "Edit recipe, Save changes, then the meal", 0, 2)
 y += 60
 RA = [shot(X(0), y, "1a", PW, "B160.1a Edit recipe", "draft", "Eaten tonight at 18:00. I fix the cream cheese, 500 g to 250 g, and tap Save changes. Then I open tonight's meal."),
   shot(X(1), y, "1b", PW, "B160.1b Tonight's dinner", "draft", "Still 125 g of cream cheese and the old numbers; nothing asked.")]
@@ -61,7 +61,7 @@ bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories287.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket B160, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.186 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories286.dc.html")
+board("Stories287.dc.html", t["boardTitle"], "Drawn 23 November 2026; Go 20:03, built in 0.3.187. Ticket B160, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.186 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories286.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B160": {"file": "Stories287.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out160.json"), "w"))
 print("B160", W, Hc + 230)

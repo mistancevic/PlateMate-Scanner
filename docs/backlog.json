@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.187",
     "0.3.186",
     "0.3.185",
     "0.3.184",
@@ -4088,8 +4089,8 @@
       "id": "B160",
       "title": "A recipe changed after a meal was logged from it: asked once for a recent meal, older meals keep their foods",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): he cooked and logged it, then changed the recipe (feta in place of one quark pack, sesame and oil added). The recipe reads PD 4.9 a portion; the meal he ate, under Your cooks, still holds the first foods and PD 6.2. Meaning to agree: is the eaten meal changed with the recipe, or asked. 19:11: think it through; a change could be a correction or a new variation, and a recipe changes again. Proposed 19:12 and agreed (makes sense): every logged meal keeps its own foods; saving a change to a recipe asks once about a meal logged from it today or yesterday, Was it made this way? Update it (same portion share) or Keep it; older meals are not asked, the save says how many keep their foods; Save as a new recipe beside Save for a big change; no warning sign that waits for a stable recipe. 19:35: draw.",
+      "state": "done",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): he cooked and logged it, then changed the recipe (feta in place of one quark pack, sesame and oil added). The recipe reads PD 4.9 a portion; the meal he ate, under Your cooks, still holds the first foods and PD 6.2. Meaning to agree: is the eaten meal changed with the recipe, or asked. 19:11: think it through; a change could be a correction or a new variation, and a recipe changes again. Proposed 19:12 and agreed (makes sense): every logged meal keeps its own foods; saving a change to a recipe asks once about a meal logged from it today or yesterday, Was it made this way? Update it (same portion share) or Keep it; older meals are not asked, the save says how many keep their foods; Save as a new recipe beside Save for a big change; no warning sign that waits for a stable recipe. 19:35: draw. 20:02 to 20:03: once for all; Go.",
       "opportunity": {
         "from": "Coach Milan's own recipe, Lazy Burek, 23 November 2026.",
         "job": "Fix a recipe after cooking it, and have the meal I ate tell the truth.",
@@ -4099,11 +4100,9 @@
       "story": "When I change a recipe I already ate from, I want to say whether that meal was made this way, so that my day counts what I really ate and older meals stay as they were.",
       "proposed": "1. Every logged meal keeps its own foods, as now: that record is what was eaten. 2. Save changes on a recipe, when its foods changed and a meal from it was logged today or yesterday, asks once in place: Monday dinner, 18:00, was made from this recipe. Was it made this way? Update it gives the meal the recipe's new foods at the same share it had of the recipe; Keep it as it was leaves it. One line after says which. 3. Older meals are not asked about; one line says how many keep their foods. 4. Save as a new recipe, beside Save changes, for a change that makes a different dish: the recipe stays as it is. The same on the Plate's Update my recipe, which has Save as a new recipe already.",
       "problem": "Changing a recipe never touches a meal logged from it. Fixed right after cooking, the recipe reads PD 4.9 a portion while the meal eaten tonight keeps the first foods and PD 6.2, and nothing says so.",
-      "open": [
-        "Several recent meals from one recipe (two cooks today): asked one by one, or once for all. Drawn for one."
-      ],
+      "open": [],
       "checks": "Light: the recipe page's Edit recipe and Save changes, and the Plate's Update my recipe. The unit tests with new ones for the share; the build; a new walkthrough for AC1 to AC6; and past-meal-change, recipe-after and recipe-swap, about 5 minutes. New words on screen, so the German sweep too.",
-      "decision": "Direction agreed 23 November 19:12. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Direction agreed 23 November 19:12; once for all 20:03, Go. Checks Light plus the German sweep, 12 of 12. Built in 0.3.187.",
       "now": "Cheese pie, eaten tonight at 18:00 for dinner, a quarter of the recipe. I fix the recipe, 250 g of cream cheese in place of 500, and Save changes. Tonight's dinner keeps 125 g of cream cheese and the old numbers; nothing is asked or said.",
       "looked_at": "A warning sign on the meal until the recipe is stable: not chosen (19:12); it leaves numbers open with no end and a coach sees half-confirmed days. Changing every meal of the recipe: not chosen; history would change behind my back. Versions of a recipe: not needed; each meal keeps the foods it was made with.",
       "board": "Stories287",
@@ -4148,10 +4147,11 @@
       "details": [
         "Today or yesterday: from midnight of yesterday on the phone's clock. A meal counts as from the recipe when it carries the recipe's id (Your cooks, Every time you ate it).",
         "The share: the meal's grams over the recipe's grams before the change, the same for every food; each food rounded to the gram.",
-        "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 19:00."
+        "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 19:00.",
+        "Built: src/recipeChange.ts (mealsOf, followed, foodsChanged, whenAll); the recipe page asks in place of Save changes; the Plate's Update my recipe (from Make or from a plan slot) leaves the question for the recipe's page on this phone (chefmealan-recipe-ask). Two or more meals today: asked once for all (Coach Milan 20:03)."
       ],
       "short": "Recipe changed after a meal from it: asked once for today or yesterday; older meals keep their foods",
-      "rel": "Proposed; not agreed until Coach Milan says Go"
+      "rel": "Built in 0.3.187; Go 23 November 2026, 20:03"
     },
     {
       "id": "B161",
