@@ -4391,6 +4391,27 @@
       "epic": "cook",
       "state": "next",
       "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it."
+    },
+    {
+      "id": "B165",
+      "title": "A long food chip in a step breaks out of the field and the page",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): in Edit recipe, the chip 250 g Körniger Frischkäse Tworog 2,5% Fett runs past the step's field and the card, and the page moves sideways. The chip never wraps (st-food white-space nowrap); B163 made pack names longer."
+    },
+    {
+      "id": "B166",
+      "title": "The numbers under a recipe's PD: empty space, and Per 100 kcal barely visible",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): on the recipe page, the numbers under one portion's PD show an empty space after Total, Per 100 kcal far down, and its lines barely visible. The table's small lines are white inside the PD card (.readout small is white), the same trap DT338 met; on the Plate the table is outside the card."
+    },
+    {
+      "id": "B167",
+      "title": "A dinner eaten at 18:28 is on Today but not in Plan",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): Today shows Lazy Burek, Dinner, 18:28, eaten by the plan; Plan shows Dinner 18:00, Pick a meal. To check: which day Plan showed (it opens on the last day picked)."
     }
   ]
 }
