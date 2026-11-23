@@ -1,0 +1,59 @@
+{
+  "id": "DT319",
+  "title": "A meal I ate, opened from the Plan: what Put it on the Plate again means",
+  "epic": "plate",
+  "state": "next",
+  "why": "Coach Milan 18 November 20:04: in the Plan he opened the What you ate card Chicken and sweet potato fries, tapped Put it on the Plate again. The foods landed right. The title was grey though the meal was saved; Meal and day were not set though it was saved as a meal. His question: is this that meal again, so a change on the Plate changes it (an edit), or a new meal that does not touch the old one (save as)? It has to be clear to everyone. As built (src/components/PastMeal.tsx, again): a copy of the foods only, no name, no photo, no meal, no link to the eaten meal; the eaten meal is edited by Change it on the same page (DT284). It also replaces a plate that has foods with no question (a way DT313 missed). Proposed to him: it stays a copy, a new plate; the button and one line say so; the name comes along; a plate with foods is asked first. Waits for his word on the meaning, then a board. 23 November 13:13: yes, Put it on the Plate again is a copy for a new meal. Draw.",
+  "opportunity": {
+    "from": "Coach Milan's own Plan, 18 November 2026.",
+    "job": "Eat a meal I liked again, starting from what I ate.",
+    "kind": "Did not understand it: no name, no meal, and no way to tell whether a change edits the eaten meal.",
+    "why_now": "Every person who repeats a meal goes this way."
+  },
+  "problem": "Put it on the Plate again copies only the foods: no name, no meal, no link to the eaten meal. The Plate shows a grey title made from the foods and No meal selected, so it looks unsaved, and nothing says whether a change touches the meal eaten. It also replaces a plate that already holds foods, with no question.",
+  "story": "When I put a meal I ate on the Plate again, I want to know it is a copy for a new meal, with its name, so that I can change it without touching what I ate.",
+  "proposed": "It stays a copy, for a new meal (Coach Milan 13:13). One line under the button says so: A copy of these foods, for a new meal. This meal stays as it is. The copy comes with the meal's name. Meal and day stay to be set: it is a new meal. A plate that holds foods is asked first: Your plate holds 2 foods: Skyr, Banana. Put Chicken and sweet potato fries in their place? Replace them, or Keep my plate. An empty plate goes straight on.",
+  "open": [
+    "Plan's meal card has no Change it: an eaten meal is changed from Today only (DT284). Should Plan's card get Change it too?"
+  ],
+  "checks": "Light: the meal card and the Plate it opens. The unit tests, the build, a new walkthrough for AC1 to AC4, and past-meal and plate-live-cook, about 5 minutes. New words on screen, so the German sweep too.",
+  "decision": "Meaning agreed 23 November 13:13: a copy for a new meal. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "now": "Plan, a day gone by, a meal opened: Put it on the Plate again and Save in My recipes. The Plate gets the foods only: a grey title made from the foods, No meal selected; the foods that were there are gone with no question.",
+  "looked_at": "The same meal again, so a change on the Plate edits what was eaten: not chosen (13:13); editing an eaten meal is Change it's job.",
+  "board": "Stories283",
+  "where": "Page 6",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "It says it is a copy",
+      "text": "Given Saturday's lunch opened from Plan, when I look under Put it on the Plate again, then one line says: A copy of these foods, for a new meal. This meal stays as it is"
+    },
+    {
+      "id": "AC2",
+      "title": "A plate with foods is asked first",
+      "text": "Given my plate holds Skyr and Banana, when I tap Put it on the Plate again, then the card asks: Your plate holds 2 foods: Skyr, Banana. Put Chicken and sweet potato fries in their place?, with Replace them and Keep my plate; Keep my plate changes nothing"
+    },
+    {
+      "id": "AC3",
+      "title": "An empty plate goes straight on",
+      "text": "Given my plate is empty, when I tap Put it on the Plate again, then the Plate opens with the foods, no question"
+    },
+    {
+      "id": "AC4",
+      "title": "The name comes along, the eaten meal stays",
+      "text": "Given I tapped Replace them, when the Plate opens, then it is named Chicken and sweet potato fries, Meal and day is not set, and Saturday's lunch is unchanged whatever I change on the Plate"
+    }
+  ],
+  "unchanged": [
+    "Cook again, for a meal from a recipe.",
+    "Save in My recipes.",
+    "Change it and Delete this meal, on Today's meal card (DT284)."
+  ],
+  "details": [
+    "The copy's foods get new ids, as today; the name goes into the plate's name.",
+    "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 13:15."
+  ],
+  "short": "Put it on the Plate again: a copy for a new meal, named, asked first",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "DT319: a meal I ate, opened from Plan: Put it on the Plate again is a copy for a new meal"
+}
