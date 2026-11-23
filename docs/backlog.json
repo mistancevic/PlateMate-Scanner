@@ -4509,6 +4509,13 @@
       "rel": "Drawn 23 November 2026 with B165 on one board; waits for Go"
     },
     {
+      "id": "DT348",
+      "title": "One button to add a step: + Step here, also after the last step",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 23:50, looking at the board B165 and B166: + Add a step and + Step here are two different buttons for the same job; should they be one kind? 23:59: yes, add it as Next. Proposed: + Step here between steps and after the last one; + Add a step goes. Wherever steps are written: Edit recipe and the publish sheet. Not drawn."
+    },
+    {
       "id": "B167",
       "title": "A dinner eaten at 18:28 is on Today but not in Plan",
       "epic": "plate",
