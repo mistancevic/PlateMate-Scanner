@@ -19,14 +19,14 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.189, not on Preview yet")}
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.189")}
 B = Board(); PW = 390; G = 70
 W = SX + 2 * PW + G + 40
 parts = [("Ticket", "B161. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: B161, canvas Page 6."),
-  ("How to read this board", "<b>As a prototype.</b> B161.1: Edit recipe's steps as they are in main, 0.3.189, not on Preview yet. B161.2: the same screen, new: the change is not visible, the notes say what changes. A blue outline marks the field."),
+  ("How to read this board", "<b>As a prototype.</b> B161.1: Edit recipe's steps as they were in 0.3.189. B161.2: the same screen, new: the change is not visible, the notes say what changes. A blue outline marks the field."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "23 November 19:03: when I need to add text at the end of a step's field, it doesn't allow me and always drops the focus; it only works if I continue typing right after the last word, not after the space. 21:33: I would say it is Samsung Keyboard. 21:34: yes."),
+  ("In Coach Milan's words", "23 November 19:03: when I need to add text at the end of a step's field, it doesn't allow me and always drops the focus; it only works if I continue typing right after the last word, not after the space. 21:33: I would say it is Samsung Keyboard. 21:34: yes. 21:39: hard to reproduce; do not change the drawing, just the implementation, then we will see if it works."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "B161", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -37,7 +37,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
-label(y, "B161.1 In main, 0.3.189", "not on Preview yet: Edit recipe, the steps", 0, 1)
+label(y, "B161.1 Before, 0.3.189", "Edit recipe, the steps", 0, 1)
 label(y, "B161.2 New", "the same screen", 1, 1)
 y += 60
 RB = [shot(X(0), y, "1a", PW, "B161.1a Step 2", "draft", "With Samsung Keyboard, a space at the end drops the cursor."),
@@ -46,7 +46,7 @@ bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories291.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket B161, Kanban column Next. Pictures from the real app, main 0.3.189; the change is not visible. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories290.dc.html")
+board("Stories291.dc.html", t["boardTitle"], "Drawn 23 November 2026; Go 21:39, built in 0.3.190. Ticket B161, Kanban column Done. Pictures from the real app, main 0.3.189; the change is not visible. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories290.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B161": {"file": "Stories291.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outB161.json"), "w"))
 print("B161", W, Hc + 230)
