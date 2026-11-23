@@ -12,15 +12,15 @@
     "problem": "A food in a step is a chip that never wraps. A long pack name, 250 g Körniger Frischkäse Tworog 2,5% Fett, runs past the step's field and the card, and the whole page moves sideways while I write.",
     "story": "When I write the steps of a recipe with long food names, I want every step to stay inside the screen, so that I can read and write it without the page moving.",
     "now": "The chip is one line, always (white-space nowrap). Under the steps, the list Tap a food to put it in the step already wraps the same name inside its button.",
-    "proposed": "A long chip wraps inside its own box, on as many lines as it needs, and stays one chip: a tap takes it out whole, and the cursor goes round it as now (B161). A short chip stays on one line. Wherever steps are written: Edit recipe and the publish sheet.",
-    "looked_at": "Cut the name short: not chosen; the step says the amount and the name, and B163 kept the full name. A chip that breaks like text, its pieces on two lines: not chosen; the box matches the chips under the steps and leaves B161's cursor rules alone. Smaller letters in the chip: not chosen; still too long for a phone.",
+    "proposed": "A chip too long for the line goes on to the next line like text. Where it breaks its ends stay open, so it reads as one chip, and the comma or word after it follows straight on. Its amount stays with the food's first word (250 g Körniger). A chip that fits stays whole and moves to the next line as a word does. A tap takes a chip out whole, and the cursor goes round it as now (B161). Wherever steps are written: Edit recipe and the publish sheet.",
+    "looked_at": "A long chip wrapping inside its own box (drawn first, 23:50): not chosen; the box takes the whole line, so the comma after it lands at the start of the next line (Coach Milan 24 November 00:01). Every chip breaking like text: not chosen; short chips split too (150 g Feta / Leicht). Cut the name short: not chosen; B163 kept the full name. Smaller letters: not chosen; still too long for a phone.",
     "decision": "Waiting for Coach Milan's Go.",
     "short": "A long food chip wraps inside its box in the steps, the page stays on the screen; with B166 in one release, 0.3.192",
     "ac": [
       {
         "id": "AC1",
         "title": "A long chip wraps",
-        "text": "Given step 1 of Lazy Burek with 250 g Körniger Frischkäse Tworog 2,5% Fett, when I open Edit recipe on a phone 390 px wide, then the chip wraps inside the step's field and the page stays 390 px wide"
+        "text": "Given step 1 of Lazy Burek with 250 g Körniger Frischkäse Tworog 2,5% Fett, when I open Edit recipe on a phone 390 px wide, then the chip goes on to the next line inside the step's field, open where it breaks, and the page stays 390 px wide"
       },
       {
         "id": "AC2",
@@ -29,8 +29,8 @@
       },
       {
         "id": "AC3",
-        "title": "A short chip stays on one line",
-        "text": "Given 2 eggs (L) in the same step, when I read the step, then that chip is on one line, as now"
+        "title": "A chip that fits stays whole",
+        "text": "Given 150 g Feta Leicht in the same step, when it does not fit at the end of a line, then it moves to the next line whole"
       },
       {
         "id": "AC4",
@@ -40,7 +40,17 @@
       {
         "id": "AC5",
         "title": "Chips never touch",
-        "text": "Given the long chip on two lines with 2 eggs (L) on the line under it, when I read the step, then there is space between the two chips"
+        "text": "Given 2 eggs (L) with 150 g Feta Leicht on the line under it, when I read the step, then there is space between the two chips"
+      },
+      {
+        "id": "AC6",
+        "title": "The comma follows the chip",
+        "text": "Given the long chip followed by a comma, when the chip breaks over two lines, then the comma is right after 2,5% Fett, not at the start of a line"
+      },
+      {
+        "id": "AC7",
+        "title": "The amount stays with the food",
+        "text": "Given the long chip after Mix, when it breaks, then 250 g stays on the same line as Körniger"
       }
     ],
     "unchanged": [
@@ -49,9 +59,9 @@
       "The names in the chips, as B163.",
       "The recipe page and the cook show the steps as now."
     ],
-    "checks": "Light, for B165 and B166 together: CSS only, nothing in what the app does changes, no new words. The unit tests, the build, one new walkthrough for B165 AC1 to AC5 and B166 AC1 to AC3, and the walkthroughs that open these screens: step-typing, step-names, steps-and-parts, recipe-changed, fibre, pd-scale. About 10 minutes. No German sweep: no on-screen words change.",
+    "checks": "Light, for B165 and B166 together: layout only (CSS, and StepsEditor measures a chip and keeps its amount with the food), nothing in what the app does changes, no new words. The unit tests, the build, one new walkthrough for B165 AC1 to AC7 and B166 AC1 to AC3, and the walkthroughs that open these screens: step-typing, step-names, steps-and-parts, recipe-changed, fibre, pd-scale. About 10 minutes. No German sweep: no on-screen words change.",
     "details": [
-      ".st-food in src/index.css: white-space normal, max-width 100%, overflow-wrap anywhere, margin 3px 0 (about 6 px between two lines of chips; Coach Milan 23 November 23:57, after B165.2b showed 0 px). It stays inline-block and contenteditable false.",
+      ".st-food in src/index.css: display inline, white-space nowrap, box-decoration-break slice, padding 2px 7px; .st-food.st-long: white-space normal, overflow-wrap anywhere; .st-field: line-height 2.1, which leaves about 6 px between lines of chips (Coach Milan 23 November 23:57). StepsEditor marks a chip st-long when it is wider than the field's line (measured after it is drawn, and again when the width changes), and joins the amount, its unit and the food's first word with no-break spaces. contenteditable false stays.",
       "The pictures: one scratch build of main, 0.3.191, not committed. The new pictures put this rule into the same page in the browser.",
       "The red dashed line in B165.1b is the phone's edge, 390 px. It is on the board only."
     ]

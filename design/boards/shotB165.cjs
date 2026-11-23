@@ -17,7 +17,8 @@ const tok = (x, n) => `[[i:${x.id}|${n}]]`;
 const recipe = { id: "m-burek", title: "Lazy Burek", items: Object.values(I), makes: { n: 4, unit: "portions" }, portion: 224, savedAt: "2026-11-23T16:00:00Z",
   steps: [`Preheat your oven to 200 °C. Mix ${tok(I.q, "Körniger Frischkäse Tworog 2,5% Fett")}, ${tok(I.e, "eggs")} and ${tok(I.f, "Feta Leicht")} in a bowl.`, `Lay out ${tok(I.p, "Frischer Blätterteig")} on baking paper.`, "Pour the filling in and bake at 200 °C for 25 minutes."] };
 // the sketch of the change: B165 lets the chip wrap inside its own box; B166 gives the table's small lines the table's colours
-const NEW_CSS = `.st-food { white-space: normal; max-width: 100%; overflow-wrap: anywhere; vertical-align: top; margin: 3px 0; }
+const NEW_CSS = `.st-food { display: inline; white-space: nowrap; -webkit-box-decoration-break: slice; box-decoration-break: slice; padding: 2px 7px; line-height: inherit; }
+.st-food.st-long { white-space: normal; overflow-wrap: anywhere; } .st-field { line-height: 2.1; }
 .readout .nt small, .readout .nt p { color: var(--ink); }
 .readout .nt .nt-note, .readout .nt .nt-sub, .readout .nt small.muted { color: var(--muted); }`;
 const MARK = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px";
@@ -64,9 +65,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       console.log(await note(p, EBTN, isNew ? "No change: the steps here already wrap." : "The steps here wrap. I tap Edit recipe.", [EBTN]));
       await shot(p, `65-${k}a`, STEPS, ".board-note"); await clean(p);
       await p.getByRole("button", { name: "Edit recipe" }).click(); await sleep(1200);
+      if (isNew) await p.evaluate(() => { for (const c of document.querySelectorAll(".st-food")) { const f = c.closest(".st-field"), cs = getComputedStyle(f), room = f.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        if (c.getBoundingClientRect().width > room) { c.classList.add("st-long"); c.textContent = c.textContent.replace(/^(\S+) (\S+) (\S+)/, "$1\u00a0$2\u00a0$3"); } } });
       if (!isNew) await p.evaluate(() => { const n = document.createElement("div"); n.id = "edge"; n.style.cssText = `position:absolute;left:390px;top:0;width:0;height:${document.documentElement.scrollHeight}px;border-left:3px dashed #c0392b;z-index:9`; document.body.append(n); });
       if (!isNew) console.log(await note(p, ESTEPS, "The chip <b>250 g Körniger Frischkäse Tworog 2,5% Fett</b> never wraps: it runs past the step's field and the card, to 416 px on a 390 px phone (the red line). The whole page moves sideways.", [LONG]));
-      else console.log(await note(p, ESTEPS, "<b>New:</b> a long chip wraps inside its own box, as the chips under the steps already do. It stays one chip: a tap still takes it out whole. 3 px above and below each chip, so they never touch. The page stays 390 px wide.", [LONG]));
+      else console.log(await note(p, ESTEPS, "<b>New:</b> a chip too long for the line goes on to the next line like text, its ends open where it breaks, so it reads as one chip; the comma stays right after it. 250&nbsp;g stays with Körniger. A chip that fits moves down whole. Lines have space between them. The page stays 390 px wide.", [".st-field"]));
       await shot(p, `65-${k}b`, ESTEPS, ".board-note", !isNew); await p.context().close();
       // ---- B166: the PD card, the numbers, Per 100 kcal ----
       p = await open(isNew);
