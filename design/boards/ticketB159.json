@@ -1,0 +1,41 @@
+{
+  "id": "B159",
+  "title": "On a client's card, a day before the client's phone recorded activity says not known",
+  "epic": "coach",
+  "state": "next",
+  "why": "Coach Milan 23 November 2026, 16:41 to 17:09, looking at his clients' cards after 0.3.182: before the release the card was more coloured. Asked whether the card is the whole truth now: full and active come from what was logged, for every day; opened or not is only recorded from 0.3.182 on the client's phone, so a white day before that can be wrong. 17:09: fix first.",
+  "opportunity": {
+    "from": "Coach Milan's own Clients page, 23 November 2026.",
+    "job": "Trust what a client's card says about each day.",
+    "kind": "Says something not known: a day before recording reads not opened.",
+    "why_now": "Every client who joined before 0.3.182 has such days in their first two weeks."
+  },
+  "story": "When I look at a client's days, I want a day the app could not record to say so, so that I never read not opened where nobody knows.",
+  "proposed": "1. The client's phone keeps the first day it recorded activity, kept beyond the 28 days; a phone that recorded before this version takes the earliest day it has. 2. On the coach's card and the client's page, a day before that first day with nothing logged reads ? (not known), never not opened. A phone that has never recorded: every such day reads ?. 3. A day with something logged keeps its colour, full or active, whatever the day. 4. The key line names ?: not known, from before the app recorded it, only when such a day shows.",
+  "problem": "Opened or not is recorded on the client's phone from 0.3.182 on. A day before that, with nothing logged, reads Empty: not opened, though the client may have opened the app.",
+  "open": [],
+  "checks": "Light: the client's card and the client's page. The unit tests with new ones for the first day and the level; the build; a new walkthrough for AC1 to AC5; and day-levels, coach-phase-today and coach-week, about 5 minutes. New words on screen, so the German sweep too.",
+  "decision": "Asked 17:07, fix first 17:09. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "now": "The example coach's client Sara, whose phone recorded from yesterday: Monday and Tuesday read not opened, though nobody knows.",
+  "looked_at": "Leaving days before recording out of the card: not chosen; the two weeks would have gaps. Back to the amber of before 0.3.182: not chosen; it said not fully logged, never whether the app was opened.",
+  "board": "Stories286",
+  "where": "Page 6",
+  "ac": [
+    {"id": "AC1", "title": "Not known", "text": "Given a client whose phone first recorded activity yesterday, when Monday and Tuesday have nothing logged, then they read ? on the card and on the client's page, never not opened"},
+    {"id": "AC2", "title": "A logged day keeps its colour", "text": "Given a day before the first recorded day with a meal logged, when I look at the card, then it reads active, or full when it was a full day"},
+    {"id": "AC3", "title": "The key", "text": "Given a ? on the card, when I read the key line, then it says ?: not known, from before the app recorded it; with no ? on the card, the key does not name it"},
+    {"id": "AC4", "title": "The first day is kept", "text": "Given a client's phone that has recorded for more than 28 days, when the oldest days drop out, then the first day recorded is kept, so no day after it turns into ?"},
+    {"id": "AC5", "title": "A phone that never recorded", "text": "Given a client whose phone has not recorded any activity yet, when I look at the card, then every day with nothing logged reads ?, until the phone records"}
+  ],
+  "unchanged": [
+    "Full, active, opened only, not opened and still to come, for days the phone recorded.",
+    "Last active and Quiet for 3 days."
+  ],
+  "details": [
+    "The first day recorded rides with the activity in the account's main record (since). For a phone that recorded before this version, the earliest day in its record, which holds up to 28 days.",
+    "The pictures are the real app on one scratch build of main, not committed, with the clock on Thursday 26 November 2026, 13:30. In the scratch the example client Sara's phone recorded from yesterday."
+  ],
+  "short": "A day before the client's phone recorded reads ? (not known), never not opened",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "B159: a day before the client's phone recorded activity says not known"
+}
