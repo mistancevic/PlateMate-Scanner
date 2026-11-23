@@ -23088,6 +23088,150 @@
     "pastmeal.keepMyPlate": {
       "text": "Zadrži moj tanjir",
       "checked": true
+    },
+    "goal.band.healthy": {
+      "text": "Zdravo dobijanje težine",
+      "checked": true
+    },
+    "goal.who.healthy": {
+      "text": "tvoja težina polako raste, do težine koju biraš",
+      "checked": true
+    },
+    "goal.point.healthy.1": {
+      "text": "Malo više hrane nego što trošiš, oko 10 % više.",
+      "checked": true
+    },
+    "goal.point.healthy.2": {
+      "text": "Tvoja težina polako raste, otprilike 1 kg mesečno, do težine koju biraš.",
+      "checked": true
+    },
+    "goal.point.healthy.3": {
+      "text": "Proteini u tvom opsegu. Trening je dobrodošao, nije obavezan.",
+      "checked": true
+    },
+    "goal.notForYou": {
+      "text": "Nije za tvoje telo sada · dodirni da vidiš zašto",
+      "checked": true
+    },
+    "goal.whyLight": {
+      "text": "Tvoja težina je niska za tvoju visinu: {weight} na {height}. Jesti manje nego što trošiš ovde nije bezbedno.",
+      "checked": true
+    },
+    "goal.whyFatWoman": {
+      "text": "Tvoj procenat masti, {pct} %, je iznad zdravog opsega za ženu od {age} godina. Jesti više nego što trošiš ovde nije pravi put.",
+      "checked": true
+    },
+    "goal.whyFatMan": {
+      "text": "Tvoj procenat masti, {pct} %, je iznad zdravog opsega za muškarca od {age} godina. Jesti više nego što trošiš ovde nije pravi put.",
+      "checked": true
+    },
+    "goal.whyCoach": {
+      "text": "Razgovaraj sa {coach} o svom cilju. Tvoj trener može da ti postavi bilo koji cilj.",
+      "checked": true
+    },
+    "goal.whyNoCoachLight": {
+      "text": "Ovo dolazi od tvoje visine i težine u Profilu. Ako je neki broj pogrešan, ispravi ga tamo. Za ovakav cilj pitaj lekara ili stručnjaka za ishranu.",
+      "checked": true
+    },
+    "goal.whyNoCoachFat": {
+      "text": "Ovo dolazi od tvog procenta masti u Profilu. Ako je broj pogrešan, ispravi ga tamo. Za ovakav cilj pitaj lekara ili stručnjaka za ishranu.",
+      "checked": true
+    },
+    "goal.targetLabel": {
+      "text": "Tvoja ciljna težina",
+      "checked": true
+    },
+    "goal.targetAbove": {
+      "text": "iznad {now}",
+      "checked": true
+    },
+    "goal.targetBelow": {
+      "text": "ispod {now}",
+      "checked": true
+    },
+    "goal.targetHint": {
+      "text": "Težina, ne promena: aplikacija pokazuje koliko si daleko pri svakom merenju.",
+      "checked": true
+    },
+    "goal.targetUp": {
+      "text": "{target}: {diff} više. Otprilike {pace} mesečno, oko {n} mesec.|{target}: {diff} više. Otprilike {pace} mesečno, oko {n} meseca.|{target}: {diff} više. Otprilike {pace} mesečno, oko {n} meseci.",
+      "checked": true
+    },
+    "goal.targetDown": {
+      "text": "{target}: {diff} manje. 0,5 do 1 % tvoje težine nedeljno, oko {lo} do {hi} meseci.",
+      "checked": true
+    },
+    "goal.targetDownSame": {
+      "text": "{target}: {diff} manje. 0,5 do 1 % tvoje težine nedeljno, oko {n} mesec.|{target}: {diff} manje. 0,5 do 1 % tvoje težine nedeljno, oko {n} meseca.|{target}: {diff} manje. 0,5 do 1 % tvoje težine nedeljno, oko {n} meseci.",
+      "checked": true
+    },
+    "goal.targetNotAbove": {
+      "text": "Cilj iznad današnjih {now}.",
+      "checked": true
+    },
+    "goal.targetNotBelow": {
+      "text": "Cilj ispod današnjih {now}.",
+      "checked": true
+    },
+    "goal.targetTooHigh": {
+      "text": "Iznad zdrave težine za tvoju visinu: najviše {limit}.",
+      "checked": true
+    },
+    "goal.targetTooLow": {
+      "text": "Ispod zdrave težine za tvoju visinu: najmanje {limit}.",
+      "checked": true
+    },
+    "goalsheet.target": {
+      "text": "Ciljna težina",
+      "checked": true
+    },
+    "sheet.targetLine": {
+      "text": "{target}. Sada {now}, {done} od {all} do sada",
+      "checked": true
+    },
+    "sheet.targetOnly": {
+      "text": "{target}",
+      "checked": true
+    },
+    "sheet.upRoughly": {
+      "text": "gore otprilike {kg} mesečno",
+      "checked": true
+    },
+    "sheet.food.healthy": {
+      "text": "oko 10 % više nego što trošiš",
+      "checked": true
+    },
+    "sheet.progress.healthy": {
+      "text": "težina polako raste, ka tvojoj ciljnoj težini",
+      "checked": true
+    },
+    "guide.healthy.happens": {
+      "text": "Jedeš malo više nego što trošiš, oko 10 % više. Tvoja težina polako raste, otprilike 1 kg mesečno, do težine koju biraš. Deo toga su mišići, a deo mast: oboje pripada zdravoj težini.",
+      "checked": true
+    },
+    "guide.healthy.training": {
+      "text": "Trening je dobrodošao, nije obavezan. Dva treninga snage nedeljno pomažu da više toga ode u mišiće.",
+      "checked": true
+    },
+    "guide.healthy.food": {
+      "text": "Proteini u tvom opsegu svaki dan, u 3 do 6 obroka. Redovni obroci i užine pomažu kada nemaš apetita: mleko, jogurt, orašasti plodovi, hleb i pirinač se lako saberu.",
+      "checked": true
+    },
+    "guide.healthy.watch": {
+      "text": "Tvoja prosečna težina za 7 dana u odnosu na ciljnu težinu, jednom nedeljno. Tvoja energija, san i kako ti stoji odeća.",
+      "checked": true
+    },
+    "guide.healthy.mistakes": {
+      "text": "Jesti mnogo više da bi se stiglo brže. Preskakati obroke kada nemaš apetita. Suditi po težini jednog jutra.",
+      "checked": true
+    },
+    "guide.healthy.switchWhen": {
+      "text": "Kada stigneš do ciljne težine: Održavanje. Težina se ne pomera 6 nedelja: razgovaraj sa svojim trenerom.",
+      "checked": true
+    },
+    "sumdo.personal.targetKg": {
+      "text": "Tvoj list cilja pokazuje koliko si daleko od nje pri svakom merenju.",
+      "checked": true
     }
   }
 }

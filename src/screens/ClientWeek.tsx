@@ -11,7 +11,7 @@ import { useState, type ReactNode } from "react";
 import type { ClientRow } from "../cloud";
 import { wordsOf, type DayLine, type SlotMark } from "../dayLines";
 import { DAY_NAMES, suggestTitle, answerWords, type CoachNote } from "../coachNotes";
-import { BANDS, PACES, bandOf, goalName, goalsForBand, isBuild, bandName } from "../goal";
+import { GOALS, PACES, bandOf, goalName, goalsForBand, isBuild, bandName } from "../goal";
 import { isoWeek, ymd } from "../plan";
 import { pdRange, pdVal } from "../ui";
 import { density } from "../pilot";
@@ -285,7 +285,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
       <section className="card you-card"><span><b>{g ? goalName(g.id) : w("clientweek.noGoalYet")}</b><small>{[row.goal?.setAt ? w("me.periodSince", { date: dateText(new Date(row.goal.setAt), { day: "numeric", month: "long" }, "en-GB") }) : null, row.goal?.setBy === "coach" ? w("clientweek.setByYou") : row.goal ? w("clientweek.setByName", { name }) : null, kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? w("clientweek.gProtein", { n: proteinNow }) : null].filter(Boolean).join(" · ")}</small>{row.nextGoal && <small className="cw-next">{w(row.nextGoal.setBy === "coach" ? "clientweek.nextGoalByYou" : "clientweek.nextGoal", { goal: goalName(row.nextGoal.band), date: longDay(row.nextGoal.from) })}</small>}</span></section>
       <section className="card cw-goal">
         <b>{w("clientweek.newGoalFor", { name })}</b>
-        <div className="bands compact">{BANDS.map((b) => {
+        <div className="bands compact">{GOALS.map((b) => {
           const on = band === b.id || (b.id === "gain" && isBuild(band));
           return <button key={b.id} type="button" className={`band-card ${on ? "on" : ""}`} aria-pressed={on} onClick={() => setBand(b.id === "gain" ? (isBuild(band) ? band : "gainsteady") : b.id)}><b>{on ? "✓ " : ""}{bandName(b.id)}</b><span>{w("clientweek.bandLine", { range: pdRange(b.range), lo: b.kcal[0].toLocaleString(numLocale()), hi: b.kcal[1].toLocaleString(numLocale()), plo: b.protein[0], phi: b.protein[1] })}</span></button>;
         })}</div>

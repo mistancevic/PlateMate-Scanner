@@ -23088,6 +23088,150 @@
     "pastmeal.keepMyPlate": {
       "text": "Meinen Teller behalten",
       "checked": true
+    },
+    "goal.band.healthy": {
+      "text": "Gesund zunehmen",
+      "checked": true
+    },
+    "goal.who.healthy": {
+      "text": "dein Gewicht steigt langsam, bis zu einem Gewicht, das du wählst",
+      "checked": true
+    },
+    "goal.point.healthy.1": {
+      "text": "Etwas mehr Essen, als du verbrauchst, etwa 10 % mehr.",
+      "checked": true
+    },
+    "goal.point.healthy.2": {
+      "text": "Dein Gewicht steigt langsam, etwa 1 kg pro Monat, bis zu dem Gewicht, das du wählst.",
+      "checked": true
+    },
+    "goal.point.healthy.3": {
+      "text": "Protein in deinem Bereich. Training ist willkommen, aber kein Muss.",
+      "checked": true
+    },
+    "goal.notForYou": {
+      "text": "Gerade nicht für deinen Körper · tippe, um zu sehen, warum",
+      "checked": true
+    },
+    "goal.whyLight": {
+      "text": "Dein Gewicht ist niedrig für deine Größe: {weight} bei {height}. Weniger zu essen, als du verbrauchst, ist hier nicht sicher.",
+      "checked": true
+    },
+    "goal.whyFatWoman": {
+      "text": "Dein Körperfett, {pct} %, liegt über dem gesunden Bereich für eine Frau mit {age} Jahren. Mehr zu essen, als du verbrauchst, ist hier nicht der Weg.",
+      "checked": true
+    },
+    "goal.whyFatMan": {
+      "text": "Dein Körperfett, {pct} %, liegt über dem gesunden Bereich für einen Mann mit {age} Jahren. Mehr zu essen, als du verbrauchst, ist hier nicht der Weg.",
+      "checked": true
+    },
+    "goal.whyCoach": {
+      "text": "Sprich mit {coach} über dein Ziel. Dein Coach kann dir jedes Ziel setzen.",
+      "checked": true
+    },
+    "goal.whyNoCoachLight": {
+      "text": "Das kommt von deiner Größe und deinem Gewicht im Profil. Wenn eine Zahl falsch ist, korrigiere sie dort. Für ein solches Ziel frag eine Ärztin, einen Arzt oder eine Fachkraft für Ernährung.",
+      "checked": true
+    },
+    "goal.whyNoCoachFat": {
+      "text": "Das kommt von deinem Körperfett im Profil. Wenn die Zahl falsch ist, korrigiere sie dort. Für ein solches Ziel frag eine Ärztin, einen Arzt oder eine Fachkraft für Ernährung.",
+      "checked": true
+    },
+    "goal.targetLabel": {
+      "text": "Dein Zielgewicht",
+      "checked": true
+    },
+    "goal.targetAbove": {
+      "text": "über {now}",
+      "checked": true
+    },
+    "goal.targetBelow": {
+      "text": "unter {now}",
+      "checked": true
+    },
+    "goal.targetHint": {
+      "text": "Ein Gewicht, keine Änderung: Die App zeigt bei jedem Wiegen, wie weit du bist.",
+      "checked": true
+    },
+    "goal.targetUp": {
+      "text": "{target}: {diff} mehr. Etwa {pace} pro Monat, ungefähr {n} Monat.|{target}: {diff} mehr. Etwa {pace} pro Monat, ungefähr {n} Monate.",
+      "checked": true
+    },
+    "goal.targetDown": {
+      "text": "{target}: {diff} weniger. 0,5 bis 1 % deines Gewichts pro Woche, ungefähr {lo} bis {hi} Monate.",
+      "checked": true
+    },
+    "goal.targetDownSame": {
+      "text": "{target}: {diff} weniger. 0,5 bis 1 % deines Gewichts pro Woche, ungefähr {n} Monat.|{target}: {diff} weniger. 0,5 bis 1 % deines Gewichts pro Woche, ungefähr {n} Monate.",
+      "checked": true
+    },
+    "goal.targetNotAbove": {
+      "text": "Ein Ziel über den heutigen {now}.",
+      "checked": true
+    },
+    "goal.targetNotBelow": {
+      "text": "Ein Ziel unter den heutigen {now}.",
+      "checked": true
+    },
+    "goal.targetTooHigh": {
+      "text": "Über dem gesunden Gewicht für deine Größe: bis {limit}.",
+      "checked": true
+    },
+    "goal.targetTooLow": {
+      "text": "Unter dem gesunden Gewicht für deine Größe: bis {limit}.",
+      "checked": true
+    },
+    "goalsheet.target": {
+      "text": "Zielgewicht",
+      "checked": true
+    },
+    "sheet.targetLine": {
+      "text": "{target}. Jetzt {now}, {done} von {all} geschafft",
+      "checked": true
+    },
+    "sheet.targetOnly": {
+      "text": "{target}",
+      "checked": true
+    },
+    "sheet.upRoughly": {
+      "text": "plus etwa {kg} pro Monat",
+      "checked": true
+    },
+    "sheet.food.healthy": {
+      "text": "etwa 10 % mehr, als du verbrauchst",
+      "checked": true
+    },
+    "sheet.progress.healthy": {
+      "text": "das Gewicht steigt langsam, auf dein Zielgewicht zu",
+      "checked": true
+    },
+    "guide.healthy.happens": {
+      "text": "Du isst etwas mehr, als du verbrauchst, etwa 10 % mehr. Dein Gewicht steigt langsam, etwa 1 kg pro Monat, bis zu dem Gewicht, das du gewählt hast. Ein Teil davon ist Muskel, ein Teil Fett: Beides gehört zu einem gesunden Gewicht.",
+      "checked": true
+    },
+    "guide.healthy.training": {
+      "text": "Training ist willkommen, aber kein Muss. Zwei Krafteinheiten pro Woche helfen, dass mehr davon zu Muskeln wird.",
+      "checked": true
+    },
+    "guide.healthy.food": {
+      "text": "Jeden Tag Protein in deinem Bereich, über 3 bis 6 Mahlzeiten. Regelmäßige Mahlzeiten und Snacks helfen, wenn du wenig Appetit hast: Milch, Joghurt, Nüsse, Brot und Reis summieren sich leicht.",
+      "checked": true
+    },
+    "guide.healthy.watch": {
+      "text": "Dein 7-Tage-Durchschnittsgewicht im Vergleich zu deinem Zielgewicht, einmal pro Woche. Deine Energie, dein Schlaf und wie deine Kleidung sitzt.",
+      "checked": true
+    },
+    "guide.healthy.mistakes": {
+      "text": "Viel mehr essen, um schneller anzukommen. Mahlzeiten auslassen, wenn du wenig Appetit hast. Nach dem Gewicht eines einzelnen Morgens urteilen.",
+      "checked": true
+    },
+    "guide.healthy.switchWhen": {
+      "text": "Wenn du dein Zielgewicht erreichst: Halten. Gewicht bewegt sich 6 Wochen nicht: Sprich mit deinem Coach.",
+      "checked": true
+    },
+    "sumdo.personal.targetKg": {
+      "text": "Dein Zielblatt zeigt bei jedem Wiegen, wie weit du davon entfernt bist.",
+      "checked": true
     }
   }
 }

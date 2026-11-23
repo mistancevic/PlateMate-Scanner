@@ -10,7 +10,10 @@ import { underAge, ADULT_ONLY } from "../safety";
 import { WeightField, HeightField } from "../components/UnitFields";
 import { units, hText, wText, wIn } from "../units";
 import { useState } from "react";
-import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalName, pointsOf, bandName } from "../goal";
+import { unfitOf, targetCheck, whyLines, type TargetKind, type TargetCheck } from "../goalFit";
+import { weighInsOff } from "../weight";
+import { wUnit, wWhole } from "../units";
+import { GOALS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalName, pointsOf, bandName } from "../goal";
 import { density } from "../pilot";
 import { pdText, pdVal, pdTag } from "../ui";
 import { Mark, APP_NAME, CHEF_NAME } from "../components/Mark";
@@ -44,6 +47,12 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   // numbers and Apply appear once you pick. My own numbers and the analysis still read a goal: the one you had, else Maintain
   const [picked, setBand] = useState<string>(p.goal?.band ? suggestBand(p.personal, p.goal.band).id : "");
   const band = picked || suggestBand(p.personal, undefined).id;
+  // DT335 (0.3.184, board Stories284; Go 23 November 2026, 14:13): a goal that does not fit this body is greyed and a tap says
+  // why, in place; the person cannot pick it. A coach setting a goal sees every goal, and a goal the coach set stays open.
+  const unfit = coach ? null : unfitOf(d);
+  const [why, setWhy] = useState<string | null>(null);
+  const greyed = (id: string) => Boolean(unfit?.ids.includes(id)) && !(p.goal?.setBy === "coach" && p.goal.band === id);
+  const reason = unfit ? whyLines(unfit, d, p.profile.coachId ? p.coachLabel : null) : null;
   const [askDoor, setAskDoor] = useState(() => !doorAnswered(p.safety));
   // DT142 (0.2.127, board Stories98; Anna's DT123; Milan 28 October 20:46 Go): the first setup (no goal yet) ends on one more
   // step after Apply: where you live and shop (home, its starter foods), the kitchens you cook and what you cook with
@@ -301,7 +310,16 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           )}
           <b className="section-title">{w("goal.stepAfter", { n: nGoal })}</b>
           <p className="small muted">{w("goal.eachGoalSaysWhatHappens")}</p>
-          <div className="goal-cards">{BANDS.map((b) => {
+          <div className="goal-cards">{GOALS.map((b) => {
+            if (greyed(b.id)) return (
+              <div key={b.id} className="goal-pick-wrap greyed">
+                <button type="button" className="goal-pick greyed" aria-disabled="true" aria-expanded={why === b.id} onClick={() => setWhy(why === b.id ? null : b.id)}>
+                  <span className="goal-pick-head"><b>{bandName(b.id)}</b><small className="greyed-tag">{w("goal.notForYou")}</small></span>
+                  <ul>{pointsOf(b).map((x) => <li key={x}>{x}</li>)}</ul>
+                </button>
+                {why === b.id && <div className="warn-box goal-why" role="note"><b>{reason?.why}</b><small>{reason?.next}</small></div>}
+              </div>
+            );
             // Build muscle has a pace (canvas board K1): Steady or Faster, started by how long the person has trained
             const on = picked === b.id || (b.id === "gain" && isBuild(picked));
             const pick = () => setBand(b.id !== "gain" ? b.id : isBuild(picked) ? picked : PACES.find((x) => x.id === (d.trainingAge ? paceForAge(d.trainingAge) : "steady"))!.band);
@@ -311,6 +329,9 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
                   <span className="goal-pick-head"><b>{bandName(b.id)}</b>{b.popular && <small>{w("goal.mostPeoplePickThis")}</small>}</span>
                   <ul>{pointsOf(b).map((x) => <li key={x}>{x}</li>)}</ul>
                 </button>
+                {on && (b.id === "healthy" || b.id === "fatloss") && !weighInsOff(p.safety) && d.weightKg && d.heightCm ? (
+                  <TargetWeight kind={b.id} d={d} onSave={(kg) => setPersonalNow(kg === undefined ? { ...d, targetKg: undefined, targetFromKg: undefined, targetFor: undefined } : { ...d, targetKg: kg, targetFromKg: d.weightKg, targetFor: b.id })} />
+                ) : null}
                 {on && b.id === "gain" && (
                   <div className="pace">
                     <small className="setting-name">{w("goal.yourPace")}</small>
@@ -400,6 +421,30 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// DT335 AC5, AC6 (0.3.184, board Stories284): a target body weight, never a change. The line under it says the change, the
+// pace and the time in words; a target outside the healthy weight for the height is not taken, so it is not saved.
+function TargetWeight({ kind, d, onSave }: { kind: TargetKind; d: Personal; onSave: (kg: number | undefined) => void }) {
+  const mine = d.targetFor === kind ? d.targetKg : undefined;
+  const [t, setT] = useState<number | undefined>(mine);
+  const now = d.weightKg ?? 0, ck = t ? targetCheck(kind, t, d) : null;
+  const pace = wUnit() === "lb" ? "2 lb" : "1 kg";
+  const no = ck && !ck.ok ? (ck as Extract<TargetCheck, { ok: false }>) : null, yes = ck && ck.ok ? (ck as Extract<TargetCheck, { ok: true }>) : null;
+  const line = !ck ? "" : yes
+    ? kind === "healthy" ? w("goal.targetUp", { n: yes.months[0], target: wWhole(t!), diff: wWhole(yes.diff), pace })
+      : yes.months[0] === yes.months[1] ? w("goal.targetDownSame", { n: yes.months[0], target: wWhole(t!), diff: wWhole(yes.diff) })
+      : w("goal.targetDown", { target: wWhole(t!), diff: wWhole(yes.diff), lo: yes.months[0], hi: yes.months[1] })
+    : no!.reason === "notAbove" ? w("goal.targetNotAbove", { now: wWhole(now) }) : no!.reason === "notBelow" ? w("goal.targetNotBelow", { now: wWhole(now) })
+    : no!.reason === "tooHigh" ? w("goal.targetTooHigh", { limit: wWhole(no!.limit) }) : w("goal.targetTooLow", { limit: wWhole(no!.limit) });
+  const done = () => { if (t === undefined) { if (mine !== undefined) onSave(undefined); } else if (ck?.ok && t !== mine) onSave(t); };
+  return (
+    <div className="pace target-weight">
+      <WeightField id={`target-${kind}`} kg={t} unit={wUnit()} label={w("goal.targetLabel")} placeholder={w(kind === "healthy" ? "goal.targetAbove" : "goal.targetBelow", { now: wWhole(now) })} onKg={setT} onDone={done} />
+      {line && <small className={`setting-hint target-line${no ? " target-no" : ""}`} role="status">{line}</small>}
+      <small className="muted">{w("goal.targetHint")}</small>
     </div>
   );
 }

@@ -39,6 +39,8 @@ export type Personal = {
   trainingAge?: TrainingAge;
   // from 7 October 2026: weigh-ins, one per date (canvas boards W0 to W2)
   weighIns?: import("./weight").WeighIn[];
+  // DT335 (0.3.184, board Stories284): a target body weight, for Gain healthy weight and Lose fat; a weight, never a change
+  targetKg?: number; targetFromKg?: number; targetFor?: string;
   // DT176 (0.3.19, board Stories124): Travel mode, on until switched off; the trips it kept; the welcome back, once
   travel?: import("./travel").Travel | null;
   trips?: import("./travel").Trip[];
@@ -207,7 +209,7 @@ export const canCalculate = (p: Personal) => Boolean(p.birthYear && p.heightCm &
 // Energy per day: resting burn (Mifflin–St Jeor, or Katch–McArdle with body fat) × life, plus that day's training, then the goal.
 // Protein follows whether you train, not the goal: 1.6 to 2.2 g per kg with two or more sessions a week (ISSN 2017; Morton et al. 2018),
 // else 1.2 to 1.6 (US Dietary Guidelines 2025–2030). Fat by the Carbs and fat pick (DT161): 30 % of the average day, 25 % for Performance; carbs the rest.
-export const ADJ: Record<string, number> = { fatloss: -0.2, recomp: -0.1, maintain: 0, gain: 0.1, gainsteady: 0.05, performance: 0.05 };
+export const ADJ: Record<string, number> = { fatloss: -0.2, recomp: -0.1, maintain: 0, gain: 0.1, gainsteady: 0.05, performance: 0.05, healthy: 0.1 };
 // DT161 (0.3.3): Carbs and fat, the person's pick. Balanced is the rule before DT161 (30 %); More carbs 25 %, the share
 // Performance always had, so Performance starts there; More fat 35 %. All three sit inside the 20 to 35 % fat range (EFSA 2010;
 // AND, DC and ACSM 2016). Very low carb: the person types the carbs, fat takes the rest each day; no number of ours.

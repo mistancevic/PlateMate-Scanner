@@ -26,6 +26,8 @@ export const wIn = (kg: number) => (U.weight === "lb" ? kgToLb(kg) : kg);
 export const wFrom = (v: number) => (U.weight === "lb" ? Math.round(lbToKg(v) * 100) / 100 : v);
 // "95.0 kg" or "209.4 lb"; d decimals
 export const wText = (kg: number, d = 1) => `${dec(wIn(kg), d)} ${U.weight}`;
+// DT335: a whole number without its .0 (55 kg, 49.5 kg)
+export const wWhole = (kg: number) => wText(kg, Number.isInteger(Math.round(wIn(kg) * 10) / 10) ? 0 : 1);
 // a change: +0.4 kg, −0.9 lb, ±0.0 kg
 export const wDelta = (kg: number) => { const x = wIn(kg); return `${x > 0 ? "+" : x < 0 ? "−" : "±"}${dec(Math.abs(x), 1)} ${U.weight}`; };
 

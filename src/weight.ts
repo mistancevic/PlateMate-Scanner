@@ -42,6 +42,7 @@ export function expectedChange(band: string, weightKg: number, weeks: number, tr
   if (band === "fatloss") { const [a, b] = pct(0.5, 1); return [-b * weeks, -a * weeks]; }
   if (band === "gain") { const [a, b] = pct(0.25, 0.5); return [a * weeks, b * weeks]; }
   if (band === "gainsteady") { const [a, b] = trainingAge === "3p" ? pct(0.25, 0.5) : pct(0.5, 1); return [a * month, b * month]; }
+  if (band === "healthy") return [0.5 * month, 1 * month]; // DT335: roughly 1 kg a month
   return [-0.5, 0.5]; // maintain, recomposition, performance: about the same
 }
 // The last 4 weeks: needs 3 weigh-ins in the first week and 3 in the last.
@@ -60,7 +61,7 @@ export function trendOf(list: WeighIn[] | undefined, band: string, weightKg: num
     return { first: first === null ? null : Math.round(first * 10) / 10, last: last === null ? null : Math.round(last * 10) / 10, change: null, weeks, count: points.length, expected, verdict: "too few", points, averages };
   const change = Math.round((last - first) * 10) / 10;
   const [lo, hi] = expected, slack = 0.1;
-  const flat = band !== "fatloss" && band !== "gain" && band !== "gainsteady";
+  const flat = band !== "fatloss" && band !== "gain" && band !== "gainsteady" && band !== "healthy";
   let verdict: Verdict = "on track";
   if (change < lo - slack) verdict = flat ? "down" : band === "fatloss" ? "faster" : "slower";
   else if (change > hi + slack) verdict = flat ? "up" : band === "fatloss" ? "slower" : "faster";

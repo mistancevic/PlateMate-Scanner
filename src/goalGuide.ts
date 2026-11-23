@@ -1,5 +1,6 @@
 // About your goal (canvas boards K2 and K3, approved 7 October 2026): one page per goal, and the goal sheet the person
-import { wIn, wUnit } from "./units";
+import { wIn, wUnit, wWhole } from "./units";
+import { targetProgress } from "./goalFit";
 // and the coach agree on. The chat reads the same page, so Chef Mealan and the coach say the same thing.
 // Sources: Iraki et al. 2019 (surplus, weekly rate, protein per meal); Aragon (muscle gain by training age);
 // Helms et al. 2014 (protein when losing fat); ISSN 2017 (protein range).
@@ -60,6 +61,15 @@ export const GUIDES: Record<string, Guide> = {
     mistakes: "Training hard on too little food. Low carbs before long or hard sessions.",
     switchWhen: "Off-season or less training: back to Maintain.",
   },
+  // DT335 (0.3.184, board Stories284): Gain healthy weight, drafted with the build for Coach Milan's look
+  healthy: {
+    happens: "You eat a little more than you burn, about 10 % more. Your weight goes up slowly, roughly 1 kg a month, to the weight you chose. Some of it is muscle and some is fat: both belong to a healthy weight.",
+    training: "Training is welcome, not required. Two strength sessions a week help more of the gain go to muscle.",
+    food: "Protein in your range every day, over 3 to 6 meals. Regular meals and snacks help when your appetite is low: milk, yoghurt, nuts, bread and rice add up easily.",
+    watch: "Your 7-day average weight against your target weight, once a week. Your energy, your sleep and how your clothes fit.",
+    mistakes: "Eating far more to get there faster. Skipping meals when your appetite is low. Judging by one morning's weight.",
+    switchWhen: "At your target weight: Maintain. Weight not moving for 6 weeks: talk to your coach.",
+  },
 };
 // the page as the screens show it, in the app's language
 export const guideOf = (id?: string): Guide | null => (id && GUIDES[id] ? Object.fromEntries(PART_KEYS.map((k) => [k, w(`guide.${id}.${k}` as WordKey)])) as Guide : null);
@@ -73,15 +83,16 @@ const kg = (w: number | undefined, pctLo: number, pctHi: number) => {
   const f = (pct: number) => { const v = wIn((w * pct) / 100); const r = v < 0.5 ? Math.round(v * 20) / 20 : Math.round(v * 10) / 10; return num(Number(r.toFixed(2))); };
   return `${f(pctLo)}–${f(pctHi)} ${wUnit()}`;
 };
-export type Sheet = { title: string; byLine: string; food: string; weight: string; counted: string; progress: string; checkIn: string };
-const FOOD: Record<string, string> = { fatloss: "", recomp: "", maintain: "", gainsteady: "", gain: "", performance: "" };
+export type Sheet = { title: string; byLine: string; food: string; weight: string; counted: string; progress: string; checkIn: string; target?: string };
+const FOOD: Record<string, string> = { fatloss: "", recomp: "", maintain: "", gainsteady: "", gain: "", performance: "", healthy: "" };
 const foodOf = (id: string) => (id in FOOD ? w(`sheet.food.${id}` as WordKey) : "");
-const PROGRESS: Record<string, string> = { fatloss: "", recomp: "", maintain: "", gainsteady: "", gain: "", performance: "" };
+const PROGRESS: Record<string, string> = { fatloss: "", recomp: "", maintain: "", gainsteady: "", gain: "", performance: "", healthy: "" };
 const progressOf = (id: string) => (id in PROGRESS ? w(`sheet.progress.${id}` as WordKey) : "");
 export function weightToExpect(id: string, weightKg?: number, age?: TrainingAge): string {
   if (id === "fatloss") return w("sheet.down", { kg: kg(weightKg, 0.5, 1) });
   if (id === "gain") return w("sheet.upWeek", { kg: kg(weightKg, 0.25, 0.5) });
   if (id === "gainsteady") return w("sheet.upMonth", { kg: age === "3p" ? kg(weightKg, 0.25, 0.5) : kg(weightKg, 0.5, 1) });
+  if (id === "healthy") return w("sheet.upRoughly", { kg: wUnit() === "lb" ? "2 lb" : "1 kg" });
   if (id === "recomp") return w("sheet.recomp");
   if (id === "maintain") return w("sheet.within", { range: wUnit() === "lb" ? "2–4 lb" : "1–2 kg" });
   return w("sheet.stable");
@@ -94,7 +105,7 @@ export function nextCheckIn(setAt: string | undefined, now = new Date()): Date {
   while (n.getTime() < now.getTime() - 864e5 / 2) n.setDate(n.getDate() + 28);
   return n;
 }
-export function sheetOf(goal: Goal | null, opts: { weightKg?: number; trainingAge?: TrainingAge; approvedBy?: string; approvedAt?: string; coachLabel?: string; now?: Date }): Sheet | null {
+export function sheetOf(goal: Goal | null, opts: { weightKg?: number; trainingAge?: TrainingAge; approvedBy?: string; approvedAt?: string; coachLabel?: string; now?: Date; target?: { kg: number; fromKg?: number; nowKg?: number } }): Sheet | null {
   const b = goal?.band ? bandOf(goal.band) : null;
   if (!b) return null;
   const byLine = opts.approvedBy && opts.approvedAt ? w("sheet.agreed", { who: opts.approvedBy, date: day(opts.approvedAt) })
@@ -103,7 +114,15 @@ export function sheetOf(goal: Goal | null, opts: { weightKg?: number; trainingAg
   return {
     title: goalName(b.id), byLine, food: foodOf(b.id), weight: weightToExpect(b.id, opts.weightKg, opts.trainingAge),
     counted: w("sheet.counted"), progress: progressOf(b.id), checkIn: w("sheet.checkIn", { date: day(nextCheckIn(goal!.setAt, opts.now).toISOString()) }),
+    ...(targetLine(b.id, opts.target) ? { target: targetLine(b.id, opts.target)! } : {}),
   };
+}
+// DT335 AC7: the target weight on the goal sheet, with today's weight and how far she has come; it moves with each weigh-in
+export function targetLine(id: string, t?: { kg: number; fromKg?: number; nowKg?: number }): string | null {
+  if (!t?.kg || (id !== "healthy" && id !== "fatloss")) return null;
+  const now = t.nowKg ?? t.fromKg; if (!now) return w("sheet.targetOnly", { target: wWhole(t.kg) });
+  const p = targetProgress(t.kg, t.fromKg ?? now, now);
+  return w("sheet.targetLine", { target: wWhole(t.kg), now: wWhole(now), done: wWhole(p.done), all: wWhole(p.all) });
 }
 // what the chat gets: the goal, what to expect and the food part of its page
 export function guideForChat(id?: string): { goal: string; food: string; watch: string } | null {
