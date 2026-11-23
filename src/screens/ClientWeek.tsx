@@ -1,3 +1,4 @@
+import { firstOf } from "../clientName";
 import { numLocale, w, wn, dec, dateText, type WordKey } from "../words";
 import { weekdayName, weekdayShort } from "../weekdayWords";
 import { BurnCard } from "../components/Measured";
@@ -30,7 +31,7 @@ const DAY = 864e5;
 const addDays = (d: Date, n: number) => { const x = new Date(d); x.setHours(12, 0, 0, 0); x.setDate(x.getDate() + n); return x; };
 const SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const first = (name: string) => name.split(" ")[0];
+const first = firstOf; // B156 (0.3.181): No name yet stays whole
 const longDay = (k: string) => dateText(new Date(`${k}T12:00:00`), { weekday: "long", day: "numeric", month: "long" }, "en-GB").replace(",", "");
 export const todayIndex = (d = new Date()) => (d.getDay() + 6) % 7;
 

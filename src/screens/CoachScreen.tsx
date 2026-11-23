@@ -1,3 +1,5 @@
+import { firstOf } from "../clientName";
+import { demoWithInvite } from "../coachDemo";
 import { BOOK_PAGES, BOOK_SOURCES } from "../bookPages";
 import { HowToTesters, Face } from "../components/HowTo";
 import { getLang } from "../lang";
@@ -56,13 +58,16 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
     try { if (user && !p.demo) await saveClientNote(user.uid, uid, text); setNotesOwn((n) => { const next = { ...n }; if (text.trim()) next[uid] = { text: text.trim(), at: new Date().toISOString() }; else delete next[uid]; return next; }); notify(w("coach.noteSaved")); }
     catch (e: any) { setError(e.message || w("coach.noteNotSaved")); }
   };
-  async function refresh() {
+  // B156 (0.3.181): when the invites do not load, Clients asks once more a moment later and fills in the names, with no tap
+  async function refresh(late?: import("../clientName").Joined[]) {
     if (!user || p.demo) return;
-    try { setRows(await listClients(user.uid)); }
+    try { setRows(await listClients(user.uid, late ? undefined : (list) => void refresh(list), late)); }
     catch (e: any) { setError(e.message || w("coach.couldNotLoadClients")); }
   }
   // DT189: opening Clients no longer clears the badge; a row leaves Waiting for you only when handled
   useEffect(() => { refresh(); p.recountWaiting(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
+  // B156: the example coach's third client, named from the invites (only with chefmealan-coach-demo-invite, for the walkthrough)
+  useEffect(() => { if (p.demo) void demoWithInvite(p.demo, (list) => void demoWithInvite(p.demo!, undefined, list).then(setRowsState)).then(setRowsState); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
   // clients who are cooks (board RG5): one switch on the client's page
   const [cookList, setCookList] = useKept<string[]>(`cooks-${user?.uid ?? "local"}`, []);
   const cooks = new Set(cookList);
@@ -95,9 +100,9 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   if (open) return (
     <ClientPage key={open.uid} row={open} coachName={coachName} ops={ops} back={() => setOpenId(null)} notify={notify} setError={setError} waitingCount={p.waiting.length}
       startOn={p.focusCard && open.feedback.some((f: any) => f.id === p.focusCard) ? "shared" : "week"}
-      today={<ClientToday p={p} row={open} head={null} today={ymd(new Date())} suggest={async (s, text) => { const note = { at: new Date().toISOString(), by: "coach" as const, name: coachName, text, suggest: s }; try { await ops.sendNote(open, [...open.notes, note]); notify(w("client.suggestedToast", { name: open.name.split(" ")[0] })); } catch (e: any) { setError(e.message || w("coach.theSuggestionDidnTSend")); } }} />}
+      today={<ClientToday p={p} row={open} head={null} today={ymd(new Date())} suggest={async (s, text) => { const note = { at: new Date().toISOString(), by: "coach" as const, name: coachName, text, suggest: s }; try { await ops.sendNote(open, [...open.notes, note]); notify(w("client.suggestedToast", { name: firstOf(open.name) })); } catch (e: any) { setError(e.message || w("coach.theSuggestionDidnTSend")); } }} />}
       tailFor={(part) => <ClientTail part={part} row={open} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi} sendNote={(notes) => ops.sendNote(open, notes)} coachName={coachName} focusCard={p.focusCard} onAnswered={() => p.recountWaiting()}
-        cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(w(on ? "coach.isCookNow" : "coach.noLongerCook", { name: open.name.split(" ")[0] }))).catch((e) => setError(e.message))} />} />
+        cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(w(on ? "coach.isCookNow" : "coach.noLongerCook", { name: firstOf(open.name) }))).catch((e) => setError(e.message))} />} />
   );
   // DT330: a feedback row opens that tester's How to on its own, Back to Clients returns
   if (howOpen) return <HowToTesters list={p.howTesters} openUid={howOpen} onBack={() => setHowOpen(null)} />;
@@ -196,7 +201,7 @@ export function ClientTail({ part, row, onSaved, setError, notify, confirmAi, co
         {setCook && (
           <label className="cook-switch">
             <span><b>{w("coach.cook")}</b><small>{w("coach.canSendYouRecipesTo")}</small></span>
-            <input type="checkbox" role="switch" aria-label={w("coach.isCook", { name: row.name.split(" ")[0] })} checked={Boolean(cook)} onChange={(e) => setCook(e.target.checked)} />
+            <input type="checkbox" role="switch" aria-label={w("coach.isCook", { name: firstOf(row.name) })} checked={Boolean(cook)} onChange={(e) => setCook(e.target.checked)} />
           </label>
         )}
         {(() => {
@@ -219,7 +224,7 @@ export function ClientTail({ part, row, onSaved, setError, notify, confirmAi, co
         })()}
         <div className="formula-row">
           <small>{w("coach.formula")}</small>
-          {([[null, w("formula.automatic")], ["mifflin", w("coach.mifflinStJeor")], ["katch", "Katch–McArdle"], ["schofield", "Schofield"], ...(row.measured && !row.flags.some((f) => f.situation === "eating") ? [["data", w("coach.fromNamesData", { name: row.name.split(" ")[0] })]] : [])] as [Formula | null, string][]).map(([k, l]) => (
+          {([[null, w("formula.automatic")], ["mifflin", w("coach.mifflinStJeor")], ["katch", "Katch–McArdle"], ["schofield", "Schofield"], ...(row.measured && !row.flags.some((f) => f.situation === "eating") ? [["data", w("coach.fromNamesData", { name: firstOf(row.name) })]] : [])] as [Formula | null, string][]).map(([k, l]) => (
             <button key={l} className={`choice ${(formula ?? null) === k ? "on" : ""}`} onClick={async () => { try { await pinFormula(row.uid, k); setFormula(k); notify(k === "data" ? w("coach.formulaData", { name: row.name }) : w("coach.formulaSet", { name: row.name, formula: l.toLowerCase() })); } catch (e: any) { setError(e.message || w("coach.couldNotSetTheFormula")); } }}>{l}</button>
           ))}
         </div>
@@ -452,7 +457,7 @@ export function Invites(p: AppApi) {
 // B142 (0.3.149, board Stories221): a line kept for one day starts with that day (Moderate day, kept on purpose: ...); a week's line stays as it was.
 function ReviewCard({ row, answer, open }: { row: ClientRow; answer: (status: "approved" | "change", note: string) => Promise<void>; open: () => void }) {
   const [note, setNote] = useState("");
-  const r = row.review!, first = row.name.split(" ")[0];
+  const r = row.review!, first = firstOf(row.name);
   return (
     <section className="card review-card">
       <b>{w("coach.reviewSet", { name: first })}</b>
