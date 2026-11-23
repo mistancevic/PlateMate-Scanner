@@ -8,12 +8,21 @@ import { potLine } from "./frying";
 // in the recipe, [[i:<item id>|<short name>]]; the amount is never typed, it is read from the recipe each time, so a
 // changed weight changes every step that names the food. A step without tokens is plain text, as before.
 export const TOKEN = /\[\[i:([^|\]]+)\|([^\]]*)\]\]/g;
-export const shortName = (food: { name: string; brand?: string | null }) => plainName(food).split(",")[0].trim().toLowerCase();
+// B163 (0.3.189, board Stories290; Go 23 November 2026, 20:57): a food's name in a step is cut only at a comma with a space
+// after it (Chicken breast, cooked: chicken breast), so a decimal comma stays (Tworog 2,5% Fett); a pack's name (a barcode,
+// or read from a label) stays as printed, with its capitals; a basic food or Chef Mealan's food is in small letters
+export const shortName = (food: { name: string; brand?: string | null; barcode?: string; source?: string }) => {
+  const cut = plainName(food).split(/,\s/)[0].trim();
+  return food.barcode || food.source === "label" ? cut : cut.toLowerCase();
+};
 export const tokenOf = (item: Ingredient) => `[[i:${item.id}|${shortName(item.food).replace(/[[\]|]/g, "")}]]`;
 // exported in 0.3.134: the food buttons under the step editor say the amount as the step does (4 eggs (M), not 208 g)
 export const amountFor = (id: string, name: string, items: Ingredient[]) => {
   const it = items.find((i) => i.id === id && i.grams > 0);
   if (!it) return name;
+  // B163: a name the app cut before (at the first comma, in small letters) follows the food now, so steps written before read
+  // right; a name the recipe chose itself (rice for Basmati rice, dry) stays
+  if (name === plainName(it.food).split(",")[0].trim().toLowerCase()) name = shortName(it.food);
   // R3, the fix (0.2.39): a step is for cooking, so frying oil is the whole pot, as the recipe writes it
   if (it.fry) return potLine(it.fry, name, (g) => amountOf(g));
   // an egg or a banana is counted (0.2.24, board CT2): "2 eggs (L)"

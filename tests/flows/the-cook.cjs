@@ -11,7 +11,8 @@ const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
 const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8"));
-const food = (id, name, calories, protein, carbs, fats, fiber) => ({ ...seed.foods[0], id, name, brand: "", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, icon: "🍽️", barcode: undefined, table: undefined, places: [] });
+// B163 (0.3.189): basic foods (a pack read from a label keeps its capitals in a step)
+const food = (id, name, calories, protein, carbs, fats, fiber) => ({ ...seed.foods[0], source: "Reference table", id, name, brand: "", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, icon: "🍽️", barcode: undefined, table: undefined, places: [] });
 const items = [[160, food("c", "Chicken breast, raw", 120, 22.5, 0, 2.6, 0)], [80, food("r", "Basmati rice, dry", 356, 8.5, 78, 0.9, 1.3)], [120, food("s", "Spinach, fresh", 23, 2.9, 3.6, 0.4, 2.2)], [8, food("o", "Olive oil", 884, 0, 0, 100, 0)]].map(([g, f]) => ({ id: f.id, grams: g, locked: false, food: f }));
 const STEPS = ["Rinse [[i:r|rice]] and cook it 12 minutes.", "Cut [[i:c|chicken]] into strips.", "Fry the chicken in [[i:o|olive oil]] 6 minutes.", "Add [[i:s|spinach]] and stir 2 minutes."];
 const skyr = food("k", "Skyr, natural", 63, 11, 4, 0.2, 0), peas = food("p", "Peas, green", 81, 5.4, 14.5, 0.4, 5.7);
@@ -93,7 +94,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     await page.getByRole("button", { name: "Use it in Chicken rice bowl" }).click(); await page.waitForTimeout(900);
     ok(/what does it replace in Chicken rice bowl, or does it add to it\?/.test(await main()), "Use it: what it replaces, or Add it");
     await page.getByRole("button", { name: "In place of spinach" }).click(); await page.waitForTimeout(500);
-    ok(/120 g skyr/.test(await page.locator(".mk-card").textContent()), "the steps follow: the skyr in the spinach's place");
+    ok(/120 g skyr/i.test(await page.locator(".mk-card").textContent()), "the steps follow: the skyr in the spinach's place"); // B163: the seed's skyr is a pack, its capital stays
     // ---- 5. coming back: Chef Mealan asks to go on ----
     await nav(page, "Recipes"); await page.waitForTimeout(500);
     ok(await page.locator(".cook-strip").count() === 0, "no strip on Recipes (Coach Milan 19:00: Today and the Plate only)");

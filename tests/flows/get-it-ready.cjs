@@ -6,7 +6,8 @@ const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
 const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8")); seed.feedback = []; seed.items = [];
 const PORT = "3405", B = `http://127.0.0.1:${PORT}`;
-const F = (id, name, calories, protein, fats, carbs) => ({ ...seed.foods[0], id, name, brand: "", source: "label", calories, protein, fats, carbs, fiber: 0, photo: undefined, photos: undefined, icon: undefined, barcode: undefined });
+// B163 (0.3.189): basic foods (a pack read from a label keeps its capitals in a step and in Get it ready)
+const F = (id, name, calories, protein, fats, carbs) => ({ ...seed.foods[0], id, name, brand: "", source: "Reference table", calories, protein, fats, carbs, fiber: 0, photo: undefined, photos: undefined, icon: undefined, barcode: undefined });
 const items = [[180, F("sa", "Salmon fillet, raw", 208, 20, 13, 0)], [150, F("rc", "Basmati rice, dry", 356, 8.5, 0.9, 78)], [120, F("br", "Broccoli", 34, 2.8, 0.4, 7)], [10, F("oo", "Olive oil", 884, 0, 100, 0)]].map(([g, f]) => ({ id: f.id, grams: g, food: f, locked: false }));
 const recipe = { id: "m-sa", title: "Salmon and rice", items, portion: 460, steps: ["Cook the rice in salted water for 12 minutes.", "Bake the salmon at 200 °C for 12 minutes."], savedAt: "2026-11-01T18:00:00Z" };
 (async () => {

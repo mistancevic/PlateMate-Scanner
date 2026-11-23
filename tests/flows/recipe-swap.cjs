@@ -55,7 +55,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
     let line = await txt(".rq-change");
     ok(/Out: Rice, cooked, 300 g\. In: Rice, white, raw, 105 g\./.test(line) && /One sarma: 216 to 215 kcal, 14 to 14 g protein, PD 6\.6 to 6\.5\./.test(line), "the line says what changed for one sarma: " + line);
     await page.locator(".rq-change").getByRole("button", { name: "Undo" }).click(); await page.waitForTimeout(300);
-    ok(await grams("Rice, cooked") === "300" && await page.locator(".rq-change").count() === 0 && /300 g rice/.test(await step2()), "Undo takes it back, in the steps too");
+    ok(await grams("Rice, cooked") === "300" && await page.locator(".rq-change").count() === 0 && /300 g rice/i.test(await step2()), "Undo takes it back, in the steps too"); // B163 (0.3.189): the seed's rice is a label food, so its capital stays
 
     // a different food: the same weight first; more than a fifth apart turns the line amber
     await page.getByRole("button", { name: "Swap Beef mince, 15 % fat, raw" }).click(); await page.waitForTimeout(200);
