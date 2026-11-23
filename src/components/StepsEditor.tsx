@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { w, wn } from "../words";
 import type { Ingredient } from "../pilot";
 import { amountOf } from "../recipes";
-import { amountFor, missingFoods, stepParts, tokenOf, usedIds } from "../steps";
+import { amountFor, chipKeep, missingFoods, stepParts, tokenOf, usedIds } from "../steps";
 import { countOf } from "../counted";
 
 // The steps, one field each, and the foods as chips (0.2.5+r16, canvas board S4, R13a and R13b). A tap on a food puts
@@ -10,8 +10,15 @@ import { countOf } from "../counted";
 // changed weight changes the step by itself. Enter starts the next step. A food that no step names is said, once any
 // step names a food. Steps written before this release stay plain text.
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+// B165 (0.3.192, board Stories293; Go Coach Milan 24 November 2026, 00:13): the chip's words, the first three kept together
+const chipInner = (label: string) => { const [keep, rest] = chipKeep(label); return `<span class="st-keep">${esc(keep)}</span>${esc(rest)}`; };
 const chipHtml = (id: string, name: string, label: string, gone: boolean) =>
-  `<span class="st-food${gone ? " gone" : ""}" contenteditable="false" data-item="${esc(id)}" data-name="${esc(name)}">${esc(label)}</span>`;
+  `<span class="st-food${gone ? " gone" : ""}" contenteditable="false" data-item="${esc(id)}" data-name="${esc(name)}">${chipInner(label)}</span>`;
+// a chip wider than its field's line is marked long, and goes on to the next line like text; one that fits moves down whole
+function markLong(el: HTMLElement) {
+  const cs = getComputedStyle(el), room = el.clientWidth - parseFloat(cs.paddingLeft || "0") - parseFloat(cs.paddingRight || "0");
+  el.querySelectorAll<HTMLElement>(".st-food").forEach((c) => { c.classList.remove("st-long"); if (room > 0 && c.getBoundingClientRect().width > room) c.classList.add("st-long"); });
+}
 const toHtml = (step: string, items: Ingredient[]) =>
   stepParts(step, items).map((p) => ("text" in p ? esc(p.text) : chipHtml(p.id, p.name, p.label, p.gone))).join("");
 // the field back to a step: words as typed, chips as tokens
@@ -49,15 +56,17 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
     if (el.dataset.filled) return;
     el.dataset.filled = "1";
     el.innerHTML = toHtml(values.current[rows.indexOf(key)] ?? "", items);
+    markLong(el);
   };
   // the amounts follow the foods: a weight changed in Foods shows in every chip at once
   const sig = items.map((i) => `${i.id}:${i.grams}`).join(",");
   useLayoutEffect(() => {
     els.current.forEach((el) => el.querySelectorAll<HTMLElement>("[data-item]").forEach((c) => {
       const it = items.find((i) => i.id === c.dataset.item && i.grams > 0);
-      c.textContent = it ? amountFor(it.id, c.dataset.name ?? "", [it]) : (c.dataset.name ?? "");
+      c.innerHTML = chipInner(it ? amountFor(it.id, c.dataset.name ?? "", [it]) : (c.dataset.name ?? ""));
       c.classList.toggle("gone", !it);
     }));
+    els.current.forEach((el) => markLong(el));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig]);
   const read = (key: string) => { const el = els.current.get(key); const k = rows.indexOf(key); if (el && k >= 0) { values.current[k] = serialize(el); emit(); } };
@@ -98,6 +107,7 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
     const after = document.createRange(); after.setStartAfter(space); after.collapse(true);
     sel?.removeAllRanges(); sel?.addRange(after);
     el.focus();
+    markLong(el);
     lastFocus.current = key;
     read(key); flush(); // a food in or out goes up at once
   };
@@ -113,6 +123,13 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
     lastFocus.current = key;
     read(key); flush(); // a food in or out goes up at once
   };
+  // B165: the chips are measured again when the width changes (a phone turned, a sheet opened)
+  useEffect(() => {
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver((es) => es.forEach((e) => markLong(e.target as HTMLElement)));
+    els.current.forEach((el) => ro.observe(el));
+    return () => ro.disconnect();
+  }, [rows]);
   const flushRef = useRef(flush); flushRef.current = flush;
   useEffect(() => () => { flushRef.current(); els.current.clear(); }, []);
   const used = usedIds(values.current);

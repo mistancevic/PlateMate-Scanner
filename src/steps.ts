@@ -29,6 +29,12 @@ export const amountFor = (id: string, name: string, items: Ingredient[]) => {
   const c = countOf(it);
   return c ? countInStep(c, it.grams) : `${amountOf(it.grams)} ${name}`;
 };
+// B165 (0.3.192, board Stories293; Go Coach Milan 24 November 2026, 00:13): a chip too long for the line goes on like text; its
+// first three words (the amount, its unit and the food's first word: 250 g Körniger) stay together on one line
+export const chipKeep = (label: string): [string, string] => {
+  const m = label.match(/^(\S+ \S+ \S+)( .*)?$/);
+  return m ? [m[1], m[2] ?? ""] : [label, ""];
+};
 export type StepPart = { text: string } | { id: string; name: string; label: string; gone: boolean };
 // a step in parts: the words, and the foods with their amounts now
 export function stepParts(step: string, items: Ingredient[]): StepPart[] {
