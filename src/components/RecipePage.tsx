@@ -6,6 +6,7 @@ import { fromMeal, getPlanned } from "../planned";
 import { suitsOf, MEAL_KINDS, type MealKind } from "../mealFit";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
+import { mealsOf, followed as followMeal, foodsChanged, whenAll, getRecipeAsk, setRecipeAsk } from "../recipeChange";
 import { stepPicOf, stepPicsOf, setStepPic, addStepPic, removeStepPic, firstStepPic, alignStepPics, allStepPics, galleryOf, placePhoto, makeCover, deletePhoto, setPhotoBy, MAX_GALLERY } from "../photos";
 import { ThinkingCard } from "./ThinkingCard";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -55,9 +56,11 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 // a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
 const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 
-export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, beforeSteps = null, atStart = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null }: {
+export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, beforeSteps = null, atStart = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null }: {
   // DT227 (0.3.61, board Stories167): a draft of this recipe saved for later on the Plate
   saved?: { sub: string; go: () => void } | null;
+  // B160 (0.3.187): Save as a new recipe from Edit recipe: the changes become a new recipe, this one stays as it is
+  onSaveNew?: (m: Pick<Meal, "items" | "makes" | "portion" | "steps" | "optional">) => void;
   // DT284 (0.3.138): a past meal of this recipe changed in place, or deleted
   onCardChange?: (id: string, ch: import("../pastMeal").CardChange) => void; onCardDelete?: (id: string) => void;
   // DT81: how many of its pieces the plan takes from today, for Cook it's suggestion
@@ -103,6 +106,14 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
   const [cookAtId, setCookAt] = useState<Feedback | null>(null);
   // DT284 v5: the meal just changed, marked in Every time you ate it
   const [changedId, setChangedId] = useState<string | null>(null);
+  // B160 (0.3.187, board Stories287): the recipe's foods changed after meals were logged from it today or yesterday: asked once
+  // for all of them; a change from the Plate's Update my recipe waits here (patch null: the recipe is already changed)
+  const [ask, setAsk] = useState<{ patch: Partial<Meal> | null; meals: Feedback[]; before: Ingredient[]; after: Ingredient[] } | null>(() => {
+    const a = getRecipeAsk(); if (!a || a.recipeId !== meal.id) return null;
+    const ms = cards.filter((f) => a.ids.includes(f.id)); if (!ms.length) { setRecipeAsk(null); return null; }
+    return { patch: null, meals: ms, before: a.before, after: meal.items };
+  });
+  const [savedLine, setSavedLine] = useState<string | null>(null);
   // DT284: the cook as it is now, so a change shows at once; gone when deleted
   const cookAt = cookAtId ? cards.find((c) => c.id === cookAtId.id) ?? null : null;
   useEffect(() => { if (cookAtId) try { window.scrollTo(0, 0); } catch { /* nothing to scroll */ } }, [cookAtId?.id]);
@@ -206,8 +217,40 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
     const same = JSON.stringify(steps) === JSON.stringify(meal.steps ?? []);
     const n = Math.round(Number(edit.makesN) || 0), typed = edit.makesUnit.trim().toLowerCase() || "portions", unit = /s$/.test(typed) ? typed : `${typed}s`;
     const makes = n >= 2 && n <= 100 ? { n, unit } : undefined;
-    onPatch({ items: kept, makes, portion: makes ? Math.round(total / makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined, moves: undefined, ...alignStepPics(meal, steps) }) });
+    const patch = { items: kept, makes, portion: makes ? Math.round(total / makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined, moves: undefined, ...alignStepPics(meal, steps) }) };
+    setSavedLine(null);
+    if (foodsChanged(meal.items, kept)) {
+      const { recent, older } = mealsOf(meal, cards);
+      if (recent.length) { setAsk({ patch, meals: recent, before: meal.items, after: kept }); return; }
+      if (older) setSavedLine(wn("recipechange.older", older));
+    }
+    onPatch(patch);
     setEdit(null); setFind(null); resetSwap();
+  };
+  // B160: the answer, for all the meals asked about at once
+  const answer = (update: boolean) => {
+    if (!ask) return;
+    const when = whenAll(ask.meals, w("recipechange.and")), n = ask.meals.length;
+    if (update && onCardChange) for (const f of ask.meals) onCardChange(f.id, { items: followMeal(f, ask.before, ask.after) });
+    if (ask.patch) onPatch(ask.patch);
+    setRecipeAsk(null); setSavedLine(wn(update ? "recipechange.followed" : "recipechange.kept", n, { when }));
+    setAsk(null); setEdit(null); setFind(null); resetSwap();
+  };
+  const askBlock = ask ? (
+    <section className="warn-box recipe-ask" role="group" aria-label={wn("recipechange.ask", ask.meals.length, { when: whenAll(ask.meals, w("recipechange.and")) })}>
+      <b>{wn("recipechange.ask", ask.meals.length, { when: whenAll(ask.meals, w("recipechange.and")) })}</b>
+      <small>{wn("recipechange.hint", ask.meals.length)}</small>
+      <div className="button-row"><button type="button" className="pill pill-small recipe-ask-keep" onClick={() => answer(false)}>{wn("recipechange.keep", ask.meals.length)}</button><button type="button" className="pill pill-small pill-primary recipe-ask-update" onClick={() => answer(true)}>{wn("recipechange.update", ask.meals.length)}</button></div>
+    </section>
+  ) : null;
+  const saveNew = () => {
+    if (!edit || !onSaveNew) return;
+    const kept = edit.items.filter((i) => i.grams > 0); if (!kept.length) return;
+    const total = kept.reduce((n, i) => n + i.grams, 0), steps = edit.steps.map((x) => x.replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 30);
+    const n = Math.round(Number(edit.makesN) || 0), typed = edit.makesUnit.trim().toLowerCase() || "portions", unit = /s$/.test(typed) ? typed : `${typed}s`;
+    const makes = n >= 2 && n <= 100 ? { n, unit } : undefined;
+    setEdit(null); setFind(null); resetSwap();
+    onSaveNew({ items: kept, makes, portion: makes ? Math.round(total / makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined });
   };
   // DT83: every change to the foods can be taken back, one at a time
   const change = (items: Ingredient[], steps?: string[]) => { if (!edit) return; setUndo((u) => [...u, { items: edit.items, steps: edit.steps }]); setEdit({ ...edit, items, ...(steps ? { steps } : {}) }); setNeed(null); };
@@ -488,6 +531,8 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
       {!edit && <NutritionCard tableOnly items={items} serves={serves} one={oneWord} all={allWord} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} />}
       {!edit && <CarryBlock meal={meal} cards={cards} />}
       {/* DT214 v2 (0.3.53, board Stories162): a recipe collects its cooks */}
+      {!edit && ask && !ask.patch && askBlock}
+      {!edit && savedLine && <p className="insight recipe-saved-line" role="status">{savedLine}</p>}
       {!edit && <YourCooks meal={meal} cards={cards} onOpen={(f) => { setChangedId(null); setCookAt(f); }} />}
       {/* DT227 (0.3.61, board Stories167): the recipe points to its draft; the draft stays on the Plate */}
       {!edit && saved && (
@@ -575,7 +620,10 @@ export function RecipePage({ onCardChange, onCardDelete, meal, cards, foods, coo
       </section>
       {edit ? (
         <>
+          {ask ? askBlock : (<>
           <button className="pill pill-wide pill-primary" disabled={!edit.items.some((i) => i.grams > 0)} onClick={save}>{w("recipe.saveChanges")}</button>
+          {onSaveNew && <button className="pill pill-wide recipe-save-new" disabled={!edit.items.some((i) => i.grams > 0)} onClick={saveNew}>{w("make.saveAsANewRecipe")}</button>}
+          </>)}
           <small className="muted rq-under">{edit.items.some((i) => i.grams > 0) ? w("recipe.theNumbersAboveFollowAs") : w("recipe.aRecipeNeedsAtLeast")}</small>
           <button className="pill pill-wide" onClick={() => { setEdit(null); setFind(null); resetSwap(); }}>{w("recipe.cancel")}</button>
           {live && <small className="muted rq-under">{w("recipe.liveOnChefmealanComThe")}</small>}

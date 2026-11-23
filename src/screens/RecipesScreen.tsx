@@ -4,7 +4,8 @@ import { w, wn, mealV, dateV, type Val } from "../words";
 import type { Lang } from "../lang";
 import { kitchenMark, markWord } from "../recipeMark";
 import { recipeName } from "../recipeDiff";
-import { portionOf } from "../pilot";
+import { portionOf, uid } from "../pilot";
+import { newNameFor } from "../recipeDiff";
 import { RecipeBar } from "../components/RecipeBar";
 import { EMPTY, ME, COACH, MEMBERS, isIdle, applyFilters, sortRows, kitchenLines, madeByLines, groupRows, type Filters, type Sort, type Context, type RecipeRow } from "../recipeFilter";
 import { membersFor } from "../members";
@@ -314,7 +315,7 @@ export function RecipesScreen(p: AppApi) {
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
-      <LangRecipePage onCardChange={(id, ch) => p.changeCard(id, ch)} onCardDelete={(id) => p.deleteCard(id)} aiOn={p.ai.on} translate={(id) => p.translateRecipe(id)} key={opened.id} meal={opened} saved={savedOf(opened.id)} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
+      <LangRecipePage onSaveNew={(x) => { const m = { ...x, id: uid(), title: newNameFor(opened.title, opened.items, x.items, state.meals.map((y) => y.title)), savedAt: new Date().toISOString(), basedOn: { id: opened.id, title: opened.title } } as Meal; setState((s) => ({ ...s, meals: [m, ...s.meals] })); setOpenId(m.id); }} onCardChange={(id, ch) => p.changeCard(id, ch)} onCardDelete={(id) => p.deleteCard(id)} aiOn={p.ai.on} translate={(id) => p.translateRecipe(id)} key={opened.id} meal={opened} saved={savedOf(opened.id)} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         landing={landed && landed.id === opened.id ? (() => {

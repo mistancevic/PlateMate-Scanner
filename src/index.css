@@ -3694,3 +3694,5 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .nt-fibre { display: block; margin-top: 8px; font-weight: 800; color: var(--ink); } .fibre-line { font-weight: 700; }
 /* B159 (0.3.186): a day before the client's phone recorded: an o, not known */
 .db-cell.lvl-unknown > span { position: relative; background: repeating-linear-gradient(135deg, #eef1f6 0 4px, #dde3ec 4px 8px); box-shadow: 0 0 0 1.5px #c9d2e0 inset; } .db-cell.lvl-unknown > span::after { content: "o"; position: absolute; inset: 0; display: grid; place-items: center; font-weight: 900; font-size: 10px; line-height: 1; color: #6b778c; }
+/* B160 (0.3.187): a recipe changed after meals were logged from it asks once */
+.recipe-ask { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; } .recipe-ask .button-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; } .recipe-saved-line { font-weight: 800; }
