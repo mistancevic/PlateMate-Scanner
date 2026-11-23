@@ -20,6 +20,8 @@ const NOTES = {
     b: "Review the label: the same, with long names that wrap into tall rows, and the doubled lines." },
   "2": { a: "<b>New:</b> each line the app knows shows its own name, in the app's language. The printed name stays, small under it. Each line once: the app reads every part between the slashes.",
     b: "<b>New:</b> Review the label shows the same names. A line the app does not know keeps its printed name, as today." },
+  "4": { a: "<b>Option B:</b> only the app's names. A line above the table says: Tap a line to see its name as printed on the pack. A small › marks the lines that have one. I tap Fat.",
+    b: "<b>Option B:</b> under Fat, its name as printed: Tuky/Masti/Мазнини/Λιπαρά. A second tap closes it." },
   "3": { a: "<b>New:</b> in Srpski the same pack reads Energija, Masti, Ugljeni hidrati, Proteini; the printed name stays under each.", b: "" } };
 const MARK = "outline:3px solid #2a72d9;outline-offset:3px;border-radius:12px";
 const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-size:14px;line-height:1.45;color:#172742;font-family:Nunito,system-ui,sans-serif;font-weight:400;text-align:left;position:relative;z-index:5`;
@@ -27,14 +29,14 @@ const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-siz
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
   const b = await chromium.launch();
-  const open = async (isNew, lang) => {
+  const open = async (isNew, lang, tap) => {
     const ctx = await b.newContext({ viewport: { width: 390, height: +(process.env.VH || 1500) }, deviceScaleFactor: 1, timezoneId: "Europe/Berlin" }); const p = await ctx.newPage();
     await p.clock.setFixedTime(new Date("2026-11-23T11:00:00+01:00"));
-    await p.addInitScript(([s, isNew, lang]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+    await p.addInitScript(([s, isNew, lang, tap]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
       localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" }));
       localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z" }));
       if (lang) localStorage.setItem("chefmealan-lang", lang);
-      if (isNew) localStorage.setItem("board-new", "1"); localStorage.setItem("seeded", "1"); }, [seed, isNew, lang]);
+      if (isNew) localStorage.setItem("board-new", "1"); if (tap) localStorage.setItem("board-tap", "1"); localStorage.setItem("seeded", "1"); }, [seed, isNew, lang, tap]);
     await require(path.join(ROOT, "tests/flows/adult.cjs"))(p);
     return p;
   };
@@ -54,16 +56,21 @@ const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-siz
   const shot = async (p, name, h) => { await p.waitForTimeout(400); if (h) await p.setViewportSize({ width: 390, height: h }); await p.waitForTimeout(200); await p.screenshot({ path: `${R}/${name}.png` }); console.log(name); };
   try {
     for (const flow of (process.env.FLOWS || "1,2").split(",")) {
-      const N = flow !== "1"; const p = await open(N, flow === "3" ? "sr-Latn" : null);
+      const N = flow !== "1"; const p = await open(N, flow === "3" ? "sr-Latn" : null, flow === "4");
       await p.goto(U + "/"); await p.waitForTimeout(900);
       if (flow === "3") { for (let i = 0; i < 3 && (await p.locator(".menu-row").filter({ hasText: /^Namirnice$/ }).count()) === 0; i++) { await p.getByRole("button", { name: "Meni" }).first().click(); await p.waitForTimeout(250); }
         await p.locator(".menu-row").filter({ hasText: /^Namirnice$/ }).first().click(); await p.waitForTimeout(400); }
       else await require(path.join(ROOT, "tests/flows/foods.cjs"))(p);
       await p.getByText("Hazelnut wafers", { exact: true }).first().click(); await p.waitForTimeout(700);
       await unroll(p, ".label-table-read");
-      await note(p, ".label-table-read", NOTES[flow].a, [".label-table-read"], "afterend");
+      await note(p, ".label-table-read", NOTES[flow].a, [flow === "4" ? ".lt-hint" : ".label-table-read", ".label-table-read"], "afterend");
       await tall(p, `${flow}a`, ".label-table-read", ".foodcard-head");
       await p.evaluate(() => document.querySelectorAll(".board-note").forEach((n) => n.remove()));
+      if (flow === "4") { // option B: the printed name behind a tap on the line
+        await p.locator(".label-table-read .lt-row").filter({ hasText: /^Fat/ }).first().click(); await p.waitForTimeout(300);
+        await note(p, ".label-table-read", NOTES["4"].b, [".label-table-read .lt-row.open"], "afterend");
+        await tall(p, "4b", ".label-table-read", ".foodcard-head");
+        await p.context().close(); continue; }
       if (flow === "3") { await p.context().close(); continue; }
       await p.getByRole("button", { name: /^Review the label/ }).first().click(); await p.waitForTimeout(900);
       await unroll(p, ".label-table");

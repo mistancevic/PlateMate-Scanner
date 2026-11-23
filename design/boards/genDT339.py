@@ -24,7 +24,7 @@ CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.179"
 B = Board(); PW = 390; G = 70
 W = SX + 3 * PW + 2 * G + 40
 parts = [("Ticket", "DT339. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT339, canvas Page 6."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT339.1: as it is in main, 0.3.179, not on Preview yet: a pack's card, then a tap on Review the label. DT339.2: the same, new. DT339.3: the new card in Srpski. Each screen scrolls, so it is one tall picture. A blue outline marks what is new."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT339.1: as it is in main, 0.3.179, not on Preview yet: a pack's card, then a tap on Review the label. DT339.2: the same, new. DT339.3: the new card in Srpski. DT339.4: the open point, option B, the printed name behind a tap. Each screen scrolls, so it is one tall picture. A blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "22 November 18:43 to 18:46: a scanned label showed Greek food names; the pack prints each line in Czech, Croatian, Bulgarian and Greek. Yes, a ticket in Next. 23 November 11:17: Draw."),
@@ -50,7 +50,14 @@ RB = [shot(X(0), y2, "2a", PW, "DT339.2a The pack's card", "changed", "Fat, with
   shot(X(1), y2, "2b", PW, "DT339.2b Review the label", "changed", "The same names; the values change as today.")]
 arrow(X(1) - G + 2, y2 + 400)
 R3 = [shot(X(2), y2, "3a", PW, "DT339.3a The card in Srpski", "changed", "Energija, Masti, Ugljeni hidrati; the printed name under each.")]
-bs = RB + R3
+# DT339.4 (Coach Milan 23 November 11:41): the open point drawn, option B, the printed name behind a tap
+y4 = max(RB + R3) + 70
+label(y4, "DT339.4 Option B, behind a tap", "to compare with DT339.2a: names only, until I tap", 0, 2)
+y4 += 60
+R4 = [shot(X(0), y4, "4a", PW, "DT339.4a The pack's card", "changed", "Only the app's names; a › on each line that has a printed name. I tap Fat."),
+  shot(X(1), y4, "4b", PW, "DT339.4b Fat opens", "changed", "Its name as printed, under it. A second tap closes it.")]
+arrow(X(1) - G + 2, y4 + 400)
+bs = RB + R3 + R4
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40

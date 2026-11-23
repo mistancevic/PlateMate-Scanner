@@ -14,12 +14,12 @@
   "story": "When I check the values of a pack I scanned, I want each line named in my language, so that I can read the table at a glance.",
   "proposed": "Each line the app knows shows the app's own name in the app's language: Fat, in Srpski Masti. The printed name stays as the record and shows small under it. The app reads every part between the slashes, and knows more languages: Czech, Slovak, Polish, Hungarian, Romanian, Slovenian, Bulgarian and Greek, besides the ones it reads today. So each line shows once. It also knows common vitamins and minerals by name. A line it does not know keeps its printed name, as today. A pack saved before gets the names when it is shown: nothing to scan again.",
   "open": [
-    "Printed name small under the app's name, as drawn, or behind a tap."
+    "Printed name small under the app's name (option A, DT339.2a, as drawn), or behind a tap on the line (option B, DT339.4)."
   ],
   "checks": "Middle: the label read and the food card. The unit tests with new ones for the line names in every language, the build, a new walkthrough for AC1 to AC6, and the walkthroughs that read or show a label table (label-table, database-photos, tea-zero, camera ones), about 10 to 15 minutes. New words on screen, so the German sweep too.",
   "decision": "Direction agreed 22 November 18:46. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
   "now": "The card and Review the label show every line as printed. Energetická hodnota/Energetska vrijednost/Енергийна стойност/Ενέργεια is one long row. Tuky/Masti/Мазнини/Λιπαρά 28 g shows, and next to it the app's own Fat 28 g; the same for Carbohydrate and Protein. In Review the label the long names wrap into tall rows.",
-  "looked_at": "The printed name behind a tap: one tap more for the record, which the coach and the person may want to compare with the pack. Keep only the first language: not chosen, the first may be one the person does not read, and the app would still miss the line.",
+  "looked_at": "Keep only the first language: not chosen, the first may be one the person does not read, and the app would still miss the line.",
   "board": "Stories280",
   "where": "Page 6",
   "ac": [
