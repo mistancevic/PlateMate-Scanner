@@ -2,7 +2,7 @@
   "id": "DT334",
   "title": "Up to 3 kitchens you cook",
   "epic": "plate",
-  "state": "next",
+  "state": "done",
   "why": "Coach Milan 22 November 2026, 15:35 to 15:43, after an onboarding call: a tester picked 10 kitchens in setup, another tester earlier picked many and narrowed them down later. 15:41: limit the kitchens you cook to 3. 15:43: taste is covered by a chip, not a second list. The testers who already have more than 3 are asked by Coach Milan himself; no code for them. 23 November 00:34 to 00:56: a chip for trying new kitchens would bring ideas from kitchens nobody asked about; that is wrong. Limit to 3, no chip.",
   "opportunity": {
     "from": "An onboarding call, 22 November 2026, and an earlier tester.",
@@ -14,8 +14,8 @@
   "story": "When I set up the kitchens I cook, I want to pick the few I really cook, so that Chef Mealan's ideas feel like my kitchen.",
   "proposed": "The kitchens you cook: up to 3, in setup and in Me. The line says why: Chef Mealan cooks in these first. Pick up to 3. With 3 picked, a fourth needs one tapped off first. The server takes the same 3, so nothing is dropped without a word.",
   "open": [],
-  "checks": "Middle: setup's step 5, Me's Where I shop and cook, and what Chef Mealan is sent. The unit tests with new ones for the cap, the build, a new walkthrough for AC1 to AC4, the walkthroughs that open setup's step 5 and Me's shop page, and those that check what Chef Mealan is sent (setup-shop, kitchens-and-steps, make-meal, chef-dinner and the rest), about 10 to 15 minutes. New words on screen, so the German sweep too.",
-  "decision": "Direction agreed 22 November 15:41; the chip taken out 23 November 00:56: limit to 3. Drawn again 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "checks": "Middle plus the German sweep: 14 of 14 walkthroughs passed (docs/qa/runs/0.3.178.json).",
+  "decision": "Go, Coach Milan 23 November 2026, 08:43, checks Middle plus the German sweep. Built in 0.3.178.",
   "now": "Setup, 5. Where you shop and cook, and Me, Where I shop and cook: the line says Pick one or more. Any number can be picked; a tester picked 10. Each kitchen gets its block of three dishes below. The server sends only the first 8 to Chef Mealan.",
   "looked_at": "A second list for the kitchens you like to eat: not chosen, 15:43, a chip says it. Changing the profiles that already have more than 3: not chosen, Coach Milan asks those testers himself. A chip for trying new kitchens, one idea in three from outside the 3: not chosen, 00:56, it brings ideas from kitchens nobody asked about. Something new is asked for in the chat; a button for it would be its own ticket, only if testers miss it.",
   "board": "Stories278",
@@ -54,6 +54,7 @@
     "Profiles with more than 3 from before: no code; the app keeps their list, the server takes the first 3."
   ],
   "short": "Up to 3 kitchens you cook",
-  "rel": "Proposed; not agreed until Coach Milan says Go",
-  "boardTitle": "DT334: up to 3 kitchens you cook"
+  "rel": "0.3.178",
+  "boardTitle": "DT334: up to 3 kitchens you cook",
+  "version": "0.3.178"
 }
