@@ -1,0 +1,53 @@
+{
+  "id": "B161",
+  "title": "Typing a space at the end of a step drops the focus",
+  "epic": "cook",
+  "state": "next",
+  "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): in the recipe's steps, a space typed at the end of a step's text drops the focus from the field; typing only works right after the last word. 21:31: finish the steps part. Not reproduced in the browser here; 21:33: Samsung Keyboard. Proposed: no saving while the keyboard builds a word, one save when it is in, the page not drawn again on every key. 21:34: draw.",
+  "opportunity": {
+    "from": "Coach Milan's own recipe, Lazy Burek, 23 November 2026.",
+    "job": "Write a step the way I type: words, spaces, more words.",
+    "kind": "Too many steps: the cursor jumps out after a space; typing works only right after the last word.",
+    "why_now": "Most testers write on Android phones; Samsung Keyboard is common there."
+  },
+  "story": "When I add words at the end of a step, I want the cursor to stay where I type, so that I can finish the step in one go.",
+  "proposed": "1. While the phone's keyboard is building a word (composition), the step field does not save. 2. When the word is in, the field saves once. 3. Saving a step no longer draws the whole recipe page again on every key; only the ticks on the food buttons follow. Nothing changes on screen.",
+  "problem": "The step field saves on every key, and each save draws the recipe page again. Samsung Keyboard builds each word in a draft and puts it in at the space; a page drawn again while the draft is open loses the cursor.",
+  "open": [],
+  "checks": "Light: Edit recipe's steps and the publish sheet's steps. The unit tests; the build; a new walkthrough that types with a phone keyboard's composition (AC1 to AC3); and steps-and-parts, steps-own-amounts and recipe-after, about 5 minutes. No new words. Then Coach Milan types on his own phone, with Samsung Keyboard, once he has it on Preview.",
+  "decision": "Samsung Keyboard 21:33, draw 21:34. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "now": "Edit recipe, step 2 of Lazy Burek ends with 375 g Frischer Blätterteig. With Samsung Keyboard, a space at the end drops the cursor out of the field. In the browser here it does not happen.",
+  "looked_at": "A plain text box per step: not chosen; the food chips with their amounts live inside the step.",
+  "board": "Stories291",
+  "where": "Page 6",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "A space at the end",
+      "text": "Given step 2 in Edit recipe, when I type a space and a word at its end with a phone keyboard that builds words, then the cursor stays in step 2 and the step holds the new word"
+    },
+    {
+      "id": "AC2",
+      "title": "Saved when the word is in",
+      "text": "Given a word being built by the keyboard, when it is in, then the step is saved once, with the word, and Save changes keeps it"
+    },
+    {
+      "id": "AC3",
+      "title": "The food buttons follow",
+      "text": "Given a food put into a step, when I type after it, then its button keeps its tick and nothing else on the page moves"
+    }
+  ],
+  "unchanged": [
+    "Enter starts a new step.",
+    "A tap on a food puts it where the cursor is.",
+    "+ Step here and + Add a step."
+  ],
+  "details": [
+    "Composition: compositionstart to compositionend; the field reads its text at compositionend and on any input outside a composition.",
+    "Not reproduced in Chromium on a phone-sized screen; the walkthrough emulates a keyboard's composition with the browser's own input commands. The real check is Coach Milan's phone.",
+    "The pictures are the same screen of main, 0.3.189: the change is not visible."
+  ],
+  "short": "A space at the end of a step keeps the cursor, with Samsung Keyboard",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "B161: a space at the end of a step keeps the cursor"
+}
