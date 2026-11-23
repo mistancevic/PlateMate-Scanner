@@ -3594,7 +3594,7 @@
       "title": "Fibre: 0 where it is a fact, and the plate counts what is known and says so",
       "epic": "plate",
       "state": "next",
-      "why": "Coach Milan 22 November 2026, 22:31: fibre is super important, and fi? shows very often. 22:51: go with the two-part proposal; no made-up numbers as estimates. 23 November 15:33: draw DT342. 15:45: with foods missing the letter is fi*, the * as a footnote: approximate, not unknown.",
+      "why": "Coach Milan 22 November 2026, 22:31: fibre is super important, and fi? shows very often. 22:51: go with the two-part proposal; no made-up numbers as estimates. 23 November 15:33: draw DT342. 15:45: with foods missing the letter is fi*, the * as a footnote: approximate, not unknown. 16:20: plain milk products count as 0 (they have no fibre by nature); added fibre (inulin) blocks the 0.",
       "opportunity": {
         "from": "Coach Milan's own look, 22 November 2026.",
         "job": "See the fibre of my plate and my day.",
@@ -3605,7 +3605,7 @@
       "proposed": "1. 0 where it is a fact: a food with no fibre value whose name says it has no fibre by nature (tea, coffee, water, salt, oil, sugar, meat, fish, eggs, plain milk products) counts as 0 fibre wherever foods are added up. Its own values stay as on its pack: what is on the package is what we show. 2. The rest counts what is known and says so: the plate's fibre reads X* g, and a * line says at least X g and names the foods without a value. The fibre letter is the known part's level with a *, fi*, Fi* or Fi+*: approximate, a footnote, not unknown (Coach Milan 15:45). fi? stays only when no food has a value. 3. That food's card says it has no fibre value and to add it from the pack in Review the label. No guessed numbers.",
       "problem": "A plate shows fi? as soon as one food on it has no fibre value, even when every other food has one. Tea, coffee, water, salt, oil, sugar, meat, fish, eggs and milk products have no fibre by nature, yet a missing value counts as unknown, and one empty value hides all the fibre that is known.",
       "open": [
-        "The list of words that make a food fibre-free by nature, and the words that block it: drawn in the design details, for Coach Milan to settle, as for DT336."
+        "The rest of the word list in the design details, for Coach Milan to settle, as for DT336. Settled 16:20: plain milk products count as 0; inulin blocks."
       ],
       "checks": "Middle: the Plate's letters and numbers, a food's card, a recipe's numbers. The unit tests with new ones for the list and the count; the build; a new walkthrough for AC1 to AC7; and the walkthroughs of the Plate's numbers and letters, about 10 minutes. New words on screen, so the German sweep too.",
       "decision": "Direction agreed 22 November 22:51. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
@@ -3622,7 +3622,7 @@
         {
           "id": "AC2",
           "title": "The list",
-          "text": "Given a food with no fibre value, when its name says tea, coffee, water, salt, oil, sugar, meat, fish, eggs or a plain milk product, as a whole word in English, German or Serbian (Latin and Cyrillic), then it counts as 0; a word for something with fibre in it (muesli, fruit, chocolate, nuts, bread, breaded, vegetables, beans) blocks the 0 and always wins"
+          "text": "Given a food with no fibre value, when its name says tea, coffee, water, salt, oil, sugar, meat, fish, eggs or a plain milk product, as a whole word in English, German or Serbian (Latin and Cyrillic), then it counts as 0; a word for something with fibre in it (muesli, fruit, chocolate, nuts, bread, breaded, vegetables, beans) or added fibre (inulin) blocks the 0 and always wins"
         },
         {
           "id": "AC3",
@@ -3657,7 +3657,7 @@
       ],
       "details": [
         "Fibre-free by nature, whole words, the name only (the list to settle). Tea, coffee, water, salt (DT336's words). Oil: oil, Öl, Olivenöl, ulje. Sugar: sugar, Zucker, šećer. Meat: chicken, beef, pork, turkey, veal, lamb, ham, bacon, steak; Hähnchen, Huhn, Rind, Schwein, Pute, Kalb, Lamm, Schinken, Speck; piletina, junetina, svinjetina, ćuretina, teletina, jagnjetina, šunka, slanina. Fish: fish, salmon, tuna, cod, trout, sardines, mackerel, shrimp; Fisch, Lachs, Thunfisch, Kabeljau, Forelle, Garnelen; riba, losos, tunjevina, oslić, pastrmka, sardine, škampi. Eggs: egg, Ei, jaje. Milk products: milk, yogurt, skyr, quark, cheese, butter, kefir; Milch, Joghurt, Käse; mleko, jogurt, sir, maslac, kajmak. Serbian also in Cyrillic.",
-        "Words that block the 0 and always win: muesli, granola, fruit and common fruits (strawberry, banana, blueberry), chocolate, cocoa, nuts, oats, bread, breaded (paniert, pohovan), cereal, vegetables, beans, tomato, seeds, jam, cake, biscuits, pizza, burger, sandwich, wrap, salad, juice; in German and Serbian too. A fruit yoghurt or breaded chicken is not 0.",
+        "Words that block the 0 and always win: muesli, granola, fruit and common fruits (strawberry, banana, blueberry), chocolate, cocoa, nuts, oats, bread, breaded (paniert, pohovan), cereal, vegetables, beans, tomato, seeds, jam, cake, biscuits, pizza, burger, sandwich, wrap, salad, juice; added fibre: inulin, chicory fibre, Inulin, Ballaststoffe, Chicorée-Faser, inulin, vlakna (Coach Milan 16:20); in German and Serbian too. A fruit yoghurt or breaded chicken is not 0.",
         "The same count wherever foods are added up: the Plate, Plate read, a recipe's numbers.",
         "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 16:00."
       ],
