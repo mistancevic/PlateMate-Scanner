@@ -1,0 +1,72 @@
+{
+  "id": "DT339",
+  "title": "A nutrition table printed in several languages shows the app's own names",
+  "epic": "plate",
+  "state": "next",
+  "why": "Coach Milan 22 November 2026, 18:43 to 18:46, from an onboarding call: a scanned label showed Greek food names; the pack prints each line in Czech, Croatian, Bulgarian and Greek, joined with slashes, and the app keeps the table as printed. 18:46: yes, a ticket in Next. 23 November 11:17: Draw.",
+  "opportunity": {
+    "from": "An onboarding call, 22 November 2026.",
+    "job": "Check the values of a pack I scanned.",
+    "kind": "Did not understand it: rows named in four languages, Greek among them.",
+    "why_now": "Packs sold across Europe print their table in several languages."
+  },
+  "problem": "The label read keeps every line of the table as printed, with its printed name. A pack sold in several countries prints each line in several languages, joined with slashes (Tuky/Masti/Мазнини/Λιπαρά for fat). The rows get long and hard to read. And where the first word is in a language the app does not know (Tuky, Sacharidy, Bílkoviny), the app does not see the line, so it adds its own Fat, Carbohydrate and Protein next to it: those lines show twice.",
+  "story": "When I check the values of a pack I scanned, I want each line named in my language, so that I can read the table at a glance.",
+  "proposed": "Each line the app knows shows the app's own name in the app's language: Fat, in Srpski Masti. The printed name stays as the record and shows small under it. The app reads every part between the slashes, and knows more languages: Czech, Slovak, Polish, Hungarian, Romanian, Slovenian, Bulgarian and Greek, besides the ones it reads today. So each line shows once. It also knows common vitamins and minerals by name. A line it does not know keeps its printed name, as today. A pack saved before gets the names when it is shown: nothing to scan again.",
+  "open": [
+    "Printed name small under the app's name, as drawn, or behind a tap."
+  ],
+  "checks": "Middle: the label read and the food card. The unit tests with new ones for the line names in every language, the build, a new walkthrough for AC1 to AC6, and the walkthroughs that read or show a label table (label-table, database-photos, tea-zero, camera ones), about 10 to 15 minutes. New words on screen, so the German sweep too.",
+  "decision": "Direction agreed 22 November 18:46. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "now": "The card and Review the label show every line as printed. Energetická hodnota/Energetska vrijednost/Енергийна стойност/Ενέργεια is one long row. Tuky/Masti/Мазнини/Λιπαρά 28 g shows, and next to it the app's own Fat 28 g; the same for Carbohydrate and Protein. In Review the label the long names wrap into tall rows.",
+  "looked_at": "The printed name behind a tap: one tap more for the record, which the coach and the person may want to compare with the pack. Keep only the first language: not chosen, the first may be one the person does not read, and the app would still miss the line.",
+  "board": "Stories280",
+  "where": "Page 6",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "The app's own name, the printed one under it",
+      "text": "Given a pack whose lines are printed in four languages, Tuky/Masti/Мазнини/Λιπαρά for fat, when I open its card, then the line says Fat, and Tuky/Masti/Мазнини/Λιπαρά shows small under it"
+    },
+    {
+      "id": "AC2",
+      "title": "Each line once",
+      "text": "Given the same pack, when I open its card, then Fat, Carbohydrate and Protein show once each, with the printed amounts: 28 g, 58 g and 7 g"
+    },
+    {
+      "id": "AC3",
+      "title": "Review the label shows the same",
+      "text": "Given the same pack, when I tap Review the label, then the lines show the same names, the printed name small under each, and the values can be changed as today"
+    },
+    {
+      "id": "AC4",
+      "title": "In the app's language",
+      "text": "Given the app in Srpski, when I open the same card, then the lines say Energija, Masti, Ugljeni hidrati, Vlakna, Proteini, So, Kalcijum; in Deutsch Energie, Fett, Kohlenhydrate"
+    },
+    {
+      "id": "AC5",
+      "title": "A line the app does not know",
+      "text": "Given a line the app does not know, such as Taurin, when the card shows it, then it keeps its printed name, as today; a line printed in the app's own words, such as Protein, shows once with nothing under it"
+    },
+    {
+      "id": "AC6",
+      "title": "A pack saved before",
+      "text": "Given a pack scanned before this release, when I open its card, then it shows the new names, with nothing to scan again"
+    }
+  ],
+  "unchanged": [
+    "The values and how they are read: the per-100 g column, nulls for trace and less-than.",
+    "The order of the lines as printed.",
+    "Adding, changing and removing a line in Review the label."
+  ],
+  "details": [
+    "Recognising a line: the whole printed name first, then each part between slashes; the of-which words in each language (z toho, od kojih, от които, εκ των οποίων) are dropped first. Short words like Sol and Сол need a word end, so Solubilní does not count as salt.",
+    "The app's names come from the words it has (nutrition.row...), new words for the lines and the vitamins and minerals that have none yet, in Srpski and German.",
+    "A line saved before with no line found (other:) is read again when it is shown.",
+    "The printed name is the record: it is kept as read, never changed.",
+    "The pictures are the real app on one scratch build of main, not committed."
+  ],
+  "short": "A table printed in several languages shows the app's own names",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "DT339: a nutrition table printed in several languages shows the app's own names"
+}
