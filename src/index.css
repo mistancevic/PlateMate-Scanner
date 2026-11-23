@@ -3680,3 +3680,8 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .readout-mid .pd-tap { cursor: pointer; }
 /* DT339 (0.3.180): the printed name of a table line, small under the app's own name */
 .lt-name .lt-printed { display: block; font-size: 12px; font-weight: 600; color: var(--muted); line-height: 1.3; margin-top: 2px; }
+/* DT340 (0.3.182): the day's level on a client's card; today outlined, days to come dashed */
+.db-cell.lvl-full > span { background: var(--high); } .db-cell.lvl-active > span { background: var(--mid); } .db-cell.lvl-opened > span { background: #b9c4d6; }
+.db-cell.lvl-empty > span { background: var(--surface); box-shadow: 0 0 0 1.5px #b9c4d6 inset; } .db-cell.lvl-todo > span { background: transparent; border: 1.5px dashed #ccd5e3; box-sizing: border-box; }
+.db-cell.is-today > span { outline: 2px solid var(--brand); outline-offset: 2px; }
+.last-active { display: block; font-weight: 800; color: var(--ink); }

@@ -105,6 +105,7 @@ import { dayLog } from "./today";
 import { dayLineOf, type DayLine } from "./dayLines";
 import { measure, startOf, daysFromLines, type Measured } from "./measured";
 import { weighInsOff } from "./weight";
+import { activityOut, markActive, markOpened } from "./activity";
 import { fixedOf } from "./components/FormulaCard";
 import { coachDemoOn } from "./coachDemo";
 // DT188 (0.3.30): the console may say "superadmin"; in the app that is a coach with Admin in the menu
@@ -719,7 +720,7 @@ export default function App() {
           if (kept.foods.length !== state.foods.length) setState(kept);
           // 0.3.61 (Coach Milan 20:24): the app opens once the account is read; the phone's newer copy goes up in the background
           // (it used to wait for the account to confirm the save, with no time limit, and the first opening after a release hung)
-          const up = () => saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
+          const up = () => saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), measured: measuredOut(), activity: activityOut(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: w("app.thisPhoneHasNewerChanges"), at: new Date().toISOString() });
           void up().then(() => setCloudStatus({ ok: true, text: w("app.thisPhoneHadNewerChanges"), at: new Date().toISOString() }))
             .catch(() => window.setTimeout(() => void up().then(() => setCloudStatus({ ok: true, text: w("app.thisPhoneHadNewerChanges"), at: new Date().toISOString() }))
@@ -766,7 +767,7 @@ export default function App() {
         } else {
           // 0.3.61: a new account gets this phone's copy in the background too; the app does not wait for it
           setCloudStatus({ ok: true, text: w("app.savingToYourAccount"), at: new Date().toISOString() });
-          void saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() })
+          void saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), activity: activityOut(), updatedAt: new Date().toISOString() })
             .then(() => setCloudStatus({ ok: true, text: w("app.savedToYourAccount"), at: new Date().toISOString() }))
             .catch((e) => setCloudStatus({ ok: false, text: w("app.notSavedYetWhy", { why: explainCloudError(e) }) }));
         }
@@ -895,7 +896,7 @@ export default function App() {
     const rows = coachDemoOn() ? (await import("./coachDemo")).demoRows() : user && profile.role === "coach" ? await listClients(user.uid).catch(() => null) : null;
     if (!rows) { setWaiting([]); setNewShared(apps); return; }
     const seen = seenWaiting(user?.uid ?? "local");
-    const list = waitingFor(rows.map((r) => ({ uid: r.uid, name: r.name, notes: r.notes ?? [], feedback: r.feedback ?? [], review: (r as any).review ?? null, checkinDay: r.checkinDay })), seen, todayIndex(), ymd(isoWeek(new Date()).monday));
+    const list = waitingFor(rows.map((r) => ({ uid: r.uid, name: r.name, notes: r.notes ?? [], feedback: r.feedback ?? [], review: (r as any).review ?? null, checkinDay: r.checkinDay, activity: r.activity })), seen, todayIndex(), ymd(isoWeek(new Date()).monday));
     setWaiting(list); setNewShared(list.length + apps);
   };
   const countNewShared = async () => {
@@ -1083,6 +1084,7 @@ export default function App() {
   // straight away when the app goes to the back, so nothing waits. Only the part that changed is written (saveCloud).
   const pendingSave = useRef<(() => void) | null>(null);
   const [filesTick, setFilesTick] = useState(0);
+  const [activityTick, setActivityTick] = useState(0);
   useEffect(() => {
     const flush = () => { if (document.visibilityState === "hidden") { const f = pendingSave.current; pendingSave.current = null; f?.(); } };
     const onHide = () => { const f = pendingSave.current; pendingSave.current = null; f?.(); };
@@ -1094,7 +1096,7 @@ export default function App() {
     if (!user || !cloudLoaded.current) return;
     const run = () => {
       window.clearTimeout(t); pendingSave.current = null;
-      saveCloud(user.uid, { ...blockOf(stateRef.current), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() }, { onlyChanged: true })
+      saveCloud(user.uid, { ...blockOf(stateRef.current), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), activity: activityOut(), updatedAt: new Date().toISOString() }, { onlyChanged: true })
         .then(async () => {
           setCloudStatus({ ok: true, text: w("app.savedToYourAccount"), at: new Date().toISOString() });
           // foods, recipes and cards: only the records that changed (storage release 2)
@@ -1107,7 +1109,23 @@ export default function App() {
     const t = window.setTimeout(run, 3000);
     pendingSave.current = run;
     return () => { window.clearTimeout(t); if (pendingSave.current === run) pendingSave.current = null; };
-  }, [state, goal, clientName, personal, goalLog, safety, user, planned, filesTick]);
+  }, [state, goal, clientName, personal, goalLog, safety, user, planned, filesTick, activityTick]);
+  // DT340 (0.3.182, board Stories282): the day's activity for the coach's card. Opening the app marks the day opened (once a
+  // day, and again when the phone comes back to it on a new day); a meal logged, the plan changed or a weigh-in marks it active.
+  // The account's copy carries it (activityOut), so the save above runs when it changes.
+  useEffect(() => {
+    const open = () => { if (document.visibilityState !== "hidden" && markOpened()) setActivityTick((n) => n + 1); };
+    open(); document.addEventListener("visibilitychange", open);
+    return () => document.removeEventListener("visibilitychange", open);
+  }, []);
+  const activitySig = `${state.feedback.length}|${state.feedback.map((f) => f.createdAt).join(",").length}|${JSON.stringify(planned).length}|${(personal.weighIns ?? []).length}`;
+  const activitySeen = useRef<string | null>(null);
+  useEffect(() => {
+    if (activitySeen.current === null) { activitySeen.current = activitySig; return; }
+    if (activitySeen.current === activitySig) return;
+    activitySeen.current = activitySig;
+    if (markActive()) setActivityTick((n) => n + 1);
+  }, [activitySig]);
   // DT246 (0.3.96, board Stories182; Coach Milan 6 November 10:30 and 10:31, a): a plate already recorded follows into its
   // meal: the foods, the amounts and the name the Plate shows are what that meal shows
   const recordNow = recordOf(state.feedback, state);
@@ -1968,7 +1986,7 @@ export default function App() {
     coachClient, setCoachClient,
     isCoach: shownProf.role === "coach" || (coachDemoOn() && view !== "user"),
     goExplorer: (t) => { setExplorerTarget(t); setMenuSection(null); setTalkOpen(false); setTab("explorer"); },
-    replyToCoach: (text: string, read?: string) => saveNotes([...coachThread.notes.map((n) => (n.at === read ? { ...n, readAt: new Date().toISOString() } : n)), { at: new Date().toISOString(), by: "client", text }]),
+    replyToCoach: (text: string, read?: string) => { if (markActive()) setActivityTick((n) => n + 1); return saveNotes([...coachThread.notes.map((n) => (n.at === read ? { ...n, readAt: new Date().toISOString() } : n)), { at: new Date().toISOString(), by: "client", text }]); },
     measured, formulaKcal, calcFormula,
     measuredSeen: !!measured?.start && measuredSeen === measured.start,
     seeMeasured: () => { const k = measured?.start ?? ""; try { localStorage.setItem("chefmealan-measured-seen", k); } catch {} setMeasuredSeen(k); },
@@ -2577,7 +2595,7 @@ export default function App() {
       if (!force) {
         const saved = await (async () => {
           if (!user || !cloudLoaded.current || localMode.current) return false;
-          try { await withTimeout(saveCloud(user.uid, { ...blockOf(stateRef.current), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() }), 10000); } catch { return false; }
+          try { await withTimeout(saveCloud(user.uid, { ...blockOf(stateRef.current), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), activity: activityOut(), updatedAt: new Date().toISOString() }), 10000); } catch { return false; }
           const wait = async (busy: () => boolean) => { for (let n = 0; n < 150 && busy(); n++) await new Promise((r) => setTimeout(r, 100)); return !busy(); };
           if (!(await wait(() => recRef.current.running))) return false;
           await syncRecords(false);

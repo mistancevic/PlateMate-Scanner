@@ -14,13 +14,37 @@ export function weekCells(days: { key: string; today: boolean; past: boolean; li
 export function phaseCells(squares: { date: string; state: "full" | "part" | "today" | "todo"; weighed: boolean }[]): DayCell[] {
   return squares.map((s) => ({ date: s.date, state: s.state === "full" ? "good" : s.state === "part" ? "look" : s.state === "today" ? "today" : "none", weighed: s.weighed, weekend: weekendOf(s.date) }));
 }
-export const rowsOf = (cells: DayCell[]): DayCell[][] => { const out: DayCell[][] = []; for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7)); return out; };
+export const rowsOf = <T,>(cells: T[]): T[][] => { const out: T[][] = []; for (let i = 0; i < cells.length; i += 7) out.push(cells.slice(i, i + 7)); return out; };
 // what the key line names, in this order, only what shows
 export function keysOf(cells: DayCell[]): DayKey[] {
   const k: DayKey[] = [];
   if (cells.some((c) => c.state === "good")) k.push("good");
   if (cells.some((c) => c.state === "look")) k.push("look");
   if (cells.some((c) => c.state === "today")) k.push("today");
+  if (cells.some((c) => c.weighed)) k.push("dot");
+  if (cells.some((c) => c.weekend)) k.push("weekend");
+  return k;
+}
+
+// DT340 (0.3.182, board Stories282; Go 23 November 2026, 13:15): the day's level on a client's card, in every phase. Green: a
+// full day. Amber: active, she did something for her food day. Grey: she only opened the app. Empty: not opened. Dashed:
+// still to come. Today is outlined and fills in as the day goes; the weigh-in dot and the shaded weekend stay.
+export type Level = "full" | "active" | "opened" | "empty" | "todo";
+export type LevelCell = { date: string; level: Level; today: boolean; weighed: boolean; weekend: boolean };
+export type LevelKey = "full" | "active" | "opened" | "empty" | "today" | "todo" | "dot" | "weekend";
+export function levelOf(o: { when: "past" | "today" | "future"; full: boolean; did: boolean; activity?: "opened" | "active" }): Level {
+  if (o.when === "future") return "todo";
+  if (o.when === "past" && o.full) return "full";
+  if (o.did || o.activity === "active") return "active";
+  return o.activity === "opened" ? "opened" : "empty";
+}
+export const levelCell = (date: string, today: string, x: { full: boolean; did: boolean; activity?: "opened" | "active" }, weighed: string[]): LevelCell =>
+  ({ date, today: date === today, weighed: weighed.includes(date), weekend: weekendOf(date), level: levelOf({ when: date < today ? "past" : date === today ? "today" : "future", ...x }) });
+export function levelKeys(cells: LevelCell[]): LevelKey[] {
+  const k: LevelKey[] = [];
+  for (const l of ["full", "active", "opened", "empty"] as const) if (cells.some((c) => c.level === l)) k.push(l);
+  if (cells.some((c) => c.today)) k.push("today");
+  if (cells.some((c) => c.level === "todo")) k.push("todo");
   if (cells.some((c) => c.weighed)) k.push("dot");
   if (cells.some((c) => c.weekend)) k.push("weekend");
   return k;

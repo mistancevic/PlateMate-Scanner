@@ -3,6 +3,7 @@
 // phone's storage, by the same code the app uses (repairState, stripPhotos, splitSave, the records' changes), and lists what
 // the account's database (Firestore) refuses: a list inside a list, a map nested deeper than 20, a field name that is empty or
 // __like_this__, a document past 1 MiB. scripts/save-check.cjs runs it at the end of every walkthrough.
+import { activityOut } from "./activity";
 import { repairState } from "./pilot";
 import { stripPhotos } from "./cloud";
 import { splitSave } from "./privateSplit";
@@ -52,7 +53,7 @@ export function accountWritesOf(store: Record<string, string>, slim = false): { 
   try {
     const state = repairState(JSON.parse(raw));
     const b = stripPhotos(state);
-    const block = { state: slim ? { ...b, foods: [], meals: [] } : b, recordsOnly: slim, foodsCount: state.foods?.length ?? 0, goal: getGoal(), personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), updatedAt: "2026-01-01T00:00:00Z" };
+    const block = { state: slim ? { ...b, foods: [], meals: [] } : b, recordsOnly: slim, foodsCount: state.foods?.length ?? 0, goal: getGoal(), personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), activity: activityOut(), updatedAt: "2026-01-01T00:00:00Z" };
     const out: { where: string; data: unknown }[] = [];
     for (const keepOld of [true, false]) {
       const { priv, main } = splitSave(block, keepOld);

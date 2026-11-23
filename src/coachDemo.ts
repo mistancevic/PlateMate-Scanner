@@ -22,7 +22,7 @@ const card = (id: string, title: string, kcal: number, protein: number, at: Date
   ({ id, status: "eaten", taste: "", notes: "", createdAt: at.toISOString(), slot, meal: { id: mealId, title, savedAt: at.toISOString(), portion: 100, items: [{ id: id + "i", food: food(id + "f", title, kcal, protein), grams: 100, locked: false }] }, ...extra }) as any;
 const MEALS = { breakfast: ["b", "Oats, skyr and banana", 472, 36], lunch: ["l", "Sarma with skyr", 602, 68], dinner: ["d", "Chicken, rice and greens", 640, 52] } as const;
 
-export function demoRows(): ClientRow[] {
+function demoRowsBase(): ClientRow[] {
   const slots = slotsOf({ meals: 3, window: null });
   const now = new Date(), today = ymd(now), monday = isoWeek(now).monday;
   const held = Object.fromEntries(Object.entries(MEALS).map(([k, [id, title, kcal, protein]]) => [k, { title, kcal, protein, source: k === "dinner" ? "coach" : "mine", mealId: id }])) as any;
@@ -86,4 +86,24 @@ export async function demoWithInvite(rows: ClientRow[], onLate?: (list: import("
   const { joined } = await joinedNames("demo", onLate, undefined, known);
   const base = rows[rows.length - 1];
   return [...rows.filter((r) => r.uid !== "c3"), { ...base, uid: "c3", goal: null, notes: [], feedback: [], measured: null, ...clientIdentity("", joined.get("c3")) }];
+}
+
+// DT340 (0.3.182, board Stories282): the example clients' activity, as their phones would send it. Nina was active today at
+// 11:40 and only opened the app the day before yesterday; Lena opened the app today and was last active yesterday at 20:15.
+// With chefmealan-coach-demo-quiet set, a third client, Sara, who has not opened the app for 3 days (for the walkthrough).
+export function demoRows(): ClientRow[] {
+  const rows = demoRowsBase(), now = new Date(), today = ymd(now), d = (n: number) => addDays(today, n);
+  const at = (n: number, h: number, m: number) => { const x = new Date(`${d(n)}T12:00:00`); x.setHours(h, m, 0, 0); return x.toISOString(); };
+  const act = (days: Record<number, "opened" | "active">, last: string, open: string) => ({ days: Object.fromEntries(Object.entries(days).map(([k, v]) => [d(Number(k)), v])), lastActiveAt: last, lastOpenAt: open });
+  const out: ClientRow[] = [
+    { ...rows[0], activity: act({ [-2]: "opened", [-1]: "active", 0: "active" }, at(0, 11, 40), at(0, 7, 5)) },
+    // B153's walkthrough sets the day Lena's phone last saved: what it sent is from that day
+    (() => { let stale = 0; try { stale = Math.max(0, Math.min(5, Number(localStorage.getItem("chefmealan-coach-demo-stale")) || 0)); } catch { /* today */ }
+      return stale ? { ...rows[1], activity: act({ [-stale - 1]: "active", [-stale]: "opened" }, at(-stale - 1, 20, 15), at(-stale, 8, 30)) } : { ...rows[1], activity: act({ [-1]: "active", 0: "opened" }, at(-1, 20, 15), at(0, 8, 30)) }; })(),
+  ];
+  let quiet = false; try { quiet = localStorage.getItem("chefmealan-coach-demo-quiet") === "1"; } catch { /* off */ }
+  if (quiet) out.push({ ...rows[1], uid: "demo-sara", name: "Sara", email: "sara@example.com", named: true, via: { kind: "invite" as const, at: new Date(now.getTime() - 12 * 864e5).toISOString() },
+    measured: null, goal: { band: "maintain", setBy: "you", setAt: new Date(now.getTime() - 12 * 864e5).toISOString(), source: "quick" }, days: {}, weighIns: [], weighDates: [], checkinDay: (now.getDay() + 1) % 7, feedback: [], notes: [],
+    activity: act({ [-5]: "active", [-4]: "opened" }, at(-5, 19, 0), at(-4, 9, 10)) });
+  return out;
 }

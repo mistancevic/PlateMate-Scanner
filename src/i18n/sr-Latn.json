@@ -1026,7 +1026,7 @@
       "checked": true
     },
     "measured.theAverageOfYourFull": {
-      "text": "Prosek tvojih punih dana: svaki planirani obrok pojeden, zamenjen ili namerno preskočen, i sve dodatno zapisano. Dani kojima nedostaje obrok se ne računaju.",
+      "text": "Prosek tvojih punih dana: svaki obrok tvog dana pojeden, zamenjen ili namerno preskočen, sa planom ili bez njega, i sve dodatno zapisano. Dani kojima nedostaje obrok se ne računaju.",
       "checked": true
     },
     "measured.whatYourWeightDid": {
@@ -8426,7 +8426,7 @@
       "checked": true
     },
     "measured.fullDayIs": {
-      "text": "Pun dan: svaki planirani obrok pojeden, zamenjen ili namerno preskočen, i sve van plana upisano. Meri se ujutru, pre doručka.",
+      "text": "Pun dan: svaki obrok tvog dana pojeden, zamenjen ili namerno preskočen, sa planom ili bez njega, i sve dodatno zapisano. Meri se ujutru, pre doručka.",
       "checked": true
     },
     "measured.firstDaysWater": {
@@ -23027,6 +23027,50 @@
     },
     "label.line.vitamin": {
       "text": "Vitamin {x}",
+      "checked": true
+    },
+    "clientweek.keyActive": {
+      "text": "Žuto: aktivan dan",
+      "checked": true
+    },
+    "clientweek.keyOpened": {
+      "text": "Sivo: samo otvorena aplikacija",
+      "checked": true
+    },
+    "clientweek.keyEmpty": {
+      "text": "Prazno: aplikacija nije otvorena",
+      "checked": true
+    },
+    "clientweek.keyTodo": {
+      "text": "Isprekidano: tek dolazi",
+      "checked": true
+    },
+    "clientweek.lastActive": {
+      "text": "Poslednja aktivnost: {when}",
+      "checked": true
+    },
+    "clientweek.activeToday": {
+      "text": "danas u {time}",
+      "checked": true
+    },
+    "clientweek.activeYesterday": {
+      "text": "juče u {time}",
+      "checked": true
+    },
+    "clientweek.activeDaysAgo": {
+      "text": "pre {n} dana, {day}",
+      "checked": true
+    },
+    "coach.waitQuiet": {
+      "text": "Bez aktivnosti {n} dana",
+      "checked": true
+    },
+    "coach.waitQuietWhen": {
+      "text": "aplikacija poslednji put otvorena {date}",
+      "checked": true
+    },
+    "coach.waitQuietN": {
+      "text": "{n} klijent bez aktivnosti|{n} klijenta bez aktivnosti|{n} klijenata bez aktivnosti",
       "checked": true
     }
   }

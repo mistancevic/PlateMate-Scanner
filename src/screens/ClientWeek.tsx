@@ -2,7 +2,8 @@ import { firstOf } from "../clientName";
 import { numLocale, w, wn, dec, dateText, type WordKey } from "../words";
 import { weekdayName, weekdayShort } from "../weekdayWords";
 import { BurnCard } from "../components/Measured";
-import { weekCells, phaseCells, rowsOf, keysOf, type DayCell, type DayKey } from "../dayBars";
+import { rowsOf, levelCell, levelKeys, type LevelCell, type LevelKey } from "../dayBars";
+import { lastActiveText } from "../activityWords";
 import { fmtKg } from "../weight";
 import { wIn, wText } from "../units";
 import { shortDate, freshMeasured } from "../measured";
@@ -50,33 +51,41 @@ export function weekOf(row: ClientRow, offset = 0) {
 const livedText = (n: number) => wn("clientweek.lived", n);
 // DT302 (0.3.150, board Stories224): the days as bars, one picture in every phase (src/dayBars.ts): rows of seven, the weekend
 // shaded, a dot under a bar for a weigh-in, and under them a key line that says what the colours mean in this phase
-const KEY_WORDS: Record<"week" | "phase", Record<DayKey, WordKey>> = {
-  week: { good: "clientweek.keyLived", look: "clientweek.keyChanged", today: "clientweek.keyToday", dot: "clientweek.keyDot", weekend: "clientweek.keyWeekend" },
-  phase: { good: "clientweek.keyFull", look: "clientweek.keyPart", today: "clientweek.keyToday", dot: "clientweek.keyDot", weekend: "clientweek.keyWeekend" } };
-function DayBars({ cells, phase, label, foot, footOn }: { cells: DayCell[]; phase: "week" | "phase"; label: string; foot: string; footOn?: boolean }) {
-  const key = keysOf(cells).map((k) => w(KEY_WORDS[phase][k])).join(" · ");
+// DT340 (0.3.182, board Stories282): every square says the day's level: full, active, opened only, not opened, still to come;
+// today outlined. The key line names only what shows.
+const KEY_WORDS: Record<LevelKey, WordKey> = { full: "clientweek.keyFull", active: "clientweek.keyActive", opened: "clientweek.keyOpened", empty: "clientweek.keyEmpty",
+  today: "clientweek.keyToday", todo: "clientweek.keyTodo", dot: "clientweek.keyDot", weekend: "clientweek.keyWeekend" };
+function DayBars({ cells, label, foot, footOn }: { cells: LevelCell[]; label: string; foot: string; footOn?: boolean }) {
+  const key = levelKeys(cells).map((k) => w(KEY_WORDS[k])).join(" · ");
   return (
     <div className="db">
       <div className="db-rows" role="img" aria-label={`${label}. ${key}`}>
-        {rowsOf(cells).map((r, i) => <div className="db-row" key={i}>{r.map((c) => <span key={c.date} className={`db-cell ${c.state}${c.weekend ? " weekend" : ""}${c.weighed ? " weighed" : ""}`}><span /><i /></span>)}</div>)}
+        {rowsOf(cells).map((r, i) => <div className="db-row" key={i}>{r.map((c) => <span key={c.date} data-level={c.level} className={`db-cell lvl-${c.level}${c.today ? " is-today" : ""}${c.weekend ? " weekend" : ""}${c.weighed ? " weighed" : ""}`}><span /><i /></span>)}</div>)}
       </div>
       <small className="db-key">{key}</small>
       <small className={`db-foot${footOn ? " cw-lived" : ""}`}>{foot}</small>
     </div>
   );
 }
+// what a day shows of the client: her day line (full, and whether she logged anything) and her phone's activity
+const dayOf = (row: ClientRow, date: string, full: boolean) => {
+  const l = row.days?.[date];
+  return { full, did: !!l && l.byPlan + l.swapped + l.skipped + (l.extras?.length ?? 0) > 0, activity: row.activity?.days?.[date] };
+};
 // the first two weeks on a card, drawn on the coach's today (B153)
 const isWeighed = (x: { weighed: boolean }) => x.weighed;
-function PhaseBars({ m }: { m: NonNullable<ClientRow["measured"]> }) {
-  const weighed = m.squares.filter(isWeighed).length, cells = phaseCells(m.squares);
-  return <DayBars cells={cells} phase="phase" label={w("measured.squaresAria", { full: m.fullDays, weighed })}
+function PhaseBars({ m, row }: { m: NonNullable<ClientRow["measured"]>; row: ClientRow }) {
+  const today = ymd(new Date()), weighed = m.squares.filter(isWeighed).length;
+  const cells = m.squares.map((q) => levelCell(q.date, today, dayOf(row, q.date, q.state === "full"), m.squares.filter(isWeighed).map((x) => x.date)));
+  return <DayBars cells={cells} label={w("measured.squaresAria", { full: m.fullDays, weighed })}
     foot={`${wn("clientweek.fullDays", m.fullDays)} · ${w("clientweek.weighInsN", { n: weighed })} · ${m.readyOn ? w("clientweek.readyOn", { date: shortDate(m.readyOn).slice(4) }) : w("clientweek.notReadyYet")}`} />;
 }
 export function WeekBars({ row }: { row: ClientRow }) {
-  const wq = weekOf(row);
+  const wq = weekOf(row), today = ymd(new Date());
   const weighed = [...(row.weighIns ?? []).map((x: any) => String(x.date)), ...(row.weighDates ?? [])];
-  const cells = weekCells(wq.days.map((x) => ({ key: x.key, today: x.today, past: x.past, lived: Boolean(x.line?.lived), planned: Boolean(x.line?.planned) })), weighed);
-  return <DayBars cells={cells} phase="week" label={w("clientweek.thisWeekABarA")} foot={livedText(wq.lived)} footOn={wq.lived > 0} />;
+  const cells = wq.days.map((x) => levelCell(x.key, today, dayOf(row, x.key, Boolean(x.line?.full)), weighed));
+  const full = cells.filter((c) => c.level === "full").length;
+  return <DayBars cells={cells} label={w("clientweek.thisWeekABarA")} foot={wn("clientweek.fullDays", full)} footOn={full > 0} />;
 }
 const weekNo = (row: ClientRow) => { const at = row.goal?.setAt ? Date.parse(row.goal.setAt) : NaN; return Number.isFinite(at) ? Math.floor((Date.now() - at) / (7 * DAY)) + 1 : null; };
 // in the first two weeks (0.2.7, board FT, FT6): the day of 14, counted from the start the client's phone sent
@@ -98,8 +107,8 @@ export function ClientRowCard({ row, today, open, note, saveNote }: { row: Clien
         <div className="client-head"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span><div><b>{first(row.name)}</b>
           {row.email && row.email !== row.name && <small className="client-email">{row.email}</small>}
           {from && <small className="client-from">{from}</small>}
-          <small>{clientLine(row, today)}</small>{newProfileChanges(row) > 0 && <small className="profile-new">{wn("clientweek.profileChanges", newProfileChanges(row))}</small>}</div></div>
-        {phaseDay(row) && row.measured ? <PhaseBars m={measuredNow(row)!} /> : <WeekBars row={row} />}
+          <small>{clientLine(row, today)}</small>{lastActiveText(row.activity) && <small className="last-active">{lastActiveText(row.activity)}</small>}{newProfileChanges(row) > 0 && <small className="profile-new">{wn("clientweek.profileChanges", newProfileChanges(row))}</small>}</div></div>
+        {phaseDay(row) && row.measured ? <PhaseBars m={measuredNow(row)!} row={row} /> : <WeekBars row={row} />}
       </button>
       {saveNote && !today && (
         <div className="client-note-own" onClick={stop}>

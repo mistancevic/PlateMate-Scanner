@@ -32,12 +32,16 @@ export type Measured = {
 };
 export type MeasuredFixed = { kcal: number; from: string; to: string; at: string };
 
-// A full day: every planned meal closed (eaten, swapped or skipped on purpose), and every meal slot of the day accounted
-// for, by a meal in it, a skip, or an extra logged instead. Lines from before 0.2.7 carry no slot count: planned and closed.
+// A full day: every meal slot of the day accounted for, by a meal in it, a skip on purpose, or an extra logged instead; every
+// planned meal closed (eaten, swapped or skipped). Lines from before 0.2.7 carry no slot count: planned and closed.
+// DT340 (0.3.182, board Stories282, AC6; Coach Milan 22 November 19:02): with or without a plan, and something was eaten. A day
+// with a plan where a planned meal was left unanswered is still not full. Every day line is drawn from the data again at each
+// save, so the days of the first two weeks already gone by are counted again by this rule.
 export function fullOf(l: DayLine): boolean {
-  if (l.when !== "past" || l.planned === 0 || l.open > 0 || l.missed > 0) return false;
-  if (typeof l.slotCount !== "number") return true;
-  return l.byPlan + l.swapped + l.skipped + l.extras.length >= l.slotCount;
+  if (l.when !== "past" || l.open > 0 || l.missed > 0) return false;
+  if (typeof l.slotCount !== "number") return l.planned > 0;
+  const ate = l.byPlan + l.swapped + l.extras.length;
+  return ate > 0 && ate + l.skipped >= l.slotCount;
 }
 export const daysFromLines = (lines: Record<string, DayLine> | undefined): Record<string, DayIn> =>
   Object.fromEntries(Object.entries(lines ?? {}).map(([k, l]) => [k, { kcal: l.kcal, full: typeof l.full === "boolean" ? l.full : fullOf(l), logged: l.byPlan + l.swapped + l.extras.length > 0 }]));

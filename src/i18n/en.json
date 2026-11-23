@@ -264,7 +264,7 @@
     "text": "What you ate.",
     "gender": true
   },
-  "measured.theAverageOfYourFull": "The average of your full days: every planned meal eaten, swapped or skipped on purpose, and anything extra logged. Days with a meal missing don't count.",
+  "measured.theAverageOfYourFull": "The average of your full days: every meal of your day eaten, swapped or skipped on purpose, with or without a plan, and anything extra logged. Days with a meal missing don't count.",
   "measured.whatYourWeightDid": "What your weight did.",
   "measured.theBurn": "The burn.",
   "measured.whatYouAtePlusKcal": "What you ate, plus 7,700 kcal for each kg the line went down, or minus for each kg it went up, spread over the 14 days.",
@@ -3182,7 +3182,7 @@
   "measured.capsDay": " · DAY {day} OF {of}",
   "measured.weighFrom": "Weigh-ins from day {day}",
   "measured.weighIns": "Weigh-ins",
-  "measured.fullDayIs": "A full day: every planned meal eaten, swapped or skipped on purpose, and anything extra logged. Weigh in in the morning, before breakfast.",
+  "measured.fullDayIs": "A full day: every meal of your day eaten, swapped or skipped on purpose, with or without a plan, and anything extra logged. Weigh in in the morning, before breakfast.",
   "measured.firstDaysWater": " The first {n} days' weigh-ins don't count: early changes are mostly water.",
   "measured.readyOn": "Ready on {date} at the earliest.",
   "goal.band.recomp": "Recomposition",
@@ -6353,5 +6353,19 @@
   "label.line.zinc": "Zinc",
   "label.line.potassium": "Potassium",
   "label.line.iodine": "Iodine",
-  "label.line.vitamin": "Vitamin {x}"
+  "label.line.vitamin": "Vitamin {x}",
+  "clientweek.keyActive": "Amber: active",
+  "clientweek.keyOpened": "Grey: opened only",
+  "clientweek.keyEmpty": "Empty: not opened",
+  "clientweek.keyTodo": "Dashed: still to come",
+  "clientweek.lastActive": "Last active: {when}",
+  "clientweek.activeToday": "today {time}",
+  "clientweek.activeYesterday": "yesterday {time}",
+  "clientweek.activeDaysAgo": "{n} days ago, {day}",
+  "coach.waitQuiet": "Quiet for {n} days",
+  "coach.waitQuietWhen": "last opened the app {date}",
+  "coach.waitQuietN": {
+    "one": "a client quiet",
+    "other": "{n} clients quiet"
+  }
 }
