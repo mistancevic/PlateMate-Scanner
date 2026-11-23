@@ -64,8 +64,10 @@ const answer = { options: [
   // CH4: the kitchens you cook
   await page.goto(U + "/me/shop"); await page.waitForTimeout(1100);
   ok(/Where I shop and cook/.test(await page.locator(".menu-title").textContent()) && await page.getByRole("group", { name: "The kitchens you cook" }).locator(".choice.on").count() === 3, "CH4: Where I shop and cook, with the three kitchens picked");
+  // changed by DT334 (0.3.178, board Stories278): up to 3 kitchens; with three picked, one goes off before another comes in
+  await page.getByRole("group", { name: "The kitchens you cook" }).getByRole("button", { name: /Mediterranean$/ }).click(); await page.waitForTimeout(200);
   await page.getByRole("group", { name: "The kitchens you cook" }).getByRole("button", { name: "Indian" }).click(); await page.waitForTimeout(300);
-  ok((await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).kitchens)).includes("Indian"), "CH4: a tap adds a kitchen");
+  ok((await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).kitchens)).includes("Indian"), "CH4: a tap adds a kitchen, once one of the three is off (DT334)");
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");
   process.exit(fails.length ? 1 : 0);

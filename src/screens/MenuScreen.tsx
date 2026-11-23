@@ -21,7 +21,7 @@ import { ConfirmButton } from "../components/Confirm";
 import { WeightField, HeightField } from "../components/UnitFields";
 import { cleanUnits, asF, ftIn, kgToLb, wText, wIn, type Units } from "../units";
 import { RHYTHMS, REGIONS } from "../moments";
-import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, KITCHENS, EQUIPMENT, equipmentOf, type Personal, type DayType } from "../personal";
+import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, KITCHENS, pickKitchen, EQUIPMENT, equipmentOf, type Personal, type DayType } from "../personal";
 import { CHEF_NAME } from "../components/Mark";
 import { KITCHEN, tasteOf, another, anotherLeft, undo, type Taste } from "../kitchens";
 import { slotsOf, windowOf, workHoursOf, timesFromWork, timesFromSleep, sleepWindow, SLOT_HOURS, toMin } from "../slots";
@@ -719,6 +719,7 @@ function ShopPanel(p: AppApi) {
 
 // The kitchens you cook and what you cook with: on Me, Where I shop and cook, and in setup's step 4 (DT142, 0.2.127)
 export function KitchensAndTools(p: AppApi) {
+  const [full, setFull] = useState(false);
   return (
     <>
     {/* The kitchens you cook (0.2.9, canvas board CH, CH4): the shops say what you can buy, the kitchens what you like to cook */}
@@ -726,8 +727,10 @@ export function KitchensAndTools(p: AppApi) {
     <section className="card kitchens" style={{ gap: 8 }}>
       <small>{w("shopp.cooksFirst")}</small>
       <div className="moments" role="group" aria-label={w("menu.theKitchensYouCook")}>
-        {KITCHENS.map((k) => { const on = (p.personal.kitchens ?? []).includes(k); return <button key={k} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, kitchens: on ? (p.personal.kitchens ?? []).filter((x) => x !== k) : [...(p.personal.kitchens ?? []), k] })}>{optWord(k)}</button>; })}
+        {KITCHENS.map((k) => { const on = (p.personal.kitchens ?? []).includes(k); return <button key={k} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => { const r = pickKitchen(p.personal.kitchens, k); setFull(r.full); if (!r.full) p.setPersonal({ ...p.personal, kitchens: r.list }); }}>{optWord(k)}</button>; })}
       </div>
+      {/* DT334 (0.3.178): up to 3; a fourth tap picks nothing and says so */}
+      {full && <small className="kitchens-full" role="status">{w("shopp.upToThree")}</small>}
       {/* What a kitchen means (0.2.10, board CH, CH7): a line, three dishes Chef Mealan would cook you, Another and Undo */}
       {(p.personal.kitchens ?? []).filter((k) => KITCHEN[k]).map((k) => {
         const t = tasteOf(p.personal, k), set = (next: Taste) => p.setPersonal({ ...p.personal, kitchenTaste: { ...(p.personal.kitchenTaste ?? {}), [k]: next } });

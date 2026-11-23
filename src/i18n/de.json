@@ -10246,7 +10246,7 @@
       "checked": true
     },
     "shopp.cooksFirst": {
-      "text": "Chef Mealan kocht vor allem in diesen Küchen: die Aromen, die Kräuter, wie eine Mahlzeit aufgebaut ist. Wähl eine oder mehrere.",
+      "text": "Chef Mealan kocht vor allem in diesen Küchen: die Aromen, die Kräuter, wie eine Mahlzeit aufgebaut ist. Wähl bis zu 3.",
       "checked": true
     },
     "shopp.stepsForWhatYouHave": {
@@ -22943,6 +22943,10 @@
     },
     "plate.whichMealFirst": {
       "text": "Welche Mahlzeit ist es? Wähl sie aus, und Chef Mealan findet Ideen dafür.",
+      "checked": true
+    },
+    "shopp.upToThree": {
+      "text": "Bis zu 3. Tipp zuerst eine ab.",
       "checked": true
     }
   }

@@ -1,6 +1,6 @@
 {
-  "release": "0.3.176",
-  "at": "2026-11-22T22:51:02.979Z",
+  "release": "0.3.178",
+  "at": "2026-11-23T07:44:47.782Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -51485,6 +51485,41 @@
       "release": "0.3.176",
       "order": 900001,
       "at": "2026-11-22T22:51:02.979Z"
+    },
+    {
+      "id": "screen.shopp.cooksFirst",
+      "kind": "screen",
+      "key": "shopp.cooksFirst",
+      "en": "Chef Mealan cooks in these first: the tastes, the herbs, how a meal is put together. Pick up to 3.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Menu and settings",
+      "where": "Menu, Profile, Goal and Shop",
+      "enBefore": "Chef Mealan cooks in these first: the tastes, the herbs, how a meal is put together. Pick one or more.",
+      "sr": "Chef Mealan prvo kuva u ovima: ukusi, začini, kako se obrok slaže. Izaberi najviše 3.",
+      "de": "Chef Mealan kocht vor allem in diesen Küchen: die Aromen, die Kräuter, wie eine Mahlzeit aufgebaut ist. Wähl bis zu 3.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.178",
+      "order": 900000,
+      "at": "2026-11-23T07:44:47.782Z"
+    },
+    {
+      "id": "screen.shopp.upToThree",
+      "kind": "screen",
+      "key": "shopp.upToThree",
+      "en": "Up to 3. Tap one off first.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Najviše 3. Prvo isključi jednu.",
+      "de": "Bis zu 3. Tipp zuerst eine ab.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.178",
+      "order": 900001,
+      "at": "2026-11-23T07:44:47.782Z"
     }
   ]
 }
