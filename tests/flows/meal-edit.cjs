@@ -71,7 +71,8 @@ const hm = (iso) => new Date(iso).toLocaleTimeString("en-GB", { timeZone: "Europ
   // ---- AC9: back to no meal selected
   await p.locator(open + " .pcal-row.pcal-looking").click(); await p.waitForTimeout(500);
   ok(await ln(p) === "No meal selected" && /^✓\s*No meal selected$/.test((await p.locator(open + " .pcal-row.on").innerText()).replace(/\s+/g, " ").trim()) && /What do you do with it\?/.test(await h.main(p)), "B150 AC9: a tap on the row No meal selected: the line says No meal selected again");
-  // ---- AC8: one dinner on the photo's day
+  // ---- AC8: one dinner on the photo's day. DT340 (0.3.182): a past meal with nothing planned has I skipped it, so the check
+  // reads the dinner alone: the planned Chicken rice bowl is gone and the dinner is not open
   await h.row(p, "Dinner", open).click(); await p.waitForTimeout(600);
   ok(await ln(p) === "Dinner Saturday, 14 November, 19:30", "the time set for Saturday's dinner is still 19:30 when Dinner is set again");
   await p.locator(".meal-line .plan-line-close").click(); await p.waitForTimeout(400);
@@ -80,7 +81,7 @@ const hm = (iso) => new Date(iso).toLocaleTimeString("en-GB", { timeZone: "Europ
   ok(e.length === 1 && e[0].slot.date === "2026-11-14" && e[0].slot.slotId === "dinner" && day(e[0].createdAt) === "2026-11-14" && hm(e[0].createdAt) === "19:30", "B150 AC8: logged as eaten: one record, Saturday's dinner, on Saturday at 19:30");
   await p.locator("main button").filter({ hasText: /^Sat 14/ }).first().click(); await p.waitForTimeout(700);
   let sat = await h.main(p);
-  ok(/Grilled chicken with rice Dinner, 19:30/.test(sat) && !/I skipped it/.test(sat), "B150 AC8: Saturday in the Plan shows my meal as Dinner, 19:30, and the planned Chicken rice bowl no longer asks");
+  ok(/Grilled chicken with rice Dinner, 19:30/.test(sat) && !/Chicken rice bowl/.test(sat) && !/Dinner, \d\d:\d\d Nothing added/.test(sat), "B150 AC8: Saturday in the Plan shows my meal as Dinner, 19:30, and the planned Chicken rice bowl no longer asks");
   await p.locator("main button").filter({ hasText: /^Today 15/ }).first().click(); await p.waitForTimeout(700);
   ok(!/Grilled chicken with rice (Breakfast|Lunch|Dinner)/.test(await h.main(p)) && /Dinner, 20:00 Chicken rice bowl/.test(await h.main(p)) && (await eaten(p)).every((f) => f.slot.date !== "2026-11-15"), "B150 AC8: today shows nothing of it: its planned dinner is as it was");
   // ---- AC10: a meal of today, when I mean today
@@ -109,7 +110,7 @@ const hm = (iso) => new Date(iso).toLocaleTimeString("en-GB", { timeZone: "Europ
   await p.goto(h.U + "/plan"); await p.waitForTimeout(1800);
   await p.locator("main button").filter({ hasText: /^Sat 14/ }).first().click(); await p.waitForTimeout(700);
   sat = await h.main(p);
-  ok(/Grilled chicken with rice Dinner, 20:00/.test(sat) && !/I skipped it/.test(sat), "B150 AC12: after the app opens it is Saturday's dinner, and Saturday's planned dinner no longer asks");
+  ok(/Grilled chicken with rice Dinner, 20:00/.test(sat) && !/Chicken rice bowl/.test(sat) && !/Dinner, \d\d:\d\d Nothing added/.test(sat), "B150 AC12: after the app opens it is Saturday's dinner, and Saturday's planned dinner no longer asks");
   await p.locator("main button").filter({ hasText: /^Today 15/ }).first().click(); await p.waitForTimeout(700);
   ok(!/Grilled chicken with rice (Breakfast|Lunch|Dinner)/.test(await h.main(p)) && /Dinner, 20:00 Chicken rice bowl/.test(await h.main(p)), "B150 AC12: today's dinner is open again, with its planned Chicken rice bowl");
   // ---- AC13: a plate without a photo
