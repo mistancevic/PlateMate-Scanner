@@ -4083,6 +4083,62 @@
       ],
       "short": "A day before the client's phone recorded reads o (not known), never not opened",
       "rel": "Built in 0.3.186; Go 23 November 2026, 17:44"
+    },
+    {
+      "id": "B160",
+      "title": "A meal eaten from a recipe keeps the first version after the recipe is changed",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): he cooked and logged it, then changed the recipe (feta in place of one quark pack, sesame and oil added). The recipe reads PD 4.9 a portion; the meal he ate, under Your cooks, still holds the first foods and PD 6.2. Meaning to agree: is the eaten meal changed with the recipe, or asked."
+    },
+    {
+      "id": "B161",
+      "title": "Typing a space at the end of a step's text drops the focus",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): in the recipe's steps, a space typed at the end of a step's text drops the focus from the field; typing only works right after the last word."
+    },
+    {
+      "id": "B162",
+      "title": "One part named twice on a recipe shows as two parts",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): Filling tagged on foods that are not next to each other shows two Filling groups (Filling, Base, Filling); they cannot be brought together."
+    },
+    {
+      "id": "B163",
+      "title": "A food's name with a comma is cut in the steps, and written in small letters",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): seen in the screenshot: step 1 says 250 g körniger frischkäse tworog 2, for Körniger Frischkäse Tworog 2,5% Fett; the name is cut at the comma and every food name is in small letters."
+    },
+    {
+      "id": "B164",
+      "title": "The link to show more of my recipes is almost invisible",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): on Recipes, the link below the list that shows more of my recipes is almost invisible."
+    },
+    {
+      "id": "DT345",
+      "title": "A step can be put between two steps",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): a step can only be added at the end. He needed one between (spray the oil over the batter, sprinkle the sesame); Chef Mealan wrote oil for the tray instead."
+    },
+    {
+      "id": "DT346",
+      "title": "Editing a recipe and making a new one look different",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): confusing when the recipe is in edit mode and when the Plate is not editing it but making a new recipe."
+    },
+    {
+      "id": "DT347",
+      "title": "Recipes: the newest first, and the filters as chips that open and close",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it."
     }
   ]
 }
