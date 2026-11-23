@@ -28,7 +28,7 @@ parts = [("Ticket", "DT339. This board is the ticket: everything about it is her
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "22 November 18:43 to 18:46: a scanned label showed Greek food names; the pack prints each line in Czech, Croatian, Bulgarian and Greek. Yes, a ticket in Next. 23 November 11:17: Draw."),
-  ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Open", t["open"][0]), ("Looked at, not chosen", t["looked_at"]),
+  ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "DT339", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
 y = 30
@@ -52,7 +52,7 @@ arrow(X(1) - G + 2, y2 + 400)
 R3 = [shot(X(2), y2, "3a", PW, "DT339.3a The card in Srpski", "changed", "Energija, Masti, Ugljeni hidrati; the printed name under each.")]
 # DT339.4 (Coach Milan 23 November 11:41): the open point drawn, option B, the printed name behind a tap
 y4 = max(RB + R3) + 70
-label(y4, "DT339.4 Option B, behind a tap", "to compare with DT339.2a: names only, until I tap", 0, 2)
+label(y4, "DT339.4 Option B, behind a tap", "looked at, not chosen (11:52): A is the one", 0, 2)
 y4 += 60
 R4 = [shot(X(0), y4, "4a", PW, "DT339.4a The pack's card", "changed", "Only the app's names; a › on each line that has a printed name. I tap Fat."),
   shot(X(1), y4, "4b", PW, "DT339.4b Fat opens", "changed", "Its name as printed, under it. A second tap closes it.")]
@@ -61,7 +61,7 @@ bs = RB + R3 + R4
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories280.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket DT339, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.179 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories279.dc.html")
+board("Stories280.dc.html", t["boardTitle"], "Drawn 23 November 2026; option A chosen 11:52, Go 11:53. Ticket DT339, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.179 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories279.dc.html")
 inner = B.render(W, Hc)
 json.dump({"DT339": {"file": "Stories280.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out339.json"), "w"))
 print("DT339", W, Hc + 230)

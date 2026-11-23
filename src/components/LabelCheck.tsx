@@ -3,6 +3,7 @@ import { Check, Globe, MessageCircle, TriangleAlert } from "lucide-react";
 import { type DayType } from "../personal";
 import { Food, KEYS, density, lessThanFromNotes, numberInput, servingOf, servingsFor, snapToServing, validateFood } from "../pilot";
 import { KNOWN, type LabelRow, type Unit, displayRows, knownOf, sortEuropean, tidy } from "../labeltable";
+import { shownName, printedUnder } from "../labelNames";
 import { type Mix, type MixTip, mixLabel } from "../mixtip";
 import { SOURCES, dayName, fitnessFor } from "../fitness";
 import { type WordKey, w } from "../words";
@@ -292,14 +293,14 @@ export function LabelCheck({
           const core = knownOf(r.key)?.core;
           return (
             <div className={`lt-row ${r.sub ? "sub" : ""}`} key={r.key + i}>
-              <span className="lt-name">{r.name}{r.source === "you" && <em> · {w("app.rowByYou")}</em>}{r.source === "database" && <em> · {w("app.rowDatabase")}</em>}{r.source === "photo" && <em className="from-photo"> · {w("app.rowFromPhoto")}</em>}</span>
+              <span className="lt-name">{shownName(r)}{printedUnder(r) && <small className="lt-printed">{printedUnder(r)}</small>}{r.source === "you" && <em> · {w("app.rowByYou")}</em>}{r.source === "database" && <em> · {w("app.rowDatabase")}</em>}{r.source === "photo" && <em className="from-photo"> · {w("app.rowFromPhoto")}</em>}</span>
               {/* 0.2.121 (Tester 2, Milan 28 October 15:26): a row like salt kept only the number, so "0." became 0 and a decimal
                   could not be typed. What you type stays as typed and counts when you leave the field */}
-              <input inputMode="decimal" aria-label={r.name} value={core ? values[core] : rowDraft[i] ?? (r.amount ?? "")} placeholder="–"
+              <input inputMode="decimal" aria-label={shownName(r)} value={core ? values[core] : rowDraft[i] ?? (r.amount ?? "")} placeholder="–"
                 onChange={(e) => core ? setValues((v) => ({ ...v, [core]: e.target.value })) : setRowDraft((d) => ({ ...d, [i]: e.target.value }))}
                 onBlur={(e) => { if (core) return; const t = e.target.value; setRows((rs) => rs.map((x, j) => j === i ? { ...x, amount: numberInput(t) } : x)); setRowDraft((d) => { const n = { ...d }; delete n[i]; return n; }); }} />
               <span className="lt-unit">{r.unit}</span>
-              {!core ? <button className="lt-x" aria-label={w("app.removeRow", { name: r.name })} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}>×</button> : <span className="lt-x" />}
+              {!core ? <button className="lt-x" aria-label={w("app.removeRow", { name: shownName(r) })} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}>×</button> : <span className="lt-x" />}
             </div>
           );
         })}

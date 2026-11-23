@@ -10,6 +10,7 @@ import { mixLabel, mixKindName, type Mix, type MixTip } from "../mixtip";
 import { log } from "../log";
 import { density, type Food } from "../pilot";
 import { displayRows } from "../labeltable";
+import { shownName, printedUnder } from "../labelNames";
 import { useEffect } from "react";
 import { JOBS, jobOf, plainLine, todayLine, jobName } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
@@ -168,7 +169,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         <div className="label-table label-table-read" aria-label={w("foodcard.nutritionTablePerG")}>
           {displayRows(food).map((r, i) => (
             <div className={`lt-row ${r.sub ? "sub" : ""}`} key={r.key + i}>
-              <span className="lt-name">{r.name}{r.source === "you" && <em> · {w("foods.addedByYou")}</em>}{r.source === "photo" && <em> · {w("foods.readFromPhoto")}</em>}</span>
+              <span className="lt-name">{shownName(r)}{printedUnder(r) && <small className="lt-printed">{printedUnder(r)}</small>}{r.source === "you" && <em> · {w("foods.addedByYou")}</em>}{r.source === "photo" && <em> · {w("foods.readFromPhoto")}</em>}</span>
               <b className="lt-val">{r.amount == null ? "–" : fmt(r.amount, r.unit === "kcal" ? 0 : 1)}</b>
               <span className="lt-unit">{r.unit}</span>
             </div>

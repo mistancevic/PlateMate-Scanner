@@ -1,4 +1,5 @@
 // A food's nutrition table as printed: every line, in order. Known lines are recognised in several languages.
+import { knownName, microOf, partsOf, stemOf } from "./labelNames";
 export type Unit = "kcal" | "kJ" | "g" | "mg" | "µg" | "%";
 export type LabelRow = { key: string; name: string; amount: number | null; unit: Unit; sub: boolean; source: "label" | "database" | "you" | "photo" };
 type Known = { key: string; name: string; sub: boolean; unit: Unit; re: RegExp; core?: "calories" | "fats" | "carbs" | "fiber" | "protein" };
@@ -24,7 +25,15 @@ export const KNOWN: Known[] = [
 ];
 const ORDER = KNOWN.map((k) => k.key);
 // "davon Zucker" before "Zucker" etc.: strip the "of which" words, then look for a known line
+// DT339 (0.3.180): a line printed in several languages, joined with slashes, is read part by part, and more languages count
+// (src/labelNames.ts). The whole name first, then each part; a vitamin or mineral the app knows by name after that.
 export function recognise(name: string): string {
+  const tries = [name, ...partsOf(name)];
+  for (const t of tries) { const k = recogniseOne(t); if (!k.startsWith("other:") && !k.startsWith("micro:")) return k; const s = stemOf(t); if (s) return s; }
+  for (const t of tries) { const m = microOf(t); if (m) return m; }
+  return recogniseOne(name);
+}
+function recogniseOne(name: string): string {
   const n = name.toLowerCase().replace(/^(davon|of which|od toga|od čega|de los cuales|waarvan|dont|di cui)\s*/i, "").trim();
   // "ungesättigt" contains "gesättigt": the unsaturated lines are checked before the saturated one
   const first = ["mono", "poly", "trans", "polyols", "addedsugars"];
@@ -51,8 +60,8 @@ export function sortEuropean(rows: LabelRow[]): LabelRow[] {
 }
 // the rows a table shows: the printed ones, plus the core values when the table lacks them, in a sensible place
 export function displayRows(food: { table?: LabelRow[]; calories: number | null; fats: number | null; carbs: number | null; fiber: number | null; protein: number | null }): LabelRow[] {
-  // a line saved without its tag gets recognised again from its printed name
-  const rows = (food.table ?? []).map((r) => (r.key ? r : { ...r, key: recognise(r.name) })).filter((r) => !(r.key === "energy" && r.unit === "kJ"));
+  // a line saved without its tag gets recognised again from its printed name; DT339 AC6: so does a line saved as not known
+  const rows = (food.table ?? []).map((r) => (r.key && !(r.key.startsWith("other:") || (r.key.startsWith("micro:") && !knownName(r.key))) ? r : { ...r, key: recognise(r.name) })).filter((r) => !(r.key === "energy" && r.unit === "kJ"));
   const have = new Set(rows.map((r) => r.key));
   const add: LabelRow[] = [];
   for (const k of KNOWN) if (k.core && !have.has(k.key)) add.push({ key: k.key, name: k.name, amount: (food as any)[k.core] ?? null, unit: k.unit, sub: false, source: "label" });

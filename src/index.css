@@ -3678,3 +3678,5 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .seg-high { background: var(--high); color: #172742; } .seg-top { background: var(--top); color: #fff; }
 .pd-scale .pd-scale-range { font-size: 11.5px; text-align: center; color: #172742; margin-top: 4px; }
 .readout-mid .pd-tap { cursor: pointer; }
+/* DT339 (0.3.180): the printed name of a table line, small under the app's own name */
+.lt-name .lt-printed { display: block; font-size: 12px; font-weight: 600; color: var(--muted); line-height: 1.3; margin-top: 2px; }

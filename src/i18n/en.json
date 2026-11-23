@@ -6338,5 +6338,20 @@
   "plate.pdScaleTitle": "What the colour means, for your target {t}. This plate: {pd}.",
   "plate.pdScaleOpen": "What the colour means",
   "plate.highPlan": "High, above your plan",
-  "plate.topPlan": "High+, far above your plan"
+  "plate.topPlan": "High+, far above your plan",
+  "label.line.trans": "of which trans fat",
+  "label.line.mono": "of which mono-unsaturates",
+  "label.line.poly": "of which polyunsaturates",
+  "label.line.cholesterol": "Cholesterol",
+  "label.line.addedsugars": "of which added sugars",
+  "label.line.starch": "of which starch",
+  "label.line.sodium": "Sodium",
+  "label.line.alcohol": "Alcohol",
+  "label.line.calcium": "Calcium",
+  "label.line.iron": "Iron",
+  "label.line.magnesium": "Magnesium",
+  "label.line.zinc": "Zinc",
+  "label.line.potassium": "Potassium",
+  "label.line.iodine": "Iodine",
+  "label.line.vitamin": "Vitamin {x}"
 }
