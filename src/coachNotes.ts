@@ -1,3 +1,4 @@
+import { firstOf } from "./clientName";
 import { w, wn, wordV, dateText, type Val } from "./words";
 // The coach's note and the check-in day (0.2.6, canvas board CW, CW4 to CW6). One thread per client in the client's own
 // account: the coach's weekly note (Approve the week or Change the numbers, one line), and the client's replies.
@@ -60,7 +61,7 @@ const REASON_WORDS: Record<string, "coach.askLook" | "coach.askOk" | "coach.askH
 export function waitingFor(rows: WaitingRow[], seen: Set<string>, todayIndex: number, weekKey: string): Waiting[] {
   const out: Waiting[] = [];
   for (const r of rows) {
-    const first = r.name.split(" ")[0];
+    const first = firstOf(r.name); // B156: No name yet stays whole
     for (const f of r.feedback) {
       const key = `card|${r.uid}|${f.id}`;
       if (seen.has(key) || onCard(r.notes, f.id).length) continue;

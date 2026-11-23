@@ -7,7 +7,7 @@ import { getAuth, GoogleAuthProvider, EmailAuthProvider, signInWithPopup, signIn
 import { getLang } from "./lang";
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, deleteField, type Firestore } from "firebase/firestore";
 import { splitSave, mergeLoad, coachFieldsOf } from "./privateSplit";
-import { clientIdentity, keepName, type Joined, type Via } from "./clientName";
+import { clientIdentity, joinedNames, keepName, type Via } from "./clientName";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
 import { looseOut, photoSigsOf, sig, stripStepPics } from "./photos";
 
@@ -249,12 +249,12 @@ export async function saveClientNote(coachUid: string, clientUid: string, text: 
   notPaused();
   await setDoc(clientNotesRef(coachUid), { [clientUid]: text.trim() ? { text: text.trim().slice(0, 600), at: new Date().toISOString() } : deleteField() }, { merge: true });
 }
-export async function listClients(coachUid: string): Promise<ClientRow[]> {
+export async function listClients(coachUid: string, onLate?: (list: import("./clientName").Joined[]) => void, known?: import("./clientName").Joined[]): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
   const snap = await getDocs(q);
-  // B141: who joined with which invite: the name and email on it, and where they came from
-  const joined = new Map<string, Joined>();
-  try { const r = await fetch("/api/invites"); const d = await r.json(); for (const j of (d.joined ?? []) as Joined[]) joined.set(j.uid, j); } catch { /* the Profile names alone, then */ }
+  // B141: who joined with which invite: the name and email on it, and where they came from. B156 (0.3.181): when the invites
+  // do not load, the last good answer kept on this phone; asked once more a moment later (onLate)
+  const { joined } = await joinedNames(coachUid, onLate, undefined, known);
   const rows = await Promise.all(snap.docs.map(async (d) => {
     const x = d.data() as any;
     let feedback: any[] = [];

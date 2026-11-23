@@ -1,6 +1,7 @@
 // The coach's week on this phone only (0.2.6): without accounts (local runs and the walkthroughs) Clients can open with two
 // example clients, so the coach's pages can be seen and tested. Off on the live app: it needs accounts there.
 import { cloudEnabled, type ClientRow } from "./cloud";
+import { clientIdentity, joinedNames } from "./clientName";
 import { inLang } from "./lang";
 import { dayLineOf, type DayLine } from "./dayLines";
 import { slotsOf } from "./slots";
@@ -75,4 +76,14 @@ export function demoRows(): ClientRow[] {
       // DT172: Lena shares no body data: her coach sees the trend in percent and the days weighed, no kilogram
       weightTrend: pctTrend(trendOf(lWeighIns, "gainsteady", 64), 64), weighDates: lWeighIns.map((w) => w.date), weightAt: today },
   ];
+}
+
+// B156 (0.3.181, board Stories281): with chefmealan-coach-demo-invite set, a third client whose Profile name is empty, named from
+// the invites as listClients names it: the last good answer kept, asked once more a moment later (for the walkthrough of B156)
+export async function demoWithInvite(rows: ClientRow[], onLate?: (list: import("./clientName").Joined[]) => void, known?: import("./clientName").Joined[]): Promise<ClientRow[]> {
+  let on = false; try { on = localStorage.getItem("chefmealan-coach-demo-invite") === "1"; } catch { /* off */ }
+  if (!on) return rows;
+  const { joined } = await joinedNames("demo", onLate, undefined, known);
+  const base = rows[rows.length - 1];
+  return [...rows.filter((r) => r.uid !== "c3"), { ...base, uid: "c3", goal: null, notes: [], feedback: [], measured: null, ...clientIdentity("", joined.get("c3")) }];
 }

@@ -1,0 +1,1041 @@
+{
+ "version": "0.3.181",
+ "commit": "d7b768d",
+ "at": "2026-11-23T11:52:37.534Z",
+ "minutes": 1,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 74,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "beta-application.cjs",
+   "about": "DT279 (0.3.140, board Stories213; Coach Milan 11 November, 12 November 13:24 and 13:44, Go 13:49): a new beta tester application is the first thing in Waiting for you on Clients, as a full card, and counts in Waiting for you and the Clients badge. Invite sits on the right; Mark as handled sits on its own line below and needs a second tap. Handled, it leaves the top. Srpski and German. Changed by B155 (0.3.173, board B155; Coach Milan, Go 22 November 14:21): a request from a person already invited or already a client is not a new request: no card in Waiting for you, and the badge does not count it. Further down, under Access requests, it says what happened (Already a client, or Invited on that date and the code not used yet), and a request that came after the invite has one button that opens the mail app: Send how to sign in, or Send the code again. The server adds what the invites say to each request; here its answer is given in place of the server, and the rule itself has unit tests (src/applications.test.ts). New checks at the end, B155 AC1 to AC8.",
+   "pass": true,
+   "seconds": 51,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the application is the first thing in Waiting for you"
+    },
+    {
+     "ok": true,
+     "text": "it says New beta tester application"
+    },
+    {
+     "ok": true,
+     "text": "a full card: name, email, WhatsApp, their words"
+    },
+    {
+     "ok": true,
+     "text": "it counts in Waiting for you and the badge: 7, badge 7, 6 other rows"
+    },
+    {
+     "ok": true,
+     "text": "the handled one is not at the top"
+    },
+    {
+     "ok": true,
+     "text": "Invite is on the right"
+    },
+    {
+     "ok": true,
+     "text": "Mark as handled is on its own line, below and away from Invite"
+    },
+    {
+     "ok": true,
+     "text": "every button is 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "one tap: Sure? Tap again, nothing handled yet"
+    },
+    {
+     "ok": true,
+     "text": "Keep it: back, nothing handled"
+    },
+    {
+     "ok": true,
+     "text": "the second tap: handled, it leaves the top"
+    },
+    {
+     "ok": true,
+     "text": "Waiting for you and the badge drop by one"
+    },
+    {
+     "ok": true,
+     "text": "Invite: the invite is made and the request handled"
+    },
+    {
+     "ok": true,
+     "text": "after Invite the card leaves the top"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: Nova prijava za beta testiranje, fits 390 px"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the second tap in the language: Sigurno? Dodirni ponovo da označiš kao rešeno Zadrži Nestaje iz liste Čeka te, bez pozivnice."
+    },
+    {
+     "ok": true,
+     "text": "de: Neue Bewerbung für den Betatest, fits 360 px"
+    },
+    {
+     "ok": true,
+     "text": "de: the second tap in the language: Sicher? Noch einmal tippen, um als erledigt zu markieren Behalten Sie verschwindet aus Wartet auf dich, ohne Einladung."
+    },
+    {
+     "ok": true,
+     "text": "B155 AC8: a first request waits as a card with Invite and Mark as handled"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC1: she joined with my invite and sent the form once more: no card in Waiting for you, and the badge does not count it"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC3: further down her request says 2 requests and Already a client: Nina · from the home page · 2 requests 11/21/2026 nina@example.com WhatsApp +490000000 “I want to help test it.” Already"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC3: it has no Invite and no Mark as handled"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC5: Send how to sign in opens a mail to her that says she already has access and how to sign in"
+    },
+    {
+     "ok": true,
+     "text": "B155: the button is 44 px high, and the request is not greyed out"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC2: she is invited, the code is not used, and she sent the form once more: no card, and the badge does not count it"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC3: further down: 2 requests, Invited on 20 Nov. The code is not used yet."
+    },
+    {
+     "ok": true,
+     "text": "B155 AC4: Send the code again opens a mail to her with the same code and the steps"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC4: no new code is made"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC7: a request that waited when the invite was made by hand left Waiting for you and says Invited on 20 Nov; no button, she did not ask again"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC6: two requests before I answered: one card, 2 requests"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC6: Invite closes the card, and it does not come back"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 360: Schon Klient, Senden, wie man sich anmeldet, fits"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 360: the invited line and Code noch einmal senden, fits: st it.” Eingeladen am 20. Nov., der Code ist noch nicht eingelöst. Code noch einmal senden"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 390: Schon Klient, Senden, wie man sich anmeldet, fits"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 390: the invited line and Code noch einmal senden, fits: st it.” Eingeladen am 20. Nov., der Code ist noch nicht eingelöst. Code noch einmal senden"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 312 account writes from 13 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "client-card.cjs",
+   "about": "B141 (0.3.146, board Stories219; Coach Milan 14 November 2026, Go 13:08): a client is never unnamed, and the coach sees how they came in. The card shows the name, the email and where from; below it the coach's own note. Create invite needs a name. The home page form's note box says who reads it, and remembers the link it was opened from. The goal step is titled Your goal.",
+   "pass": true,
+   "seconds": 22,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the card: name, email, where from: N Nina nina@example.com From the home page form · QR · 4 November Lose fat · week 3 · check-in Monday Profile: 2 changes since you looked"
+    },
+    {
+     "ok": true,
+     "text": "nothing on Clients says unnamed"
+    },
+    {
+     "ok": true,
+     "text": "an invite made by hand: From your invite: L Lena lena@example.com From your invite · 17 November Build muscle · Steady · first two weeks, day 6 of 14 · check-in Monday"
+    },
+    {
+     "ok": true,
+     "text": "no note yet: Add a note"
+    },
+    {
+     "ok": true,
+     "text": "the box says only you see it"
+    },
+    {
+     "ok": true,
+     "text": "Cancel on the left, Save on the right: Cancel|Save"
+    },
+    {
+     "ok": true,
+     "text": "the note stays on the card, with Edit note: Your note: Met at the High Performers meetup, Friday 13 November. Edit note"
+    },
+    {
+     "ok": true,
+     "text": "writing a note does not open the client"
+    },
+    {
+     "ok": true,
+     "text": "buttons at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "a tap on the card opens the client"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: Preko prijave na početnoj stranici · QR; Dodaj belešku"
+    },
+    {
+     "ok": true,
+     "text": "de: Über das Formular auf der Startseite · QR; Notiz hinzufügen"
+    },
+    {
+     "ok": true,
+     "text": "the note box says what to write (DT299)"
+    },
+    {
+     "ok": true,
+     "text": "the form sends the name and the link it was opened from: {\"name\":\"Ana\",\"src\":\"qr\"}"
+    },
+    {
+     "ok": true,
+     "text": "no page errors: "
+    },
+    {
+     "ok": true,
+     "text": "save check: 76 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "client-names.cjs",
+   "about": "B156 (0.3.181, board Stories281; Go 23 November 2026, 12:43): Clients keeps the names it knew when the invites do not load. The example coach with a third client whose Profile name is empty (chefmealan-coach-demo-invite), named from the invites; the walkthrough answers or refuses /api/invites, as a promote would. AC1 the last good answer kept, AC2 one more try with no tap, AC3 No name yet whole, AC4 a new answer replaces the kept one.",
+   "pass": true,
+   "seconds": 31,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B156 AC1: the kept answer: Sara, sara.novak@example.com"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC3: a client never seen shows the whole line: No name yet"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: about 3 s later, with no tap, the name fills in: Sara, sara.novak@example.com"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: asked once more: 2"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: and not again: 2"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: two failures, two requests, still No name yet: 2, No name yet"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC4: the new answer, not the kept one: Sara"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC4: and it is kept from now on"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 96 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-phase-today.cjs",
+   "about": "B153 (0.3.170, board B153): the coach sees a client's first two weeks on the coach's today, not on the day her phone last saved. The coach demo: Lena is on day 6 of 14; her phone last saved 3 days ago (chefmealan-coach-demo-stale), on day 3. AC1 the outline is on today; AC2 the days since are amber; AC3 the days ahead are grey; AC4 her page says day 6 of 14 with the same squares; AC5 the full days under the bars are the green ones. Unchanged: with a phone that saved today the card is as before.",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B153: Lena's card says day 6 of 14"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC1: the outline is on day 6, today: good,good,look,look,look,today,none,none,none,none,none,none,none,none"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC2: days 3 to 5, from the day the phone saved, are amber"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC3: days 7 to 14 are grey, still to come"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC5: the full days are the green ones: 2 full days · 0 weigh-ins · ready 1 Dec"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC4: her page says day 6 of 14"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC4: her page has the same squares as her card"
+    },
+    {
+     "ok": true,
+     "text": "B153 unchanged: a phone that saved today keeps its days: good,good,look,good,good,today,none,none,none,none,none,none,none,none"
+    },
+    {
+     "ok": true,
+     "text": "B153 unchanged: a client in a normal week has one row of seven"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 48 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-views.cjs",
+   "about": "DT189 (0.3.31, board Stories138): Waiting for you at the top of Clients, the badge as its count, the strip in words on My day; Answer and Good or Seen under a shared card; the answer on the client's Today quoting the meal. DT188 (0.3.30, board Stories137; Coach Milan 31 October 12:56 to 13:00, 16:08, 16:26 Go): roles and navigation. Explorer is the fifth tab for everyone and leaves the menu. The coach is one account with two views, My day and My clients, switched at the top of Today; in My clients the bar keeps its order and Plate becomes Clients; Today, Plan and Recipes show the chosen client's, read-only, under the title My clients with the name below. The coach suggests a planned snack or an Explorer page; the client gets a card on Today with Accept and Not now (a reason as a chip or a line). The superadmin has Admin in the menu.",
+   "pass": true,
+   "seconds": 32,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the client's bar: Today, Plan, Plate, Recipes, Explorer: Today,Plan,Plate,Recipes,Explorer"
+    },
+    {
+     "ok": true,
+     "text": "five tabs, 44 px or more: 56,56,56,56,56"
+    },
+    {
+     "ok": true,
+     "text": "the menu: Foods and Me stay, Explorer left, no Admin for a client"
+    },
+    {
+     "ok": true,
+     "text": "a suggestion is a card on Today, newest first: Coach Milan suggests. Nothing changes until you tap.A page: The body: The gutOpe"
+    },
+    {
+     "ok": true,
+     "text": "the badge on Today counts the two suggestions"
+    },
+    {
+     "ok": true,
+     "text": "Not now: four reasons as chips, and a line"
+    },
+    {
+     "ok": true,
+     "text": "the answer is on the thread: not now, ask me at the check-in"
+    },
+    {
+     "ok": true,
+     "text": "the next suggestion: the snack"
+    },
+    {
+     "ok": true,
+     "text": "Accept: the snack is on Plan for seven days, source coach: 7"
+    },
+    {
+     "ok": true,
+     "text": "the time is on each date; the Lifestyle default is untouched"
+    },
+    {
+     "ok": true,
+     "text": "accepted: the card goes; the answer is on the thread"
+    },
+    {
+     "ok": true,
+     "text": "the answer on Today quotes the meal and its time, with Got it"
+    },
+    {
+     "ok": true,
+     "text": "the coach: no switch, six tabs, Clients the sixth: Today,Plan,Plate,Recipes,Explorer,Clients"
+    },
+    {
+     "ok": true,
+     "text": "six tabs, each 44 px or more wide: 61,61,61,61,61,61"
+    },
+    {
+     "ok": true,
+     "text": "Clients, its own tab"
+    },
+    {
+     "ok": true,
+     "text": "a client's page: Today, Week, Shared, Goal; it opens on Week"
+    },
+    {
+     "ok": true,
+     "text": "Today: Suggest, a planned snack, a page from Explorer"
+    },
+    {
+     "ok": true,
+     "text": "the suggestion is listed as waiting"
+    },
+    {
+     "ok": true,
+     "text": "Shared: the cards the client sent"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the goal, the formula"
+    },
+    {
+     "ok": true,
+     "text": "Recipes is the coach's own"
+    },
+    {
+     "ok": true,
+     "text": "Today is the coach's own"
+    },
+    {
+     "ok": true,
+     "text": "Me for a coach: no My coach; Your summary after Where I shop and cook: Profile,Goal,Lifestyle,Training week,Google Calendar,Where I shop and cook,Your summary,Account"
+    },
+    {
+     "ok": true,
+     "text": "My day: the strip in words: 6 things wait on Clients: 4 cards shared, 2 check-ins today. Open Clients ›"
+    },
+    {
+     "ok": true,
+     "text": "Clients opens with Waiting for you, one row per thing: 6"
+    },
+    {
+     "ok": true,
+     "text": "the badge on Clients is the list's count: 6"
+    },
+    {
+     "ok": true,
+     "text": "the row opens the client's page with Answer under the shared cards"
+    },
+    {
+     "ok": true,
+     "text": "Send: the card shows the answer and Answer again; the field folds"
+    },
+    {
+     "ok": true,
+     "text": "Answer again opens the field with Cancel"
+    },
+    {
+     "ok": true,
+     "text": "Cancel folds it"
+    },
+    {
+     "ok": true,
+     "text": "0.3.32: the way back says what waits one level up: ‹ Clients · 5 waiting"
+    },
+    {
+     "ok": true,
+     "text": "Good: a reaction on the card only"
+    },
+    {
+     "ok": true,
+     "text": "answered rows left the list: 6 then 5 (opened: Nina · look at this Pizza, 3 slicesWedne)"
+    },
+    {
+     "ok": true,
+     "text": "Admin: people and roles, the privacy tracker, the walkthroughs"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-week.cjs",
+   "about": "The coach's week, 0.2.6 (canvas board CW, Milan 13 and 15 October 2026). Skip a meal on purpose on Today; the coach's note on Today; Clients with check-ins and the week as bars; a client's page with the week, a day opened, the note, the check-in day and a goal from a date. Without accounts, Clients opens on two example clients (?coachdemo).",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Skip: the row says Skipped on purpose, with Undo"
+    },
+    {
+     "ok": true,
+     "text": "the skip is kept with the plan"
+    },
+    {
+     "ok": true,
+     "text": "Undo brings the meal back"
+    },
+    {
+     "ok": true,
+     "text": "Today shows the coach's note"
+    },
+    {
+     "ok": true,
+     "text": "Got it: the note leaves Today and is marked read"
+    },
+    {
+     "ok": true,
+     "text": "the coach's bar: six tabs, Clients the sixth"
+    },
+    {
+     "ok": true,
+     "text": "Clients starts with Check-ins today"
+    },
+    {
+     "ok": true,
+     "text": "a client row: seven bars in one row and the days lived by the plan"
+    },
+    {
+     "ok": true,
+     "text": "DT302: Saturday and Sunday are shaded"
+    },
+    {
+     "ok": true,
+     "text": "DT302: the key line names what shows, in a week's words: Outline: today · Dot: weigh-in · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "the client opens on a page of her own, with the week"
+    },
+    {
+     "ok": true,
+     "text": "today says so far"
+    },
+    {
+     "ok": true,
+     "text": "last week: lived days with ✓, a changed day with what changed"
+    },
+    {
+     "ok": true,
+     "text": "a day: planned against eaten per meal, the extra, the words only from a shared card"
+    },
+    {
+     "ok": true,
+     "text": "the note is sent and listed"
+    },
+    {
+     "ok": true,
+     "text": "the check-in day changes"
+    },
+    {
+     "ok": true,
+     "text": "the date is on the button"
+    },
+    {
+     "ok": true,
+     "text": "the goal waits for its date"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "first-two-weeks.cjs",
+   "about": "The first two weeks and the measured burn (0.2.7, canvas board FT): Today, Me, Goal, the calculator and the coach, from real meals and weigh-ins, with the clock on day 6 (Thursday 15 October) and day 14 (Friday 23 October). The example person of the board: male, 1981, 182 cm, 95 kg, the first goal on Saturday 10 October.",
+   "pass": true,
+   "seconds": 26,
+   "checks": [
+    {
+     "ok": true,
+     "text": "FT1: Today has the getting to know you card"
+    },
+    {
+     "ok": true,
+     "text": "FT1: day 6 of 14, 4 full days, 4 weigh-ins"
+    },
+    {
+     "ok": true,
+     "text": "FT1: the squares: full|full weighed|part weighed|full|full weighed|today weighed|todo"
+    },
+    {
+     "ok": true,
+     "text": "FT3: measuring, 4 of 10 full days, 2 of 7 weigh-ins from day 4, ready on 23 October"
+    },
+    {
+     "ok": true,
+     "text": "FT3: the formula line with its number"
+    },
+    {
+     "ok": true,
+     "text": "FT0 fixed: the formula text starts at the left, Change on the same line {\"left\":17,\"same\":true}"
+    },
+    {
+     "ok": true,
+     "text": "FT5: From your data is greyed until day 14"
+    },
+    {
+     "ok": true,
+     "text": "FT2: the getting to know you card is gone on day 14"
+    },
+    {
+     "ok": true,
+     "text": "FT2: 2,520 kcal a day, give or take 75, 12 full days, 11 weigh-ins: ✓ YOUR BURN IS MEASURED2,520kcal a dayGive or take 75. From your 14 days: 12 full days and 11 weigh-ins. The formula said 2,650. Your numbers stay as they are u"
+    },
+    {
+     "ok": true,
+     "text": "FT2: Got it takes the card away"
+    },
+    {
+     "ok": true,
+     "text": "FT2: and it stays away"
+    },
+    {
+     "ok": true,
+     "text": "FT4: the measured burn, its range, the three steps"
+    },
+    {
+     "ok": true,
+     "text": "FT5: Use my data opens the calculator with From your data picked"
+    },
+    {
+     "ok": true,
+     "text": "FT5: 130 kcal a day less than Mifflin St Jeor"
+    },
+    {
+     "ok": true,
+     "text": "FT5: the days, 2,250 on average (2,520 × 0.9), 150 less, the source: 50 kcal at PD 8.0, with 4 training days and 3 without. From your data: 150 kcal less than with the formula.Protein and fat stay the same every day. Carbs go up and down with your training. The days come from your Training week. Sources: your own 14 days, 10 Oct to 23 Oct; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004."
+    },
+    {
+     "ok": true,
+     "text": "FT5: each day about 130 less, to the nearest 50: 2,450 2,100 2,400 2,100 2,450 2,300 2,100"
+    },
+    {
+     "ok": true,
+     "text": "applied: From your data, 2,520 fixed with its dates"
+    },
+    {
+     "ok": true,
+     "text": "applied: the week's average is 2,250: 2250"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the formula line says From your data, 2,520"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the card says which number is in use"
+    },
+    {
+     "ok": true,
+     "text": "eating declared: nothing on Today"
+    },
+    {
+     "ok": true,
+     "text": "eating declared: no measured burn on Goal"
+    },
+    {
+     "ok": true,
+     "text": "FT6: Lena in her first two weeks: her fourteen days, in two rows of seven (DT302, 0.3.150, board Stories224)"
+    },
+    {
+     "ok": true,
+     "text": "DT302: the key line in the first two weeks' words: Green: full day · Amber: not fully logged · Outline: today · Dot: weigh-in · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "DT302: four weekend days shaded, in the same places in both rows: ww-----ww-----"
+    },
+    {
+     "ok": true,
+     "text": "FT7: Nina's burn on her page, with the gap line"
+    },
+    {
+     "ok": true,
+     "text": "FT7: From Nina's data as a formula pin"
+    },
+    {
+     "ok": true,
+     "text": "save check: 162 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "how-to-waiting.cjs",
+   "about": "Story DT330 (0.3.167, board DT330; Coach Milan 19 November 20:26 to 20:30, Go 20:41): How to feedback that needs Coach Milan waits in Waiting for you at the top of Clients, after the beta applications, and counts in its title and the Clients badge. Every Didn't work, and every I did it with face 1 or 2 or with words. A tap opens that tester's How to on its own, ‹ Clients goes back, and the row is gone. Only the owner's account reads the feedback. Made-up testers: Ana and Bo. The checks name the acceptance criteria of the board (DT330 AC1 to AC8).",
+   "pass": true,
+   "seconds": 19,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT330 AC2: three rows: Ana's Didn't work, Bo's 4 of 5 with words, Ana's 2 of 5; not Ana's plain 5, not Bo's plain 4: 3"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC1: the newest row first: first name, situation, Didn't work, the line, How to and the day: Ana · Scan a pack from any screen Didn't work “Holding Plate opened the menu, but Barcode showed a black camera.” How to · 19 Nov ›"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC1: after the beta application, before what clients sent: app,howto,howto,howto,client"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC3: the face, 4 of 5 and the line: Bo · A recipe in another language 4 of 5 “German worked, the voice too.” How to · 19 Nov ›"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC3: Ana · I ate something: log it with a photo 2 of 5 “The read missed the rice.” How to · 19 Nov ›"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC4: Waiting for you 11 and the badge 11 count the application, the three rows and 7 from clients"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC5: Ana's How to on its own, every situation, her line"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC5: ‹ Clients"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC6: the row is gone and the counts are one less: 10, badge 10"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC7: not the owner: the feedback answers 403, no row waits, and nothing more counts"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC8: sr-Latn: ra.” Kako da · 19. nov › · ‹ Klijenti"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC8: de: ” So geht's · 19. Nov. › · ‹ Klienten"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 96 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "your-summary.cjs",
+   "about": "DT167 (0.3.9, board Stories119 versions 1 and 2; Coach Milan 30 October 08:47 to 09:59): Your summary, the last row of Me and where the steps end; Taste in Lifestyle; Plan your week and Craft your first meal; what the coach sees, part by part, health data off until switched on; on the coach's side, the shared profile with what changed since the coach last looked.",
+   "pass": true,
+   "seconds": 23,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT209: the steps, Your summary, My coach, then Account: Profile,Goal,Lifestyle,Training week,Google Calendar,Where I shop and cook,Your summary,My coach,Account"
+    },
+    {
+     "ok": true,
+     "text": "Taste no longer sits alone at the bottom of Me"
+    },
+    {
+     "ok": true,
+     "text": "Taste in Lifestyle, under Nutrition, after What you eat: Where you eat,What you eat,Taste,Alcohol"
+    },
+    {
+     "ok": true,
+     "text": "DT209: Where I shop and cook's Next leads to Your summary"
+    },
+    {
+     "ok": true,
+     "text": "every part, by step: You,Goal and numbers,Your day,How you eat,Training week,Where you shop and cook,Health questions"
+    },
+    {
+     "ok": true,
+     "text": "You: body data, health data, numbers only: Bodyhealth data Male, born 1981, 182 cm, 85 kg Your resting burn, about 1,770 kcal, and your protein range. Numbers only"
+    },
+    {
+     "ok": true,
+     "text": "Your day: wake-up and bedtime with the meal times they set"
+    },
+    {
+     "ok": true,
+     "text": "Where you eat and Work travel: Chef Mealan reads them now"
+    },
+    {
+     "ok": true,
+     "text": "taste in your own words, in the summary"
+    },
+    {
+     "ok": true,
+     "text": "Plan your week, Craft your first meal, Save as PDF"
+    },
+    {
+     "ok": true,
+     "text": "without a coach, nothing to choose for one"
+    },
+    {
+     "ok": true,
+     "text": "Craft your first meal opens Plate: http://127.0.0.1:3430/plate"
+    },
+    {
+     "ok": true,
+     "text": "Plan your week opens Plan"
+    },
+    {
+     "ok": true,
+     "text": "by default: the everyday parts on; diet, alcohol, own words, allergies and body data off"
+    },
+    {
+     "ok": true,
+     "text": "the health questions stay as today: which and when"
+    },
+    {
+     "ok": true,
+     "text": "saved: body data switched on with its date, your consent: {\"on\":{\"goal\":\"2026-11-23T11:52:31.299Z\",\"day\":\"2026-11-23T11:52:31.299Z\",\"eat\":\"2026-11-23T11:52:31.299Z\",\"week\":\"2026-11-23T11:52:31.299Z\",\"shop\":\"2026-11-23T"
+    },
+    {
+     "ok": true,
+     "text": "the summary says how much the coach sees"
+    },
+    {
+     "ok": true,
+     "text": "Clients marks a client whose shared profile changed"
+    },
+    {
+     "ok": true,
+     "text": "the client's page starts with what changed: What changed since you last looked 21 Nov Wake-up and bedtime: 6:00 to 8:00 · 22:00 to midnight → Before 6:00 · 22:00 to midnight. 21 Nov Meals: 3 a day, 07:30, 13:45 and 20:00 → 3 a day, 06:30, 13:15"
+    },
+    {
+     "ok": true,
+     "text": "the shared parts below, what wasn't shared said, no private row: one of these, answered 6 November Chef Mealan helps with everything. Asked again once a year. ✓ Chef reads Not shared What you eat, alcohol, in your own words, allergies and intolerances, your body data. Nina keeps these to themselves. Save as PDF, as of today"
+    },
+    {
+     "ok": true,
+     "text": "DT237: the card in the coach's language, one button for Nina's, 44 px: Goal and numbers,Your day,How you eat,Where you shop and coo"
+    },
+    {
+     "ok": true,
+     "text": "DT237: a tap shows her rows in Srpski, the rest stays English: Cilj i brojevi,Tvoj dan,Kako jedeš,Gde kupuješ i kuvaš,Zdrav"
+    },
+    {
+     "ok": true,
+     "text": "DT237: Back to English puts it back"
+    },
+    {
+     "ok": true,
+     "text": "looked at: the mark goes"
+    },
+    {
+     "ok": true,
+     "text": "DT172: without body data, weigh-ins in percent and days weighed, no kilogram: Weigh-ins 1 this week 1 morning weighed Not enough weigh-ins yet for a trend."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "why"
+}
