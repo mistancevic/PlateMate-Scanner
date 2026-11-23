@@ -4411,7 +4411,7 @@
       "title": "A dinner eaten at 18:28 is on Today but not in Plan",
       "epic": "plate",
       "state": "next",
-      "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): Today shows Lazy Burek, Dinner, 18:28, eaten by the plan; Plan shows Dinner 18:00, Pick a meal. To check: which day Plan showed (it opens on the last day picked)."
+      "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): Today shows Lazy Burek, Dinner, 18:28, eaten by the plan; Plan shows Dinner 18:00, Pick a meal. To check: which day Plan showed (it opens on the last day picked). 22:28: Plan showed Monday. Today: Eaten 22:24 on the banner, the card at 06:28 PM, 2,474 kcal and 1090 g (the whole recipe is 925 g, 2,351 kcal), counted as by the plan. 22:30: he edited it or something and it was created again, or it asked whether he ate it; then he deleted the meal. To trace: edit, the eaten question, a second record, and a delete that left Plan's dinner empty while Today keeps a dinner."
     }
   ]
 }
