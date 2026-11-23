@@ -36,6 +36,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ## State, 23 November 2026, 09:20
 
 - 0.3.178 (DT334) is merged into main and tagged v0.3.178 (local tag); before it 0.3.177 (Srpski confirmed), 0.3.176 (DT337), 0.3.175 (B157, B158), 0.3.174 (DT336). Main is at the handover commit after it. Coach Milan starts Preview and Promote.
+- Full run on main at 0.3.178 (23 November, 09:00 to 09:25, rule 6 of the checks): 228 of 228 walkthroughs passed, docs/qa/runs/0.3.178.json.
 - Release plan (agreed): R1 done (DT336, B157, B158, DT337, DT334). R2 DT338, DT339. R3 B156, DT340. R4 DT335. DT342 (fibre) in Next, not drawn.
 - A board says what the flow before is, by its version and where it is: "In main, 0.3.176, not on Preview yet", never "Today" (ticket form, rule 5). Every arrow is a tap; a screen scrolled is one tall picture (rule 2).
 
