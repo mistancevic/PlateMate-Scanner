@@ -23296,6 +23296,14 @@
     "recipe.otherPart": {
       "text": "Ostalo",
       "checked": true
+    },
+    "sameask.slotEaten": {
+      "text": "{meal}: već pojedeno danas.",
+      "checked": true
+    },
+    "plan.eatenAt": {
+      "text": "✓ Pojedeno u {time}",
+      "checked": true
     }
   }
 }

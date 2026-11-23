@@ -8,6 +8,7 @@
 // dry at most) and the other foods grow with it, the potato dinner fits, the bulgur bowl that cannot is shown with why, the
 // herbs come as For cooking, not counted, and the cooked chicken says about how much that is raw.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters. no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
+// Changed by B167 (0.3.191): the third step names the chicken as on its pack since B163 (0.3.189), Chicken breast; the check reads it in any case.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -93,7 +94,7 @@ const STEPS = { steps: [
   ok(/How to make (?!it ›)/.test(t) && !/How do you want to eat it/.test(t), "DT89: a dinner you cook gets How to make it, not the bowl ways");
   ok(asked && asked.items.length === 5 && asked.items[4].name === "Penne, dry" && JSON.stringify(asked.cooking) === JSON.stringify(["dried oregano", "salt and pepper"]), "DT89, DT91: Chef Mealan was asked for the steps of the five foods, with the herbs");
   const steps = await page.locator(".rp-steps li").allTextContents();
-  ok(steps.length === 4 && /cook \d+ g penne for 11 minutes/.test(steps[0]) && /150 g chicken breast/.test(steps[2]), "DT89: four steps, at the plate's amounts: " + steps[0]);
+  ok(steps.length === 4 && /cook \d+ g penne for 11 minutes/.test(steps[0]) && /150 g chicken breast/i.test(steps[2]), "DT89: four steps, at the plate's amounts: " + steps[0] + " / " + steps[2]);
   ok(/Chef Mealan's steps for your dinner, at your amounts\./.test(await text(page, ".step-head")), "DT89: the head says whose steps and for what");
   await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(700);
   // DT90: As the steps say; Save keeps the steps, the kitchen and who made it

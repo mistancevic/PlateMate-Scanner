@@ -5823,6 +5823,8 @@
     "screen.recipechange.and": {"en":"and","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
     "screen.steps.stepHere": {"en":"+ Step here","area":"Recipes","where":"Recipes","release":"0.3.188"},
     "screen.steps.addBetween": {"en":"Add a step between step {a} and step {b}","area":"Recipes","where":"Recipes","release":"0.3.188"},
-    "screen.recipe.otherPart": {"en":"Other","area":"Recipes","where":"Recipes","release":"0.3.188"}
+    "screen.recipe.otherPart": {"en":"Other","area":"Recipes","where":"Recipes","release":"0.3.188"},
+    "screen.sameask.slotEaten": {"en":"{meal} is already eaten today.","area":"Words used across the app","where":"Across the app","release":"0.3.190"},
+    "screen.plan.eatenAt": {"en":"✓ Eaten {time}","area":"Plan","where":"Plan","release":"0.3.190"}
   }
 }

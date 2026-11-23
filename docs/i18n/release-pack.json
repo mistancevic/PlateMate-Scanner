@@ -1,6 +1,6 @@
 {
-  "release": "0.3.188",
-  "at": "2026-11-23T19:37:18.930Z",
+  "release": "0.3.191",
+  "at": "2026-11-23T22:01:58.807Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -53126,6 +53126,44 @@
       "release": "0.3.188",
       "order": 900002,
       "at": "2026-11-23T19:37:18.930Z"
+    },
+    {
+      "id": "screen.sameask.slotEaten",
+      "kind": "screen",
+      "key": "sameask.slotEaten",
+      "en": "{meal} is already eaten today.",
+      "forms": "plain",
+      "slots": [
+        "meal"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "{meal}: već pojedeno danas.",
+      "de": "{meal}: heute schon gegessen.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.191",
+      "order": 900000,
+      "at": "2026-11-23T22:01:58.807Z"
+    },
+    {
+      "id": "screen.plan.eatenAt",
+      "kind": "screen",
+      "key": "plan.eatenAt",
+      "en": "✓ Eaten {time}",
+      "forms": "plain",
+      "slots": [
+        "time"
+      ],
+      "area": "Plan",
+      "where": "Plan",
+      "sr": "✓ Pojedeno u {time}",
+      "de": "✓ Gegessen um {time}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.191",
+      "order": 900001,
+      "at": "2026-11-23T22:01:58.807Z"
     }
   ]
 }

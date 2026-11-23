@@ -21,6 +21,7 @@ import { PlanRow } from "../components/PlanRow";
 import { ShortHelp } from "../components/ShortHelp";
 import { Picture, pictureOfRecipe } from "../components/MealPicture";
 import { PastMeal, recipeOfEaten } from "../components/PastMeal";
+import { eatenIn, withEaten } from "../planEaten";
 import { NotCountedRow } from "../components/Served";
 import { DayEditor } from "../components/DayEditor";
 import { dayLog } from "../today";
@@ -61,6 +62,8 @@ export function PlanScreen(p: AppApi) {
   const [shopping, setShopping] = useState(false);
   // SL6: a planned meal with foods but no recipe behind it (changed for this day only) opens to show what it is
   const [viewing, setViewing] = useState<Slot | null>(null);
+  // B167: a meal eaten today, opened from Plan
+  const [ateId, setAteId] = useState<string | null>(null);
   // SL3: the button names the open list; it is read again when the sheet closes
   const shopOpen = shopping ? null : openList(getStore());
   // DT207b: with earlier lists kept, the button says Shopping lists, so a past list is one tap away
@@ -107,7 +110,10 @@ export function PlanScreen(p: AppApi) {
   const target = numbers ? density(numbers.protein, numbers.kcal) : null;
   const unit = p.personal.pdUnit === "pct" ? "pct" : "pd";
   const held = p.planned[key] ?? {};
-  const sum = sumOf(held);
+  const ateOpened = ateId ? p.state.feedback.find((f) => f.id === ateId && f.status === "eaten") ?? null : null;
+  useEffect(() => { setAteId(null); }, [key]);
+  // B167 (0.3.191): today, a meal already eaten counts what was eaten, in place of what was planned
+  const sum = sumOf(isPast ? held : withEaten(held, p.state.feedback, key));
   const openCount = slots.filter((s) => !held[s.id]).length;
   // DT74 (board DT74, Anna's first run): every target names its day; a full day well off its kcal says so, and can fit
   const dayPoss = isToday ? "today's" : `${WEEKDAY_OF(date)}'s`;
@@ -145,7 +151,10 @@ export function PlanScreen(p: AppApi) {
       </div>
       {/* 0.3.59 (Coach Milan 2 November 19:00): no cook strip on Plan; it stays on Today and the Plate */}
       <TripCard p={p} />
-      {isPast ? <PastDay p={p} date={date} dayKey={key} line={line} slots={slots} numbers={numbers} /> : (<>
+      {isPast ? <PastDay p={p} date={date} dayKey={key} line={line} slots={slots} numbers={numbers} /> : ateOpened ? (
+        <PastMeal p={p} f={ateOpened} day={w("plan.todayDate", { date: (l) => (l === "en" ? `${WEEKDAY_OF(date)}, ${date.getDate()} ${MONTH(date)}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}
+          slot={slots.find((x) => x.id === ateOpened.slot?.slotId)?.name} back={() => setAteId(null)}
+          onChange={(ch) => p.changeCard(ateOpened.id, ch)} onDelete={() => { p.deleteCard(ateOpened.id); setAteId(null); }} />) : (<>
       {/* SL2 (Milan 16:03): the day's head and the day as planned are one card at the top: the date, the kind of day and the
           open slots, then the plan against the target. The target is said once, in the numbers. */}
       <section className="plan plan-head">
@@ -180,6 +189,20 @@ export function PlanScreen(p: AppApi) {
               <Pencil size={18} />
             </button>
           );
+          // B167 (0.3.191, board Stories292, B167.2a and b): a meal eaten today shows what was eaten, as a past day does; a tap
+          // opens the meal, where Change or delete is; no Swap and no Empty
+          const ate = eatenIn(p.state.feedback, key, r.slot.id);
+          if (ate.length) return (
+            <div key={r.slot.id} className="plan-slot-wrap plan-eaten-wrap">
+              {ate.map((f) => { const a = aggregate(f.meal.items), rr = recipeOfEaten(f, p.state.meals); return (
+                <div className="past-plate past-eaten plan-slot plan-slot-eaten" key={f.id} role="button" tabIndex={0} aria-label={w("plan.openMeal", { title: f.meal.title })}
+                  onClick={() => setAteId(f.id)} onKeyDown={(e) => { if (e.key === "Enter" && e.target === e.currentTarget) setAteId(f.id); }}>
+                  <Picture src={f.photo ?? pictureOfRecipe(rr)} />
+                  <span><small>{mealName(r.slot.name)}, {r.slot.time}</small><b>{f.meal.title}</b>
+                    <small className="fit-ok plan-eaten-line">{w("plan.eatenAt", { time: new Date(f.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) })} · {w("plan.kcalProteinG", { kcal: fmt(Math.round(a.calories ?? 0), 0), protein: Math.round(a.protein ?? 0) })}</small></span>
+                  <ChevronRight size={18} />
+                </div>); })}
+            </div>);
           const m = held[r.slot.id];
           // a planned meal's mark is its protein; the size of the whole day is the head card's to say (plan-off)
           const fit = m ? fitOf(m, target, unit) : null;
