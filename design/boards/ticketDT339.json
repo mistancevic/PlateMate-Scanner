@@ -2,7 +2,7 @@
   "id": "DT339",
   "title": "A nutrition table printed in several languages shows the app's own names",
   "epic": "plate",
-  "state": "next",
+  "state": "done",
   "why": "Coach Milan 22 November 2026, 18:43 to 18:46, from an onboarding call: a scanned label showed Greek food names; the pack prints each line in Czech, Croatian, Bulgarian and Greek, joined with slashes, and the app keeps the table as printed. 18:46: yes, a ticket in Next. 23 November 11:17: Draw. 11:52: option A, the printed name small under. 11:53: Go.",
   "opportunity": {
     "from": "An onboarding call, 22 November 2026.",
@@ -15,7 +15,7 @@
   "proposed": "Each line the app knows shows the app's own name in the app's language: Fat, in Srpski Masti. The printed name stays as the record and shows small under it. The app reads every part between the slashes, and knows more languages: Czech, Slovak, Polish, Hungarian, Romanian, Slovenian, Bulgarian and Greek, besides the ones it reads today. So each line shows once. It also knows common vitamins and minerals by name. A line it does not know keeps its printed name, as today. A pack saved before gets the names when it is shown: nothing to scan again.",
   "open": [],
   "checks": "Middle: the label read and the food card. The unit tests with new ones for the line names in every language, the build, a new walkthrough for AC1 to AC6, and the walkthroughs that read or show a label table (label-table, database-photos, tea-zero, camera ones), about 10 to 15 minutes. New words on screen, so the German sweep too.",
-  "decision": "Direction agreed 22 November 18:46. Option A, the printed name small under the app's name (11:52). Go 23 November 2026, 11:53, checks Middle plus the German sweep.",
+  "decision": "Direction agreed 22 November 18:46. Option A, the printed name small under the app's name (11:52). Go 23 November 2026, 11:53, checks Middle plus the German sweep. 25 of 25 walkthroughs. Built in 0.3.180.",
   "now": "The card and Review the label show every line as printed. Energetická hodnota/Energetska vrijednost/Енергийна стойност/Ενέργεια is one long row. Tuky/Masti/Мазнини/Λιπαρά 28 g shows, and next to it the app's own Fat 28 g; the same for Carbohydrate and Protein. In Review the label the long names wrap into tall rows.",
   "looked_at": "Option B, the printed name behind a tap on the line (DT339.4): not chosen (Coach Milan 11:52); the person checks the table against the pack, so the printed name stays in sight. Keep only the first language: not chosen, the first may be one the person does not read, and the app would still miss the line.",
   "board": "Stories280",
@@ -65,6 +65,6 @@
     "The pictures are the real app on one scratch build of main, not committed."
   ],
   "short": "A table printed in several languages shows the app's own names",
-  "rel": "Agreed: Go 23 November 2026, 11:53",
+  "rel": "Built in 0.3.180; Go 23 November 2026, 11:53",
   "boardTitle": "DT339: a nutrition table printed in several languages shows the app's own names"
 }

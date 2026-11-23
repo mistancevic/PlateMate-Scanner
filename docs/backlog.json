@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.180",
     "0.3.179",
     "0.3.178",
     "0.3.177",
@@ -3300,8 +3301,8 @@
       "id": "DT339",
       "title": "A nutrition table printed in several languages shows the app's own names",
       "epic": "plate",
-      "state": "next",
-      "why": "Coach Milan 22 November 2026, 18:43 to 18:46, from an onboarding call: a scanned label showed Greek food names; the pack prints each line in Czech, Croatian, Bulgarian and Greek, joined with slashes, and the app keeps the table as printed. 18:46: yes, a ticket in Next. 23 November 11:17: Draw.",
+      "state": "done",
+      "why": "Coach Milan 22 November 2026, 18:43 to 18:46, from an onboarding call: a scanned label showed Greek food names; the pack prints each line in Czech, Croatian, Bulgarian and Greek, joined with slashes, and the app keeps the table as printed. 18:46: yes, a ticket in Next. 23 November 11:17: Draw. 11:52: option A, the printed name small under. 11:53: Go.",
       "opportunity": {
         "from": "An onboarding call, 22 November 2026.",
         "job": "Check the values of a pack I scanned.",
@@ -3311,13 +3312,11 @@
       "problem": "The label read keeps every line of the table as printed, with its printed name. A pack sold in several countries prints each line in several languages, joined with slashes (Tuky/Masti/Мазнини/Λιπαρά for fat). The rows get long and hard to read. And where the first word is in a language the app does not know (Tuky, Sacharidy, Bílkoviny), the app does not see the line, so it adds its own Fat, Carbohydrate and Protein next to it: those lines show twice.",
       "story": "When I check the values of a pack I scanned, I want each line named in my language, so that I can read the table at a glance.",
       "proposed": "Each line the app knows shows the app's own name in the app's language: Fat, in Srpski Masti. The printed name stays as the record and shows small under it. The app reads every part between the slashes, and knows more languages: Czech, Slovak, Polish, Hungarian, Romanian, Slovenian, Bulgarian and Greek, besides the ones it reads today. So each line shows once. It also knows common vitamins and minerals by name. A line it does not know keeps its printed name, as today. A pack saved before gets the names when it is shown: nothing to scan again.",
-      "open": [
-        "Printed name small under the app's name (option A, DT339.2a, as drawn), or behind a tap on the line (option B, DT339.4)."
-      ],
+      "open": [],
       "checks": "Middle: the label read and the food card. The unit tests with new ones for the line names in every language, the build, a new walkthrough for AC1 to AC6, and the walkthroughs that read or show a label table (label-table, database-photos, tea-zero, camera ones), about 10 to 15 minutes. New words on screen, so the German sweep too.",
-      "decision": "Direction agreed 22 November 18:46. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Direction agreed 22 November 18:46. Option A, the printed name small under the app's name (11:52). Go 23 November 2026, 11:53, checks Middle plus the German sweep. 25 of 25 walkthroughs. Built in 0.3.180.",
       "now": "The card and Review the label show every line as printed. Energetická hodnota/Energetska vrijednost/Енергийна стойност/Ενέργεια is one long row. Tuky/Masti/Мазнини/Λιπαρά 28 g shows, and next to it the app's own Fat 28 g; the same for Carbohydrate and Protein. In Review the label the long names wrap into tall rows.",
-      "looked_at": "Keep only the first language: not chosen, the first may be one the person does not read, and the app would still miss the line.",
+      "looked_at": "Option B, the printed name behind a tap on the line (DT339.4): not chosen (Coach Milan 11:52); the person checks the table against the pack, so the printed name stays in sight. Keep only the first language: not chosen, the first may be one the person does not read, and the app would still miss the line.",
       "board": "Stories280",
       "where": "Page 6",
       "ac": [
@@ -3365,7 +3364,8 @@
         "The pictures are the real app on one scratch build of main, not committed."
       ],
       "short": "A table printed in several languages shows the app's own names",
-      "rel": "Proposed; not agreed until Coach Milan says Go"
+      "rel": "Built in 0.3.180; Go 23 November 2026, 11:53",
+      "version": "0.3.180"
     },
     {
       "id": "DT340",
@@ -3580,7 +3580,7 @@
       "title": "Clients keeps the names it knew when the invites do not load",
       "epic": "coach",
       "state": "next",
-      "why": "Coach Milan 22 November 2026, 15:23: a client showed as No on Clients. 15:28: after reopening Clients the name was back; a promote ran at the same time, and the other names were right. 15:35: yes, a ticket in Next, not drawn yet.",
+      "why": "Coach Milan 22 November 2026, 15:23: a client showed as No on Clients. 15:28: after reopening Clients the name was back; a promote ran at the same time, and the other names were right. 15:35: yes, a ticket in Next, not drawn yet. 23 November 11:53: Next drawing.",
       "opportunity": {
         "from": "Coach Milan's own Clients screen during a promote, 22 November 2026.",
         "job": "See every client under the right name, every time I open Clients.",
@@ -3590,11 +3590,49 @@
       "problem": "Clients reads the clients and, in a second request, the coach's invites. A client whose Profile name is empty gets the invite's name, email and where she came from (B141). When the invites request fails (a promote, a weak connection, a server waking up), the app says nothing and draws the cards without it, keeps nothing from before, and does not try again. The fallback No name yet is then cut to its first word, No, like a first name.",
       "story": "When the names from my invites cannot be loaded for a moment, I want Clients to keep the names it already knew and fill in the rest as soon as it can, so that a client is never shown under a wrong name.",
       "proposed": "1. The app keeps the last good answer of the invites on the coach's phone and uses it when the request fails. 2. A failed request is tried once more a moment later, and the names fill in when the answer arrives. 3. A card with no name at all shows the whole line No name yet, never its first word.",
-      "open": [
-        "Not covered: a client who joined while the request fails and whom the phone has never seen shows No name yet until the second try succeeds."
+      "open": [],
+      "checks": "Light: Clients only. The unit tests with new ones for the kept answer, the second try and the whole No name yet line, the build, a new walkthrough for AC1 to AC4, and the walkthroughs that open Clients (client-card, coach-views, coach-week, coach-badge, coach-phase-today), about 5 to 10 minutes. No new words on screen.",
+      "decision": "Direction agreed 22 November 15:35. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "now": "Clients reads the clients, then the invites in a second request. A client with no Profile name gets the invite's name and email. When the invites request fails, the card shows No: the first word of No name yet. No email, nothing kept from before, nothing tried again; reopening Clients brings the name back.",
+      "looked_at": "Wait for the invites before drawing any card: not chosen, a slow request would hold back every client. Save the invite's name into the client's account: not chosen here, the client's own Profile name stays theirs (B141).",
+      "board": "Stories281",
+      "where": "Page 6",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "The last good answer is kept",
+          "text": "Given the invites loaded once on this phone, when the request fails, then Clients shows Sara with her email and where she came from, as before"
+        },
+        {
+          "id": "AC2",
+          "title": "Tried once more",
+          "text": "Given the request fails, when a moment passes, about 3 seconds, then the app asks once more, and when the answer comes the names fill in, with no tap"
+        },
+        {
+          "id": "AC3",
+          "title": "No name yet, the whole line",
+          "text": "Given a client this phone has never seen and the request fails, when Clients shows the card, then it says No name yet, never No; the same wherever the app uses a client's first name"
+        },
+        {
+          "id": "AC4",
+          "title": "A new answer replaces the kept one",
+          "text": "Given the invites load, when an invite's name changed since, then Clients shows the new name and keeps that answer"
+        }
       ],
-      "checks": "To agree with the board; likely Light: Clients only.",
-      "decision": "Open. In Next. Not drawn yet."
+      "unchanged": [
+        "A client's own Profile name comes first, as since B141.",
+        "The order of the cards, the week bars and the notes.",
+        "Clients when the invites load: as today."
+      ],
+      "details": [
+        "The kept answer lives on the coach's phone only, under the coach's account; it is the invites' names, emails and where from, nothing else.",
+        "One more try, about 3 seconds after a failure; not more, so a long outage does not keep asking.",
+        "A client who joined while the request fails and whom the phone has never seen shows No name yet until the second try answers (AC3).",
+        "The first name is the first word of the name, except when the card has no name: then the whole line.",
+        "The pictures are the real app on one scratch build of main, not committed: the example coach with a third client whose Profile name is empty, the invites answered or refused by the board script."
+      ],
+      "short": "Clients keeps the names it knew when the invites do not load",
+      "rel": "Proposed; not agreed until Coach Milan says Go"
     },
     {
       "id": "B157",
