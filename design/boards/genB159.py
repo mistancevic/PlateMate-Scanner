@@ -20,11 +20,11 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.185, not on Preview yet")}
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.185")}
 B = Board(); PW = 390; G = 70
 W = SX + 2 * PW + G + 40
 parts = [("Ticket", "B159. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: B159, canvas Page 6."),
-  ("How to read this board", "<b>As a prototype.</b> B159.1: a client's card on the coach's Clients page as it is in main, 0.3.185, not on Preview yet. B159.2: the same card, new. The example client Sara, whose phone recorded from yesterday. A blue outline marks what is new."),
+  ("How to read this board", "<b>As a prototype.</b> B159.1: a client's card on the coach's Clients page as it was in 0.3.185. B159.2: the same card, new. The example client Sara, whose phone recorded from yesterday. A blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "23 November 17:05: before the release it was a more coloured page. 17:07: so what is there now that is the whole truth? 17:09: fix first. 17:15: an o instead of a question mark."),
@@ -38,7 +38,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
-label(y, "B159.1 In main, 0.3.185", "not on Preview yet: Clients, Sara's card", 0, 1)
+label(y, "B159.1 Before, 0.3.185", "Clients, Sara's card", 0, 1)
 label(y, "B159.2 New", "the same card", 1, 1)
 y += 60
 RB = [shot(X(0), y, "1a", PW, "B159.1a Sara's card", "draft", "Monday and Tuesday read not opened, though her phone only recorded from yesterday."),
@@ -47,7 +47,7 @@ bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories286.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket B159, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.185 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories285.dc.html")
+board("Stories286.dc.html", t["boardTitle"], "Drawn 23 November 2026; Go 17:44, built in 0.3.186. Ticket B159, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.185 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories285.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B159": {"file": "Stories286.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out159.json"), "w"))
 print("B159", W, Hc + 230)

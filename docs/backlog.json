@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.186",
     "0.3.185",
     "0.3.184",
     "0.3.183",
@@ -4026,8 +4027,8 @@
       "id": "B159",
       "title": "On a client's card, a day before the client's phone recorded activity says not known",
       "epic": "coach",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 16:41 to 17:09, looking at his clients' cards after 0.3.182: before the release the card was more coloured. Asked whether the card is the whole truth now: full and active come from what was logged, for every day; opened or not is only recorded from 0.3.182 on the client's phone, so a white day before that can be wrong. 17:09: fix first. 17:15: an o instead of a question mark.",
+      "state": "done",
+      "why": "Coach Milan 23 November 2026, 16:41 to 17:09, looking at his clients' cards after 0.3.182: before the release the card was more coloured. Asked whether the card is the whole truth now: full and active come from what was logged, for every day; opened or not is only recorded from 0.3.182 on the client's phone, so a white day before that can be wrong. 17:09: fix first. 17:15: an o instead of a question mark. 17:44: Go.",
       "opportunity": {
         "from": "Coach Milan's own Clients page, 23 November 2026.",
         "job": "Trust what a client's card says about each day.",
@@ -4035,11 +4036,11 @@
         "why_now": "Every client who joined before 0.3.182 has such days in their first two weeks."
       },
       "story": "When I look at a client's days, I want a day the app could not record to say so, so that I never read not opened where nobody knows.",
-      "proposed": "1. The client's phone keeps the first day it recorded activity, kept beyond the 28 days; a phone that recorded before this version takes the earliest day it has. 2. On the coach's card and the client's page, a day before that first day with nothing logged reads o (not known), never not opened. A phone that has never recorded: every such day reads o. 3. A day with something logged keeps its colour, full or active, whatever the day. 4. The key line names o: not known, from before the app recorded it, only when such a day shows.",
+      "proposed": "1. The client's phone keeps the first day it recorded activity, kept beyond the 28 days; a phone that recorded before this version takes the earliest day it has. 2. On the client's card on Clients, a day before that first day with nothing logged reads o (not known), never not opened. A phone that has never recorded: every such day reads o. 3. A day with something logged keeps its colour, full or active, whatever the day. 4. The key line names o: not known, from before the app recorded it, only when such a day shows.",
       "problem": "Opened or not is recorded on the client's phone from 0.3.182 on. A day before that, with nothing logged, reads Empty: not opened, though the client may have opened the app.",
       "open": [],
       "checks": "Light: the client's card and the client's page. The unit tests with new ones for the first day and the level; the build; a new walkthrough for AC1 to AC5; and day-levels, coach-phase-today and coach-week, about 5 minutes. New words on screen, so the German sweep too.",
-      "decision": "Asked 17:07, fix first 17:09. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Asked 17:07, fix first 17:09, an o 17:15. Go 17:44, checks Light plus the German sweep, 10 of 10. Built in 0.3.186.",
       "now": "The example coach's client Sara, whose phone recorded from yesterday: Monday and Tuesday read not opened, though nobody knows.",
       "looked_at": "Leaving days before recording out of the card: not chosen; the two weeks would have gaps. Back to the amber of before 0.3.182: not chosen; it said not fully logged, never whether the app was opened.",
       "board": "Stories286",
@@ -4048,7 +4049,7 @@
         {
           "id": "AC1",
           "title": "Not known",
-          "text": "Given a client whose phone first recorded activity yesterday, when Monday and Tuesday have nothing logged, then they read o on the card and on the client's page, never not opened"
+          "text": "Given a client whose phone first recorded activity yesterday, when Monday and Tuesday have nothing logged, then they read o on the client's card, never not opened"
         },
         {
           "id": "AC2",
@@ -4076,11 +4077,12 @@
         "Last active and Quiet for 3 days."
       ],
       "details": [
+        "Built: the day squares are on the client's card only; the client's own page shows the week as a list, so nothing changes there (found while building).",
         "The first day recorded rides with the activity in the account's main record (since). For a phone that recorded before this version, the earliest day in its record, which holds up to 28 days.",
         "The pictures are the real app on one scratch build of main, not committed, with the clock on Thursday 26 November 2026, 13:30. In the scratch the example client Sara's phone recorded from yesterday."
       ],
       "short": "A day before the client's phone recorded reads o (not known), never not opened",
-      "rel": "Proposed; not agreed until Coach Milan says Go"
+      "rel": "Built in 0.3.186; Go 23 November 2026, 17:44"
     }
   ]
 }
