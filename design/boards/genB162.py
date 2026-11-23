@@ -19,15 +19,15 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.187, not on Preview yet")}
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.187")}
 B = Board(); PW = 390; G = 70
 W = SX + 2 * PW + G + 40
 parts = [("Ticket", "B162. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: B162, canvas Page 6."),
-  ("How to read this board", "<b>As a prototype.</b> B162.1: Lazy burek's Foods on the recipe page as they are in main, 0.3.187, not on Preview yet. B162.2: the same, new. A blue outline marks what is new."),
+  ("How to read this board", "<b>As a prototype.</b> B162.1: Lazy burek's Foods on the recipe page as they were in 0.3.187. B162.2: the same, new. A blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "23 November 19:03: even though I added a tag for the part, it couldn't sort out that separated parts are actually the same layer, and I couldn't get them together; the recipe has a separated filling now. 20:23: let's do steps and layers."),
-  ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Open", " ".join(t["open"])), ("Looked at, not chosen", t["looked_at"]),
+  ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "B162", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
 y = 30
@@ -37,7 +37,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
-label(y, "B162.1 In main, 0.3.187", "not on Preview yet: Foods", 0, 1)
+label(y, "B162.1 Before, 0.3.187", "Foods", 0, 1)
 label(y, "B162.2 New", "the same recipe", 1, 1)
 y += 60
 RB = [shot(X(0), y, "1a", PW, "B162.1a Foods", "draft", "Filling three times, the sesame with no part in between."),
@@ -46,7 +46,7 @@ bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories288.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket B162, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.187 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories287.dc.html")
+board("Stories288.dc.html", t["boardTitle"], "Drawn 23 November 2026; Go 20:36, built in 0.3.188. Ticket B162, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.187 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories287.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B162": {"file": "Stories288.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outB162.json"), "w"))
 print("B162", W, Hc + 230)

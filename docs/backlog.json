@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.188",
     "0.3.187",
     "0.3.186",
     "0.3.185",
@@ -4164,8 +4165,8 @@
       "id": "B162",
       "title": "One part named twice on a recipe shows as two parts",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): Filling tagged on foods that are not next to each other shows two Filling groups (Filling, Base, Filling); they cannot be brought together. 20:23: steps and layers next. Drawn.",
+      "state": "done",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): Filling tagged on foods that are not next to each other shows two Filling groups (Filling, Base, Filling); they cannot be brought together. 20:23: steps and layers next. Drawn. 20:36: Go.",
       "opportunity": {
         "from": "Coach Milan's own recipe, Lazy Burek, 23 November 2026.",
         "job": "Read a recipe by its parts: the filling, then the base.",
@@ -4175,11 +4176,9 @@
       "story": "When I read a recipe with parts, I want each part once with all its foods, so that I see what goes into the filling and what into the base.",
       "proposed": "1. On the recipe page, the foods are shown by part: each part once, with all its foods, in the order the parts first come. 2. Foods with no part, in a recipe with parts, come last under Other. 3. A recipe with no parts shows as now. Only the order on screen changes; the recipe, its steps and its numbers stay as they are.",
       "problem": "The recipe page draws a part heading each time the part changes from one food to the next. Foods added later go to the end of the list, so Lazy Burek shows Filling, Base, Filling, the sesame with no part, then Filling again, and nothing can bring them together.",
-      "open": [
-        "The name for foods with no part: Other, drawn."
-      ],
+      "open": [],
       "checks": "Light: the recipe page's Foods with and without parts. The unit tests with a new one for the order; the build; a new walkthrough for AC1 to AC3; and recipe-parts walkthroughs, about 5 minutes. A new word on screen, so the German sweep too.",
-      "decision": "Asked 19:03; next 20:23. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Go 23 November 20:36 with DT345 and B162 together; checks Light plus the German sweep, 15 of 15. Built in 0.3.188.",
       "now": "Lazy burek's Foods: Filling (cream cheese), Base (puff pastry), Filling (salt, eggs, then the sesame with no part), Filling (feta, oil).",
       "looked_at": "Sorting the recipe's foods for good on save: not chosen; the order on screen is enough and nothing stored changes.",
       "board": "Stories288",
@@ -4210,7 +4209,7 @@
         "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 20:30."
       ],
       "short": "Each part once on the recipe page; foods with no part last, under Other",
-      "rel": "Proposed; not agreed until Coach Milan says Go"
+      "rel": "Built in 0.3.188; Go 23 November 2026, 20:36"
     },
     {
       "id": "B163",
@@ -4230,8 +4229,8 @@
       "id": "DT345",
       "title": "A step can be put between two steps",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): a step can only be added at the end. He needed one between (spray the oil over the batter, sprinkle the sesame); Chef Mealan wrote oil for the tray instead. 20:23: B161 is the least relevant; steps and layers next (DT345 and B162). Drawn.",
+      "state": "done",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): a step can only be added at the end. He needed one between (spray the oil over the batter, sprinkle the sesame); Chef Mealan wrote oil for the tray instead. 20:23: B161 is the least relevant; steps and layers next (DT345 and B162). Drawn. 20:36: Go.",
       "opportunity": {
         "from": "Coach Milan's own recipe, Lazy Burek, 23 November 2026.",
         "job": "Fix a recipe's steps in the order I cook them.",
@@ -4243,7 +4242,7 @@
       "problem": "Edit recipe has + Add a step at the end only, and steps cannot be moved. A step that belongs between two steps lands after the oven and the resting, so the recipe reads in the wrong order.",
       "open": [],
       "checks": "Light: Edit recipe's steps and the publish sheet's steps. The unit tests; the build; a new walkthrough for AC1 to AC4; and recipe-after, recipe-photos and cook-mode, about 5 minutes. New words on screen, so the German sweep too.",
-      "decision": "Asked 19:03; next 20:23. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Go 23 November 20:36 with DT345 and B162 together; checks Light plus the German sweep, 15 of 15. Built in 0.3.188.",
       "now": "Lazy burek in Edit recipe: five steps and + Add a step at the end. The step for the oil and the sesame belongs between step 3 and step 4; added, it is step 6.",
       "looked_at": "Moving steps up and down: not chosen for now; inserting where the step belongs is the one move that was missing. Drag to reorder: harder on a phone and with the keyboard open.",
       "board": "Stories289",
@@ -4280,7 +4279,7 @@
         "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 20:30."
       ],
       "short": "+ Step here between two steps in Edit recipe",
-      "rel": "Proposed; not agreed until Coach Milan says Go"
+      "rel": "Built in 0.3.188; Go 23 November 2026, 20:36"
     },
     {
       "id": "DT346",

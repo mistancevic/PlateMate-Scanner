@@ -19,11 +19,11 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.187, not on Preview yet")}
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.187")}
 B = Board(); PW = 390; G = 70
 W = SX + 3 * PW + 2 * G + 40
 parts = [("Ticket", "DT345. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT345, canvas Page 6."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT345.1: Edit recipe's steps as they are in main, 0.3.187, not on Preview yet, for Lazy burek. DT345.2: the same, new. Every arrow is a tap; a scrolled screen is one tall picture. A blue outline marks what is new."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT345.1: Edit recipe's steps as they were in 0.3.187, for Lazy burek. DT345.2: the same, new. Every arrow is a tap; a scrolled screen is one tall picture. A blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "23 November 19:03: I couldn't insert the cooking step, only add at the end. Chef could do it, but he used oil for the baking tray instead of spraying it over the batter and sprinkling the sesame. A small change would help here. 20:23: let's do steps and layers."),
@@ -37,7 +37,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
-label(y, "DT345.1 In main, 0.3.187", "not on Preview yet: Edit recipe, the steps", 0, 2)
+label(y, "DT345.1 Before, 0.3.187", "Edit recipe, the steps", 0, 2)
 y += 60
 RA = [shot(X(0), y, "1a", PW, "DT345.1a The steps", "draft", "Five steps, + Add a step at the end. I tap + Add a step."),
   shot(X(1), y, "1b", PW, "DT345.1b A sixth step", "draft", "The new step is step 6, after the oven and the resting.")]
@@ -53,7 +53,7 @@ bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories289.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket DT345, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.187 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories288.dc.html")
+board("Stories289.dc.html", t["boardTitle"], "Drawn 23 November 2026; Go 20:36, built in 0.3.188. Ticket DT345, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.187 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories288.dc.html")
 inner = B.render(W, Hc)
 json.dump({"DT345": {"file": "Stories289.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outDT345.json"), "w"))
 print("DT345", W, Hc + 230)

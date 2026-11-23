@@ -2,8 +2,8 @@
   "id": "DT345",
   "title": "A step can be put between two steps",
   "epic": "cook",
-  "state": "next",
-  "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): a step can only be added at the end. He needed one between (spray the oil over the batter, sprinkle the sesame); Chef Mealan wrote oil for the tray instead. 20:23: B161 is the least relevant; steps and layers next (DT345 and B162). Drawn.",
+  "state": "done",
+  "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): a step can only be added at the end. He needed one between (spray the oil over the batter, sprinkle the sesame); Chef Mealan wrote oil for the tray instead. 20:23: B161 is the least relevant; steps and layers next (DT345 and B162). Drawn. 20:36: Go.",
   "opportunity": {
     "from": "Coach Milan's own recipe, Lazy Burek, 23 November 2026.",
     "job": "Fix a recipe's steps in the order I cook them.",
@@ -15,7 +15,7 @@
   "problem": "Edit recipe has + Add a step at the end only, and steps cannot be moved. A step that belongs between two steps lands after the oven and the resting, so the recipe reads in the wrong order.",
   "open": [],
   "checks": "Light: Edit recipe's steps and the publish sheet's steps. The unit tests; the build; a new walkthrough for AC1 to AC4; and recipe-after, recipe-photos and cook-mode, about 5 minutes. New words on screen, so the German sweep too.",
-  "decision": "Asked 19:03; next 20:23. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "decision": "Go 23 November 20:36 with DT345 and B162 together; checks Light plus the German sweep, 15 of 15. Built in 0.3.188.",
   "now": "Lazy burek in Edit recipe: five steps and + Add a step at the end. The step for the oil and the sesame belongs between step 3 and step 4; added, it is step 6.",
   "looked_at": "Moving steps up and down: not chosen for now; inserting where the step belongs is the one move that was missing. Drag to reorder: harder on a phone and with the keyboard open.",
   "board": "Stories289",
@@ -52,6 +52,6 @@
     "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 20:30."
   ],
   "short": "+ Step here between two steps in Edit recipe",
-  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "rel": "Built in 0.3.188; Go 23 November 2026, 20:36",
   "boardTitle": "DT345: a step can be put between two steps"
 }
