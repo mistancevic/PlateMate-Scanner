@@ -1,6 +1,6 @@
 {
-  "release": "0.3.182",
-  "at": "2026-11-23T12:29:41.749Z",
+  "release": "0.3.183",
+  "at": "2026-11-23T13:15:51.962Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -52105,6 +52105,78 @@
       "release": "0.3.182",
       "order": 900012,
       "at": "2026-11-23T12:29:41.749Z"
+    },
+    {
+      "id": "screen.pastmeal.copyLine",
+      "kind": "screen",
+      "key": "pastmeal.copyLine",
+      "en": "A copy of these foods, for a new meal. This meal stays as it is.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Kopija ovih namirnica, za novi obrok. Ovaj obrok ostaje kakav jeste.",
+      "de": "Eine Kopie dieser Lebensmittel, für eine neue Mahlzeit. Diese Mahlzeit bleibt, wie sie ist.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.183",
+      "order": 900000,
+      "at": "2026-11-23T13:15:51.962Z"
+    },
+    {
+      "id": "screen.pastmeal.replaceAsk",
+      "kind": "screen",
+      "key": "pastmeal.replaceAsk",
+      "en": "Your plate holds 1 food: {foods}. Put {title} in its place?|Your plate holds {n} foods: {foods}. Put {title} in their place?",
+      "forms": "count",
+      "slots": [
+        "foods",
+        "n",
+        "title"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Na tvom tanjiru je {n} namirnica: {foods}. Da {title} ide umesto nje?|Na tvom tanjiru su {n} namirnice: {foods}. Da {title} ide umesto njih?|Na tvom tanjiru je {n} namirnica: {foods}. Da {title} ide umesto njih?",
+      "de": "Auf deinem Teller ist {n} Lebensmittel: {foods}. {title} an seine Stelle legen?|Auf deinem Teller sind {n} Lebensmittel: {foods}. {title} an ihre Stelle legen?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.183",
+      "order": 900001,
+      "at": "2026-11-23T13:15:51.962Z"
+    },
+    {
+      "id": "screen.pastmeal.replaceThem",
+      "kind": "screen",
+      "key": "pastmeal.replaceThem",
+      "en": "Replace it|Replace them",
+      "forms": "count",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Zameni je|Zameni ih|Zameni ih",
+      "de": "Ersetzen|Ersetzen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.183",
+      "order": 900002,
+      "at": "2026-11-23T13:15:51.962Z"
+    },
+    {
+      "id": "screen.pastmeal.keepMyPlate",
+      "kind": "screen",
+      "key": "pastmeal.keepMyPlate",
+      "en": "Keep my plate",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Zadrži moj tanjir",
+      "de": "Meinen Teller behalten",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.183",
+      "order": 900003,
+      "at": "2026-11-23T13:15:51.962Z"
     }
   ]
 }

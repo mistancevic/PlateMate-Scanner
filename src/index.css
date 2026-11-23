@@ -3685,3 +3685,5 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .db-cell.lvl-empty > span { background: var(--surface); box-shadow: 0 0 0 1.5px #b9c4d6 inset; } .db-cell.lvl-todo > span { background: transparent; border: 1.5px dashed #ccd5e3; box-sizing: border-box; }
 .db-cell.is-today > span { outline: 2px solid var(--brand); outline-offset: 2px; }
 .last-active { display: block; font-weight: 800; color: var(--ink); }
+/* DT319 (0.3.183): Put it on the Plate again says it is a copy; a plate with foods is asked first */
+.pm-copy-line { display: block; margin-top: 6px; } .pm-replace { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
