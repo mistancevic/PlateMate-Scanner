@@ -45,7 +45,7 @@ const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-siz
       await p.goto(U + "/plate"); await p.waitForTimeout(1300);
       await require(path.join(ROOT, "tests/flows/set-meal.cjs"))(p, "Breakfast"); await p.waitForTimeout(400);
       await top(p, ".readout", 70);
-      await note(p, ".readout", `${N ? "<b>No change:</b> " : ""}One egg for breakfast, PD 8.4, in the High colour. ${N ? "I tap the PD number." : "A tap on the PD number does nothing; nothing says what the colour means."}`, [".readout-mid b"]);
+      await note(p, ".readout", N ? "<b>New:</b> one egg for breakfast, PD 8.4, in the High colour, and the words say so: High, above your plan. I tap the PD number." : "One egg for breakfast, PD 8.4, in the High colour, and the words say fits your plan. A tap on the PD number does nothing; nothing says what the colour means.", N ? [".readout-mid b", ".readout-mid span"] : [".readout-mid b"]);
       await shot(p, `${flow}b`); await clean(p);
       if (N) {
         await p.locator(".readout-mid b").first().click(); await p.waitForTimeout(400);

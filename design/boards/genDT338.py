@@ -28,9 +28,9 @@ parts = [("Ticket", "DT338. This board is the ticket: everything about it is her
   ("How to read this board", "<b>Whole flows, like a prototype.</b> DT338.1: as it is in main, 0.3.178, not on Preview yet: the Goal page, then the Plate. DT338.2: the same, new: the scale on the Goal page, and on the Plate behind a tap on the PD number. A screen that stays is marked No change; a blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "22 November 17:57: add the ranges and their colours where users see them, so they know what the colour of their numbers means. 18:01: both places."),
+  ("In Coach Milan's words", "23 November 09:30: High, above your plan. 22 November 17:57: add the ranges and their colours where users see them, so they know what the colour of their numbers means. 18:01: both places."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
-  ("Open", "<br>".join(t["open"])), ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
+  ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "DT338", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
 y = 30
 X = lambda i: SX + i * (PW + G)
@@ -48,7 +48,7 @@ y2 = max(RA) + 70
 label(y2, "DT338.2 New", "the scale on the Goal page, and behind the PD number")
 y2 += 60
 RB = [shot(X(0), y2, "2a", PW, "DT338.2a Me, Goal", "changed", "The scale under the target."),
-  shot(X(1), y2, "2b", PW, "DT338.2b The Plate", "same", "PD 8.4 in High. I tap the number."),
+  shot(X(1), y2, "2b", PW, "DT338.2b The Plate", "changed", "High, above your plan. I tap the number."),
   shot(X(2), y2, "2c", PW, "DT338.2c The scale opens", "changed", "A mark where this plate sits: High.")]
 for i in range(1, 3): arrow(X(i) - G + 2, y2 + 540)
 bs = RB

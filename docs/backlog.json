@@ -3235,7 +3235,7 @@
       "title": "What the PD colours mean: one scale on the Goal page and behind the PD number on the Plate",
       "epic": "setup",
       "state": "next",
-      "why": "Coach Milan 22 November 2026, 17:57 to 18:01: add the ranges and their colours where users see them, so they know what the colour of their numbers means; today the colour changes as PD moves from one range to another. 18:01: both places.",
+      "why": "Coach Milan 22 November 2026, 17:57 to 18:01: add the ranges and their colours where users see them, so they know what the colour of their numbers means; today the colour changes as PD moves from one range to another. 18:01: both places. 23 November 09:30: the words under the number: High, above your plan.",
       "opportunity": {
         "from": "An onboarding call, 22 November 2026.",
         "job": "Understand at a glance whether my plate is where my target wants it.",
@@ -3244,12 +3244,10 @@
       },
       "problem": "Five bands around the person's own target colour the PD block: Low−, Low, On plan, High, High+ (0.6, 0.9, 1.5 and 2.5 times the target). The only place that says the ranges is a line under the filter chips in Foods, after a chip is tapped.",
       "story": "When I see the colour of my PD, I want to see what it means in my own numbers, so that I know what to change.",
-      "proposed": "One scale: five coloured parts, each with its name and its range in the person's own numbers (for a target of 5.3: under 3.2, 3.2 to 4.8, 4.8 to 8.0, 8.0 to 13.3, above 13.3). On the Goal page under the PD target. On the Plate, a tap on the PD number opens the same scale with a mark where this plate sits.",
-      "open": [
-        "The words under the Plate's number say fits your plan for any PD at or above the target, also in High and High+ (8.4 here). With the scale next to it, they disagree. Change them to the band's name in this ticket, or leave them?"
-      ],
-      "checks": "Light: two screens, a scale added and nothing else changes in what the app does. The unit tests with new ones for the scale's ranges and mark, the build, a new walkthrough for AC1 to AC3, and the walkthroughs that open Me, Goal and the Plate's PD block, about 5 to 10 minutes. New words on screen, so the German sweep too.",
-      "decision": "Direction agreed 22 November 18:01: both places. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "proposed": "One scale: five coloured parts, each with its name and its range in the person's own numbers (for a target of 5.3: under 3.2, 3.2 to 4.8, 4.8 to 8.0, 8.0 to 13.3, above 13.3). On the Goal page under the PD target. On the Plate, a tap on the PD number opens the same scale with a mark where this plate sits. The words under the Plate's number follow the band: High, above your plan; High+, far above your plan. On plan keeps fits your plan, and under the target keeps its words.",
+      "open": [],
+      "checks": "Light: two screens, a scale added and the words under the Plate's number. The unit tests with new ones for the scale's ranges and mark, the build, a new walkthrough for AC1 to AC4, and the walkthroughs that open Me, Goal and the Plate's PD block, about 5 to 10 minutes. New words on screen, so the German sweep too.",
+      "decision": "Direction agreed 22 November 18:01: both places; the words 23 November 09:30. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
       "now": "Me, Goal shows the PD target, 5.3, with no word on the colours. On the Plate the PD block takes one of five colours as the plate moves (one egg, PD 8.4: High), and a tap on the number does nothing. The ranges are said only in Foods, in a line under the filter chips after a chip is tapped.",
       "looked_at": "A legend on every PD block: not chosen, too much on every screen; the Goal page and a tap on the Plate are where the question comes up (18:01: both places).",
       "board": "Stories279",
@@ -3269,6 +3267,11 @@
           "id": "AC3",
           "title": "A second tap closes it",
           "text": "Given the scale is open on the Plate, when I tap the PD number again, then it closes"
+        },
+        {
+          "id": "AC4",
+          "title": "The words say the band",
+          "text": "Given one egg for breakfast at PD 8.4, when the Plate shows its PD, then the words under the number say High, above your plan; at PD 14 they say High+, far above your plan; on plan they say fits your plan, as today"
         }
       ],
       "unchanged": [
