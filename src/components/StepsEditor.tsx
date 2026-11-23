@@ -34,7 +34,13 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
   const lastFocus = useRef<string | null>(null);
   const [, bump] = useState(0);
   const shown = items.filter((i) => i.grams > 0);
-  const emit = () => { onChange([...values.current]); bump((n) => n + 1); };
+  // B161 (0.3.190, board Stories291; Coach Milan 23 November 2026, 21:39): with Samsung Keyboard a space at the end of a step
+  // dropped the cursor. The keyboard builds each word in a draft (composition) and the page was drawn again on every key while
+  // the draft was open. Now nothing is read while a word is being built; the steps go up to the page a quarter second after the last
+  // key, or at once when the field is left, a step is added or the editor closes. Only the food buttons' ticks follow at once.
+  const composing = useRef(false), later = useRef<number | null>(null), sent = useRef(true);
+  const flush = () => { if (later.current !== null) { window.clearTimeout(later.current); later.current = null; } if (!sent.current) { sent.current = true; onChange([...values.current]); } };
+  const emit = (now = false) => { sent.current = false; bump((n) => n + 1); if (now) { flush(); return; } if (later.current !== null) window.clearTimeout(later.current); later.current = window.setTimeout(flush, 250); };
   // a new field gets its text once; after that the field is the person's
   // (React calls the ref again on every render; only a field that has never been filled is filled)
   const fill = (key: string, el: HTMLDivElement | null) => {
@@ -64,7 +70,7 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
     const key = newRow();
     values.current.splice(after + 1, 0, "");
     setRows((rs) => { const n = [...rs]; n.splice(after + 1, 0, key); return n; });
-    emit(); lastFocus.current = key; focusEnd(key);
+    emit(true); lastFocus.current = key; focusEnd(key);
   };
   // a tap on a food: into the step where the cursor is, else at the end of the last step used
   const put = (item: Ingredient) => {
@@ -93,7 +99,7 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
     sel?.removeAllRanges(); sel?.addRange(after);
     el.focus();
     lastFocus.current = key;
-    read(key);
+    read(key); flush(); // a food in or out goes up at once
   };
   // 0.3.134 (Coach Milan 11 November 20:55; a tester put bread in a step by mistake and the phone's keyboard could not take
   // it out): a tap on a food that is in a step takes it out again, from the step where the cursor is, else the last one with it
@@ -105,9 +111,10 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
     const next = chip.nextSibling; if (next && next.nodeType === Node.TEXT_NODE && /^ /.test(next.textContent ?? "")) next.textContent = (next.textContent ?? "").slice(1);
     chip.remove();
     lastFocus.current = key;
-    read(key);
+    read(key); flush(); // a food in or out goes up at once
   };
-  useEffect(() => () => { els.current.clear(); }, []);
+  const flushRef = useRef(flush); flushRef.current = flush;
+  useEffect(() => () => { flushRef.current(); els.current.clear(); }, []);
   const used = usedIds(values.current);
   const missing = missingFoods(values.current, items);
   // DT83 fix (Milan 21:56): a food taken out of the recipe and still named in a step is said, so the steps don't keep it
@@ -120,7 +127,9 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
         <div className="st-row">
           <span className="st-n">{k + 1}</span>
           <div className="st-field" role="textbox" aria-label={w("steps.stepN", { n: k + 1 })} aria-multiline="false" contentEditable suppressContentEditableWarning
-            ref={(el) => fill(key, el)} onFocus={() => { lastFocus.current = key; }} onInput={() => read(key)}
+            ref={(el) => fill(key, el)} onFocus={() => { lastFocus.current = key; }} onBlur={() => { if (!composing.current) { read(key); flush(); } }}
+            onCompositionStart={() => { composing.current = true; }} onCompositionEnd={() => { composing.current = false; read(key); }}
+            onInput={(e) => { if (composing.current || (e.nativeEvent as InputEvent).isComposing) return; read(key); }}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addRow(k); } }}
             onPaste={(e) => { e.preventDefault(); document.execCommand("insertText", false, e.clipboardData.getData("text/plain").replace(/\s*\n\s*/g, " ")); }}
             data-placeholder={k === 0 ? w("steps.whiskTheEggsWithThe") : ""} />
