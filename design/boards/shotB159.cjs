@@ -35,7 +35,7 @@ const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-siz
     await note(p, "Sara", "Sara's phone started recording yesterday, when she first opened the new version. Monday and Tuesday read <b>not opened</b>, though nobody knows: she may have opened the app.", [".db-row"]);
     await shot(p, "1a", "Sara"); await p.context().close();
     p = await open(true);
-    await note(p, "Sara", "<b>New:</b> Monday and Tuesday, before her phone recorded and with nothing logged, read <b>?</b>: not known. The key line says so. A day with something logged keeps its colour.", [".db-row", ".db-key"]);
+    await note(p, "Sara", "<b>New:</b> Monday and Tuesday, before her phone recorded and with nothing logged, read <b>o</b>: not known. The key line says so. A day with something logged keeps its colour.", [".db-row", ".db-key"]);
     await shot(p, "2a", "Sara"); await p.context().close();
   } catch (e) { console.log("ERR", e.message); } finally { await b.close(); server.kill(); }
 })();

@@ -27,7 +27,7 @@ parts = [("Ticket", "B159. This board is the ticket: everything about it is here
   ("How to read this board", "<b>As a prototype.</b> B159.1: a client's card on the coach's Clients page as it is in main, 0.3.185, not on Preview yet. B159.2: the same card, new. The example client Sara, whose phone recorded from yesterday. A blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "23 November 17:05: before the release it was a more coloured page. 17:07: so what is there now that is the whole truth? 17:09: fix first."),
+  ("In Coach Milan's words", "23 November 17:05: before the release it was a more coloured page. 17:07: so what is there now that is the whole truth? 17:09: fix first. 17:15: an o instead of a question mark."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "B159", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -42,7 +42,7 @@ label(y, "B159.1 In main, 0.3.185", "not on Preview yet: Clients, Sara's card", 
 label(y, "B159.2 New", "the same card", 1, 1)
 y += 60
 RB = [shot(X(0), y, "1a", PW, "B159.1a Sara's card", "draft", "Monday and Tuesday read not opened, though her phone only recorded from yesterday."),
-  shot(X(1), y, "2a", PW, "B159.2a Sara's card", "changed", "Monday and Tuesday read ?: not known. The key line names it.")]
+  shot(X(1), y, "2a", PW, "B159.2a Sara's card", "changed", "Monday and Tuesday read o: not known. The key line names it.")]
 bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
