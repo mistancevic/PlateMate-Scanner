@@ -3690,3 +3690,5 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 /* DT335 (0.3.184): a goal that does not fit is greyed; a tap says why, in place; the target body weight */
 .goal-pick.greyed { opacity: .6; background: #eef1f6; border-style: dashed; cursor: pointer; } .greyed-tag { display: block; color: #8a4b00 !important; font-weight: 800; }
 .goal-why { margin-top: 6px; display: flex; flex-direction: column; gap: 4px; } .target-weight { margin-top: 8px; } .target-line { font-weight: 800; color: var(--ink); } .target-line.target-no { color: #8a4b00; }
+/* DT342 (0.3.185): fibre, 0 where it is a fact, and at least what is known */
+.nt-fibre { display: block; margin-top: 8px; font-weight: 800; color: var(--ink); } .fibre-line { font-weight: 700; }

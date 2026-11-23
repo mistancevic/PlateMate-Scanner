@@ -12,11 +12,15 @@
 // energy, carbs the rest); fibre 14 g per 1,000 kcal (Dietary Guidelines for Americans, 2020) until the plan has its own.
 // A letter says the level, never good or bad: F+ on a nut is the nut.
 import { BAND_EDGES, fit, type PdBand } from "./goal";
+import { fibreFree } from "./fibre0";
 import { w, wordV, dec, type WordKey } from "./words";
 
 export type Rates = { fats: number; carbs: number; fiber: number; protein: number }; // grams per 100 kcal
 export const FIBRE_PER_1000_KCAL = 14;
-export type Numbers = { calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber?: number | null };
+export type Numbers = { calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber?: number | null; fiberMissing?: string[]; fiberZero?: string[] };
+// DT342 (0.3.185): the numbers of foods added up, for the letters and the table: with a food missing, the fibre that is known
+export const numbersOfTotals = (t: { calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; fiberKnown?: number; fiberMissing?: string[]; fiberZero?: string[] }): Numbers =>
+  ({ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber ?? t.fiberKnown ?? null, ...(t.fiberMissing ? { fiberMissing: t.fiberMissing } : {}), ...(t.fiberZero ? { fiberZero: t.fiberZero } : {}) });
 
 // the day's rates: from its numbers, the PD target first for protein
 export function ratesOf(day: { kcal: number; protein: number; fats: number; carbs: number } | null, pdRef: number | null): Rates | null {
@@ -41,7 +45,13 @@ export function letterOf(macro: Macro, value: number | null, rate: number): stri
   return band === "top" || band === "high" ? `${cap}+` : band === "plan" ? cap : band === "close" ? low : `${low}-`;
 }
 export function lettersOf(n: Numbers, rates: Rates): string[] {
-  return LETTER_ORDER.map((m) => letterOf(m, per100kcal(n[m], n.calories), rates[m]));
+  // DT342 (0.3.185, board Stories285): a food with no fibre by nature reads as 0 (fi-, not fi?); with a food missing, the letter
+  // of the fibre that is known with a *, like a footnote: approximate, not unknown (Coach Milan 23 November, 15:45). Under the
+  // plan it is fi*, never fi-*, as the missing food could lift it
+  const nm = (n as { name?: string }).name;
+  if (nm && (n.fiber === null || n.fiber === undefined) && fibreFree(nm)) n = { ...n, fiber: 0 };
+  return LETTER_ORDER.map((m) => { const l = letterOf(m, per100kcal(n[m], n.calories), rates[m]);
+    return m === "fiber" && n.fiberMissing?.length && !l.endsWith("?") ? `${l.replace(/-$/, "")}*` : l; });
 }
 export const lettersText = (n: Numbers, rates: Rates | null): string | null => (rates ? lettersOf(n, rates).join(" ") : null);
 

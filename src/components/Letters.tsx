@@ -2,7 +2,7 @@
 // into cells. DT129 (0.2.109, board Stories86; Milan 26 October 13:09 to 15:06): back to the first scanner's quick read, one
 // line of four letters, f | c | fi- | P, and a tap opens the numbers: the plate against the planned meal (Plate, Planned, %),
 // then what is in it (g, kcal, % plate, % day, a Total), read down a column. Per 100 kcal keeps the four sentences.
-import { w, numText, type WordKey } from "../words";
+import { w, wn, numText, type WordKey } from "../words";
 import { useState, type ReactNode } from "react";
 import { lettersOf, letterLine, letterEdge, LETTER_ORDER, per100kcal, bandsNote, FIBRE_PER_1000_KCAL, type Rates, type Numbers } from "../letters";
 
@@ -52,11 +52,12 @@ export function NumbersTable({ n, rates, extra, weight, day, plan }: { n: Number
         return (
           <div key={m} className={`nt-grid nt-in nt-row${day ? "" : " nt-noday"}`}><span>{w(NAME[m])}</span>
             {g === null || g === undefined ? <><span>?</span><span /><span />{day && <span />}</>
-              : <><span>{fmt(g)}</span><span>{fmt(g * KCAL_PER_G[m])}</span><span>{kcal > 0 ? Math.round(((g * KCAL_PER_G[m]) / kcal) * 100) : ""}</span>{day && <span>{dayOf(m) > 0 ? Math.round((g / dayOf(m)) * 100) : ""}</span>}</>}
+              : <><span>{m === "fiber" && n.fiberMissing?.length ? `${fmt(g)}*` : fmt(g)}</span><span>{fmt(g * KCAL_PER_G[m])}</span><span>{kcal > 0 ? Math.round(((g * KCAL_PER_G[m]) / kcal) * 100) : ""}</span>{day && <span>{dayOf(m) > 0 ? Math.round((g / dayOf(m)) * 100) : ""}</span>}</>}
           </div>
         );
       })}
       <div className={`nt-grid nt-in nt-row nt-total${day ? "" : " nt-noday"}`}><span>{w("letters.total")}</span><span>{weight === null ? "" : fmt(weight)}</span><span>{fmt(kcal)}</span><span>100</span>{day && <span>{day.kcal > 0 ? Math.round((kcal / day.kcal) * 100) : ""}</span>}</div>
+      {(n.fiberMissing?.length || n.fiberZero?.length) ? <small className="nt-fibre">{[n.fiberMissing?.length ? wn("letters.fibreAtLeast", n.fiberMissing.length, { g: fmt(n.fiber ?? 0), foods: n.fiberMissing.join(", ") }) : "", n.fiberZero?.length ? wn("letters.fibreZero", n.fiberZero.length, { foods: n.fiberZero.join(", ") }) : ""].filter(Boolean).join(" ")}</small> : null}
       <small className="nt-note">{[w("letters.noteRead"), plan ? w("letters.notePlan", { meal: plan.word }) : "", w("letters.notePlate"), day ? w("letters.noteDay") : ""].filter(Boolean).join(" ")}</small>
       <button type="button" className="link nt-more" aria-expanded={sentences} onClick={() => setSentences((x) => !x)}>{w("letters.per100kcal")} {sentences ? "⌃" : "›"}</button>
       {sentences && <div className="letters-lines">{LETTER_ORDER.map((m) => { const v = per100kcal(n[m], n.calories), e = letterEdge(v, rates[m]); return <small key={m}>{letterLine(m, v, rates[m])}{e && <> <span className="nt-edge">~ {e}</span></>}</small>; })}{extra && <small>{extra}</small>}<small className="muted">{bandsNote()}</small></div>}
