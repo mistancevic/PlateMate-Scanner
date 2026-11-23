@@ -1,0 +1,57 @@
+{
+  "id": "DT345",
+  "title": "A step can be put between two steps",
+  "epic": "cook",
+  "state": "next",
+  "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): a step can only be added at the end. He needed one between (spray the oil over the batter, sprinkle the sesame); Chef Mealan wrote oil for the tray instead. 20:23: B161 is the least relevant; steps and layers next (DT345 and B162). Drawn.",
+  "opportunity": {
+    "from": "Coach Milan's own recipe, Lazy Burek, 23 November 2026.",
+    "job": "Fix a recipe's steps in the order I cook them.",
+    "kind": "Missing: a step can only be added at the end; steps cannot be moved.",
+    "why_now": "Recipes are fixed right after the first cook, when a missing step shows."
+  },
+  "story": "When I edit a recipe's steps, I want to add a step between two steps, so that the steps stay in the order I cook.",
+  "proposed": "1. In Edit recipe, between two steps, a + Step here button. A tap puts an empty step there, the cursor in it; the steps after it move down one. 2. + Add a step at the end stays. 3. The same wherever the steps are written: Edit recipe, and the publish sheet. Enter at the end of a step already starts a new step after it; nothing changes there. Empty steps go on save, as now.",
+  "problem": "Edit recipe has + Add a step at the end only, and steps cannot be moved. A step that belongs between two steps lands after the oven and the resting, so the recipe reads in the wrong order.",
+  "open": [],
+  "checks": "Light: Edit recipe's steps and the publish sheet's steps. The unit tests; the build; a new walkthrough for AC1 to AC4; and recipe-after, recipe-photos and cook-mode, about 5 minutes. New words on screen, so the German sweep too.",
+  "decision": "Asked 19:03; next 20:23. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "now": "Lazy burek in Edit recipe: five steps and + Add a step at the end. The step for the oil and the sesame belongs between step 3 and step 4; added, it is step 6.",
+  "looked_at": "Moving steps up and down: not chosen for now; inserting where the step belongs is the one move that was missing. Drag to reorder: harder on a phone and with the keyboard open.",
+  "board": "Stories289",
+  "where": "Page 6",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "A step between two steps",
+      "text": "Given Edit recipe with five steps, when I tap + Step here between step 3 and step 4, then an empty step 4 is there with the cursor in it, and the steps that were 4 and 5 are 5 and 6"
+    },
+    {
+      "id": "AC2",
+      "title": "Saved in its place",
+      "text": "Given the new step written, when I tap Save changes, then the recipe's steps read in that order, the new one fourth"
+    },
+    {
+      "id": "AC3",
+      "title": "At the end, as before",
+      "text": "Given Edit recipe, when I tap + Add a step, then a step is added at the end, as now"
+    },
+    {
+      "id": "AC4",
+      "title": "Left empty",
+      "text": "Given a step added between two and left empty, when I save, then it is gone and the steps keep their order"
+    }
+  ],
+  "unchanged": [
+    "Enter at the end of a step starts a new step after it.",
+    "A tap on a food puts it into the step where the cursor is.",
+    "A step's photo stays with its step."
+  ],
+  "details": [
+    "Each + Step here is a button of at least 44 px, with its own label: Add a step between step 3 and step 4.",
+    "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 20:30."
+  ],
+  "short": "+ Step here between two steps in Edit recipe",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "DT345: a step can be put between two steps"
+}

@@ -1,0 +1,53 @@
+{
+  "id": "B162",
+  "title": "One part named twice on a recipe shows as two parts",
+  "epic": "cook",
+  "state": "next",
+  "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): Filling tagged on foods that are not next to each other shows two Filling groups (Filling, Base, Filling); they cannot be brought together. 20:23: steps and layers next. Drawn.",
+  "opportunity": {
+    "from": "Coach Milan's own recipe, Lazy Burek, 23 November 2026.",
+    "job": "Read a recipe by its parts: the filling, then the base.",
+    "kind": "Did not understand it: Filling shows three times.",
+    "why_now": "Foods added later go to the end of the list, so most changed recipes split their parts."
+  },
+  "story": "When I read a recipe with parts, I want each part once with all its foods, so that I see what goes into the filling and what into the base.",
+  "proposed": "1. On the recipe page, the foods are shown by part: each part once, with all its foods, in the order the parts first come. 2. Foods with no part, in a recipe with parts, come last under Other. 3. A recipe with no parts shows as now. Only the order on screen changes; the recipe, its steps and its numbers stay as they are.",
+  "problem": "The recipe page draws a part heading each time the part changes from one food to the next. Foods added later go to the end of the list, so Lazy Burek shows Filling, Base, Filling, the sesame with no part, then Filling again, and nothing can bring them together.",
+  "open": [
+    "The name for foods with no part: Other, drawn."
+  ],
+  "checks": "Light: the recipe page's Foods with and without parts. The unit tests with a new one for the order; the build; a new walkthrough for AC1 to AC3; and recipe-parts walkthroughs, about 5 minutes. A new word on screen, so the German sweep too.",
+  "decision": "Asked 19:03; next 20:23. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "now": "Lazy burek's Foods: Filling (cream cheese), Base (puff pastry), Filling (salt, eggs, then the sesame with no part), Filling (feta, oil).",
+  "looked_at": "Sorting the recipe's foods for good on save: not chosen; the order on screen is enough and nothing stored changes.",
+  "board": "Stories288",
+  "where": "Page 6",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "Each part once",
+      "text": "Given Lazy burek, when I open it, then Foods shows Filling once with the cream cheese, salt, eggs, feta and oil, then Base with the puff pastry"
+    },
+    {
+      "id": "AC2",
+      "title": "No part, last",
+      "text": "Given the sesame with no part, when I open the recipe, then it comes last, under Other"
+    },
+    {
+      "id": "AC3",
+      "title": "No parts, as now",
+      "text": "Given a recipe with no parts, when I open it, then its foods show as now, with no heading"
+    }
+  ],
+  "unchanged": [
+    "The recipe's foods, steps and numbers.",
+    "Parts on the Plate and in Edit recipe."
+  ],
+  "details": [
+    "The order: the parts in the order they first come in the recipe's foods, each with its foods in their own order; the foods with no part after them.",
+    "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 20:30."
+  ],
+  "short": "Each part once on the recipe page; foods with no part last, under Other",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "B162: one part shows once on the recipe page"
+}
