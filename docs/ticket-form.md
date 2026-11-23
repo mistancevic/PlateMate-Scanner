@@ -54,7 +54,7 @@ Coach Milan, 15:38: "we should discuss about walkthroughs and testing before you
 2. **Always, whatever the level:** the unit tests, the build, and the new walkthrough for the ticket's criteria. When on-screen words change, the German sweep runs too.
 3. **Three levels:**
    - **Light:** one screen, and nothing changes in what the app does (words, layout, a line moved). Also run the walkthroughs that open that screen. About 5 to 10 minutes. Example: DT331.
-   - **Area:** a behaviour changes in one area (Clients, the Plate, Plan, Recipes). Also run every walkthrough of that area and of the code files the change touches. About 10 to 20 minutes. Example: B153, the Clients card and the client's page.
+   - **Middle** (called Area until 23 November 2026; Coach Milan 08:37): a behaviour changes in one area (Clients, the Plate, Plan, Recipes). Also run every walkthrough of that area and of the code files the change touches. About 10 to 20 minutes. Example: B153, the Clients card and the client's page.
    - **Full:** all walkthroughs, about 41 minutes. For shared code everything uses (the plate and meal model, the culinary and nutrition rules, storage and sync, navigation, languages), and for a release with several tickets.
 4. **If something outside the agreed set looks touched while coding**, Claude stops and asks before widening the run. Claude does not widen it silently.
 5. **The merge report says the level that ran**, and the run record in `docs/qa/runs/<version>.json` says it too (`reduced` with the reason).
