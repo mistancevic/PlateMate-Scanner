@@ -114,8 +114,10 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
   const gone = [...new Set(values.current.flatMap((x) => stepParts(x, items).filter((p): p is Extract<typeof p, { gone: boolean }> => "gone" in p && p.gone).map((p) => p.name)))];
   return (
     <div className="st">
-      {rows.map((key, k) => (
-        <div className="st-row" key={key}>
+      {rows.map((key, k) => (<div key={key}>
+        {/* DT345 (0.3.188, board Stories289; Go 23 November 2026, 20:36): a step can go between two steps */}
+        {k > 0 && <button type="button" className="st-between" aria-label={w("steps.addBetween", { a: k, b: k + 1 })} onMouseDown={(e) => e.preventDefault()} onClick={() => addRow(k - 1)}>{w("steps.stepHere")}</button>}
+        <div className="st-row">
           <span className="st-n">{k + 1}</span>
           <div className="st-field" role="textbox" aria-label={w("steps.stepN", { n: k + 1 })} aria-multiline="false" contentEditable suppressContentEditableWarning
             ref={(el) => fill(key, el)} onFocus={() => { lastFocus.current = key; }} onInput={() => read(key)}
@@ -123,7 +125,7 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
             onPaste={(e) => { e.preventDefault(); document.execCommand("insertText", false, e.clipboardData.getData("text/plain").replace(/\s*\n\s*/g, " ")); }}
             data-placeholder={k === 0 ? w("steps.whiskTheEggsWithThe") : ""} />
         </div>
-      ))}
+      </div>))}
       <button type="button" className="pill pill-small pill-action st-add" onClick={() => addRow(rows.length - 1)}>{w("steps.addAStep")}</button>
       {shown.length > 0 && (
         <div className="st-foods">

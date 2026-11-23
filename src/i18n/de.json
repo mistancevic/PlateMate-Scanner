@@ -23284,6 +23284,18 @@
     "recipechange.and": {
       "text": "und",
       "checked": true
+    },
+    "steps.stepHere": {
+      "text": "+ Schritt hier",
+      "checked": true
+    },
+    "steps.addBetween": {
+      "text": "Einen Schritt zwischen Schritt {a} und Schritt {b} einfügen",
+      "checked": true
+    },
+    "recipe.otherPart": {
+      "text": "Sonstiges",
+      "checked": true
     }
   }
 }

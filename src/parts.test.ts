@@ -90,3 +90,11 @@ test("R14: one food twice, each finds its own: flour in the dough and flour for 
   const noParts = [{ id: "a", food: flour }, { id: "b", food: flour }];
   assert.deepEqual(pairItems(noParts, [{ id: "x", food: flour, grams: 10 }, { id: "y", food: flour, grams: 2 }]).map((x) => x?.grams), [10, 2], "without parts, the same order");
 });
+
+test("B162: each part once, in the order the parts first come; no part last", async () => {
+  const { byParts } = await import("./parts");
+  const l: { n: string; part?: string }[] = [{ n: "q", part: "Filling" }, { n: "p", part: "Base" }, { n: "s", part: "Filling" }, { n: "se" }, { n: "f", part: "Filling" }];
+  assert.deepEqual(byParts(l).map((x) => x.n), ["q", "s", "f", "p", "se"]);
+  const none: { n: string; part?: string }[] = [{ n: "a" }, { n: "b" }];
+  assert.equal(byParts(none), none, "no parts: as it is");
+});

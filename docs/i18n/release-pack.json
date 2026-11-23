@@ -1,6 +1,6 @@
 {
-  "release": "0.3.187",
-  "at": "2026-11-23T19:11:00.737Z",
+  "release": "0.3.188",
+  "at": "2026-11-23T19:37:18.930Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -53072,6 +53072,60 @@
       "release": "0.3.187",
       "order": 900007,
       "at": "2026-11-23T19:10:51.914Z"
+    },
+    {
+      "id": "screen.steps.stepHere",
+      "kind": "screen",
+      "key": "steps.stepHere",
+      "en": "+ Step here",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "+ Korak ovde",
+      "de": "+ Schritt hier",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.188",
+      "order": 900000,
+      "at": "2026-11-23T19:37:18.930Z"
+    },
+    {
+      "id": "screen.steps.addBetween",
+      "kind": "screen",
+      "key": "steps.addBetween",
+      "en": "Add a step between step {a} and step {b}",
+      "forms": "plain",
+      "slots": [
+        "a",
+        "b"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Dodaj korak između koraka {a} i koraka {b}",
+      "de": "Einen Schritt zwischen Schritt {a} und Schritt {b} einfügen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.188",
+      "order": 900001,
+      "at": "2026-11-23T19:37:18.930Z"
+    },
+    {
+      "id": "screen.recipe.otherPart",
+      "kind": "screen",
+      "key": "recipe.otherPart",
+      "en": "Other",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Ostalo",
+      "de": "Sonstiges",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.188",
+      "order": 900002,
+      "at": "2026-11-23T19:37:18.930Z"
     }
   ]
 }

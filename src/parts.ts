@@ -17,6 +17,12 @@ export function partsOf(items: { part?: string }[], opts: { part?: string }[] = 
   for (const x of [...items, ...opts, ...leftOut]) if (x.part && !out.includes(x.part)) out.push(x.part);
   return out;
 }
+// B162 (0.3.188, board Stories288; Go 23 November 2026, 20:36): the recipe page shows each part once: the parts in the order
+// they first come, each with its foods in their own order; foods with no part last (under Other). With no parts, as it is.
+export function byParts<T extends { part?: string }>(list: T[]): T[] {
+  const ps = partsOf(list);
+  return ps.length ? [...ps.flatMap((p) => list.filter((i) => i.part === p)), ...list.filter((i) => !i.part)] : list;
+}
 // a food kept with a recipe carries no photo: the photos live in the photo store, by food
 export const leanFood = (f: Food): Food => { const { photo: _p, photos: _ps, ...rest } = f as Food & { photos?: unknown }; return rest as Food; };
 // the recipe's optional foods at this plate's portion: the recipe's grams times the factor the plate uses
