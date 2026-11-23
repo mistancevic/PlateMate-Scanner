@@ -5741,6 +5741,21 @@
     "screen.plate.pdScaleTitle": {"en":"What the colour means, for your target {t}. This plate: {pd}.","area":"The Plate","where":"The Plate","release":"0.3.179"},
     "screen.plate.pdScaleOpen": {"en":"What the colour means","area":"The Plate","where":"The Plate","release":"0.3.179"},
     "screen.plate.highPlan": {"en":"High, above your plan","area":"The Plate","where":"The Plate","release":"0.3.179"},
-    "screen.plate.topPlan": {"en":"High+, far above your plan","area":"The Plate","where":"The Plate","release":"0.3.179"}
+    "screen.plate.topPlan": {"en":"High+, far above your plan","area":"The Plate","where":"The Plate","release":"0.3.179"},
+    "screen.label.line.trans": {"en":"of which trans fat","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.mono": {"en":"of which mono-unsaturates","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.poly": {"en":"of which polyunsaturates","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.cholesterol": {"en":"Cholesterol","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.addedsugars": {"en":"of which added sugars","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.starch": {"en":"of which starch","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.sodium": {"en":"Sodium","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.alcohol": {"en":"Alcohol","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.calcium": {"en":"Calcium","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.iron": {"en":"Iron","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.magnesium": {"en":"Magnesium","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.zinc": {"en":"Zinc","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.potassium": {"en":"Potassium","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.iodine": {"en":"Iodine","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.label.line.vitamin": {"en":"Vitamin {x}","area":"Words used across the app","where":"Across the app","release":"0.3.180"}
   }
 }

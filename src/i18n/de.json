@@ -22968,6 +22968,66 @@
     "plate.topPlan": {
       "text": "Hoch+, weit über deinem Plan",
       "checked": true
+    },
+    "label.line.trans": {
+      "text": "davon Transfette",
+      "checked": true
+    },
+    "label.line.mono": {
+      "text": "davon einfach ungesättigte Fettsäuren",
+      "checked": true
+    },
+    "label.line.poly": {
+      "text": "davon mehrfach ungesättigte Fettsäuren",
+      "checked": true
+    },
+    "label.line.cholesterol": {
+      "text": "Cholesterin",
+      "checked": true
+    },
+    "label.line.addedsugars": {
+      "text": "davon zugesetzter Zucker",
+      "checked": true
+    },
+    "label.line.starch": {
+      "text": "davon Stärke",
+      "checked": true
+    },
+    "label.line.sodium": {
+      "text": "Natrium",
+      "checked": true
+    },
+    "label.line.alcohol": {
+      "text": "Alkohol",
+      "checked": true
+    },
+    "label.line.calcium": {
+      "text": "Calcium",
+      "checked": true
+    },
+    "label.line.iron": {
+      "text": "Eisen",
+      "checked": true
+    },
+    "label.line.magnesium": {
+      "text": "Magnesium",
+      "checked": true
+    },
+    "label.line.zinc": {
+      "text": "Zink",
+      "checked": true
+    },
+    "label.line.potassium": {
+      "text": "Kalium",
+      "checked": true
+    },
+    "label.line.iodine": {
+      "text": "Jod",
+      "checked": true
+    },
+    "label.line.vitamin": {
+      "text": "Vitamin {x}",
+      "checked": true
     }
   }
 }

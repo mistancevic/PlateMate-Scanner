@@ -22968,6 +22968,66 @@
     "plate.topPlan": {
       "text": "Visoko+, daleko iznad tvog plana",
       "checked": true
+    },
+    "label.line.trans": {
+      "text": "od kojih trans masti",
+      "checked": true
+    },
+    "label.line.mono": {
+      "text": "od kojih mononezasićene masne kiseline",
+      "checked": true
+    },
+    "label.line.poly": {
+      "text": "od kojih polinezasićene masne kiseline",
+      "checked": true
+    },
+    "label.line.cholesterol": {
+      "text": "Holesterol",
+      "checked": true
+    },
+    "label.line.addedsugars": {
+      "text": "od kojih dodati šećeri",
+      "checked": true
+    },
+    "label.line.starch": {
+      "text": "od kojih skrob",
+      "checked": true
+    },
+    "label.line.sodium": {
+      "text": "Natrijum",
+      "checked": true
+    },
+    "label.line.alcohol": {
+      "text": "Alkohol",
+      "checked": true
+    },
+    "label.line.calcium": {
+      "text": "Kalcijum",
+      "checked": true
+    },
+    "label.line.iron": {
+      "text": "Gvožđe",
+      "checked": true
+    },
+    "label.line.magnesium": {
+      "text": "Magnezijum",
+      "checked": true
+    },
+    "label.line.zinc": {
+      "text": "Cink",
+      "checked": true
+    },
+    "label.line.potassium": {
+      "text": "Kalijum",
+      "checked": true
+    },
+    "label.line.iodine": {
+      "text": "Jod",
+      "checked": true
+    },
+    "label.line.vitamin": {
+      "text": "Vitamin {x}",
+      "checked": true
     }
   }
 }
