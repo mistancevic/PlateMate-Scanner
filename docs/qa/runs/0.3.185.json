@@ -1,0 +1,2049 @@
+{
+ "version": "0.3.185",
+ "commit": "2c3620e",
+ "at": "2026-11-23T15:34:55.161Z",
+ "minutes": 4,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 72,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "back-and-photos.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards C4 and C5): in a food's photos you move to the next one without closing: the arrows, a photo below, or the arrow keys, and it says 2 of 3; tapping the photo doesn't close it. Back closes only what is on top: the photo, then the card, then the tab you came from; the address follows the tab, so a reload opens on the same tab. A food added today is marked New on the list. With one photo, tapping it closes it; Add a photo lets you take one or choose one from the phone (Milan, 7 and 8 October 2026): Take a photo and Choose a photo on a phone, where Android's photo picker has no camera; on a computer, one Add a photo. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the app opens at /today: http://127.0.0.1:3412/today"
+    },
+    {
+     "ok": true,
+     "text": "Foods has its own address: http://127.0.0.1:3412/foods"
+    },
+    {
+     "ok": true,
+     "text": "a food added today is marked New"
+    },
+    {
+     "ok": true,
+     "text": "an older food is not"
+    },
+    {
+     "ok": true,
+     "text": "a photo can be taken with the camera, or chosen from the phone's photos"
+    },
+    {
+     "ok": true,
+     "text": "the photo says 1 of 3"
+    },
+    {
+     "ok": true,
+     "text": "Next: 2 of 3"
+    },
+    {
+     "ok": true,
+     "text": "the arrow key: 3 of 3"
+    },
+    {
+     "ok": true,
+     "text": "a photo below: 1 of 3"
+    },
+    {
+     "ok": true,
+     "text": "tapping the photo doesn't close it"
+    },
+    {
+     "ok": true,
+     "text": "Back closes the photo; the card stays"
+    },
+    {
+     "ok": true,
+     "text": "Back closes the card; the Foods list stays"
+    },
+    {
+     "ok": true,
+     "text": "Back goes to the tab you came from: http://127.0.0.1:3412/today"
+    },
+    {
+     "ok": true,
+     "text": "one photo: it says tap the photo to close"
+    },
+    {
+     "ok": true,
+     "text": "one photo: tapping it closes it, the card stays"
+    },
+    {
+     "ok": true,
+     "text": "after Close, Back goes to the tab you came from: http://127.0.0.1:3412/today"
+    },
+    {
+     "ok": true,
+     "text": "a reload opens on the same tab"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "bar-and-yeast.cjs",
+   "about": "Bar and yeast, the read fails, the chat answers (0.2.92, canvas Page 2, boards Stories64 and Stories65, DT104 to DT108; Milan 24 October 21:55 to 22:22, testing 0.2.91 on the preview). Checked: a failed read says so with Try again (DT104); the yeast is caught by code before any read, with Take the yeast out and Ask Chef Mealan for a dish around it (DT105); foods he names in a chat answer become rows with + Add, Take it out and Scan it, through the rules (DT106); Ask Chef Mealan from the Plate always sends the plate as a new question and the chips sit under every answer (DT107); the four letters F C Fi P on the readout, the rows and the food card (DT108). Chef Mealan's answers are stand-ins (no AI). 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.",
+   "pass": true,
+   "seconds": 20,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT105: the yeast gets its line and two buttons, by code"
+    },
+    {
+     "ok": true,
+     "text": "DT104: a failed read says so, with Try again: calls 1"
+    },
+    {
+     "ok": true,
+     "text": "DT104: Try again reads the plate again: calls 2"
+    },
+    {
+     "ok": true,
+     "text": "DT108: four letters under the readout, F C Fi P: \"F C fi? p\""
+    },
+    {
+     "ok": true,
+     "text": "DT108: letters on each row: F C fi? p | f C fi? P+"
+    },
+    {
+     "ok": true,
+     "text": "DT108: yeast reads low fat and high protein: f C fi? P+"
+    },
+    {
+     "ok": true,
+     "text": "DT129: the tap opens the numbers under the PD block"
+    },
+    {
+     "ok": true,
+     "text": "DT108: Per 100 kcal shows a line per letter against the day's rates"
+    },
+    {
+     "ok": true,
+     "text": "DT105: the chat asks for a dish around the plate: What dish can I make around what is on my plate, so it makes a dinner? 50 g Clean Protein Bar Peanut Love, 7 g Active dry yeast."
+    },
+    {
+     "ok": true,
+     "text": "DT106: one row per food he named, in his order, the drop first: Active dry yeast, Quark, low fat (Magerquark), Apple, dried cranberries"
+    },
+    {
+     "ok": true,
+     "text": "DT106: Take it out, + Add twice, Scan it"
+    },
+    {
+     "ok": true,
+     "text": "DT106: a row says where the food comes from, its amount and what the plate reaches"
+    },
+    {
+     "ok": true,
+     "text": "DT106: Take it out takes the yeast off the plate"
+    },
+    {
+     "ok": true,
+     "text": "DT106: + Add puts the quark on the plate at its start amount: 250 g"
+    },
+    {
+     "ok": true,
+     "text": "DT107: the chips come back under the answer"
+    },
+    {
+     "ok": true,
+     "text": "DT105: the yeast back, the line is back"
+    },
+    {
+     "ok": true,
+     "text": "DT107: the second Ask sends the plate as a new question, the old turns stay above: What dish can I make around what is on my plate, so it makes a dinner? 50 g Clean Protein Bar Peanut Love, 250 g Quark, low fat (Magerquark), 7 g Active dry yeast."
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 32 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 17,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "dish-first.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 18 October 2026, 21:08 to 22:11, story R16 on canvas board RS15): see the dish and its PD first; nothing breaks the layout. Reading a recipe shows the dish's picture on top (the page's own photo from a link, your first screenshot from screenshots), for you only, never published; then where it came from; then the PD block, the same as on the Plate, in place of a small line. On the recipe page the PD block sits under Where it came from. The Nutrition table has one set of columns for the whole card: every number sits under its heading and none leaves the card. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 13,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the read shows the page's photo of the dish on top"
+    },
+    {
+     "ok": true,
+     "text": "then where it came from, then the PD block for one fritter"
+    },
+    {
+     "ok": true,
+     "text": "the small PD line is gone"
+    },
+    {
+     "ok": true,
+     "text": "where it came from reads as letters"
+    },
+    {
+     "ok": true,
+     "text": "the read's Nutrition table: numbers line up, none leaves the card ok"
+    },
+    {
+     "ok": true,
+     "text": "the recipe keeps the page's photo with where it came from, for you only"
+    },
+    {
+     "ok": true,
+     "text": "the recipe page: PD right under Where it came from, before the foods"
+    },
+    {
+     "ok": true,
+     "text": "the recipe page's Nutrition table: numbers line up, none leaves the card ok"
+    },
+    {
+     "ok": true,
+     "text": "from screenshots, the first screenshot is the picture"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 54 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "dont-have-it.cjs",
+   "about": "Help inside the plate: \"Don't have it\" offers swaps from your foods; one tap changes exactly one food; closing changes nothing.",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "open and close the helper leaves the plate as it was -> [\"Nutella\",\"Leibniz Butterkeks\",\"Skyr, natural\"]"
+    },
+    {
+     "ok": true,
+     "text": "swaps from your foods are offered -> [\"Quark, low fat (Magerquark)\",\"Whey protein powder\"]"
+    },
+    {
+     "ok": true,
+     "text": "the missing food is not offered "
+    },
+    {
+     "ok": true,
+     "text": "exactly one food changed -> [\"Nutella\",\"Leibniz Butterkeks\",\"Quark, low fat (Magerquark)\"]"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "edge-band.cjs",
+   "about": "JOURNEY (0.2.113, board Stories88, DT132; Milan 27 October 13:52, 14:12, 14:21, 14:37 \"Go\"), rule N54: on the edge. A value within 2 points of a rule's line passes, amber, with the number, the line and one hint; no DaaM Good spot. Well over the line stays a fail. The plate's size 1.3 to 1.5 portions is on the edge too. A letter within 5 percent of a band edge says so in Per 100 kcal; the quick line of letters stays as it is. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.",
+   "pass": true,
+   "seconds": 15,
+   "checks": [
+    {
+     "ok": true,
+     "text": "N54: 51 percent fat passes on the edge, amber, the number, the line, a hint: ~ Nutrition, on the edgeFat is about half of this lunch's energy: 51 percent, and the line is 50.To be clear of it: a little less salmon, or a protein side."
+    },
+    {
+     "ok": true,
+     "text": "N54: no red line, and no DaaM Good spot on the edge"
+    },
+    {
+     "ok": true,
+     "text": "N54: well over the line stays a plain fail"
+    },
+    {
+     "ok": true,
+     "text": "C31, N54: 1.3 to 1.5 portions is on the edge, not two lunches:  Chef Mealan✓ CulinaryA plain lunch plate.✓ Nutrition✓ Your day~ Size, on the edgeAbout 1.4 lunch portions: 1,265 kcal for a lunch of about 917, and the line is 1.5.To be clear of it: a little less of"
+    },
+    {
+     "ok": true,
+     "text": "N54: the letter at an edge says so in Per 100 kcal; the quick line keeps F: F fat: 4.8 g per 100 kcal, as your day's 3.3. ~ On the edge of high: 1.47 times your day, the edge is 1.5.c- carbs: 5.1 g per 100 kcal, close to none against yo"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 33 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "fibre.cjs",
+   "about": "JOURNEY INVARIANT (DT342, 0.3.185, board Stories285; Coach Milan, Go 23 November 2026, 16:21): fibre, 0 where it is a fact. Olive oil from a pack with no fibre value counts as 0 (none by nature): the plate has a real fibre letter, the numbers say fibre in grams and one line names the oil; the oil's own row reads fi-, and its own values stay as on its pack. With a food that has no fibre value and is not on the list (a muesli bar), the plate counts what is known: fibre 6* g, a * line says at least 6 g and names the food, and the letter has a * (fi*, never fi-*). The muesli bar's card says to add the fibre from the pack in Review the label. No guessed number.",
+   "pass": true,
+   "seconds": 16,
+   "checks": [
+    {
+     "ok": true,
+     "text": "AC1: the plate has a real fibre letter, fi: fi"
+    },
+    {
+     "ok": true,
+     "text": "AC7: the oil's row reads fi-: F+ c- fi- p-"
+    },
+    {
+     "ok": true,
+     "text": "AC1: the numbers say fibre 6 g: 6"
+    },
+    {
+     "ok": true,
+     "text": "AC3: one line names the oil: Olive oil counts as 0 fibre: none by nature."
+    },
+    {
+     "ok": true,
+     "text": "AC1: the oil's own values stay as on its pack, fibre empty"
+    },
+    {
+     "ok": true,
+     "text": "AC5: the letter has a *, fi*, never fi-*: fi*"
+    },
+    {
+     "ok": true,
+     "text": "AC4: the numbers say fibre 6*: 6*"
+    },
+    {
+     "ok": true,
+     "text": "AC4: the * line: * Fibre: at least 6 g. 1 food without a value: Muesli bar. Olive oil counts as 0 fibre: none by nature."
+    },
+    {
+     "ok": true,
+     "text": "AC6: the muesli bar's card says where to add it: No fibre on this food's values. If the pack gives it, add it in Review the label; until then your plate's fibre has a *: at least what the other foods have."
+    },
+    {
+     "ok": true,
+     "text": "AC6: the oil's card says it counts as 0"
+    },
+    {
+     "ok": true,
+     "text": "AC5: no food with a fibre value: fi?: fi?"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 104 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "find-then-add.cjs",
+   "about": "Changed by DT148 (0.2.129, board Stories100 version 2; Coach Milan 28 October 22:51): Take it reads + Add everywhere. JOURNEY INVARIANT (Milan, 5 October 2026): on Foods, finding and adding are two things. Find a food searches only my foods, letters or a saved barcode, and never adds. Add a food is one row, Type, Barcode, Scan; what was typed in Find rides along. The sheet's title is the word tapped, under a small ADD A FOOD line.",
+   "pass": true,
+   "seconds": 85,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Find a food on top, with the count"
+    },
+    {
+     "ok": true,
+     "text": "Add sits in the header, closed"
+    },
+    {
+     "ok": true,
+     "text": "Add a food: one row, Type, Scan:  Type |  Scan"
+    },
+    {
+     "ok": true,
+     "text": "the old chips and the loose barcode field are gone"
+    },
+    {
+     "ok": true,
+     "text": "one letter: my foods by word start, nothing from outside"
+    },
+    {
+     "ok": true,
+     "text": "two letters: the basic foods join the one list, no database yet"
+    },
+    {
+     "ok": true,
+     "text": "three letters: one list, my foods first, the word and the count on top"
+    },
+    {
+     "ok": true,
+     "text": "and the database behind one line"
+    },
+    {
+     "ok": true,
+     "text": "the line opens the database rows, up to five"
+    },
+    {
+     "ok": true,
+     "text": "finding added nothing by itself"
+    },
+    {
+     "ok": true,
+     "text": "with results, the end card asks in plain words"
+    },
+    {
+     "ok": true,
+     "text": "Take it puts a basic food in my foods, with its identity, in English (DT204)"
+    },
+    {
+     "ok": true,
+     "text": "DT125: the same food is never two rows: the basic row is gone, yours stands"
+    },
+    {
+     "ok": true,
+     "text": "a food saved in Munich is found by its Serbian name: "
+    },
+    {
+     "ok": true,
+     "text": "a chip that hides the match says so, with Show all"
+    },
+    {
+     "ok": true,
+     "text": "Show all brings the match back"
+    },
+    {
+     "ok": true,
+     "text": "a database product is fetched by its barcode"
+    },
+    {
+     "ok": true,
+     "text": "nothing anywhere: the end card says so, in plain words"
+    },
+    {
+     "ok": true,
+     "text": "the sheet is titled Manual, under Add a food"
+    },
+    {
+     "ok": true,
+     "text": "the search text rides along"
+    },
+    {
+     "ok": true,
+     "text": "the name is filled and the food without a label is suggested"
+    },
+    {
+     "ok": true,
+     "text": "digits found nowhere: the number comes with you"
+    },
+    {
+     "ok": true,
+     "text": "the Manual sheet holds the number in its barcode field"
+    },
+    {
+     "ok": true,
+     "text": "Look up asks the database"
+    },
+    {
+     "ok": true,
+     "text": "the camera header reads Add a food, Scan"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "food-gallery.cjs",
+   "about": "",
+   "pass": true,
+   "seconds": 22,
+   "checks": [
+    {
+     "ok": true,
+     "text": "no photo yet: one line asks for the front"
+    },
+    {
+     "ok": true,
+     "text": "the first real photo replaces the drawn picture"
+    },
+    {
+     "ok": true,
+     "text": "three added photos, no drawn picture among them"
+    },
+    {
+     "ok": true,
+     "text": "the main photo comes first, with a star"
+    },
+    {
+     "ok": true,
+     "text": "Make it the main photo: it moves to the front and says so"
+    },
+    {
+     "ok": true,
+     "text": "still three photos"
+    },
+    {
+     "ok": true,
+     "text": "close is its own button, top right"
+    },
+    {
+     "ok": true,
+     "text": "one tap only arms Remove; the photo stays"
+    },
+    {
+     "ok": true,
+     "text": "the second tap hides it, with Undo"
+    },
+    {
+     "ok": true,
+     "text": "Undo brings it back"
+    },
+    {
+     "ok": true,
+     "text": "after the note goes, the photo is removed for real: 2 shown, 2 stored"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "food-names.cjs",
+   "about": "DT204 (0.3.47, board Stories151; Coach Milan 1 November 17:57 to 18:44 Go; Tester 2's lunch photo of 30 October): food names in the app's language with the market's name under them on Foods and the food's card; Tester 2's Spanać becomes Spinach, raw; the pasta icon on tortellini; one decimal point on a phone set to Serbian; no portion lines on the parts of a dish read from a photo, while a food added by hand keeps its line.",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the plate in one language: Tortellini, Creamy pesto sauce, Mushrooms, sliced, Spinach"
+    },
+    {
+     "ok": true,
+     "text": "Spanać in the library became Spinach, raw, and keeps Spanać as another name"
+    },
+    {
+     "ok": true,
+     "text": "tortellini has the pasta icon"
+    },
+    {
+     "ok": true,
+     "text": "no cake on the plate"
+    },
+    {
+     "ok": true,
+     "text": "no portion lines on the parts of a dish read from a photo"
+    },
+    {
+     "ok": true,
+     "text": "one decimal point on a phone set to Serbian: 1.3 under your 4.8"
+    },
+    {
+     "ok": true,
+     "text": "peanut butter added by hand keeps its portion line"
+    },
+    {
+     "ok": true,
+     "text": "Foods: Spinach, raw, In shops in Serbia: Spanać"
+    },
+    {
+     "ok": true,
+     "text": "Tunjevina, a name she typed, stays as it is, no line"
+    },
+    {
+     "ok": true,
+     "text": "an estimate that shares a table name gets no line"
+    },
+    {
+     "ok": true,
+     "text": "the food's card says it too"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 10 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "fritters-from-scratch.cjs",
+   "about": "The fritters from scratch (0.2.93, canvas Page 2, board Stories66, DT109; Milan 24 October 23:34, testing 0.2.92: chicken, rice, an egg and an apple locked as the Apple fritters, with the fritters' fourteen steps). Checked: a recipe opened on the Plate keeps its link while at least half of its foods are there, a swap keeps it, and the link goes with a toast when the foods go; Lock the recipe then gives the plate's own way, not the original's steps; Save makes a recipe of its own.",
+   "pass": true,
+   "seconds": 17,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the fritters open on the Plate, linked, with their seven foods noted: [\"flour\",\"sugar\",\"butter\",\"eggs\",\"apples\",\"soil\",\"yeast\"]"
+    },
+    {
+     "ok": true,
+     "text": "the plate carries the recipe's name"
+    },
+    {
+     "ok": true,
+     "text": "DT109: four of seven foods left, still the fritters"
+    },
+    {
+     "ok": true,
+     "text": "DT109: three of seven left, the link is gone: fromRecipe undefined"
+    },
+    {
+     "ok": true,
+     "text": "DT109: the toast says so"
+    },
+    {
+     "ok": true,
+     "text": "DT109: the recipe's name left the plate with it"
+    },
+    {
+     "ok": true,
+     "text": "DT109: no whole-recipe choice on a plate that is no recipe (DT220: the button How to make it › may name the page it opens)"
+    },
+    {
+     "ok": true,
+     "text": "DT109: Lock the recipe never shows the fritters' steps: Added: 1 bar, 50 g. Set the amount you actually have. Back to the platePrepMakeEatHow to make Eggs, Apples, Active dry y"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 40 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "home-languages.cjs",
+   "about": "DT236 v3 (0.3.93, boards Stories177 and Stories180; Coach Milan 5 November 11:36, Go): the home page in English, Srpski and Deutsch (Beta). chefmealan.com stays English; /sr and /de carry their own language, title and search line; the switch in the header shows the language that is on and opens all three; a phone in Serbian or German sees the box once; the choice is the app's too. The header fits on a phone in every language. The clips stay English (Coach Milan 11:26).",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "/de says lang=de, with its German title"
+    },
+    {
+     "ok": true,
+     "text": "/sr says lang=sr-Latn"
+    },
+    {
+     "ok": true,
+     "text": "chefmealan.com stays English and names the three addresses"
+    },
+    {
+     "ok": true,
+     "text": "an English phone sees no box"
+    },
+    {
+     "ok": true,
+     "text": "the switch shows EN"
+    },
+    {
+     "ok": true,
+     "text": "the switch is 44 px"
+    },
+    {
+     "ok": true,
+     "text": "it opens English, Srpski (latinica), Deutsch (Beta): ✓English · Srpski (latinica) · Deutsch (Beta)"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch goes to chefmealan.com/de"
+    },
+    {
+     "ok": true,
+     "text": "the page is in German: Lebe deinen Ernährungsplan, Tag für Tag."
+    },
+    {
+     "ok": true,
+     "text": "the app takes the same choice"
+    },
+    {
+     "ok": true,
+     "text": "in German the header fits a 390 px phone"
+    },
+    {
+     "ok": true,
+     "text": "the clips stay as they are"
+    },
+    {
+     "ok": true,
+     "text": "in German the languages block still names English, Srpski, Deutsch · Beta"
+    },
+    {
+     "ok": true,
+     "text": "a German phone sees the box above the English page"
+    },
+    {
+     "ok": true,
+     "text": "Auf Deutsch opens /de, the box goes"
+    },
+    {
+     "ok": true,
+     "text": "chefmealan.com opens the German page for this phone from now on"
+    },
+    {
+     "ok": true,
+     "text": "a Serbian phone sees the box in Srpski"
+    },
+    {
+     "ok": true,
+     "text": "Continue in English: English stays, the box does not come back"
+    },
+    {
+     "ok": true,
+     "text": "English: the header fits a 360 px phone"
+    },
+    {
+     "ok": true,
+     "text": "English: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "Srpski: the header fits a 360 px phone"
+    },
+    {
+     "ok": true,
+     "text": "Srpski: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "German: the header fits a 360 px phone"
+    },
+    {
+     "ok": true,
+     "text": "German: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "me-plate-fixes.cjs",
+   "about": "DT205 to DT207 (0.3.48; Coach Milan 1 November 19:42 findings, 19:54 Go). Profile keeps every answer as you go: no Save in the middle, Next: Goal the main button; Your summary, Plan your week, then Back comes back to Your summary; Shopping lists shows the earlier lists first, New shopping list its own button; a food added to a plate started hours ago asks Add or Start a new plate (DT206); a plate of only a drink gets no meal built around it. Changed by story DT313 (0.3.159, board Stories250; Coach Milan, Go 18 November 15:56): a food onto a plate from hours ago asks on the same screen as a photo; the check DT206 reads the new words. Nothing else changed.",
+   "pass": true,
+   "seconds": 21,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT206: a food for a plate from hours ago asks first: It already has Chicken and rice, from 10:32. A new food cannot land on it by itself: you decide where it goes."
+    },
+    {
+     "ok": true,
+     "text": "Start a new plate: only the skyr: Skyr"
+    },
+    {
+     "ok": true,
+     "text": "a plate started now takes the next food without a question"
+    },
+    {
+     "ok": true,
+     "text": "DT206: a plate of only a drink offers no meal around it"
+    },
+    {
+     "ok": true,
+     "text": "DT205: no Save button in the middle of Profile"
+    },
+    {
+     "ok": true,
+     "text": "DT205: the weight is kept a moment after typing: 93"
+    },
+    {
+     "ok": true,
+     "text": "DT205: a birth year of two digits waits, and says so"
+    },
+    {
+     "ok": true,
+     "text": "DT205: Next: Goal is the main button at the end"
+    },
+    {
+     "ok": true,
+     "text": "Next: Goal opens Goal: /me/goal"
+    },
+    {
+     "ok": true,
+     "text": "Plan your week opens Plan: /plan"
+    },
+    {
+     "ok": true,
+     "text": "DT207e: Back from Plan comes back to Your summary: /me/summary"
+    },
+    {
+     "ok": true,
+     "text": "DT207b: with an earlier list kept, the button says Shopping lists"
+    },
+    {
+     "ok": true,
+     "text": "DT207b: the earlier list first, then New shopping list, no form yet"
+    },
+    {
+     "ok": true,
+     "text": "New shopping list opens the form for list 2"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 28 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "members-foods.cjs",
+   "about": "Changed by DT148 (0.2.129, board Stories100 version 2; Coach Milan 28 October 22:51): Take it reads + Add everywhere. Members' foods (0.2.97, canvas Page 2, board Stories68, DT115; Milan 24 October 19:00 and 25 October 01:47 to 02:05): one catalogue of every reviewed scan. Two members on one server (in memory, no Firestore): Tester 2 in Belgrade with tuna in brine, Tester 3 in Cyprus with fresh tuna, and you in Munich with tuna in olive oil. Checked: a reviewed food travels once (no photo); Find a food shows Members' foods, your market first; Also seen by members under your own tuna; Add to my foods copies it; the barcode scan answers from the catalogue before Open Food Facts; the swap list reaches the catalogue with the same tuna in another state first and the difference per can.",
+   "pass": true,
+   "seconds": 23,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the other members' reviewed scans are in the catalogue: [{\"ok\":true,\"shared\":1},{\"ok\":true,\"shared\":3}]"
+    },
+    {
+     "ok": true,
+     "text": "DT115: your two reviewed foods travel once, no photo, no starter foods: Tuna in olive oil, drained, Rice, cooked"
+    },
+    {
+     "ok": true,
+     "text": "DT115: what was sent is noted, so nothing goes twice"
+    },
+    {
+     "ok": true,
+     "text": "DT136: Munich's search says what waits in Belgrade and Cyprus"
+    },
+    {
+     "ok": true,
+     "text": "DT115, DT125: the four foods the others scanned as rows of the one list: 4"
+    },
+    {
+     "ok": true,
+     "text": "DT115, 0.2.100: the Greek tuna found by the English word, never your own: Tuna in water, drained, Tuna steak, fresh, Τόνος σε νερό, Tuna in brine, drained"
+    },
+    {
+     "ok": true,
+     "text": "DT125: yours first, then members', your market (Munich) first, the basic food last"
+    },
+    {
+     "ok": true,
+     "text": "0.2.100: tunjevina finds the tuna of every language"
+    },
+    {
+     "ok": true,
+     "text": "DT171: no market or day shown; a food without a barcode says so"
+    },
+    {
+     "ok": true,
+     "text": "DT125: the old groups and the line under your tuna are gone; one list"
+    },
+    {
+     "ok": true,
+     "text": "DT115, DT171: a copy in your foods with the values and the source"
+    },
+    {
+     "ok": true,
+     "text": "0.2.101: a copy's photo is only ever an Open Food Facts link: none"
+    },
+    {
+     "ok": true,
+     "text": "DT125: the copied food is one row, yours, never twice"
+    },
+    {
+     "ok": true,
+     "text": "0.2.103: the copy carries the other languages' words: [\"thunfisch\",\"tunjevina\",\"туњевина\",\"τόνος\"]"
+    },
+    {
+     "ok": true,
+     "text": "0.2.103: a member's food opens its card"
+    },
+    {
+     "ok": true,
+     "text": "DT115: a barcode a member checked answers from the catalogue: Members' foods · checked by a member"
+    },
+    {
+     "ok": true,
+     "text": "0.2.103: tuna finds Tunjevina in the Plate's search"
+    },
+    {
+     "ok": true,
+     "text": "DT115: the same tuna in another state leads the swaps, with the difference per can: 🐟Tuna in brine, drainedEva · a member's food; joins your foods · PD 22.9 · the same tuna, another state · 88 kcal less per can, the same protein104 g"
+    },
+    {
+     "ok": true,
+     "text": "DT115, DT171: a member's food in the list says so, not where it was seen"
+    },
+    {
+     "ok": true,
+     "text": "DT115: a food without a barcode seen only in Cyprus is not offered in Munich"
+    },
+    {
+     "ok": true,
+     "text": "0.2.96: no ingredient in the swap list"
+    },
+    {
+     "ok": true,
+     "text": "DT115: taking a member's swap copies the food into your library"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 36 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "mix-tip.cjs",
+   "about": "Mix it: a food that doesn't fit on its own shows partners by moment; one tap makes the plate; Not quite opens the helper with the tip.",
+   "pass": true,
+   "seconds": 60,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Nutella gets a Mix it section"
+    },
+    {
+     "ok": true,
+     "text": "two or three mixes offered: 3"
+    },
+    {
+     "ok": true,
+     "text": "the first partner is a protein base: with Skyr, naturalPD 6.4 · 158 kcal · Da"
+    },
+    {
+     "ok": true,
+     "text": "every chip says what it makes"
+    },
+    {
+     "ok": true,
+     "text": "every chip says the calories it lands on"
+    },
+    {
+     "ok": true,
+     "text": "the tip shown is logged once, with what was offered"
+    },
+    {
+     "ok": true,
+     "text": "the plate is Nutella plus the partner"
+    },
+    {
+     "ok": true,
+     "text": "the plate lands on the target: PD 6.36"
+    },
+    {
+     "ok": true,
+     "text": "the readout says it fits"
+    },
+    {
+     "ok": true,
+     "text": "the tap is logged with partners and moment"
+    },
+    {
+     "ok": true,
+     "text": "Eggs fit on their own: no Mix it"
+    },
+    {
+     "ok": true,
+     "text": "before training: every mix under the snack line"
+    },
+    {
+     "ok": true,
+     "text": "before training: nothing to cook"
+    },
+    {
+     "ok": true,
+     "text": "the helper carries the tip: I scanned Nutella for before training. You suggested with Sk"
+    },
+    {
+     "ok": true,
+     "text": "the ask is logged"
+    },
+    {
+     "ok": true,
+     "text": "the review sheet shows Mix it before the food is saved"
+    },
+    {
+     "ok": true,
+     "text": "a partner is offered on the review sheet: with Skyr, naturalPD 7.1 · 144"
+    },
+    {
+     "ok": true,
+     "text": "the chip saved the food"
+    },
+    {
+     "ok": true,
+     "text": "and put the mix on the plate: Shop biscuit + Skyr, natural"
+    },
+    {
+     "ok": true,
+     "text": "the review sheet does not call a mix cooking because the ready box is still unticked"
+    },
+    {
+     "ok": true,
+     "text": "the sheet says how it fits: on its own, before and after training"
+    },
+    {
+     "ok": true,
+     "text": "on its own: under the target, said plainly and never green"
+    },
+    {
+     "ok": true,
+     "text": "Tell Mealan on the sheet saves the food and opens the helper with the tip: I scanned Shop wafer for regular meal. Y"
+    },
+    {
+     "ok": true,
+     "text": "the wafer was saved on the way"
+    },
+    {
+     "ok": true,
+     "text": "the person's foods stay: Chicken breast, cooked + Tomato sauce, no added sugar"
+    },
+    {
+     "ok": true,
+     "text": "no swap for a food that was never asked for"
+    },
+    {
+     "ok": true,
+     "text": "the label check shows the PD: PD 13.8"
+    },
+    {
+     "ok": true,
+     "text": "and what one bar is"
+    },
+    {
+     "ok": true,
+     "text": "after training counts in bars: After training: Suits after training: 2 bars, 90 g gives about 45 g pr"
+    },
+    {
+     "ok": true,
+     "text": "the serving is saved with the food"
+    },
+    {
+     "ok": true,
+     "text": "the plate shows the count first, the grams small (0.2.24, CT)"
+    },
+    {
+     "ok": true,
+     "text": "what Mealan moves lands on whole bars: 45 g"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 28 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "places.cjs",
+   "about": "JOURNEY (0.2.120, board Stories93 version 3, DT136; Milan 27 October 18:23 to 28 October 14:59, \"DT136. Can go\"; Tester 3): foods by place. Marko shops in Limassol; Belgrade's foods and members' foods seen in Belgrade wait behind their chip; a basic food takes Limassol's name. Where I shop is one list of places: home always on, another place's switch, its starter foods the first time, Delete unused keeps what was used. A trip on Plan puts its place on and tags the foods added then.",
+   "pass": true,
+   "seconds": 20,
+   "checks": [
+    {
+     "ok": true,
+     "text": "every food got its place: Belgrade's from their names"
+    },
+    {
+     "ok": true,
+     "text": "a basic food takes Limassol's name; the Serbian stays as another name"
+    },
+    {
+     "ok": true,
+     "text": "Limassol's search: nothing from Belgrade, Limassol's members' food shows"
+    },
+    {
+     "ok": true,
+     "text": "a line and a chip say what waits in Belgrade: 4 more in Belgrade."
+    },
+    {
+     "ok": true,
+     "text": "Belgrade on: its foods show"
+    },
+    {
+     "ok": true,
+     "text": "the search chip adds no starter foods"
+    },
+    {
+     "ok": true,
+     "text": "home is Limassol, always on"
+    },
+    {
+     "ok": true,
+     "text": "Belgrade off: its 2 foods kept: Where you live, shop and cook is home: its foods are always in your search. Any other place: its switch puts its foods in your search. The first time, its starter foods come with it. Limassol Home · 20 foods, fifty Cypriot with their Greek names Add its starte"
+    },
+    {
+     "ok": true,
+     "text": "Delete unused counts only the one never used (the favourite stays)"
+    },
+    {
+     "ok": true,
+     "text": "the unused Belgrade food is deleted; the used one stays"
+    },
+    {
+     "ok": true,
+     "text": "Munich on, the first time: its starter foods are added (0 new; the rest were in the library)"
+    },
+    {
+     "ok": true,
+     "text": "the trip is on Plan, its switch on for its days"
+    },
+    {
+     "ok": true,
+     "text": "a food added on the trip is tagged Belgrade"
+    },
+    {
+     "ok": true,
+     "text": "the trip's switch turns its foods off"
+    },
+    {
+     "ok": true,
+     "text": "trip off: Kajmak waits with Belgrade"
+    },
+    {
+     "ok": true,
+     "text": "the card says Sold in Belgrade"
+    },
+    {
+     "ok": true,
+     "text": "+ A place adds Limassol"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "plate-numbers.cjs",
+   "about": "JOURNEY (0.2.109, board Stories86, DT129; Milan 26 October 13:09 to 15:06): the PD block reads at a glance, the numbers on a tap. The heading is the meal by name; beside PD the status and Energy, Weight, Protein with the plate's numbers, right aligned; under the number the four letters on one line. A tap opens Against your planned day: the plate against the meal planned in this slot (Plate, Planned, %), then what is in it (g, kcal, % plate, % day, a Total). No meal planned: no first part. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.",
+   "pass": true,
+   "seconds": 9,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT129: the heading is the meal by name: LunchPD"
+    },
+    {
+     "ok": true,
+     "text": "DT129: beside PD, Energy, Weight, Protein with the plate's numbers: Energy655 kcalWeight450 gProtein69 g"
+    },
+    {
+     "ok": true,
+     "text": "DT129: nothing about the plan in the block"
+    },
+    {
+     "ok": true,
+     "text": "DT129: the four letters on one line: f- C fi- P+"
+    },
+    {
+     "ok": true,
+     "text": "DT129: the numbers wait for a tap"
+    },
+    {
+     "ok": true,
+     "text": "DT129: the tap opens the numbers under the PD block"
+    },
+    {
+     "ok": true,
+     "text": "DT129: the plate and your plan, Plate, Planned, %: Energy655 kcal803 kcal82% | Weight450 g550 g82% | Protein69 g86 g80%"
+    },
+    {
+     "ok": true,
+     "text": "DT129: the Total row: weight, kcal, 100, share of the day: Total45065510024"
+    },
+    {
+     "ok": true,
+     "text": "DT129: fat: 8 g, 72 kcal, 11% of the plate, its share of the day: Fat872119"
+    },
+    {
+     "ok": true,
+     "text": "DT129: Per 100 kcal keeps the four sentences"
+    },
+    {
+     "ok": true,
+     "text": "DT129: a second tap closes it"
+    },
+    {
+     "ok": true,
+     "text": "DT129: no meal planned: only what is in it"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 52 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "read-correct.cjs",
+   "about": "Story DT318 (0.3.160, board DT318; Coach Milan, Go 19 November 01:00): correcting what Chef Mealan read from a photo, in three ways, each with one job. His own checks stand on the read, under the chips: how much, what it is, and new, which one, with real foods of that kind, your own first. Under them one field, Tell Chef Mealan what to check: a tap on a chip makes the words about that food, with no chip marked the field takes a missing food; Send to Chef Mealan makes him look again, and what you set stays. By hand: Continue on the Plate opens the Plate's food list as it is. A chip shows the food's full name. The link Wrong foods? Help Chef Mealan read it is gone from the Plate's screen. The checks name the acceptance criteria of the board (DT318 AC1 to AC14). Changed by story DT307 (0.3.163, board DT307; Coach Milan, Go 19 November 11:36): + Add more stands left of Continue on the Plate, so Continue on the Plate is tapped by its own name (.rv-continue)",
+   "pass": true,
+   "seconds": 46,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT318 AC1: each chip shows the food's full name and grams: Yogurt, 10% fat ~80 g"
+    },
+    {
+     "ok": true,
+     "text": "the line under the chips no longer says Tap an amount to correct it"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC2: the check about an amount stands under the chips, with ~200 g, ~350 g and Skip"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC2: the check about what a food is stands under it, with its answers and Skip"
+    },
+    {
+     "ok": true,
+     "text": "on the read, top to bottom: the chips, his checks, the field for Chef Mealan, Continue on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC12: the button says Continue on the Plate, and there is no Change the foods"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC12: the Plate opens with its food list as it is: the foods, the swipe, + Add more to your plate"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC2: the two checks I did not answer still stand on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC13: the Plate with a photo has no link Wrong foods? Help Chef Mealan read it"
+    },
+    {
+     "ok": true,
+     "text": "must not change: Retake and + Photo are on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC3: a tap on ~200 g: the chip says 200 g without the ~, and the question is gone"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC7: in the check about what it is, an answer that is in no list says estimate; Skyr is a food of the app"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC4: a tap on Yogurt settles the type, and he asks next: which yogurt is it?"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC6: each answer is a food by its full name: my own two first, marked yours, then two of the app's foods that differ; and Skip"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC5: a tap on my yogurt: the chip says Hildebrand yogurt, 0.2% fat, and the question is gone"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC6: on the plate it is that food of my list, with its label's values, at the same grams"
+    },
+    {
+     "ok": true,
+     "text": "the field says Tell Chef Mealan what to check; with nothing written, Send to Chef Mealan waits"
+    },
+    {
+     "ok": true,
+     "text": "Send to Chef Mealan sends my words, and what I set: the chicken at 200 g and my yogurt"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC9: a chip Mayonnaise is there, marked as new"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC11: the chicken is still 200 g and the yogurt is still mine, and he does not ask about the chicken again"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC8: one line from Chef Mealan says what he did, and I am still on the read"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC8: a tap on a chip marks it, the field says About: Sweet potato fries, baked, the chip does not turn into a number, and the mark new is gone"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC8: my words go to Chef Mealan with the food they are about"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC8: and one line from him says what he did"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC10: the microphone is inside the field"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC10: what I say stands in the field as if typed"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC7: Sour cream is in no list: its chip says estimate, and no question which one follows"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC11: an amount typed on the Plate, 150 g of fries, is kept as mine"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC11: when Chef Mealan answers my words, the fries are still 150 g"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC14: Tell Chef Mealan what to check, About, Send to Chef Mealan, Continue on the Plate and Chef Mealan's line are in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "DT318 AC14: and in German"
+    },
+    {
+     "ok": true,
+     "text": "save check: 86 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-centre.cjs",
+   "about": "The recipe page at the centre (0.2.25, canvas board RP, RP1 to RP5b; Milan 17 October 2026, 17:42 to 18:23). A recipe from a link: the original is the steps, numbered, headings in bold, the page's signs read as letters; a line says the original works with your foods; Chef Mealan's way on a tap, then a toggle. PD sits above the table, as on the Plate; each column says its weight. How to make it says what you make and what you eat. A changed dish: the line says what differs. Every recipe made ends on its page; a plate that is no recipe ends on Today. Today has no camera; Manual, then Scan. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).",
+   "pass": true,
+   "seconds": 32,
+   "checks": [
+    {
+     "ok": true,
+     "text": "RP5: Today has no Scan food"
+    },
+    {
+     "ok": true,
+     "text": "RP5b: Recipe photo, Recipe link, and Photo or scan on the right (Recipe link | Photo or scan)"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the read card shows the steps with the foods"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the Plate shows the recipe's steps to review before Make it"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the original is the steps, numbered"
+    },
+    {
+     "ok": true,
+     "text": "RP1b: the page's signs read as letters; a range reads 10 to 20"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the page's heading in bold"
+    },
+    {
+     "ok": true,
+     "text": "RP1: a line says the original works; Chef Mealan's way on a tap"
+    },
+    {
+     "ok": true,
+     "text": "RP2: the three tiles gave way"
+    },
+    {
+     "ok": true,
+     "text": "RP2: the readout above the table, one slice, then the four letters (One slicePD1.31.2 under your 2.5379 kcal · 4.9 g protein · 94 gfc-fi?p-›)"
+    },
+    {
+     "ok": true,
+     "text": "RP2: each column says its weight (1 SLICE94 gALL 121,131 g100 G)"
+    },
+    {
+     "ok": true,
+     "text": "RP2: PD is no row of the table"
+    },
+    {
+     "ok": true,
+     "text": "RP1c: Chef Mealan's steps and the original, one tap apart"
+    },
+    {
+     "ok": true,
+     "text": "RP1c: the original is one tap away"
+    },
+    {
+     "ok": true,
+     "text": "RP1b: your dish differs: the line says how; the original for the original foods (No longer No-bake cheesecake: its foods are gone. The plate is yours. Back to the platePrepMakeEatHow to make No-bake cheesecake, more proteinNo steps yet for your changed dish.What you makeThe whole )"
+    },
+    {
+     "ok": true,
+     "text": "RP3: You make, You eat, each with weight and energy"
+    },
+    {
+     "ok": true,
+     "text": "RP4: the changed dish, saved, opens on its page"
+    },
+    {
+     "ok": true,
+     "text": "RP4: a recipe made again ends on its page"
+    },
+    {
+     "ok": true,
+     "text": "RP4: a plate that is no recipe ends on Today (/today)"
+    },
+    {
+     "ok": true,
+     "text": "No page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 35 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-nutrition.cjs",
+   "about": "Nutrition on the recipe page (0.2.21, canvas board IM, IM21 and IM21b; Milan 17 October 2026, 13:44 and 14:02). The stats say one serving; the table is worked out by code in the EU label order with exact counts (All 8, All 2), PD and a line by part; the recipe's own numbers sit under ours. A sweetener with no energy and carbohydrate (erythritol) is a real food, counted as polyols: read from a recipe, it never makes the stored data unreadable.",
+   "pass": true,
+   "seconds": 16,
+   "checks": [
+    {
+     "ok": true,
+     "text": "A sweetener with no energy and carbohydrate is a real food: the stored data reads back"
+    },
+    {
+     "ok": true,
+     "text": "RP2 (was IM21): the readout says one slice, with its weight (One slicePD5.41.1 under your 6.4284 kcal · 15.2 g protein · 150 gfc-fi*p›)"
+    },
+    {
+     "ok": true,
+     "text": "IM21, RP2: columns: 1 slice, All 8, 100 g, each with its weight (1 SLICE150 gALL 81,202 g100 G)"
+    },
+    {
+     "ok": true,
+     "text": "IM21: the EU order, with the sweetener's polyols (Energy,Fat,Carbohydrate,of which polyols,Protein)"
+    },
+    {
+     "ok": true,
+     "text": "IM21: 40 g erythritol, 5 g a slice (of which polyols5 g40 g3.3 g)"
+    },
+    {
+     "ok": true,
+     "text": "IM21: a line by part, for one slice"
+    },
+    {
+     "ok": true,
+     "text": "RP2: PD in the readout above, not in the table; no recipe numbers when it gives none; nothing missing"
+    },
+    {
+     "ok": true,
+     "text": "IM21b, RP2: exact counts: 1 cookie, All 2, with their weights (1 COOKIE78 gALL 2155 g100 G)"
+    },
+    {
+     "ok": true,
+     "text": "IM21b: the recipe's own numbers (The recipe says, per cookie: 234 kcal · 6.8 g fat · 29.5 g carbohydrate · 15.5 g protein · PD 6.6. Ours agrees.)"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    }
+   ]
+  },
+  {
+   "file": "recipes-add.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 18 October 2026, 19:45 to 19:58, story R6 on canvas board RS14): a recipe can be added on Recipes, with the same block as the Plate (Screenshot and Link). The read shows the Nutrition table after the foods, on both screens, with what the recipe says once, at the top. On Recipes it ends with Save in My recipes, which opens the recipe's page in Recipes and puts nothing on the Plate. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 9,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Recipes, Mine: Add a recipe with Use a screenshot and Paste a link (DT301)"
+    },
+    {
+     "ok": true,
+     "text": "the read shows the Nutrition table after the foods, without repeating the claim"
+    },
+    {
+     "ok": true,
+     "text": "what the recipe says, once, at the top"
+    },
+    {
+     "ok": true,
+     "text": "on Recipes the read ends with Save in My recipes"
+    },
+    {
+     "ok": true,
+     "text": "saved in My recipes, with what it says; nothing on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "Save opens the recipe's page, in Recipes, with the way back to Recipes"
+    },
+    {
+     "ok": true,
+     "text": "the Plate's read: the same Nutrition table, and Put it on my plate"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 34 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "tea-zero.cjs",
+   "about": "DT336 (0.3.174, board Stories274; Go 22 November 2026, 20:47): a tea, coffee, water or salt read from a barcode with no values in the product database is saved as 0 with no question: one line says so, the values show 0, there is no box to tick, and its PD is said in words. On the Plate it adds its grams and no energy. Any other product with no values gets an amber heads-up, and saving it empty still stops, as today. A tea with values is as today. B157 (0.3.175, board Stories275): Serbian word forms, in Latin and Cyrillic, and Ice Tea block the 0. B158 (0.3.175, board Stories276): the heads-up says the barcode has no values: close this, then scan the nutrition table with the camera on Label.",
+   "pass": true,
+   "seconds": 96,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT336 AC1: one line says Tea has almost no calories, so it is saved as 0 kcal."
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC1: energy, fat, carbohydrate and protein show 0"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC1: there is no box I checked the values"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC1: no heads-up for the tea"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC4: the label check says No PD: it has 0 kcal."
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC2: nothing else is asked"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC2: saved with 0 kcal and 0 protein"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC2: its notes say No values on the pack"
+    },
+    {
+     "ok": true,
+     "text": "DT336: saved as a tea with no values; nothing of the check is kept"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC4: its card says No PD: it has 0 kcal."
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC4: never a question mark and never On plan"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC5: the tea is on the plate, 300 g"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC5: the plate's energy and protein stay (This plate PD 7.0 fits your plan Energy 563 kcal Weight 448 g Protein 39 g f- C Fi P › / This plate PD 7.0 fits your plan Energy 563 kcal Weight 748 g Protein 39 g f- C Fi P ›)"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC5: its weight grows by the tea's grams"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC3: a coffee by its category is handled as the tea"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC3: no box for the coffee"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC3: the coffee is saved as 0, with no question"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7, B158 AC1: one amber line says the barcode has no values: close this, then scan the table on Label"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: the warn-box look, with the warning triangle"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: the values are empty"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: the box I checked the values is there"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: the biscuit is never 0"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: saving it empty still stops with the same lines as today"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC7: nothing is saved"
+    },
+    {
+     "ok": true,
+     "text": "DT336: the heads-up goes once a value is typed"
+    },
+    {
+     "ok": true,
+     "text": "DT336: salt and vinegar crisps get the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC1: Čaj sa šećerom gets the heads-up, the values empty and the box there"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC2: Чај са шећером gets the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC2: Kafa sa mlekom gets the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC2: Čaj s ukusom breskve gets the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC3: Ice Tea Peach gets the heads-up, never 0"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC4: Čaj bez šećera gets the heads-up"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC4: the 0 typed from the pack is saved as typed"
+    },
+    {
+     "ok": true,
+     "text": "B157 AC5: Čaj od nane is saved as 0, as in 0.3.174"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC8: a tea with values shows the database's values and the box, as today"
+    },
+    {
+     "ok": true,
+     "text": "DT336 AC8: no new line for a tea with values"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 291 account writes from 12 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "DT342 Middle plus the German sweep: the Plate's letters and numbers, a food's card, a recipe's numbers"
+}
