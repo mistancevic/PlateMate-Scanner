@@ -84,6 +84,17 @@ export const bandRange = (b: PdBand, t: number) => {
   const f = (x: number) => dec(Math.round(x * 10) / 10, 1);
   return b === "below" ? w("goal.rangeUnder", { n: f(t * 0.6) }) : b === "close" ? w("goal.rangeTo", { a: f(t * 0.6), b: f(t * 0.9) }) : b === "plan" ? w("goal.rangeTo", { a: f(t * 0.9), b: f(t * 1.5) }) : b === "high" ? w("goal.rangeTo", { a: f(t * 1.5), b: f(t * 2.5) }) : w("goal.rangeAndUp", { n: f(t * 2.5) });
 };
+// DT338 (0.3.179, board Stories279; Go 23 November 2026, 10:42): the five bands as one scale, in the person's own numbers.
+// Each band takes a fifth of the bar; High+ is drawn up to 3.5 times the target. scaleAt is where a PD sits on it, 0 to 100.
+export const SCALE_BANDS: PdBand[] = ["below", "close", "plan", "high", "top"];
+const SCALE_EDGES = [0, BAND_EDGES.close, BAND_EDGES.plan, BAND_EDGES.high, BAND_EDGES.top, 3.5];
+export const scaleAt = (pd: number | null, t: number | null): number | null => {
+  if (pd === null || t === null || t <= 0 || !Number.isFinite(pd)) return null;
+  const r = Math.max(0, pd / t);
+  if (r >= SCALE_EDGES[5]) return 100;
+  const k = SCALE_EDGES.findIndex((e, i) => i < 5 && r >= e && r < SCALE_EDGES[i + 1]);
+  return Math.round(((k + (r - SCALE_EDGES[k]) / (SCALE_EDGES[k + 1] - SCALE_EDGES[k])) * 20) * 10) / 10;
+};
 
 // The line under the chips: one line, the band's range for this target. Pairing is Mix it's job, not the chip's.
 export const bandLineIdle = () => w("goal.bandIdle");

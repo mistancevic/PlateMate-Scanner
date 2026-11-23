@@ -51,6 +51,38 @@ RB = [shot(X(0), y2, "2a", PW, "DT338.2a Me, Goal", "changed", "The scale under 
   shot(X(1), y2, "2b", PW, "DT338.2b The Plate", "changed", "High, above your plan. I tap the number."),
   shot(X(2), y2, "2c", PW, "DT338.2c The scale opens", "changed", "A mark where this plate sits: High.")]
 for i in range(1, 3): arrow(X(i) - G + 2, y2 + 540)
+# DT338.3 and .4 (AC5, Coach Milan 23 November 10:42): the same formula for two other goals
+y3 = max(RB) + 70
+label(y3, "DT338.3 New, Recomposition", "the same formula: target 6.3, every edge moves with it", 0, 2)
+y3 += 60
+R3 = [shot(X(0), y3, "3a", PW, "DT338.3a Me, Goal", "changed", "Target 6.3: On plan 5.7 to 9.5."),
+  shot(X(1), y3, "3b", PW, "DT338.3b The Plate, scale open", "changed", "The egg at PD 8.4: On plan.")]
+arrow(X(1) - G + 2, y3 + 540)
+y4 = max(R3) + 70
+label(y4, "DT338.4 New, Build muscle, Steady", "target 5.0: the same egg is High", 0, 2)
+y4 += 60
+R4 = [shot(X(0), y4, "4a", PW, "DT338.4a Me, Goal", "changed", "Target 5.0: On plan 4.5 to 7.5."),
+  shot(X(1), y4, "4b", PW, "DT338.4b The Plate, scale open", "changed", "The egg at PD 8.4: High.")]
+arrow(X(1) - G + 2, y4 + 540)
+# the formula, side by side for three goals
+import math
+def f1(x): return f"{math.floor(x * 10 + 0.5) / 10:.1f}"  # as the app rounds
+rows = [("Your own numbers", 2000, 106), ("Recomposition", 2300, 145), ("Build muscle, Steady", 2600, 130)]
+th = "padding:8px 10px;text-align:left;font-size:14px;color:#123a7a;border-bottom:2px solid #123a7a"
+td = "padding:8px 10px;font-size:14px;color:#172742;border-bottom:1px solid #d1dcf0"
+body = ""
+for n, k, pr in rows:
+    T = pr / k * 100; e = [f1(T * m) for m in (0.6, 0.9, 1.5, 2.5)]
+    egg = "On plan" if 0.9 * T <= 8.4 < 1.5 * T else ("High" if 8.4 < 2.5 * T else "High+")
+    body += f'<tr><td style="{td};font-weight:800">{n}</td><td style="{td}">{k} kcal, {pr} g</td><td style="{td};font-weight:900">{f1(T)}</td><td style="{td}">under {e[0]}</td><td style="{td}">{e[0]} to {e[1]}</td><td style="{td};font-weight:800">{e[1]} to {e[2]}</td><td style="{td}">{e[2]} to {e[3]}</td><td style="{td}">{e[3]} and up</td><td style="{td}">{f1(T)} to {e[2]}</td><td style="{td};font-weight:800">{egg}</td></tr>'
+hd = "".join(f'<th style="{th}">{h}</th>' for h in ["Goal", "Food a day", "PD target", "Low−", "Low", "On plan", "High", "High+", "Fit to my target", "One egg, PD 8.4"])
+TW = 3 * PW + 2 * G
+ytab = max(R4) + 70
+label(ytab, "The formula, three goals", "PD target = protein ÷ kcal × 100; every edge is 0.6, 0.9, 1.5 and 2.5 times the target", 0, 3)
+ytab += 60
+B.html.append(f'<div style="position:absolute;left:{X(0)}px;top:{ytab}px;width:{TW}px;background:#fff;border:2px solid #d1dcf0;border-radius:14px;padding:14px 16px;box-sizing:border-box"><table style="border-collapse:collapse;width:100%">{hd and "<tr>" + hd + "</tr>"}{body}</table>'
+  f'<div style="margin-top:12px;font-size:14px;line-height:1.45;color:#3d4a63">A higher target moves every range up. For someone who wants to gain, High means too little energy for the protein, not bad food. Fit to my target asks for the target itself up to the top of On plan.</div></div>')
+RB = RB + [ytab + 230]
 bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)

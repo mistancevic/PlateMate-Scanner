@@ -1,3 +1,4 @@
+import { PdScale } from "../components/PdScale";
 import { numLocale, w, wn, wIn as wordIn, dec, dateText, phoneLoc, mealName, mealV, type WordKey } from "../words";
 import { weekdayName } from "../weekdayWords";
 import { optWord } from "../optWords";
@@ -360,6 +361,8 @@ function GoalPanel(p: AppApi) {
             {state.goals.fats != null && state.goals.carbs != null && <p className="macro-line">{w("menu.macroSame", { fat: fmt(state.goals.fats, 0), carbs: fmt(state.goals.carbs, 0) })}</p>}
           </>
         ) : null}
+        {/* DT338 (0.3.179, Stories279): what the PD colours mean, in this person's numbers, under the target */}
+        {p.dayPd ? <div className="pd-scale-box"><PdScale target={p.dayPd} title={w("goal.pdScaleTitle", { t: pdVal(p.dayPd) })} /></div> : null}
       </section>
       {p.personal.nextGoal && (() => {
         // a goal applied from a later date waits here (canvas board FX, G2)

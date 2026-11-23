@@ -1,6 +1,6 @@
 {
-  "release": "0.3.178",
-  "at": "2026-11-23T07:44:47.782Z",
+  "release": "0.3.179",
+  "at": "2026-11-23T09:48:50.220Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -51520,6 +51520,96 @@
       "release": "0.3.178",
       "order": 900001,
       "at": "2026-11-23T07:44:47.782Z"
+    },
+    {
+      "id": "screen.goal.pdScaleTitle",
+      "kind": "screen",
+      "key": "goal.pdScaleTitle",
+      "en": "What the PD colours mean, for your target {t}",
+      "forms": "plain",
+      "slots": [
+        "t"
+      ],
+      "area": "Me and setup",
+      "where": "Me",
+      "sr": "Šta znače boje PD-a, za tvoj cilj {t}",
+      "de": "Was die PD-Farben bedeuten, für dein Ziel {t}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.179",
+      "order": 900000,
+      "at": "2026-11-23T09:48:50.220Z"
+    },
+    {
+      "id": "screen.plate.pdScaleTitle",
+      "kind": "screen",
+      "key": "plate.pdScaleTitle",
+      "en": "What the colour means, for your target {t}. This plate: {pd}.",
+      "forms": "plain",
+      "slots": [
+        "pd",
+        "t"
+      ],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Šta znači boja, za tvoj cilj {t}. Ovaj tanjir: {pd}.",
+      "de": "Was die Farbe bedeutet, für dein Ziel {t}. Dieser Teller: {pd}.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.179",
+      "order": 900001,
+      "at": "2026-11-23T09:48:50.220Z"
+    },
+    {
+      "id": "screen.plate.pdScaleOpen",
+      "kind": "screen",
+      "key": "plate.pdScaleOpen",
+      "en": "What the colour means",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Šta znači boja",
+      "de": "Was die Farbe bedeutet",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.179",
+      "order": 900002,
+      "at": "2026-11-23T09:48:50.220Z"
+    },
+    {
+      "id": "screen.plate.highPlan",
+      "kind": "screen",
+      "key": "plate.highPlan",
+      "en": "High, above your plan",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Visoko, iznad tvog plana",
+      "de": "Hoch, über deinem Plan",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.179",
+      "order": 900003,
+      "at": "2026-11-23T09:48:50.220Z"
+    },
+    {
+      "id": "screen.plate.topPlan",
+      "kind": "screen",
+      "key": "plate.topPlan",
+      "en": "High+, far above your plan",
+      "forms": "plain",
+      "slots": [],
+      "area": "The Plate",
+      "where": "The Plate",
+      "sr": "Visoko+, daleko iznad tvog plana",
+      "de": "Hoch+, weit über deinem Plan",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.179",
+      "order": 900004,
+      "at": "2026-11-23T09:48:50.220Z"
     }
   ]
 }

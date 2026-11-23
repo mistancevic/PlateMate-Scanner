@@ -1,3 +1,4 @@
+import { PdScale } from "../components/PdScale";
 import { w, wn, wIn, dec, mealV, mealName, wordV, dateV, dateText, type Val, type WordKey } from "../words";
 import { samePhotoMeal, updateWith, deleteCard as deleteCardIn } from "../pastMeal";
 import { liveStatus, minutesOf, type LiveStatus } from "../plateLive";
@@ -182,6 +183,7 @@ export function JourneyScreen(p: AppApi) {
   // the amounts before Fit: a mover that comes back unchanged means the plate was already above the target (0.2.7+r2)
   const [fitBefore, setFitBefore] = useState<Record<string, number> | null>(null);
   const [lineOpen, setLineOpen] = useState(false);
+  const [scaleOpen, setScaleOpen] = useState(false); // DT338: the PD scale behind a tap on the Plate's number
   const [chef, setChef] = useState<ChefState | null>(null);
   // title0: the name the plate had before Chef Mealan's dinner went on it (DT90: a name you typed stays)
   const [madeBy, setMadeBy] = useState<{ kitchen: string; base: string; from: Ingredient[]; tried: string[]; title0: string } | null>(() => (ui0.madeBy as any) ?? null);
@@ -2011,14 +2013,18 @@ export function JourneyScreen(p: AppApi) {
   // the end shows on a plate with foods that is yours to decide: no meal set, or set with the pencil. Not a recipe as
   // mapped, a plate kept as Just looking, a plate already recorded, or a meal opened from Plan (those keep their buttons)
   const endShown = !liveOn && step === "in" && items.length > 0 && !(imported && rec) && state.photo?.who !== "idea" && p.pick !== "exploring" && !p.recordNow && (!p.filling || p.filling.by === "line") && !mpSay;
+  const canScale = pd !== null && pdRef !== null && !tooBig;
   const readoutEl = items.length > 0 ? (
     <section className={`readout readout-fit-${p.fitPd(pd)}`}>
       <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? w("make.theWholeRecipe") : mealSlot ? mealName(mealSlot.name) : madeBy || (imported && mealNeed) ? w("plate.thisMeal", { meal: mealW }) : unset ? w("plate.thisPlate") : w("plate.asItStands")}</span><span>{pdTag()}</span></div>
       <div className="readout-mid">
-        <b>{pdVal(pd)}</b>
+        {/* DT338 (0.3.179, Stories279): a tap on the PD number opens the scale with a mark where this plate sits; a second closes it */}
+        {canScale ? <b className="pd-tap" role="button" tabIndex={0} aria-expanded={scaleOpen} aria-label={w("plate.pdScaleOpen")} onClick={() => setScaleOpen((x) => !x)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setScaleOpen((x) => !x); } }}>{pdVal(pd)}</b> : <b>{pdVal(pd)}</b>}
         {/* DT93, rule 3: a plate far over the meal says so, instead of going to the maths */}
-        <div><span>{tooBig ? w("plate.notYet", { meal: mealW }) : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? w("plate.fitsPlan") : w("plate.underYour", { gap: fixed(pdRef - pd), target: fixed(pdRef) })) : w("plate.noTarget")}</span><small className="rd-rows"><span>{w("plate.energy")}</span><b>{fmt(t.calories, 0)}</b> <span>{w("plate.kcal")}</span><span>{w("plate.weight")}</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>{w("plate.protein")}</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
+        {/* DT338 AC4: above On plan the words say the band: High, above your plan; High+, far above your plan */}
+        <div><span>{tooBig ? w("plate.notYet", { meal: mealW }) : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? (p.fitPd(pd) === "high" ? w("plate.highPlan") : p.fitPd(pd) === "top" ? w("plate.topPlan") : w("plate.fitsPlan")) : w("plate.underYour", { gap: fixed(pdRef - pd), target: fixed(pdRef) })) : w("plate.noTarget")}</span><small className="rd-rows"><span>{w("plate.energy")}</span><b>{fmt(t.calories, 0)}</b> <span>{w("plate.kcal")}</span><span>{w("plate.weight")}</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>{w("plate.protein")}</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
       </div>
+      {canScale && scaleOpen ? <div className="pd-scale-box"><PdScale target={pdRef} pd={pd} title={w("plate.pdScaleTitle", { t: pdVal(pdRef), pd: pdVal(pd) })} /></div> : null}
       {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
       {/* DT116 (0.2.98) and 0.2.99: the letters with their grams, one block; sugars, saturates and salt in the tap */}
       {p.rates ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who={w("letters.thePlate")} extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)}

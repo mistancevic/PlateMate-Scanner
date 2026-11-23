@@ -22948,6 +22948,26 @@
     "shopp.upToThree": {
       "text": "Bis zu 3. Tipp zuerst eine ab.",
       "checked": true
+    },
+    "goal.pdScaleTitle": {
+      "text": "Was die PD-Farben bedeuten, für dein Ziel {t}",
+      "checked": true
+    },
+    "plate.pdScaleTitle": {
+      "text": "Was die Farbe bedeutet, für dein Ziel {t}. Dieser Teller: {pd}.",
+      "checked": true
+    },
+    "plate.pdScaleOpen": {
+      "text": "Was die Farbe bedeutet",
+      "checked": true
+    },
+    "plate.highPlan": {
+      "text": "Hoch, über deinem Plan",
+      "checked": true
+    },
+    "plate.topPlan": {
+      "text": "Hoch+, weit über deinem Plan",
+      "checked": true
     }
   }
 }
