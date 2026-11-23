@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.189",
     "0.3.188",
     "0.3.187",
     "0.3.186",
@@ -4215,8 +4216,8 @@
       "id": "B163",
       "title": "A food's name with a comma is cut in the steps, and written in small letters",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): seen in the screenshot: step 1 says 250 g körniger frischkäse tworog 2, for Körniger Frischkäse Tworog 2,5% Fett; the name is cut at the comma and every food name is in small letters. 20:52: is it cut on the comma, or two pieces of the cheese? Cut at the comma of 2,5%; one cheese. Proposed: cut only at a comma with a space after it; lowercase only the basic foods, a pack's name as printed. 20:53: draw.",
+      "state": "done",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): seen in the screenshot: step 1 says 250 g körniger frischkäse tworog 2, for Körniger Frischkäse Tworog 2,5% Fett; the name is cut at the comma and every food name is in small letters. 20:52: is it cut on the comma, or two pieces of the cheese? Cut at the comma of 2,5%; one cheese. Proposed: cut only at a comma with a space after it; lowercase only the basic foods, a pack's name as printed. 20:53: draw. 20:57: Go.",
       "opportunity": {
         "from": "Coach Milan's own recipe, Lazy Burek, 23 November 2026.",
         "job": "Read a recipe's steps with the foods I bought.",
@@ -4228,7 +4229,7 @@
       "problem": "A step names a food by the part of its name before the first comma, in small letters. Körniger Frischkäse Tworog 2,5% Fett reads körniger frischkäse tworog 2, and every German noun loses its capital.",
       "open": [],
       "checks": "Light: the recipe's steps, Edit recipe's steps and Start cooking. The unit tests with new ones for the names; the build; a new walkthrough for AC1 to AC4; and steps-own-amounts, original-steps and cook-mode, about 5 minutes. No new words on screen.",
-      "decision": "Answered 20:52, draw 20:53. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Go 23 November 20:57; checks Light, widened to every walkthrough with steps, 33 of 33. Built in 0.3.189.",
       "now": "Lazy Burek's steps, written by Chef Mealan: 250 g körniger frischkäse tworog 2, 3 g alpen jodsalz, 150 g feta leicht, 375 g frischer blätterteig.",
       "looked_at": "The whole name always: not chosen; Chicken breast, cooked reads better as chicken breast in a step. Capital letters for every food: not chosen; English steps write eggs and rice in small letters.",
       "board": "Stories290",
@@ -4261,10 +4262,11 @@
       ],
       "details": [
         "A pack's name: a food with a barcode, or one read from a label (source label). Everything else in small letters.",
-        "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 21:00."
+        "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 21:00.",
+        "Built: shortName and amountFor in src/steps.ts. A name the app cut before (at the first comma, in small letters) follows the food now; a name a recipe chose itself (rice for Basmati rice, dry) stays as written (found while building, so recipes read from a link keep their own words)."
       ],
       "short": "A food's name in the steps: cut only at a comma with a space; a pack's name as printed",
-      "rel": "Proposed; not agreed until Coach Milan says Go"
+      "rel": "Built in 0.3.189; Go 23 November 2026, 20:57"
     },
     {
       "id": "B164",

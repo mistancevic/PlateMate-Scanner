@@ -19,14 +19,14 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.188, not on Preview yet")}
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.188")}
 B = Board(); PW = 390; G = 70
 W = SX + 2 * PW + G + 40
 parts = [("Ticket", "B163. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: B163, canvas Page 6."),
-  ("How to read this board", "<b>As a prototype.</b> B163.1: Lazy Burek's steps on the recipe page as they are in main, 0.3.188, not on Preview yet. B163.2: the same, new. A blue outline marks what is new."),
+  ("How to read this board", "<b>As a prototype.</b> B163.1: Lazy Burek's steps on the recipe page as they were in 0.3.188. B163.2: the same, new. A blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "23 November 20:52: is it cut on the comma, or were there 2 pieces of the cheese? 20:53: draw."),
+  ("In Coach Milan's words", "23 November 20:52: is it cut on the comma, or were there 2 pieces of the cheese? 20:53: draw. 20:57: Go."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "B163", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -37,7 +37,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
-label(y, "B163.1 In main, 0.3.188", "not on Preview yet: Steps", 0, 1)
+label(y, "B163.1 Before, 0.3.188", "Steps", 0, 1)
 label(y, "B163.2 New", "the same steps", 1, 1)
 y += 60
 RB = [shot(X(0), y, "1a", PW, "B163.1a Steps", "draft", "Cut at the comma of 2,5%, every name in small letters."),
@@ -46,7 +46,7 @@ bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories290.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket B163, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.188 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories289.dc.html")
+board("Stories290.dc.html", t["boardTitle"], "Drawn 23 November 2026; Go 20:57, built in 0.3.189. Ticket B163, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.188 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories289.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B163": {"file": "Stories290.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outB163.json"), "w"))
 print("B163", W, Hc + 230)
