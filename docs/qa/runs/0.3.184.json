@@ -1,0 +1,1753 @@
+{
+ "version": "0.3.184",
+ "commit": "6e6cdd2",
+ "at": "2026-11-23T13:47:39.076Z",
+ "minutes": 3,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 68,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "anna-day-one.cjs",
+   "about": "DT143 to DT146 (0.3.38, board Stories146; Anna's two blind runs of 22 October, checked again on 0.3.37; Coach Milan 1 November 10:48 Go): Anna's setup, then her first day. DT143: while today is empty, one card with three ways (pick lunch, plan the day, log what you ate), no Earlier before her first day, yesterday only on day two. DT144: setup's table shows each day's PD; Plan says today's kcal target like Today, the range in words; Me's Goal row says average day and protein every day. DT146: 45 to 60 min stays a range; a toast shows at the top, under the title bar.",
+   "pass": true,
+   "seconds": 15,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT144: setup's table shows each day's PD: PD 5.6, PD 6.2, PD 5.6, PD 6.2, PD 5.6, PD 6.2, PD 6.2"
+    },
+    {
+     "ok": true,
+     "text": "DT146: the toast shows at the top: y 62"
+    },
+    {
+     "ok": true,
+     "text": "DT143: one card on her first day: Your first day, nothing planned or eaten"
+    },
+    {
+     "ok": true,
+     "text": "DT143: its three ways: Pick a meal for lunch|Plan the day|Log what you ate"
+    },
+    {
+     "ok": true,
+     "text": "DT143: no empty plan card, no empty meals card; Tomorrow stays"
+    },
+    {
+     "ok": true,
+     "text": "DT143: no Earlier on her first day"
+    },
+    {
+     "ok": true,
+     "text": "DT144: Plan says today's kcal target and the range in words: of 2,050 kcal today a planned day fits from 1,850 to 2,250 0 of 95 to 130"
+    },
+    {
+     "ok": true,
+     "text": "DT146: the training row keeps 45 to 60 min"
+    },
+    {
+     "ok": true,
+     "text": "DT144: Me's Goal row says average day and protein every day"
+    },
+    {
+     "ok": true,
+     "text": "DT143: day two: Earlier shows yesterday only"
+    },
+    {
+     "ok": true,
+     "text": "DT143: an empty day after the first says Today"
+    },
+    {
+     "ok": true,
+     "text": "DT143: Log what you ate opens the Plate"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-week.cjs",
+   "about": "The coach's week, 0.2.6 (canvas board CW, Milan 13 and 15 October 2026). Skip a meal on purpose on Today; the coach's note on Today; Clients with check-ins and the week as bars; a client's page with the week, a day opened, the note, the check-in day and a goal from a date. Without accounts, Clients opens on two example clients (?coachdemo).",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Skip: the row says Skipped on purpose, with Undo"
+    },
+    {
+     "ok": true,
+     "text": "the skip is kept with the plan"
+    },
+    {
+     "ok": true,
+     "text": "Undo brings the meal back"
+    },
+    {
+     "ok": true,
+     "text": "Today shows the coach's note"
+    },
+    {
+     "ok": true,
+     "text": "Got it: the note leaves Today and is marked read"
+    },
+    {
+     "ok": true,
+     "text": "the coach's bar: six tabs, Clients the sixth"
+    },
+    {
+     "ok": true,
+     "text": "Clients starts with Check-ins today"
+    },
+    {
+     "ok": true,
+     "text": "a client row: seven bars in one row and the full days (DT340, 0.3.182: was the days lived by the plan)"
+    },
+    {
+     "ok": true,
+     "text": "DT302: Saturday and Sunday are shaded"
+    },
+    {
+     "ok": true,
+     "text": "DT302: the key line names what shows, in a week's words: Amber: active · Outline: today · Dashed: still to come · Dot: weigh-in · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "the client opens on a page of her own, with the week"
+    },
+    {
+     "ok": true,
+     "text": "today says so far"
+    },
+    {
+     "ok": true,
+     "text": "last week: lived days with ✓, a changed day with what changed"
+    },
+    {
+     "ok": true,
+     "text": "a day: planned against eaten per meal, the extra, the words only from a shared card"
+    },
+    {
+     "ok": true,
+     "text": "the note is sent and listed"
+    },
+    {
+     "ok": true,
+     "text": "the check-in day changes"
+    },
+    {
+     "ok": true,
+     "text": "the date is on the button"
+    },
+    {
+     "ok": true,
+     "text": "the goal waits for its date"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 14,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "first-goal.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 6 October 2026, approved on the canvas): the first screen has a way out, Not now, and saves nothing until Set my day. Two ways in: Calculate for me, My own numbers. Five goals. Life once, training per day. Every day the same, or each day its own as one table: kcal, protein, fat, carbs per day, How on each row, the week's average under it.",
+   "pass": true,
+   "seconds": 20,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the first screen has Not now"
+    },
+    {
+     "ok": true,
+     "text": "Not now saves nothing; Today says To set, the goal among them"
+    },
+    {
+     "ok": true,
+     "text": "Calculate for me, not Work it out"
+    },
+    {
+     "ok": true,
+     "text": "the six goals: Recomposition, Lose fat, Maintain, Gain healthy weight, Build muscle, Performance"
+    },
+    {
+     "ok": true,
+     "text": "each goal says what happens to your weight and food"
+    },
+    {
+     "ok": true,
+     "text": "a birth year under 18 is told, in place, that Chef Mealan is for adults, and why"
+    },
+    {
+     "ok": true,
+     "text": "a birth year under 18 is not saved"
+    },
+    {
+     "ok": true,
+     "text": "an adult picking Lose fat sees no age line"
+    },
+    {
+     "ok": true,
+     "text": "four days by how hard they are: Rest, Light, Moderate, Hard"
+    },
+    {
+     "ok": true,
+     "text": "the week's average under the table"
+    },
+    {
+     "ok": true,
+     "text": "How shows the arithmetic and the sources"
+    },
+    {
+     "ok": true,
+     "text": "the average is saved with all four: {\"calories\":1400,\"protein\":95,\"fats\":47,\"carbs\":149,\"fiber\":null}"
+    },
+    {
+     "ok": true,
+     "text": "a hard training day raises today's calories: 1,400 to 1,650"
+    },
+    {
+     "ok": true,
+     "text": "Me, Goal shows the same four-day table"
+    },
+    {
+     "ok": true,
+     "text": "opened from Me, the goal screen has a way back to Me"
+    },
+    {
+     "ok": true,
+     "text": "own numbers: a typed day says set by you, an empty one calculated"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "first-two-weeks.cjs",
+   "about": "The first two weeks and the measured burn (0.2.7, canvas board FT): Today, Me, Goal, the calculator and the coach, from real meals and weigh-ins, with the clock on day 6 (Thursday 15 October) and day 14 (Friday 23 October). The example person of the board: male, 1981, 182 cm, 95 kg, the first goal on Saturday 10 October.",
+   "pass": true,
+   "seconds": 25,
+   "checks": [
+    {
+     "ok": true,
+     "text": "FT1: Today has the getting to know you card"
+    },
+    {
+     "ok": true,
+     "text": "FT1: day 6 of 14, 4 full days, 4 weigh-ins"
+    },
+    {
+     "ok": true,
+     "text": "FT1: the squares: full|full weighed|part weighed|full|full weighed|today weighed|todo"
+    },
+    {
+     "ok": true,
+     "text": "FT3: measuring, 4 of 10 full days, 2 of 7 weigh-ins from day 4, ready on 23 October"
+    },
+    {
+     "ok": true,
+     "text": "FT3: the formula line with its number"
+    },
+    {
+     "ok": true,
+     "text": "FT0 fixed: the formula text starts at the left, Change on the same line {\"left\":17,\"same\":true}"
+    },
+    {
+     "ok": true,
+     "text": "FT5: From your data is greyed until day 14"
+    },
+    {
+     "ok": true,
+     "text": "FT2: the getting to know you card is gone on day 14"
+    },
+    {
+     "ok": true,
+     "text": "FT2: 2,520 kcal a day, give or take 75, 12 full days, 11 weigh-ins: ✓ YOUR BURN IS MEASURED2,520kcal a dayGive or take 75. From your 14 days: 12 full days and 11 weigh-ins. The formula said 2,650. Your numbers stay as they are u"
+    },
+    {
+     "ok": true,
+     "text": "FT2: Got it takes the card away"
+    },
+    {
+     "ok": true,
+     "text": "FT2: and it stays away"
+    },
+    {
+     "ok": true,
+     "text": "FT4: the measured burn, its range, the three steps"
+    },
+    {
+     "ok": true,
+     "text": "FT5: Use my data opens the calculator with From your data picked"
+    },
+    {
+     "ok": true,
+     "text": "FT5: 130 kcal a day less than Mifflin St Jeor"
+    },
+    {
+     "ok": true,
+     "text": "FT5: the days, 2,250 on average (2,520 × 0.9), 150 less, the source: 50 kcal at PD 8.0, with 4 training days and 3 without. From your data: 150 kcal less than with the formula.Protein and fat stay the same every day. Carbs go up and down with your training. The days come from your Training week. Sources: your own 14 days, 10 Oct to 23 Oct; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004."
+    },
+    {
+     "ok": true,
+     "text": "FT5: each day about 130 less, to the nearest 50: 2,450 2,100 2,400 2,100 2,450 2,300 2,100"
+    },
+    {
+     "ok": true,
+     "text": "applied: From your data, 2,520 fixed with its dates"
+    },
+    {
+     "ok": true,
+     "text": "applied: the week's average is 2,250: 2250"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the formula line says From your data, 2,520"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the card says which number is in use"
+    },
+    {
+     "ok": true,
+     "text": "eating declared: nothing on Today"
+    },
+    {
+     "ok": true,
+     "text": "eating declared: no measured burn on Goal"
+    },
+    {
+     "ok": true,
+     "text": "FT6: Lena in her first two weeks: her fourteen days, in two rows of seven (DT302, 0.3.150, board Stories224)"
+    },
+    {
+     "ok": true,
+     "text": "DT302: the key line in the first two weeks' words: Green: full day · Amber: active · Grey: opened only · Outline: today · Dashed: still to come · Dot: weigh-in · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "DT302: four weekend days shaded, in the same places in both rows: ww-----ww-----"
+    },
+    {
+     "ok": true,
+     "text": "FT7: Nina's burn on her page, with the gap line"
+    },
+    {
+     "ok": true,
+     "text": "FT7: From Nina's data as a formula pin"
+    },
+    {
+     "ok": true,
+     "text": "save check: 162 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "formula.cjs",
+   "about": "The goal calculator (canvas board FX, G1a to G3, Milan 14 October 2026; the formula card from board TW, F1 and F2). 1 You, 2 the formula, 3 the goal, 4 the days, then Apply from a date. The formula is a draft until applied. A goal from a later date waits on Me, Goal and Plan already uses it; a day gone by keeps its own target; History shows periods.",
+   "pass": true,
+   "seconds": 15,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Me, Goal says which formula is in use, in one line"
+    },
+    {
+     "ok": true,
+     "text": "three tries on one day leave one period: MaintainNOWSince 3 November, calculated from your profile2,600kcal, 150 g protein"
+    },
+    {
+     "ok": true,
+     "text": "the calculator in four steps (DT161: Carbs and fat), the formula behind How we calculate: 1. You | 2. Your goal | 3. Carbs and fat | 4. Your days"
+    },
+    {
+     "ok": true,
+     "text": "You shows the body fat, or that it is not given"
+    },
+    {
+     "ok": true,
+     "text": "four choices with the resting burn from each"
+    },
+    {
+     "ok": true,
+     "text": "From your data waits, greyed, until the burn is measured"
+    },
+    {
+     "ok": true,
+     "text": "Katch McArdle sleeps without body fat"
+    },
+    {
+     "ok": true,
+     "text": "the difference in plain numbers"
+    },
+    {
+     "ok": true,
+     "text": "the pick is a draft: nothing saved yet"
+    },
+    {
+     "ok": true,
+     "text": "the days follow the draft and the sources name Schofield"
+    },
+    {
+     "ok": true,
+     "text": "About the three formulas opens"
+    },
+    {
+     "ok": true,
+     "text": "Apply from today, by default"
+    },
+    {
+     "ok": true,
+     "text": "Apply keeps the formula"
+    },
+    {
+     "ok": true,
+     "text": "Me, Goal says Schofield now"
+    },
+    {
+     "ok": true,
+     "text": "the date is on the button: Apply from Monday 30 November"
+    },
+    {
+     "ok": true,
+     "text": "the new goal waits; the goal in use stays"
+    },
+    {
+     "ok": true,
+     "text": "Me, Goal shows the waiting goal with its date"
+    },
+    {
+     "ok": true,
+     "text": "Plan already uses the waiting goal from its date"
+    },
+    {
+     "ok": true,
+     "text": "yesterday keeps the target it had"
+    },
+    {
+     "ok": true,
+     "text": "Cancel takes the waiting goal away"
+    },
+    {
+     "ok": true,
+     "text": "the page says nothing about children"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "goal-apply.cjs",
+   "about": "JOURNEY (0.2.119, Tester 2's session, Milan 28 October 14:59): the goal screen never ends without a way out. My own numbers, each day its own, with nothing typed: the table showed numbers and Apply stayed grey; now the rows shown are applied. A missing number says what is missing. Calculate for me without height says so. Reset clears all four numbers and your days.",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "own numbers is the way in, each day its own"
+    },
+    {
+     "ok": true,
+     "text": "each day its own, nothing typed: the calculated rows can be applied"
+    },
+    {
+     "ok": true,
+     "text": "the rows shown are saved as your own days"
+    },
+    {
+     "ok": true,
+     "text": "a missing number says what is missing"
+    },
+    {
+     "ok": true,
+     "text": "Calculate for me with a full profile: Apply is there"
+    },
+    {
+     "ok": true,
+     "text": "Reset clears all four numbers: {\"calories\":null,\"protein\":null,\"fats\":null,\"carbs\":null,\"fiber\":null}"
+    },
+    {
+     "ok": true,
+     "text": "Reset clears your own days and the goal"
+    },
+    {
+     "ok": true,
+     "text": "after Reset the goal screen opens on Calculate for me, no goal picked"
+    },
+    {
+     "ok": true,
+     "text": "a goal picked: Apply"
+    },
+    {
+     "ok": true,
+     "text": "Calculate for me says what is missing: To calculate your numbers, fill in your height above. Or use My own numbers."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "goal-fit.cjs",
+   "about": "JOURNEY INVARIANT (DT335, 0.3.184, board Stories284; Coach Milan, Go 23 November 2026, 14:13): Gain healthy weight is a goal, after Maintain. The list of goals stays whole; a goal that does not fit the body is greyed, Not for your body now, and a tap opens the reason in place, from her own numbers and never a BMI number; the goal is not picked. Too light from height and weight greys Recomposition and Lose fat; too much body fat, only when body fat is given, greys Gain healthy weight and Build muscle. Gain healthy weight and Lose fat take a target body weight, never a change: the line says the change, the pace and the time; a target outside the healthy weight for the height is not taken. Me › Goal shows the target, the weight now and how far she has come, and it moves with each weigh-in. No target with the eating situation.",
+   "pass": true,
+   "seconds": 25,
+   "checks": [
+    {
+     "ok": true,
+     "text": "AC1: Gain healthy weight is a goal, after Maintain: Recomposition, Lose fat, Maintain, Gain healthy weight, Build muscle, Performance"
+    },
+    {
+     "ok": true,
+     "text": "AC1: its card: Gain healthy weightA little more food than you burn, about 10 % more.Your weight goes up slowly, roughly 1 kg a month, to the weight you choose.Protein in your range. Training is welcome, not required."
+    },
+    {
+     "ok": true,
+     "text": "AC2: too light greys Recomposition and Lose fat: Recomposition, Lose fat"
+    },
+    {
+     "ok": true,
+     "text": "AC2: Not for your body now, tap to see why"
+    },
+    {
+     "ok": true,
+     "text": "AC2: the reason in place, her own numbers, no BMI number: Your weight is low for your height: 48 kg at 168 cm. Eating less than you burn is not safe here.This comes from your height and weight in Profile. If a number is wrong, correct it there. For a goal like this, ask a doctor or a nutrition professional."
+    },
+    {
+     "ok": true,
+     "text": "AC4: without a coach, where the numbers come from and who to ask"
+    },
+    {
+     "ok": true,
+     "text": "AC2: the greyed goal is not picked"
+    },
+    {
+     "ok": true,
+     "text": "AC5: Gain healthy weight asks for a target weight"
+    },
+    {
+     "ok": true,
+     "text": "AC5: 55 kg: 7 kg more, roughly 1 kg a month, about 7 months: 55 kg: 7 kg more. Roughly 1 kg a month, about 7 months."
+    },
+    {
+     "ok": true,
+     "text": "AC5: above the healthy weight for her height is not taken: Above the healthy weight for your height: up to 70 kg."
+    },
+    {
+     "ok": true,
+     "text": "AC5: 55 kg is kept, 71 is not: 55"
+    },
+    {
+     "ok": true,
+     "text": "the goal is Gain healthy weight: healthy"
+    },
+    {
+     "ok": true,
+     "text": "AC7: the goal sheet shows the target, her weight now and how far: Set by you on 23 NovemberFoodabout 10 % more than you burnWeight to expectup roughly 1 kg a monthCounted asyour 7-day average, not one morningProgress meansweight up slowly, towards your target weightTarget weight55 kg. 48 kg now, 0 kg of 7 kg so farNext check"
+    },
+    {
+     "ok": true,
+     "text": "AC7: it moves with a weigh-in: Target weight55 kg. 49.5 kg now, 1.5 kg of 7 kg so far"
+    },
+    {
+     "ok": true,
+     "text": "its own goal page"
+    },
+    {
+     "ok": true,
+     "text": "AC3: no body fat given, nothing greyed on the heavy side"
+    },
+    {
+     "ok": true,
+     "text": "AC6: 72 kg: 10 kg less, 0.5 to 1 % a week, about 3 to 6 months: 72 kg: 10 kg less. 0.5 to 1 % of your weight a week, about 3 to 6 months."
+    },
+    {
+     "ok": true,
+     "text": "AC6: under the healthy weight for her height is not taken: Below the healthy weight for your height: down to 53 kg."
+    },
+    {
+     "ok": true,
+     "text": "AC6: no top limit: 79 kg: 3 kg less. 0.5 to 1 % of your weight a week, about 1 to 2 months."
+    },
+    {
+     "ok": true,
+     "text": "AC3: body fat 38 % greys Gain healthy weight and Build muscle: Gain healthy weight, Build muscle"
+    },
+    {
+     "ok": true,
+     "text": "AC3: the reason: Your body fat, 38 %, is above the healthy range for a woman of 36. Eating more than you burn is not the way here.This comes from your body fat in Profile. If the number is wrong, correct it there. For a goal like this, ask a doctor or a nutrition professional."
+    },
+    {
+     "ok": true,
+     "text": "AC8: with the eating situation, Gain healthy weight has no target weight"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 32 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "goal-pace.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards K1 to K3): Build muscle has a pace. Picking it shows Your pace, Steady or Faster, and How long have you trained regularly?, which sets the starting pace (under 1 year Faster, longer Steady). Maintain says you can still get stronger. Me › Goal shows the goal with its pace, the goal sheet (food, weight to expect in your kilos, counted as the 7-day average, progress, next check-in) and About your goal.",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Maintain says you can still get stronger"
+    },
+    {
+     "ok": true,
+     "text": "no pace until Build muscle is picked"
+    },
+    {
+     "ok": true,
+     "text": "Build muscle shows the pace, Steady to start"
+    },
+    {
+     "ok": true,
+     "text": "under 1 year starts on Faster"
+    },
+    {
+     "ok": true,
+     "text": "over 3 years starts on Steady"
+    },
+    {
+     "ok": true,
+     "text": "the goal is kept with its pace: gainsteady"
+    },
+    {
+     "ok": true,
+     "text": "Me › Goal names the goal with its pace"
+    },
+    {
+     "ok": true,
+     "text": "the goal sheet: Set by you on 23 NovemberFoodabout 5 % more than you burnWeight to expectup 0.25–0.5 kg a monthCounted asyour 7-day average, not one morningProgress meansheavier lifts, waist about the sameNext check-"
+    },
+    {
+     "ok": true,
+     "text": "About your goal: the six parts"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "home-languages.cjs",
+   "about": "DT236 v3 (0.3.93, boards Stories177 and Stories180; Coach Milan 5 November 11:36, Go): the home page in English, Srpski and Deutsch (Beta). chefmealan.com stays English; /sr and /de carry their own language, title and search line; the switch in the header shows the language that is on and opens all three; a phone in Serbian or German sees the box once; the choice is the app's too. The header fits on a phone in every language. The clips stay English (Coach Milan 11:26).",
+   "pass": true,
+   "seconds": 17,
+   "checks": [
+    {
+     "ok": true,
+     "text": "/de says lang=de, with its German title"
+    },
+    {
+     "ok": true,
+     "text": "/sr says lang=sr-Latn"
+    },
+    {
+     "ok": true,
+     "text": "chefmealan.com stays English and names the three addresses"
+    },
+    {
+     "ok": true,
+     "text": "an English phone sees no box"
+    },
+    {
+     "ok": true,
+     "text": "the switch shows EN"
+    },
+    {
+     "ok": true,
+     "text": "the switch is 44 px"
+    },
+    {
+     "ok": true,
+     "text": "it opens English, Srpski (latinica), Deutsch (Beta): ✓English · Srpski (latinica) · Deutsch (Beta)"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch goes to chefmealan.com/de"
+    },
+    {
+     "ok": true,
+     "text": "the page is in German: Lebe deinen Ernährungsplan, Tag für Tag."
+    },
+    {
+     "ok": true,
+     "text": "the app takes the same choice"
+    },
+    {
+     "ok": true,
+     "text": "in German the header fits a 390 px phone"
+    },
+    {
+     "ok": true,
+     "text": "the clips stay as they are"
+    },
+    {
+     "ok": true,
+     "text": "in German the languages block still names English, Srpski, Deutsch · Beta"
+    },
+    {
+     "ok": true,
+     "text": "a German phone sees the box above the English page"
+    },
+    {
+     "ok": true,
+     "text": "Auf Deutsch opens /de, the box goes"
+    },
+    {
+     "ok": true,
+     "text": "chefmealan.com opens the German page for this phone from now on"
+    },
+    {
+     "ok": true,
+     "text": "a Serbian phone sees the box in Srpski"
+    },
+    {
+     "ok": true,
+     "text": "Continue in English: English stays, the box does not come back"
+    },
+    {
+     "ok": true,
+     "text": "English: the header fits a 360 px phone"
+    },
+    {
+     "ok": true,
+     "text": "English: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "Srpski: the header fits a 360 px phone"
+    },
+    {
+     "ok": true,
+     "text": "Srpski: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "German: the header fits a 360 px phone"
+    },
+    {
+     "ok": true,
+     "text": "German: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "how-you-eat.cjs",
+   "about": "DT160 and DT161 (0.3.3, canvas Page 2, boards Stories112 version 2 and Stories113; Coach Milan 29 October 19:30 \"Both DT160 and 161 can go. Double check the impact from profile setup. Makes no sense that it is there set but no influence. Also, take into account selected kitchen dishes\"). The goal setup has 3. Carbs and fat: Balanced by default, More fat moves fat to 35 % and the day table with it, Very low carb takes typed carbs and fat the rest; the Explorer says Calculated for you, names the pick, and opens each family with Your day; What you eat has Paleo, Meat only and Other; the kitchens' dishes follow the diet; every request that asks Chef Mealan for food carries how the person eats.",
+   "pass": true,
+   "seconds": 23,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT161: 3. Carbs and fat, four chips"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Balanced by default, 83 g of fat, as before"
+    },
+    {
+     "ok": true,
+     "text": "DT161: the range, the carbs' span, the days below 45 %"
+    },
+    {
+     "ok": true,
+     "text": "DT161: More fat, 97 g, every day but Monday below 45 %"
+    },
+    {
+     "ok": true,
+     "text": "DT161: the day table follows the chip: Monday MondayStrength, hard · eveningPD 5.6 2,850 160 97 334"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Very low carb waits for the carbs to be typed"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Very low carb, fat the rest of each day, said against both ranges: Your carbs a day, g162 to 223 gof fat a dayYour carbs stay a"
+    },
+    {
+     "ok": true,
+     "text": "DT160: Calculated for you names the goal, the pick and today: Calculated for you. Ranges and meal amounts here come from your goal and setup: Maintain, More fat, 85 kg, three meals. Today: strength, moderate, 2,600 kcal. Numbers marked for you change when they change. Change them ›"
+    },
+    {
+     "ok": true,
+     "text": "DT160: protein, one range every day, yours in it"
+    },
+    {
+     "ok": true,
+     "text": "DT160: fat on the week's average, saturated fat under 10 %"
+    },
+    {
+     "ok": true,
+     "text": "DT160: carbs today, and the week from the lightest day to the hardest: Your week197 to 334 g · today 272 gCarbs"
+    },
+    {
+     "ok": true,
+     "text": "DT160: the days below 45 % named, and why"
+    },
+    {
+     "ok": true,
+     "text": "DT160: fibre at least 25 g, free sugars under 10 % of today"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Meat only says what it means for the numbers, with a way to Goal"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Other, in your words; Chef Mealan reads it"
+    },
+    {
+     "ok": true,
+     "text": "audit: the alcohol line says what Chef Mealan does with it"
+    },
+    {
+     "ok": true,
+     "text": "DT161: a request to Chef Mealan carries how they eat: {\"what_they_eat\":\"Other\",\"in_their_words\":\"Mediterranean, no gluten\",\"carbs_and_fat\":\"More fat\"}"
+    },
+    {
+     "ok": true,
+     "text": "DT161: a request that doesn't ask for food carries nothing more"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Balkan, no dish we list fits Vegan, said plainly"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Italian and Indian show only Vegan dishes"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "kitchens-three.cjs",
+   "about": "DT334 (0.3.178, board Stories278; Go 23 November 2026, 08:43): up to 3 kitchens you cook, in setup's step 5 and in Me, Where I shop and cook. The line says Pick up to 3; with 3 picked a fourth tap picks nothing and says Up to 3. Tap one off first.; one off, then another; a profile from before with more keeps its list (that Chef Mealan is sent the first 3 is a unit test, src/kitchens.test.ts).",
+   "pass": true,
+   "seconds": 8,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT334 AC1: setup's step 5 says Pick up to 3"
+    },
+    {
+     "ok": true,
+     "text": "DT334 AC2: a fourth tap picks nothing: Balkan, Italian, Greek"
+    },
+    {
+     "ok": true,
+     "text": "DT334 AC2: one line says Up to 3. Tap one off first."
+    },
+    {
+     "ok": true,
+     "text": "DT334 AC3: Greek off, then Indian: Balkan, Italian, Indian, and the line is gone"
+    },
+    {
+     "ok": true,
+     "text": "DT334 AC1: Me, Where I shop and cook says Pick up to 3"
+    },
+    {
+     "ok": true,
+     "text": "DT334 AC4: a profile from before keeps its 10 kitchens"
+    },
+    {
+     "ok": true,
+     "text": "DT334 AC4: with 10 from before, a new one is not picked and the line says so"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 8 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "me-pages.cjs",
+   "about": "Me pages (fix pass, 11 October 2026, canvas S M4 to M8, T5): every page in Me has its own address, Back goes one page back and a reload stays; the top bar says Me and no tab is lit; Chef Mealan, never Mealan alone; the meal times set the eating window; Today shows its numbers whole from the first moment.",
+   "pass": true,
+   "seconds": 19,
+   "checks": [
+    {
+     "ok": true,
+     "text": "T5: the day card is whole at its first paint: {\"row\":\"0of PD 6.30of 2,300 kcal today0of 145 g protein\",\"macros\":true}"
+    },
+    {
+     "ok": true,
+     "text": "M6, M4: Me at /me, the top bar says Me, no tab lit (/me, Me, 0)"
+    },
+    {
+     "ok": true,
+     "text": "the Me card's PD is its own protein in its own kcal: 6.3, 2300, 145"
+    },
+    {
+     "ok": true,
+     "text": "M6: Profile at /me/profile"
+    },
+    {
+     "ok": true,
+     "text": "M5: Chef Mealan is an AI chef"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from Profile goes to Me: /me"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from Me goes to the Menu it was opened from: /menu"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from the Menu goes to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "M6: Lifestyle at /me/lifestyle"
+    },
+    {
+     "ok": true,
+     "text": "M6: a reload stays on Lifestyle: /me/lifestyle"
+    },
+    {
+     "ok": true,
+     "text": "M8: no Set my window"
+    },
+    {
+     "ok": true,
+     "text": "M8: the window from the meal times: Eating window: 08:00 to 19:00. From your first and last meal."
+    },
+    {
+     "ok": true,
+     "text": "M8: a later dinner moves the window: Eating window: 08:00 to 20:30. From your first and last meal."
+    },
+    {
+     "ok": true,
+     "text": "M6: Back after the reload goes to Me: /me"
+    },
+    {
+     "ok": true,
+     "text": "M6: and then to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "M6: the goal from Today at /me/goal: /me/goal"
+    },
+    {
+     "ok": true,
+     "text": "M6: the link up goes to Me: /me"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from there to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "M6: Close from Training week goes to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "M6: Plan tapped from Profile opens Plan: /plan"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from there goes to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "setup-screen.cjs",
+   "about": "JOURNEY (0.2.124, board Stories95, DT139; Anna's blind runs, her DT118; Milan 28 October 17:05 Go): the first screen. The formula is automatic, behind How we calculate ›; sections numbered as they show; five numbers and PD said once; no goal picked for you; Lifestyle, one name; a coach can adjust these numbers later; both paces in % a week.",
+   "pass": true,
+   "seconds": 5,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the line says five numbers"
+    },
+    {
+     "ok": true,
+     "text": "no formula block: How we calculate ›, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sections numbered as they show: 1. You | 2. Your goal"
+    },
+    {
+     "ok": true,
+     "text": "nothing picked for you; no numbers, no Apply yet"
+    },
+    {
+     "ok": true,
+     "text": "Lifestyle, one name"
+    },
+    {
+     "ok": true,
+     "text": "a goal picked: 3. Carbs and fat (DT161), 4. Your days: 1. You | 2. Your goal | 3. Carbs and fat | 4. Your days"
+    },
+    {
+     "ok": true,
+     "text": "PD said once; Apply; the coach line"
+    },
+    {
+     "ok": true,
+     "text": "How we calculate › opens the formula names"
+    },
+    {
+     "ok": true,
+     "text": "both paces in % a week: Your pace Steady about 5 % more food · weight up about 0.05 to 0.25 % a week, by how long you've trained · for someone who has trained a while and wants to get stronger Faster about 10 % more food · w"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "setup-shop.cjs",
+   "about": "JOURNEY (0.2.127, board Stories98, DT142; Anna's DT123; Milan 28 October 20:46 Go): the first setup ends on one more step, 4. Where you shop and cook: home in one tap brings its starter foods, with See them in Foods; the kitchens and what you cook with, as in Me; Done: to Today, which says Pick home first until home is picked. Changing the goal later skips it.",
+   "pass": true,
+   "seconds": 9,
+   "checks": [
+    {
+     "ok": true,
+     "text": "after Apply on the first setup: 5. Where you shop and cook (DT161 added Carbs and fat)"
+    },
+    {
+     "ok": true,
+     "text": "the step ends on its button: Pick home first, until home is picked"
+    },
+    {
+     "ok": true,
+     "text": "the kitchens and what you cook with, as in Me"
+    },
+    {
+     "ok": true,
+     "text": "one tap: home is Limassol, its starter foods came (67)"
+    },
+    {
+     "ok": true,
+     "text": "the line says how many, with See them in Foods: 67 foods for Limassol With its starter foods, ready to search. See them in Foods ›"
+    },
+    {
+     "ok": true,
+     "text": "home picked: Done: to Today"
+    },
+    {
+     "ok": true,
+     "text": "Done: setup ends on Today"
+    },
+    {
+     "ok": true,
+     "text": "the kitchen picked is kept"
+    },
+    {
+     "ok": true,
+     "text": "changing the goal later: no step 4"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 71 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "target-analysis.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 6 October 2026): own numbers are checked where they are. All four fields typeable per day; a blank one fills in and says so; a row that does not add up says what it comes to; a finding about a day sits under that day, one about the week under the week's line; Keep, on purpose remembers it; Save says how many are kept.",
+   "pass": true,
+   "seconds": 38,
+   "checks": [
+    {
+     "ok": true,
+     "text": "all four typed: Set by you"
+    },
+    {
+     "ok": true,
+     "text": "a blank fat and carbs fill in and say so"
+    },
+    {
+     "ok": true,
+     "text": "a row that does not add up says what it comes to"
+    },
+    {
+     "ok": true,
+     "text": "an empty day is calculated and says so"
+    },
+    {
+     "ok": true,
+     "text": "the carbs finding sits under its day"
+    },
+    {
+     "ok": true,
+     "text": "the energy finding sits under the week's line"
+    },
+    {
+     "ok": true,
+     "text": "Save says how many are kept: Apply from today, 2 kept as they are"
+    },
+    {
+     "ok": true,
+     "text": "Keep, on purpose remembers it, and Save counts one less"
+    },
+    {
+     "ok": true,
+     "text": "Change it puts the cursor in the field it's about"
+    },
+    {
+     "ok": true,
+     "text": "saving with one open keeps it on purpose: carbs-easy,energy"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 4 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "training-week.cjs",
+   "about": "Changed by DT140 (0.2.125, board Stories96; Anna's DT117): the week is the source, tap a day; Move to on Training week. Changed by DT147 (0.2.128, board Stories99 version 2): a day stays open until tapped again; on Training week it opens under itself, How hard shows the zones of the one picked, and Move is one line at the end of the open day. JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards T1 and T3): Calculate for me asks your everyday first (your work, steps on a usual day, counted on every day), then your training: Light, Moderate and Hard, each with its zones, − and +, and How long as a range from 15 minutes. There is no Rest row: the days left are days without training, and + stops at 7. The training days are the Training week's. The day settings say No training, have no Walk (walking is in the steps), and offer Light, Moderate and Hard with their zones and the same ranges.",
+   "pass": true,
+   "seconds": 16,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Lifestyle first (DT139: one name), then your training: Lifestyle, Your training"
+    },
+    {
+     "ok": true,
+     "text": "your work, as before"
+    },
+    {
+     "ok": true,
+     "text": "steps on a usual day are kept"
+    },
+    {
+     "ok": true,
+     "text": "no Rest row with − and +"
+    },
+    {
+     "ok": true,
+     "text": "a new week: 0 training days, 7 without: 0 training days7 without"
+    },
+    {
+     "ok": true,
+     "text": "seven days, Monday first; no counter to guess from"
+    },
+    {
+     "ok": true,
+     "text": "4 training days, the ones tapped: 4 training daysMon, Wed, Fri, Sun · 3 without"
+    },
+    {
+     "ok": true,
+     "text": "the days tapped stay open: 4"
+    },
+    {
+     "ok": true,
+     "text": "Hard starts at 60 to 90 min"
+    },
+    {
+     "ok": true,
+     "text": "a 15 to 30 minute HIIT on Monday morning counts as 25 minutes; Friday is moderate; Tuesday rests"
+    },
+    {
+     "ok": true,
+     "text": "the day says what it is"
+    },
+    {
+     "ok": true,
+     "text": "the zones, behind one line; walking goes in steps"
+    },
+    {
+     "ok": true,
+     "text": "the Training week holds the same week: 3 days without training; Your usual training weekaverage 2,800 kcalMonStrength, hard · morningWorkTueNo trainingWorkWedStrength, moderate · eveni"
+    },
+    {
+     "ok": true,
+     "text": "No training, and no Walk"
+    },
+    {
+     "ok": true,
+     "text": "How hard: Light, Moderate, Hard"
+    },
+    {
+     "ok": true,
+     "text": "DT147: the zones of the one picked, Hard: Zone 4 · hard, only a few words at a timeintervals, HIIT, a "
+    },
+    {
+     "ok": true,
+     "text": "How long as ranges: 15–30 min, 30–45 min, 45–60 min, 60–90 min, 90+ min"
+    },
+    {
+     "ok": true,
+     "text": "No training says the work and the steps still count"
+    },
+    {
+     "ok": true,
+     "text": "DT147: Wednesday opens under Wednesday; Monday stays open"
+    },
+    {
+     "ok": true,
+     "text": "Move Wednesday to Thursday: the training goes as it is; Wednesday rests"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "your-summary.cjs",
+   "about": "DT167 (0.3.9, board Stories119 versions 1 and 2; Coach Milan 30 October 08:47 to 09:59): Your summary, the last row of Me and where the steps end; Taste in Lifestyle; Plan your week and Craft your first meal; what the coach sees, part by part, health data off until switched on; on the coach's side, the shared profile with what changed since the coach last looked.",
+   "pass": true,
+   "seconds": 21,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT209: the steps, Your summary, My coach, then Account: Profile,Goal,Lifestyle,Training week,Google Calendar,Where I shop and cook,Your summary,My coach,Account"
+    },
+    {
+     "ok": true,
+     "text": "Taste no longer sits alone at the bottom of Me"
+    },
+    {
+     "ok": true,
+     "text": "Taste in Lifestyle, under Nutrition, after What you eat: Where you eat,What you eat,Taste,Alcohol"
+    },
+    {
+     "ok": true,
+     "text": "DT209: Where I shop and cook's Next leads to Your summary"
+    },
+    {
+     "ok": true,
+     "text": "every part, by step: You,Goal and numbers,Your day,How you eat,Training week,Where you shop and cook,Health questions"
+    },
+    {
+     "ok": true,
+     "text": "You: body data, health data, numbers only: Bodyhealth data Male, born 1981, 182 cm, 85 kg Your resting burn, about 1,770 kcal, and your protein range. Numbers only"
+    },
+    {
+     "ok": true,
+     "text": "Your day: wake-up and bedtime with the meal times they set"
+    },
+    {
+     "ok": true,
+     "text": "Where you eat and Work travel: Chef Mealan reads them now"
+    },
+    {
+     "ok": true,
+     "text": "taste in your own words, in the summary"
+    },
+    {
+     "ok": true,
+     "text": "Plan your week, Craft your first meal, Save as PDF"
+    },
+    {
+     "ok": true,
+     "text": "without a coach, nothing to choose for one"
+    },
+    {
+     "ok": true,
+     "text": "Craft your first meal opens Plate: http://127.0.0.1:3400/plate"
+    },
+    {
+     "ok": true,
+     "text": "Plan your week opens Plan"
+    },
+    {
+     "ok": true,
+     "text": "by default: the everyday parts on; diet, alcohol, own words, allergies and body data off"
+    },
+    {
+     "ok": true,
+     "text": "the health questions stay as today: which and when"
+    },
+    {
+     "ok": true,
+     "text": "saved: body data switched on with its date, your consent: {\"on\":{\"goal\":\"2026-11-23T13:47:32.945Z\",\"day\":\"2026-11-23T13:47:32.945Z\",\"eat\":\"2026-11-23T13:47:32.945Z\",\"week\":\"2026-11-23T13:47:32.945Z\",\"shop\":\"2026-11-23T"
+    },
+    {
+     "ok": true,
+     "text": "the summary says how much the coach sees"
+    },
+    {
+     "ok": true,
+     "text": "Clients marks a client whose shared profile changed"
+    },
+    {
+     "ok": true,
+     "text": "the client's page starts with what changed: What changed since you last looked 21 Nov Wake-up and bedtime: 6:00 to 8:00 · 22:00 to midnight → Before 6:00 · 22:00 to midnight. 21 Nov Meals: 3 a day, 07:30, 13:45 and 20:00 → 3 a day, 06:30, 13:15"
+    },
+    {
+     "ok": true,
+     "text": "the shared parts below, what wasn't shared said, no private row: one of these, answered 6 November Chef Mealan helps with everything. Asked again once a year. ✓ Chef reads Not shared What you eat, alcohol, in your own words, allergies and intolerances, your body data. Nina keeps these to themselves. Save as PDF, as of today"
+    },
+    {
+     "ok": true,
+     "text": "DT237: the card in the coach's language, one button for Nina's, 44 px: Goal and numbers,Your day,How you eat,Where you shop and coo"
+    },
+    {
+     "ok": true,
+     "text": "DT237: a tap shows her rows in Srpski, the rest stays English: Cilj i brojevi,Tvoj dan,Kako jedeš,Gde kupuješ i kuvaš,Zdrav"
+    },
+    {
+     "ok": true,
+     "text": "DT237: Back to English puts it back"
+    },
+    {
+     "ok": true,
+     "text": "looked at: the mark goes"
+    },
+    {
+     "ok": true,
+     "text": "DT172: without body data, weigh-ins in percent and days weighed, no kilogram: Weigh-ins 1 this week 1 morning weighed Not enough weigh-ins yet for a trend."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "DT335 Middle plus the German sweep: the goal step, Me Goal, the goal sheet, the coach setting a goal"
+}
