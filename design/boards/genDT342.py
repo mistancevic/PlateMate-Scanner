@@ -24,10 +24,10 @@ CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.184,
 B = Board(); PW = 390; G = 70
 W = SX + 3 * PW + 2 * G + 40
 parts = [("Ticket", "DT342. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT342, canvas Page 6."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT342.1: the Plate as it is in main, 0.3.184, not on Preview yet: chicken, rice, broccoli and olive oil from a pack with no fibre value. DT342.2: the same plate, new. DT342.3: the same plate with a muesli bar whose pack gives no fibre, new. Every arrow is a tap; a scrolled screen is one tall picture. The word list is in the design details at the bottom."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT342.1: the Plate as it is in main, 0.3.184, not on Preview yet: chicken, rice, broccoli and olive oil from a pack with no fibre value. DT342.2: the same plate, new. DT342.3: the same plate with a muesli bar whose pack gives no fibre, new, with fi* (Coach Milan 15:45). Every arrow is a tap; a scrolled screen is one tall picture. The word list is in the design details at the bottom."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "22 November 22:31: fibre is super important, and fi? shows very often. 22:51: go with the two-part proposal; no made-up numbers as estimates. 23 November 15:33: draw DT342 first."),
+  ("In Coach Milan's words", "22 November 22:31: fibre is super important, and fi? shows very often. 22:51: go with the two-part proposal; no made-up numbers as estimates. 23 November 15:33: draw DT342 first. 15:45: in this case fi*, a * like a footnote, approximate, not a question mark."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Open", " ".join(t["open"])), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "DT342", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -50,9 +50,9 @@ RB = [shot(X(0), y2, "2a", PW, "DT342.2a The Plate", "changed", "A real fibre le
   shot(X(1), y2, "2b", PW, "DT342.2b The numbers", "changed", "Fibre 6 g; one line says olive oil counts as 0.")]
 arrow(X(1) - G + 2, y2 + 200)
 y3 = max(RB) + 70
-label(y3, "DT342.3 New", "a muesli bar with no fibre value: at least, and which food", 0, 2)
+label(y3, "DT342.3 New", "a muesli bar with no fibre value: fi*, at least, and which food", 0, 2)
 y3 += 60
-RC = [shot(X(0), y3, "3a", PW, "DT342.3a The numbers", "changed", "At least 6 g, 1 food without a value: Muesli bar. I tap Muesli bar on the plate."),
+RC = [shot(X(0), y3, "3a", PW, "DT342.3a The numbers", "changed", "fi* and 6* g: at least 6 g, 1 food without a value. I tap Muesli bar on the plate."),
   shot(X(1), y3, "3b", PW, "DT342.3b The muesli bar's card", "changed", "No fibre value: add it from the pack in Review the label.")]
 arrow(X(1) - G + 2, y3 + 200)
 RB = RC

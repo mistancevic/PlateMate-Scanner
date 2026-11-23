@@ -1,6 +1,6 @@
 // Board DT342 (Coach Milan 22 November 2026, 22:31 and 22:51): fibre, 0 where it is a fact, and the plate counts what is known
 // and says so. Main on top (0.3.184), new below. One scratch build of main (/home/claude/work/dt342, not committed); board-new
-// turns the new rule on. The clock is Monday 23 November 2026, 16:00.
+// turns the new rule on. The clock is Monday 23 November 2026, 16:00. Coach Milan 15:45: fi* with foods missing, a * as a footnote.
 const ROOT = process.env.BOARD_ROOT || "/home/claude/work/dt342";
 const { chromium } = require(ROOT + "/node_modules/playwright");
 const { spawn } = require("node:child_process"); const fs = require("node:fs"), path = require("node:path");
@@ -53,12 +53,12 @@ const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-siz
     await tall(p, "2b", ".nt", ".board-note"); await p.context().close();
     p = await open(true, [...base, it(45, bar)]);
     await p.locator(".letters-row").first().click(); await p.waitForTimeout(400);
-    await note(p, ".nt-fibre", "<b>New:</b> a muesli bar whose pack gives no fibre. The plate counts what is known: <b>at least 6 g</b>, and says which food has no value. The letter stays <b>fi?</b>: the bar could lift it. With the known part already On plan, the letter is shown.", [".nt-fibre"]);
-    await tall(p, "2c", ".readout", ".board-note"); await clean(p);
+    await note(p, ".nt-fibre", "<b>New:</b> a muesli bar whose pack gives no fibre. The plate counts what is known: <b>6*</b> g, and the * line says at least 6 g and which food has no value. The letter is <b>fi*</b>: the level of the foods with a value, approximate, like a footnote. Under the plan it is fi*, never fi-* (the missing food could lift it); On plan Fi*, above Fi+*.", [".nt-fibre", ".readout-letters"]);
+    await tall(p, "3a", ".readout", ".board-note"); await clean(p);
     await p.locator(".name-link").filter({ hasText: /Muesli bar/ }).click(); await p.waitForTimeout(600);
     await p.setViewportSize({ width: 390, height: 1000 }); await p.waitForTimeout(300);
     await note(p, ".fibre-line", "<b>New:</b> the muesli bar's card says there is no fibre value and where to add it from the pack. No guessed number.", [".fibre-line"]);
     await p.evaluate(() => document.querySelector(".board-note").scrollIntoView({ block: "end" })); await p.waitForTimeout(400);
-    await p.screenshot({ path: `${R}/2d.png` }); console.log("2d"); await p.context().close();
+    await p.screenshot({ path: `${R}/3b.png` }); console.log("3b"); await p.context().close();
   } catch (e) { console.log("ERR", e.message); } finally { await b.close(); server.kill(); }
 })();
