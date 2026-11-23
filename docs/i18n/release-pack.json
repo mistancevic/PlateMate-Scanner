@@ -1,6 +1,6 @@
 {
-  "release": "0.3.184",
-  "at": "2026-11-23T13:33:27.085Z",
+  "release": "0.3.185",
+  "at": "2026-11-23T15:26:05.351Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -52835,6 +52835,82 @@
       "release": "0.3.184",
       "order": 900035,
       "at": "2026-11-23T13:33:27.085Z"
+    },
+    {
+      "id": "screen.letters.fibreAtLeast",
+      "kind": "screen",
+      "key": "letters.fibreAtLeast",
+      "en": "* Fibre: at least {g} g. {n} food without a value: {foods}.|* Fibre: at least {g} g. {n} foods without a value: {foods}.",
+      "forms": "count",
+      "slots": [
+        "foods",
+        "g",
+        "n"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "* Vlakna: najmanje {g} g. {n} namirnica bez vrednosti: {foods}.|* Vlakna: najmanje {g} g. {n} namirnice bez vrednosti: {foods}.|* Vlakna: najmanje {g} g. {n} namirnica bez vrednosti: {foods}.",
+      "de": "* Ballaststoffe: mindestens {g} g. {n} Lebensmittel ohne Wert: {foods}.|* Ballaststoffe: mindestens {g} g. {n} Lebensmittel ohne Wert: {foods}.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.185",
+      "order": 900000,
+      "at": "2026-11-23T15:26:05.351Z"
+    },
+    {
+      "id": "screen.letters.fibreZero",
+      "kind": "screen",
+      "key": "letters.fibreZero",
+      "en": "{foods} counts as 0 fibre: none by nature.|{foods} count as 0 fibre: none by nature.",
+      "forms": "count",
+      "slots": [
+        "foods"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "{foods} se računa kao 0 vlakana: nema ih po prirodi.|{foods} se računaju kao 0 vlakana: nemaju ih po prirodi.|{foods} se računaju kao 0 vlakana: nemaju ih po prirodi.",
+      "de": "{foods} zählt als 0 Ballaststoffe: von Natur aus keine.|{foods} zählen als 0 Ballaststoffe: von Natur aus keine.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.185",
+      "order": 900001,
+      "at": "2026-11-23T15:26:05.351Z"
+    },
+    {
+      "id": "screen.foodcard.fibreNone",
+      "kind": "screen",
+      "key": "foodcard.fibreNone",
+      "en": "No fibre on the pack: {food} has none by nature, so it counts as 0 on your plate.",
+      "forms": "plain",
+      "slots": [
+        "food"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Na pakovanju nema vlakana: {food} ih po prirodi nema, pa se na tvom tanjiru računa kao 0.",
+      "de": "Keine Ballaststoffe auf der Packung: {food} hat von Natur aus keine, also zählt es auf deinem Teller als 0.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.185",
+      "order": 900002,
+      "at": "2026-11-23T15:26:05.351Z"
+    },
+    {
+      "id": "screen.foodcard.fibreMissing",
+      "kind": "screen",
+      "key": "foodcard.fibreMissing",
+      "en": "No fibre on this food's values. If the pack gives it, add it in Review the label; until then your plate's fibre has a *: at least what the other foods have.",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "U vrednostima ove namirnice nema vlakana. Ako ih pakovanje navodi, dodaj ih u Pregledaj deklaraciju; do tada vlakna tvog tanjira imaju *: najmanje koliko imaju ostale namirnice.",
+      "de": "In den Werten dieses Lebensmittels fehlen die Ballaststoffe. Wenn die Packung sie angibt, trag sie unter Etikett prüfen ein; bis dahin haben die Ballaststoffe deines Tellers ein *: mindestens so viel, wie die anderen Lebensmittel haben.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.185",
+      "order": 900003,
+      "at": "2026-11-23T15:26:05.351Z"
     }
   ]
 }

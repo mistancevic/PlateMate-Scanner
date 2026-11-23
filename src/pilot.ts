@@ -1,3 +1,4 @@
+import { fibreOf } from "./fibre0";
 import { countOf, gramsOfOne, KINDS } from "./counted";
 import { obviousZero } from "./obvious0";
 import { cleanMealNames, cleanCardNames, cleanFoodNames, cleanText1 } from "./entities";
@@ -394,14 +395,26 @@ export function density(grams: number | null, kcal: number | null) {
     ? (100 * grams) / kcal
     : null;
 }
-export function aggregate(items: Ingredient[]): Nutrition & { weight: number } {
+// DT342 (0.3.185, board Stories285): the fibre of foods added up. A food with no fibre by nature counts as 0 (fiberZero names
+// them); with a food still without a value, fiber stays unknown and fiberKnown holds what the others have (fiberMissing names
+// the foods), so a total is never shown as exact when it is not
+export type Totals = Nutrition & { weight: number; fiberKnown?: number; fiberMissing?: string[]; fiberZero?: string[] };
+export function aggregate(items: Ingredient[]): Totals {
   const active = items.filter((x) => x.grams > 0);
-  const result = { ...EMPTY, weight: active.reduce((s, x) => s + x.grams, 0) };
+  const result: Totals = { ...EMPTY, weight: active.reduce((s, x) => s + x.grams, 0) };
   for (const k of KEYS)
     result[k] =
       active.length && active.every((x) => x.food[k] !== null)
         ? active.reduce((s, x) => s + (x.food[k]! * x.grams) / 100, 0)
         : null;
+  if (active.length && result.fiber === null) {
+    const zero = active.filter((x) => (x.food.fiber === null || x.food.fiber === undefined) && fibreOf(x.food) === 0);
+    const miss = active.filter((x) => fibreOf(x.food) === null), known = active.filter((x) => fibreOf(x.food) !== null);
+    const sum = known.reduce((s, x) => s + (fibreOf(x.food)! * x.grams) / 100, 0);
+    if (zero.length) result.fiberZero = zero.map((x) => x.food.name);
+    if (!miss.length) result.fiber = sum;
+    else { result.fiberMissing = miss.map((x) => x.food.name); if (known.length > zero.length) result.fiberKnown = sum; }
+  }
   return result;
 }
 export function portionTotals(items: Ingredient[], grams: number | null) {

@@ -1,3 +1,4 @@
+import { fibreFree } from "../fibre0";
 import { placeName } from "../places";
 import { w } from "../words";
 import { shelfName } from "../reference";
@@ -145,6 +146,8 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
           {rates && food.calories ? <Letters n={food} rates={rates} who={food.name} table={<NumbersTable n={food} rates={rates} weight={100} day={null} plan={null} />} /> : null}
         </section>
         )}
+        {/* DT342 (0.3.185): no fibre value on the pack: 0 when it has none by nature, else where to add it; never a guessed number */}
+        {(food.fiber === null || food.fiber === undefined) && food.calories ? <p className="insight fibre-line">{fibreFree(food.name) ? w("foodcard.fibreNone", { food: food.name }) : w("foodcard.fibreMissing")}</p> : null}
         <p className="insight">{plainLine(food, target)}</p>
         {mix && mix.tip.case !== "fits" && mix.tip.case !== "unknown" && (
           <section className="mix-tip">

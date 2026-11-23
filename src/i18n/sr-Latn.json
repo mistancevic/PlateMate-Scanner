@@ -23232,6 +23232,22 @@
     "sumdo.personal.targetKg": {
       "text": "Tvoj list cilja pokazuje koliko si daleko od nje pri svakom merenju.",
       "checked": true
+    },
+    "letters.fibreAtLeast": {
+      "text": "* Vlakna: najmanje {g} g. {n} namirnica bez vrednosti: {foods}.|* Vlakna: najmanje {g} g. {n} namirnice bez vrednosti: {foods}.|* Vlakna: najmanje {g} g. {n} namirnica bez vrednosti: {foods}.",
+      "checked": true
+    },
+    "letters.fibreZero": {
+      "text": "{foods} se računa kao 0 vlakana: nema ih po prirodi.|{foods} se računaju kao 0 vlakana: nemaju ih po prirodi.|{foods} se računaju kao 0 vlakana: nemaju ih po prirodi.",
+      "checked": true
+    },
+    "foodcard.fibreNone": {
+      "text": "Na pakovanju nema vlakana: {food} ih po prirodi nema, pa se na tvom tanjiru računa kao 0.",
+      "checked": true
+    },
+    "foodcard.fibreMissing": {
+      "text": "U vrednostima ove namirnice nema vlakana. Ako ih pakovanje navodi, dodaj ih u Pregledaj deklaraciju; do tada vlakna tvog tanjira imaju *: najmanje koliko imaju ostale namirnice.",
+      "checked": true
     }
   }
 }

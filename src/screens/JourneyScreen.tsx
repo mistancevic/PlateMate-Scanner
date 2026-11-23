@@ -22,7 +22,7 @@ import { calGuess, dayAt, type CalRow } from "../plateCal";
 import { plateCal, type CalInfo } from "./PlateCalendar";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADish, isDrink, type Mix } from "../mixtip";
-import { lettersOf } from "../letters";
+import { lettersOf, numbersOfTotals } from "../letters";
 import { Letters, NumbersTable, type PlanNumbers } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
 import { asMine, stemOf, type MemberFood } from "../memberFoods";
@@ -2027,7 +2027,7 @@ export function JourneyScreen(p: AppApi) {
       {canScale && scaleOpen ? <div className="pd-scale-box"><PdScale target={pdRef} pd={pd} title={w("plate.pdScaleTitle", { t: pdVal(pdRef), pd: pdVal(pd) })} /></div> : null}
       {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
       {/* DT116 (0.2.98) and 0.2.99: the letters with their grams, one block; sugars, saturates and salt in the tap */}
-      {p.rates ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who={w("letters.thePlate")} extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)}
+      {p.rates ? <Letters n={numbersOfTotals(t)} rates={p.rates} who={w("letters.thePlate")} extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)}
     </section>
   ) : null;
   // DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November, Go 11:35): the read alone. The photo and its
@@ -2191,7 +2191,7 @@ export function JourneyScreen(p: AppApi) {
           </div>
         )}
         {readoutEl}
-        {items.length > 0 && numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
+        {items.length > 0 && numbersOpen && p.rates && <NumbersTable n={numbersOfTotals(t)} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
         {/* DT308.7 and DT310.3 (0.3.155): Fit to my target directly under the result: solid blue with Chef Mealan's hat when the
             plate misses your target, white with a blue border when it fits */}
         {plainWays && items.length > 0 && <button className={`pill pill-wide fit-top${fitsTarget ? " pill-action" : " pill-primary"}`} onClick={makeAMeal}><ChefHat size={18} className="hat" /> {fit ? w("plate.fitAgain") : w("plate.fit")}</button>}

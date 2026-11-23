@@ -1,3 +1,4 @@
+import { numbersOfTotals } from "../letters";
 // IM21, IM21b (0.2.21), RP2 (0.2.25): the Nutrition table, worked out by code from the foods and their grams. Shared by the
 // recipe page and, since R6 (0.2.43, board RS14), the read card on the Plate and on Recipes.
 import { dec, w, wIn, wordV, type Val, type WordKey } from "../words";
@@ -36,7 +37,7 @@ export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, r
           <small>{w("nutrition.kcalProteinGrams", { kcal: energy === null ? "?" : fmt(many ? energy : n.rows[0].all ?? 0, 0), protein: fmt((many ? prot?.serving : prot?.all) ?? 0, 1), grams: fmt(grams / (many ? serves : 1), 0) })}</small></div>
       </div>
       {/* DT113 (0.2.94): the four letters, the same for one portion or all of it (they are rates) */}
-      {rates && (() => { const t = aggregate(items); return t.calories ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={rates} who={w("letters.thisRecipe")} table={<NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={rates} weight={t.weight ?? null} day={null} plan={null} />} /> : null; })()}
+      {rates && (() => { const t = aggregate(items); return t.calories ? <Letters n={numbersOfTotals(t)} rates={rates} who={w("letters.thisRecipe")} table={<NumbersTable n={numbersOfTotals(t)} rates={rates} weight={t.weight ?? null} day={null} plan={null} />} /> : null; })()}
     </section>}
     {/* editing: the readout follows as you type; the table comes back with Save */}
     {!readoutOnly && <section className="card nt-card" aria-label={w("nutrition.nutrition")}>

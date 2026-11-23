@@ -1,3 +1,4 @@
+import { numbersOfTotals } from "../letters";
 // The read of a meal photo on the Plate: the photo, the foods with their amounts, the numbers, Chef Mealan's line,
 // Did you eat it? (or Is it for the plan?), Save in My recipes and Done.
 // 0.3.156: moved out of JourneyScreen.tsx as it was. It is a plain function the Plate screen calls while it draws:
@@ -136,7 +137,7 @@ export function plateRead(given: PlateReadIn) {
         <div className="rv-change"><button type="button" className="pill pill-small rv-add-more" onClick={addMore}>+ {w("plate.addMoreShort")}</button><button type="button" className="pill pill-small pill-action rv-continue" onClick={() => setState((s) => (s.photo ? { ...s, photo: { ...s.photo, view: undefined } } : s))}>{w("plate.changeTheFoods")}</button></div>
       </div>
       {readoutEl}
-      {numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
+      {numbersOpen && p.rates && <NumbersTable n={numbersOfTotals(t)} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
       {p.ai.on && <PhotoSaid photo={ph} meal={mealSlot ? mealSlot.name : null} />}
       {state.cooking?.length ? <small className="pt-cook"><b>{w("plate.forCooking")}</b> {state.cooking.join(", ")}</small> : null}
       {adv && <div className="bubble mealan chef-line rv-chef"><p><b>{CHEF_NAME}:</b> {adv.line}</p></div>}
