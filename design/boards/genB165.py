@@ -57,7 +57,7 @@ y = row(y, "B165.1 Before, 0.3.191", "the recipe page, then Edit recipe", [
   ("65-1b", PW, "B165.1b Edit recipe, Steps", "draft", "The long chip runs past the field, the card and the phone's edge.")], ["Edit recipe"])
 y = row(y, "B165.2 New", "the same two screens", [
   ("65-2a", PW, "B165.2a Recipe page, Steps", "same", "As before."),
-  ("65-2b", PW, "B165.2b Edit recipe, Steps", "changed", "The long chip wraps inside its box.")], ["Edit recipe"])
+  ("65-2b", PW, "B165.2b Edit recipe, Steps", "changed", "The long chip goes on like text; the comma follows it.")], ["Edit recipe"])
 y = row(y, "B166.1 Before, 0.3.191", "the PD card, the numbers, Per 100 kcal", [
   ("66-1a", PW, "B166.1a Recipe page, PD card", "draft", "One portion's PD, with the letters."),
   ("66-1b", PW, "B166.1b The numbers", "draft", "An empty space after Total: white on white."),

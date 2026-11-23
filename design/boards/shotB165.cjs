@@ -69,7 +69,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         if (c.getBoundingClientRect().width > room) { c.classList.add("st-long"); c.textContent = c.textContent.replace(/^(\S+) (\S+) (\S+)/, "$1\u00a0$2\u00a0$3"); } } });
       if (!isNew) await p.evaluate(() => { const n = document.createElement("div"); n.id = "edge"; n.style.cssText = `position:absolute;left:390px;top:0;width:0;height:${document.documentElement.scrollHeight}px;border-left:3px dashed #c0392b;z-index:9`; document.body.append(n); });
       if (!isNew) console.log(await note(p, ESTEPS, "The chip <b>250 g Körniger Frischkäse Tworog 2,5% Fett</b> never wraps: it runs past the step's field and the card, to 416 px on a 390 px phone (the red line). The whole page moves sideways.", [LONG]));
-      else console.log(await note(p, ESTEPS, "<b>New:</b> a chip too long for the line goes on to the next line like text, its ends open where it breaks, so it reads as one chip; the comma stays right after it. 250&nbsp;g stays with Körniger. A chip that fits moves down whole. Lines have space between them. The page stays 390 px wide.", [".st-field"]));
+      else console.log(await note(p, ESTEPS, "<b>New:</b> a chip too long for the line goes on to the next line like text, its ends open where it breaks, so it reads as one chip; the comma stays right after it. 250&nbsp;g stays with Körniger. A chip that fits moves down whole. Lines have space between them. The page stays 390 px wide.", ["JS:document.querySelector(\".st-field\")"]));
       await shot(p, `65-${k}b`, ESTEPS, ".board-note", !isNew); await p.context().close();
       // ---- B166: the PD card, the numbers, Per 100 kcal ----
       p = await open(isNew);
