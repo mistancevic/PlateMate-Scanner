@@ -4086,10 +4086,10 @@
     },
     {
       "id": "B160",
-      "title": "A meal eaten from a recipe keeps the first version after the recipe is changed",
+      "title": "A recipe changed after a meal was logged from it: asked once for a recent meal, older meals keep their foods",
       "epic": "cook",
       "state": "next",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): he cooked and logged it, then changed the recipe (feta in place of one quark pack, sesame and oil added). The recipe reads PD 4.9 a portion; the meal he ate, under Your cooks, still holds the first foods and PD 6.2. Meaning to agree: is the eaten meal changed with the recipe, or asked."
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): he cooked and logged it, then changed the recipe (feta in place of one quark pack, sesame and oil added). The recipe reads PD 4.9 a portion; the meal he ate, under Your cooks, still holds the first foods and PD 6.2. Meaning to agree: is the eaten meal changed with the recipe, or asked. 19:11: think it through; a change could be a correction or a new variation, and a recipe changes again. Proposed 19:12 and agreed (makes sense): every logged meal keeps its own foods; saving a change to a recipe asks once about a meal logged from it today or yesterday, Was it made this way? Update it (same portion share) or Keep it; older meals are not asked, the save says how many keep their foods; Save as a new recipe beside Save for a big change; no warning sign that waits for a stable recipe."
     },
     {
       "id": "B161",
