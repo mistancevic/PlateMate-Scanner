@@ -23248,6 +23248,10 @@
     "foodcard.fibreMissing": {
       "text": "U vrednostima ove namirnice nema vlakana. Ako ih pakovanje navodi, dodaj ih u Pregledaj deklaraciju; do tada vlakna tvog tanjira imaju *: najmanje koliko imaju ostale namirnice.",
       "checked": true
+    },
+    "clientweek.keyUnknown": {
+      "text": "o: nije poznato, od pre nego što je aplikacija počela da beleži",
+      "checked": true
     }
   }
 }

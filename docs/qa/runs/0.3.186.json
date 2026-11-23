@@ -1,0 +1,845 @@
+{
+ "version": "0.3.186",
+ "commit": "db05b3c",
+ "at": "2026-11-23T16:49:33.522Z",
+ "minutes": 1,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 69,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "client-names.cjs",
+   "about": "B156 (0.3.181, board Stories281; Go 23 November 2026, 12:43): Clients keeps the names it knew when the invites do not load. The example coach with a third client whose Profile name is empty (chefmealan-coach-demo-invite), named from the invites; the walkthrough answers or refuses /api/invites, as a promote would. AC1 the last good answer kept, AC2 one more try with no tap, AC3 No name yet whole, AC4 a new answer replaces the kept one.",
+   "pass": true,
+   "seconds": 30,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B156 AC1: the kept answer: Sara, sara.novak@example.com"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC3: a client never seen shows the whole line: No name yet"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: about 3 s later, with no tap, the name fills in: Sara, sara.novak@example.com"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: asked once more: 2"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: and not again: 2"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: two failures, two requests, still No name yet: 2, No name yet"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC4: the new answer, not the kept one: Sara"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC4: and it is kept from now on"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 96 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-badge.cjs",
+   "about": "JOURNEY (0.2.121, Tester 2, Milan 28 October 15:24): a note from the coach waits on Today, and the Today tab says how many. Got it clears it.",
+   "pass": true,
+   "seconds": 6,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the Today tab shows 1: a note from the coach waits"
+    },
+    {
+     "ok": true,
+     "text": "the note is on Today"
+    },
+    {
+     "ok": true,
+     "text": "Got it clears the badge"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-phase-today.cjs",
+   "about": "B153 (0.3.170, board B153): the coach sees a client's first two weeks on the coach's today, not on the day her phone last saved. The coach demo: Lena is on day 6 of 14; her phone last saved 3 days ago (chefmealan-coach-demo-stale), on day 3. AC1 the outline is on today; AC2 the days since are amber; AC3 the days ahead are grey; AC4 her page says day 6 of 14 with the same squares; AC5 the full days under the bars are the green ones. Unchanged: with a phone that saved today the card is as before.",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B153: Lena's card says day 6 of 14"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC1: the outline is on day 6, today: good,good,look,look,look,today,none,none,none,none,none,none,none,none"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC2: days 3 to 5, from the day the phone saved, are amber"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC3: days 7 to 14 are grey, still to come"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC5: the full days are the green ones: 2 full days · 0 weigh-ins · ready 1 Dec"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC4: her page says day 6 of 14"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC4: her page has the same squares as her card"
+    },
+    {
+     "ok": true,
+     "text": "B153 unchanged: a phone that saved today keeps its days: good,good,look,good,good,today,none,none,none,none,none,none,none,none"
+    },
+    {
+     "ok": true,
+     "text": "B153 unchanged: a client in a normal week has one row of seven"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 48 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-views.cjs",
+   "about": "DT189 (0.3.31, board Stories138): Waiting for you at the top of Clients, the badge as its count, the strip in words on My day; Answer and Good or Seen under a shared card; the answer on the client's Today quoting the meal. DT188 (0.3.30, board Stories137; Coach Milan 31 October 12:56 to 13:00, 16:08, 16:26 Go): roles and navigation. Explorer is the fifth tab for everyone and leaves the menu. The coach is one account with two views, My day and My clients, switched at the top of Today; in My clients the bar keeps its order and Plate becomes Clients; Today, Plan and Recipes show the chosen client's, read-only, under the title My clients with the name below. The coach suggests a planned snack or an Explorer page; the client gets a card on Today with Accept and Not now (a reason as a chip or a line). The superadmin has Admin in the menu.",
+   "pass": true,
+   "seconds": 31,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the client's bar: Today, Plan, Plate, Recipes, Explorer: Today,Plan,Plate,Recipes,Explorer"
+    },
+    {
+     "ok": true,
+     "text": "five tabs, 44 px or more: 56,56,56,56,56"
+    },
+    {
+     "ok": true,
+     "text": "the menu: Foods and Me stay, Explorer left, no Admin for a client"
+    },
+    {
+     "ok": true,
+     "text": "a suggestion is a card on Today, newest first: Coach Milan suggests. Nothing changes until you tap.A page: The body: The gutOpe"
+    },
+    {
+     "ok": true,
+     "text": "the badge on Today counts the two suggestions"
+    },
+    {
+     "ok": true,
+     "text": "Not now: four reasons as chips, and a line"
+    },
+    {
+     "ok": true,
+     "text": "the answer is on the thread: not now, ask me at the check-in"
+    },
+    {
+     "ok": true,
+     "text": "the next suggestion: the snack"
+    },
+    {
+     "ok": true,
+     "text": "Accept: the snack is on Plan for seven days, source coach: 7"
+    },
+    {
+     "ok": true,
+     "text": "the time is on each date; the Lifestyle default is untouched"
+    },
+    {
+     "ok": true,
+     "text": "accepted: the card goes; the answer is on the thread"
+    },
+    {
+     "ok": true,
+     "text": "the answer on Today quotes the meal and its time, with Got it"
+    },
+    {
+     "ok": true,
+     "text": "the coach: no switch, six tabs, Clients the sixth: Today,Plan,Plate,Recipes,Explorer,Clients"
+    },
+    {
+     "ok": true,
+     "text": "six tabs, each 44 px or more wide: 61,61,61,61,61,61"
+    },
+    {
+     "ok": true,
+     "text": "Clients, its own tab"
+    },
+    {
+     "ok": true,
+     "text": "a client's page: Today, Week, Shared, Goal; it opens on Week"
+    },
+    {
+     "ok": true,
+     "text": "Today: Suggest, a planned snack, a page from Explorer"
+    },
+    {
+     "ok": true,
+     "text": "the suggestion is listed as waiting"
+    },
+    {
+     "ok": true,
+     "text": "Shared: the cards the client sent"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the goal, the formula"
+    },
+    {
+     "ok": true,
+     "text": "Recipes is the coach's own"
+    },
+    {
+     "ok": true,
+     "text": "Today is the coach's own"
+    },
+    {
+     "ok": true,
+     "text": "Me for a coach: no My coach; Your summary after Where I shop and cook: Profile,Goal,Lifestyle,Training week,Google Calendar,Where I shop and cook,Your summary,Account"
+    },
+    {
+     "ok": true,
+     "text": "My day: the strip in words: 6 things wait on Clients: 4 cards shared, 2 check-ins today. Open Clients ›"
+    },
+    {
+     "ok": true,
+     "text": "Clients opens with Waiting for you, one row per thing: 6"
+    },
+    {
+     "ok": true,
+     "text": "the badge on Clients is the list's count: 6"
+    },
+    {
+     "ok": true,
+     "text": "the row opens the client's page with Answer under the shared cards"
+    },
+    {
+     "ok": true,
+     "text": "Send: the card shows the answer and Answer again; the field folds"
+    },
+    {
+     "ok": true,
+     "text": "Answer again opens the field with Cancel"
+    },
+    {
+     "ok": true,
+     "text": "Cancel folds it"
+    },
+    {
+     "ok": true,
+     "text": "0.3.32: the way back says what waits one level up: ‹ Clients · 5 waiting"
+    },
+    {
+     "ok": true,
+     "text": "Good: a reaction on the card only"
+    },
+    {
+     "ok": true,
+     "text": "answered rows left the list: 6 then 5 (opened: Nina · look at this Pizza, 3 slicesWedne)"
+    },
+    {
+     "ok": true,
+     "text": "Admin: people and roles, the privacy tracker, the walkthroughs"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-week.cjs",
+   "about": "The coach's week, 0.2.6 (canvas board CW, Milan 13 and 15 October 2026). Skip a meal on purpose on Today; the coach's note on Today; Clients with check-ins and the week as bars; a client's page with the week, a day opened, the note, the check-in day and a goal from a date. Without accounts, Clients opens on two example clients (?coachdemo).",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Skip: the row says Skipped on purpose, with Undo"
+    },
+    {
+     "ok": true,
+     "text": "the skip is kept with the plan"
+    },
+    {
+     "ok": true,
+     "text": "Undo brings the meal back"
+    },
+    {
+     "ok": true,
+     "text": "Today shows the coach's note"
+    },
+    {
+     "ok": true,
+     "text": "Got it: the note leaves Today and is marked read"
+    },
+    {
+     "ok": true,
+     "text": "the coach's bar: six tabs, Clients the sixth"
+    },
+    {
+     "ok": true,
+     "text": "Clients starts with Check-ins today"
+    },
+    {
+     "ok": true,
+     "text": "a client row: seven bars in one row and the full days (DT340, 0.3.182: was the days lived by the plan)"
+    },
+    {
+     "ok": true,
+     "text": "DT302: Saturday and Sunday are shaded"
+    },
+    {
+     "ok": true,
+     "text": "DT302: the key line names what shows, in a week's words: Amber: active · Outline: today · Dashed: still to come · Dot: weigh-in · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "the client opens on a page of her own, with the week"
+    },
+    {
+     "ok": true,
+     "text": "today says so far"
+    },
+    {
+     "ok": true,
+     "text": "last week: lived days with ✓, a changed day with what changed"
+    },
+    {
+     "ok": true,
+     "text": "a day: planned against eaten per meal, the extra, the words only from a shared card"
+    },
+    {
+     "ok": true,
+     "text": "the note is sent and listed"
+    },
+    {
+     "ok": true,
+     "text": "the check-in day changes"
+    },
+    {
+     "ok": true,
+     "text": "the date is on the button"
+    },
+    {
+     "ok": true,
+     "text": "the goal waits for its date"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "day-levels.cjs",
+   "about": "DT340 (0.3.182, board Stories282; Go 23 November 2026, 13:15): the client's card shows activity. The example coach on Thursday 26 November, 13:30: four levels a day (AC1), today filling in (AC2), Last active (AC3), a client quiet for 3 days in Waiting for you (AC4, chefmealan-coach-demo-quiet). The client: a meal with nothing planned skipped on purpose on Plan (AC5), the privacy notice (AC7), and the phone marks the day opened, then active. AC6, the full-day rule: src/activity.test.ts.",
+   "pass": true,
+   "seconds": 15,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT340 AC1: Nina's week: full, full, active, today active, days to come dashed: full full active active* todo todo todo"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC1: Sara's days, the app not opened: empty empty empty empty* todo todo todo"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC2: Lena opened the app today and logged nothing: today grey, outlined: full full active full full opened* todo todo todo todo todo todo todo todo"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC1: the key line names only what shows: Green: full day · Amber: active · Grey: opened only · Outline: today · Dashed: still to come · Dot: weigh-in · Shaded: weekend / Empty: not opened · Outline: today · Dashed: still to come · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC3: Last active: today 11:40 / Last active: yesterday 20:15 / Last active: 5 days ago, Saturday"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC4: Waiting for you, first: Sara · Quiet for 3 days, last opened the app Sunday 22 November"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC4: Nina and Lena opened the app: not quiet"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC4: a tap opens Sara"
+    },
+    {
+     "ok": true,
+     "text": "the example coach without Sara: two clients, nobody quiet"
+    },
+    {
+     "ok": true,
+     "text": "DT340: opening the app marks today opened: {\"days\":{\"2026-11-26\":\"opened\"},\"lastActiveAt\":null,\"lastOpenAt\":\"2026-11-26T12:30:00.000Z\",\"since\":\"2026-11-26\"}"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC5: a day gone by, nothing planned: each meal has I skipped it: 3"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC5: breakfast shows Skipped with Undo"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC5: kept as a skip on purpose: {\"breakfast\":{\"title\":\"\",\"kcal\":0,\"protein\":0,\"source\":\"mine\",\"skipped\":true}}"
+    },
+    {
+     "ok": true,
+     "text": "DT340: changing the plan marks today active"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC5: Undo removes the skip, nothing left planned"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC7: the privacy notice says so"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "days-not-known.cjs",
+   "about": "B159 (0.3.186, board Stories286; Go 23 November 2026, 17:44): on a client's card, a day before the client's phone recorded activity, with nothing logged, reads o (not known), never not opened; a day with something logged keeps its colour; the key line names the o only when it shows. The example coach on Thursday 26 November, 13:30, with Sara (chefmealan-coach-demo-quiet): her phone recorded from yesterday (chefmealan-coach-demo-recorded 1), or never (none). AC2 and AC4: src/activity.test.ts.",
+   "pass": true,
+   "seconds": 9,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B159 AC1: recorded from yesterday: Monday and Tuesday not known, yesterday active, today opened: unknown unknown active opened* todo todo todo"
+    },
+    {
+     "ok": true,
+     "text": "B159 AC3: the key names the o: Amber: active · Grey: opened only · o: not known, from before the app recorded it · Outline: today · Dashed: still to come · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "B159 AC3: Lena's phone recorded all her days: no o, the key does not name it: full full active full full opened* todo todo todo todo todo todo todo todo"
+    },
+    {
+     "ok": true,
+     "text": "B159 AC5: a phone that never recorded: every day with nothing logged is not known: unknown unknown unknown unknown* todo todo todo"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 48 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 15,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "B159 Light plus the German sweep: the client's card"
+}
