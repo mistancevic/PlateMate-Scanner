@@ -1,6 +1,7 @@
 // Who the person is, for calculating their numbers. Every field optional; stored on the phone and in their account only.
 import { w, numText, numLocale, dateText, type WordKey } from "./words";
 import { getLang } from "./lang";
+import { KITCHENS_MAX } from "./kitchensMax";
 import { BANDS, ALL_BANDS, goalLabel, goalName as goalNameOf, type Band, type TrainingAge } from "./goal";
 // DT243: calculate() names its weight w, so the app's lines go through tr inside it
 const tr = w;
@@ -84,6 +85,15 @@ export const DEFAULT_EQUIPMENT = ["oven", "stovetop", "microwave"];
 export const equipmentOf = (p: Pick<Personal, "equipment">) => (Array.isArray(p.equipment) ? p.equipment.filter((x) => EQUIPMENT.some(([id]) => id === x)) : DEFAULT_EQUIPMENT);
 // The kitchens you cook (0.2.9, board CH, CH4), in the order drawn
 export const KITCHENS = ["Balkan", "Italian", "Mediterranean", "German", "French", "Spanish", "Greek", "Turkish", "Middle Eastern", "Indian", "Thai", "Chinese", "Japanese", "Korean", "Mexican", "American"];
+// DT334 (0.3.178, board Stories278; Go 23 November 2026, 08:43): up to 3 kitchens you cook. A tap on a fourth picks nothing and
+// says so; a tap on one picked takes it off. A list from before with more is kept as it is until its owner taps one off.
+export { KITCHENS_MAX };
+export function pickKitchen(list: readonly string[] | undefined, k: string): { list: string[]; full: boolean } {
+  const cur = [...(list ?? [])];
+  if (cur.includes(k)) return { list: cur.filter((x) => x !== k), full: false };
+  if (cur.length >= KITCHENS_MAX) return { list: cur, full: true };
+  return { list: [...cur, k], full: false };
+}
 export type DayTarget = { kcal: number; protein: number; fats: number; carbs: number };
 export type NextGoal = { from: string; at: string; band: string; source: "profile" | "exact" | "coach" | "quick"; setBy: "you" | "coach"; kcal: number; protein: number; fats: number; carbs: number; method?: string; formula?: Formula | null; measured?: import("./measured").MeasuredFixed | null };
 // today's target kept with the day; the newest 400 days stay

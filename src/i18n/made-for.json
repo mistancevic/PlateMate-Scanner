@@ -2634,7 +2634,7 @@
     "screen.shopp.homeFoods": {"en":"Home · {n} foods","area":"Menu and settings","where":"Menu, Profile, Goal and Shop"},
     "screen.shopp.homeFoodsCy": {"en":"Home · {n} foods, fifty Cypriot with their Greek names","area":"Menu and settings","where":"Menu, Profile, Goal and Shop"},
     "screen.shopp.morePlaces": {"en":"{n} more places","area":"Menu and settings","where":"Menu, Profile, Goal and Shop"},
-    "screen.shopp.cooksFirst": {"en":"Chef Mealan cooks in these first: the tastes, the herbs, how a meal is put together. Pick one or more.","area":"Menu and settings","where":"Menu, Profile, Goal and Shop"},
+    "screen.shopp.cooksFirst": {"en":"Chef Mealan cooks in these first: the tastes, the herbs, how a meal is put together. Pick up to 3.","area":"Menu and settings","where":"Menu, Profile, Goal and Shop","release":"0.3.178"},
     "screen.shopp.stepsForWhatYouHave": {"en":"Chef Mealan writes the steps for what you have. A recipe that needs something you don't have says how to make it without, or that it can't.","area":"Menu and settings","where":"Menu, Profile, Goal and Shop"},
     "screen.shopp.anotherInstead": {"en":"Another instead of {dish}","area":"Menu and settings","where":"Menu, Profile, Goal and Shop"},
     "screen.goal.who.recomp": {"en":"lose fat and build muscle at the same time","area":"Words used across the app","where":"Across the app"},
@@ -5735,6 +5735,7 @@
     "screen.app.noValuesOnPack": {"en":"No values on the pack.","area":"Words used across the app","where":"Across the app","release":"0.3.174"},
     "screen.app.dbNoValues": {"en":"The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label.","area":"Words used across the app","where":"Across the app","release":"0.3.175"},
     "screen.plate.kcalGramsPd": {"en":"{kcal} kcal · {grams} g · {pd}","area":"The Plate","where":"The Plate","release":"0.3.176"},
-    "screen.plate.whichMealFirst": {"en":"Which meal is it? Pick it, and Chef Mealan finds ideas for it.","area":"The Plate","where":"The Plate","release":"0.3.176"}
+    "screen.plate.whichMealFirst": {"en":"Which meal is it? Pick it, and Chef Mealan finds ideas for it.","area":"The Plate","where":"The Plate","release":"0.3.176"},
+    "screen.shopp.upToThree": {"en":"Up to 3. Tap one off first.","area":"Words used across the app","where":"Across the app","release":"0.3.178"}
   }
 }

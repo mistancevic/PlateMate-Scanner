@@ -10590,7 +10590,7 @@
       "checked": true
     },
     "shopp.cooksFirst": {
-      "text": "Chef Mealan prvo kuva u ovima: ukusi, začini, kako se obrok slaže. Izaberi jednu ili više.",
+      "text": "Chef Mealan prvo kuva u ovima: ukusi, začini, kako se obrok slaže. Izaberi najviše 3.",
       "checked": true
     },
     "shopp.stepsForWhatYouHave": {
@@ -22943,6 +22943,10 @@
     },
     "plate.whichMealFirst": {
       "text": "Koji je ovo obrok? Izaberi ga, i Chef Mealan nalazi ideje za njega.",
+      "checked": true
+    },
+    "shopp.upToThree": {
+      "text": "Najviše 3. Prvo isključi jednu.",
       "checked": true
     }
   }

@@ -3661,3 +3661,6 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .none-line { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; } .none-line svg { flex: none; margin-top: 2px; color: var(--close-text); }
 .readout.readout-none { background: #fff; color: var(--ink, #172742); border: 1px solid var(--line, #d1dcf0); }
 .readout.readout-none > b { display: block; margin-top: 8px; font-size: 17px; }
+
+/* DT334 (0.3.178): up to 3 kitchens; a fourth tap says so */
+.kitchens-full { color: var(--close-text); font-weight: 700; }
