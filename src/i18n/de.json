@@ -2526,7 +2526,7 @@
       "checked": true
     },
     "measured.theAverageOfYourFull": {
-      "text": "Der Durchschnitt deiner vollen Tage: jede geplante Mahlzeit gegessen, getauscht oder bewusst ausgelassen, und alles Zusätzliche eingetragen. Tage, an denen eine Mahlzeit fehlt, zählen nicht.",
+      "text": "Der Durchschnitt deiner vollen Tage: jede Mahlzeit deines Tages gegessen, getauscht oder bewusst ausgelassen, mit oder ohne Plan, und alles Zusätzliche eingetragen. Tage, an denen eine Mahlzeit fehlt, zählen nicht.",
       "checked": true
     },
     "measured.whatYourWeightDid": {
@@ -3118,7 +3118,7 @@
       "checked": true
     },
     "measured.fullDayIs": {
-      "text": "Ein voller Tag: jede geplante Mahlzeit gegessen, getauscht oder bewusst ausgelassen, und alles Zusätzliche eingetragen. Wiege dich morgens, vor dem Frühstück.",
+      "text": "Ein voller Tag: jede Mahlzeit deines Tages gegessen, getauscht oder bewusst ausgelassen, mit oder ohne Plan, und alles Zusätzliche eingetragen. Wiege dich morgens, vor dem Frühstück.",
       "checked": true
     },
     "measured.firstDaysWater": {
@@ -23027,6 +23027,50 @@
     },
     "label.line.vitamin": {
       "text": "Vitamin {x}",
+      "checked": true
+    },
+    "clientweek.keyActive": {
+      "text": "Gelb: aktiv",
+      "checked": true
+    },
+    "clientweek.keyOpened": {
+      "text": "Grau: nur geöffnet",
+      "checked": true
+    },
+    "clientweek.keyEmpty": {
+      "text": "Leer: nicht geöffnet",
+      "checked": true
+    },
+    "clientweek.keyTodo": {
+      "text": "Gestrichelt: kommt noch",
+      "checked": true
+    },
+    "clientweek.lastActive": {
+      "text": "Zuletzt aktiv: {when}",
+      "checked": true
+    },
+    "clientweek.activeToday": {
+      "text": "heute {time}",
+      "checked": true
+    },
+    "clientweek.activeYesterday": {
+      "text": "gestern {time}",
+      "checked": true
+    },
+    "clientweek.activeDaysAgo": {
+      "text": "vor {n} Tagen, {day}",
+      "checked": true
+    },
+    "coach.waitQuiet": {
+      "text": "Seit {n} Tagen ruhig",
+      "checked": true
+    },
+    "coach.waitQuietWhen": {
+      "text": "App zuletzt geöffnet: {date}",
+      "checked": true
+    },
+    "coach.waitQuietN": {
+      "text": "{n} ruhiger Klient|{n} ruhige Klienten",
       "checked": true
     }
   }

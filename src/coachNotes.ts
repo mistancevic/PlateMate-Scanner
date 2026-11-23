@@ -1,3 +1,5 @@
+import { quietDays, QUIET_AFTER } from "./activity";
+import { quietWhen } from "./activityWords";
 import { firstOf } from "./clientName";
 import { w, wn, wordV, dateText, type Val } from "./words";
 // The coach's note and the check-in day (0.2.6, canvas board CW, CW4 to CW6). One thread per client in the client's own
@@ -52,8 +54,8 @@ export const setCoachLocal = (c: CoachLocal) => { try { localStorage.setItem(KEY
 // ---- DT189: Waiting for you, the coach's list. One row per thing a client sent or asked, newest first: a card shared (with a
 // question or not, until opened), a reply to a note, numbers to approve, a check-in due today. The badge on Clients is this
 // list's count; a row leaves the list when answered, reacted to, approved, sent, or opened and marked seen on this phone.
-export type Waiting = { key: string; uid: string; name: string; kind: "card" | "reply" | "review" | "checkin"; what: string; when: string; at: string; cardId?: string };
-export type WaitingRow = { uid: string; name: string; notes: CoachNote[]; feedback: any[]; review: { status: string; at?: string } | null; checkinDay: number };
+export type Waiting = { key: string; uid: string; name: string; kind: "card" | "reply" | "review" | "checkin" | "quiet"; what: string; when: string; at: string; cardId?: string };
+export type WaitingRow = { uid: string; name: string; notes: CoachNote[]; feedback: any[]; review: { status: string; at?: string } | null; checkinDay: number; activity?: import("./activity").Activity };
 const SEEN = (uid: string) => `chefmealan-waiting-seen-${uid}`;
 export const seenWaiting = (coachUid: string): Set<string> => { try { return new Set(JSON.parse(localStorage.getItem(SEEN(coachUid)) || "[]")); } catch { return new Set(); } };
 export const markWaitingSeen = (coachUid: string, key: string) => { try { const s = seenWaiting(coachUid); s.add(key); localStorage.setItem(SEEN(coachUid), JSON.stringify([...s].slice(-400))); } catch {} };
@@ -75,12 +77,17 @@ export function waitingFor(rows: WaitingRow[], seen: Set<string>, todayIndex: nu
     if (r.review?.status === "waiting") { const key = `review|${r.uid}|${r.review.at ?? ""}`; if (!seen.has(key)) out.push({ key, uid: r.uid, name: first, kind: "review", what: w("coach.waitNumbers"), when: w("coach.waitGoalSheet"), at: r.review.at ?? "" }); }
     if (r.checkinDay === todayIndex && !r.notes.some((n) => n.by === "coach" && n.week === weekKey)) out.push({ key: `checkin|${r.uid}|${weekKey}`, uid: r.uid, name: first, kind: "checkin", what: w("coach.waitCheckin"), when: w("coach.waitNoteNotSent"), at: `${weekKey}T00:00:00` });
   }
-  return out.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+  // DT340 (0.3.182, board Stories282, AC4): a client who has not opened the app for 3 days in a row waits, first in the list;
+  // she leaves it once she opens the app again
+  const quiet: Waiting[] = [];
+  const today = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })();
+  for (const r of rows) { const n = quietDays(r.activity, today); if (n >= QUIET_AFTER && r.activity) quiet.push({ key: `quiet|${r.uid}|${r.activity.lastOpenAt}`, uid: r.uid, name: firstOf(r.name), kind: "quiet", what: w("coach.waitQuiet", { n }), when: quietWhen(r.activity), at: r.activity.lastOpenAt ?? "" }); }
+  return [...quiet, ...out.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0))];
 }
 // the strip on My day, in words
 export function waitingWords(list: Waiting[]): string {
   if (!list.length) return "";
   const n = (k: Waiting["kind"]) => list.filter((x) => x.kind === k).length;
-  const parts = [n("card") ? wn("coach.waitCards", n("card")) : "", n("reply") ? wn("coach.waitReplies", n("reply")) : "", n("review") ? w("coach.waitNumbers") : "", n("checkin") ? wn("coach.waitCheckins", n("checkin")) : ""].filter(Boolean);
+  const parts = [n("quiet") ? wn("coach.waitQuietN", n("quiet")) : "", n("card") ? wn("coach.waitCards", n("card")) : "", n("reply") ? wn("coach.waitReplies", n("reply")) : "", n("review") ? w("coach.waitNumbers") : "", n("checkin") ? wn("coach.waitCheckins", n("checkin")) : ""].filter(Boolean);
   return wn("coach.waitStrip", list.length, { parts: parts.join(", ") });
 }

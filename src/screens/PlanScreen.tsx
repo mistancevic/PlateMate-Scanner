@@ -322,7 +322,8 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
           {toAdd.map((sl) => {
             const m = p.planned[dayKey]?.[sl.id], f = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time, dayName: WEEKDAY_OF(date) };
             const slot = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time };
-            if (m?.skipped) return <div className="past-plate" key={sl.id}><span><small>{mealName(sl.name)}, {sl.time}</small><b>{w("plan.skipped")}</b></span><button type="button" className="pill pill-small pill-action" onClick={() => p.fill(dayKey, sl.id, { ...m, skipped: false })}>{w("plan.undo")}</button></div>;
+            // DT340 (0.3.182, AC5): a meal skipped with nothing planned is kept as a skip with no title; Undo removes it
+            if (m?.skipped) return <div className="past-plate" key={sl.id}><span><small>{mealName(sl.name)}, {sl.time}</small><b>{w("plan.skipped")}</b></span><button type="button" className="pill pill-small pill-action" onClick={() => p.fill(dayKey, sl.id, m.title ? { ...m, skipped: false } : null)}>{w("plan.undo")}</button></div>;
             if (m) return (
               <div className="past-plate past-planned" key={sl.id}>
                 <span><small>{w("plan.slotPlanned", { meal: mealV(sl.name), time: sl.time })}</small><b>{m.title}</b></span>
@@ -333,7 +334,8 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
                 </div>
               </div>
             );
-            return <div className="past-plate" key={sl.id}><span><small>{mealName(sl.name)}, {sl.time}</small><b>{w("plan.nothingAdded")}</b></span><button type="button" className="pill pill-small" onClick={() => p.fillOnPlate(f, null, "")}>{w("plan.addWhatYouAte")}</button></div>;
+            // DT340 (0.3.182, board Stories282, AC5): a meal with nothing planned can be skipped on purpose too, so the day can be full
+            return <div className="past-plate past-planned" key={sl.id}><span><small>{mealName(sl.name)}, {sl.time}</small><b>{w("plan.nothingAdded")}</b></span><div className="button-row"><button type="button" className="pill pill-small" onClick={() => p.fillOnPlate(f, null, "")}>{w("plan.addWhatYouAte")}</button><button type="button" className="pill pill-small skip-unplanned" onClick={() => p.fill(dayKey, sl.id, { title: "", kcal: 0, protein: 0, source: "mine", skipped: true })}>{w("plan.iSkippedIt")}</button></div></div>;
           })}
           <small className="muted">{w("plan.aDayBeforeTodayIs")}</small>
         </div>

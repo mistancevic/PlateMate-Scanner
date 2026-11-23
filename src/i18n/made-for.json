@@ -243,7 +243,7 @@
     "screen.measured.notEnoughDataYet": {"en":"Not enough data yet","area":"Today","where":"Measured cards"},
     "screen.measured.useMyData": {"en":"Use my data","area":"Today","where":"Measured cards"},
     "screen.measured.whatYouAte": {"en":"What you ate.","area":"Today","where":"Measured cards"},
-    "screen.measured.theAverageOfYourFull": {"en":"The average of your full days: every planned meal eaten, swapped or skipped on purpose, and anything extra logged. Days with a meal missing don't count.","area":"Today","where":"Measured cards"},
+    "screen.measured.theAverageOfYourFull": {"en":"The average of your full days: every meal of your day eaten, swapped or skipped on purpose, with or without a plan, and anything extra logged. Days with a meal missing don't count.","area":"Today","where":"Measured cards","release":"0.3.182"},
     "screen.measured.whatYourWeightDid": {"en":"What your weight did.","area":"Today","where":"Measured cards"},
     "screen.measured.theBurn": {"en":"The burn.","area":"Today","where":"Measured cards"},
     "screen.measured.whatYouAtePlusKcal": {"en":"What you ate, plus 7,700 kcal for each kg the line went down, or minus for each kg it went up, spread over the 14 days.","area":"Today","where":"Measured cards"},
@@ -2093,7 +2093,7 @@
     "screen.measured.capsDay": {"en":" · DAY {day} OF {of}","area":"Today","where":"Measured cards"},
     "screen.measured.weighFrom": {"en":"Weigh-ins from day {day}","area":"Today","where":"Measured cards"},
     "screen.measured.weighIns": {"en":"Weigh-ins","area":"Today","where":"Measured cards"},
-    "screen.measured.fullDayIs": {"en":"A full day: every planned meal eaten, swapped or skipped on purpose, and anything extra logged. Weigh in in the morning, before breakfast.","area":"Today","where":"Measured cards"},
+    "screen.measured.fullDayIs": {"en":"A full day: every meal of your day eaten, swapped or skipped on purpose, with or without a plan, and anything extra logged. Weigh in in the morning, before breakfast.","area":"Today","where":"Measured cards","release":"0.3.182"},
     "screen.measured.firstDaysWater": {"en":" The first {n} days' weigh-ins don't count: early changes are mostly water.","area":"Today","where":"Measured cards"},
     "screen.measured.readyOn": {"en":"Ready on {date} at the earliest.","area":"Today","where":"Measured cards"},
     "screen.goal.band.recomp": {"en":"Recomposition","area":"Me and setup","where":"Goal"},
@@ -5756,6 +5756,17 @@
     "screen.label.line.zinc": {"en":"Zinc","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
     "screen.label.line.potassium": {"en":"Potassium","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
     "screen.label.line.iodine": {"en":"Iodine","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
-    "screen.label.line.vitamin": {"en":"Vitamin {x}","area":"Words used across the app","where":"Across the app","release":"0.3.180"}
+    "screen.label.line.vitamin": {"en":"Vitamin {x}","area":"Words used across the app","where":"Across the app","release":"0.3.180"},
+    "screen.clientweek.keyActive": {"en":"Amber: active","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.clientweek.keyOpened": {"en":"Grey: opened only","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.clientweek.keyEmpty": {"en":"Empty: not opened","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.clientweek.keyTodo": {"en":"Dashed: still to come","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.clientweek.lastActive": {"en":"Last active: {when}","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.clientweek.activeToday": {"en":"today {time}","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.clientweek.activeYesterday": {"en":"yesterday {time}","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.clientweek.activeDaysAgo": {"en":"{n} days ago, {day}","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.coach.waitQuiet": {"en":"Quiet for {n} days","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.coach.waitQuietWhen": {"en":"last opened the app {date}","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.coach.waitQuietN": {"en":"a client quiet|{n} clients quiet","area":"Clients","where":"Clients","release":"0.3.182"}
   }
 }

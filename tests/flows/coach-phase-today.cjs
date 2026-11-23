@@ -29,7 +29,8 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
     await p.locator(".bottom-nav button").last().click(); await p.waitForTimeout(1200);
     return { p, ctx };
   };
-  const states = (loc) => loc.evaluateAll((xs) => xs.map((x) => ["good", "look", "today", "none"].find((k) => x.classList.contains(k))));
+  // DT340 (0.3.182): the squares carry the day's level; read as before: green full, today outlined, still to come, any other day gone by
+  const states = (loc) => loc.evaluateAll((xs) => xs.map((x) => x.classList.contains("is-today") ? "today" : x.classList.contains("lvl-full") ? "good" : x.classList.contains("lvl-todo") ? "none" : "look"));
   try {
     // a phone that last saved 3 days ago
     let { p, ctx } = await open(3);
