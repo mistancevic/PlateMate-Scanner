@@ -1,0 +1,55 @@
+{
+  "id": "DT338",
+  "title": "What the PD colours mean: one scale on the Goal page and behind the PD number on the Plate",
+  "epic": "setup",
+  "state": "next",
+  "why": "Coach Milan 22 November 2026, 17:57 to 18:01: add the ranges and their colours where users see them, so they know what the colour of their numbers means; today the colour changes as PD moves from one range to another. 18:01: both places.",
+  "opportunity": {
+    "from": "An onboarding call, 22 November 2026.",
+    "job": "Understand at a glance whether my plate is where my target wants it.",
+    "kind": "Did not understand it: colours that change with no key.",
+    "why_now": "New testers see the colour on their first plate."
+  },
+  "problem": "Five bands around the person's own target colour the PD block: Low−, Low, On plan, High, High+ (0.6, 0.9, 1.5 and 2.5 times the target). The only place that says the ranges is a line under the filter chips in Foods, after a chip is tapped.",
+  "story": "When I see the colour of my PD, I want to see what it means in my own numbers, so that I know what to change.",
+  "proposed": "One scale: five coloured parts, each with its name and its range in the person's own numbers (for a target of 5.3: under 3.2, 3.2 to 4.8, 4.8 to 8.0, 8.0 to 13.3, above 13.3). On the Goal page under the PD target. On the Plate, a tap on the PD number opens the same scale with a mark where this plate sits.",
+  "open": [
+    "The words under the Plate's number say fits your plan for any PD at or above the target, also in High and High+ (8.4 here). With the scale next to it, they disagree. Change them to the band's name in this ticket, or leave them?"
+  ],
+  "checks": "Light: two screens, a scale added and nothing else changes in what the app does. The unit tests with new ones for the scale's ranges and mark, the build, a new walkthrough for AC1 to AC3, and the walkthroughs that open Me, Goal and the Plate's PD block, about 5 to 10 minutes. New words on screen, so the German sweep too.",
+  "decision": "Direction agreed 22 November 18:01: both places. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "now": "Me, Goal shows the PD target, 5.3, with no word on the colours. On the Plate the PD block takes one of five colours as the plate moves (one egg, PD 8.4: High), and a tap on the number does nothing. The ranges are said only in Foods, in a line under the filter chips after a chip is tapped.",
+  "looked_at": "A legend on every PD block: not chosen, too much on every screen; the Goal page and a tap on the Plate are where the question comes up (18:01: both places).",
+  "board": "Stories279",
+  "where": "Page 6",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "The scale on the Goal page",
+      "text": "Given my PD target is 5.3, when I open Me, Goal, then under the target one scale shows five colours with their names and ranges in my numbers: Low− under 3.2, Low 3.2 to 4.8, On plan 4.8 to 8.0, High 8.0 to 13.3, High+ 13.3 and up"
+    },
+    {
+      "id": "AC2",
+      "title": "A tap on the Plate's PD number opens it",
+      "text": "Given one egg for breakfast at PD 8.4, when I tap the PD number, then the same scale opens under it with a mark over High, where this plate sits"
+    },
+    {
+      "id": "AC3",
+      "title": "A second tap closes it",
+      "text": "Given the scale is open on the Plate, when I tap the PD number again, then it closes"
+    }
+  ],
+  "unchanged": [
+    "The five bands and their edges: 0.6, 0.9, 1.5 and 2.5 times the target (BAND_EDGES in src/goal.ts).",
+    "The colours of the PD block, the Foods pills and chips.",
+    "The letters F C Fi P and their tap."
+  ],
+  "details": [
+    "Every place that colours PD uses the five bands: the Plate's readout, a food's card, a recipe's readout, a past meal's readout and the Foods pills (checked in the code, 23 November). Plan's meal rows colour only the words, in three states, and stay as they are.",
+    "The scale is one component, used in both places; the ranges come from the same code as the Foods line (bandRange).",
+    "The pictures are the real app on one scratch build of main, not committed."
+  ],
+  "short": "What the PD colours mean, on the Goal page and behind the PD number",
+  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "boardTitle": "DT338: what the PD colours mean, one scale on the Goal page and behind the PD number on the Plate"
+}
