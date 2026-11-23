@@ -6333,5 +6333,10 @@
   "plate.liveEaten": "Eaten. Changes to this plate change this meal.",
   "plate.livePlanned": "Planned",
   "plate.liveHolds": "{meal} already holds {title}.",
-  "plate.saveToMyRecipes": "Save it to My recipes"
+  "plate.saveToMyRecipes": "Save it to My recipes",
+  "goal.pdScaleTitle": "What the PD colours mean, for your target {t}",
+  "plate.pdScaleTitle": "What the colour means, for your target {t}. This plate: {pd}.",
+  "plate.pdScaleOpen": "What the colour means",
+  "plate.highPlan": "High, above your plan",
+  "plate.topPlan": "High+, far above your plan"
 }

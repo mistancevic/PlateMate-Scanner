@@ -5736,6 +5736,11 @@
     "screen.app.dbNoValues": {"en":"The barcode has no values for this product. Close this, then scan the nutrition table with the camera on Label.","area":"Words used across the app","where":"Across the app","release":"0.3.175"},
     "screen.plate.kcalGramsPd": {"en":"{kcal} kcal · {grams} g · {pd}","area":"The Plate","where":"The Plate","release":"0.3.176"},
     "screen.plate.whichMealFirst": {"en":"Which meal is it? Pick it, and Chef Mealan finds ideas for it.","area":"The Plate","where":"The Plate","release":"0.3.176"},
-    "screen.shopp.upToThree": {"en":"Up to 3. Tap one off first.","area":"Words used across the app","where":"Across the app","release":"0.3.178"}
+    "screen.shopp.upToThree": {"en":"Up to 3. Tap one off first.","area":"Words used across the app","where":"Across the app","release":"0.3.178"},
+    "screen.goal.pdScaleTitle": {"en":"What the PD colours mean, for your target {t}","area":"Me and setup","where":"Me","release":"0.3.179"},
+    "screen.plate.pdScaleTitle": {"en":"What the colour means, for your target {t}. This plate: {pd}.","area":"The Plate","where":"The Plate","release":"0.3.179"},
+    "screen.plate.pdScaleOpen": {"en":"What the colour means","area":"The Plate","where":"The Plate","release":"0.3.179"},
+    "screen.plate.highPlan": {"en":"High, above your plan","area":"The Plate","where":"The Plate","release":"0.3.179"},
+    "screen.plate.topPlan": {"en":"High+, far above your plan","area":"The Plate","where":"The Plate","release":"0.3.179"}
   }
 }

@@ -22948,6 +22948,26 @@
     "shopp.upToThree": {
       "text": "Najviše 3. Prvo isključi jednu.",
       "checked": true
+    },
+    "goal.pdScaleTitle": {
+      "text": "Šta znače boje PD-a, za tvoj cilj {t}",
+      "checked": true
+    },
+    "plate.pdScaleTitle": {
+      "text": "Šta znači boja, za tvoj cilj {t}. Ovaj tanjir: {pd}.",
+      "checked": true
+    },
+    "plate.pdScaleOpen": {
+      "text": "Šta znači boja",
+      "checked": true
+    },
+    "plate.highPlan": {
+      "text": "Visoko, iznad tvog plana",
+      "checked": true
+    },
+    "plate.topPlan": {
+      "text": "Visoko+, daleko iznad tvog plana",
+      "checked": true
     }
   }
 }

@@ -15,15 +15,16 @@ const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-siz
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
   const b = await chromium.launch();
-  const open = async (isNew) => {
+  const open = async (isNew, g = { band: "maintain", calories: 2000, protein: 106 }) => {
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, timezoneId: "Europe/Berlin" }); const p = await ctx.newPage();
     await p.clock.setFixedTime(new Date("2026-11-23T08:00:00+01:00"));
     await p.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "" }) }));
-    await p.addInitScript(([s, isNew]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
-      localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "exact" }));
+    const s0 = { ...seed, goals: { ...seed.goals, calories: g.calories, protein: g.protein } };
+    await p.addInitScript(([s, isNew, band]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+      localStorage.setItem("chefmealan-goal", JSON.stringify({ band, setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "exact" }));
       localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "female", birthYear: 1995, heightCm: 168, weightKg: 62, kitchens: ["German", "Balkan", "Mediterranean"], plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
       localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z" }));
-      if (isNew) localStorage.setItem("board-new", "1"); localStorage.setItem("seeded", "1"); }, [seed, isNew]);
+      if (isNew) localStorage.setItem("board-new", "1"); localStorage.setItem("seeded", "1"); }, [s0, isNew, g.band]);
     await require(path.join(ROOT, "tests/flows/adult.cjs"))(p);
     return p;
   };
@@ -53,6 +54,22 @@ const NOTE = `${MARK};background:#fff8d6;padding:8px 10px;margin:12px 0;font-siz
         await note(p, ".readout", "<b>New:</b> the same scale opens, with a mark where this plate sits: High, 8.0 to 13.3. A second tap closes it.", [".readout .pd-scale"]);
         await shot(p, "2c"); await clean(p);
       }
+      await p.context().close();
+    }
+    // DT338.3 (AC5, Coach Milan 23 November 10:42): the same formula for two other goals, Recomposition and Build muscle Steady
+    for (const [k, g, word] of [["3", { band: "recomp", calories: 2300, protein: 145 }, "Recomposition: 2300 kcal and 145 g protein, so my PD target is 6.3. Every edge moves with it: On plan is 5.7 to 9.5."],
+      ["4", { band: "gainsteady", calories: 2600, protein: 130 }, "Build muscle, Steady: 2600 kcal and 130 g protein, so my PD target is 5.0. On plan is 4.5 to 7.5."]]) {
+      const p = await open(true, g);
+      await p.goto(U + "/me/goal"); await p.waitForTimeout(1300);
+      await top(p, ".goal-head", 90);
+      await note(p, ".pd-scale", `<b>New:</b> ${word}`, [".goal-head .pd-scale"]);
+      await shot(p, `${k}a`); await clean(p);
+      await p.goto(U + "/plate"); await p.waitForTimeout(1300);
+      await require(path.join(ROOT, "tests/flows/set-meal.cjs"))(p, "Breakfast"); await p.waitForTimeout(400);
+      await p.locator(".readout-mid b").first().click(); await p.waitForTimeout(400);
+      await top(p, ".readout", 70);
+      await note(p, ".readout", k === "3" ? "<b>New:</b> the same egg, PD 8.4, is On plan for this goal, and the words say fits your plan." : "<b>New:</b> the same egg, PD 8.4, is High for this goal: too little energy for its protein when I want to gain.", [".readout .pd-scale"]);
+      await shot(p, `${k}b`); await clean(p);
       await p.context().close();
     }
   } catch (e) { console.log("ERR", e.message); } finally { await b.close(); server.kill(); }

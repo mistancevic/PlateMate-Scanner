@@ -1,0 +1,2229 @@
+{
+ "version": "0.3.179",
+ "commit": "8fa4c50",
+ "at": "2026-11-23T10:04:59.898Z",
+ "minutes": 3,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 71,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "design-rules.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 20 October 2026, 07:06 to 07:30, boards DS1 and DS2): the design system's button rules. A: one filled, wide button per screen, the main step; every other action is outlined. B: a card's buttons share one row under everything else in the card, the card's full width. C: an answer is a chip, never a button. D: Today has no wide button; a next meal with nothing planned is a card with Pick a meal and Make it on the Plate. E: Back sits top left, above the step bar, and says where it goes. Never rewrite these lines to fit a change. Added by stories DS4 G and DS5 H (Milan 08:49 to 09:30, boards DS4 and DS5): a page's title comes first, under Back: a recipe's name before its photo. On /built a link inside a sentence is underlined, and each part has one filled button. Added by story DT305 (Coach Milan 16 November 2026, 10:04 to 10:49, boards Stories230 and Stories231; written down in docs/rules/design.md as D6 and D7): an answer to tick sits under its question in its own block; the buttons of a section sit under the whole section in one row. Guarded on the read of a photo, in photo-read.cjs.",
+   "pass": true,
+   "seconds": 32,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B: I ate it and Change it share one row, the card's full width, equal widths"
+    },
+    {
+     "ok": true,
+     "text": "B: Did you have it? I ate it, Change it, Skipped it, one row, edge to edge"
+    },
+    {
+     "ok": true,
+     "text": "C: How did it carry you? answers are chips"
+    },
+    {
+     "ok": true,
+     "text": "A: Sarma has no steps yet: Start cooking is grey, nothing else is filled: "
+    },
+    {
+     "ok": true,
+     "text": "A, B: Write my own is a button next to the other way, not a link"
+    },
+    {
+     "ok": true,
+     "text": "E: the recipe page's Back, Recipes, sits top left above the photo"
+    },
+    {
+     "ok": true,
+     "text": "G: the recipe's name comes first, under Back, before the photo"
+    },
+    {
+     "ok": true,
+     "text": "A: on the Plate no Add in the food list is filled: "
+    },
+    {
+     "ok": true,
+     "text": "E: Back sits top left, above the step bar: Back to the plate"
+    },
+    {
+     "ok": true,
+     "text": "E: no Back at the bottom of the step"
+    },
+    {
+     "ok": true,
+     "text": "D: in the evening Today has no wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: the Tomorrow card still opens tomorrow's plan"
+    },
+    {
+     "ok": true,
+     "text": "D: lunch with nothing planned is a card, not a wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: Pick a meal, Make it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "D: Make it on the Plate opens the Plate for lunch"
+    },
+    {
+     "ok": true,
+     "text": "F: 11+ of 93 g fat, and the note: Why the +: Protein bar has no fat or carbs value, so fat and carbs are counted without it."
+    },
+    {
+     "ok": true,
+     "text": "F: its name opens it in Foods"
+    },
+    {
+     "ok": true,
+     "text": "H: a link inside a sentence is underlined"
+    },
+    {
+     "ok": true,
+     "text": "H: one filled button per part: [[\"Try it: the calculator on the home page\",true],[\"See it work\",false],[\"Read Worth Building\",false],[\"Notify me\",true],[\"Email Milan\",true],[\"Connect on LinkedIn\",false]]"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 118 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 15,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "dish-parts.cjs",
+   "about": "Dishes in parts, and optional foods inside them (0.2.19, canvas boards IM, IM15 to IM18; Milan 17 October 2026, 11:08 to 11:26). A protein cheesecake from Instagram, read by Chef Mealan (faked here: no AI key), in three parts with an optional chocolate in the topping: the plate in parts (IM15), Leave it out and Put it back (IM16b), Change one part (IM16), + Add inside a part, the steps part by part (IM17). Then a bowl of your own put into parts on the plate, kept with its parts (IM18, IM18b). Changed by story R21 (Milan 22:27, board RS20): one slice is the recipe divided by what it makes, from the exact grams, so the kcal read one lower (284, 175, 301). Everything else is unchanged. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).",
+   "pass": true,
+   "seconds": 26,
+   "checks": [
+    {
+     "ok": true,
+     "text": "IM15: the plate in the recipe's parts (Base,Filling,Topping)"
+    },
+    {
+     "ok": true,
+     "text": "IM15: the optional chocolate sits inside the topping, with + Add"
+    },
+    {
+     "ok": true,
+     "text": "IM15: one slice, 284 kcal (284)"
+    },
+    {
+     "ok": true,
+     "text": "IM16b: the base left out with its numbers: 175 kcal (175)"
+    },
+    {
+     "ok": true,
+     "text": "IM16b: the filling can still go"
+    },
+    {
+     "ok": true,
+     "text": "IM16b: the last part with foods can't be left out"
+    },
+    {
+     "ok": true,
+     "text": "IM16b: Put it back brings both back, as they were"
+    },
+    {
+     "ok": true,
+     "text": "IM16: Chef Mealan gets the part to change and every food's part, at this plate's grams"
+    },
+    {
+     "ok": true,
+     "text": "IM16: the filling changed, with its note: 237 kcal (237)"
+    },
+    {
+     "ok": true,
+     "text": "IM16: the base stays as the recipe makes it"
+    },
+    {
+     "ok": true,
+     "text": "IM16: Back to the original undoes it"
+    },
+    {
+     "ok": true,
+     "text": "IM12b: the chocolate in the topping, 3 g: 301 kcal (301)"
+    },
+    {
+     "ok": true,
+     "text": "IM15: the recipe page lists the foods in their parts"
+    },
+    {
+     "ok": true,
+     "text": "IM17: Chef Mealan gets the parts and the optional chocolate in the topping"
+    },
+    {
+     "ok": true,
+     "text": "IM17: the steps part by part"
+    },
+    {
+     "ok": true,
+     "text": "IM17: the parts are kept with the steps; the optional chocolate with its part"
+    },
+    {
+     "ok": true,
+     "text": "IM18: Optional takes the sour cream out of the numbers (668)"
+    },
+    {
+     "ok": true,
+     "text": "IM18b: your bowl in its parts, the sour cream optional in Toppings (Rice,Chicken,Toppings)"
+    },
+    {
+     "ok": true,
+     "text": "IM18b: the recipe keeps its parts and the optional sour cream; the plate is clear"
+    },
+    {
+     "ok": true,
+     "text": "IM18b: next time it opens like this"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 64 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "fab-and-fit.cjs",
+   "about": "0.2.7+r2 (Milan, 15 October 2026): the floating Chef Mealan on a menu page opens the conversation over it, and closing it comes back to the page; Fit to my target on a plate already above the target says nothing moved, and the PD stands. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the floating Chef Mealan shows on a menu page"
+    },
+    {
+     "ok": true,
+     "text": "a tap opens the conversation over the page"
+    },
+    {
+     "ok": true,
+     "text": "the menu page waits underneath"
+    },
+    {
+     "ok": true,
+     "text": "Back closes the conversation and the Goal page is there again"
+    },
+    {
+     "ok": true,
+     "text": "and the floating Chef Mealan with it"
+    },
+    {
+     "ok": true,
+     "text": "as it stands: PD 16.8 (LunchPD16.8High+, far above your planEnergy477 kcalWeight350 gProtein80 gfc-fi-P+›)"
+    },
+    {
+     "ok": true,
+     "text": "Fit: already above the target, nothing moved, and it says so"
+    },
+    {
+     "ok": true,
+     "text": "the PD and the kcal stand (in place, 0.2.88)"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "first-two-weeks.cjs",
+   "about": "The first two weeks and the measured burn (0.2.7, canvas board FT): Today, Me, Goal, the calculator and the coach, from real meals and weigh-ins, with the clock on day 6 (Thursday 15 October) and day 14 (Friday 23 October). The example person of the board: male, 1981, 182 cm, 95 kg, the first goal on Saturday 10 October.",
+   "pass": true,
+   "seconds": 26,
+   "checks": [
+    {
+     "ok": true,
+     "text": "FT1: Today has the getting to know you card"
+    },
+    {
+     "ok": true,
+     "text": "FT1: day 6 of 14, 4 full days, 4 weigh-ins"
+    },
+    {
+     "ok": true,
+     "text": "FT1: the squares: full|full weighed|part weighed|full|full weighed|today weighed|todo"
+    },
+    {
+     "ok": true,
+     "text": "FT3: measuring, 4 of 10 full days, 2 of 7 weigh-ins from day 4, ready on 23 October"
+    },
+    {
+     "ok": true,
+     "text": "FT3: the formula line with its number"
+    },
+    {
+     "ok": true,
+     "text": "FT0 fixed: the formula text starts at the left, Change on the same line {\"left\":17,\"same\":true}"
+    },
+    {
+     "ok": true,
+     "text": "FT5: From your data is greyed until day 14"
+    },
+    {
+     "ok": true,
+     "text": "FT2: the getting to know you card is gone on day 14"
+    },
+    {
+     "ok": true,
+     "text": "FT2: 2,520 kcal a day, give or take 75, 12 full days, 11 weigh-ins: ✓ YOUR BURN IS MEASURED2,520kcal a dayGive or take 75. From your 14 days: 12 full days and 11 weigh-ins. The formula said 2,650. Your numbers stay as they are u"
+    },
+    {
+     "ok": true,
+     "text": "FT2: Got it takes the card away"
+    },
+    {
+     "ok": true,
+     "text": "FT2: and it stays away"
+    },
+    {
+     "ok": true,
+     "text": "FT4: the measured burn, its range, the three steps"
+    },
+    {
+     "ok": true,
+     "text": "FT5: Use my data opens the calculator with From your data picked"
+    },
+    {
+     "ok": true,
+     "text": "FT5: 130 kcal a day less than Mifflin St Jeor"
+    },
+    {
+     "ok": true,
+     "text": "FT5: the days, 2,250 on average (2,520 × 0.9), 150 less, the source: 50 kcal at PD 8.0, with 4 training days and 3 without. From your data: 150 kcal less than with the formula.Protein and fat stay the same every day. Carbs go up and down with your training. The days come from your Training week. Sources: your own 14 days, 10 Oct to 23 Oct; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004."
+    },
+    {
+     "ok": true,
+     "text": "FT5: each day about 130 less, to the nearest 50: 2,450 2,100 2,400 2,100 2,450 2,300 2,100"
+    },
+    {
+     "ok": true,
+     "text": "applied: From your data, 2,520 fixed with its dates"
+    },
+    {
+     "ok": true,
+     "text": "applied: the week's average is 2,250: 2250"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the formula line says From your data, 2,520"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the card says which number is in use"
+    },
+    {
+     "ok": true,
+     "text": "eating declared: nothing on Today"
+    },
+    {
+     "ok": true,
+     "text": "eating declared: no measured burn on Goal"
+    },
+    {
+     "ok": true,
+     "text": "FT6: Lena in her first two weeks: her fourteen days, in two rows of seven (DT302, 0.3.150, board Stories224)"
+    },
+    {
+     "ok": true,
+     "text": "DT302: the key line in the first two weeks' words: Green: full day · Amber: not fully logged · Outline: today · Dot: weigh-in · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "DT302: four weekend days shaded, in the same places in both rows: ww-----ww-----"
+    },
+    {
+     "ok": true,
+     "text": "FT7: Nina's burn on her page, with the gap line"
+    },
+    {
+     "ok": true,
+     "text": "FT7: From Nina's data as a formula pin"
+    },
+    {
+     "ok": true,
+     "text": "save check: 162 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "formula.cjs",
+   "about": "The goal calculator (canvas board FX, G1a to G3, Milan 14 October 2026; the formula card from board TW, F1 and F2). 1 You, 2 the formula, 3 the goal, 4 the days, then Apply from a date. The formula is a draft until applied. A goal from a later date waits on Me, Goal and Plan already uses it; a day gone by keeps its own target; History shows periods.",
+   "pass": true,
+   "seconds": 16,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Me, Goal says which formula is in use, in one line"
+    },
+    {
+     "ok": true,
+     "text": "three tries on one day leave one period: MaintainNOWSince 3 November, calculated from your profile2,600kcal, 150 g protein"
+    },
+    {
+     "ok": true,
+     "text": "the calculator in four steps (DT161: Carbs and fat), the formula behind How we calculate: 1. You | 2. Your goal | 3. Carbs and fat | 4. Your days"
+    },
+    {
+     "ok": true,
+     "text": "You shows the body fat, or that it is not given"
+    },
+    {
+     "ok": true,
+     "text": "four choices with the resting burn from each"
+    },
+    {
+     "ok": true,
+     "text": "From your data waits, greyed, until the burn is measured"
+    },
+    {
+     "ok": true,
+     "text": "Katch McArdle sleeps without body fat"
+    },
+    {
+     "ok": true,
+     "text": "the difference in plain numbers"
+    },
+    {
+     "ok": true,
+     "text": "the pick is a draft: nothing saved yet"
+    },
+    {
+     "ok": true,
+     "text": "the days follow the draft and the sources name Schofield"
+    },
+    {
+     "ok": true,
+     "text": "About the three formulas opens"
+    },
+    {
+     "ok": true,
+     "text": "Apply from today, by default"
+    },
+    {
+     "ok": true,
+     "text": "Apply keeps the formula"
+    },
+    {
+     "ok": true,
+     "text": "Me, Goal says Schofield now"
+    },
+    {
+     "ok": true,
+     "text": "the date is on the button: Apply from Monday 30 November"
+    },
+    {
+     "ok": true,
+     "text": "the new goal waits; the goal in use stays"
+    },
+    {
+     "ok": true,
+     "text": "Me, Goal shows the waiting goal with its date"
+    },
+    {
+     "ok": true,
+     "text": "Plan already uses the waiting goal from its date"
+    },
+    {
+     "ok": true,
+     "text": "yesterday keeps the target it had"
+    },
+    {
+     "ok": true,
+     "text": "Cancel takes the waiting goal away"
+    },
+    {
+     "ok": true,
+     "text": "the page says nothing about children"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "goal-apply.cjs",
+   "about": "JOURNEY (0.2.119, Tester 2's session, Milan 28 October 14:59): the goal screen never ends without a way out. My own numbers, each day its own, with nothing typed: the table showed numbers and Apply stayed grey; now the rows shown are applied. A missing number says what is missing. Calculate for me without height says so. Reset clears all four numbers and your days.",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "own numbers is the way in, each day its own"
+    },
+    {
+     "ok": true,
+     "text": "each day its own, nothing typed: the calculated rows can be applied"
+    },
+    {
+     "ok": true,
+     "text": "the rows shown are saved as your own days"
+    },
+    {
+     "ok": true,
+     "text": "a missing number says what is missing"
+    },
+    {
+     "ok": true,
+     "text": "Calculate for me with a full profile: Apply is there"
+    },
+    {
+     "ok": true,
+     "text": "Reset clears all four numbers: {\"calories\":null,\"protein\":null,\"fats\":null,\"carbs\":null,\"fiber\":null}"
+    },
+    {
+     "ok": true,
+     "text": "Reset clears your own days and the goal"
+    },
+    {
+     "ok": true,
+     "text": "after Reset the goal screen opens on Calculate for me, no goal picked"
+    },
+    {
+     "ok": true,
+     "text": "a goal picked: Apply"
+    },
+    {
+     "ok": true,
+     "text": "Calculate for me says what is missing: To calculate your numbers, fill in your height above. Or use My own numbers."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "how-you-eat.cjs",
+   "about": "DT160 and DT161 (0.3.3, canvas Page 2, boards Stories112 version 2 and Stories113; Coach Milan 29 October 19:30 \"Both DT160 and 161 can go. Double check the impact from profile setup. Makes no sense that it is there set but no influence. Also, take into account selected kitchen dishes\"). The goal setup has 3. Carbs and fat: Balanced by default, More fat moves fat to 35 % and the day table with it, Very low carb takes typed carbs and fat the rest; the Explorer says Calculated for you, names the pick, and opens each family with Your day; What you eat has Paleo, Meat only and Other; the kitchens' dishes follow the diet; every request that asks Chef Mealan for food carries how the person eats.",
+   "pass": true,
+   "seconds": 24,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT161: 3. Carbs and fat, four chips"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Balanced by default, 83 g of fat, as before"
+    },
+    {
+     "ok": true,
+     "text": "DT161: the range, the carbs' span, the days below 45 %"
+    },
+    {
+     "ok": true,
+     "text": "DT161: More fat, 97 g, every day but Monday below 45 %"
+    },
+    {
+     "ok": true,
+     "text": "DT161: the day table follows the chip: Monday MondayStrength, hard · eveningPD 5.6 2,850 160 97 334"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Very low carb waits for the carbs to be typed"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Very low carb, fat the rest of each day, said against both ranges: Your carbs a day, g162 to 223 gof fat a dayYour carbs stay a"
+    },
+    {
+     "ok": true,
+     "text": "DT160: Calculated for you names the goal, the pick and today: Calculated for you. Ranges and meal amounts here come from your goal and setup: Maintain, More fat, 85 kg, three meals. Today: strength, moderate, 2,600 kcal. Numbers marked for you change when they change. Change them ›"
+    },
+    {
+     "ok": true,
+     "text": "DT160: protein, one range every day, yours in it"
+    },
+    {
+     "ok": true,
+     "text": "DT160: fat on the week's average, saturated fat under 10 %"
+    },
+    {
+     "ok": true,
+     "text": "DT160: carbs today, and the week from the lightest day to the hardest: Your week197 to 334 g · today 272 gCarbs"
+    },
+    {
+     "ok": true,
+     "text": "DT160: the days below 45 % named, and why"
+    },
+    {
+     "ok": true,
+     "text": "DT160: fibre at least 25 g, free sugars under 10 % of today"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Meat only says what it means for the numbers, with a way to Goal"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Other, in your words; Chef Mealan reads it"
+    },
+    {
+     "ok": true,
+     "text": "audit: the alcohol line says what Chef Mealan does with it"
+    },
+    {
+     "ok": true,
+     "text": "DT161: a request to Chef Mealan carries how they eat: {\"what_they_eat\":\"Other\",\"in_their_words\":\"Mediterranean, no gluten\",\"carbs_and_fat\":\"More fat\"}"
+    },
+    {
+     "ok": true,
+     "text": "DT161: a request that doesn't ask for food carries nothing more"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Balkan, no dish we list fits Vegan, said plainly"
+    },
+    {
+     "ok": true,
+     "text": "DT161: Italian and Indian show only Vegan dishes"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "me-pages.cjs",
+   "about": "Me pages (fix pass, 11 October 2026, canvas S M4 to M8, T5): every page in Me has its own address, Back goes one page back and a reload stays; the top bar says Me and no tab is lit; Chef Mealan, never Mealan alone; the meal times set the eating window; Today shows its numbers whole from the first moment.",
+   "pass": true,
+   "seconds": 19,
+   "checks": [
+    {
+     "ok": true,
+     "text": "T5: the day card is whole at its first paint: {\"row\":\"0of PD 6.30of 2,300 kcal today0of 145 g protein\",\"macros\":true}"
+    },
+    {
+     "ok": true,
+     "text": "M6, M4: Me at /me, the top bar says Me, no tab lit (/me, Me, 0)"
+    },
+    {
+     "ok": true,
+     "text": "the Me card's PD is its own protein in its own kcal: 6.3, 2300, 145"
+    },
+    {
+     "ok": true,
+     "text": "M6: Profile at /me/profile"
+    },
+    {
+     "ok": true,
+     "text": "M5: Chef Mealan is an AI chef"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from Profile goes to Me: /me"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from Me goes to the Menu it was opened from: /menu"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from the Menu goes to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "M6: Lifestyle at /me/lifestyle"
+    },
+    {
+     "ok": true,
+     "text": "M6: a reload stays on Lifestyle: /me/lifestyle"
+    },
+    {
+     "ok": true,
+     "text": "M8: no Set my window"
+    },
+    {
+     "ok": true,
+     "text": "M8: the window from the meal times: Eating window: 08:00 to 19:00. From your first and last meal."
+    },
+    {
+     "ok": true,
+     "text": "M8: a later dinner moves the window: Eating window: 08:00 to 20:30. From your first and last meal."
+    },
+    {
+     "ok": true,
+     "text": "M6: Back after the reload goes to Me: /me"
+    },
+    {
+     "ok": true,
+     "text": "M6: and then to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "M6: the goal from Today at /me/goal: /me/goal"
+    },
+    {
+     "ok": true,
+     "text": "M6: the link up goes to Me: /me"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from there to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "M6: Close from Training week goes to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "M6: Plan tapped from Profile opens Plan: /plan"
+    },
+    {
+     "ok": true,
+     "text": "M6: Back from there goes to Today: /today"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "me-plate-fixes.cjs",
+   "about": "DT205 to DT207 (0.3.48; Coach Milan 1 November 19:42 findings, 19:54 Go). Profile keeps every answer as you go: no Save in the middle, Next: Goal the main button; Your summary, Plan your week, then Back comes back to Your summary; Shopping lists shows the earlier lists first, New shopping list its own button; a food added to a plate started hours ago asks Add or Start a new plate (DT206); a plate of only a drink gets no meal built around it. Changed by story DT313 (0.3.159, board Stories250; Coach Milan, Go 18 November 15:56): a food onto a plate from hours ago asks on the same screen as a photo; the check DT206 reads the new words. Nothing else changed.",
+   "pass": true,
+   "seconds": 22,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT206: a food for a plate from hours ago asks first: It already has Chicken and rice, from 05:03. A new food cannot land on it by itself: you decide where it goes."
+    },
+    {
+     "ok": true,
+     "text": "Start a new plate: only the skyr: Skyr"
+    },
+    {
+     "ok": true,
+     "text": "a plate started now takes the next food without a question"
+    },
+    {
+     "ok": true,
+     "text": "DT206: a plate of only a drink offers no meal around it"
+    },
+    {
+     "ok": true,
+     "text": "DT205: no Save button in the middle of Profile"
+    },
+    {
+     "ok": true,
+     "text": "DT205: the weight is kept a moment after typing: 93"
+    },
+    {
+     "ok": true,
+     "text": "DT205: a birth year of two digits waits, and says so"
+    },
+    {
+     "ok": true,
+     "text": "DT205: Next: Goal is the main button at the end"
+    },
+    {
+     "ok": true,
+     "text": "Next: Goal opens Goal: /me/goal"
+    },
+    {
+     "ok": true,
+     "text": "Plan your week opens Plan: /plan"
+    },
+    {
+     "ok": true,
+     "text": "DT207e: Back from Plan comes back to Your summary: /me/summary"
+    },
+    {
+     "ok": true,
+     "text": "DT207b: with an earlier list kept, the button says Shopping lists"
+    },
+    {
+     "ok": true,
+     "text": "DT207b: the earlier list first, then New shopping list, no form yet"
+    },
+    {
+     "ok": true,
+     "text": "New shopping list opens the form for list 2"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 28 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "meal-line.cjs",
+   "about": "Story DT308.1, DT308.9 and DT308.10 (0.3.157, boards Stories236 and Stories241; Coach Milan, Go 18 November 11:14): the meal line and Fit with no meal set. A new plate says No meal selected, in grey, with a pencil, and nothing is counted or planned. No meal is guessed when a food lands. The pencil opens your calendar: the days on top, that day's meals with their time and state, as the last row Just looking, and under them What is it? and Chef Mealan's What kind of moment?, as they were. A tap on a meal sets the meal and the day and closes it; a tap on a chip keeps it open; the pencil closes it with no meal set. Once set, the line says the meal, then the day, date and time, and the moment when it is not a regular meal, and an X stands in the pencil's place: it clears the meal and the day, and the moment is Regular meal again. With no meal set, Fit to my target aims only at your PD target: the result says This plate, and Chef Mealan says first what Fit aimed at. The checks name the rows of the build brief (A1 to A8, B1, B2). Changed by B150 (0.3.160, board B150; Go 19 November 01:00): the line says No meal selected under the small title Meal and day, in ink; the pencil is always there and is the X that closes while edit mode is open; a tap on a meal keeps edit mode open; the row No meal selected, marked while no meal is set, took the place of Just looking and of the X that cleared.",
+   "pass": true,
+   "seconds": 29,
+   "checks": [
+    {
+     "ok": true,
+     "text": "A1, changed by B150: an empty plate: the line says No meal selected, with a pencil"
+    },
+    {
+     "ok": true,
+     "text": "A1, changed by B150: the line is in ink, under its small grey title"
+    },
+    {
+     "ok": true,
+     "text": "A2: three foods from the list landed: the line did not change, no meal is guessed"
+    },
+    {
+     "ok": true,
+     "text": "A1: the result says This plate, sized for no meal"
+    },
+    {
+     "ok": true,
+     "text": "A1: nothing is counted or planned"
+    },
+    {
+     "ok": true,
+     "text": "A3: the days on top: Sat 14, Sun 15 today, Mon 16, Tue 17, More: Sat 14 | Sun 15, today | Mon 16 | Tue 17 | More"
+    },
+    {
+     "ok": true,
+     "text": "A3, changed by B150: today's meals with their time and state, and as the last row No meal selected, marked: Breakfast 07:30 · not eaten | Lunch 13:45 · not eaten | Dinner 20:00 · next | Snack now | ✓ No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "A3, changed by B150: no meal is marked; the row No meal selected is"
+    },
+    {
+     "ok": true,
+     "text": "A3: under the meals What is it? and What kind of moment?, as in 0.3.156"
+    },
+    {
+     "ok": true,
+     "text": "A3: Which day? and What is it for? are gone: the calendar took their place"
+    },
+    {
+     "ok": true,
+     "text": "A5: Before training is chosen with a tick, and the calendar stays open"
+    },
+    {
+     "ok": true,
+     "text": "A5: a taste chip is chosen and the calendar stays open"
+    },
+    {
+     "ok": true,
+     "text": "A6, changed by B150: the X in the pencil's place: closed, no meal set"
+    },
+    {
+     "ok": true,
+     "text": "A5: a moment chosen with no meal set holds for the plate: the line names it"
+    },
+    {
+     "ok": true,
+     "text": "A4, changed by B150: a tap on Dinner: edit mode stays open"
+    },
+    {
+     "ok": true,
+     "text": "A4: the line says the meal, then day, date and time, changed by B151: then Planned (20:00 is still ahead), and the moment: Dinner Sunday, 15 November, 20:00 Planned · Before training · Savoury"
+    },
+    {
+     "ok": true,
+     "text": "A4, changed by B150: no X that clears the meal; the X in the pencil's place only closes"
+    },
+    {
+     "ok": true,
+     "text": "A8: the result is for the dinner, as in 0.3.156"
+    },
+    {
+     "ok": true,
+     "text": "A7, changed by B150: the row No meal selected: no meal is set again: No meal selected Savoury"
+    },
+    {
+     "ok": true,
+     "text": "A7: the moment is Regular meal again"
+    },
+    {
+     "ok": true,
+     "text": "A3: Monday's meals as they stand in the plan; no Snack row on a coming day with no snack among its meals: Breakfast 07:30 · nothing planned | Lunch 13:45 · nothing planned | Dinner 20:00 · nothing planned | ✓ No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "A4: Monday's lunch is set; changed by B151: the line says Planned: Lunch Monday, 16 November, 13:45 Planned · Savoury"
+    },
+    {
+     "ok": true,
+     "text": "D2: the button Put it in Monday's lunch no longer exists"
+    },
+    {
+     "ok": true,
+     "text": "A7, changed by B150: the row No meal selected clears a meal of another day too"
+    },
+    {
+     "ok": true,
+     "text": "A3, changed by B150: the last row says No meal selected and is marked; nothing says Just looking"
+    },
+    {
+     "ok": true,
+     "text": "A3: More: another day joins the days and its meals show"
+    },
+    {
+     "ok": true,
+     "text": "B1: the plate is under the PD target and no meal is set"
+    },
+    {
+     "ok": true,
+     "text": "B1: Fit moved my own foods only: skyr 30 g to 100 g, oats and banana as they were"
+    },
+    {
+     "ok": true,
+     "text": "B1: the plate reaches the PD target; the energy is what the foods give"
+    },
+    {
+     "ok": true,
+     "text": "B2: the result says This plate"
+    },
+    {
+     "ok": true,
+     "text": "B2: Chef Mealan says first what Fit aimed at: No meal is set, so Fit aimed at your PD target only: 4.8 or more. The energy is what your foods give."
+    },
+    {
+     "ok": true,
+     "text": "B2: under it what Fit did, with Undo: Fit set 100 g skyr, natural, the most for a portion (it asked for 95 g). Undo"
+    },
+    {
+     "ok": true,
+     "text": "A2, changed by B150: after Fit the line still says No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "A8: with a meal set, Fit works for that meal as in 0.3.156: no line about no meal"
+    },
+    {
+     "ok": true,
+     "text": "save check: 48 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "mix-tip.cjs",
+   "about": "Mix it: a food that doesn't fit on its own shows partners by moment; one tap makes the plate; Not quite opens the helper with the tip.",
+   "pass": true,
+   "seconds": 60,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Nutella gets a Mix it section"
+    },
+    {
+     "ok": true,
+     "text": "two or three mixes offered: 3"
+    },
+    {
+     "ok": true,
+     "text": "the first partner is a protein base: with Skyr, naturalPD 6.4 · 158 kcal · Da"
+    },
+    {
+     "ok": true,
+     "text": "every chip says what it makes"
+    },
+    {
+     "ok": true,
+     "text": "every chip says the calories it lands on"
+    },
+    {
+     "ok": true,
+     "text": "the tip shown is logged once, with what was offered"
+    },
+    {
+     "ok": true,
+     "text": "the plate is Nutella plus the partner"
+    },
+    {
+     "ok": true,
+     "text": "the plate lands on the target: PD 6.36"
+    },
+    {
+     "ok": true,
+     "text": "the readout says it fits"
+    },
+    {
+     "ok": true,
+     "text": "the tap is logged with partners and moment"
+    },
+    {
+     "ok": true,
+     "text": "Eggs fit on their own: no Mix it"
+    },
+    {
+     "ok": true,
+     "text": "before training: every mix under the snack line"
+    },
+    {
+     "ok": true,
+     "text": "before training: nothing to cook"
+    },
+    {
+     "ok": true,
+     "text": "the helper carries the tip: I scanned Nutella for before training. You suggested with Sk"
+    },
+    {
+     "ok": true,
+     "text": "the ask is logged"
+    },
+    {
+     "ok": true,
+     "text": "the review sheet shows Mix it before the food is saved"
+    },
+    {
+     "ok": true,
+     "text": "a partner is offered on the review sheet: with Skyr, naturalPD 7.1 · 144"
+    },
+    {
+     "ok": true,
+     "text": "the chip saved the food"
+    },
+    {
+     "ok": true,
+     "text": "and put the mix on the plate: Shop biscuit + Skyr, natural"
+    },
+    {
+     "ok": true,
+     "text": "the review sheet does not call a mix cooking because the ready box is still unticked"
+    },
+    {
+     "ok": true,
+     "text": "the sheet says how it fits: on its own, before and after training"
+    },
+    {
+     "ok": true,
+     "text": "on its own: under the target, said plainly and never green"
+    },
+    {
+     "ok": true,
+     "text": "Tell Mealan on the sheet saves the food and opens the helper with the tip: I scanned Shop wafer for regular meal. Y"
+    },
+    {
+     "ok": true,
+     "text": "the wafer was saved on the way"
+    },
+    {
+     "ok": true,
+     "text": "the person's foods stay: Chicken breast, cooked + Tomato sauce, no added sugar"
+    },
+    {
+     "ok": true,
+     "text": "no swap for a food that was never asked for"
+    },
+    {
+     "ok": true,
+     "text": "the label check shows the PD: PD 13.8"
+    },
+    {
+     "ok": true,
+     "text": "and what one bar is"
+    },
+    {
+     "ok": true,
+     "text": "after training counts in bars: After training: Suits after training: 2 bars, 90 g gives about 45 g pr"
+    },
+    {
+     "ok": true,
+     "text": "the serving is saved with the food"
+    },
+    {
+     "ok": true,
+     "text": "the plate shows the count first, the grams small (0.2.24, CT)"
+    },
+    {
+     "ok": true,
+     "text": "what Mealan moves lands on whole bars: 45 g"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 28 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "oil-taken-up.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 18 October 2026, 14:17 to 14:36, story R3 on canvas board RS2): oil is counted, but never more than the food takes up. A recipe that fries keeps its whole pot of oil listed, as it needs it; the numbers count what the fried food takes up, 15% of its weight, and every place that shows it says it is an estimate: the read, the plate, the recipe page. A splash of oil in a pan is counted in full, with no note. Never rewrite these lines to fit a change. Changed by story R3, the fix (Milan 15:12 and 15:15, board RS10): the recipe follows the original, so the read card and the recipe page show the pot as the amount, and the counted oil as the small line; the steps are in cook-with-the-pot.cjs. Changed by story R16 (Milan 21:08, board RS15): the read's one-portion numbers are in the PD block, not a small line.",
+   "pass": true,
+   "seconds": 13,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the read shows the 1,380 g pot and counts 207 g of oil: 🥗Vegetable oil1 to 2 quarts (1 to 1.9 L) on the recipe · for frying Counted: 207 g, taken up in frying, an estimate1,380 g"
+    },
+    {
+     "ok": true,
+     "text": "the row keeps the recipe's pot, says for frying, and that the amount is an estimate"
+    },
+    {
+     "ok": true,
+     "text": "a line under the foods says the oil counted is an estimate, and where it comes from"
+    },
+    {
+     "ok": true,
+     "text": "one fritter is no longer 1,486 kcal: 564"
+    },
+    {
+     "ok": true,
+     "text": "the plate says the oil is an estimate, first"
+    },
+    {
+     "ok": true,
+     "text": "the recipe page shows the pot as written, and counts what is taken up: Vegetable oil1 to 2 quarts (1 to 1.9 L), for frying. Counted: 207 g, taken up in frying, an estimate. 1,380 g"
+    },
+    {
+     "ok": true,
+     "text": "a splash in a pan is counted in full, with no note: 🧈Olive oila splash on the recipe5 g"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 33 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "pd-scale.cjs",
+   "about": "DT338 (0.3.179, board Stories279; Go 23 November 2026, 10:42): what the PD colours mean. One scale, five colours with their names and ranges in the person's own numbers, under the PD target on Me, Goal (AC1); on the Plate a tap on the PD number opens it with a mark where the plate sits (AC2), a second tap closes it (AC3); the words under the number say the band above On plan (AC4); the ranges follow the goal: Recomposition and Build muscle, Steady (AC5).",
+   "pass": true,
+   "seconds": 21,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT338 AC1: five colours with their names: Low−, Low, On plan, High, High+"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC1: the ranges in my numbers: under 3.2 | 3.2 to 4.8 | 4.8 to 8.0 | 8.0 to 13.3 | 13.3 and up"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC1: the scale says it is for my target 5.3"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC1: on the Goal page there is no mark"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: the scale is closed until I tap"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC4: at PD 8.4 the words say High, above your plan: High, above your plan"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: the PD number is 8.4"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: the scale opens with a mark over High: High"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: inside the PD block the title and ranges are dark on white, readable"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: it says This plate: 8.4."
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: the number tells a screen reader it is open"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC3: a second tap closes it"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC2: Enter on the number opens it too"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC4: far above, the words say High+, far above your plan: High+, far above your plan"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC4: on plan the words say fits your plan, as before: fits your plan"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC5: Recomposition, the egg at PD 8.4 is On plan: On plan"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC5: Recomposition, target 6.3, On plan 5.7 to 9.5: under 3.8 | 3.8 to 5.7 | 5.7 to 9.5 | 9.5 to 15.8 | 15.8 and up"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC5: Build muscle, target 5.0, On plan 4.5 to 7.5: under 3.0 | 3.0 to 4.5 | 4.5 to 7.5 | 7.5 to 12.5 | 12.5 and up"
+    },
+    {
+     "ok": true,
+     "text": "DT338 AC5: Build muscle, the same egg is High: High"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 100 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "plan-fill.cjs",
+   "about": "Plan, 0.2.2 (canvas S \"Plan purpose one\", H7): filling a slot by hand. Tap a slot, the sheet with My recipes, Coach's The day picked is next week's Monday, never today, so the lines say Monday's whatever day the run falls on (12 October 2026: a run on a Monday read Today's). recipes and Chef Mealan's starters with their PD marks, a meal in the slot with fits or the amber gap, Fit it on the Plate with the slot on the plan line, Put it in the slot from the Plate, the day as planned adding up, emptying a slot. Changed by story R19 (Milan 06:04 to 06:41, board RS18): a tap on a planned meal opens the meal; Pick a meal opens with a swipe to the left (Swap). An open slot still opens Pick a meal on a tap. Changed by story DT74 (Milan 22 October 2026, board DT74): a meal around the target says close, not fits; fits is kept for a meal within 0.2 of it. The marks are fits, close or under. DT76: the starter's numbers come from its foods (647 and 56). 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one: a slot opened from Plan says the meal, its day and time, and Goes into your plan; a plate with no slot says No meal selected. Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.",
+   "pass": true,
+   "seconds": 46,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the sheet names the slot and its time"
+    },
+    {
+     "ok": true,
+     "text": "and says what the slot needs"
+    },
+    {
+     "ok": true,
+     "text": "My recipes, Coach's recipes, the starters: My recipes|Coach's recipes|Chef Mealan's starters"
+    },
+    {
+     "ok": true,
+     "text": "two of mine and eight starters"
+    },
+    {
+     "ok": true,
+     "text": "each row carries its PD mark, fits, close or under"
+    },
+    {
+     "ok": true,
+     "text": "the sheet closes"
+    },
+    {
+     "ok": true,
+     "text": "Lunch holds the starter with its numbers and its mark: EmptySwapLunch, 13:45Chicken, rice and greensstarter · 647 kcal · 56 g · PD 8.7 · fitsSwap"
+    },
+    {
+     "ok": true,
+     "text": "two slots open"
+    },
+    {
+     "ok": true,
+     "text": "the day as planned adds up: 8.7 647 56"
+    },
+    {
+     "ok": true,
+     "text": "Sarma is under: Fit it on the Plate and Ask Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "the strip marks the day that holds meals"
+    },
+    {
+     "ok": true,
+     "text": "changed by DT308.1: the Plate's line names the meal and its day, going into your plan: Breakfast Monday, 30 November, 07:30 Goes into your plan."
+    },
+    {
+     "ok": true,
+     "text": "the Plate opens with Sarma's foods"
+    },
+    {
+     "ok": true,
+     "text": "DT101: no lifter goes with sarma; the tip offers Ask Chef Mealan: rows 0"
+    },
+    {
+     "ok": true,
+     "text": "after Fit (in place, 0.2.88) the Plate offers Put it in Monday's breakfast"
+    },
+    {
+     "ok": true,
+     "text": "the box is coloured by the score"
+    },
+    {
+     "ok": true,
+     "text": "the name keeps the focus while typing: \"Morning skyr\", focus on title-input"
+    },
+    {
+     "ok": true,
+     "text": "back on Plan"
+    },
+    {
+     "ok": true,
+     "text": "Breakfast holds the plate's meal under my name, no gap: EmptySwapBreakfast, 07:30Morning skyrmade on the Plate · 770 kcal · 53 g · PD 6.9 · fitsSwap breakfastEmpty breakfast"
+    },
+    {
+     "ok": true,
+     "text": "and it is saved to My recipes"
+    },
+    {
+     "ok": true,
+     "text": "picking it again from the sheet keeps one copy"
+    },
+    {
+     "ok": true,
+     "text": "two ways out: Put it in Monday's lunch and Fit to my target"
+    },
+    {
+     "ok": true,
+     "text": "the tip says how far under the plate is"
+    },
+    {
+     "ok": true,
+     "text": "three foods to add, each with Add"
+    },
+    {
+     "ok": true,
+     "text": "sorted by the score the plate would reach: 7.3 6.9 6.8"
+    },
+    {
+     "ok": true,
+     "text": "Lunch holds the plate as it stands, with its gap: EmptySwapLunch, 13:45Nutella & Leibniz Butterkeksmade on the Plate · 3"
+    },
+    {
+     "ok": true,
+     "text": "saved once"
+    },
+    {
+     "ok": true,
+     "text": "Fit it on the Plate lands on the first step, the name as the title"
+    },
+    {
+     "ok": true,
+     "text": "and the tip is there"
+    },
+    {
+     "ok": true,
+     "text": "Add lifts the plate: 1.4 to 7.3"
+    },
+    {
+     "ok": true,
+     "text": "after Fit the plate reaches the slot's target within the lifter's portion, no tip: PD 6.9"
+    },
+    {
+     "ok": true,
+     "text": "Go on the keyboard leaves the name field"
+    },
+    {
+     "ok": true,
+     "text": "Lunch shows the new name"
+    },
+    {
+     "ok": true,
+     "text": "the recipe is renamed, not copied"
+    },
+    {
+     "ok": true,
+     "text": "all slots set"
+    },
+    {
+     "ok": true,
+     "text": "Dinner says my recipe"
+    },
+    {
+     "ok": true,
+     "text": "the sheet says what is in the slot"
+    },
+    {
+     "ok": true,
+     "text": "emptied: 1 slot open"
+    },
+    {
+     "ok": true,
+     "text": "the recipe's page shows the new name"
+    },
+    {
+     "ok": true,
+     "text": "the tile shows the new name"
+    },
+    {
+     "ok": true,
+     "text": "and the slot that holds it shows the new name"
+    },
+    {
+     "ok": true,
+     "text": "the slots keep their meals after a reload"
+    },
+    {
+     "ok": true,
+     "text": "Create a new meal opens the Plate for the slot"
+    },
+    {
+     "ok": true,
+     "text": "leaving the Plate drops the slot: No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 28 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "plate-landing.cjs",
+   "about": "Story DT308 Release 2, the landing (0.3.155, boards Stories236 and 238; Coach Milan 17 November, Go 20:30), with DT310 (board Stories240, Go 20:30). The Plate with foods is the one landing: On your plate; the result; Fit to my target directly under it, white with a blue border when the plate fits and solid blue with Chef Mealan's hat when it misses your target; the foods; + Add more to your plate, which opens the three tiles and the list in place, with an X; Prepare it under it. The old row Manual, Scan, Photo of my meal, Say what you have, + Add a food and Quick picks are gone. A dish from a recipe is one row with its name and weight, its foods under it. DT310: a choice is a white chip; chosen, it is light blue with a dark blue border and a tick. Not in this release: the meal line No meal selected, the calendar, What do you do with it? 0.3.157 (DT308, the meal model, and DT311; Coach Milan, Go 18 November 11:14), changed by the stories: Empty plate stands in the row above the foods, and the card's top says only On your plate (DT311). The read ends with What do you do with it?, three white choices; Ate it and the marked meal bring Did you eat it? back, whose chips this walkthrough looks at (DT308.4).",
+   "pass": true,
+   "seconds": 25,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT308.7, changed by DT311 (0.3.157): the card's top says only On your plate; Empty plate stands in the row above the foods"
+    },
+    {
+     "ok": true,
+     "text": "DT308.7: the order: the result, Fit to my target, the foods, the swipe line, + Add more to your plate, Prepare it: 272, 530, 676, 763, 807, 877"
+    },
+    {
+     "ok": true,
+     "text": "DT308.7: Fit to my target stands directly under the result, as wide as it"
+    },
+    {
+     "ok": true,
+     "text": "DT310.3: the plate fits: Fit to my target is white with a blue border, with the hat"
+    },
+    {
+     "ok": true,
+     "text": "DT308.7: gone from the plate with foods: Manual, Scan, Photo of my meal, Say what you have, + Add a food, Quick picks"
+    },
+    {
+     "ok": true,
+     "text": "DT308.7: + Add more to your plate, and Prepare it under it, both as wide as the card, neither filled"
+    },
+    {
+     "ok": true,
+     "text": "DT308.7: it opens in place, with its title and an X of at least 44 px that says Close"
+    },
+    {
+     "ok": true,
+     "text": "DT308.7: the same three tiles, then From the list: the search, See all foods, Add manually; no foods until you search"
+    },
+    {
+     "ok": true,
+     "text": "DT308.7: + Add on a food puts it on the plate at once; the list stays open for the next one"
+    },
+    {
+     "ok": true,
+     "text": "DT308.7: the X closes it again"
+    },
+    {
+     "ok": true,
+     "text": "DT310.3: the plate misses your target: Fit to my target is solid blue with white words, with Chef Mealan's hat"
+    },
+    {
+     "ok": true,
+     "text": "DT308.3: a dish is one row with its name and weight; its foods stand under it: Oat bowl with banana410 g"
+    },
+    {
+     "ok": true,
+     "text": "DT308.3: the foods are under the dish's row, set in from it"
+    },
+    {
+     "ok": true,
+     "text": "DT308.7: a recipe on the plate has + Add more to your plate too"
+    },
+    {
+     "ok": true,
+     "text": "DT310, DT308.4: Save it, Plan it and Ate it are choices: all three white"
+    },
+    {
+     "ok": true,
+     "text": "DT310: the choice tapped is light blue while its calendar is open"
+    },
+    {
+     "ok": true,
+     "text": "DT310.1: a choice is a white chip; all three look the same until you choose"
+    },
+    {
+     "ok": true,
+     "text": "DT310.1: chosen, it is light blue with a dark blue border and a tick: {\"bg\":\"rgb(218, 230, 251)\",\"border\":\"rgb(42, 114, 217)\",\"tick\":\"\\\"✓\\\"\"}"
+    },
+    {
+     "ok": true,
+     "text": "the landing in sr-Latn: Na tvom tanjiru; + Dodaj još na svoj tanjir"
+    },
+    {
+     "ok": true,
+     "text": "the landing in de: Auf deinem Teller; + Mehr auf deinen Teller legen"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "plate-starts-whole.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 18 October 2026, 15:55 to 16:16, story R15 on canvas board RS12): the plate starts with the whole recipe, as mapped, from a link and with Make it from Recipes. Then you pick what you eat: one fritter, as the recipe makes it, or sized for your meal. One fritter is one share of the recipe: the line and the card give one number; a tiny amount keeps its tenth of a gram. With the whole recipe on the plate, How to make it makes all of it and asks nothing. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "from a link, the plate starts with the whole recipe, and the card says so: {\"title\":\"The whole recipePD\",\"kcal\":6619}"
+    },
+    {
+     "ok": true,
+     "text": "the line: the whole recipe as mapped, pick what you eat: The whole recipeOne fritter, as the recipe makes itThe whole recipe, as you mapped it: 12 fritters. One fritter is 552 kcal. Pick what you eat."
+    },
+    {
+     "ok": true,
+     "text": "one fritter: the line and the card give one number, 552 kcal (card 552)"
+    },
+    {
+     "ok": true,
+     "text": "a tiny amount keeps its tenth of a gram: nutmeg 0.1 g"
+    },
+    {
+     "ok": true,
+     "text": "the whole recipe on the plate: How to make it makes all of it and asks nothing: What you makeYou make the whole recipe2,001 g · 6,619 kcalYou eat the whole recipe2,001 g · 6,619 kcal · PD 1.0The steps are for the whole recipe. Your plate is the whole recipe, so nothing is left."
+    },
+    {
+     "ok": true,
+     "text": "Make it from Recipes starts with the whole recipe too"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 34 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-import.cjs",
+   "about": "A recipe from a screenshot or a link (0.2.16, canvas board IM, IM1 to IM7; Milan 16 October 2026, 20:28 to 22:17). HOWTO: screenshot (DT260): this walkthrough follows How to's situation screenshot; when it fails after a screen changed, update that situation's steps in src/i18n/en.json Milan's day: 2,800 kcal, 180 g protein (PD 6.4), dinner at 18:30 about 933 kcal. A Margherita from two screenshots, read by Chef Mealan (faked here: no AI key), saved in Mine with where it came from, sized for dinner, then fitted: Change the dish (the first try fails the checks and goes back once), Add on the side (your way first, a side that can't reach the target left out), Did it work? after cooking. A link from Instagram is refused with the next step. Changed by story R16 (Milan 21:08, board RS15): one pizza's numbers and PD are in the PD block on the read, not a small line. Changed by story R21 (Milan 22:27, board RS20): one pizza keeps the exact grams, 2.5 g of the 5 g, shown to a tenth. Everything else is unchanged. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs). no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters. Changed by DT311 too: Empty plate stands in the row above the foods, not at the top of the card.",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "IM1: an empty plate: Add to your plate, with Recipe photo and Recipe link"
+    },
+    {
+     "ok": true,
+     "text": "IM1: no Empty plate on an empty plate"
+    },
+    {
+     "ok": true,
+     "text": "IM2: the two pictures, in order, with Read them"
+    },
+    {
+     "ok": true,
+     "text": "IM2: both pictures go to Chef Mealan, nothing else"
+    },
+    {
+     "ok": true,
+     "text": "IM3: the dish, and where it came from, read from the screenshots"
+    },
+    {
+     "ok": true,
+     "text": "IM3: makes 2 pizzas, one pizza 1,121 kcal, PD 4.1 (R16: in the PD block)"
+    },
+    {
+     "ok": true,
+     "text": "0.2.17: the recipe's own numbers next to ours"
+    },
+    {
+     "ok": true,
+     "text": "0.2.17: an optional ingredient is marked and left out of the numbers"
+    },
+    {
+     "ok": true,
+     "text": "0.2.17: Add it puts it into the numbers"
+    },
+    {
+     "ok": true,
+     "text": "IM3: every line says where its amount came from"
+    },
+    {
+     "ok": true,
+     "text": "IM4: the plate is the Margherita"
+    },
+    {
+     "ok": true,
+     "text": "IM4: sized for dinner: every food scaled the same way (210,83,105,8,2)"
+    },
+    {
+     "ok": true,
+     "text": "IM4: two portions to pick from, with what each is"
+    },
+    {
+     "ok": true,
+     "text": "IM4: PD 4.2, said in the readout (4.1 for the whole recipe; the amounts to the gram)"
+    },
+    {
+     "ok": true,
+     "text": "IM1b, changed by DT311 (0.3.157): Empty plate stands in the row above the foods, out of the row that adds foods"
+    },
+    {
+     "ok": true,
+     "text": "IM4: under the target: two ways to fit it (wording of board PF, A6, 0.2.35)"
+    },
+    {
+     "ok": true,
+     "text": "IM6: saved in Mine with where it came from, how many it makes and the two screenshots"
+    },
+    {
+     "ok": true,
+     "text": "IM6: a screenshot is never the recipe's photo or cover"
+    },
+    {
+     "ok": true,
+     "text": "IM4: 1 of 2 pizzas: the recipe's own portion"
+    },
+    {
+     "ok": true,
+     "text": "IM5: a change that fails the checks goes back once, with why"
+    },
+    {
+     "ok": true,
+     "text": "IM5: the changed dish has its own name"
+    },
+    {
+     "ok": true,
+     "text": "IM5: a cooking note per swap, Not cooked yet, Back to the original"
+    },
+    {
+     "ok": true,
+     "text": "IM5: at the target now"
+    },
+    {
+     "ok": true,
+     "text": "IM5: Back to the original undoes it"
+    },
+    {
+     "ok": true,
+     "text": "IM5b: Greek yogurt first, your way, 305 g; potato chips left out (Greek yogurt on the side, 305 g · your way | Skyr after)"
+    },
+    {
+     "ok": true,
+     "text": "IM5b: the pizza a little smaller, the side brings the protein (160,63,79,6,2,305)"
+    },
+    {
+     "ok": true,
+     "text": "IM5b: at the target, the pizza as the recipe makes it"
+    },
+    {
+     "ok": true,
+     "text": "After: Did the side work?, and the card points at the recipe, no second copy"
+    },
+    {
+     "ok": true,
+     "text": "After: the card keeps that the side worked, and points at the recipe"
+    },
+    {
+     "ok": true,
+     "text": "After: the recipe remembers it, once"
+    },
+    {
+     "ok": true,
+     "text": "RP4: a recipe made ends on its page, Made today"
+    },
+    {
+     "ok": true,
+     "text": "IM6: Where it came from, Adapted from, Add the link, makes 2"
+    },
+    {
+     "ok": true,
+     "text": "IM6: the two screenshots, for you only"
+    },
+    {
+     "ok": true,
+     "text": "IM6: the link added later stays with the recipe"
+    },
+    {
+     "ok": true,
+     "text": "IM7: an Instagram link: didn't open, Use a screenshot (DT301)"
+    },
+    {
+     "ok": true,
+     "text": "IM7: Use a screenshot goes to the pictures"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 34 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "setup-shop.cjs",
+   "about": "JOURNEY (0.2.127, board Stories98, DT142; Anna's DT123; Milan 28 October 20:46 Go): the first setup ends on one more step, 4. Where you shop and cook: home in one tap brings its starter foods, with See them in Foods; the kitchens and what you cook with, as in Me; Done: to Today, which says Pick home first until home is picked. Changing the goal later skips it.",
+   "pass": true,
+   "seconds": 9,
+   "checks": [
+    {
+     "ok": true,
+     "text": "after Apply on the first setup: 5. Where you shop and cook (DT161 added Carbs and fat)"
+    },
+    {
+     "ok": true,
+     "text": "the step ends on its button: Pick home first, until home is picked"
+    },
+    {
+     "ok": true,
+     "text": "the kitchens and what you cook with, as in Me"
+    },
+    {
+     "ok": true,
+     "text": "one tap: home is Limassol, its starter foods came (67)"
+    },
+    {
+     "ok": true,
+     "text": "the line says how many, with See them in Foods: 67 foods for Limassol With its starter foods, ready to search. See them in Foods ›"
+    },
+    {
+     "ok": true,
+     "text": "home picked: Done: to Today"
+    },
+    {
+     "ok": true,
+     "text": "Done: setup ends on Today"
+    },
+    {
+     "ok": true,
+     "text": "the kitchen picked is kept"
+    },
+    {
+     "ok": true,
+     "text": "changing the goal later: no step 4"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 71 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "three-gates.cjs",
+   "about": "The three gates (0.2.98, canvas Page 2, boards G3 and Stories69, DT116; Milan 25 October 01:24 to 10:52): culinary, nutrition, your day, each a line in Chef Mealan's card, the sweet spot when all three hold. Checked: a shake with biscuits and peanut butter as a lunch fails nutrition (most protein from the powder) while PD fits; Add a protein base puts one on; chicken and rice at 23:10 fail your day (the eating window); a plain lunch at 13:00 is the DaaM Good spot; the grams line under the letters. Chef Mealan's read is a stand-in (no AI). 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.",
+   "pass": true,
+   "seconds": 13,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT129: the four letters on one line: F | c | fi? | P"
+    },
+    {
+     "ok": true,
+     "text": "DT129: beside PD, Energy, Weight, Protein with the plate's numbers"
+    },
+    {
+     "ok": true,
+     "text": "0.2.99: sugars, saturates and salt are not a line in the readout"
+    },
+    {
+     "ok": true,
+     "text": "DT116: three lines, culinary and your day pass, nutrition fails: ✓ CulinaryA pl | ✕ NutritionMos | ✓ Your day"
+    },
+    {
+     "ok": true,
+     "text": "N28: the sentence in words and numbers, no letters: ✕ NutritionMost of this lunch's protein comes from the powder: 47 of 60 g.Add a protein baseMake it a snackKeep it as it"
+    },
+    {
+     "ok": true,
+     "text": "the readout keeps fits your plan: the numbers pass, the gate does not"
+    },
+    {
+     "ok": true,
+     "text": "DT116: the ways out under the line that fails"
+    },
+    {
+     "ok": true,
+     "text": "no sweet spot while a gate fails"
+    },
+    {
+     "ok": true,
+     "text": "DT116: a protein base on the plate: Quark, low fat (Magerquark)"
+    },
+    {
+     "ok": true,
+     "text": "N27: fat over half the lunch's energy: ✕ NutritionMore than half of this lunch's energy is fat: 61 percent, 41 g.Add a protein baseMake it a snackKee"
+    },
+    {
+     "ok": true,
+     "text": "Your day: a full plate outside the window: ✕ Your day23:10, and your eating window is 08:00 to 21:00. A full plate now sits on tomorrow.Make it a snackKeep it as i"
+    },
+    {
+     "ok": true,
+     "text": "DT116: all three hold: the DaaM Good spot"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 37 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "where-and-dish.cjs",
+   "about": "0.2.5 (canvas S \"Plan decides, purpose two: the store\" and \"Plate makes\", H9, H12): Where does this go after a scan from Today (on the plate now, into a planned meal with what it does to its PD, a new meal in an empty slot, keep); a dish as one row on the Plate with its portions, the recipe never moved, a side as the lever; a dish eaten as it stands is its recipe. Changed by story R19 (Milan 06:04 to 06:41, board RS18): the lunch row opens the meal, with its slot on top; Change it on the Plate there opens the Plate for the slot, as the row did. Everything after is unchanged. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line says the meal, the day and the moment, or No meal selected; it no longer names A dish. Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.",
+   "pass": true,
+   "seconds": 22,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the recipe is one row, 1 of 8 portions"
+    },
+    {
+     "ok": true,
+     "text": "changed by DT308.1 and B150: the line says the meal and its day, with no X; it no longer names A dish (the dish is a row of the plate)"
+    },
+    {
+     "ok": true,
+     "text": "two portions double the plate: 454 to 908 kcal"
+    },
+    {
+     "ok": true,
+     "text": "the after step says the recipe exists"
+    },
+    {
+     "ok": true,
+     "text": "no second Sarma: Sarma"
+    },
+    {
+     "ok": true,
+     "text": "after Fit (in place, 0.2.88) the dish is still one row and the side is what Fit moved"
+    },
+    {
+     "ok": true,
+     "text": "the recipe's amounts stay one portion: 100, 150, 25"
+    },
+    {
+     "ok": true,
+     "text": "Scan on the Plate opens the camera"
+    },
+    {
+     "ok": true,
+     "text": "the food is in My foods"
+    },
+    {
+     "ok": true,
+     "text": "Scan on the Plate puts the food on the plate"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 27 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "why"
+}
