@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.183",
     "0.3.182",
     "0.3.181",
     "0.3.180",
@@ -2380,8 +2381,8 @@
       "id": "DT319",
       "title": "A meal I ate, opened from the Plan: what Put it on the Plate again means",
       "epic": "plate",
-      "state": "next",
-      "why": "Coach Milan 18 November 20:04: in the Plan he opened the What you ate card Chicken and sweet potato fries, tapped Put it on the Plate again. The foods landed right. The title was grey though the meal was saved; Meal and day were not set though it was saved as a meal. His question: is this that meal again, so a change on the Plate changes it (an edit), or a new meal that does not touch the old one (save as)? It has to be clear to everyone. As built (src/components/PastMeal.tsx, again): a copy of the foods only, no name, no photo, no meal, no link to the eaten meal; the eaten meal is edited by Change it on the same page (DT284). It also replaces a plate that has foods with no question (a way DT313 missed). Proposed to him: it stays a copy, a new plate; the button and one line say so; the name comes along; a plate with foods is asked first. Waits for his word on the meaning, then a board. 23 November 13:13: yes, Put it on the Plate again is a copy for a new meal. Draw.",
+      "state": "done",
+      "why": "Coach Milan 18 November 20:04: in the Plan he opened the What you ate card Chicken and sweet potato fries, tapped Put it on the Plate again. The foods landed right. The title was grey though the meal was saved; Meal and day were not set though it was saved as a meal. His question: is this that meal again, so a change on the Plate changes it (an edit), or a new meal that does not touch the old one (save as)? It has to be clear to everyone. As built (src/components/PastMeal.tsx, again): a copy of the foods only, no name, no photo, no meal, no link to the eaten meal; the eaten meal is edited by Change it on the same page (DT284). It also replaces a plate that has foods with no question (a way DT313 missed). Proposed to him: it stays a copy, a new plate; the button and one line say so; the name comes along; a plate with foods is asked first. Waits for his word on the meaning, then a board. 23 November 13:13: yes, Put it on the Plate again is a copy for a new meal. Draw. 14:13: Go.",
       "opportunity": {
         "from": "Coach Milan's own Plan, 18 November 2026.",
         "job": "Eat a meal I liked again, starting from what I ate.",
@@ -2395,7 +2396,7 @@
         "Plan's meal card has no Change it: an eaten meal is changed from Today only (DT284). Should Plan's card get Change it too?"
       ],
       "checks": "Light: the meal card and the Plate it opens. The unit tests, the build, a new walkthrough for AC1 to AC4, and past-meal and plate-live-cook, about 5 minutes. New words on screen, so the German sweep too.",
-      "decision": "Meaning agreed 23 November 13:13: a copy for a new meal. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Meaning agreed 23 November 13:13. Go 14:13, checks Light plus the German sweep, 8 of 8. Built in 0.3.183.",
       "now": "Plan, a day gone by, a meal opened: Put it on the Plate again and Save in My recipes. The Plate gets the foods only: a grey title made from the foods, No meal selected; the foods that were there are gone with no question.",
       "looked_at": "The same meal again, so a change on the Plate edits what was eaten: not chosen (13:13); editing an eaten meal is Change it's job.",
       "board": "Stories283",
@@ -2429,11 +2430,13 @@
       ],
       "details": [
         "The copy's foods get new ids, as today; the name goes into the plate's name.",
-        "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 13:15."
+        "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 13:15.",
+        "Built: the copy is bound to no meal and to no meal eaten (recorded and plannedAt cleared, Meal and day cleared), so a plate that was a logged meal is not changed by it."
       ],
       "short": "Put it on the Plate again: a copy for a new meal, named, asked first",
-      "rel": "Proposed; not agreed until Coach Milan says Go",
-      "boardTitle": "DT319: a meal I ate, opened from Plan: Put it on the Plate again is a copy for a new meal"
+      "rel": "Built in 0.3.183; Go 23 November 2026, 14:13",
+      "boardTitle": "DT319: a meal I ate, opened from Plan: Put it on the Plate again is a copy for a new meal",
+      "version": "0.3.183"
     },
     {
       "id": "DT323",
@@ -3007,7 +3010,7 @@
       "title": "Gain healthy weight as a goal, goals greyed when they do not fit, and a target body weight",
       "epic": "setup",
       "state": "next",
-      "why": "Coach Milan 22 November 2026, 15:48 to 16:01, after an onboarding call: a tester who is a bit underweight wants to gain weight, muscle and also some fat, and wanted plus 7 kg as her goal. An overweight person should not be offered every goal; on the edge everything is fine. 15:54: no BMI as a number (it fails for muscular men); keep the whole fixed list of goals, a goal that does not fit cannot be picked and a tap says why and to contact the coach; asked about people without a coach. 16:01: all good; a goal question should reach the Chef Mealan team, him as the internal coach, as an open item in Waiting for you. 16:07: a question to the team is not needed now, an edge case that may matter once we grow big; grey out the goals that do not fit, people will ping him anyway. Build only the logic that takes away the opposite goals. 16:12: Gain healthy weight is the only goal missing from the first list (rarely needed in his practice); add it and grey out what is its opposite, and the other way round. The target is a body weight, not plus 7 kg: from 48 kg the goal is 55 kg, with a pace such as roughly 1 kg a month. 16:19: the target body weight is for both Gain healthy weight and Lose fat; a step forward, to be made smarter later. 23 November 13:47: the limits from official guidelines, as a note on the board; EU ones where they exist.",
+      "why": "Coach Milan 22 November 2026, 15:48 to 16:01, after an onboarding call: a tester who is a bit underweight wants to gain weight, muscle and also some fat, and wanted plus 7 kg as her goal. An overweight person should not be offered every goal; on the edge everything is fine. 15:54: no BMI as a number (it fails for muscular men); keep the whole fixed list of goals, a goal that does not fit cannot be picked and a tap says why and to contact the coach; asked about people without a coach. 16:01: all good; a goal question should reach the Chef Mealan team, him as the internal coach, as an open item in Waiting for you. 16:07: a question to the team is not needed now, an edge case that may matter once we grow big; grey out the goals that do not fit, people will ping him anyway. Build only the logic that takes away the opposite goals. 16:12: Gain healthy weight is the only goal missing from the first list (rarely needed in his practice); add it and grey out what is its opposite, and the other way round. The target is a body weight, not plus 7 kg: from 48 kg the goal is 55 kg, with a pace such as roughly 1 kg a month. 16:19: the target body weight is for both Gain healthy weight and Lose fat; a step forward, to be made smarter later. 23 November 13:47: the limits from official guidelines, as a note on the board; EU ones where they exist. 23 November 14:13: Go.",
       "opportunity": {
         "from": "An onboarding call, 22 November 2026.",
         "job": "Pick a goal that fits my body, with a number I can aim for.",
@@ -3023,7 +3026,7 @@
         "Later: the target made smarter (Coach Milan 16:19). This ticket is the first step."
       ],
       "checks": "Middle: the goal step in setup and on Me, Goal, the goal sheet, and the coach setting a goal. The unit tests with new ones for the limits by sex and age, the target and its pace; the build; a new walkthrough for AC1 to AC8; and the walkthroughs of the goal step, Me, Goal and the coach's goal, about 10 to 15 minutes. New words on screen, so the German sweep too.",
-      "decision": "Direction agreed 22 November 15:54 to 16:19; limits from official guidelines, 23 November 13:47. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Direction agreed 22 November 15:54 to 16:19; limits 23 November 13:47. Go 14:13, checks Middle plus the German sweep.",
       "now": "The goal step offers every goal to everyone, Lose fat and Recomposition too for a person who is underweight. Build muscle is the nearest to gaining healthy weight. There is no target weight.",
       "looked_at": "A BMI number on screen: not chosen (15:54), it fails for muscular men. Blocking the heavy side from height and weight alone: not chosen, for the same reason; only body fat, when given, blocks it. A target as plus 7 kg: not chosen (16:12), a body weight is what people aim for.",
       "board": "Stories284",
@@ -3083,7 +3086,7 @@
         "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026."
       ],
       "short": "Gain healthy weight; goals that do not fit greyed; a target body weight",
-      "rel": "Proposed; not agreed until Coach Milan says Go",
+      "rel": "Agreed: Go 23 November 2026, 14:13",
       "boardTitle": "DT335: Gain healthy weight as a goal, goals greyed when they do not fit, and a target body weight"
     },
     {

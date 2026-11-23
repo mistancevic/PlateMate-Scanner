@@ -20,11 +20,11 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.181")}
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.182")}
 B = Board(); PW = 390; G = 70
 W = SX + 3 * PW + 2 * G + 40
 parts = [("Ticket", "DT319. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT319, canvas Page 6."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT319.1: as it is in main, 0.3.181, not on Preview yet: Saturday's lunch opened from Plan, then the Plate. DT319.2: the same, new. Every arrow is a tap. A blue outline marks what is new."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT319.1: as it was in 0.3.182: Saturday's lunch opened from Plan, then the Plate. DT319.2: the same, new. Every arrow is a tap. A blue outline marks what is new."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "18 November 20:04: is this that meal again, so a change on the Plate changes it, or a new meal that does not touch the old one? It has to be clear to everyone. 23 November 13:13: a copy for a new meal, yes."),
@@ -38,7 +38,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
-label(y, "DT319.1 In main, 0.3.181", "not on Preview yet: the meal card, then the Plate", 0, 2)
+label(y, "DT319.1 Before, 0.3.182", "the meal card, then the Plate", 0, 2)
 y += 60
 RA = [shot(X(0), y, "1a", PW, "DT319.1a Saturday's lunch, from Plan", "draft", "My plate holds Skyr and Banana. I tap Put it on the Plate again."),
   shot(X(1), y, "1b", PW, "DT319.1b The Plate", "draft", "No name, no meal; Skyr and Banana gone with no question.")]
@@ -54,7 +54,7 @@ bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories283.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket DT319, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.181 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories282.dc.html")
+board("Stories283.dc.html", t["boardTitle"], "Drawn 23 November 2026; Go 14:13, built in 0.3.183. Ticket DT319, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.181 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories282.dc.html")
 inner = B.render(W, Hc)
 json.dump({"DT319": {"file": "Stories283.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out319.json"), "w"))
 print("DT319", W, Hc + 230)

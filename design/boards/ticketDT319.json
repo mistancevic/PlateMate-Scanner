@@ -2,8 +2,8 @@
   "id": "DT319",
   "title": "A meal I ate, opened from the Plan: what Put it on the Plate again means",
   "epic": "plate",
-  "state": "next",
-  "why": "Coach Milan 18 November 20:04: in the Plan he opened the What you ate card Chicken and sweet potato fries, tapped Put it on the Plate again. The foods landed right. The title was grey though the meal was saved; Meal and day were not set though it was saved as a meal. His question: is this that meal again, so a change on the Plate changes it (an edit), or a new meal that does not touch the old one (save as)? It has to be clear to everyone. As built (src/components/PastMeal.tsx, again): a copy of the foods only, no name, no photo, no meal, no link to the eaten meal; the eaten meal is edited by Change it on the same page (DT284). It also replaces a plate that has foods with no question (a way DT313 missed). Proposed to him: it stays a copy, a new plate; the button and one line say so; the name comes along; a plate with foods is asked first. Waits for his word on the meaning, then a board. 23 November 13:13: yes, Put it on the Plate again is a copy for a new meal. Draw.",
+  "state": "done",
+  "why": "Coach Milan 18 November 20:04: in the Plan he opened the What you ate card Chicken and sweet potato fries, tapped Put it on the Plate again. The foods landed right. The title was grey though the meal was saved; Meal and day were not set though it was saved as a meal. His question: is this that meal again, so a change on the Plate changes it (an edit), or a new meal that does not touch the old one (save as)? It has to be clear to everyone. As built (src/components/PastMeal.tsx, again): a copy of the foods only, no name, no photo, no meal, no link to the eaten meal; the eaten meal is edited by Change it on the same page (DT284). It also replaces a plate that has foods with no question (a way DT313 missed). Proposed to him: it stays a copy, a new plate; the button and one line say so; the name comes along; a plate with foods is asked first. Waits for his word on the meaning, then a board. 23 November 13:13: yes, Put it on the Plate again is a copy for a new meal. Draw. 14:13: Go.",
   "opportunity": {
     "from": "Coach Milan's own Plan, 18 November 2026.",
     "job": "Eat a meal I liked again, starting from what I ate.",
@@ -17,7 +17,7 @@
     "Plan's meal card has no Change it: an eaten meal is changed from Today only (DT284). Should Plan's card get Change it too?"
   ],
   "checks": "Light: the meal card and the Plate it opens. The unit tests, the build, a new walkthrough for AC1 to AC4, and past-meal and plate-live-cook, about 5 minutes. New words on screen, so the German sweep too.",
-  "decision": "Meaning agreed 23 November 13:13: a copy for a new meal. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "decision": "Meaning agreed 23 November 13:13. Go 14:13, checks Light plus the German sweep, 8 of 8. Built in 0.3.183.",
   "now": "Plan, a day gone by, a meal opened: Put it on the Plate again and Save in My recipes. The Plate gets the foods only: a grey title made from the foods, No meal selected; the foods that were there are gone with no question.",
   "looked_at": "The same meal again, so a change on the Plate edits what was eaten: not chosen (13:13); editing an eaten meal is Change it's job.",
   "board": "Stories283",
@@ -51,9 +51,10 @@
   ],
   "details": [
     "The copy's foods get new ids, as today; the name goes into the plate's name.",
-    "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 13:15."
+    "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 13:15.",
+    "Built: the copy is bound to no meal and to no meal eaten (recorded and plannedAt cleared, Meal and day cleared), so a plate that was a logged meal is not changed by it."
   ],
   "short": "Put it on the Plate again: a copy for a new meal, named, asked first",
-  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "rel": "Built in 0.3.183; Go 23 November 2026, 14:13",
   "boardTitle": "DT319: a meal I ate, opened from Plan: Put it on the Plate again is a copy for a new meal"
 }
