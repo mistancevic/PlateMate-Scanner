@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.179",
     "0.3.178",
     "0.3.177",
     "0.3.176",
@@ -3234,8 +3235,8 @@
       "id": "DT338",
       "title": "What the PD colours mean: one scale on the Goal page and behind the PD number on the Plate",
       "epic": "setup",
-      "state": "next",
-      "why": "Coach Milan 22 November 2026, 17:57 to 18:01: add the ranges and their colours where users see them, so they know what the colour of their numbers means; today the colour changes as PD moves from one range to another. 18:01: both places. 23 November 09:30: the words under the number: High, above your plan.",
+      "state": "done",
+      "why": "Coach Milan 22 November 2026, 17:57 to 18:01: add the ranges and their colours where users see them, so they know what the colour of their numbers means; today the colour changes as PD moves from one range to another. 18:01: both places. 23 November 09:30: the words under the number: High, above your plan. 10:42: two more goals on the board, Recomposition and Build muscle, to see how the formula moves the ranges; then Go.",
       "opportunity": {
         "from": "An onboarding call, 22 November 2026.",
         "job": "Understand at a glance whether my plate is where my target wants it.",
@@ -3246,8 +3247,8 @@
       "story": "When I see the colour of my PD, I want to see what it means in my own numbers, so that I know what to change.",
       "proposed": "One scale: five coloured parts, each with its name and its range in the person's own numbers (for a target of 5.3: under 3.2, 3.2 to 4.8, 4.8 to 8.0, 8.0 to 13.3, above 13.3). On the Goal page under the PD target. On the Plate, a tap on the PD number opens the same scale with a mark where this plate sits. The words under the Plate's number follow the band: High, above your plan; High+, far above your plan. On plan keeps fits your plan, and under the target keeps its words.",
       "open": [],
-      "checks": "Light: two screens, a scale added and the words under the Plate's number. The unit tests with new ones for the scale's ranges and mark, the build, a new walkthrough for AC1 to AC4, and the walkthroughs that open Me, Goal and the Plate's PD block, about 5 to 10 minutes. New words on screen, so the German sweep too.",
-      "decision": "Direction agreed 22 November 18:01: both places; the words 23 November 09:30. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "checks": "Light: two screens, a scale added and the words under the Plate's number. The unit tests with new ones for the scale's ranges and mark, the build, a new walkthrough for AC1 to AC5, and the walkthroughs that open Me, Goal and the Plate's PD block, about 5 to 10 minutes. New words on screen, so the German sweep too.",
+      "decision": "Go, Coach Milan 23 November 2026, 10:42, with AC5 (Recomposition and Build muscle, Steady); Fit to my target stays at the target to 1.5 times it. Checks Light plus the German sweep, 23 of 23. Built in 0.3.179.",
       "now": "Me, Goal shows the PD target, 5.3, with no word on the colours. On the Plate the PD block takes one of five colours as the plate moves (one egg, PD 8.4: High), and a tap on the number does nothing. The ranges are said only in Foods, in a line under the filter chips after a chip is tapped.",
       "looked_at": "A legend on every PD block: not chosen, too much on every screen; the Goal page and a tap on the Plate are where the question comes up (18:01: both places).",
       "board": "Stories279",
@@ -3272,6 +3273,11 @@
           "id": "AC4",
           "title": "The words say the band",
           "text": "Given one egg for breakfast at PD 8.4, when the Plate shows its PD, then the words under the number say High, above your plan; at PD 14 they say High+, far above your plan; on plan they say fits your plan, as today"
+        },
+        {
+          "id": "AC5",
+          "title": "The ranges follow the goal",
+          "text": "Given two goals, Recomposition with 2300 kcal and 145 g protein, and Build muscle, Steady, with 2600 kcal and 130 g protein, when I open Me, Goal and then the Plate with one egg at PD 8.4, then Recomposition shows target 6.3 with On plan 5.7 to 9.5 and the egg On plan, and Build muscle shows target 5.0 with On plan 4.5 to 7.5 and the egg High"
         }
       ],
       "unchanged": [
@@ -3282,11 +3288,13 @@
       "details": [
         "Every place that colours PD uses the five bands: the Plate's readout, a food's card, a recipe's readout, a past meal's readout and the Foods pills (checked in the code, 23 November). Plan's meal rows colour only the words, in three states, and stay as they are.",
         "The scale is one component, used in both places; the ranges come from the same code as the Foods line (bandRange).",
-        "The pictures are the real app on one scratch build of main, not committed."
+        "The pictures are the real app on one scratch build of main, not committed.",
+        "The same formula for three goals: every edge is 0.6, 0.9, 1.5 and 2.5 times the target; Fit to my target asks for the target to 1.5 times it. See the table on the board."
       ],
       "short": "What the PD colours mean, on the Goal page and behind the PD number",
-      "rel": "Proposed; not agreed until Coach Milan says Go",
-      "boardTitle": "DT338: what the PD colours mean, one scale on the Goal page and behind the PD number on the Plate"
+      "rel": "0.3.179",
+      "boardTitle": "DT338: what the PD colours mean, one scale on the Goal page and behind the PD number on the Plate",
+      "version": "0.3.179"
     },
     {
       "id": "DT339",

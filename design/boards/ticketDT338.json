@@ -2,7 +2,7 @@
   "id": "DT338",
   "title": "What the PD colours mean: one scale on the Goal page and behind the PD number on the Plate",
   "epic": "setup",
-  "state": "next",
+  "state": "done",
   "why": "Coach Milan 22 November 2026, 17:57 to 18:01: add the ranges and their colours where users see them, so they know what the colour of their numbers means; today the colour changes as PD moves from one range to another. 18:01: both places. 23 November 09:30: the words under the number: High, above your plan. 10:42: two more goals on the board, Recomposition and Build muscle, to see how the formula moves the ranges; then Go.",
   "opportunity": {
     "from": "An onboarding call, 22 November 2026.",
@@ -59,6 +59,6 @@
     "The same formula for three goals: every edge is 0.6, 0.9, 1.5 and 2.5 times the target; Fit to my target asks for the target to 1.5 times it. See the table on the board."
   ],
   "short": "What the PD colours mean, on the Goal page and behind the PD number",
-  "rel": "Agreed: Go 23 November 2026, 10:42",
+  "rel": "Built in 0.3.179; Go 23 November 2026, 10:42",
   "boardTitle": "DT338: what the PD colours mean, one scale on the Goal page and behind the PD number on the Plate"
 }
