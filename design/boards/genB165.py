@@ -75,7 +75,7 @@ acTable(B, y, W - 40, {**t5, "rel": "Proposed; not agreed until Coach Milan says
 y += HT.get("ac5", 800) + 30
 acTable(B, y, W - 40, {**t6, "rel": "Proposed; not agreed until Coach Milan says Go"}); B.html[-1] = B.html[-1].replace("<div data-ac", "<div data-ac=\"B166\"", 1)
 Hc = y + HT.get("ac6", 700) + 40
-board("Stories293.dc.html", T["boardTitle"], "Drawn 23 November 2026, for the Go of Coach Milan. Tickets B165 and B166, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.191, and a sketch of the change on that build. Nothing in the app is changed yet.", B, W, Hc, "Stories292.dc.html")
+board("Stories293.dc.html", T["boardTitle"], "Drawn 23 November 2026, for the Go of Coach Milan. Tickets B165 and B166, Kanban column Now. Pictures from the real app on a scratch build of main, 0.3.191, and a sketch of the change on that build. Nothing in the app is changed yet.", B, W, Hc, "Stories292.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B165": {"file": "Stories293.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outB165.json"), "w"))
 print("B165", W, Hc + 230)
