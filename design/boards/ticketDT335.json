@@ -2,8 +2,8 @@
   "id": "DT335",
   "title": "Gain healthy weight as a goal, goals greyed when they do not fit, and a target body weight",
   "epic": "setup",
-  "state": "next",
-  "why": "Coach Milan 22 November 2026, 15:48 to 16:01, after an onboarding call: a tester who is a bit underweight wants to gain weight, muscle and also some fat, and wanted plus 7 kg as her goal. An overweight person should not be offered every goal; on the edge everything is fine. 15:54: no BMI as a number (it fails for muscular men); keep the whole fixed list of goals, a goal that does not fit cannot be picked and a tap says why and to contact the coach; asked about people without a coach. 16:01: all good; a goal question should reach the Chef Mealan team, him as the internal coach, as an open item in Waiting for you. 16:07: a question to the team is not needed now, an edge case that may matter once we grow big; grey out the goals that do not fit, people will ping him anyway. Build only the logic that takes away the opposite goals. 16:12: Gain healthy weight is the only goal missing from the first list (rarely needed in his practice); add it and grey out what is its opposite, and the other way round. The target is a body weight, not plus 7 kg: from 48 kg the goal is 55 kg, with a pace such as roughly 1 kg a month. 16:19: the target body weight is for both Gain healthy weight and Lose fat; a step forward, to be made smarter later. 23 November 13:47: the limits from official guidelines, as a note on the board; EU ones where they exist.",
+  "state": "done",
+  "why": "Coach Milan 22 November 2026, 15:48 to 16:01, after an onboarding call: a tester who is a bit underweight wants to gain weight, muscle and also some fat, and wanted plus 7 kg as her goal. An overweight person should not be offered every goal; on the edge everything is fine. 15:54: no BMI as a number (it fails for muscular men); keep the whole fixed list of goals, a goal that does not fit cannot be picked and a tap says why and to contact the coach; asked about people without a coach. 16:01: all good; a goal question should reach the Chef Mealan team, him as the internal coach, as an open item in Waiting for you. 16:07: a question to the team is not needed now, an edge case that may matter once we grow big; grey out the goals that do not fit, people will ping him anyway. Build only the logic that takes away the opposite goals. 16:12: Gain healthy weight is the only goal missing from the first list (rarely needed in his practice); add it and grey out what is its opposite, and the other way round. The target is a body weight, not plus 7 kg: from 48 kg the goal is 55 kg, with a pace such as roughly 1 kg a month. 16:19: the target body weight is for both Gain healthy weight and Lose fat; a step forward, to be made smarter later. 23 November 13:47: the limits from official guidelines, as a note on the board; EU ones where they exist. 23 November 14:13: Go.",
   "opportunity": {
     "from": "An onboarding call, 22 November 2026.",
     "job": "Pick a goal that fits my body, with a number I can aim for.",
@@ -19,7 +19,7 @@
     "Later: the target made smarter (Coach Milan 16:19). This ticket is the first step."
   ],
   "checks": "Middle: the goal step in setup and on Me, Goal, the goal sheet, and the coach setting a goal. The unit tests with new ones for the limits by sex and age, the target and its pace; the build; a new walkthrough for AC1 to AC8; and the walkthroughs of the goal step, Me, Goal and the coach's goal, about 10 to 15 minutes. New words on screen, so the German sweep too.",
-  "decision": "Direction agreed 22 November 15:54 to 16:19; limits from official guidelines, 23 November 13:47. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+  "decision": "Direction agreed 22 November 15:54 to 16:19; limits from official guidelines, 23 November 13:47. Go 14:13, checks Middle plus the German sweep, 20 of 20. Built in 0.3.184.",
   "now": "The goal step offers every goal to everyone, Lose fat and Recomposition too for a person who is underweight. Build muscle is the nearest to gaining healthy weight. There is no target weight.",
   "looked_at": "A BMI number on screen: not chosen (15:54), it fails for muscular men. Blocking the heavy side from height and weight alone: not chosen, for the same reason; only body fat, when given, blocks it. A target as plus 7 kg: not chosen (16:12), a body weight is what people aim for.",
   "board": "Stories284",
@@ -76,9 +76,10 @@
     "Too much body fat: over the top of the healthy range by sex and age, from Gallagher et al. 2000 (Am J Clin Nutr 72:694), which links body fat to the WHO BMI lines. Women 33 % (20 to 39), 34 % (40 to 59), 36 % (60 to 79); men 20 %, 22 %, 25 %. There is no EU or WHO line for body fat itself; EASO's 2024 framework adds a waist-to-height ratio, which the app does not ask for.",
     "Target range: a gain up to the top of the healthy weight for the height (BMI 25); a loss down to the underweight line (BMI 18.5), no top limit, so a muscular man is not stopped.",
     "Pace: gain roughly 1 kg a month (Coach Milan 16:12); loss 0.5 to 1 % of the body weight a week, as the Lose fat card already says.",
-    "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026."
+    "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026.",
+    "Built: the coach's goal card on the client's page has Gain healthy weight too, and a goal the coach set is never greyed. A target is kept with its goal, so a target for Gain healthy weight does not show under Lose fat. The target weight is on Your summary. The recipe fits on recipe pages keep the five goals they were made with."
   ],
   "short": "Gain healthy weight; goals that do not fit greyed; a target body weight",
-  "rel": "Proposed; not agreed until Coach Milan says Go",
+  "rel": "Built in 0.3.184; Go 23 November 2026, 14:13",
   "boardTitle": "DT335: Gain healthy weight as a goal, goals greyed when they do not fit, and a target body weight"
 }

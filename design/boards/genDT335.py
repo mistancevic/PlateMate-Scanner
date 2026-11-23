@@ -20,11 +20,11 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.182")}
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.183")}
 B = Board(); PW = 390; G = 70
 W = SX + 3 * PW + 2 * G + 40
 parts = [("Ticket", "DT335. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT335, canvas Page 6."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT335.1: the goal step as it is in main, 0.3.182, not on Preview yet, for a woman of 28, 48 kg at 168 cm. DT335.2: the same, new. DT335.3: the heavy side, a woman of 36, 82 kg, body fat 38 %. Every arrow is a tap; a scrolled screen is one tall picture. The sources of the limits are in the design details at the bottom."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> DT335.1: the goal step as it was in 0.3.183, for a woman of 28, 48 kg at 168 cm. DT335.2: the same, new. DT335.3: the heavy side, a woman of 36, 82 kg, body fat 38 %. Every arrow is a tap; a scrolled screen is one tall picture. The sources of the limits are in the design details at the bottom."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "22 November 15:48: a tester who is a bit underweight wants to gain, muscle and some fat, plus 7 kg. 15:54: no BMI as a number; keep the whole list, a goal that does not fit cannot be picked and a tap says why. 16:12: add Gain healthy weight; the target is a body weight, 48 to 55 kg, roughly 1 kg a month. 16:19: a target weight for Gain healthy weight and Lose fat. 23 November 13:47: limits from official guidelines, as a note."),
@@ -38,7 +38,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
-label(y, "DT335.1 In main", "48 kg at 168 cm, 28", 0, 1)
+label(y, "DT335.1 Before, 0.3.183", "48 kg at 168 cm, 28", 0, 1)
 label(y, "DT335.2 New", "the same woman", 1, 2)
 y += 60
 RA = [shot(X(0), y, "1a", PW, "DT335.1a The goal step", "draft", "Every goal can be picked; nothing for healthy weight gain.")]
@@ -61,7 +61,7 @@ bs = R3 + [R2d]
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories284.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket DT335, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.182 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories283.dc.html")
+board("Stories284.dc.html", t["boardTitle"], "Drawn 23 November 2026; Go 14:13, built in 0.3.184. Ticket DT335, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.182 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories283.dc.html")
 inner = B.render(W, Hc)
 json.dump({"DT335": {"file": "Stories284.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out335.json"), "w"))
 print("DT335", W, Hc + 230)
