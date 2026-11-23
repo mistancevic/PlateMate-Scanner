@@ -36,7 +36,7 @@ import { stepParts, tokenOf } from "../steps";
 import { coverIsDrawn, isDrawnPhoto, TEST_MODELS } from "../covers";
 import { sig } from "../photos";
 import { CHEF_NAME } from "./Mark";
-import { partsOf, cleanPart, leanFood } from "../parts";
+import { partsOf, cleanPart, leanFood, byParts } from "../parts";
 import { NutritionCard } from "./NutritionCard";
 import { CarryBlock } from "./CarryBlock";
 import { portionsIn } from "../pilot";
@@ -461,8 +461,9 @@ export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards,
         )}
         {edit && !partsShown && <button type="button" className="link rq-parts-open" onClick={() => setPartsOpen(true)}>{w("recipe.partsAndOptionalFoods")}</button>}
         {edit && partsShown && <div className="pt-h pt-mode"><span><small>{w("recipe.partsGiveAFoodIts")}</small></span><span className="pt-acts">{newPart === null ? <button className="pill pill-small pill-action" onClick={() => setNewPart("")}>{w("recipe.newPart")}</button> : <input className="pt-new" autoFocus aria-label={w("recipe.nameOfTheNewPart")} placeholder={w("recipe.toppingPlaceholder")} value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
-        {(edit || !cookN || cookN === makesN ? items : sizedFor(meal, cookN)).map((it, k) => {
-          const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{partName(it.part)}</div> : null;
+        {/* B162 (0.3.188, board Stories288): each part once; foods with no part last, under Other; nothing stored changes */}
+        {(edit ? items : byParts(!cookN || cookN === makesN ? items : sizedFor(meal, cookN))).map((it, k, arr) => {
+          const head = !edit && (k === 0 || (arr[k - 1].part ?? "") !== (it.part ?? "")) && (it.part || partsOf(arr).length > 0) ? <div className="rq-part" key={`h${k}`}>{it.part ? partName(it.part) : w("recipe.otherPart")}</div> : null;
           return [head, (
           <div className="sheet-row rq-food" key={it.id}>
             {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="pill pill-small pill-action rq-swap-link" aria-label={w("recipe.swapFood", { food: it.food.name })} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>{w("recipe.swap")}</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>{w("recipe.optional")}</button></span>}</span> : <small>{cookName(it.food.name).short}{weighLine(it.food.name) && <span className="rq-weigh"> · {weighLine(it.food.name)}</span>}{it.fry && <span className="rq-fry">{it.fry.written ? w("recipe.writtenForFrying", { written: it.fry.written }) : w("recipe.forFrying")}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit

@@ -6459,5 +6459,8 @@
     "one": "{n} meal eaten before keeps its foods: what you ate stays as it was.",
     "other": "{n} meals eaten before keep their foods: what you ate stays as it was."
   },
-  "recipechange.and": "and"
+  "recipechange.and": "and",
+  "steps.stepHere": "+ Step here",
+  "steps.addBetween": "Add a step between step {a} and step {b}",
+  "recipe.otherPart": "Other"
 }

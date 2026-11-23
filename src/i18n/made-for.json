@@ -5820,6 +5820,9 @@
     "screen.recipechange.followed": {"en":"The meal of {when} follows the change.|The meals of {when} follow the change.","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
     "screen.recipechange.kept": {"en":"The meal of {when} keeps its foods, as you ate it.|The meals of {when} keep their foods, as you ate them.","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
     "screen.recipechange.older": {"en":"{n} meal eaten before keeps its foods: what you ate stays as it was.|{n} meals eaten before keep their foods: what you ate stays as it was.","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
-    "screen.recipechange.and": {"en":"and","area":"Words used across the app","where":"Across the app","release":"0.3.187"}
+    "screen.recipechange.and": {"en":"and","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
+    "screen.steps.stepHere": {"en":"+ Step here","area":"Recipes","where":"Recipes","release":"0.3.188"},
+    "screen.steps.addBetween": {"en":"Add a step between step {a} and step {b}","area":"Recipes","where":"Recipes","release":"0.3.188"},
+    "screen.recipe.otherPart": {"en":"Other","area":"Recipes","where":"Recipes","release":"0.3.188"}
   }
 }
