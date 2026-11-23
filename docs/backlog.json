@@ -4216,7 +4216,55 @@
       "title": "A food's name with a comma is cut in the steps, and written in small letters",
       "epic": "cook",
       "state": "next",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): seen in the screenshot: step 1 says 250 g körniger frischkäse tworog 2, for Körniger Frischkäse Tworog 2,5% Fett; the name is cut at the comma and every food name is in small letters."
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): seen in the screenshot: step 1 says 250 g körniger frischkäse tworog 2, for Körniger Frischkäse Tworog 2,5% Fett; the name is cut at the comma and every food name is in small letters. 20:52: is it cut on the comma, or two pieces of the cheese? Cut at the comma of 2,5%; one cheese. Proposed: cut only at a comma with a space after it; lowercase only the basic foods, a pack's name as printed. 20:53: draw.",
+      "opportunity": {
+        "from": "Coach Milan's own recipe, Lazy Burek, 23 November 2026.",
+        "job": "Read a recipe's steps with the foods I bought.",
+        "kind": "Says something not true: a name cut at the decimal comma, in small letters.",
+        "why_now": "Packs in German, Serbian and most of the EU write decimals with a comma."
+      },
+      "story": "When I read a recipe's steps, I want each food named as on its pack, so that I find it in my kitchen and the step reads right.",
+      "proposed": "1. A food's name in a step is cut only at a comma with a space after it (Chicken breast, cooked: chicken breast); a comma between digits stays (Tworog 2,5% Fett). 2. A pack's name stays as printed (a food with a barcode or read from a label); a basic food, a typical value or Chef Mealan's food is in small letters, as now (2 eggs). 3. The name comes from the food each time the step is shown, so steps already written read right too.",
+      "problem": "A step names a food by the part of its name before the first comma, in small letters. Körniger Frischkäse Tworog 2,5% Fett reads körniger frischkäse tworog 2, and every German noun loses its capital.",
+      "open": [],
+      "checks": "Light: the recipe's steps, Edit recipe's steps and Start cooking. The unit tests with new ones for the names; the build; a new walkthrough for AC1 to AC4; and steps-own-amounts, original-steps and cook-mode, about 5 minutes. No new words on screen.",
+      "decision": "Answered 20:52, draw 20:53. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "now": "Lazy Burek's steps, written by Chef Mealan: 250 g körniger frischkäse tworog 2, 3 g alpen jodsalz, 150 g feta leicht, 375 g frischer blätterteig.",
+      "looked_at": "The whole name always: not chosen; Chicken breast, cooked reads better as chicken breast in a step. Capital letters for every food: not chosen; English steps write eggs and rice in small letters.",
+      "board": "Stories290",
+      "where": "Page 6",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "A decimal comma stays",
+          "text": "Given Körniger Frischkäse Tworog 2,5% Fett in a step, when I read the steps, then it reads 250 g Körniger Frischkäse Tworog 2,5% Fett"
+        },
+        {
+          "id": "AC2",
+          "title": "A pack's name as printed",
+          "text": "Given Frischer Blätterteig from a barcode and Alpen JodSalz from a label, when I read the steps, then they read as printed, with their capitals"
+        },
+        {
+          "id": "AC3",
+          "title": "Basic foods in small letters",
+          "text": "Given Eggs from the basic foods and Chicken breast, cooked, when I read the steps, then they read 2 eggs (L) and chicken breast, as now"
+        },
+        {
+          "id": "AC4",
+          "title": "Steps already written",
+          "text": "Given steps written before this version, when I read them, in Edit recipe or in Start cooking, then the names follow the same rule"
+        }
+      ],
+      "unchanged": [
+        "The amounts in the steps.",
+        "A food swapped in Edit recipe takes its place in the steps."
+      ],
+      "details": [
+        "A pack's name: a food with a barcode, or one read from a label (source label). Everything else in small letters.",
+        "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 21:00."
+      ],
+      "short": "A food's name in the steps: cut only at a comma with a space; a pack's name as printed",
+      "rel": "Proposed; not agreed until Coach Milan says Go"
     },
     {
       "id": "B164",
