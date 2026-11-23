@@ -6367,5 +6367,15 @@
   "coach.waitQuietN": {
     "one": "a client quiet",
     "other": "{n} clients quiet"
-  }
+  },
+  "pastmeal.copyLine": "A copy of these foods, for a new meal. This meal stays as it is.",
+  "pastmeal.replaceAsk": {
+    "one": "Your plate holds 1 food: {foods}. Put {title} in its place?",
+    "other": "Your plate holds {n} foods: {foods}. Put {title} in their place?"
+  },
+  "pastmeal.replaceThem": {
+    "one": "Replace it",
+    "other": "Replace them"
+  },
+  "pastmeal.keepMyPlate": "Keep my plate"
 }

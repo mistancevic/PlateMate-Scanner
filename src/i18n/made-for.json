@@ -5767,6 +5767,10 @@
     "screen.clientweek.activeDaysAgo": {"en":"{n} days ago, {day}","area":"Clients","where":"Clients","release":"0.3.182"},
     "screen.coach.waitQuiet": {"en":"Quiet for {n} days","area":"Clients","where":"Clients","release":"0.3.182"},
     "screen.coach.waitQuietWhen": {"en":"last opened the app {date}","area":"Clients","where":"Clients","release":"0.3.182"},
-    "screen.coach.waitQuietN": {"en":"a client quiet|{n} clients quiet","area":"Clients","where":"Clients","release":"0.3.182"}
+    "screen.coach.waitQuietN": {"en":"a client quiet|{n} clients quiet","area":"Clients","where":"Clients","release":"0.3.182"},
+    "screen.pastmeal.copyLine": {"en":"A copy of these foods, for a new meal. This meal stays as it is.","area":"Words used across the app","where":"Across the app","release":"0.3.183"},
+    "screen.pastmeal.replaceAsk": {"en":"Your plate holds 1 food: {foods}. Put {title} in its place?|Your plate holds {n} foods: {foods}. Put {title} in their place?","area":"Words used across the app","where":"Across the app","release":"0.3.183"},
+    "screen.pastmeal.replaceThem": {"en":"Replace it|Replace them","area":"Words used across the app","where":"Across the app","release":"0.3.183"},
+    "screen.pastmeal.keepMyPlate": {"en":"Keep my plate","area":"Words used across the app","where":"Across the app","release":"0.3.183"}
   }
 }

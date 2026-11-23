@@ -3,7 +3,7 @@
 // the numbers, the foods with their grams as they were logged. Put it on the Plate again, or Save in My recipes.
 import { useRef, useState, type ReactNode } from "react";
 import { aggregate, density, uid, type Feedback, type Meal } from "../pilot";
-import { w, mealName, dateText } from "../words";
+import { w, wn, mealName, dateText } from "../words";
 import { amountChoices, type CardChange } from "../pastMeal";
 import { resizeImageBase64 } from "../utils/image";
 import { tasteWord } from "./YourCooks";
@@ -28,8 +28,17 @@ export function PastMeal({ p, f, day, slot, back, recipe, when, words = false, a
   const [at, setAt] = useState(0);
   const big = all[at] ?? cover;
   const a = aggregate(f.meal.items);
-  const [mode, setMode] = useState<"view" | "change" | "sure">("view");
-  const again = () => { if (!p) return; p.setState((s) => ({ ...s, items: f.meal.items.map((it) => ({ ...it, id: uid() })) })); p.setTab("journey"); };
+  const [mode, setMode] = useState<"view" | "change" | "sure" | "replace">("view");
+  // DT319 (0.3.183, board Stories283; Go 23 November 2026, 14:13): Put it on the Plate again is a copy, for a new meal. The copy
+  // takes the meal's name; it is bound to no meal (Meal and day stay to be set) and never to the plate that was there, so a
+  // change on the Plate does not touch the meal eaten. A plate that holds foods is asked first.
+  const put = () => {
+    if (!p) return;
+    p.setState((s) => ({ ...s, items: f.meal.items.map((it) => ({ ...it, id: uid() })), title: f.meal.title, portion: null, photo: undefined, fromRecipe: undefined, recipeFoods: undefined, recorded: undefined, plannedAt: undefined }));
+    p.setFilling(null); p.setTab("journey");
+  };
+  const again = () => { if (!p) return; if (!r && p.state.items.length > 0 && mode !== "replace") { setMode("replace"); return; } put(); };
+  const held = p?.state.items ?? [];
   return (
     <section className="card plan-day past-meal">
       <button type="button" className="link pm-back" onClick={back}>‹ {day}</button>
@@ -50,6 +59,12 @@ export function PastMeal({ p, f, day, slot, back, recipe, when, words = false, a
       {actions ? actions(all[at] ?? null) : <div className="button-row pm-actions">
         <button type="button" className="pill pill-small pill-primary pm-again" onClick={again}>{r ? w("plan.cookAgain") : w("plan.onThePlateAgain")}</button>
         {!r && <button type="button" className="pill pill-small pm-save" onClick={() => { p?.saveCardAsRecipe(f.id); }}>{w("today.saveInMyRecipes")}</button>}
+      </div>}
+      {!actions && !r && mode !== "replace" && <small className="muted pm-copy-line">{w("pastmeal.copyLine")}</small>}
+      {!actions && mode === "replace" && <div className="warn-box pm-replace" role="alertdialog" aria-label={w("plan.onThePlateAgain")}>
+        <b>{wn("pastmeal.replaceAsk", held.length, { foods: held.map((i) => i.food.name).join(", "), title: f.meal.title })}</b>
+        <div className="button-row"><button type="button" className="pill pill-small pm-replace-no" onClick={() => setMode("view")}>{w("pastmeal.keepMyPlate")}</button>
+          <button type="button" className="pill pill-small pill-primary pm-replace-yes" onClick={put}>{wn("pastmeal.replaceThem", held.length)}</button></div>
       </div>}
       {(onChange || onDelete) && <div className="pm-edit">
         {onChange && <button type="button" className="pill pill-primary pill-wide pm-change" onClick={() => setMode("change")}>{w("pastmeal.changeIt")}</button>}

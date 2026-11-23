@@ -23072,6 +23072,22 @@
     "coach.waitQuietN": {
       "text": "{n} klijent bez aktivnosti|{n} klijenta bez aktivnosti|{n} klijenata bez aktivnosti",
       "checked": true
+    },
+    "pastmeal.copyLine": {
+      "text": "Kopija ovih namirnica, za novi obrok. Ovaj obrok ostaje kakav jeste.",
+      "checked": true
+    },
+    "pastmeal.replaceAsk": {
+      "text": "Na tvom tanjiru je {n} namirnica: {foods}. Da {title} ide umesto nje?|Na tvom tanjiru su {n} namirnice: {foods}. Da {title} ide umesto njih?|Na tvom tanjiru je {n} namirnica: {foods}. Da {title} ide umesto njih?",
+      "checked": true
+    },
+    "pastmeal.replaceThem": {
+      "text": "Zameni je|Zameni ih|Zameni ih",
+      "checked": true
+    },
+    "pastmeal.keepMyPlate": {
+      "text": "Zadrži moj tanjir",
+      "checked": true
     }
   }
 }
