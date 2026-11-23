@@ -23,6 +23,7 @@ import { plateCal, type CalInfo } from "./PlateCalendar";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADish, isDrink, type Mix } from "../mixtip";
 import { lettersOf, numbersOfTotals } from "../letters";
+import { mealsOf, foodsChanged, setRecipeAsk as askOnRecipe } from "../recipeChange";
 import { Letters, NumbersTable, type PlanNumbers } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
 import { asMine, stemOf, type MemberFood } from "../memberFoods";
@@ -375,6 +376,7 @@ export function JourneyScreen(p: AppApi) {
     const Slot: Val = (l) => { const t = (slotV(f) as (x: typeof l) => string | null)(l); return t === null ? null : t.charAt(0).toUpperCase() + t.slice(1); };
     if (choice === "update") {
       const upd: Meal = { ...base, items: its, portion: weight };
+      { const { recent } = mealsOf(base, state.feedback); if (recent.length) askOnRecipe({ recipeId: base.id, before: structuredClone(base.items), ids: recent.map((f) => f.id) }); } // B160
       setState((s) => ({ ...s, meals: s.meals.map((m) => (m.id === base.id ? upd : m)), items: [], portion: null, title: "" }));
       p.fill(f.date, f.slotId, fromMeal(upd, src));
       notify(w("plate.recipeUpdated", { title: base.title, slot: Slot }));
@@ -3105,6 +3107,8 @@ export function JourneyScreen(p: AppApi) {
         const keep = changedFrom ? recipeChoice === "new" && status === "eaten" : !origin && saveRecipe && status === "eaten";
         const updateBase = changedFrom && recipeChoice === "update" && status === "eaten" ? changedFrom : null;
         if (triedNow) log("recipe_fit", { way: triedNow.kind, result: triedNow.result });
+        // B160 (0.3.187): Update my recipe after meals were logged from it today or yesterday: asked on the recipe's page, once
+        if (updateBase && foodsChanged(updateBase.items, keptItems)) { const { recent } = mealsOf(updateBase, state.feedback, new Date(), cardId); if (recent.length) askOnRecipe({ recipeId: updateBase.id, before: structuredClone(updateBase.items), ids: recent.map((f) => f.id) }); }
         // R16 (0.2.44, Milan 21:56, board RS15): the rest of a whole recipe made is not followed: it may go to the family or to
         // work. The recipe goes on Plan for the days you eat it; Today shows it there, and I ate it logs it with its recipe.
         // where you land (0.2.23, IM23c): the recipe the meal made or changed, a recipe made for the first time, or steps drafted now

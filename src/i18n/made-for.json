@@ -5812,6 +5812,14 @@
     "screen.letters.fibreZero": {"en":"{foods} counts as 0 fibre: none by nature.|{foods} count as 0 fibre: none by nature.","area":"Recipes","where":"Recipes","release":"0.3.185"},
     "screen.foodcard.fibreNone": {"en":"No fibre on the pack: {food} has none by nature, so it counts as 0 on your plate.","area":"Words used across the app","where":"Across the app","release":"0.3.185"},
     "screen.foodcard.fibreMissing": {"en":"No fibre on this food's values. If the pack gives it, add it in Review the label; until then your plate's fibre has a *: at least what the other foods have.","area":"Words used across the app","where":"Across the app","release":"0.3.185"},
-    "screen.clientweek.keyUnknown": {"en":"o: not known, from before the app recorded it","area":"Clients","where":"Clients","release":"0.3.186"}
+    "screen.clientweek.keyUnknown": {"en":"o: not known, from before the app recorded it","area":"Clients","where":"Clients","release":"0.3.186"},
+    "screen.recipechange.ask": {"en":"The meal of {when} was made from this recipe. Was it made this way?|The meals of {when} were made from this recipe. Were they made this way?","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
+    "screen.recipechange.hint": {"en":"Update it: the meal takes the recipe's new foods, the same share as you ate. Keep it: it stays as it was logged.|Update them: each takes the recipe's new foods, the same share as you ate. Keep them: they stay as they were logged.","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
+    "screen.recipechange.update": {"en":"Update it|Update them","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
+    "screen.recipechange.keep": {"en":"Keep it as it was|Keep them as they were","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
+    "screen.recipechange.followed": {"en":"The meal of {when} follows the change.|The meals of {when} follow the change.","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
+    "screen.recipechange.kept": {"en":"The meal of {when} keeps its foods, as you ate it.|The meals of {when} keep their foods, as you ate them.","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
+    "screen.recipechange.older": {"en":"{n} meal eaten before keeps its foods: what you ate stays as it was.|{n} meals eaten before keep their foods: what you ate stays as it was.","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
+    "screen.recipechange.and": {"en":"and","area":"Words used across the app","where":"Across the app","release":"0.3.187"}
   }
 }

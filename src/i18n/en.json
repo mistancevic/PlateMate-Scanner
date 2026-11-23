@@ -6430,5 +6430,34 @@
   },
   "foodcard.fibreNone": "No fibre on the pack: {food} has none by nature, so it counts as 0 on your plate.",
   "foodcard.fibreMissing": "No fibre on this food's values. If the pack gives it, add it in Review the label; until then your plate's fibre has a *: at least what the other foods have.",
-  "clientweek.keyUnknown": "o: not known, from before the app recorded it"
+  "clientweek.keyUnknown": "o: not known, from before the app recorded it",
+  "recipechange.ask": {
+    "one": "The meal of {when} was made from this recipe. Was it made this way?",
+    "other": "The meals of {when} were made from this recipe. Were they made this way?"
+  },
+  "recipechange.hint": {
+    "one": "Update it: the meal takes the recipe's new foods, the same share as you ate. Keep it: it stays as it was logged.",
+    "other": "Update them: each takes the recipe's new foods, the same share as you ate. Keep them: they stay as they were logged."
+  },
+  "recipechange.update": {
+    "one": "Update it",
+    "other": "Update them"
+  },
+  "recipechange.keep": {
+    "one": "Keep it as it was",
+    "other": "Keep them as they were"
+  },
+  "recipechange.followed": {
+    "one": "The meal of {when} follows the change.",
+    "other": "The meals of {when} follow the change."
+  },
+  "recipechange.kept": {
+    "one": "The meal of {when} keeps its foods, as you ate it.",
+    "other": "The meals of {when} keep their foods, as you ate them."
+  },
+  "recipechange.older": {
+    "one": "{n} meal eaten before keeps its foods: what you ate stays as it was.",
+    "other": "{n} meals eaten before keep their foods: what you ate stays as it was."
+  },
+  "recipechange.and": "and"
 }

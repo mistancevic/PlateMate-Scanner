@@ -23252,6 +23252,38 @@
     "clientweek.keyUnknown": {
       "text": "o: nije poznato, od pre nego što je aplikacija počela da beleži",
       "checked": true
+    },
+    "recipechange.ask": {
+      "text": "Obrok od {when} je napravljen po ovom receptu. Da li je napravljen ovako?|Obroci od {when} su napravljeni po ovom receptu. Da li su napravljeni ovako?|Obroci od {when} su napravljeni po ovom receptu. Da li su napravljeni ovako?",
+      "checked": true
+    },
+    "recipechange.hint": {
+      "text": "Ažuriraj ga: obrok dobija nove namirnice recepta, u istom udelu kao do sada. Zadrži ga: ostaje kako je zabeležen.|Ažuriraj ih: svaki dobija nove namirnice recepta, u istom udelu kao do sada. Zadrži ih: ostaju kako su zabeleženi.|Ažuriraj ih: svaki dobija nove namirnice recepta, u istom udelu kao do sada. Zadrži ih: ostaju kako su zabeleženi.",
+      "checked": true
+    },
+    "recipechange.update": {
+      "text": "Ažuriraj ga|Ažuriraj ih|Ažuriraj ih",
+      "checked": true
+    },
+    "recipechange.keep": {
+      "text": "Zadrži ga kakav je bio|Zadrži ih kakvi su bili|Zadrži ih kakvi su bili",
+      "checked": true
+    },
+    "recipechange.followed": {
+      "text": "Obrok od {when} prati izmenu.|Obroci od {when} prate izmenu.|Obroci od {when} prate izmenu.",
+      "checked": true
+    },
+    "recipechange.kept": {
+      "text": "Obrok od {when} zadržava svoje namirnice, kako je pojeden.|Obroci od {when} zadržavaju svoje namirnice, kako su pojedeni.|Obroci od {when} zadržavaju svoje namirnice, kako su pojedeni.",
+      "checked": true
+    },
+    "recipechange.older": {
+      "text": "{n} ranije pojeden obrok zadržava svoje namirnice: pojedeno ostaje kako je bilo.|{n} ranije pojedena obroka zadržavaju svoje namirnice: pojedeno ostaje kako je bilo.|{n} ranije pojedenih obroka zadržava svoje namirnice: pojedeno ostaje kako je bilo.",
+      "checked": true
+    },
+    "recipechange.and": {
+      "text": "i",
+      "checked": true
     }
   }
 }

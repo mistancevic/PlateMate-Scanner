@@ -1,6 +1,6 @@
 {
-  "release": "0.3.186",
-  "at": "2026-11-23T16:46:01.052Z",
+  "release": "0.3.187",
+  "at": "2026-11-23T19:11:00.737Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -52928,6 +52928,150 @@
       "release": "0.3.186",
       "order": 900000,
       "at": "2026-11-23T16:46:01.052Z"
+    },
+    {
+      "id": "screen.recipechange.ask",
+      "kind": "screen",
+      "key": "recipechange.ask",
+      "en": "The meal of {when} was made from this recipe. Was it made this way?|The meals of {when} were made from this recipe. Were they made this way?",
+      "forms": "count",
+      "slots": [
+        "when"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Obrok od {when} je napravljen po ovom receptu. Da li je napravljen ovako?|Obroci od {when} su napravljeni po ovom receptu. Da li su napravljeni ovako?|Obroci od {when} su napravljeni po ovom receptu. Da li su napravljeni ovako?",
+      "de": "Die Mahlzeit von {when} wurde nach diesem Rezept gemacht. Wurde sie so gemacht?|Die Mahlzeiten von {when} wurden nach diesem Rezept gemacht. Wurden sie so gemacht?",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.187",
+      "order": 900000,
+      "at": "2026-11-23T19:10:51.914Z"
+    },
+    {
+      "id": "screen.recipechange.hint",
+      "kind": "screen",
+      "key": "recipechange.hint",
+      "en": "Update it: the meal takes the recipe's new foods, the same share as you ate. Keep it: it stays as it was logged.|Update them: each takes the recipe's new foods, the same share as you ate. Keep them: they stay as they were logged.",
+      "forms": "count",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Ažuriraj ga: obrok dobija nove namirnice recepta, u istom udelu kao do sada. Zadrži ga: ostaje kako je zabeležen.|Ažuriraj ih: svaki dobija nove namirnice recepta, u istom udelu kao do sada. Zadrži ih: ostaju kako su zabeleženi.|Ažuriraj ih: svaki dobija nove namirnice recepta, u istom udelu kao do sada. Zadrži ih: ostaju kako su zabeleženi.",
+      "de": "Aktualisieren: Die Mahlzeit bekommt die neuen Lebensmittel des Rezepts, im selben Anteil, den du gegessen hast. Behalten: Sie bleibt, wie sie eingetragen wurde.|Aktualisieren: Jede bekommt die neuen Lebensmittel des Rezepts, im selben Anteil, den du gegessen hast. Behalten: Sie bleiben, wie sie eingetragen wurden.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.187",
+      "order": 900001,
+      "at": "2026-11-23T19:10:51.914Z"
+    },
+    {
+      "id": "screen.recipechange.update",
+      "kind": "screen",
+      "key": "recipechange.update",
+      "en": "Update it|Update them",
+      "forms": "count",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Ažuriraj ga|Ažuriraj ih|Ažuriraj ih",
+      "de": "Aktualisieren|Beide aktualisieren",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.187",
+      "order": 900002,
+      "at": "2026-11-23T19:10:51.914Z"
+    },
+    {
+      "id": "screen.recipechange.keep",
+      "kind": "screen",
+      "key": "recipechange.keep",
+      "en": "Keep it as it was|Keep them as they were",
+      "forms": "count",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Zadrži ga kakav je bio|Zadrži ih kakvi su bili|Zadrži ih kakvi su bili",
+      "de": "So lassen, wie sie war|So lassen, wie sie waren",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.187",
+      "order": 900003,
+      "at": "2026-11-23T19:10:51.914Z"
+    },
+    {
+      "id": "screen.recipechange.followed",
+      "kind": "screen",
+      "key": "recipechange.followed",
+      "en": "The meal of {when} follows the change.|The meals of {when} follow the change.",
+      "forms": "count",
+      "slots": [
+        "when"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Obrok od {when} prati izmenu.|Obroci od {when} prate izmenu.|Obroci od {when} prate izmenu.",
+      "de": "Die Mahlzeit von {when} folgt der Änderung.|Die Mahlzeiten von {when} folgen der Änderung.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.187",
+      "order": 900004,
+      "at": "2026-11-23T19:10:51.914Z"
+    },
+    {
+      "id": "screen.recipechange.kept",
+      "kind": "screen",
+      "key": "recipechange.kept",
+      "en": "The meal of {when} keeps its foods, as you ate it.|The meals of {when} keep their foods, as you ate them.",
+      "forms": "count",
+      "slots": [
+        "when"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Obrok od {when} zadržava svoje namirnice, kako je pojeden.|Obroci od {when} zadržavaju svoje namirnice, kako su pojedeni.|Obroci od {when} zadržavaju svoje namirnice, kako su pojedeni.",
+      "de": "Die Mahlzeit von {when} behält ihre Lebensmittel, wie du sie gegessen hast.|Die Mahlzeiten von {when} behalten ihre Lebensmittel, wie du sie gegessen hast.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.187",
+      "order": 900005,
+      "at": "2026-11-23T19:10:51.914Z"
+    },
+    {
+      "id": "screen.recipechange.older",
+      "kind": "screen",
+      "key": "recipechange.older",
+      "en": "{n} meal eaten before keeps its foods: what you ate stays as it was.|{n} meals eaten before keep their foods: what you ate stays as it was.",
+      "forms": "count",
+      "slots": [
+        "n"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "{n} ranije pojeden obrok zadržava svoje namirnice: pojedeno ostaje kako je bilo.|{n} ranije pojedena obroka zadržavaju svoje namirnice: pojedeno ostaje kako je bilo.|{n} ranije pojedenih obroka zadržava svoje namirnice: pojedeno ostaje kako je bilo.",
+      "de": "{n} früher gegessene Mahlzeit behält ihre Lebensmittel: Was du gegessen hast, bleibt, wie es war.|{n} früher gegessene Mahlzeiten behalten ihre Lebensmittel: Was du gegessen hast, bleibt, wie es war.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.187",
+      "order": 900006,
+      "at": "2026-11-23T19:10:51.914Z"
+    },
+    {
+      "id": "screen.recipechange.and",
+      "kind": "screen",
+      "key": "recipechange.and",
+      "en": "and",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "i",
+      "de": "und",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.187",
+      "order": 900007,
+      "at": "2026-11-23T19:10:51.914Z"
     }
   ]
 }

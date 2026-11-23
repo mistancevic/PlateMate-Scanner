@@ -23252,6 +23252,38 @@
     "clientweek.keyUnknown": {
       "text": "o: nicht bekannt, aus der Zeit, bevor die App es aufgezeichnet hat",
       "checked": true
+    },
+    "recipechange.ask": {
+      "text": "Die Mahlzeit von {when} wurde nach diesem Rezept gemacht. Wurde sie so gemacht?|Die Mahlzeiten von {when} wurden nach diesem Rezept gemacht. Wurden sie so gemacht?",
+      "checked": true
+    },
+    "recipechange.hint": {
+      "text": "Aktualisieren: Die Mahlzeit bekommt die neuen Lebensmittel des Rezepts, im selben Anteil, den du gegessen hast. Behalten: Sie bleibt, wie sie eingetragen wurde.|Aktualisieren: Jede bekommt die neuen Lebensmittel des Rezepts, im selben Anteil, den du gegessen hast. Behalten: Sie bleiben, wie sie eingetragen wurden.",
+      "checked": true
+    },
+    "recipechange.update": {
+      "text": "Aktualisieren|Beide aktualisieren",
+      "checked": true
+    },
+    "recipechange.keep": {
+      "text": "So lassen, wie sie war|So lassen, wie sie waren",
+      "checked": true
+    },
+    "recipechange.followed": {
+      "text": "Die Mahlzeit von {when} folgt der Änderung.|Die Mahlzeiten von {when} folgen der Änderung.",
+      "checked": true
+    },
+    "recipechange.kept": {
+      "text": "Die Mahlzeit von {when} behält ihre Lebensmittel, wie du sie gegessen hast.|Die Mahlzeiten von {when} behalten ihre Lebensmittel, wie du sie gegessen hast.",
+      "checked": true
+    },
+    "recipechange.older": {
+      "text": "{n} früher gegessene Mahlzeit behält ihre Lebensmittel: Was du gegessen hast, bleibt, wie es war.|{n} früher gegessene Mahlzeiten behalten ihre Lebensmittel: Was du gegessen hast, bleibt, wie es war.",
+      "checked": true
+    },
+    "recipechange.and": {
+      "text": "und",
+      "checked": true
     }
   }
 }
