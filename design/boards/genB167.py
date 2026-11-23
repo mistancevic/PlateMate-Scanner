@@ -26,7 +26,7 @@ parts = [("Ticket", "B167. This board is the ticket: everything about it is here
   ("How to read this board", "<b>As a prototype, left to right.</b> B167.1: the evening as it went in 0.3.190: Plan on today, the cook at 22:24, Today, the delete. B167.2: the same evening, new. A blue outline marks what each note is about."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "23 November 22:26: dinner is saved at around 18h but not in the plan. 22:28: yes, Monday. 22:30: I edited it or something and it created it again, or asked me if I ate it; then I deleted the meal. 22:36: yes, draw all three."),
+  ("In Coach Milan's words", "23 November 22:26: dinner is saved at around 18h but not in the plan. 22:28: yes, Monday. 22:30: I edited it or something and it created it again, or asked me if I ate it; then I deleted the meal. 22:36: yes, draw all three. 22:57: Go."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "B167", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -58,7 +58,7 @@ bs = RB + RN + RE
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories292.dc.html", t["boardTitle"], "Drawn 23 November 2026, 22:36. Ticket B167, Kanban column Now. Pictures from the real app on a scratch build of main, 0.3.190, and a sketch of the change on that build. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories291.dc.html")
+board("Stories292.dc.html", t["boardTitle"], "Drawn 23 November 2026, 22:36; Go 22:57, built in 0.3.191. Ticket B167, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.190, and a sketch of the change on that build.", B, W, Hc, "Stories291.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B167": {"file": "Stories292.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outB167.json"), "w"))
 print("B167", W, Hc + 230)
