@@ -1,0 +1,1125 @@
+{
+ "version": "0.3.187",
+ "commit": "0669d19",
+ "at": "2026-11-23T19:19:28.522Z",
+ "minutes": 4,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 64,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 13,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "past-meal-change.cjs",
+   "about": "DT284 (0.3.138, board Stories211; Coach Milan 12 November 08:24, Go; a tester's meal was recorded twice because a past meal could not be changed): the rows of Every time you ate it open their meal; a past meal has Change it and Delete this meal, from Recipes and from Plan. A change stays the same meal at its own time; a delete asks Sure? first and takes the meal out of the recipe's lists and its day. Srpski and German fit 360 px. DT284 v5 (0.3.140): after Save changes, back on the recipe with the row marked ✓ Changed; no Change it again.",
+   "pass": true,
+   "seconds": 25,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Every time you ate it: two rows, each a button"
+    },
+    {
+     "ok": true,
+     "text": "the rows are 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "a row opens its meal"
+    },
+    {
+     "ok": true,
+     "text": "the meal offers Change it and Delete this meal"
+    },
+    {
+     "ok": true,
+     "text": "Delete asks Sure? first and says where it leaves"
+    },
+    {
+     "ok": true,
+     "text": "Keep it: nothing deleted"
+    },
+    {
+     "ok": true,
+     "text": "Sure: the double is gone; back on the recipe, one row"
+    },
+    {
+     "ok": true,
+     "text": "How much: Half a portion, 162 g | 1 portion, 324 g | As logged, 443 g"
+    },
+    {
+     "ok": true,
+     "text": "As logged is chosen until you change it"
+    },
+    {
+     "ok": true,
+     "text": "every control in the form is 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "Cancel: nothing changed"
+    },
+    {
+     "ok": true,
+     "text": "Save changes: still one meal, at its own time"
+    },
+    {
+     "ok": true,
+     "text": "the amount, the taste, the words and the photo changed"
+    },
+    {
+     "ok": true,
+     "text": "Save changes: back on the recipe, no Change it again"
+    },
+    {
+     "ok": true,
+     "text": "the row says it: Yesterday, 10:08 · logged Half a portion, 162 g · DaaM good “Half a portion, changed on the call.” ›"
+    },
+    {
+     "ok": true,
+     "text": "the row is marked: ✓ Changed. Still one meal, at 10:08."
+    },
+    {
+     "ok": true,
+     "text": "the marked row is on screen"
+    },
+    {
+     "ok": true,
+     "text": "opened again, the meal shows the change"
+    },
+    {
+     "ok": true,
+     "text": "opened and back again: the mark is gone"
+    },
+    {
+     "ok": true,
+     "text": "opened again: still changed"
+    },
+    {
+     "ok": true,
+     "text": "Plan, Wednesday: two eaten meals"
+    },
+    {
+     "ok": true,
+     "text": "a past meal opened from Plan offers Change it"
+    },
+    {
+     "ok": true,
+     "text": "a meal with no recipe: Half of it, or As logged: Half of it, 81 g | As logged, 162 g"
+    },
+    {
+     "ok": true,
+     "text": "deleted from Plan: the day keeps one meal"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: in the language and fits 390 px: Izmeni ovaj obrok Isti obrok, isto vreme. Plan, spiskovi recepta i tvoj trener vide izmenu. Koliko je pojedeno"
+    },
+    {
+     "ok": true,
+     "text": "de: in the language and fits 360 px: Diese Mahlzeit ändern Gleiche Mahlzeit, gleiche Zeit. Der Plan, die Listen des Rezepts und dein Coach sehen di"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 104 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "plate-again.cjs",
+   "about": "DT319 (0.3.183, board Stories283; Go 23 November 2026, 14:13): a meal I ate, opened from Plan: Put it on the Plate again is a copy for a new meal. One line says so (AC1); a plate that holds foods is asked first, Keep my plate changes nothing (AC2); an empty plate goes straight on (AC3); the copy has the meal's name, no meal set, and a change on it leaves the meal eaten as it was (AC4). Saturday's lunch, 21 November; the clock is Monday 23 November, 13:15.",
+   "pass": true,
+   "seconds": 14,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT319 AC1: one line says it is a copy for a new meal"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC2: the plate has foods, so it asks: Your plate holds 2 foods: Skyr, Banana. Put Chicken and sweet potato fries in their place?"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC2: still on the meal, not the Plate"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC2: Keep my plate changes nothing"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: the Plate holds the meal's three foods"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: the copy comes with its name: Chicken and sweet potato fries"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: no meal set, bound to nothing: MEAL AND DAY No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: the copy changed on the Plate: 250"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC4: Saturday's lunch is as it was, and nothing new is logged"
+    },
+    {
+     "ok": true,
+     "text": "DT319 AC3: an empty plate: no question, the Plate with the foods and the name"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 50 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-after.cjs",
+   "about": "The recipe after it came in, and units (0.2.18, canvas boards IM, IM8 to IM11, and UN; Milan 17 October 2026, 09:10 to 09:42). Milan's cookie from Instagram, read by Chef Mealan (faked here: no AI key): the optional foods stay with the recipe in their own list (IM8); the original steps are kept for him only (IM9b); Chef Mealan's steps say how each relates to the original (IM9); what he cooks with, and a plain \"can't\" when there is no sensible way (IM10, IM10b); one picture try when kept, then Draw a picture with the day's count, no retries overnight (IM11, IM11b). Then °F, lb and ft and in on Profile (UN).",
+   "pass": true,
+   "seconds": 28,
+   "checks": [
+    {
+     "ok": true,
+     "text": "IM8: the three optional foods stay with the recipe, out of its foods"
+    },
+    {
+     "ok": true,
+     "text": "IM9b: the original steps are kept with where it came from"
+    },
+    {
+     "ok": true,
+     "text": "IM11: one picture try when the recipe is kept"
+    },
+    {
+     "ok": true,
+     "text": "IM8, IM14: Optional, not in the numbers: each with its words and grams; the plate adds them, not this page"
+    },
+    {
+     "ok": true,
+     "text": "IM14: the recipe's numbers leave them out; Make it, and add them on the plate"
+    },
+    {
+     "ok": true,
+     "text": "RP1 (was IM9b): the original is the steps, no longer folded under Where it came from"
+    },
+    {
+     "ok": true,
+     "text": "UN: the original's 350 degrees Fahrenheit shows as 175 °C (the account starts metric)"
+    },
+    {
+     "ok": true,
+     "text": "IM11: No picture yet, with the day's count: 3 of 10"
+    },
+    {
+     "ok": true,
+     "text": "IM11: nothing tried again on its own"
+    },
+    {
+     "ok": true,
+     "text": "IM11: Draw a picture is one tap; the picture is the cover"
+    },
+    {
+     "ok": true,
+     "text": "IM9, IM10: the original steps, oven, stovetop and microwave, and how many it makes go to Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "IM9: the steps say they come from the original"
+    },
+    {
+     "ok": true,
+     "text": "IM9: each step marked: Adapted, Added, As the original"
+    },
+    {
+     "ok": true,
+     "text": "IM9: the marks are kept with the steps"
+    },
+    {
+     "ok": true,
+     "text": "IM10: What you cook with: oven, stovetop and microwave on at the start"
+    },
+    {
+     "ok": true,
+     "text": "IM10: kept as picked"
+    },
+    {
+     "ok": true,
+     "text": "IM9: saving the recipe with the same steps keeps the marks, and its 2 servings"
+    },
+    {
+     "ok": true,
+     "text": "IM10b: Chef Mealan gets what you cook with"
+    },
+    {
+     "ok": true,
+     "text": "IM10b: no sensible way: said plainly, asked once"
+    },
+    {
+     "ok": true,
+     "text": "IM13: Make it from Recipes: the foods one by one, with the two portions, not one locked block"
+    },
+    {
+     "ok": true,
+     "text": "IM12: the three optional foods under the foods, out of the numbers"
+    },
+    {
+     "ok": true,
+     "text": "IM12b: + Add puts it on the plate as a food like the others; the numbers move"
+    },
+    {
+     "ok": true,
+     "text": "IM12b: still the recipe's plate, with its two portions"
+    },
+    {
+     "ok": true,
+     "text": "IM12b: Leave it out sends it back; the numbers as before"
+    },
+    {
+     "ok": true,
+     "text": "UN1: Units on Profile, metric at the start"
+    },
+    {
+     "ok": true,
+     "text": "UN1: what °C means, in a line"
+    },
+    {
+     "ok": true,
+     "text": "UN2: 95 kg is 209.4 lb; 182 cm is 6 ft 0 in; food stays in grams"
+    },
+    {
+     "ok": true,
+     "text": "UN2: the profile asks in ft and in, and lb"
+    },
+    {
+     "ok": true,
+     "text": "UN2: the account still keeps 95 kg and 182 cm"
+    },
+    {
+     "ok": true,
+     "text": "UN2: the weigh-in line in lb"
+    },
+    {
+     "ok": true,
+     "text": "UN2: 208.0 lb typed is kept as 94.35 kg, and shows as 208.0 lb"
+    },
+    {
+     "ok": true,
+     "text": "UN2: with °F chosen, the original's oven heat is 350 °F"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 30 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-change.cjs",
+   "about": "JOURNEY (0.2.122, board Stories94, DT137; Milan 28 October 15:32 and 16:09 Go; Tester 2's breakfast): a plate opened from a recipe and changed asks once at Put it in: Update my recipe, Save as a new recipe (its own name), or Only for this day. Update: one recipe, the plate's foods, Plan's slot as the recipe is now. Before, a second recipe with the same name. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT137: Save asks, and says what changed: Changed from your recipe Skyr breakfast Oats 20 to 60 g. Update my recipe Save as a new recipe Only this time Skyr breakfast stays as it was"
+    },
+    {
+     "ok": true,
+     "text": "DT137: three ways"
+    },
+    {
+     "ok": true,
+     "text": "DT137: a new recipe's name is never the old one: Skyr breakfast, changed"
+    },
+    {
+     "ok": true,
+     "text": "DT137: Update my recipe: one Skyr breakfast, now with 60 g oats: Skyr breakfast"
+    },
+    {
+     "ok": true,
+     "text": "DT137 with 0.2.121: today's breakfast on Plan is the recipe as it is now"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 29 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-changed.cjs",
+   "about": "B160 (0.3.187, board Stories287; Coach Milan, Go 23 November 2026, 20:03): a recipe changed after a meal was logged from it. Cheese pie, eaten tonight at 18:00 (and at lunch, for the once-for-all case), or on Friday. Save changes with the foods changed asks once for all the meals from it today or yesterday; Update gives each the new foods at the share it had; Keep leaves them; older meals are not asked and one line says how many keep their foods; a change of the steps alone asks nothing; Save as a new recipe keeps this one as it is. The clock is Monday 23 November 2026, 19:00.",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "AC1: asked once: The meal of Monday 23 November, 18:00 was made from this recipe. Was it made this way?"
+    },
+    {
+     "ok": true,
+     "text": "AC1: nothing saved before the answer"
+    },
+    {
+     "ok": true,
+     "text": "AC2: the recipe is saved; the dinner takes the new foods at its share: q63 p94 s1 e31"
+    },
+    {
+     "ok": true,
+     "text": "AC2: one line says it follows the change"
+    },
+    {
+     "ok": true,
+     "text": "once for all: The meals of Monday 23 November, 13:00 and Monday 23 November, 18:00 were made from this recipe. Were they made this way?"
+    },
+    {
+     "ok": true,
+     "text": "AC3: the recipe is saved; both meals keep their foods"
+    },
+    {
+     "ok": true,
+     "text": "AC3: one line says so"
+    },
+    {
+     "ok": true,
+     "text": "AC4: an older meal is not asked about and keeps its foods"
+    },
+    {
+     "ok": true,
+     "text": "AC4: one line: 1 meal eaten before keeps its foods: what you ate stays as it was."
+    },
+    {
+     "ok": true,
+     "text": "AC5: a change of the steps alone asks nothing"
+    },
+    {
+     "ok": true,
+     "text": "AC6: a new recipe with the change; the first stays; no meal asked about: Cheese pie, changed"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 152 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-cook.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 8 October 2026, canvas boards RG0, RG1, RG3 and RG5): Cook is a permission, not a role. A client publishes only when their coach made them a cook, and what they send waits for their coach: the coach sees the page, then makes it live or sends it back with a note the cook sees. Changes to a cook's live recipe wait the same way, and the live page stays as it was until then. The cook can take their own recipe down. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 21,
+   "checks": [
+    {
+     "ok": true,
+     "text": "a client who isn't a cook has no Publish"
+    },
+    {
+     "ok": true,
+     "text": "their coach makes them a cook"
+    },
+    {
+     "ok": true,
+     "text": "a cook's button says Send to their coach: Send to your coach"
+    },
+    {
+     "ok": true,
+     "text": "sent: Waiting for the coach, and it can't be sent again while it waits"
+    },
+    {
+     "ok": true,
+     "text": "nothing is on the site while it waits"
+    },
+    {
+     "ok": true,
+     "text": "it waits for the coach, with its photo to see the page"
+    },
+    {
+     "ok": true,
+     "text": "the coach sends it back with a note"
+    },
+    {
+     "ok": true,
+     "text": "the tile says Sent back"
+    },
+    {
+     "ok": true,
+     "text": "the cook sees Sent back, and the note"
+    },
+    {
+     "ok": true,
+     "text": "sent again; the coach makes it live"
+    },
+    {
+     "ok": true,
+     "text": "DT196: the public recipe has no note, status, recipe id or author id: slug,title,lines,makes,servingName,minutes,items,steps,rating,who,per100,perServing,all,pd,proteinShare,fits,hasPhoto,photoAi,cooked,author,publishedAt,updatedAt"
+    },
+    {
+     "ok": true,
+     "text": "My recipes: Live"
+    },
+    {
+     "ok": true,
+     "text": "while the change waits, the live page stays as it was"
+    },
+    {
+     "ok": true,
+     "text": "the coach sees the change"
+    },
+    {
+     "ok": true,
+     "text": "made live: the page has the change"
+    },
+    {
+     "ok": true,
+     "text": "the cook can take their own recipe down"
+    },
+    {
+     "ok": true,
+     "text": "once the coach switches Cook off, nothing more can be sent"
+    },
+    {
+     "ok": true,
+     "text": "DT196: section 4 says 12 months and 30 days"
+    },
+    {
+     "ok": true,
+     "text": "the page's footer says the app's version: © 2026 Milan Stancevic · Impressum · Privacy · Disclaimer · Who's behind it · Version 0.3.187"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-makes.cjs",
+   "about": "What a recipe makes (DT80, Milan 23 October 12:26 and 12:27, board DT80). A sarma recipe saved from the Plate says nothing about what it makes, so the Plate divides it by weight into portions. Edit recipe, Makes 8 sarma: the page counts one sarma, a lunch already planned turns into the sarmas that keep its kcal, Plan counts in sarmas, and the page says what the plan takes.",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "before: Plan counts the Plate's portions: −2 portions+of the 4 it makes"
+    },
+    {
+     "ok": true,
+     "text": "Edit recipe asks what it makes"
+    },
+    {
+     "ok": true,
+     "text": "Add a food: raw rice finds Rice, white, raw, a food without a label"
+    },
+    {
+     "ok": true,
+     "text": "the page: Makes 8 sarmas, and one sarma's numbers:  RecipesSarmaOn paperCalculated from labels and food tables, not cooked yet. Cook it once, to the end of Eat, and it says From the kitchen.The whole recipe makes 8 sarmas · one sarma 157 kcalAdd a pho"
+    },
+    {
+     "ok": true,
+     "text": "the page says what the plan takes: 8 sarmas: 4 on Tuesday lunch. 4 sarmas left."
+    },
+    {
+     "ok": true,
+     "text": "after: Plan counts in sarmas: −4 sarmas+of the 8 it makes"
+    },
+    {
+     "ok": true,
+     "text": "the lunch keeps about its kcal: 628 before, 628 after"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-photos.cjs",
+   "about": "The recipe's page (0.2.5+r11, canvas board S3, R7 to R11, Milan 12 October 2026). R7: a tile is one tap, no buttons, the cover and where the recipe is. R8: the recipe's page, photos first: × deletes after Sure?, Add adds, the plate photos from the times it was made are offered. R9: ‹ › move the picked photo; first place is the cover. R10: Make it (the recipe on the Plate, unchanged) and Edit recipe. R11: edit mode, grams, × a food, Add a food, steps, Save changes or Cancel. A long name never makes the page wider than the phone. A live recipe whose page has a photo and the app none takes the page's photo once as its cover, and a removed cover never comes back from the page.",
+   "pass": true,
+   "seconds": 17,
+   "checks": [
+    {
+     "ok": true,
+     "text": "R4: the live recipe takes its page's photo as the cover (1 fetch)"
+    },
+    {
+     "ok": true,
+     "text": "R7: no buttons on the tile; it says Live on chefmealan.com"
+    },
+    {
+     "ok": true,
+     "text": "R7: a recipe without photos of its own still shows its card's plate photo"
+    },
+    {
+     "ok": true,
+     "text": "R8: the page opens with the cover large"
+    },
+    {
+     "ok": true,
+     "text": "the long name never makes the page wider than the phone (360 px)"
+    },
+    {
+     "ok": true,
+     "text": "R8: the recipe's numbers: 365 kcal, 43.8 g protein"
+    },
+    {
+     "ok": true,
+     "text": "R9: × asks Sure? first; nothing is deleted on the first tap"
+    },
+    {
+     "ok": true,
+     "text": "R9: the second tap deletes the photo"
+    },
+    {
+     "ok": true,
+     "text": "R4: a removed cover never comes back from the page"
+    },
+    {
+     "ok": true,
+     "text": "R8: Add adds a photo, twice"
+    },
+    {
+     "ok": true,
+     "text": "DT280: Make it the cover: the picked photo is the cover"
+    },
+    {
+     "ok": true,
+     "text": "R11: Editing the recipe"
+    },
+    {
+     "ok": true,
+     "text": "R11: the numbers follow as you type: 398 kcal, 50 g protein, PD 12.6"
+    },
+    {
+     "ok": true,
+     "text": "R11: Cancel leaves the recipe as it was"
+    },
+    {
+     "ok": true,
+     "text": "R13a: a tap on a food puts it in the step with its amount; a food in no step is named: Fold in 100 g chicken breast  | Skyr, natural is not in any step yet."
+    },
+    {
+     "ok": true,
+     "text": "R13a: every food in a step says so"
+    },
+    {
+     "ok": true,
+     "text": "R13b: the amount in the step follows the foods: 120 g"
+    },
+    {
+     "ok": true,
+     "text": "R11: a live recipe says the live page changes only with Change live page"
+    },
+    {
+     "ok": true,
+     "text": "R11: Save changes keeps the foods, the grams and the steps: Eggs 120, Chicken breast, cooked 100, Skyr, natural 100"
+    },
+    {
+     "ok": true,
+     "text": "R13: the steps read with the amounts on the recipe's page: Steps1Whisk 2 eggs (L)2Fold in 100 g chicken breast and cook slowly.3Serve with 100 g skyrPhotos for the steps come from cooking: + Photo on a step in Make. Tap a photo to change or remove it.Add photos to the stepsPick several at once from your phone. Then you place each one on its step.Start cooking3 steps, read aloud. Say next, back or "
+    },
+    {
+     "ok": true,
+     "text": "R10: Make it opens the recipe on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "R10: Make it leaves the recipe as it is"
+    },
+    {
+     "ok": true,
+     "text": "the photos stay after a reload, the cover first"
+    },
+    {
+     "ok": true,
+     "text": "0.3.134: the plate photo from the time it was made is the cover by itself; nothing left to offer"
+    },
+    {
+     "ok": true,
+     "text": "IM22: Delete recipe says what goes first: its photo"
+    },
+    {
+     "ok": true,
+     "text": "IM22: Delete recipe deletes the recipe and goes back to Recipes, saying what was done"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-swap.cjs",
+   "about": "JOURNEY INVARIANT (DT83, Milan 23 October 2026, 16:49 and 20:00): a food in a recipe can be swapped, and the new one takes the old one's place with an amount the person chooses: The same energy or The same weight, both with their grams. The same food in another state (cooked rice to raw rice) leads with the same energy; a different food leads with the same weight. While editing, one line says what changed for one portion, before and after, and Undo takes back the last change; more than a fifth apart turns it amber. Add right after a Remove asks whether the new food takes the removed one's place; a food of its own asks for its grams and the recipe is not saved without them. The steps follow a swap (Milan 21:56): the food that takes another's place takes its place in the steps, and Undo takes that back too. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "nothing changed yet, no line"
+    },
+    {
+     "ok": true,
+     "text": "the search says what it swaps"
+    },
+    {
+     "ok": true,
+     "text": "raw for cooked: the same energy first, both with grams: The same energy: 105 g Rice, white, raw | The same weight: 300 g Rice, white, raw | Cancel"
+    },
+    {
+     "ok": true,
+     "text": "it says why"
+    },
+    {
+     "ok": true,
+     "text": "raw rice takes its place, 105 g"
+    },
+    {
+     "ok": true,
+     "text": "the steps follow: step 2 names the raw rice, 105 g: Mix the 500 g beef mince with the 105 g rice and the 150 g onion."
+    },
+    {
+     "ok": true,
+     "text": "no food is left out of the steps"
+    },
+    {
+     "ok": true,
+     "text": "the line says the steps followed"
+    },
+    {
+     "ok": true,
+     "text": "the line says what changed for one sarma: Out: Rice, cooked, 300 g. In: Rice, white, raw, 105 g.One sarma: 216 to 215 kcal, 14 to 14 g protein, PD 6.6 to 6.5.The steps follow: one step names Rice, white, raw where it named Rice, cooked.Undo"
+    },
+    {
+     "ok": true,
+     "text": "Undo takes it back, in the steps too"
+    },
+    {
+     "ok": true,
+     "text": "a different food: the same weight first"
+    },
+    {
+     "ok": true,
+     "text": "within a fifth: not amber"
+    },
+    {
+     "ok": true,
+     "text": "more than a fifth apart: amber, and it says to check"
+    },
+    {
+     "ok": true,
+     "text": "Add after Remove asks if it takes the onion's place"
+    },
+    {
+     "ok": true,
+     "text": "a removed food still named in a step is said: onion is in a step but no longer in the recipe. Change the step, or tap the food that takes its place."
+    },
+    {
+     "ok": true,
+     "text": "a food of its own comes without grams, not 100 g"
+    },
+    {
+     "ok": true,
+     "text": "Save waits for the grams"
+    },
+    {
+     "ok": true,
+     "text": "saved in place: Cabbage, raw 800 | Chicken breast, cooked 500 | Rice, cooked 300 | Oats 40"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "B160 Light plus the German sweep: Edit recipe and Save changes, the Plate's Update my recipe"
+}
