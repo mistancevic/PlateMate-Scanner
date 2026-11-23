@@ -6,7 +6,8 @@ const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
 const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8")); seed.feedback = []; seed.items = [];
 const PORT = "3408", B = `http://127.0.0.1:${PORT}`;
-const F = (id, name, calories, protein, fats, carbs) => ({ ...seed.foods[0], id, name, brand: "", source: "label", calories, protein, fats, carbs, fiber: 0, photo: undefined, photos: undefined, icon: undefined, barcode: undefined });
+// B163 (0.3.189): basic foods (a pack read from a label keeps its capitals in a step and in Get it ready)
+const F = (id, name, calories, protein, fats, carbs) => ({ ...seed.foods[0], id, name, brand: "", source: "Reference table", calories, protein, fats, carbs, fiber: 0, photo: undefined, photos: undefined, icon: undefined, barcode: undefined });
 const items = [[250, F("i0", "Pasulj, kuvan", 127, 8.7, 0.5, 23)], [120, F("i1", "Crni luk", 40, 1.1, 0.1, 9)], [15, F("i2", "Suncokretovo ulje", 884, 0, 100, 0)]].map(([g, f]) => ({ id: f.id, grams: g, food: f, locked: false }));
 const SR = ["Iseci [[i:i1|crni luk]] na tanke polukrugove i propržite ga na [[i:i2|ulju]] 10 minuta, dok ne omekša.", "Dodaj [[i:i0|pasulj]], sve stavi u vatrostalnu posudu i peci 40 minuta na 200 °C."];
 const DE = ["Schneide die [[i:i1|Zwiebel]] in dünne Halbringe und brate sie 10 Minuten im [[i:i2|Öl]], bis sie weich ist.", "Gib die [[i:i0|Bohnen]] dazu, gib alles in eine Auflaufform und backe es 40 Minuten bei 200 °C."];

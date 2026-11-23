@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { fromDraft, stepText } from "./steps";
 import type { Food, Ingredient } from "./pilot";
 
-const food = (name: string): Food => ({ id: name, name, brand: "", basis: "100g", source: "label", notes: "", reviewedAt: "", readyToEat: true, calories: 100, protein: 10, fats: 1, carbs: 1, fiber: null });
+// B163 (0.3.189): generic foods, as the basic foods are (a label's name would keep its capitals in a step)
+const food = (name: string): Food => ({ id: name, name, brand: "", basis: "100g", source: "Reference table", notes: "", reviewedAt: "", readyToEat: true, calories: 100, protein: 10, fats: 1, carbs: 1, fiber: null });
 const items: Ingredient[] = [["c", "Chicken breast, cooked", 200], ["b", "Cottage cheese (Hüttenkäse)", 150], ["t", "Tomato", 150], ["u", "Cucumber", 150], ["o", "Olive oil", 10], ["w", "Wholegrain bread", 125]].map(([id, n, g]) => ({ id: id as string, food: food(n as string), grams: g as number, locked: false }));
 const draft = ["Cut {3} and {4} into chunks, salt them lightly and leave for five minutes.", "Slice {1} across the grain; warm it in a dry pan, two minutes a side.", "Crumble {2} over the salad and finish with {5}.", "Toast {6} and serve it on the side."];
 

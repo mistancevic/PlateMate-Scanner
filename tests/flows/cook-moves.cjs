@@ -6,7 +6,8 @@ const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
 const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8"));
-const food = (id, name, calories, protein, carbs, fats, fiber) => ({ ...seed.foods[0], id, name, brand: "", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, icon: "🍽️", barcode: undefined, table: undefined, places: [] });
+// B163 (0.3.189): these are basic foods (a pack read from a label would keep its capitals in a step)
+const food = (id, name, calories, protein, carbs, fats, fiber) => ({ ...seed.foods[0], source: "Reference table", id, name, brand: "", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, icon: "🍽️", barcode: undefined, table: undefined, places: [] });
 const crepes = [[104, food("eg", "Eggs", 143, 12.6, 0.7, 9.5, 0)], [100, food("mi", "Milk 1.5%", 47, 3.4, 4.9, 1.5, 0)], [35, food("wf", "Wheat flour, white", 364, 10, 76, 1, 2.7)], [180, food("qu", "Quark, low fat", 67, 12, 4, 0.2, 0)], [81, food("ba", "Banana", 89, 1.1, 22.8, 0.3, 2.6)]].map(([g, f]) => ({ id: f.id, grams: g, locked: false, food: f }));
 const g = (i) => `${i.grams} g ${i.food.name}`;
 const BOWL = [`Put ${g(crepes[3])} in a bowl.`, `Add ${[0, 1, 2, 4].map((k) => g(crepes[k])).join(" and ")} and stir until it's one colour.`];
