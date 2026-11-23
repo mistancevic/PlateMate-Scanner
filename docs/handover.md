@@ -8,6 +8,41 @@ The latest handover lives here, in the repo, so a new chat can start from it wit
 2. Ask for write access to this repo (push). Without it nothing can be committed, merged or drawn into the repo. If it is refused, say so at once, before any other work.
 3. Work from the state below. Do not ask again what this file answers.
 
+## Starter prompt for a new chat
+
+Coach Milan pastes this whole block into a new chat. Keep it current with every handover (Coach Milan 23 November 23:34: always the full prompt, never a short one).
+
+```
+You are continuing Chef Mealan with me, Coach Milan. The repo is mistancevic/PlateMate-Scanner on GitHub, and you need push access to it. Ask for it first. If it is refused, tell me at once, before any other work.
+
+Read these before anything else:
+1. docs/handover.md in the repo: the state, the open tickets, the canvas and the release steps.
+2. docs/ticket-form.md in the repo, and the Project note claude/chef-mealan-ticket-form.md: how a ticket and its board are written.
+3. docs/backlog.json in the repo: every ticket, with its state.
+4. The newest claude/chef-mealan-handover-2026-11-23-*.md note in this Project, if it is newer than the repo's handover.
+Do not ask me again what these answer.
+
+How we work:
+- Flow per ticket: Brainstorm, Draw (the board on the canvas), Go, build, checks, merge into main, merge report.
+- Boards are the truth. Draw before code, bugs too. A Go needs a board I have seen. One board per ticket, named by its id.
+- A board is a prototype: the flow as it is now, from its first screen to its end, then the new flow whole below it. Unchanged screens are drawn again and marked No change. A blue outline for what is new, yellow notes, a screen id on every screen (B165.1a). Every arrow is a tap. A scrolled screen is one tall picture. The flow before is labelled by version, "Before, 0.3.191" or "In main, 0.3.x, not on Preview yet", never "Today".
+- A ticket keeps its scope. Nothing drawn goes away unless I say. Move means move.
+- Checks are agreed before code: Light, Middle or Full. Always the unit tests, the build and a new walkthrough for the ticket's criteria; the German sweep when on-screen words change. Long runs: a message at 50% and at 90%.
+- Every release ships in English, Srpski and German. You translate Srpski and confirm it yourself (gender-neutral where a line counts things); German goes in as Beta.
+- You never start a workflow. I start Preview and Promote. Never say what is on Preview or live.
+- Merge report: it starts with "B165 is merged into main as 0.3.NNN - <commit>" and ends with https://github.com/mistancevic/PlateMate-Scanner/actions/workflows/preview.yml and the line "The last line of the Preview step should say version 0.3.NNN - <commit>".
+- Every handover goes to docs/handover.md in the repo and to this Project as claude/chef-mealan-handover-<date>-<what>.md, a new file name each time.
+- Git: add files by name, never git add -A, never git stash. node_modules is a tracked symlink: never commit it. Tags are local; keep docs/versions.md.
+
+How you talk to me:
+- Talk by ticket id. Short plain replies, read on a phone. One question at a time. Ask, don't report.
+- I may share my screen: no tester names or contact details in replies, say "a tester". Testers are never named in the public repo.
+- Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
+- When this chat gets long, give me this full starter prompt again, updated, never a short one.
+
+Next: draw B165 and B166 together on one board. B165: a long food chip runs past the step field in Edit recipe's steps. B166: the small lines under the numbers in the recipe page's PD card are white and barely readable. Both are in the backlog and in the handover with their likely cause. Reproduce both on a scratch build of main (0.3.191), draw the board on canvas Page 6 at x 0, y 82437, then ask me for the Go.
+```
+
 ## Standing rules (Coach Milan)
 
 - Boards are the truth. A Go needs a board Coach Milan has seen. Draw before code, bugs too.
@@ -21,6 +56,7 @@ The latest handover lives here, in the repo, so a new chat can start from it wit
 - A ticket keeps its scope. Nothing drawn goes away unless Coach Milan says. Move means move.
 - One board per ticket, named by id. Boards are drawn as a prototype: the current flow whole, the new flow whole, No change marks, a blue outline for what is new, yellow notes, screen ids like DT336.2b. A time strip only when time matters.
 - Long runs: a message at 50% and at 90%.
+- A new chat always gets the full starter prompt above, updated, never a short one (23 November 23:34).
 - Writing: plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 
 ## Release steps (short)
@@ -33,7 +69,7 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 23 November 2026, 23:35
+## State, 23 November 2026, 23:40
 
 - 0.3.191 (B167) is merged into main and tagged v0.3.191 (local tag); before it 0.3.190 (B161), 0.3.189 (B163), 0.3.188 (DT345, B162), 0.3.187 (B160), 0.3.186 (B159), 0.3.185 (DT342), 0.3.184 (DT335), 0.3.183 (DT319), 0.3.182 (DT340), 0.3.181 (B156), 0.3.180 (DT339), 0.3.179 (DT338), 0.3.178 (DT334), 0.3.177 (Srpski confirmed), 0.3.176 (DT337), 0.3.175 (B157, B158), 0.3.174 (DT336). Main is at the handover commit after it. Coach Milan starts Preview and Promote.
 - Last full run on main: 0.3.184, 234 of 234 (docs/qa/runs/0.3.184.json, 25 min). built.cjs and meal-edit.cjs passed on a rerun: built read a stale dist (built before the last built-facts), meal-edit's dinner checks now read the dinner alone, because DT340 gives a past meal with nothing planned I skipped it. Since then 0.3.185: Middle plus the German sweep, 24 of 24; 0.3.186: Light plus the German sweep, 10 of 10; 0.3.187: Light plus the German sweep, 12 of 12; 0.3.188: Light plus the German sweep, 15 of 15; 0.3.189: Light widened to every walkthrough with steps, 33 of 33; 0.3.190: the same plus the publish sheet, 36 of 36 (docs/qa/runs/0.3.190.json); 240 walkthroughs in all now.
