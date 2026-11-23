@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.192",
     "0.3.191",
     "0.3.190",
     "0.3.189",
@@ -4397,7 +4398,7 @@
       "id": "B165",
       "title": "A long food chip in a step breaks out of the field and the page",
       "epic": "cook",
-      "state": "now",
+      "state": "done",
       "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): in Edit recipe, the chip 250 g Körniger Frischkäse Tworog 2,5% Fett runs past the step's field and the card, and the page moves sideways. The chip never wraps (st-food white-space nowrap); B163 made pack names longer.",
       "opportunity": {
         "from": "Coach Milan's own look, 23 November 2026, 22:26: screenshots from his phone of Lazy Burek in Edit recipe, 0.3.190.",
@@ -4409,7 +4410,7 @@
       "proposed": "A chip too long for the line goes on to the next line like text. Where it breaks its ends stay open, so it reads as one chip, and the comma or word after it follows straight on. Its amount stays with the food's first word (250 g Körniger). A chip that fits stays whole and moves to the next line as a word does. A tap takes a chip out whole, and the cursor goes round it as now (B161). Wherever steps are written: Edit recipe and the publish sheet.",
       "problem": "A food in a step is a chip that never wraps. A long pack name, 250 g Körniger Frischkäse Tworog 2,5% Fett, runs past the step's field and the card, and the whole page moves sideways while I write.",
       "checks": "Light, for B165 and B166 together: layout only (CSS, and StepsEditor measures a chip and keeps its amount with the food), nothing in what the app does changes, no new words. The unit tests, the build, one new walkthrough for B165 AC1 to AC7 and B166 AC1 to AC3, and the walkthroughs that open these screens: step-typing, step-names, steps-and-parts, recipe-changed, fibre, pd-scale. About 10 minutes. No German sweep: no on-screen words change.",
-      "decision": "Waiting for Coach Milan's Go.",
+      "decision": "Go 24 November 2026, 00:13; checks Light, 7 of 7 (docs/qa/runs/0.3.192.json). Built in 0.3.192.",
       "now": "The chip is one line, always (white-space nowrap). Under the steps, the list Tap a food to put it in the step already wraps the same name inside its button.",
       "looked_at": "A long chip wrapping inside its own box (drawn first, 23:50): not chosen; the box takes the whole line, so the comma after it lands at the start of the next line (Coach Milan 24 November 00:01). Every chip breaking like text: not chosen; short chips split too (150 g Feta / Leicht). Cut the name short: not chosen; B163 kept the full name. Smaller letters: not chosen; still too long for a phone.",
       "ac": [
@@ -4458,19 +4459,21 @@
       "details": [
         ".st-food in src/index.css: display inline, white-space nowrap, box-decoration-break slice, padding 2px 7px; .st-food.st-long: white-space normal, overflow-wrap anywhere; .st-field: line-height 2.1, which leaves about 6 px between lines of chips (Coach Milan 23 November 23:57). StepsEditor marks a chip st-long when it is wider than the field's line (measured after it is drawn, and again when the width changes), and joins the amount, its unit and the food's first word with no-break spaces. contenteditable false stays.",
         "The pictures: one scratch build of main, 0.3.191, not committed. The new pictures put this rule into the same page in the browser.",
-        "The red dashed line in B165.1b is the phone's edge, 390 px. It is on the board only."
+        "The red dashed line in B165.1b is the phone's edge, 390 px. It is on the board only.",
+        "Built: .st-food inline, nowrap, box-decoration-break slice; .st-long for a chip wider than its field (markLong in StepsEditor, measured on fill, a food in, a weight changed and a ResizeObserver); .st-keep holds chipKeep(label), the first three words (src/steps.ts); .st-field line-height 2.1. New walkthrough tests/flows/chip-lines.cjs (PORT 3617)."
       ],
       "short": "A long food chip wraps inside its box in the steps, the page stays on the screen; with B166 in one release, 0.3.192",
       "open": [],
       "board": "Stories293",
       "where": "Page 6",
-      "rel": "Drawn 23 November 2026 with B166 on one board; waits for Go"
+      "rel": "Built in 0.3.192; Go 24 November 2026, 00:13",
+      "version": "0.3.192"
     },
     {
       "id": "B166",
       "title": "The numbers under a recipe's PD: empty space, and Per 100 kcal barely visible",
       "epic": "cook",
-      "state": "now",
+      "state": "done",
       "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): on the recipe page, the numbers under one portion's PD show an empty space after Total, Per 100 kcal far down, and its lines barely visible. The table's small lines are white inside the PD card (.readout small is white), the same trap DT338 met; on the Plate the table is outside the card.",
       "opportunity": {
         "from": "Coach Milan's own look, 23 November 2026, 22:26: screenshots from his phone of Lazy Burek's recipe page, 0.3.190.",
@@ -4482,7 +4485,7 @@
       "proposed": "Inside the PD card, the table keeps its own colours: its lines in dark text, its notes in grey, as on the Plate. One rule for the table wherever it sits in a PD card.",
       "problem": "Inside the recipe's PD card, the small lines of the numbers are white on white. Under Total there is an empty space, Per 100 kcal sits far down, and its lines can barely be read. On the Plate the same table reads well.",
       "checks": "Light, with B165: see B165's block.",
-      "decision": "Waiting for Coach Milan's Go.",
+      "decision": "Go 24 November 2026, 00:13; checks Light, 7 of 7 (docs/qa/runs/0.3.192.json). Built in 0.3.192.",
       "now": "The PD card makes its small text white (.readout small, .readout p), for the orange card. The table sits inside the card, so its note, its fibre line and Per 100 kcal's lines turn white too. DT338 met the same with the PD scale and mended only the scale.",
       "looked_at": "Move the table under the card, as on the Plate: not chosen; a bigger change to the page, for a colour. Mend each line one by one, as DT338 did: not chosen; the next line added would be white again.",
       "ac": [
@@ -4510,13 +4513,15 @@
       "details": [
         "src/index.css, after .readout small, .readout p: inside .readout .nt, small and p take var(--ink); .nt-note, .nt-sub and small.muted take var(--muted).",
         "A food's card holds the same table in its PD card, so the same rule mends it there too.",
-        "Seen while drawing, not in B166: under One portion, the table shows the whole recipe, 897 g and 2,194 kcal, while the card says 549 kcal for one portion. For Coach Milan to decide whether it gets its own ticket."
+        "Seen while drawing, not in B166: under One portion, the table shows the whole recipe, 897 g and 2,194 kcal, while the card says 549 kcal for one portion. For Coach Milan to decide whether it gets its own ticket.",
+        "Built: .readout .nt small and p take var(--ink); .nt-note, .nt-sub and small.muted var(--muted). New walkthrough tests/flows/chip-lines.cjs (PORT 3617)."
       ],
       "short": "The table in a PD card reads in its own colours; with B165 in one release, 0.3.192",
       "open": [],
       "board": "Stories293",
       "where": "Page 6",
-      "rel": "Drawn 23 November 2026 with B165 on one board; waits for Go"
+      "rel": "Built in 0.3.192; Go 24 November 2026, 00:13",
+      "version": "0.3.192"
     },
     {
       "id": "DT348",
@@ -4597,7 +4602,8 @@
         "Built: src/planEaten.ts (eatenIn, withEaten); PlanScreen shows today's eaten meals and opens them; SamePhotoAsk with kind slot (sameask.slotEaten) from saveEat in JourneyScreen; deleteCard in src/pastMeal.ts ends a cook at stage carry; dayRecord in src/record.ts counts byPlan by meal. New walkthrough tests/flows/plan-eaten.cjs (PORT 3616). chef-dinner.cjs reads Chicken breast in any case, as named since B163."
       ],
       "short": "Plan shows a meal eaten today; Save asks when the meal is already eaten; delete ends the cook",
-      "rel": "Built in 0.3.191; Go 23 November 2026, 22:57"
+      "rel": "Built in 0.3.191; Go 23 November 2026, 22:57",
+      "version": "0.3.191"
     }
   ]
 }

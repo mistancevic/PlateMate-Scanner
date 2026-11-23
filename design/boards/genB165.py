@@ -35,8 +35,8 @@ def req(t, words):
       ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]), ("Decision", t["decision"])]
 parts = [("Tickets", "B165 and B166, drawn together on one board (Coach Milan 23 November 23:33). This board is both tickets. On the canvas page Kanban each is one short card with the label Board: B165 and B166, canvas Page 6."),
   ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> B165.1: Lazy Burek's steps, then Edit recipe, as in 0.3.191. B165.2: the same, new. B166.1: the PD card, the numbers, Per 100 kcal, as in 0.3.191. B166.2: the same, new. A blue outline marks what each note is about."),
-  ("B165. " + t5["title"], "")] + req(t5, "23 November 22:26, screenshots of Edit recipe: the chip runs out of the field. 23:33: draw B165 and B166 together.")[1:] + \
-  [("B166. " + t6["title"], "")] + req(t6, "23 November 22:26, screenshots of the recipe page: an empty space after Total, Per 100 kcal far down and barely visible. 23:33: draw both.")[1:] + \
+  ("B165. " + t5["title"], "")] + req(t5, "23 November 22:26, screenshots of Edit recipe: the chip runs out of the field. 23:33: draw B165 and B166 together. 23:50: is there a bit of space between the chips? 24 November 00:01: the comma is wrongly at the beginning of the next row. 00:13: we can go now with B165 and B166.")[1:] + \
+  [("B166. " + t6["title"], "")] + req(t6, "23 November 22:26, screenshots of the recipe page: an empty space after Total, Per 100 kcal far down and barely visible. 23:33: draw both. 24 November 00:13: Go.")[1:] + \
   [("3. The agreement", "Two blocks at the bottom of this board, B165 and B166.")]
 n0 = len(B.html); storyCard(B, 30, "B165 B166", "a long chip, and numbers you can read", parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
 X = lambda i: SX + i * (PW + G)
@@ -71,11 +71,11 @@ html = "".join(B.html); ids = set(re.findall(r"B16[56]\.\d+[a-z]", html)); imgs 
 if len(ids) < imgs: raise SystemExit(f"{imgs} screens but {len(ids)} screen ids")
 B.no_ids = True
 y = max(y, 30 + HT.get("card", 3400) + 60) + 20
-acTable(B, y, W - 40, {**t5, "rel": "Proposed; not agreed until Coach Milan says Go"}); B.html[-1] = B.html[-1].replace("<div data-ac", "<div data-ac=\"B165\"", 1)
+acTable(B, y, W - 40, {**t5, "rel": "Go 24 November 2026, 00:13; built in 0.3.192"}); B.html[-1] = B.html[-1].replace("<div data-ac", "<div data-ac=\"B165\"", 1)
 y += HT.get("ac5", 800) + 30
-acTable(B, y, W - 40, {**t6, "rel": "Proposed; not agreed until Coach Milan says Go"}); B.html[-1] = B.html[-1].replace("<div data-ac", "<div data-ac=\"B166\"", 1)
+acTable(B, y, W - 40, {**t6, "rel": "Go 24 November 2026, 00:13; built in 0.3.192"}); B.html[-1] = B.html[-1].replace("<div data-ac", "<div data-ac=\"B166\"", 1)
 Hc = y + HT.get("ac6", 700) + 40
-board("Stories293.dc.html", T["boardTitle"], "Drawn 23 November 2026, for the Go of Coach Milan. Tickets B165 and B166, Kanban column Now. Pictures from the real app on a scratch build of main, 0.3.191, and a sketch of the change on that build. Nothing in the app is changed yet.", B, W, Hc, "Stories292.dc.html")
+board("Stories293.dc.html", T["boardTitle"], "Drawn 23 November 2026; Go 24 November 00:13, built in 0.3.192. Tickets B165 and B166, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.191, and a sketch of the change on that build.", B, W, Hc, "Stories292.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B165": {"file": "Stories293.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outB165.json"), "w"))
 print("B165", W, Hc + 230)

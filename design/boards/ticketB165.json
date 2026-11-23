@@ -14,7 +14,7 @@
     "now": "The chip is one line, always (white-space nowrap). Under the steps, the list Tap a food to put it in the step already wraps the same name inside its button.",
     "proposed": "A chip too long for the line goes on to the next line like text. Where it breaks its ends stay open, so it reads as one chip, and the comma or word after it follows straight on. Its amount stays with the food's first word (250 g Körniger). A chip that fits stays whole and moves to the next line as a word does. A tap takes a chip out whole, and the cursor goes round it as now (B161). Wherever steps are written: Edit recipe and the publish sheet.",
     "looked_at": "A long chip wrapping inside its own box (drawn first, 23:50): not chosen; the box takes the whole line, so the comma after it lands at the start of the next line (Coach Milan 24 November 00:01). Every chip breaking like text: not chosen; short chips split too (150 g Feta / Leicht). Cut the name short: not chosen; B163 kept the full name. Smaller letters: not chosen; still too long for a phone.",
-    "decision": "Waiting for Coach Milan's Go.",
+    "decision": "Go 24 November 2026, 00:13; checks Light, 7 of 7 (docs/qa/runs/0.3.192.json). Built in 0.3.192.",
     "short": "A long food chip wraps inside its box in the steps, the page stays on the screen; with B166 in one release, 0.3.192",
     "ac": [
       {
@@ -80,7 +80,7 @@
     "now": "The PD card makes its small text white (.readout small, .readout p), for the orange card. The table sits inside the card, so its note, its fibre line and Per 100 kcal's lines turn white too. DT338 met the same with the PD scale and mended only the scale.",
     "proposed": "Inside the PD card, the table keeps its own colours: its lines in dark text, its notes in grey, as on the Plate. One rule for the table wherever it sits in a PD card.",
     "looked_at": "Move the table under the card, as on the Plate: not chosen; a bigger change to the page, for a colour. Mend each line one by one, as DT338 did: not chosen; the next line added would be white again.",
-    "decision": "Waiting for Coach Milan's Go.",
+    "decision": "Go 24 November 2026, 00:13; checks Light, 7 of 7 (docs/qa/runs/0.3.192.json). Built in 0.3.192.",
     "short": "The table in a PD card reads in its own colours; with B165 in one release, 0.3.192",
     "ac": [
       {
