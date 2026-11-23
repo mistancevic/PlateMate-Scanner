@@ -4,6 +4,7 @@ import { weekdayName, weekdayShort } from "../weekdayWords";
 import { BurnCard } from "../components/Measured";
 import { rowsOf, levelCell, levelKeys, type LevelCell, type LevelKey } from "../dayBars";
 import { lastActiveText } from "../activityWords";
+import { sinceOf } from "../activity";
 import { fmtKg } from "../weight";
 import { wIn, wText } from "../units";
 import { shortDate, freshMeasured } from "../measured";
@@ -53,7 +54,7 @@ const livedText = (n: number) => wn("clientweek.lived", n);
 // shaded, a dot under a bar for a weigh-in, and under them a key line that says what the colours mean in this phase
 // DT340 (0.3.182, board Stories282): every square says the day's level: full, active, opened only, not opened, still to come;
 // today outlined. The key line names only what shows.
-const KEY_WORDS: Record<LevelKey, WordKey> = { full: "clientweek.keyFull", active: "clientweek.keyActive", opened: "clientweek.keyOpened", empty: "clientweek.keyEmpty",
+const KEY_WORDS: Record<LevelKey, WordKey> = { full: "clientweek.keyFull", active: "clientweek.keyActive", opened: "clientweek.keyOpened", empty: "clientweek.keyEmpty", unknown: "clientweek.keyUnknown",
   today: "clientweek.keyToday", todo: "clientweek.keyTodo", dot: "clientweek.keyDot", weekend: "clientweek.keyWeekend" };
 function DayBars({ cells, label, foot, footOn }: { cells: LevelCell[]; label: string; foot: string; footOn?: boolean }) {
   const key = levelKeys(cells).map((k) => w(KEY_WORDS[k])).join(" · ");
@@ -70,7 +71,8 @@ function DayBars({ cells, label, foot, footOn }: { cells: LevelCell[]; label: st
 // what a day shows of the client: her day line (full, and whether she logged anything) and her phone's activity
 const dayOf = (row: ClientRow, date: string, full: boolean) => {
   const l = row.days?.[date];
-  return { full, did: !!l && l.byPlan + l.swapped + l.skipped + (l.extras?.length ?? 0) > 0, activity: row.activity?.days?.[date] };
+  const since = sinceOf(row.activity); // B159 (0.3.186): before the phone recorded, opened or not is not known
+  return { full, did: !!l && l.byPlan + l.swapped + l.skipped + (l.extras?.length ?? 0) > 0, activity: row.activity?.days?.[date], unknown: since === null || date < since };
 };
 // the first two weeks on a card, drawn on the coach's today (B153)
 const isWeighed = (x: { weighed: boolean }) => x.weighed;

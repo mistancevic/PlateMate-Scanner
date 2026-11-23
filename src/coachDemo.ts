@@ -104,6 +104,10 @@ export function demoRows(): ClientRow[] {
   let quiet = false; try { quiet = localStorage.getItem("chefmealan-coach-demo-quiet") === "1"; } catch { /* off */ }
   if (quiet) out.push({ ...rows[1], uid: "demo-sara", name: "Sara", email: "sara@example.com", named: true, via: { kind: "invite" as const, at: new Date(now.getTime() - 12 * 864e5).toISOString() },
     measured: null, goal: { band: "maintain", setBy: "you", setAt: new Date(now.getTime() - 12 * 864e5).toISOString(), source: "quick" }, days: {}, weighIns: [], weighDates: [], checkinDay: (now.getDay() + 1) % 7, feedback: [], notes: [],
-    activity: act({ [-5]: "active", [-4]: "opened" }, at(-5, 19, 0), at(-4, 9, 10)) });
+    activity: (() => { // B159 (0.3.186): chefmealan-coach-demo-recorded, for the walkthrough: "none", her phone has not recorded; a number, it recorded from that many days ago
+      let r: string | null = null; try { r = localStorage.getItem("chefmealan-coach-demo-recorded"); } catch { /* as before */ }
+      if (r === "none") return act({}, null as unknown as string, null as unknown as string);
+      if (r && Number(r) >= 1) { const n = Math.min(20, Number(r)); return { ...act({ [-n]: "active", 0: "opened" }, at(-n, 19, 0), at(0, 9, 10)), since: d(-n) }; }
+      return act({ [-5]: "active", [-4]: "opened" }, at(-5, 19, 0), at(-4, 9, 10)); })() });
   return out;
 }

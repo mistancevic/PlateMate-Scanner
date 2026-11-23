@@ -74,3 +74,22 @@ test("DT340 AC3: Last active, in words", async () => {
   assert.equal(lastActiveText(a("2026-11-21T19:00:00"), now), "Last active: 5 days ago, Saturday");
   assert.equal(lastActiveText({ days: {}, lastOpenAt: null, lastActiveAt: null }, now), "");
 });
+
+test("B159: a day before the phone recorded is not known; a logged day keeps its colour", async () => {
+  const { levelOf } = await import("./dayBars");
+  assert.equal(levelOf({ when: "past", full: false, did: false, unknown: true }), "unknown");
+  assert.equal(levelOf({ when: "past", full: false, did: true, unknown: true }), "active", "AC2: something logged");
+  assert.equal(levelOf({ when: "past", full: true, did: true, unknown: true }), "full", "AC2: a full day");
+  assert.equal(levelOf({ when: "future", full: false, did: false, unknown: true }), "todo");
+  assert.equal(levelOf({ when: "past", full: false, did: false }), "empty", "after the first recorded day: not opened");
+});
+test("B159 AC4, AC5: the first day recorded is kept beyond the 28 days; none recorded, none known", async () => {
+  const { sinceOf, markOpened, activityOut } = await import("./activity");
+  assert.equal(sinceOf(null), null); assert.equal(sinceOf({ days: {}, lastActiveAt: null, lastOpenAt: null }), null, "AC5");
+  assert.equal(sinceOf({ days: { "2026-11-21": "opened", "2026-11-20": "active" }, lastActiveAt: null, lastOpenAt: null }), "2026-11-20", "a phone from before 0.3.186: its earliest day");
+  const store: Record<string, string> = {}; (globalThis as any).localStorage = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; }, removeItem: (k: string) => { delete store[k]; } };
+  markOpened(new Date("2026-11-20T09:00:00"));
+  markOpened(new Date("2026-12-30T09:00:00"));
+  const a = activityOut();
+  assert.equal(a.since, "2026-11-20"); assert.equal(a.days["2026-11-20"], undefined, "the day itself dropped out after 28 days"); assert.equal(sinceOf(a), "2026-11-20");
+});

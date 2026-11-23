@@ -5811,6 +5811,7 @@
     "screen.letters.fibreAtLeast": {"en":"* Fibre: at least {g} g. {n} food without a value: {foods}.|* Fibre: at least {g} g. {n} foods without a value: {foods}.","area":"Recipes","where":"Recipes","release":"0.3.185"},
     "screen.letters.fibreZero": {"en":"{foods} counts as 0 fibre: none by nature.|{foods} count as 0 fibre: none by nature.","area":"Recipes","where":"Recipes","release":"0.3.185"},
     "screen.foodcard.fibreNone": {"en":"No fibre on the pack: {food} has none by nature, so it counts as 0 on your plate.","area":"Words used across the app","where":"Across the app","release":"0.3.185"},
-    "screen.foodcard.fibreMissing": {"en":"No fibre on this food's values. If the pack gives it, add it in Review the label; until then your plate's fibre has a *: at least what the other foods have.","area":"Words used across the app","where":"Across the app","release":"0.3.185"}
+    "screen.foodcard.fibreMissing": {"en":"No fibre on this food's values. If the pack gives it, add it in Review the label; until then your plate's fibre has a *: at least what the other foods have.","area":"Words used across the app","where":"Across the app","release":"0.3.185"},
+    "screen.clientweek.keyUnknown": {"en":"o: not known, from before the app recorded it","area":"Clients","where":"Clients","release":"0.3.186"}
   }
 }

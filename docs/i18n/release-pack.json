@@ -1,6 +1,6 @@
 {
-  "release": "0.3.185",
-  "at": "2026-11-23T15:26:05.351Z",
+  "release": "0.3.186",
+  "at": "2026-11-23T16:46:01.052Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -52911,6 +52911,23 @@
       "release": "0.3.185",
       "order": 900003,
       "at": "2026-11-23T15:26:05.351Z"
+    },
+    {
+      "id": "screen.clientweek.keyUnknown",
+      "kind": "screen",
+      "key": "clientweek.keyUnknown",
+      "en": "o: not known, from before the app recorded it",
+      "forms": "plain",
+      "slots": [],
+      "area": "Clients",
+      "where": "Clients",
+      "sr": "o: nije poznato, od pre nego što je aplikacija počela da beleži",
+      "de": "o: nicht bekannt, aus der Zeit, bevor die App es aufgezeichnet hat",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.186",
+      "order": 900000,
+      "at": "2026-11-23T16:46:01.052Z"
     }
   ]
 }

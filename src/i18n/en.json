@@ -6429,5 +6429,6 @@
     "other": "{foods} count as 0 fibre: none by nature."
   },
   "foodcard.fibreNone": "No fibre on the pack: {food} has none by nature, so it counts as 0 on your plate.",
-  "foodcard.fibreMissing": "No fibre on this food's values. If the pack gives it, add it in Review the label; until then your plate's fibre has a *: at least what the other foods have."
+  "foodcard.fibreMissing": "No fibre on this food's values. If the pack gives it, add it in Review the label; until then your plate's fibre has a *: at least what the other foods have.",
+  "clientweek.keyUnknown": "o: not known, from before the app recorded it"
 }

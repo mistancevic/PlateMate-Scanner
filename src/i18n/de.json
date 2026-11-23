@@ -23248,6 +23248,10 @@
     "foodcard.fibreMissing": {
       "text": "In den Werten dieses Lebensmittels fehlen die Ballaststoffe. Wenn die Packung sie angibt, trag sie unter Etikett prüfen ein; bis dahin haben die Ballaststoffe deines Tellers ein *: mindestens so viel, wie die anderen Lebensmittel haben.",
       "checked": true
+    },
+    "clientweek.keyUnknown": {
+      "text": "o: nicht bekannt, aus der Zeit, bevor die App es aufgezeichnet hat",
+      "checked": true
     }
   }
 }
