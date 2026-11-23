@@ -21,6 +21,7 @@ export type DayRecord = {
 
 const numsOf = (cards: Feedback[]) => cards.reduce((t, f) => { const a = aggregate(f.meal.items); return { kcal: t.kcal + (a.calories ?? 0), protein: t.protein + (a.protein ?? 0) }; }, { kcal: 0, protein: 0 });
 
+// B167 (0.3.191): a meal of the day counts once by the plan, however many dishes it holds (two of Dinner: 1 of 1, not 2 of 1)
 export function dayRecord(slots: Slot[], held: Record<string, PlannedMeal> | undefined, logged: Feedback[], date: string): DayRecord {
   const eaten = logged.filter((f) => f.status === "eaten" && f.slot?.date === date);
   const extras = logged.filter((f) => f.status === "eaten" && !f.slot);
@@ -30,7 +31,7 @@ export function dayRecord(slots: Slot[], held: Record<string, PlannedMeal> | und
   const empty = slots.filter((s) => !held?.[s.id] && !eatenIds.has(s.id));
   const planned = slots.filter((s) => held?.[s.id] || eatenIds.has(s.id)).length;
   const n = numsOf([...eaten, ...extras]);
-  return { slots, planned, eaten, extras, open, skipped, empty, byPlan: eaten.length, kcal: n.kcal, protein: n.protein, pd: density(n.protein, n.kcal), done: planned > 0 && open.length === 0 };
+  return { slots, planned, eaten, extras, open, skipped, empty, byPlan: eatenIds.size, kcal: n.kcal, protein: n.protein, pd: density(n.protein, n.kcal), done: planned > 0 && open.length === 0 };
 }
 
 // "1 of 3 by the plan so far, 1 extra · 1,420 of 2,200 kcal"

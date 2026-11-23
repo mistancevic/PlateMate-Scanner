@@ -1183,6 +1183,7 @@
   "pastmeal.saveChanges": "Save changes",
   "pastmeal.cancel": "Cancel",
   "sameask.already": "This photo is already a meal of {day}.",
+  "sameask.slotEaten": "{meal} is already eaten today.",
   "sameask.mealLine": "{title}, {g} g",
   "sameask.update": "Update that meal",
   "sameask.both": "Keep both",
@@ -3565,6 +3566,7 @@
   "plan.backUsualDay": "Back to the usual {day}",
   "plan.ofKcal": "of {kcal} kcal",
   "plan.kcalProteinG": "{kcal} kcal · {protein} g protein",
+  "plan.eatenAt": "✓ Eaten {time}",
   "shop.nMeals": {
     "one": "{n} meal",
     "other": "{n} meals"

@@ -4,7 +4,8 @@ import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more" | "explorer";
 // DT285 (0.3.139): the same photo already a meal of that day: Update that meal, or Keep both
-export type SameAsk = { earlier: import("../pilot").Feedback; update: () => void; both: () => void };
+// B167 (0.3.191): kind slot asks about a meal of the day already eaten, not about the same photo
+export type SameAsk = { earlier: import("../pilot").Feedback; update: () => void; both: () => void; kind?: "slot" };
 // B146 (0.3.152): holds is what a photo read, as a list in words; with it the question shows as a screen of its own
 export type PlateAsk = { kind: "photo" | "recipe" | "slot" | "food" | "chat" | "said"; what: string; image?: string; holds?: string; apply: (how: "add" | "new") => void;
   // 0.3.157 (DT308.12f): Back returns to where the question came from (the photo screen), with nothing changed

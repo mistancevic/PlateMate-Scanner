@@ -1,6 +1,7 @@
 import { PdScale } from "../components/PdScale";
 import { w, wn, wIn, dec, mealV, mealName, wordV, dateV, dateText, type Val, type WordKey } from "../words";
 import { samePhotoMeal, updateWith, deleteCard as deleteCardIn } from "../pastMeal";
+import { eatenIn } from "../planEaten";
 import { liveStatus, minutesOf, type LiveStatus } from "../plateLive";
 import { SamePhotoAsk } from "../components/SamePhotoAsk";
 import { ServedOnPlate } from "../components/Served";
@@ -3056,6 +3057,15 @@ export function JourneyScreen(p: AppApi) {
     if (!same && good !== "no") {
       const earlier = samePhotoMeal(state.feedback, [...photos, ...cookPhotos.map((x) => x.src)], new Date().toISOString());
       if (earlier) { p.askSamePhoto({ earlier, update: () => saveEat(true, earlier), both: () => saveEat(true, "both") }); return; }
+    }
+    // B167 (0.3.191, board Stories292, B167.2c): the meal this cook goes to was already eaten today: ask first, as for the
+    // same photo. Update that meal: it takes this plate and keeps its time. Keep both: two meals. A plate logged with the
+    // pencil and then cooked (B154) is that meal itself and asks nothing.
+    if (!same && good !== "no") {
+      const tg = eatAt ? eatAt.slot : p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId } : pickSlot ? { date: todayKey, slotId: pickSlot.id } : null;
+      const live = liveRec?.cardId;
+      const earlier = tg ? eatenIn(state.feedback, tg.date, tg.slotId).find((f) => f.id !== live) : undefined;
+      if (earlier) { p.askSamePhoto({ earlier, kind: "slot", update: () => saveEat(true, earlier), both: () => saveEat(true, "both") }); return; }
     }
     const into = same && same !== "both" ? same : null;
     log("made", { went, ate, photos: cookPhotos.length });

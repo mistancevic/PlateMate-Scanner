@@ -23296,6 +23296,14 @@
     "recipe.otherPart": {
       "text": "Sonstiges",
       "checked": true
+    },
+    "sameask.slotEaten": {
+      "text": "{meal}: heute schon gegessen.",
+      "checked": true
+    },
+    "plan.eatenAt": {
+      "text": "✓ Gegessen um {time}",
+      "checked": true
     }
   }
 }

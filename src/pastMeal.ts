@@ -35,9 +35,12 @@ export function changeCard(s: PilotState, id: string, ch: CardChange): PilotStat
   }) };
 }
 
+// B167 (0.3.191, board Stories292, B167.2f): deleting the meal a cook saved ends that cook once it was eaten (stage carry):
+// the strip goes, and nothing asks how a deleted meal carried you
 export function deleteCard(s: PilotState, id: string): PilotState {
   if (!s.feedback.some((f) => f.id === id)) return s;
-  const cook = s.cook && (s.cook as { cardId?: string }).cardId === id ? { ...s.cook, cardId: undefined } : s.cook;
+  const own = s.cook && (s.cook as { cardId?: string }).cardId === id;
+  const cook = own ? (s.cook!.stage === "carry" ? undefined : { ...s.cook!, cardId: undefined }) : s.cook;
   return { ...s, feedback: s.feedback.filter((f) => f.id !== id), ...(cook !== s.cook ? { cook } : {}) };
 }
 
