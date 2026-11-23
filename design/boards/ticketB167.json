@@ -1,0 +1,74 @@
+{
+  "id": "B167",
+  "title": "A dinner eaten at 18:28 is on Today but not in Plan",
+  "epic": "plate",
+  "state": "now",
+  "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone: Today shows Lazy Burek, Dinner, 18:28, eaten by the plan; Plan shows Dinner 18:00, Pick a meal. 22:28: Plan showed Monday. Today: Eaten 22:24 on the strip, the card at 06:28 PM, 2,474 kcal and 1090 g, counted as by the plan. 22:30: he edited it or something and it was created again, or it asked whether he ate it; then he deleted the meal. 22:33: traced on a scratch build: Plan for today reads only the plan; the cook of the edited recipe saved a second dinner at 22:24 without a word; the delete left the strip. 22:36: draw all three.",
+  "opportunity": {
+    "from": "Coach Milan's own dinner, Lazy Burek, 23 November 2026.",
+    "job": "See my day as it went, the same on Today and in Plan.",
+    "kind": "Says something not true: Plan says Pick a meal for a dinner eaten; a second dinner logged without a word; a strip about a deleted meal.",
+    "why_now": "B160 asks after a recipe changes, so cooking it again the same evening is now more likely."
+  },
+  "story": "When I have eaten a meal and cook the same recipe again later, I want Plan, Today and the cook to agree on what I ate, so that my day counts each meal once and I trust the numbers.",
+  "proposed": "1. Plan on today shows a meal already eaten as eaten, as a past day does: its picture, its name, ✓ Eaten 18:28, kcal and protein. A tap opens the meal, where Change or delete is. No Swap and no Empty on it. The day's numbers at the top count what was eaten in that meal, in place of what was planned. 2. Save at the end of a cook, into a meal already eaten today, asks first, as for the same photo (DT285): Dinner is already eaten today, with that meal, then Update that meal, Keep both and Back. Nothing is saved while it asks. 3. Deleting the meal a cook saved ends that cook: the strip goes. 4. Today counts a meal once: two dishes in Dinner are 1 of 1 by the plan, not 2 of 1.",
+  "problem": "Three places disagree about one dinner. Plan for today reads only the plan, never what was eaten. Save at the end of a cook writes into Dinner even when Dinner was eaten, and Today then says 2 of 1 by the plan. Deleting that meal leaves the cook's strip: Eaten 22:24, Chef Mealan asks how it carried you.",
+  "open": [],
+  "checks": "Medium: Plan, the end of a cook and Today. The unit tests with new ones for the meal already eaten and the count once; the build; a new walkthrough for AC1 to AC7; and same-photo, eat-save, plate-live-cook, prepare-no-meal, plan walkthroughs and past-day, about 15 minutes. New words in Srpski and German.",
+  "decision": "",
+  "now": "Today: Lazy Burek, Dinner, 18:28, ✓ Eaten, by the plan. Plan, today: Dinner 18:00, Lazy Burek with Swap and Empty, or Pick a meal once emptied. The cook at 22:24: Save, Which meal?, Dinner (eaten), saved again.",
+  "looked_at": "Block a second meal in a meal already eaten: not chosen; a second plate of the same dinner happens. Plan shows the planned meal and the eaten one both: not chosen; one row says what happened, as a past day does. Keep the strip and point it at the other dinner: not chosen; the cook's own meal is gone.",
+  "board": "Stories292",
+  "where": "Page 6",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "Plan shows a meal eaten today",
+      "text": "Given Lazy Burek eaten at 18:28 in Dinner, when I open Plan on today, then Dinner shows Lazy Burek, ✓ Eaten 18:28, its kcal and protein, with no Swap and no Empty; a tap opens the meal"
+    },
+    {
+      "id": "AC2",
+      "title": "The day counts what was eaten",
+      "text": "Given Dinner planned and eaten, when I read the top of Plan on today, then its numbers count the dinner eaten, not the one planned; a meal with nothing eaten counts its plan as now"
+    },
+    {
+      "id": "AC3",
+      "title": "An emptied plan keeps the eaten meal",
+      "text": "Given the dinner eaten and the plan's Dinner empty, when I open Plan on today, then Dinner still shows Lazy Burek, eaten, not Pick a meal"
+    },
+    {
+      "id": "AC4",
+      "title": "Save asks when the meal is already eaten",
+      "text": "Given Dinner eaten at 18:28, when a cook is saved into Dinner, then it asks: Dinner is already eaten today, with Monday, dinner, 18:28 and Lazy Burek; Update that meal, Keep both, Back; nothing is saved while it asks"
+    },
+    {
+      "id": "AC5",
+      "title": "The answers",
+      "text": "Given that question, when I tap Update that meal, then one dinner at 18:28 holds the cook's foods; Keep both gives two meals in Dinner; Back saves nothing and Save is there again"
+    },
+    {
+      "id": "AC6",
+      "title": "Delete ends the cook",
+      "text": "Given the meal a cook saved, when I delete it, then the strip goes and nothing asks how it carried me"
+    },
+    {
+      "id": "AC7",
+      "title": "A meal counts once",
+      "text": "Given two dishes in Dinner, when I read Today, then it says 1 of 1 by the plan, with both counted in kcal"
+    }
+  ],
+  "unchanged": [
+    "A planned meal not yet eaten: Swap, Empty and the pieces, as now.",
+    "A past day in Plan, as now.",
+    "A plate logged with the pencil and then cooked (B154) is one meal and asks nothing.",
+    "The same photo on the same day asks as now (DT285)."
+  ],
+  "details": [
+    "A meal eaten: a record with that day and that meal of the day, status eaten.",
+    "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 22:24; Dinner at 18:00; Lazy Burek eaten at 18:28. The new pictures are a sketch of the change on that build.",
+    "In the pictures Lazy Burek is a test recipe: Körniger Frischkäse, Frischer Blätterteig, Feta leicht and eggs, 895 g."
+  ],
+  "short": "Plan shows a meal eaten today; Save asks when the meal is already eaten; delete ends the cook",
+  "rel": "Drawn 23 November 2026",
+  "boardTitle": "B167: one dinner, the same on Today and in Plan"
+}
