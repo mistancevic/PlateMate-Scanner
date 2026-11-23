@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.181",
     "0.3.180",
     "0.3.179",
     "0.3.178",
@@ -3433,25 +3434,25 @@
     },
     {
       "id": "DT343",
-      "title": "The printed name in my language: match the line to the local language",
+      "title": "A product's name in my language, the printed name kept",
       "epic": "plate",
       "state": "later",
-      "why": "Coach Milan 23 November 2026, 12:11 to 12:20, after DT339: so far, what is on the pack is what we show; that is important. Later, as a smart function, match the local language: for travel mode, and for foods sold on a local market without a translated label.",
+      "why": "Coach Milan 23 November 2026, 12:11 to 12:43, after DT339: what is on the pack is what we show. Later, as a smart function, the local language: for travel mode, and for foods sold on a local market without a translated label. 12:43: yes, the product's name in my language (the table's lines already show the app's names since DT339); shortening the printed line under a table line is dropped. Asked: can the translation serve other members, to avoid doing it twice.",
       "opportunity": {
         "from": "The board DT339, 23 November 2026.",
-        "job": "Read a pack's table in a language I know, at home or travelling.",
-        "kind": "Did not understand it: a line printed in four languages, or only in the local one.",
-        "why_now": "Later (Coach Milan 12:20). DT339 shows the pack as printed first."
+        "job": "Know what a food is when its pack is in a language I do not read, at home or travelling.",
+        "kind": "Did not understand it: a product name only in the local language.",
+        "why_now": "Later (Coach Milan 12:20)."
       },
-      "problem": "Since DT339 (0.3.180) each line shows the app's name with the printed name under it, exactly as on the pack: all the languages it prints, or only the local one. The app does not know which part between the slashes is which language, and some languages share a word (Masti is Croatian and Serbian).",
-      "story": "When I read a pack printed in languages I do not read, I want the printed part in my language picked out, so that I can match the line to the pack without reading the rest.",
-      "proposed": "Not drawn. A first idea: when the app is sure which part is in the person's language or the market's, it marks that part; the whole printed name stays.",
+      "problem": "A product's name is kept as printed (Γιαούρτι στραγγιστό 2%) in Foods, on the Plate and in Plan. Someone who does not read the language does not know what the food is. Product names are endless, so no fixed list can cover them.",
+      "story": "When I add a food whose pack is in a language I do not read, I want its name in my language next to the printed one, so that I know what I am eating and planning.",
+      "proposed": "Not drawn. A first idea: when the app reads a pack, the same read also returns the name in the app's language; it is stored next to the printed name, which stays the record. Foods, the Plate and Plan show the name in my language with the printed one small under it, as the table lines since DT339. The translation travels with the food in Members' foods (one catalogue shared by all members since 0.2.97), so the next member who scans it gets the name without a second read.",
       "open": [
-        "What is shown when the app is not sure which part is which language.",
-        "How this meets travel mode."
+        "One name per app language (English, Deutsch, Srpski): the first member in each language makes it, or all three at once.",
+        "A wrong translation would reach other members: the printed name always stays, and a member can correct her own name."
       ],
       "checks": "To agree with the board.",
-      "decision": "Later, Coach Milan 23 November 12:20. Not drawn."
+      "decision": "Later, Coach Milan 23 November 12:20; scope set 12:43 (the product's name, not the table's lines). Not drawn."
     },
     {
       "id": "B154",
@@ -3601,8 +3602,8 @@
       "id": "B156",
       "title": "Clients keeps the names it knew when the invites do not load",
       "epic": "coach",
-      "state": "next",
-      "why": "Coach Milan 22 November 2026, 15:23: a client showed as No on Clients. 15:28: after reopening Clients the name was back; a promote ran at the same time, and the other names were right. 15:35: yes, a ticket in Next, not drawn yet. 23 November 11:53: Next drawing.",
+      "state": "done",
+      "why": "Coach Milan 22 November 2026, 15:23: a client showed as No on Clients. 15:28: after reopening Clients the name was back; a promote ran at the same time, and the other names were right. 15:35: yes, a ticket in Next, not drawn yet. 23 November 11:53: Next drawing. 12:43: Go.",
       "opportunity": {
         "from": "Coach Milan's own Clients screen during a promote, 22 November 2026.",
         "job": "See every client under the right name, every time I open Clients.",
@@ -3614,7 +3615,7 @@
       "proposed": "1. The app keeps the last good answer of the invites on the coach's phone and uses it when the request fails. 2. A failed request is tried once more a moment later, and the names fill in when the answer arrives. 3. A card with no name at all shows the whole line No name yet, never its first word.",
       "open": [],
       "checks": "Light: Clients only. The unit tests with new ones for the kept answer, the second try and the whole No name yet line, the build, a new walkthrough for AC1 to AC4, and the walkthroughs that open Clients (client-card, coach-views, coach-week, coach-badge, coach-phase-today), about 5 to 10 minutes. No new words on screen.",
-      "decision": "Direction agreed 22 November 15:35. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "decision": "Direction agreed 22 November 15:35. Go 23 November 2026, 12:43, checks Light, 10 of 10 walkthroughs. Built in 0.3.181.",
       "now": "Clients reads the clients, then the invites in a second request. A client with no Profile name gets the invite's name and email. When the invites request fails, the card shows No: the first word of No name yet. No email, nothing kept from before, nothing tried again; reopening Clients brings the name back.",
       "looked_at": "Wait for the invites before drawing any card: not chosen, a slow request would hold back every client. Save the invite's name into the client's account: not chosen here, the client's own Profile name stays theirs (B141).",
       "board": "Stories281",
@@ -3651,10 +3652,12 @@
         "One more try, about 3 seconds after a failure; not more, so a long outage does not keep asking.",
         "A client who joined while the request fails and whom the phone has never seen shows No name yet until the second try answers (AC3).",
         "The first name is the first word of the name, except when the card has no name: then the whole line.",
-        "The pictures are the real app on one scratch build of main, not committed: the example coach with a third client whose Profile name is empty, the invites answered or refused by the board script."
+        "The pictures are the real app on one scratch build of main, not committed: the example coach with a third client whose Profile name is empty, the invites answered or refused by the board script.",
+        "Built: after the second try the cards are drawn again with the answer it brought, without asking a third time."
       ],
       "short": "Clients keeps the names it knew when the invites do not load",
-      "rel": "Proposed; not agreed until Coach Milan says Go"
+      "rel": "Built in 0.3.181; Go 23 November 2026, 12:43",
+      "version": "0.3.181"
     },
     {
       "id": "B157",
@@ -3765,6 +3768,25 @@
       "rel": "0.3.175",
       "boardTitle": "B158: the heads-up for a product with no values says what to do: close this, then scan the table on Label",
       "version": "0.3.175"
+    },
+    {
+      "id": "DT344",
+      "title": "The table's line names in every EU language",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 23 November 2026, 12:22 to 12:43, after DT339: the line names are a fixed family of about 10 to 20; a pack in a language the app does not read yet still shows Fat twice. 12:43: yes, a small ticket.",
+      "opportunity": {
+        "from": "The board DT339, 23 November 2026.",
+        "job": "Check the values of a pack I scanned.",
+        "kind": "Did not understand it: the same line twice.",
+        "why_now": "Packs from every EU market reach testers."
+      },
+      "problem": "Since DT339 (0.3.180) the app reads the table's lines in German, English, Serbian, Croatian, Spanish, Dutch, French, Italian, Portuguese, Czech, Slovak, Polish, Hungarian, Romanian, Slovenian, Bulgarian and Greek. A line in Finnish (Rasva), Swedish sub-lines, Danish, Estonian (Rasvad), Latvian (Tauki), Lithuanian (Riebalai), Irish or Maltese is not recognised: it keeps its printed name and the app adds its own Fat next to it.",
+      "story": "When I scan a pack from any EU market, I want each line of its table once, under the app's name, so that I can read it at a glance.",
+      "proposed": "Not drawn. The remaining official EU languages added to the words the app knows for each line (src/labelNames.ts), with a unit test per language.",
+      "open": [],
+      "checks": "To agree with the board; likely Light: the label read only.",
+      "decision": "Next, Coach Milan 23 November 12:43. Not drawn."
     }
   ]
 }

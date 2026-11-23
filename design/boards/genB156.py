@@ -20,11 +20,11 @@ def shot(x, y, name, w, title, status, note):
       f'<div style="margin-top:6px;font-size:13.5px;line-height:1.4;color:#3d4a63;min-height:38px">{note}</div>'
       f'<div style="margin-top:8px">{im}</div></div>')
     return y + 110 + h
-CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.179")}
+CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.180")}
 B = Board(); PW = 390; G = 70
 W = SX + 3 * PW + 2 * G + 40
 parts = [("Ticket", "B156. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: B156, canvas Page 6."),
-  ("How to read this board", "<b>Whole flows, like a prototype.</b> B156.1: as it is in main, 0.3.179, not on Preview yet: Clients when the invites load, and when they do not. B156.2: the same, new. Nothing here is a tap: each screen is Clients in a different moment, so there are no arrows. A blue outline marks the card that matters."),
+  ("How to read this board", "<b>Whole flows, like a prototype.</b> B156.1: as it was before 0.3.181: Clients when the invites load, and when they do not. B156.2: the same, new. Nothing here is a tap: each screen is Clients in a different moment, so there are no arrows. A blue outline marks the card that matters."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "22 November 15:23: a client showed as No on Clients. 15:28: after reopening Clients the name was back; a promote ran at the same time, and the other names were right. 15:35: yes, a ticket in Next. 23 November 11:53: Next drawing."),
@@ -38,7 +38,7 @@ def label(y, text, sub, c0=0, n=None):
     B.html.append(f'<div style="position:absolute;left:{X(c0)}px;top:{y}px;width:{lw}px;border-bottom:3px solid #123a7a;padding-bottom:6px"><span style="font-size:26px;font-weight:900;color:#123a7a">{text}</span><span style="font-size:15px;color:#3d4a63;margin-left:12px">{sub}</span></div>')
 def moment(x, y, text):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:13px;font-weight:800;color:#3d4a63;line-height:1.3">{text}</div>')
-label(y, "B156.1 In main, 0.3.179", "not on Preview yet: Clients, two moments", 0, 2)
+label(y, "B156.1 Before, 0.3.180", "Clients, two moments", 0, 2)
 y += 60
 RA = [shot(X(0), y, "1a", PW, "B156.1a The invites load", "draft", "Sara, from her invite, with her email."),
   shot(X(1), y, "1b", PW, "B156.1b The invites do not load", "draft", "The same client shows as No.")]
@@ -53,7 +53,7 @@ bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, t)
 Hc = y + HT.get("ac", 900) + 40
-board("Stories281.dc.html", t["boardTitle"], "Drawn 23 November 2026. Ticket B156, Kanban column Next. Pictures from the real app on a scratch build of main, 0.3.179 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories280.dc.html")
+board("Stories281.dc.html", t["boardTitle"], "Drawn 23 November 2026; Go 12:43, built in 0.3.181. Ticket B156, Kanban column Done. Pictures from the real app on a scratch build of main, 0.3.179 and new. Drawn for the Go of Coach Milan; nothing in the app is changed.", B, W, Hc, "Stories280.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B156": {"file": "Stories281.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/out156.json"), "w"))
 print("B156", W, Hc + 230)
