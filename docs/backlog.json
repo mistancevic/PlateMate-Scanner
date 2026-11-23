@@ -4397,15 +4397,111 @@
       "id": "B165",
       "title": "A long food chip in a step breaks out of the field and the page",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): in Edit recipe, the chip 250 g Körniger Frischkäse Tworog 2,5% Fett runs past the step's field and the card, and the page moves sideways. The chip never wraps (st-food white-space nowrap); B163 made pack names longer."
+      "state": "now",
+      "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): in Edit recipe, the chip 250 g Körniger Frischkäse Tworog 2,5% Fett runs past the step's field and the card, and the page moves sideways. The chip never wraps (st-food white-space nowrap); B163 made pack names longer.",
+      "opportunity": {
+        "from": "Coach Milan's own look, 23 November 2026, 22:26: screenshots from his phone of Lazy Burek in Edit recipe, 0.3.190.",
+        "job": "Write and fix a recipe's steps on the phone.",
+        "kind": "Looks broken: a chip runs out of the step's field and the card, and the page moves sideways.",
+        "why_now": "B163 names a pack's food as printed, so the chips with pack names got longer."
+      },
+      "story": "When I write the steps of a recipe with long food names, I want every step to stay inside the screen, so that I can read and write it without the page moving.",
+      "proposed": "A long chip wraps inside its own box, on as many lines as it needs, and stays one chip: a tap takes it out whole, and the cursor goes round it as now (B161). A short chip stays on one line. Wherever steps are written: Edit recipe and the publish sheet.",
+      "problem": "A food in a step is a chip that never wraps. A long pack name, 250 g Körniger Frischkäse Tworog 2,5% Fett, runs past the step's field and the card, and the whole page moves sideways while I write.",
+      "checks": "Light, for B165 and B166 together: CSS only, nothing in what the app does changes, no new words. The unit tests, the build, one new walkthrough for B165 AC1 to AC4 and B166 AC1 to AC3, and the walkthroughs that open these screens: step-typing, step-names, steps-and-parts, recipe-changed, fibre, pd-scale. About 10 minutes. No German sweep: no on-screen words change.",
+      "decision": "Waiting for Coach Milan's Go.",
+      "now": "The chip is one line, always (white-space nowrap). Under the steps, the list Tap a food to put it in the step already wraps the same name inside its button.",
+      "looked_at": "Cut the name short: not chosen; the step says the amount and the name, and B163 kept the full name. A chip that breaks like text, its pieces on two lines: not chosen; the box matches the chips under the steps and leaves B161's cursor rules alone. Smaller letters in the chip: not chosen; still too long for a phone.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "A long chip wraps",
+          "text": "Given step 1 of Lazy Burek with 250 g Körniger Frischkäse Tworog 2,5% Fett, when I open Edit recipe on a phone 390 px wide, then the chip wraps inside the step's field and the page stays 390 px wide"
+        },
+        {
+          "id": "AC2",
+          "title": "Still one chip",
+          "text": "Given that chip on two lines, when I tap its food under the steps, then the whole chip leaves the step, with its amount"
+        },
+        {
+          "id": "AC3",
+          "title": "A short chip stays on one line",
+          "text": "Given 2 eggs (L) in the same step, when I read the step, then that chip is on one line, as now"
+        },
+        {
+          "id": "AC4",
+          "title": "The publish sheet too",
+          "text": "Given the same recipe in the sheet to share it with members, when I read its steps, then the long chip wraps there too"
+        }
+      ],
+      "unchanged": [
+        "Typing in a step, a space at the end and the keyboard, as B161.",
+        "+ Step here between two steps, as DT345.",
+        "The names in the chips, as B163.",
+        "The recipe page and the cook show the steps as now."
+      ],
+      "details": [
+        ".st-food in src/index.css: white-space normal, max-width 100%, overflow-wrap anywhere. It stays inline-block and contenteditable false.",
+        "The pictures: one scratch build of main, 0.3.191, not committed. The new pictures put this rule into the same page in the browser.",
+        "The red dashed line in B165.1b is the phone's edge, 390 px. It is on the board only."
+      ],
+      "short": "A long food chip wraps inside its box in the steps, the page stays on the screen; with B166 in one release, 0.3.192",
+      "open": [],
+      "board": "Stories293",
+      "where": "Page 6",
+      "rel": "Drawn 23 November 2026 with B166 on one board; waits for Go"
     },
     {
       "id": "B166",
       "title": "The numbers under a recipe's PD: empty space, and Per 100 kcal barely visible",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): on the recipe page, the numbers under one portion's PD show an empty space after Total, Per 100 kcal far down, and its lines barely visible. The table's small lines are white inside the PD card (.readout small is white), the same trap DT338 met; on the Plate the table is outside the card."
+      "state": "now",
+      "why": "Coach Milan 23 November 2026, 22:26, with screenshots from his phone (0.3.190 on Preview): on the recipe page, the numbers under one portion's PD show an empty space after Total, Per 100 kcal far down, and its lines barely visible. The table's small lines are white inside the PD card (.readout small is white), the same trap DT338 met; on the Plate the table is outside the card.",
+      "opportunity": {
+        "from": "Coach Milan's own look, 23 November 2026, 22:26: screenshots from his phone of Lazy Burek's recipe page, 0.3.190.",
+        "job": "Read what a recipe holds, from its PD card.",
+        "kind": "Looks broken: an empty space under Total, and Per 100 kcal's lines barely visible.",
+        "why_now": "DT342 put a fibre line under the table, and it is white on the recipe page too."
+      },
+      "story": "When I open the numbers of a recipe, I want every line in them to be readable, so that I understand what the recipe holds without guessing.",
+      "proposed": "Inside the PD card, the table keeps its own colours: its lines in dark text, its notes in grey, as on the Plate. One rule for the table wherever it sits in a PD card.",
+      "problem": "Inside the recipe's PD card, the small lines of the numbers are white on white. Under Total there is an empty space, Per 100 kcal sits far down, and its lines can barely be read. On the Plate the same table reads well.",
+      "checks": "Light, with B165: see B165's block.",
+      "decision": "Waiting for Coach Milan's Go.",
+      "now": "The PD card makes its small text white (.readout small, .readout p), for the orange card. The table sits inside the card, so its note, its fibre line and Per 100 kcal's lines turn white too. DT338 met the same with the PD scale and mended only the scale.",
+      "looked_at": "Move the table under the card, as on the Plate: not chosen; a bigger change to the page, for a colour. Mend each line one by one, as DT338 did: not chosen; the next line added would be white again.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "The note under Total",
+          "text": "Given Lazy Burek's page, when I tap the letters in the PD card, then the note under Total reads in grey, with no empty space before Per 100 kcal"
+        },
+        {
+          "id": "AC2",
+          "title": "Per 100 kcal",
+          "text": "Given the numbers open, when I tap Per 100 kcal, then its four lines read in dark text and the note under them in grey"
+        },
+        {
+          "id": "AC3",
+          "title": "The fibre line",
+          "text": "Given a recipe with a food that has no fibre value, when I open its numbers, then the line * Fibre: at least 1 g. 1 food without a value reads in dark text, as on the Plate"
+        }
+      ],
+      "unchanged": [
+        "The orange PD card: its big number and its white lines, as now.",
+        "The Plate's numbers, outside the card, as now.",
+        "The PD scale's colours, as DT338."
+      ],
+      "details": [
+        "src/index.css, after .readout small, .readout p: inside .readout .nt, small and p take var(--ink); .nt-note, .nt-sub and small.muted take var(--muted).",
+        "A food's card holds the same table in its PD card, so the same rule mends it there too.",
+        "Seen while drawing, not in B166: under One portion, the table shows the whole recipe, 897 g and 2,194 kcal, while the card says 549 kcal for one portion. For Coach Milan to decide whether it gets its own ticket."
+      ],
+      "short": "The table in a PD card reads in its own colours; with B165 in one release, 0.3.192",
+      "open": [],
+      "board": "Stories293",
+      "where": "Page 6",
+      "rel": "Drawn 23 November 2026 with B165 on one board; waits for Go"
     },
     {
       "id": "B167",
