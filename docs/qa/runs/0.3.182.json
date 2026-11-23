@@ -1,0 +1,2853 @@
+{
+ "version": "0.3.182",
+ "commit": "53c9f15",
+ "at": "2026-11-23T12:41:45.855Z",
+ "minutes": 3,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 69,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "beta-application.cjs",
+   "about": "DT279 (0.3.140, board Stories213; Coach Milan 11 November, 12 November 13:24 and 13:44, Go 13:49): a new beta tester application is the first thing in Waiting for you on Clients, as a full card, and counts in Waiting for you and the Clients badge. Invite sits on the right; Mark as handled sits on its own line below and needs a second tap. Handled, it leaves the top. Srpski and German. Changed by B155 (0.3.173, board B155; Coach Milan, Go 22 November 14:21): a request from a person already invited or already a client is not a new request: no card in Waiting for you, and the badge does not count it. Further down, under Access requests, it says what happened (Already a client, or Invited on that date and the code not used yet), and a request that came after the invite has one button that opens the mail app: Send how to sign in, or Send the code again. The server adds what the invites say to each request; here its answer is given in place of the server, and the rule itself has unit tests (src/applications.test.ts). New checks at the end, B155 AC1 to AC8.",
+   "pass": true,
+   "seconds": 48,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the application is the first thing in Waiting for you"
+    },
+    {
+     "ok": true,
+     "text": "it says New beta tester application"
+    },
+    {
+     "ok": true,
+     "text": "a full card: name, email, WhatsApp, their words"
+    },
+    {
+     "ok": true,
+     "text": "it counts in Waiting for you and the badge: 7, badge 7, 6 other rows"
+    },
+    {
+     "ok": true,
+     "text": "the handled one is not at the top"
+    },
+    {
+     "ok": true,
+     "text": "Invite is on the right"
+    },
+    {
+     "ok": true,
+     "text": "Mark as handled is on its own line, below and away from Invite"
+    },
+    {
+     "ok": true,
+     "text": "every button is 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "one tap: Sure? Tap again, nothing handled yet"
+    },
+    {
+     "ok": true,
+     "text": "Keep it: back, nothing handled"
+    },
+    {
+     "ok": true,
+     "text": "the second tap: handled, it leaves the top"
+    },
+    {
+     "ok": true,
+     "text": "Waiting for you and the badge drop by one"
+    },
+    {
+     "ok": true,
+     "text": "Invite: the invite is made and the request handled"
+    },
+    {
+     "ok": true,
+     "text": "after Invite the card leaves the top"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: Nova prijava za beta testiranje, fits 390 px"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the second tap in the language: Sigurno? Dodirni ponovo da označiš kao rešeno Zadrži Nestaje iz liste Čeka te, bez pozivnice."
+    },
+    {
+     "ok": true,
+     "text": "de: Neue Bewerbung für den Betatest, fits 360 px"
+    },
+    {
+     "ok": true,
+     "text": "de: the second tap in the language: Sicher? Noch einmal tippen, um als erledigt zu markieren Behalten Sie verschwindet aus Wartet auf dich, ohne Einladung."
+    },
+    {
+     "ok": true,
+     "text": "B155 AC8: a first request waits as a card with Invite and Mark as handled"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC1: she joined with my invite and sent the form once more: no card in Waiting for you, and the badge does not count it"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC3: further down her request says 2 requests and Already a client: Nina · from the home page · 2 requests 11/21/2026 nina@example.com WhatsApp +490000000 “I want to help test it.” Already"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC3: it has no Invite and no Mark as handled"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC5: Send how to sign in opens a mail to her that says she already has access and how to sign in"
+    },
+    {
+     "ok": true,
+     "text": "B155: the button is 44 px high, and the request is not greyed out"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC2: she is invited, the code is not used, and she sent the form once more: no card, and the badge does not count it"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC3: further down: 2 requests, Invited on 20 Nov. The code is not used yet."
+    },
+    {
+     "ok": true,
+     "text": "B155 AC4: Send the code again opens a mail to her with the same code and the steps"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC4: no new code is made"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC7: a request that waited when the invite was made by hand left Waiting for you and says Invited on 20 Nov; no button, she did not ask again"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC6: two requests before I answered: one card, 2 requests"
+    },
+    {
+     "ok": true,
+     "text": "B155 AC6: Invite closes the card, and it does not come back"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 360: Schon Klient, Senden, wie man sich anmeldet, fits"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 360: the invited line and Code noch einmal senden, fits: st it.” Eingeladen am 20. Nov., der Code ist noch nicht eingelöst. Code noch einmal senden"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 390: Schon Klient, Senden, wie man sich anmeldet, fits"
+    },
+    {
+     "ok": true,
+     "text": "B155 de 390: the invited line and Code noch einmal senden, fits: st it.” Eingeladen am 20. Nov., der Code ist noch nicht eingelöst. Code noch einmal senden"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 312 account writes from 13 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "busy-times.cjs",
+   "about": "DT179 and DT179a (0.3.23, boards Stories127 and Stories128; Coach Milan 31 October 09:07 Go): from your calendar to the HOWTO: busyDay (DT260): this walkthrough follows How to's situation busyDay; when it fails after a screen changed, update that situation's steps in src/i18n/en.json app, and which meals go in. Read when I'm busy, off at first: busy times only, kept on the phone. Plan shows a busy block and asks where it meets the day: a meal in a meeting, a late evening, a full day, training. A meal moved in Google comes back. Which meals: every slot, or only the planned ones. Google is a stand-in: an in-memory calendar with busy times.",
+   "pass": true,
+   "seconds": 41,
+   "checks": [
+    {
+     "ok": true,
+     "text": "on, with a token: the calendar is made and filled: 49"
+    },
+    {
+     "ok": true,
+     "text": "the page says the time once (no second Up to date line)"
+    },
+    {
+     "ok": true,
+     "text": "Which meals, under Meals: every meal slot at first"
+    },
+    {
+     "ok": true,
+     "text": "only meals I planned: open slots out, Monday's dinner and its cooking in"
+    },
+    {
+     "ok": true,
+     "text": "training stays"
+    },
+    {
+     "ok": true,
+     "text": "every meal slot again"
+    },
+    {
+     "ok": true,
+     "text": "From your calendar to the app: Read when I'm busy, off at first"
+    },
+    {
+     "ok": true,
+     "text": "busy and free only, said"
+    },
+    {
+     "ok": true,
+     "text": "on: busy times read once, for the main calendar"
+    },
+    {
+     "ok": true,
+     "text": "kept on the phone"
+    },
+    {
+     "ok": true,
+     "text": "Monday: one busy row, 13:00 to 14:30, no title: 13:00to 14:30Busy in your calendar"
+    },
+    {
+     "ok": true,
+     "text": "lunch asks: CHEF MEALANLunch at 13:15 is in a busy block, 13:00 to 14:30. Move it for Monday?12:3014:30Keep 13:15"
+    },
+    {
+     "ok": true,
+     "text": "12:30, 14:30, Keep 13:15, each 44 px or more: 44,44,44"
+    },
+    {
+     "ok": true,
+     "text": "lunch at 12:30 on Monday only"
+    },
+    {
+     "ok": true,
+     "text": "Back to 13:15 under it"
+    },
+    {
+     "ok": true,
+     "text": "Google: Monday's lunch at 12:30, Tuesday's as usual"
+    },
+    {
+     "ok": true,
+     "text": "the question is gone once answered"
+    },
+    {
+     "ok": true,
+     "text": "Wednesday asks: CHEF MEALANBusy until 19:30. Dinner at 20:00 leaves 30 minutes to cook. A quick dinner, or cook on Tuesday and warm it up?Quick dinner ideasCook ahead on TuesdayKeep it"
+    },
+    {
+     "ok": true,
+     "text": "Google: cooking on Tuesday, none on Wednesday"
+    },
+    {
+     "ok": true,
+     "text": "Wednesday's dinner says cooked ahead on Tuesday"
+    },
+    {
+     "ok": true,
+     "text": "a full day: take lunch along"
+    },
+    {
+     "ok": true,
+     "text": "training asks, Move to 20:00"
+    },
+    {
+     "ok": true,
+     "text": "rest day: Thursday's training leaves the calendar"
+    },
+    {
+     "ok": true,
+     "text": "Lunch to carry asks Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "moved in Google: Friday's dinner at 21:00 here too"
+    },
+    {
+     "ok": true,
+     "text": "Plan says it was moved in Google Calendar"
+    },
+    {
+     "ok": true,
+     "text": "Back to 20:00: here and in Google"
+    },
+    {
+     "ok": true,
+     "text": "off: the busy times are forgotten on the phone"
+    },
+    {
+     "ok": true,
+     "text": "Plan without busy rows"
+    },
+    {
+     "ok": true,
+     "text": "the privacy notice says it"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "client-card.cjs",
+   "about": "B141 (0.3.146, board Stories219; Coach Milan 14 November 2026, Go 13:08): a client is never unnamed, and the coach sees how they came in. The card shows the name, the email and where from; below it the coach's own note. Create invite needs a name. The home page form's note box says who reads it, and remembers the link it was opened from. The goal step is titled Your goal.",
+   "pass": true,
+   "seconds": 21,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the card: name, email, where from: N Nina nina@example.com From the home page form · QR · 4 November Lose fat · week 3 · check-in Monday Last active: today 11:40 Profile: 2 changes since you looked"
+    },
+    {
+     "ok": true,
+     "text": "nothing on Clients says unnamed"
+    },
+    {
+     "ok": true,
+     "text": "an invite made by hand: From your invite: L Lena lena@example.com From your invite · 17 November Build muscle · Steady · first two weeks, day 6 of 14 · check-in Monday Last active: yesterday 20:15"
+    },
+    {
+     "ok": true,
+     "text": "no note yet: Add a note"
+    },
+    {
+     "ok": true,
+     "text": "the box says only you see it"
+    },
+    {
+     "ok": true,
+     "text": "Cancel on the left, Save on the right: Cancel|Save"
+    },
+    {
+     "ok": true,
+     "text": "the note stays on the card, with Edit note: Your note: Met at the High Performers meetup, Friday 13 November. Edit note"
+    },
+    {
+     "ok": true,
+     "text": "writing a note does not open the client"
+    },
+    {
+     "ok": true,
+     "text": "buttons at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "a tap on the card opens the client"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: Preko prijave na početnoj stranici · QR; Dodaj belešku"
+    },
+    {
+     "ok": true,
+     "text": "de: Über das Formular auf der Startseite · QR; Notiz hinzufügen"
+    },
+    {
+     "ok": true,
+     "text": "the note box says what to write (DT299)"
+    },
+    {
+     "ok": true,
+     "text": "the form sends the name and the link it was opened from: {\"name\":\"Ana\",\"src\":\"qr\"}"
+    },
+    {
+     "ok": true,
+     "text": "no page errors: "
+    },
+    {
+     "ok": true,
+     "text": "save check: 76 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "client-names.cjs",
+   "about": "B156 (0.3.181, board Stories281; Go 23 November 2026, 12:43): Clients keeps the names it knew when the invites do not load. The example coach with a third client whose Profile name is empty (chefmealan-coach-demo-invite), named from the invites; the walkthrough answers or refuses /api/invites, as a promote would. AC1 the last good answer kept, AC2 one more try with no tap, AC3 No name yet whole, AC4 a new answer replaces the kept one.",
+   "pass": true,
+   "seconds": 29,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B156 AC1: the kept answer: Sara, sara.novak@example.com"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC3: a client never seen shows the whole line: No name yet"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: about 3 s later, with no tap, the name fills in: Sara, sara.novak@example.com"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: asked once more: 2"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: and not again: 2"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC2: two failures, two requests, still No name yet: 2, No name yet"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC4: the new answer, not the kept one: Sara"
+    },
+    {
+     "ok": true,
+     "text": "B156 AC4: and it is kept from now on"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 96 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-phase-today.cjs",
+   "about": "B153 (0.3.170, board B153): the coach sees a client's first two weeks on the coach's today, not on the day her phone last saved. The coach demo: Lena is on day 6 of 14; her phone last saved 3 days ago (chefmealan-coach-demo-stale), on day 3. AC1 the outline is on today; AC2 the days since are amber; AC3 the days ahead are grey; AC4 her page says day 6 of 14 with the same squares; AC5 the full days under the bars are the green ones. Unchanged: with a phone that saved today the card is as before.",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B153: Lena's card says day 6 of 14"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC1: the outline is on day 6, today: good,good,look,look,look,today,none,none,none,none,none,none,none,none"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC2: days 3 to 5, from the day the phone saved, are amber"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC3: days 7 to 14 are grey, still to come"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC5: the full days are the green ones: 2 full days · 0 weigh-ins · ready 1 Dec"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC4: her page says day 6 of 14"
+    },
+    {
+     "ok": true,
+     "text": "B153 AC4: her page has the same squares as her card"
+    },
+    {
+     "ok": true,
+     "text": "B153 unchanged: a phone that saved today keeps its days: good,good,look,good,good,today,none,none,none,none,none,none,none,none"
+    },
+    {
+     "ok": true,
+     "text": "B153 unchanged: a client in a normal week has one row of seven"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 48 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-views.cjs",
+   "about": "DT189 (0.3.31, board Stories138): Waiting for you at the top of Clients, the badge as its count, the strip in words on My day; Answer and Good or Seen under a shared card; the answer on the client's Today quoting the meal. DT188 (0.3.30, board Stories137; Coach Milan 31 October 12:56 to 13:00, 16:08, 16:26 Go): roles and navigation. Explorer is the fifth tab for everyone and leaves the menu. The coach is one account with two views, My day and My clients, switched at the top of Today; in My clients the bar keeps its order and Plate becomes Clients; Today, Plan and Recipes show the chosen client's, read-only, under the title My clients with the name below. The coach suggests a planned snack or an Explorer page; the client gets a card on Today with Accept and Not now (a reason as a chip or a line). The superadmin has Admin in the menu.",
+   "pass": true,
+   "seconds": 32,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the client's bar: Today, Plan, Plate, Recipes, Explorer: Today,Plan,Plate,Recipes,Explorer"
+    },
+    {
+     "ok": true,
+     "text": "five tabs, 44 px or more: 56,56,56,56,56"
+    },
+    {
+     "ok": true,
+     "text": "the menu: Foods and Me stay, Explorer left, no Admin for a client"
+    },
+    {
+     "ok": true,
+     "text": "a suggestion is a card on Today, newest first: Coach Milan suggests. Nothing changes until you tap.A page: The body: The gutOpe"
+    },
+    {
+     "ok": true,
+     "text": "the badge on Today counts the two suggestions"
+    },
+    {
+     "ok": true,
+     "text": "Not now: four reasons as chips, and a line"
+    },
+    {
+     "ok": true,
+     "text": "the answer is on the thread: not now, ask me at the check-in"
+    },
+    {
+     "ok": true,
+     "text": "the next suggestion: the snack"
+    },
+    {
+     "ok": true,
+     "text": "Accept: the snack is on Plan for seven days, source coach: 7"
+    },
+    {
+     "ok": true,
+     "text": "the time is on each date; the Lifestyle default is untouched"
+    },
+    {
+     "ok": true,
+     "text": "accepted: the card goes; the answer is on the thread"
+    },
+    {
+     "ok": true,
+     "text": "the answer on Today quotes the meal and its time, with Got it"
+    },
+    {
+     "ok": true,
+     "text": "the coach: no switch, six tabs, Clients the sixth: Today,Plan,Plate,Recipes,Explorer,Clients"
+    },
+    {
+     "ok": true,
+     "text": "six tabs, each 44 px or more wide: 61,61,61,61,61,61"
+    },
+    {
+     "ok": true,
+     "text": "Clients, its own tab"
+    },
+    {
+     "ok": true,
+     "text": "a client's page: Today, Week, Shared, Goal; it opens on Week"
+    },
+    {
+     "ok": true,
+     "text": "Today: Suggest, a planned snack, a page from Explorer"
+    },
+    {
+     "ok": true,
+     "text": "the suggestion is listed as waiting"
+    },
+    {
+     "ok": true,
+     "text": "Shared: the cards the client sent"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the goal, the formula"
+    },
+    {
+     "ok": true,
+     "text": "Recipes is the coach's own"
+    },
+    {
+     "ok": true,
+     "text": "Today is the coach's own"
+    },
+    {
+     "ok": true,
+     "text": "Me for a coach: no My coach; Your summary after Where I shop and cook: Profile,Goal,Lifestyle,Training week,Google Calendar,Where I shop and cook,Your summary,Account"
+    },
+    {
+     "ok": true,
+     "text": "My day: the strip in words: 6 things wait on Clients: 4 cards shared, 2 check-ins today. Open Clients ›"
+    },
+    {
+     "ok": true,
+     "text": "Clients opens with Waiting for you, one row per thing: 6"
+    },
+    {
+     "ok": true,
+     "text": "the badge on Clients is the list's count: 6"
+    },
+    {
+     "ok": true,
+     "text": "the row opens the client's page with Answer under the shared cards"
+    },
+    {
+     "ok": true,
+     "text": "Send: the card shows the answer and Answer again; the field folds"
+    },
+    {
+     "ok": true,
+     "text": "Answer again opens the field with Cancel"
+    },
+    {
+     "ok": true,
+     "text": "Cancel folds it"
+    },
+    {
+     "ok": true,
+     "text": "0.3.32: the way back says what waits one level up: ‹ Clients · 5 waiting"
+    },
+    {
+     "ok": true,
+     "text": "Good: a reaction on the card only"
+    },
+    {
+     "ok": true,
+     "text": "answered rows left the list: 6 then 5 (opened: Nina · look at this Pizza, 3 slicesWedne)"
+    },
+    {
+     "ok": true,
+     "text": "Admin: people and roles, the privacy tracker, the walkthroughs"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "coach-week.cjs",
+   "about": "The coach's week, 0.2.6 (canvas board CW, Milan 13 and 15 October 2026). Skip a meal on purpose on Today; the coach's note on Today; Clients with check-ins and the week as bars; a client's page with the week, a day opened, the note, the check-in day and a goal from a date. Without accounts, Clients opens on two example clients (?coachdemo).",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Skip: the row says Skipped on purpose, with Undo"
+    },
+    {
+     "ok": true,
+     "text": "the skip is kept with the plan"
+    },
+    {
+     "ok": true,
+     "text": "Undo brings the meal back"
+    },
+    {
+     "ok": true,
+     "text": "Today shows the coach's note"
+    },
+    {
+     "ok": true,
+     "text": "Got it: the note leaves Today and is marked read"
+    },
+    {
+     "ok": true,
+     "text": "the coach's bar: six tabs, Clients the sixth"
+    },
+    {
+     "ok": true,
+     "text": "Clients starts with Check-ins today"
+    },
+    {
+     "ok": true,
+     "text": "a client row: seven bars in one row and the full days (DT340, 0.3.182: was the days lived by the plan)"
+    },
+    {
+     "ok": true,
+     "text": "DT302: Saturday and Sunday are shaded"
+    },
+    {
+     "ok": true,
+     "text": "DT302: the key line names what shows, in a week's words: Amber: active · Outline: today · Dashed: still to come · Dot: weigh-in · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "the client opens on a page of her own, with the week"
+    },
+    {
+     "ok": true,
+     "text": "today says so far"
+    },
+    {
+     "ok": true,
+     "text": "last week: lived days with ✓, a changed day with what changed"
+    },
+    {
+     "ok": true,
+     "text": "a day: planned against eaten per meal, the extra, the words only from a shared card"
+    },
+    {
+     "ok": true,
+     "text": "the note is sent and listed"
+    },
+    {
+     "ok": true,
+     "text": "the check-in day changes"
+    },
+    {
+     "ok": true,
+     "text": "the date is on the button"
+    },
+    {
+     "ok": true,
+     "text": "the goal waits for its date"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "day-adds-up.cjs",
+   "about": "The day adds up (DT74, board DT74, Milan 22 October 2026: Anna's first run). A brand-new person, no recipes of her own, only Chef Mealan's starters: a woman of 63 kg who lifts three times a week and wants to build muscle. Tomorrow is planned slot by slot. Checked across the whole day, not one screen: each slot shows what is left once the others are planned; \"fits\" only where a meal fits, \"close\" where it lands around the target, its size named; a full day well off its kcal says so, and Fit the portions brings it within a tenth; Back to the usual portions undoes it; every target names its day, and the same day's target is the same number on Plan and in the top bar. Changed by story DT75 (Milan 22 October 23:54 to 23:58, board DT75, Anna's second run): the day's kcal is a range, a tenth either side (2,100: 1,900 to 2,300); off says how far from its edge; Fit the portions lands inside it in quarters and says so; protein shows the person's range, and above it a quiet line; the slot line gives the PD of what is left, and the picker judges against it, with no size mark. Changed by story DT76 (Milan 23 October 07:17, board DT76): a starter is its foods in grams; a fitted one opens with the grams to weigh at its portions, eggs counted, and the shopping list for the day has its foods.",
+   "pass": true,
+   "seconds": 14,
+   "checks": [
+    {
+     "ok": true,
+     "text": "today's target is one number, named today, on Plan and in the top bar: Plan 5.7, bar \"Build muscle · PD 5.7 today\""
+    },
+    {
+     "ok": true,
+     "text": "the day planned names its own target: Tuesday's"
+    },
+    {
+     "ok": true,
+     "text": "the day's kcal is a range, a tenth either side: 1650 to 2050 around 1851"
+    },
+    {
+     "ok": true,
+     "text": "no size mark in the picker"
+    },
+    {
+     "ok": true,
+     "text": "a meal under the target never says fits, and its number says PD: \"PD 5.41.1 under\""
+    },
+    {
+     "ok": true,
+     "text": "a starter that does fit still says fits"
+    },
+    {
+     "ok": true,
+     "text": "the next slot counts what is already planned: Tap a meal to put it in this slot. With the other meals planned, it has about 714 kcal and 39 g of protein left, PD 5.5."
+    },
+    {
+     "ok": true,
+     "text": "its PD is the PD of what is left, not the day's: 714, 39, 5.5"
+    },
+    {
+     "ok": true,
+     "text": "lunch has the day less breakfast, shared with dinner: 714 = (1851 − 422) ÷ 2"
+    },
+    {
+     "ok": true,
+     "text": "it moved: 617 before breakfast, 714 after"
+    },
+    {
+     "ok": true,
+     "text": "all slots set, 1361 kcal planned"
+    },
+    {
+     "ok": true,
+     "text": "the day says it is under its range, by how much: 289 kcal under Tuesday's range of 1,650 to 2,050 kcal. Add a snack, or make the portions b"
+    },
+    {
+     "ok": true,
+     "text": "Fit the portions: the day lands inside its range, 1868 in 1650 to 2050 kcal, and the warning goes"
+    },
+    {
+     "ok": true,
+     "text": "the message says where the day landed"
+    },
+    {
+     "ok": true,
+     "text": "each meal says how much of it, in quarters: 1½ portions, 1½ portions"
+    },
+    {
+     "ok": true,
+     "text": "a fitted starter opens with the foods to weigh: Tuesday, lunch, 13:45CloseTuna salad wrapChef Mealan's starter, 1½ portions. These are the foods to weigh.Tortilla, wheat105 gTuna, canned i"
+    },
+    {
+     "ok": true,
+     "text": "the shopping list has the starters' foods: Shopping listsCloseShopping list 1Which days is it for? It starts Tuesday 24 November, the first day with meals planned."
+    },
+    {
+     "ok": true,
+     "text": "protein above the range is said quietly: 162 g of protein, above your range of 100 to 140 g. That does no harm. To bring "
+    },
+    {
+     "ok": true,
+     "text": "Back to the usual portions: 1361 kcal again, the warning back"
+    },
+    {
+     "ok": true,
+     "text": "Me names the average day"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "day-levels.cjs",
+   "about": "DT340 (0.3.182, board Stories282; Go 23 November 2026, 13:15): the client's card shows activity. The example coach on Thursday 26 November, 13:30: four levels a day (AC1), today filling in (AC2), Last active (AC3), a client quiet for 3 days in Waiting for you (AC4, chefmealan-coach-demo-quiet). The client: a meal with nothing planned skipped on purpose on Plan (AC5), the privacy notice (AC7), and the phone marks the day opened, then active. AC6, the full-day rule: src/activity.test.ts.",
+   "pass": true,
+   "seconds": 15,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT340 AC1: Nina's week: full, full, active, today active, days to come dashed: full full active active* todo todo todo"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC1: Sara's days, the app not opened: empty empty empty empty* todo todo todo"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC2: Lena opened the app today and logged nothing: today grey, outlined: full full active full full opened* todo todo todo todo todo todo todo todo"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC1: the key line names only what shows: Green: full day · Amber: active · Grey: opened only · Outline: today · Dashed: still to come · Dot: weigh-in · Shaded: weekend / Empty: not opened · Outline: today · Dashed: still to come · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC3: Last active: today 11:40 / Last active: yesterday 20:15 / Last active: 5 days ago, Saturday"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC4: Waiting for you, first: Sara · Quiet for 3 days, last opened the app Sunday 22 November"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC4: Nina and Lena opened the app: not quiet"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC4: a tap opens Sara"
+    },
+    {
+     "ok": true,
+     "text": "the example coach without Sara: two clients, nobody quiet"
+    },
+    {
+     "ok": true,
+     "text": "DT340: opening the app marks today opened: {\"days\":{\"2026-11-26\":\"opened\"},\"lastActiveAt\":null,\"lastOpenAt\":\"2026-11-26T12:30:00.000Z\"}"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC5: a day gone by, nothing planned: each meal has I skipped it: 3"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC5: breakfast shows Skipped with Undo"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC5: kept as a skip on purpose: {\"breakfast\":{\"title\":\"\",\"kcal\":0,\"protein\":0,\"source\":\"mine\",\"skipped\":true}}"
+    },
+    {
+     "ok": true,
+     "text": "DT340: changing the plan marks today active"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC5: Undo removes the skip, nothing left planned"
+    },
+    {
+     "ok": true,
+     "text": "DT340 AC7: the privacy notice says so"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "design-rules.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 20 October 2026, 07:06 to 07:30, boards DS1 and DS2): the design system's button rules. A: one filled, wide button per screen, the main step; every other action is outlined. B: a card's buttons share one row under everything else in the card, the card's full width. C: an answer is a chip, never a button. D: Today has no wide button; a next meal with nothing planned is a card with Pick a meal and Make it on the Plate. E: Back sits top left, above the step bar, and says where it goes. Never rewrite these lines to fit a change. Added by stories DS4 G and DS5 H (Milan 08:49 to 09:30, boards DS4 and DS5): a page's title comes first, under Back: a recipe's name before its photo. On /built a link inside a sentence is underlined, and each part has one filled button. Added by story DT305 (Coach Milan 16 November 2026, 10:04 to 10:49, boards Stories230 and Stories231; written down in docs/rules/design.md as D6 and D7): an answer to tick sits under its question in its own block; the buttons of a section sit under the whole section in one row. Guarded on the read of a photo, in photo-read.cjs.",
+   "pass": true,
+   "seconds": 32,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B: I ate it and Change it share one row, the card's full width, equal widths"
+    },
+    {
+     "ok": true,
+     "text": "B: Did you have it? I ate it, Change it, Skipped it, one row, edge to edge"
+    },
+    {
+     "ok": true,
+     "text": "C: How did it carry you? answers are chips"
+    },
+    {
+     "ok": true,
+     "text": "A: Sarma has no steps yet: Start cooking is grey, nothing else is filled: "
+    },
+    {
+     "ok": true,
+     "text": "A, B: Write my own is a button next to the other way, not a link"
+    },
+    {
+     "ok": true,
+     "text": "E: the recipe page's Back, Recipes, sits top left above the photo"
+    },
+    {
+     "ok": true,
+     "text": "G: the recipe's name comes first, under Back, before the photo"
+    },
+    {
+     "ok": true,
+     "text": "A: on the Plate no Add in the food list is filled: "
+    },
+    {
+     "ok": true,
+     "text": "E: Back sits top left, above the step bar: Back to the plate"
+    },
+    {
+     "ok": true,
+     "text": "E: no Back at the bottom of the step"
+    },
+    {
+     "ok": true,
+     "text": "D: in the evening Today has no wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: the Tomorrow card still opens tomorrow's plan"
+    },
+    {
+     "ok": true,
+     "text": "D: lunch with nothing planned is a card, not a wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: Pick a meal, Make it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "D: Make it on the Plate opens the Plate for lunch"
+    },
+    {
+     "ok": true,
+     "text": "F: 11+ of 93 g fat, and the note: Why the +: Protein bar has no fat or carbs value, so fat and carbs are counted without it."
+    },
+    {
+     "ok": true,
+     "text": "F: its name opens it in Foods"
+    },
+    {
+     "ok": true,
+     "text": "H: a link inside a sentence is underlined"
+    },
+    {
+     "ok": true,
+     "text": "H: one filled button per part: [[\"Try it: the calculator on the home page\",true],[\"See it work\",false],[\"Read Worth Building\",false],[\"Notify me\",true],[\"Email Milan\",true],[\"Connect on LinkedIn\",false]]"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 118 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 14,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "explore-photo.cjs",
+   "about": "0.3.62 (Coach Milan 2 November 20:16 to 20:55, Go): a friend's dinner, read while Adding Wednesday's lunch, was stuck: no button showed. The photo's third chip is now Exploring (was An idea): the plate leaves the meal it was for, the pencil block says Exploring, that meal stays as it was and Chef Mealan says so; the idea's buttons show; nothing is logged; no eating window check. With the pencil block on Exploring first, a camera photo is Exploring too. The read is a stand-in (no AI here). Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): the photo screen has no chips. Just looking is the meal line's own answer, behind the pencil, also while the photo waits; a photo you take waits on the photo screen too, and Read the plate reads it. Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): Just looking and the X are gone. The last row of the calendar says No meal selected (just-looking.cjs taps it); a photo read with no meal selected is a photo of yours with no meal, and nothing is logged. Don't count it (not-counted.cjs) makes it the kept plate with the idea's buttons. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: Just looking is the last row of the calendar behind the pencil (just-looking.cjs), in place of the chip under What is it for; a meal is tapped in that calendar, and with a meal set the X clears it first.",
+   "pass": true,
+   "seconds": 30,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Adding Wednesday's lunch"
+    },
+    {
+     "ok": true,
+     "text": "DT305: the photo waits on the photo screen, with no chips"
+    },
+    {
+     "ok": true,
+     "text": "DT305, changed by B150: No meal selected behind the pencil, while the photo waits"
+    },
+    {
+     "ok": true,
+     "text": "B150: the plate leaves Wednesday's lunch; the line says No meal selected; nothing logged"
+    },
+    {
+     "ok": true,
+     "text": "B150: Don't count it keeps the plate out of the day; the line still says No meal selected"
+    },
+    {
+     "ok": true,
+     "text": "the photo line says A photo with no meal selected: A photo with no meal selected. 2 foods read, amounts estimated (~). Not logged: "
+    },
+    {
+     "ok": true,
+     "text": "the idea's buttons show: Chef Mealan: A meal as the photo shows it: about 520 to 850 kcal and 49 g protein. Fit it and it is sized for your day. Fit it to my mealSave as an ideaPut it i"
+    },
+    {
+     "ok": true,
+     "text": "no eating-window check while exploring"
+    },
+    {
+     "ok": true,
+     "text": "nothing logged"
+    },
+    {
+     "ok": true,
+     "text": "B150: No meal selected first: the camera's photo is read with no meal, and nothing is logged"
+    },
+    {
+     "ok": true,
+     "text": "B150: Don't count it: the idea's buttons show"
+    },
+    {
+     "ok": true,
+     "text": "0.3.65, changed by B150: on Adding Wednesday's lunch the meal line has its pencil and no X"
+    },
+    {
+     "ok": true,
+     "text": "0.3.65, changed by B150: No meal selected leaves Wednesday's lunch"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 27 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "first-two-weeks.cjs",
+   "about": "The first two weeks and the measured burn (0.2.7, canvas board FT): Today, Me, Goal, the calculator and the coach, from real meals and weigh-ins, with the clock on day 6 (Thursday 15 October) and day 14 (Friday 23 October). The example person of the board: male, 1981, 182 cm, 95 kg, the first goal on Saturday 10 October.",
+   "pass": true,
+   "seconds": 25,
+   "checks": [
+    {
+     "ok": true,
+     "text": "FT1: Today has the getting to know you card"
+    },
+    {
+     "ok": true,
+     "text": "FT1: day 6 of 14, 4 full days, 4 weigh-ins"
+    },
+    {
+     "ok": true,
+     "text": "FT1: the squares: full|full weighed|part weighed|full|full weighed|today weighed|todo"
+    },
+    {
+     "ok": true,
+     "text": "FT3: measuring, 4 of 10 full days, 2 of 7 weigh-ins from day 4, ready on 23 October"
+    },
+    {
+     "ok": true,
+     "text": "FT3: the formula line with its number"
+    },
+    {
+     "ok": true,
+     "text": "FT0 fixed: the formula text starts at the left, Change on the same line {\"left\":17,\"same\":true}"
+    },
+    {
+     "ok": true,
+     "text": "FT5: From your data is greyed until day 14"
+    },
+    {
+     "ok": true,
+     "text": "FT2: the getting to know you card is gone on day 14"
+    },
+    {
+     "ok": true,
+     "text": "FT2: 2,520 kcal a day, give or take 75, 12 full days, 11 weigh-ins: ✓ YOUR BURN IS MEASURED2,520kcal a dayGive or take 75. From your 14 days: 12 full days and 11 weigh-ins. The formula said 2,650. Your numbers stay as they are u"
+    },
+    {
+     "ok": true,
+     "text": "FT2: Got it takes the card away"
+    },
+    {
+     "ok": true,
+     "text": "FT2: and it stays away"
+    },
+    {
+     "ok": true,
+     "text": "FT4: the measured burn, its range, the three steps"
+    },
+    {
+     "ok": true,
+     "text": "FT5: Use my data opens the calculator with From your data picked"
+    },
+    {
+     "ok": true,
+     "text": "FT5: 130 kcal a day less than Mifflin St Jeor"
+    },
+    {
+     "ok": true,
+     "text": "FT5: the days, 2,250 on average (2,520 × 0.9), 150 less, the source: 50 kcal at PD 8.0, with 4 training days and 3 without. From your data: 150 kcal less than with the formula.Protein and fat stay the same every day. Carbs go up and down with your training. The days come from your Training week. Sources: your own 14 days, 10 Oct to 23 Oct; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004."
+    },
+    {
+     "ok": true,
+     "text": "FT5: each day about 130 less, to the nearest 50: 2,450 2,100 2,400 2,100 2,450 2,300 2,100"
+    },
+    {
+     "ok": true,
+     "text": "applied: From your data, 2,520 fixed with its dates"
+    },
+    {
+     "ok": true,
+     "text": "applied: the week's average is 2,250: 2250"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the formula line says From your data, 2,520"
+    },
+    {
+     "ok": true,
+     "text": "Goal: the card says which number is in use"
+    },
+    {
+     "ok": true,
+     "text": "eating declared: nothing on Today"
+    },
+    {
+     "ok": true,
+     "text": "eating declared: no measured burn on Goal"
+    },
+    {
+     "ok": true,
+     "text": "FT6: Lena in her first two weeks: her fourteen days, in two rows of seven (DT302, 0.3.150, board Stories224)"
+    },
+    {
+     "ok": true,
+     "text": "DT302: the key line in the first two weeks' words: Green: full day · Amber: active · Grey: opened only · Outline: today · Dashed: still to come · Dot: weigh-in · Shaded: weekend"
+    },
+    {
+     "ok": true,
+     "text": "DT302: four weekend days shaded, in the same places in both rows: ww-----ww-----"
+    },
+    {
+     "ok": true,
+     "text": "FT7: Nina's burn on her page, with the gap line"
+    },
+    {
+     "ok": true,
+     "text": "FT7: From Nina's data as a formula pin"
+    },
+    {
+     "ok": true,
+     "text": "save check: 162 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "formula.cjs",
+   "about": "The goal calculator (canvas board FX, G1a to G3, Milan 14 October 2026; the formula card from board TW, F1 and F2). 1 You, 2 the formula, 3 the goal, 4 the days, then Apply from a date. The formula is a draft until applied. A goal from a later date waits on Me, Goal and Plan already uses it; a day gone by keeps its own target; History shows periods.",
+   "pass": true,
+   "seconds": 16,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Me, Goal says which formula is in use, in one line"
+    },
+    {
+     "ok": true,
+     "text": "three tries on one day leave one period: MaintainNOWSince 3 November, calculated from your profile2,600kcal, 150 g protein"
+    },
+    {
+     "ok": true,
+     "text": "the calculator in four steps (DT161: Carbs and fat), the formula behind How we calculate: 1. You | 2. Your goal | 3. Carbs and fat | 4. Your days"
+    },
+    {
+     "ok": true,
+     "text": "You shows the body fat, or that it is not given"
+    },
+    {
+     "ok": true,
+     "text": "four choices with the resting burn from each"
+    },
+    {
+     "ok": true,
+     "text": "From your data waits, greyed, until the burn is measured"
+    },
+    {
+     "ok": true,
+     "text": "Katch McArdle sleeps without body fat"
+    },
+    {
+     "ok": true,
+     "text": "the difference in plain numbers"
+    },
+    {
+     "ok": true,
+     "text": "the pick is a draft: nothing saved yet"
+    },
+    {
+     "ok": true,
+     "text": "the days follow the draft and the sources name Schofield"
+    },
+    {
+     "ok": true,
+     "text": "About the three formulas opens"
+    },
+    {
+     "ok": true,
+     "text": "Apply from today, by default"
+    },
+    {
+     "ok": true,
+     "text": "Apply keeps the formula"
+    },
+    {
+     "ok": true,
+     "text": "Me, Goal says Schofield now"
+    },
+    {
+     "ok": true,
+     "text": "the date is on the button: Apply from Monday 30 November"
+    },
+    {
+     "ok": true,
+     "text": "the new goal waits; the goal in use stays"
+    },
+    {
+     "ok": true,
+     "text": "Me, Goal shows the waiting goal with its date"
+    },
+    {
+     "ok": true,
+     "text": "Plan already uses the waiting goal from its date"
+    },
+    {
+     "ok": true,
+     "text": "yesterday keeps the target it had"
+    },
+    {
+     "ok": true,
+     "text": "Cancel takes the waiting goal away"
+    },
+    {
+     "ok": true,
+     "text": "the page says nothing about children"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "google-calendar.cjs",
+   "about": "DT178 (0.3.21, board Stories126; Coach Milan 31 October 00:08 Go): Chef Mealan's own calendar in Google. Me > Google Calendar, off at first: what goes in (Weigh in and Check-in off), what an event says, Connect. On: the calendar Chef Mealan is made and the next 14 days go in, names and times and a link, no numbers. A change goes across within seconds; Plan says so once; a shopping list gets Shop on; without a token one tap updates; a calendar link opens that day on Plan; Turn off removes the calendar or keeps it. Google is a stand-in here: an in-memory calendar answering the same API.",
+   "pass": true,
+   "seconds": 58,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Me: Google Calendar, off"
+    },
+    {
+     "ok": true,
+     "text": "under Training week: Profile, Goal, Lifestyle, Training week, Google Calendar, Where I shop and cook, Your summary, My coach, Account"
+    },
+    {
+     "ok": true,
+     "text": "its own address, /me/calendar"
+    },
+    {
+     "ok": true,
+     "text": "what goes in: meals, cooking, training, shopping on; weigh in and check-in off; the dish's name on"
+    },
+    {
+     "ok": true,
+     "text": "what an event says"
+    },
+    {
+     "ok": true,
+     "text": "every control 44 px or more: 55,74,56,74,76,76,55,52"
+    },
+    {
+     "ok": true,
+     "text": "while writing, the page says how far: 📅Writing to Google Calendar: 16 of 45."
+    },
+    {
+     "ok": true,
+     "text": "the calendar is noted as soon as Google makes it"
+    },
+    {
+     "ok": true,
+     "text": "events are written a few at a time: 4"
+    },
+    {
+     "ok": true,
+     "text": "on, with the calendar's id kept"
+    },
+    {
+     "ok": true,
+     "text": "a calendar of its own, called Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "every call carries the token"
+    },
+    {
+     "ok": true,
+     "text": "tonight's dinner is in: 2026-10-30T06:30:00 Breakfast | 2026-10-30T13:15:00 Lunch | 2026-10-30T20:00:00 Dinner"
+    },
+    {
+     "ok": true,
+     "text": "Monday's training at 17:30"
+    },
+    {
+     "ok": true,
+     "text": "Monday: dinner with its dish, and cooking before it"
+    },
+    {
+     "ok": true,
+     "text": "no weigh in, no check-in"
+    },
+    {
+     "ok": true,
+     "text": "each event: a link to the day, no numbers"
+    },
+    {
+     "ok": true,
+     "text": "the next 14 days: 14"
+    },
+    {
+     "ok": true,
+     "text": "the page says on, 14 days"
+    },
+    {
+     "ok": true,
+     "text": "the dish's name off: Dinner and Cook dinner, within seconds"
+    },
+    {
+     "ok": true,
+     "text": "weigh in on: one a day, before breakfast"
+    },
+    {
+     "ok": true,
+     "text": "weigh in off again: taken out"
+    },
+    {
+     "ok": true,
+     "text": "Plan: also in your Google Calendar"
+    },
+    {
+     "ok": true,
+     "text": "the list has Shop on"
+    },
+    {
+     "ok": true,
+     "text": "Shopping list 1, Saturday 10:00, in the calendar"
+    },
+    {
+     "ok": true,
+     "text": "the calendar's link opens Monday on Plan"
+    },
+    {
+     "ok": true,
+     "text": "without a token nothing goes across by itself"
+    },
+    {
+     "ok": true,
+     "text": "Plan: Update Google Calendar"
+    },
+    {
+     "ok": true,
+     "text": "the button is 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "one tap: training taken out, the line is back"
+    },
+    {
+     "ok": true,
+     "text": "never reached Google: said in plain words"
+    },
+    {
+     "ok": true,
+     "text": "back in front: it goes again by itself and is done"
+    },
+    {
+     "ok": true,
+     "text": "Turn off asks: remove, or keep"
+    },
+    {
+     "ok": true,
+     "text": "removed from Google; off"
+    },
+    {
+     "ok": true,
+     "text": "the kinds you chose are kept for next time"
+    },
+    {
+     "ok": true,
+     "text": "Me says off again"
+    },
+    {
+     "ok": true,
+     "text": "the privacy notice says it"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "home-page.cjs",
+   "about": "HP3 (0.3.42, board Stories147; Coach Milan 1 November 10:48 to 13:24 Go): the home page for individuals and coaches. The top bar on one line (Chef Mealan, Coaches, Sign in on a phone); the beta box with the spots left from the number set under Clients, the commitment and the waiting list one link away; two ways in; Cook it, Your day, Explorer, the coach section with Get a coach code; two more trust lines; the beta form and the waiting list, separate; at 0 spots the waiting list comes first. HP5 1d (0.3.46): the first screen is the photo carousel with the button on it; the calculator under it. Local runs have no sign-in, so ?home shows the home page. Changed by story DT328 (0.3.165, board DT328; Coach Milan, Go 19 November 17:16): Start from anything shows four ways in again",
+   "pass": true,
+   "seconds": 27,
+   "checks": [
+    {
+     "ok": true,
+     "text": "only the first photo loads with the page: curry-m.webp"
+    },
+    {
+     "ok": true,
+     "text": "the top bar on a phone: Coaches, the language, Sign in, one line: Coaches, EN, Sign in, 64 px"
+    },
+    {
+     "ok": true,
+     "text": "the beta box on the photo: the button, 12 spots, the commitment, the waiting list link, whose cooking"
+    },
+    {
+     "ok": true,
+     "text": "the button and its lines on the first screen, no sideways scroll: {\"b\":728.828125,\"own\":824,\"sw\":390}"
+    },
+    {
+     "ok": true,
+     "text": "the calculator under the photo: Try it here, the title, one line"
+    },
+    {
+     "ok": true,
+     "text": "the waiting-list link is 44 px to tap and keeps the line height: {\"tap\":44,\"lines\":2,\"h\":41,\"lh\":20.3}"
+    },
+    {
+     "ok": true,
+     "text": "five photos, the curry first"
+    },
+    {
+     "ok": true,
+     "text": "the curry loads with the page: curry-m.webp, meatballs-m.webp, quesadilla-m.webp, waffle-m.webp, squares-m.webp"
+    },
+    {
+     "ok": true,
+     "text": "a tap on the third dot shows the quesadilla"
+    },
+    {
+     "ok": true,
+     "text": "the other photos load after the page"
+    },
+    {
+     "ok": true,
+     "text": "the carousel moves on by itself"
+    },
+    {
+     "ok": true,
+     "text": "four ways in: A barcode, A label, A few packs at once, A photo of your meal"
+    },
+    {
+     "ok": true,
+     "text": "the section: Cook it, hands free"
+    },
+    {
+     "ok": true,
+     "text": "the section: Your day as it really goes"
+    },
+    {
+     "ok": true,
+     "text": "the section: Know why, not only what"
+    },
+    {
+     "ok": true,
+     "text": "the section: Coach your clients' real days"
+    },
+    {
+     "ok": true,
+     "text": "the section: Join the beta, free"
+    },
+    {
+     "ok": true,
+     "text": "the section: The waiting list"
+    },
+    {
+     "ok": true,
+     "text": "the cook clip is on the page and served"
+    },
+    {
+     "ok": true,
+     "text": "the situation clip is on the page and served"
+    },
+    {
+     "ok": true,
+     "text": "the explorer clip is on the page and served"
+    },
+    {
+     "ok": true,
+     "text": "the coach clip is on the page and served"
+    },
+    {
+     "ok": true,
+     "text": "who it is for, and the disclaimer, separate"
+    },
+    {
+     "ok": true,
+     "text": "Milan's line from the book cover"
+    },
+    {
+     "ok": true,
+     "text": "the new sections' labels: Cook, Explorer · Situations, Explorer · The body and nutrients, In your language"
+    },
+    {
+     "ok": true,
+     "text": "the languages as chips, 15 px, not buttons: English, Srpski, Deutsch · Beta"
+    },
+    {
+     "ok": true,
+     "text": "In your language: the title, four lines, the Beta note"
+    },
+    {
+     "ok": true,
+     "text": "the languages clip and its poster are on the page and served as a video and an image"
+    },
+    {
+     "ok": true,
+     "text": "two more trust lines"
+    },
+    {
+     "ok": true,
+     "text": "Coaches scrolls to the coach section: y 0"
+    },
+    {
+     "ok": true,
+     "text": "Get a coach code: the beta form with I am a coach picked"
+    },
+    {
+     "ok": true,
+     "text": "the waiting list needs the tick, and says so"
+    },
+    {
+     "ok": true,
+     "text": "joined: the line says it"
+    },
+    {
+     "ok": true,
+     "text": "the waiting list holds the email and which fits: {\"waiting\":[{\"id\":\"07a0a464fe3954d579bc1bc6c5d32dc7\",\"email\":\"lena@example.com\",\"who\":\"self\",\"createdAt\":\"2026-11-23T12:40:21.111Z\"}]}"
+    },
+    {
+     "ok": true,
+     "text": "the privacy notice names the waiting list"
+    },
+    {
+     "ok": true,
+     "text": "0 spots: the main button is the waiting list"
+    },
+    {
+     "ok": true,
+     "text": "0 spots: the waiting list first, then the next beta round: The waiting list, The next beta round"
+    },
+    {
+     "ok": true,
+     "text": "reduce motion: the curry only, no dots: curry-m.webp"
+    },
+    {
+     "ok": true,
+     "text": "a computer: the large curry, full width, the words at the left, the button on the first screen: curry-l.webp {\"w\":1366,\"x\":183,\"b\":537.921875}"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 12 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "how-to-waiting.cjs",
+   "about": "Story DT330 (0.3.167, board DT330; Coach Milan 19 November 20:26 to 20:30, Go 20:41): How to feedback that needs Coach Milan waits in Waiting for you at the top of Clients, after the beta applications, and counts in its title and the Clients badge. Every Didn't work, and every I did it with face 1 or 2 or with words. A tap opens that tester's How to on its own, ‹ Clients goes back, and the row is gone. Only the owner's account reads the feedback. Made-up testers: Ana and Bo. The checks name the acceptance criteria of the board (DT330 AC1 to AC8).",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT330 AC2: three rows: Ana's Didn't work, Bo's 4 of 5 with words, Ana's 2 of 5; not Ana's plain 5, not Bo's plain 4: 3"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC1: the newest row first: first name, situation, Didn't work, the line, How to and the day: Ana · Scan a pack from any screen Didn't work “Holding Plate opened the menu, but Barcode showed a black camera.” How to · 19 Nov ›"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC1: after the beta application, before what clients sent: app,howto,howto,howto,client"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC3: the face, 4 of 5 and the line: Bo · A recipe in another language 4 of 5 “German worked, the voice too.” How to · 19 Nov ›"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC3: Ana · I ate something: log it with a photo 2 of 5 “The read missed the rice.” How to · 19 Nov ›"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC4: Waiting for you 11 and the badge 11 count the application, the three rows and 7 from clients"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC5: Ana's How to on its own, every situation, her line"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC5: ‹ Clients"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC6: the row is gone and the counts are one less: 10, badge 10"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC7: not the owner: the feedback answers 403, no row waits, and nothing more counts"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC8: sr-Latn: ra.” Kako da · 19. nov › · ‹ Klijenti"
+    },
+    {
+     "ok": true,
+     "text": "DT330 AC8: de: ” So geht's · 19. Nov. › · ‹ Klienten"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 96 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "metrics.cjs",
+   "about": "The counter and the Metrics page (0.2.5+r17, canvas board M, M1 to M4, Milan 13 October 2026). Today opened sends app_open once a day; the days before today are closed against the plan (planned, by the plan, swapped, lived by the plan) and reach the server stripped; home page counts are one number per day; Metrics shows in the menu for the account the server names (here, without accounts, the local one) with the North Star, the KPIs and the way in; the privacy notice carries the two lines.",
+   "pass": true,
+   "seconds": 27,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Today opened: app_open once a day"
+    },
+    {
+     "ok": true,
+     "text": "the days since Today was first opened are closed, each once: 2026-11-20, 2026-11-21, 2026-11-22"
+    },
+    {
+     "ok": true,
+     "text": "yesterday: 2 planned, 2 by the plan, 1 swapped ({\"t\":\"2026-11-23T12:40:23.892Z\",\"hour\":13,\"event\":\"day_closed\",\"date\":\"2026-11-22\",\"planned\":2,\"byPlan\":2,\"extras\":0,\"swapped\":1,\"lived\":false,\"proteinPct\":51,\"energyPct\":35})"
+    },
+    {
+     "ok": true,
+     "text": "lived by the plan follows the rule: protein 51 %, energy 35 %, lived false"
+    },
+    {
+     "ok": true,
+     "text": "sent within seconds: the outbox is empty (0)"
+    },
+    {
+     "ok": true,
+     "text": "no cookie is set by the counts"
+    },
+    {
+     "ok": true,
+     "text": "the way in counts visits 2, calculator 1, Try 1: {\"visits\":2,\"qr\":1,\"ig\":1,\"books\":[{\"name\":\"Worthy Numbers\",\"n\":1,\"by\":[{\"name\":\"QR\",\"n\":1}]}],\"calc\":1,\"tried\":1,\"asked\":0,\"joined\":0,\"active\":1}"
+    },
+    {
+     "ok": true,
+     "text": "one active member this week"
+    },
+    {
+     "ok": true,
+     "text": "meals by the plan in yesterday's week: 100 %"
+    },
+    {
+     "ok": true,
+     "text": "an event the counter doesn't take is refused (400)"
+    },
+    {
+     "ok": true,
+     "text": "M1: Metrics in the menu for the account the server names"
+    },
+    {
+     "ok": true,
+     "text": "MT71: the whole page shows from the first day of counting: Today, and since the first day TODAY SINCE 20 NOV Home page visits 2 2 Members w"
+    },
+    {
+     "ok": true,
+     "text": "MT71: the time frame on top, and since when it counts"
+    },
+    {
+     "ok": true,
+     "text": "MT71: each card says which days it counts"
+    },
+    {
+     "ok": true,
+     "text": "MT71: the way in shows this week's visits so far, 2"
+    },
+    {
+     "ok": true,
+     "text": "SH73, 0.2.115: a visit from the QR code counts as QR, one from Instagram as Instagram, under Home page visits"
+    },
+    {
+     "ok": true,
+     "text": "MT71: the book's visit and its QR code show this week, before a full week is counted"
+    },
+    {
+     "ok": true,
+     "text": "M5: next to today, the count since the first day"
+    },
+    {
+     "ok": true,
+     "text": "DT207a (0.3.48): today and since the first day on top"
+    },
+    {
+     "ok": true,
+     "text": "DT207a: on top in Last week too"
+    },
+    {
+     "ok": true,
+     "text": "MT71: Last week names its own days"
+    },
+    {
+     "ok": true,
+     "text": "MT71: 4 weeks says its days, and a week before the first day says not counted yet"
+    },
+    {
+     "ok": true,
+     "text": "M6: Metrics holds product measures only, no costs"
+    },
+    {
+     "ok": true,
+     "text": "M6b: Running costs in the menu, next to Metrics"
+    },
+    {
+     "ok": true,
+     "text": "M6b: AI use, cost per active member and fixed cost"
+    },
+    {
+     "ok": true,
+     "text": "M6b: the prices are kept; the cost per member counts itself"
+    },
+    {
+     "ok": true,
+     "text": "M6b: Saved shows once"
+    },
+    {
+     "ok": true,
+     "text": "M6b: the bills as one fixed total, not divided, with the check against the count: ge them only when Google does.Fixed cost, NovemberThe two bills from Google, typed once a month. A total, not divided: most of it is there with 0 members or 50.AI bill, €Cloud bill, €Save€1.24this monthThe AI bill is €0.41; the count at your prices is €0.00. The bill also covers the preview, your tests and the days b"
+    },
+    {
+     "ok": true,
+     "text": "M6b: Saved still once, under the row saved"
+    },
+    {
+     "ok": true,
+     "text": "M2: a full week: the North Star, the five KPIs, the way in, this week in the app; no cost"
+    },
+    {
+     "ok": true,
+     "text": "M2: 4 weeks shows the North Star week by week"
+    },
+    {
+     "ok": true,
+     "text": "M4: the privacy notice says how visits are counted and how the pilot log is kept"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 29 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "past-and-plan.cjs",
+   "about": "JOURNEY (0.2.130, DT149, board Stories101 version 2; Tester 3, UX4; Coach Milan 29 October 00:14 and 00:58 Go): \"The past is recording what I ate. The future is planning what I will eat. In the moment is what I eat.\" A meal for tomorrow from Plan is planning: the bar says Planning Friday's dinner, the line says Planning, the main button is Put it in Friday's dinner before Fit and after it, there is no Make it, nothing is logged or rated. A recipe planned for Friday says Change it on the Plate. A day gone by on Plan lists each meal: a planned one is I ate it, at its time; Add what you ate opens the Plate, Adding Wednesday's lunch: no Fit, one button puts it in at the meal's time, no rating. Which day? behind the Plate's pencil makes a plate tomorrow's lunch. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one (the meal, then the day, date and time; Goes into your plan. for a meal to come; the words Planning and Eaten are gone from it). Which day? is gone: the calendar behind the pencil makes a plate tomorrow's lunch, and that plate has no Put it in button. A meal opened from Plan keeps Put it in Friday's dinner, as before. Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.",
+   "pass": true,
+   "seconds": 26,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT230: no bar; changed by DT308.1: the meal line says Dinner, Friday, and that it goes into your plan: Dinner Friday, 30 October, 20:00 Goes into your plan."
+    },
+    {
+     "ok": true,
+     "text": "the line says the day and that it goes into your plan; changed by B150: with its pencil, no X"
+    },
+    {
+     "ok": true,
+     "text": "the main button: Put it in Friday's dinner, before Fit"
+    },
+    {
+     "ok": true,
+     "text": "after Fit: still Put it in, no Make it"
+    },
+    {
+     "ok": true,
+     "text": "the plate says it is planned, not eaten"
+    },
+    {
+     "ok": true,
+     "text": "Friday's dinner is planned; nothing logged, nothing to rate"
+    },
+    {
+     "ok": true,
+     "text": "a recipe for Friday: Change it on the Plate, no Make it"
+    },
+    {
+     "ok": true,
+     "text": "it opens as Friday's breakfast, going into your plan"
+    },
+    {
+     "ok": true,
+     "text": "yesterday: each meal can be added; the planned dinner is I ate it"
+    },
+    {
+     "ok": true,
+     "text": "I ate it adds it on Wednesday at 20:00, nothing rated"
+    },
+    {
+     "ok": true,
+     "text": "the day shows it as eaten at dinner"
+    },
+    {
+     "ok": true,
+     "text": "Adding Wednesday's lunch; changed by DT308.1: the line says Lunch, Wednesday, 28 October, 13:45"
+    },
+    {
+     "ok": true,
+     "text": "no Fit, no Make: it is what you ate"
+    },
+    {
+     "ok": true,
+     "text": "added on Wednesday at 13:45, nothing rated"
+    },
+    {
+     "ok": true,
+     "text": "your calendar sits behind the pencil: the days on top (Which day? is gone)"
+    },
+    {
+     "ok": true,
+     "text": "tomorrow's meals say what is planned"
+    },
+    {
+     "ok": true,
+     "text": "the plate is now Friday's lunch, going into your plan: Lunch Friday, 30 October, 13:45 Goes into your plan."
+    },
+    {
+     "ok": true,
+     "text": "a meal set with the pencil has no Put it in button; changed by B151: the pencil itself plans the plate once it has foods"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 28 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "past-meal.cjs",
+   "about": "DT267 (0.3.117, board Stories200; Coach Milan 9 November, Go; from a tester): a meal eaten on a past day keeps its picture on Plan. The row shows the picture, the whole row opens the meal: the photo large, its other photos, the numbers, the foods with grams. Cook again only for a meal from a recipe; any other says Open, and inside Put it on the Plate again.",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "two eaten meals on Saturday"
+    },
+    {
+     "ok": true,
+     "text": "the meal read from a photo shows its picture"
+    },
+    {
+     "ok": true,
+     "text": "a meal with no recipe says Open, not Cook again"
+    },
+    {
+     "ok": true,
+     "text": "a meal from a recipe keeps Cook again"
+    },
+    {
+     "ok": true,
+     "text": "the row's buttons are at least 44 px"
+    },
+    {
+     "ok": true,
+     "text": "the day fits the width"
+    },
+    {
+     "ok": true,
+     "text": "a tap on the row opens the meal"
+    },
+    {
+     "ok": true,
+     "text": "the photo, large"
+    },
+    {
+     "ok": true,
+     "text": "its other photos under it"
+    },
+    {
+     "ok": true,
+     "text": "a tap on a small photo shows it large"
+    },
+    {
+     "ok": true,
+     "text": "the foods with their grams: Sourdough bread 120 g | Cooked ham 60 g | Fried egg 55 g"
+    },
+    {
+     "ok": true,
+     "text": "the numbers: 477 kcal 30 g protein PD 6.4"
+    },
+    {
+     "ok": true,
+     "text": "Put it on the Plate again, and Save in My recipes"
+    },
+    {
+     "ok": true,
+     "text": "every button at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "back returns to Saturday"
+    },
+    {
+     "ok": true,
+     "text": "the Plate holds its three foods; nothing new is logged"
+    },
+    {
+     "ok": true,
+     "text": "a recipe's meal: Cook again, no Save in My recipes"
+    },
+    {
+     "ok": true,
+     "text": "one photo or none: no row of small photos"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the row in the language: Otvori ›"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the meal in the language"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: fits the width"
+    },
+    {
+     "ok": true,
+     "text": "de: the row in the language: Öffnen ›"
+    },
+    {
+     "ok": true,
+     "text": "de: the meal in the language"
+    },
+    {
+     "ok": true,
+     "text": "de: fits the width"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 27 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-cook.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 8 October 2026, canvas boards RG0, RG1, RG3 and RG5): Cook is a permission, not a role. A client publishes only when their coach made them a cook, and what they send waits for their coach: the coach sees the page, then makes it live or sends it back with a note the cook sees. Changes to a cook's live recipe wait the same way, and the live page stays as it was until then. The cook can take their own recipe down. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 22,
+   "checks": [
+    {
+     "ok": true,
+     "text": "a client who isn't a cook has no Publish"
+    },
+    {
+     "ok": true,
+     "text": "their coach makes them a cook"
+    },
+    {
+     "ok": true,
+     "text": "a cook's button says Send to their coach: Send to your coach"
+    },
+    {
+     "ok": true,
+     "text": "sent: Waiting for the coach, and it can't be sent again while it waits"
+    },
+    {
+     "ok": true,
+     "text": "nothing is on the site while it waits"
+    },
+    {
+     "ok": true,
+     "text": "it waits for the coach, with its photo to see the page"
+    },
+    {
+     "ok": true,
+     "text": "the coach sends it back with a note"
+    },
+    {
+     "ok": true,
+     "text": "the tile says Sent back"
+    },
+    {
+     "ok": true,
+     "text": "the cook sees Sent back, and the note"
+    },
+    {
+     "ok": true,
+     "text": "sent again; the coach makes it live"
+    },
+    {
+     "ok": true,
+     "text": "DT196: the public recipe has no note, status, recipe id or author id: slug,title,lines,makes,servingName,minutes,items,steps,rating,who,per100,perServing,all,pd,proteinShare,fits,hasPhoto,photoAi,cooked,author,publishedAt,updatedAt"
+    },
+    {
+     "ok": true,
+     "text": "My recipes: Live"
+    },
+    {
+     "ok": true,
+     "text": "while the change waits, the live page stays as it was"
+    },
+    {
+     "ok": true,
+     "text": "the coach sees the change"
+    },
+    {
+     "ok": true,
+     "text": "made live: the page has the change"
+    },
+    {
+     "ok": true,
+     "text": "the cook can take their own recipe down"
+    },
+    {
+     "ok": true,
+     "text": "once the coach switches Cook off, nothing more can be sent"
+    },
+    {
+     "ok": true,
+     "text": "DT196: section 4 says 12 months and 30 days"
+    },
+    {
+     "ok": true,
+     "text": "the page's footer says the app's version: © 2026 Milan Stancevic · Impressum · Privacy · Disclaimer · Who's behind it · Version 0.3.182"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "safety.cjs",
+   "about": "JOURNEY INVARIANT (safety, 4 October 2026): consent before body data; the door asks the situations; a ticked eating situation switches Mealan's chat off and the plate keeps working; a declared allergy never shows up as a partner and the label check says what a pack contains; Export my data gives one file with everything. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 57,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the consent screen comes before the body fields"
+    },
+    {
+     "ok": true,
+     "text": "the body fields are shut until consent"
+    },
+    {
+     "ok": true,
+     "text": "I agree opens the fields and records consent"
+    },
+    {
+     "ok": true,
+     "text": "the door says tick one, or none, until something is ticked"
+    },
+    {
+     "ok": true,
+     "text": "the chat waits for the door's answer"
+    },
+    {
+     "ok": true,
+     "text": "none applies is recorded with its date"
+    },
+    {
+     "ok": true,
+     "text": "and it shows in the history"
+    },
+    {
+     "ok": true,
+     "text": "ticking a situation clears none"
+    },
+    {
+     "ok": true,
+     "text": "the allergy chips stay folded until the tick"
+    },
+    {
+     "ok": true,
+     "text": "the fourteen EU allergens as chips, under the tick"
+    },
+    {
+     "ok": true,
+     "text": "the door is recorded: eating,allergies"
+    },
+    {
+     "ok": true,
+     "text": "the consent is visible with its date"
+    },
+    {
+     "ok": true,
+     "text": "the door says Mealan is an AI chef and can be wrong"
+    },
+    {
+     "ok": true,
+     "text": "the door keeps a dated, visible history: November 23, 2026, current: A difficult relationship with ea"
+    },
+    {
+     "ok": true,
+     "text": "the flag carries its source and date"
+    },
+    {
+     "ok": true,
+     "text": "the person is told the chat is off until the coach confirms"
+    },
+    {
+     "ok": true,
+     "text": "the chat shows Mealan, chef only here, and that it is off"
+    },
+    {
+     "ok": true,
+     "text": "a question gets the fixed line, not the model"
+    },
+    {
+     "ok": true,
+     "text": "no dairy partner for someone avoiding milk: no mix offered"
+    },
+    {
+     "ok": true,
+     "text": "the label check says the pack contains what they avoid"
+    },
+    {
+     "ok": true,
+     "text": "the export holds profile, safety, foods, cards and goal"
+    },
+    {
+     "ok": true,
+     "text": "and the declarations are in it"
+    },
+    {
+     "ok": true,
+     "text": "Profile: no Save button, kept as you go"
+    },
+    {
+     "ok": true,
+     "text": "Goal opens at the top: scrollY 0"
+    },
+    {
+     "ok": true,
+     "text": "Goal leads to Lifestyle"
+    },
+    {
+     "ok": true,
+     "text": "Lifestyle leads to the Training week"
+    },
+    {
+     "ok": true,
+     "text": "the Training week leads to Where I shop and cook"
+    },
+    {
+     "ok": true,
+     "text": "DT209: Where I shop leads to Your summary"
+    },
+    {
+     "ok": true,
+     "text": "a public page at /impressum"
+    },
+    {
+     "ok": true,
+     "text": "a public page at /privacy"
+    },
+    {
+     "ok": true,
+     "text": "a public page at /disclaimer"
+    },
+    {
+     "ok": true,
+     "text": "a public page at /about"
+    },
+    {
+     "ok": true,
+     "text": "the privacy notice names the legal basis for health data"
+    },
+    {
+     "ok": true,
+     "text": "Back to the app leaves the legal pages"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "week-and-school.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 6 October 2026, as approved on the canvas): Plan has real weeks with dates; a change belongs to its date only, the Training week stays; earlier weeks can be browsed, and a past day shows what was eaten (canvas board TW, 13 October 2026). Release A (Milan, 7 October 2026): Chef Mealan is for adults. A birth year under 18 stops at \"Chef Mealan is for adults\", with the reason (the AI) and a way to correct the year. Release B (Milan, 7 October 2026, canvas B0 to B3): any adult can work, study, or both, or be at home. Lifestyle asks what fills the weekdays first, and only the questions that fit follow. A day is a Work day, a Study day or a Day off; the week keeps its colors, and Today says \"Study day\" on a study day.",
+   "pass": true,
+   "seconds": 24,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the Training week has no tabs and no dates"
+    },
+    {
+     "ok": true,
+     "text": "its address is /me/training-week: http://127.0.0.1:3415/me/training-week"
+    },
+    {
+     "ok": true,
+     "text": "the old address still opens it"
+    },
+    {
+     "ok": true,
+     "text": "the training row comes from the Training week"
+    },
+    {
+     "ok": true,
+     "text": "the training row opens the day editor, for this date only"
+    },
+    {
+     "ok": true,
+     "text": "the changed date says so on Plan"
+    },
+    {
+     "ok": true,
+     "text": "the usual week stays as it was: cardio"
+    },
+    {
+     "ok": true,
+     "text": "Back to the usual Wednesday puts the date back"
+    },
+    {
+     "ok": true,
+     "text": "a rest day has the pencil by the date"
+    },
+    {
+     "ok": true,
+     "text": "the arrows go back a week, and forward again"
+    },
+    {
+     "ok": true,
+     "text": "a past day shows what was eaten, or says nothing was"
+    },
+    {
+     "ok": true,
+     "text": "an adult is asked about alcohol"
+    },
+    {
+     "ok": true,
+     "text": "no page errors (adult)"
+    },
+    {
+     "ok": true,
+     "text": "work and study: both sets of questions"
+    },
+    {
+     "ok": true,
+     "text": "No fixed work is gone from Working hours; At home covers it"
+    },
+    {
+     "ok": true,
+     "text": "Work only: no study questions"
+    },
+    {
+     "ok": true,
+     "text": "Study only: no work questions"
+    },
+    {
+     "ok": true,
+     "text": "At home: nothing more is asked, and it says what it means"
+    },
+    {
+     "ok": true,
+     "text": "a day is a Work day, a Study day or a Day off"
+    },
+    {
+     "ok": true,
+     "text": "the week says Study on that day"
+    },
+    {
+     "ok": true,
+     "text": "the week keeps its colored bars"
+    },
+    {
+     "ok": true,
+     "text": "a day off says Day off on the right"
+    },
+    {
+     "ok": true,
+     "text": "Today: Study day, then team sport in the evening. A moderate day."
+    },
+    {
+     "ok": true,
+     "text": "no page errors (apprentice)"
+    },
+    {
+     "ok": true,
+     "text": "a birth year under 18 stops at Chef Mealan is for adults, and the reason is the AI"
+    },
+    {
+     "ok": true,
+     "text": "nothing else opens: no Today, Plate, Foods or Me"
+    },
+    {
+     "ok": true,
+     "text": "Correct my birth year opens the profile"
+    },
+    {
+     "ok": true,
+     "text": "no page errors (17)"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "your-summary.cjs",
+   "about": "DT167 (0.3.9, board Stories119 versions 1 and 2; Coach Milan 30 October 08:47 to 09:59): Your summary, the last row of Me and where the steps end; Taste in Lifestyle; Plan your week and Craft your first meal; what the coach sees, part by part, health data off until switched on; on the coach's side, the shared profile with what changed since the coach last looked.",
+   "pass": true,
+   "seconds": 22,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT209: the steps, Your summary, My coach, then Account: Profile,Goal,Lifestyle,Training week,Google Calendar,Where I shop and cook,Your summary,My coach,Account"
+    },
+    {
+     "ok": true,
+     "text": "Taste no longer sits alone at the bottom of Me"
+    },
+    {
+     "ok": true,
+     "text": "Taste in Lifestyle, under Nutrition, after What you eat: Where you eat,What you eat,Taste,Alcohol"
+    },
+    {
+     "ok": true,
+     "text": "DT209: Where I shop and cook's Next leads to Your summary"
+    },
+    {
+     "ok": true,
+     "text": "every part, by step: You,Goal and numbers,Your day,How you eat,Training week,Where you shop and cook,Health questions"
+    },
+    {
+     "ok": true,
+     "text": "You: body data, health data, numbers only: Bodyhealth data Male, born 1981, 182 cm, 85 kg Your resting burn, about 1,770 kcal, and your protein range. Numbers only"
+    },
+    {
+     "ok": true,
+     "text": "Your day: wake-up and bedtime with the meal times they set"
+    },
+    {
+     "ok": true,
+     "text": "Where you eat and Work travel: Chef Mealan reads them now"
+    },
+    {
+     "ok": true,
+     "text": "taste in your own words, in the summary"
+    },
+    {
+     "ok": true,
+     "text": "Plan your week, Craft your first meal, Save as PDF"
+    },
+    {
+     "ok": true,
+     "text": "without a coach, nothing to choose for one"
+    },
+    {
+     "ok": true,
+     "text": "Craft your first meal opens Plate: http://127.0.0.1:3426/plate"
+    },
+    {
+     "ok": true,
+     "text": "Plan your week opens Plan"
+    },
+    {
+     "ok": true,
+     "text": "by default: the everyday parts on; diet, alcohol, own words, allergies and body data off"
+    },
+    {
+     "ok": true,
+     "text": "the health questions stay as today: which and when"
+    },
+    {
+     "ok": true,
+     "text": "saved: body data switched on with its date, your consent: {\"on\":{\"goal\":\"2026-11-23T12:41:13.759Z\",\"day\":\"2026-11-23T12:41:13.759Z\",\"eat\":\"2026-11-23T12:41:13.759Z\",\"week\":\"2026-11-23T12:41:13.759Z\",\"shop\":\"2026-11-23T"
+    },
+    {
+     "ok": true,
+     "text": "the summary says how much the coach sees"
+    },
+    {
+     "ok": true,
+     "text": "Clients marks a client whose shared profile changed"
+    },
+    {
+     "ok": true,
+     "text": "the client's page starts with what changed: What changed since you last looked 21 Nov Wake-up and bedtime: 6:00 to 8:00 · 22:00 to midnight → Before 6:00 · 22:00 to midnight. 21 Nov Meals: 3 a day, 07:30, 13:45 and 20:00 → 3 a day, 06:30, 13:15"
+    },
+    {
+     "ok": true,
+     "text": "the shared parts below, what wasn't shared said, no private row: one of these, answered 6 November Chef Mealan helps with everything. Asked again once a year. ✓ Chef reads Not shared What you eat, alcohol, in your own words, allergies and intolerances, your body data. Nina keeps these to themselves. Save as PDF, as of today"
+    },
+    {
+     "ok": true,
+     "text": "DT237: the card in the coach's language, one button for Nina's, 44 px: Goal and numbers,Your day,How you eat,Where you shop and coo"
+    },
+    {
+     "ok": true,
+     "text": "DT237: a tap shows her rows in Srpski, the rest stays English: Cilj i brojevi,Tvoj dan,Kako jedeš,Gde kupuješ i kuvaš,Zdrav"
+    },
+    {
+     "ok": true,
+     "text": "DT237: Back to English puts it back"
+    },
+    {
+     "ok": true,
+     "text": "looked at: the mark goes"
+    },
+    {
+     "ok": true,
+     "text": "DT172: without body data, weigh-ins in percent and days weighed, no kilogram: Weigh-ins 1 this week 1 morning weighed Not enough weigh-ins yet for a trend."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "why"
+}
