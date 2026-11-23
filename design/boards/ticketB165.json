@@ -17,10 +17,31 @@
     "decision": "Waiting for Coach Milan's Go.",
     "short": "A long food chip wraps inside its box in the steps, the page stays on the screen; with B166 in one release, 0.3.192",
     "ac": [
-      {"id": "AC1", "title": "A long chip wraps", "text": "Given step 1 of Lazy Burek with 250 g Körniger Frischkäse Tworog 2,5% Fett, when I open Edit recipe on a phone 390 px wide, then the chip wraps inside the step's field and the page stays 390 px wide"},
-      {"id": "AC2", "title": "Still one chip", "text": "Given that chip on two lines, when I tap its food under the steps, then the whole chip leaves the step, with its amount"},
-      {"id": "AC3", "title": "A short chip stays on one line", "text": "Given 2 eggs (L) in the same step, when I read the step, then that chip is on one line, as now"},
-      {"id": "AC4", "title": "The publish sheet too", "text": "Given the same recipe in the sheet to share it with members, when I read its steps, then the long chip wraps there too"}
+      {
+        "id": "AC1",
+        "title": "A long chip wraps",
+        "text": "Given step 1 of Lazy Burek with 250 g Körniger Frischkäse Tworog 2,5% Fett, when I open Edit recipe on a phone 390 px wide, then the chip wraps inside the step's field and the page stays 390 px wide"
+      },
+      {
+        "id": "AC2",
+        "title": "Still one chip",
+        "text": "Given that chip on two lines, when I tap its food under the steps, then the whole chip leaves the step, with its amount"
+      },
+      {
+        "id": "AC3",
+        "title": "A short chip stays on one line",
+        "text": "Given 2 eggs (L) in the same step, when I read the step, then that chip is on one line, as now"
+      },
+      {
+        "id": "AC4",
+        "title": "The publish sheet too",
+        "text": "Given the same recipe in the sheet to share it with members, when I read its steps, then the long chip wraps there too"
+      },
+      {
+        "id": "AC5",
+        "title": "Chips never touch",
+        "text": "Given the long chip on two lines with 2 eggs (L) on the line under it, when I read the step, then there is space between the two chips"
+      }
     ],
     "unchanged": [
       "Typing in a step, a space at the end and the keyboard, as B161.",
@@ -28,9 +49,9 @@
       "The names in the chips, as B163.",
       "The recipe page and the cook show the steps as now."
     ],
-    "checks": "Light, for B165 and B166 together: CSS only, nothing in what the app does changes, no new words. The unit tests, the build, one new walkthrough for B165 AC1 to AC4 and B166 AC1 to AC3, and the walkthroughs that open these screens: step-typing, step-names, steps-and-parts, recipe-changed, fibre, pd-scale. About 10 minutes. No German sweep: no on-screen words change.",
+    "checks": "Light, for B165 and B166 together: CSS only, nothing in what the app does changes, no new words. The unit tests, the build, one new walkthrough for B165 AC1 to AC5 and B166 AC1 to AC3, and the walkthroughs that open these screens: step-typing, step-names, steps-and-parts, recipe-changed, fibre, pd-scale. About 10 minutes. No German sweep: no on-screen words change.",
     "details": [
-      ".st-food in src/index.css: white-space normal, max-width 100%, overflow-wrap anywhere. It stays inline-block and contenteditable false.",
+      ".st-food in src/index.css: white-space normal, max-width 100%, overflow-wrap anywhere, margin 3px 0 (about 6 px between two lines of chips; Coach Milan 23 November 23:57, after B165.2b showed 0 px). It stays inline-block and contenteditable false.",
       "The pictures: one scratch build of main, 0.3.191, not committed. The new pictures put this rule into the same page in the browser.",
       "The red dashed line in B165.1b is the phone's edge, 390 px. It is on the board only."
     ]
@@ -52,9 +73,21 @@
     "decision": "Waiting for Coach Milan's Go.",
     "short": "The table in a PD card reads in its own colours; with B165 in one release, 0.3.192",
     "ac": [
-      {"id": "AC1", "title": "The note under Total", "text": "Given Lazy Burek's page, when I tap the letters in the PD card, then the note under Total reads in grey, with no empty space before Per 100 kcal"},
-      {"id": "AC2", "title": "Per 100 kcal", "text": "Given the numbers open, when I tap Per 100 kcal, then its four lines read in dark text and the note under them in grey"},
-      {"id": "AC3", "title": "The fibre line", "text": "Given a recipe with a food that has no fibre value, when I open its numbers, then the line * Fibre: at least 1 g. 1 food without a value reads in dark text, as on the Plate"}
+      {
+        "id": "AC1",
+        "title": "The note under Total",
+        "text": "Given Lazy Burek's page, when I tap the letters in the PD card, then the note under Total reads in grey, with no empty space before Per 100 kcal"
+      },
+      {
+        "id": "AC2",
+        "title": "Per 100 kcal",
+        "text": "Given the numbers open, when I tap Per 100 kcal, then its four lines read in dark text and the note under them in grey"
+      },
+      {
+        "id": "AC3",
+        "title": "The fibre line",
+        "text": "Given a recipe with a food that has no fibre value, when I open its numbers, then the line * Fibre: at least 1 g. 1 food without a value reads in dark text, as on the Plate"
+      }
     ],
     "unchanged": [
       "The orange PD card: its big number and its white lines, as now.",
