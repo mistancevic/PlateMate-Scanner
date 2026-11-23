@@ -3594,21 +3594,75 @@
       "title": "Fibre: 0 where it is a fact, and the plate counts what is known and says so",
       "epic": "plate",
       "state": "next",
-      "why": "Coach Milan 22 November 2026, 22:31: fibre is super important, and fi? shows very often. 22:51: go with the two-part proposal; no made-up numbers as estimates.",
+      "why": "Coach Milan 22 November 2026, 22:31: fibre is super important, and fi? shows very often. 22:51: go with the two-part proposal; no made-up numbers as estimates. 23 November 15:33: draw DT342.",
       "opportunity": {
         "from": "Coach Milan's own look, 22 November 2026.",
         "job": "See the fibre of my plate and my day.",
         "kind": "Did not understand it: fi? on most plates.",
-        "why_now": "Fibre is voluntary on EU labels, and Chef Mealan's added foods carry no fibre value, so most plates read fi?."
+        "why_now": "Fibre is voluntary on EU labels, and many packs and Chef Mealan's added foods carry no fibre value, so most plates read fi?."
       },
-      "problem": "A plate shows fi? as soon as one food on it has no fibre value, even when every other food has one. Tea, coffee, water, salt, oil, sugar, meat, fish, eggs and milk products have no fibre by nature, yet a missing value counts as unknown.",
-      "story": "When I look at the fibre of my plate, I want to see what is known and how much is missing, so that I can still act on it.",
-      "proposed": "1. 0 where it is a fact: foods that have no fibre by nature (tea, coffee, water, salt, oil, sugar, meat, fish, eggs, milk products) count as 0 fibre. 2. The rest counts what is known and says so: the plate adds the fibre of the foods that have a value and shows it as at least X g, N foods without a value. The food's card asks to add the fibre from the pack. No guessed numbers.",
+      "story": "When I look at the fibre of my plate, I want to see what is known and which food is missing, so that I can still act on it.",
+      "proposed": "1. 0 where it is a fact: a food with no fibre value whose name says it has no fibre by nature (tea, coffee, water, salt, oil, sugar, meat, fish, eggs, plain milk products) counts as 0 fibre wherever foods are added up. Its own values stay as on its pack: what is on the package is what we show. 2. The rest counts what is known and says so: the plate's fibre reads at least X g, and one line names the foods without a value. The fibre letter shows when the known part is already On plan or above; under that it stays fi?, because the missing food could lift it. 3. That food's card says it has no fibre value and to add it from the pack in Review the label. No guessed numbers.",
+      "problem": "A plate shows fi? as soon as one food on it has no fibre value, even when every other food has one. Tea, coffee, water, salt, oil, sugar, meat, fish, eggs and milk products have no fibre by nature, yet a missing value counts as unknown, and one empty value hides all the fibre that is known.",
       "open": [
-        "Which words or categories make a food fibre-free by nature, to settle while drawing, as for DT336."
+        "The list of words that make a food fibre-free by nature, and the words that block it: drawn in the design details, for Coach Milan to settle, as for DT336."
       ],
-      "checks": "To agree with the board.",
-      "decision": "Direction agreed 22 November 22:51. Not drawn yet."
+      "checks": "Middle: the Plate's letters and numbers, a food's card, a recipe's numbers. The unit tests with new ones for the list and the count; the build; a new walkthrough for AC1 to AC7; and the walkthroughs of the Plate's numbers and letters, about 10 minutes. New words on screen, so the German sweep too.",
+      "decision": "Direction agreed 22 November 22:51. Drawn 23 November 2026 for Coach Milan's look. No Go, so nothing is built.",
+      "now": "The Plate: chicken, rice, broccoli and olive oil from a pack that gives no fibre. The letters read fi?, and the numbers say Fibre ?, though the rice and the broccoli have about 6 g.",
+      "looked_at": "A guessed fibre value from Chef Mealan or a table for a pack without one: not chosen (22:51), no made-up numbers. Setting 0 into the pack's own values: not chosen; the pack stays as printed and only the count uses 0.",
+      "board": "Stories285",
+      "where": "Page 6",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "0 where it is a fact",
+          "text": "Given olive oil from a pack with no fibre value on my plate, when the plate adds up its fibre, then the oil counts as 0, the plate shows a real fibre letter, and the oil's own values stay as on its pack"
+        },
+        {
+          "id": "AC2",
+          "title": "The list",
+          "text": "Given a food with no fibre value, when its name says tea, coffee, water, salt, oil, sugar, meat, fish, eggs or a plain milk product, as a whole word in English, German or Serbian (Latin and Cyrillic), then it counts as 0; a word for something with fibre in it (muesli, fruit, chocolate, nuts, bread, breaded, vegetables, beans) blocks the 0 and always wins"
+        },
+        {
+          "id": "AC3",
+          "title": "The numbers say why",
+          "text": "Given the plate's numbers open, when a food counts as 0 by nature, then one line names it: Olive oil counts as 0 fibre: none by nature"
+        },
+        {
+          "id": "AC4",
+          "title": "What is known, at least",
+          "text": "Given a muesli bar with no fibre value on my plate, when I open the plate's numbers, then fibre reads at least 6 g and one line says 1 food without a value: Muesli bar"
+        },
+        {
+          "id": "AC5",
+          "title": "The letter",
+          "text": "Given foods without a fibre value on my plate, when the known fibre is already On plan or above, then the letter shows it (Fi, Fi+); under that the letter stays fi?, because the missing food could lift it"
+        },
+        {
+          "id": "AC6",
+          "title": "The food's card",
+          "text": "Given the muesli bar's card, when it has no fibre value, then one line says so and to add it from the pack in Review the label; a food on the list says it counts as 0 on my plate. No guessed number"
+        },
+        {
+          "id": "AC7",
+          "title": "Each food's row",
+          "text": "Given olive oil on my plate, when I look at its row, then its letters read fi-, not fi?"
+        }
+      ],
+      "unchanged": [
+        "A food's own values: as on its pack, the fibre field empty when the pack gives none.",
+        "The fibre rate of the day, 14 g per 1,000 kcal, and the five letter levels.",
+        "A food with a fibre value: counted as it is."
+      ],
+      "details": [
+        "Fibre-free by nature, whole words, the name only (the list to settle). Tea, coffee, water, salt (DT336's words). Oil: oil, Öl, Olivenöl, ulje. Sugar: sugar, Zucker, šećer. Meat: chicken, beef, pork, turkey, veal, lamb, ham, bacon, steak; Hähnchen, Huhn, Rind, Schwein, Pute, Kalb, Lamm, Schinken, Speck; piletina, junetina, svinjetina, ćuretina, teletina, jagnjetina, šunka, slanina. Fish: fish, salmon, tuna, cod, trout, sardines, mackerel, shrimp; Fisch, Lachs, Thunfisch, Kabeljau, Forelle, Garnelen; riba, losos, tunjevina, oslić, pastrmka, sardine, škampi. Eggs: egg, Ei, jaje. Milk products: milk, yogurt, skyr, quark, cheese, butter, kefir; Milch, Joghurt, Käse; mleko, jogurt, sir, maslac, kajmak. Serbian also in Cyrillic.",
+        "Words that block the 0 and always win: muesli, granola, fruit and common fruits (strawberry, banana, blueberry), chocolate, cocoa, nuts, oats, bread, breaded (paniert, pohovan), cereal, vegetables, beans, tomato, seeds, jam, cake, biscuits, pizza, burger, sandwich, wrap, salad, juice; in German and Serbian too. A fruit yoghurt or breaded chicken is not 0.",
+        "The same count wherever foods are added up: the Plate, Plate read, a recipe's numbers.",
+        "The pictures are the real app on one scratch build of main, not committed, with the clock on Monday 23 November 2026, 16:00."
+      ],
+      "short": "Fibre: 0 where it is a fact; the plate says at least X g and which food has no value",
+      "rel": "Proposed; not agreed until Coach Milan says Go"
     },
     {
       "id": "DT343",
