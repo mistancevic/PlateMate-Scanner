@@ -40,7 +40,7 @@ How you talk to me:
 - Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 - When this chat gets long, give me this full starter prompt again, updated, never a short one.
 
-Next: 0.3.192 (B165 and B166) is merged into main; I start Preview. B168 and DT349 are drawn together on canvas Page 6 and wait for my Go: Numbers for − 1 portion + above the PD card (not saved), the Plate's PD card on the recipe page (PdCard, design rule D8), the cooking's − and + moved to Start cooking (saved, 1 portion), the Cook it card gone. Checks Full, new words, release 0.3.193. After it, from Next: DT348 (one button to add a step), B164, DT346, DT347, DT344.
+Next: 0.3.192 (B165 and B166) is merged into main; I start Preview. B168 and DT349 are redrawn on canvas Page 6 and wait for my Go: the recipe's header is the meal (title, a placeholder photo with its buttons on it, the Plate's PD card for the whole meal with its numbers under it, Nutrition with 1 portion, All and 100 g); the portions to cook are chips at the top of Foods (saved, the grams follow); the Cook it card goes; PdCard and design rule D8. Checks Full, new words, release 0.3.193. After it, from Next: DT348 (one button to add a step), B164, DT346, DT347, DT344.
 ```
 
 ## Standing rules (Coach Milan)
@@ -69,9 +69,10 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 24 November 2026, 14:05
+## State, 24 November 2026, 15:05
 
-- B168 and DT349 drawn together 24 November 14:00 (Stories294, w 2270, h 7374; Coach Milan 13:47 to 13:54: Cook it is a CTA; separate the whole recipe and cooking from the portion calculation of macros; draw, then we continue). Scratch /home/claude/work/b168 holds it all: src/components/PdCard.tsx, NutritionCard count, RecipePage readN (Numbers for, not saved) and the cook row in the Steps block (rq-cook-at). Not done in the scratch yet: the Plate on PdCard, design.md D8, the design-rules check, the words in en.json. Checks proposed Full.
+- B168 and DT349 redrawn 24 November 15:05 (Coach Milan 14:49: the header is the meal, a placeholder photo with the CTAs on it, portioning elsewhere as - + or chips; 14:50: yes, but the PD card is the whole meal, not one portion). Stories294 now h 6566. Scratch /home/claude/work/b168 holds it: PdCard, NutritionCard whole meal, rq-nopic-ph placeholder (an SVG plate), chips at the top of Foods (rq-portion-chips, choice). Numbers for and the cook row at Start cooking are out of the scratch.
+- B168 and DT349 first drawn together 24 November 14:00 (Stories294, w 2270, h 7374; Coach Milan 13:47 to 13:54: Cook it is a CTA; separate the whole recipe and cooking from the portion calculation of macros; draw, then we continue). Scratch /home/claude/work/b168 holds it all: src/components/PdCard.tsx, NutritionCard count, RecipePage readN (Numbers for, not saved) and the cook row in the Steps block (rq-cook-at). Not done in the scratch yet: the Plate on PdCard, design.md D8, the design-rules check, the words in en.json. Checks proposed Full.
 - B168 redrawn 24 November 08:05 as a variant (Coach Milan 07:58: no more navigation in the card, use Cook it's - and +; the PD card layout is a new design ticket, DT349): NutritionCard takes count, Cook it's cookN (meal.cook.n), none while editing; Stories294 now w 1790, h 4307. Scratch /home/claude/work/b168 holds this variant (PdCard was taken out of it). Seen: Cook it at 1 says 1 portions (not in B168).
 - B168 first redrawn 24 November 07:55 (Stories294, Page 6, w 1790, h 5177; Coach Milan 07:42: the same PD card layout as on the Plate, in the design system and components, and - and + to keep the whole recipe; 07:48: option A, - and + in the card's title). Scratch /home/claude/work/b168 holds src/components/PdCard.tsx and NutritionCard with the count (not committed; reuse it for the build). The Plate is to use PdCard too; docs/rules/design.md D8 and a design-rules.cjs check. Open: a food's PD card (FoodCard), not in B168, own ticket unless Coach Milan says. First drawn 07:10, state now, waits for Go. Cause: NutritionCard hands NumbersTable aggregate(items) of the whole recipe. Fix drawn: with more than one portion, the table gets the foods at grams divided by the portions; RecipeIn uses the same card. Scratch build /home/claude/work/b168 (main 0.3.192 with the change behind localStorage board-new). Board tools: shotB168.cjs, genB168.py, ticketB168.json, heightsB168.json, assetsB168.json.
 - 0.3.192 (B165 and B166) is merged into main as 98907aa (merge of pm192) and tagged v0.3.192 (local tag); Go 24 November 00:13, checks Light, 7 of 7 (docs/qa/runs/0.3.192.json, 1 min): chip-lines, step-typing, step-names, steps-and-parts, recipe-changed, fibre, pd-scale. No new words, so the language tables stay at 0.3.191 and no German sweep. Main is at the release commit after it. Coach Milan starts Preview and Promote.
@@ -136,8 +137,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - Stories291 B161 at x 0, y 76002, w 1290, h 2617.
 - Stories292 B167 at x 0, y 78739, w 2670, h 3578.
 - Stories293 B165 and B166 at x 0, y 82437, w 1790, h 6466.
-- Stories294 B168 and DT349 at x 0, y 89023, w 2270, h 7374.
-- The next board on Page 6 goes at x 0, y 96517.
+- Stories294 B168 and DT349 at x 0, y 89023, w 2270, h 6566.
+- The next board on Page 6 goes at x 0, y 95709.
 - A sheet that scrolls is drawn as one tall picture: shotDT339.cjs unroll() opens its scroll boxes at their real width.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.191; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json of 0.3.191. Two new lines in 0.3.191, Srpski confirmed by Claude, German in Beta.
