@@ -26,16 +26,16 @@ def shot(x, y, name, w, title, status, note):
     return y + 110 + h
 CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "Before, 0.3.191")}
 B = Board(); PW = 390; G = 90
-W = SX + 2 * PW + 1 * G + 40
+W = SX + 3 * PW + 2 * G + 40
 def req(t, words):
     o = t["opportunity"]
     return [("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
       ("Problem", t["problem"]), ("Story", t["story"]), ("In Coach Milan's words", words),
       ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]), ("Decision", t["decision"])]
 parts = [("Ticket", "B168. This board is the ticket. On the canvas page Kanban it is one short card with the label Board: B168, canvas Page 6."),
-  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> B168.1: Lazy Burek's PD card and its numbers, as in 0.3.192. B168.2: the same, new. A blue outline marks what each note is about.")] + \
-  req(t5, "24 November 07:04: whether the numbers table under One portion gets its own ticket: yes, we need to fix that. 07:07: draw it with one portion.") + [("3. The agreement", "In the wide block at the bottom of this board.")]
-n0 = len(B.html); storyCard(B, 30, "B168", "one portion, its numbers", parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
+  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> B168.1: Lazy Burek's PD card and its numbers, as in 0.3.192. B168.2: the same, new: the Plate's card, one portion first, + up to the whole recipe. B168.3: the Plate's card, for reference. A blue outline marks what each note is about.")] + \
+  req(t5, "24 November 07:04: whether the numbers table under One portion gets its own ticket: yes, we need to fix that. 07:07: draw it with one portion. 07:42: we need to have the same PD card layout as it is on the Plate; that should be also in the design system and components fixed. How to not lose the whole recipe numbers? Can we use + - to navigate what is considered for calculation? 07:48: A, the − and + in the card.") + [("3. The agreement", "In the wide block at the bottom of this board.")]
+n0 = len(B.html); storyCard(B, 30, "B168", "the PD card, one portion first", parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
 X = lambda i: SX + i * (PW + G)
 def label(y, text, sub, n):
     lw = n * PW + (n - 1) * G
@@ -50,11 +50,14 @@ def row(y, rid, sub, shots, taps):
     return max(ends) + 70
 y = 30
 y = row(y, "B168.1 Before, 0.3.192", "the PD card, then its numbers", [
-  ("68-1a", PW, "B168.1a Recipe page, PD card", "draft", "One portion: 549 kcal, 224 g."),
-  ("68-1b", PW, "B168.1b The numbers", "draft", "Total 897 g, 2,194 kcal: the whole recipe.")], ["the letters"])
-y = row(y, "B168.2 New", "the same two screens", [
-  ("68-2a", PW, "B168.2a Recipe page, PD card", "same", "As before."),
-  ("68-2b", PW, "B168.2b The numbers", "changed", "Total 224 g, 549 kcal: one portion.")], ["the letters"])
+  ("68-1a", PW, "B168.1a Recipe page, PD card", "draft", "One portion in one small line."),
+  ("68-1b", PW, "B168.1b The numbers", "draft", "Inside the card; Total 897 g: the whole recipe.")], ["the letters"])
+y = row(y, "B168.2 New", "the Plate's card, one portion first, + up to all 4", [
+  ("68-2a", PW, "B168.2a Recipe page, PD card", "changed", "The Plate's card; − One portion + in its title."),
+  ("68-2b", PW, "B168.2b The numbers", "changed", "Under the card; one portion, Total 224 g."),
+  ("68-2c", PW, "B168.2c All 4 portions", "changed", "The rows and the numbers count the whole recipe.")], ["the letters", "+ three times"])
+y = row(y, "B168.3 The Plate", "the card the recipe page takes, for reference", [
+  ("68-3a", PW, "B168.3a The Plate, PD card", "same", "As now; it becomes the shared PdCard.")], [])
 # every screen carries its id, for both tickets (rule 9); board() counts only the first id, so the count is made here
 html = "".join(B.html); ids = set(re.findall(r"B168\.\d+[a-z]", html)); imgs = html.count("<img")
 if len(ids) < imgs: raise SystemExit(f"{imgs} screens but {len(ids)} screen ids")

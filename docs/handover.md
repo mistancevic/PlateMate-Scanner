@@ -40,7 +40,7 @@ How you talk to me:
 - Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 - When this chat gets long, give me this full starter prompt again, updated, never a short one.
 
-Next: 0.3.192 (B165 and B166) is merged into main; I start Preview. B168 (the numbers under One portion show the whole recipe) is drawn on canvas Page 6 and waits for my Go, checks Light, release 0.3.193. After it, from Next: DT348 (one button to add a step), B164, DT346, DT347, DT344.
+Next: 0.3.192 (B165 and B166) is merged into main; I start Preview. B168 is redrawn on canvas Page 6 and waits for my Go: the recipe's PD card becomes the Plate's card (one component, PdCard, a design rule), one portion first, - and + up to the whole recipe. Checks Middle, new words, release 0.3.193. Open: a food's PD card as its own ticket. After it, from Next: DT348 (one button to add a step), B164, DT346, DT347, DT344.
 ```
 
 ## Standing rules (Coach Milan)
@@ -69,9 +69,9 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 24 November 2026, 07:15
+## State, 24 November 2026, 07:55
 
-- B168 drawn 24 November 07:10 (Stories294, Page 6; Coach Milan 07:04 yes, 07:07 draw it with one portion), state now, waits for Go. Cause: NutritionCard hands NumbersTable aggregate(items) of the whole recipe. Fix drawn: with more than one portion, the table gets the foods at grams divided by the portions; RecipeIn uses the same card. Scratch build /home/claude/work/b168 (main 0.3.192 with the change behind localStorage board-new). Board tools: shotB168.cjs, genB168.py, ticketB168.json, heightsB168.json, assetsB168.json.
+- B168 redrawn 24 November 07:55 (Stories294, Page 6, w 1790, h 5177; Coach Milan 07:42: the same PD card layout as on the Plate, in the design system and components, and - and + to keep the whole recipe; 07:48: option A, - and + in the card's title). Scratch /home/claude/work/b168 holds src/components/PdCard.tsx and NutritionCard with the count (not committed; reuse it for the build). The Plate is to use PdCard too; docs/rules/design.md D8 and a design-rules.cjs check. Open: a food's PD card (FoodCard), not in B168, own ticket unless Coach Milan says. First drawn 07:10, state now, waits for Go. Cause: NutritionCard hands NumbersTable aggregate(items) of the whole recipe. Fix drawn: with more than one portion, the table gets the foods at grams divided by the portions; RecipeIn uses the same card. Scratch build /home/claude/work/b168 (main 0.3.192 with the change behind localStorage board-new). Board tools: shotB168.cjs, genB168.py, ticketB168.json, heightsB168.json, assetsB168.json.
 - 0.3.192 (B165 and B166) is merged into main as 98907aa (merge of pm192) and tagged v0.3.192 (local tag); Go 24 November 00:13, checks Light, 7 of 7 (docs/qa/runs/0.3.192.json, 1 min): chip-lines, step-typing, step-names, steps-and-parts, recipe-changed, fibre, pd-scale. No new words, so the language tables stay at 0.3.191 and no German sweep. Main is at the release commit after it. Coach Milan starts Preview and Promote.
 - 0.3.191 (B167) is merged into main and tagged v0.3.191 (local tag); before it 0.3.190 (B161), 0.3.189 (B163), 0.3.188 (DT345, B162), 0.3.187 (B160), 0.3.186 (B159), 0.3.185 (DT342), 0.3.184 (DT335), 0.3.183 (DT319), 0.3.182 (DT340), 0.3.181 (B156), 0.3.180 (DT339), 0.3.179 (DT338), 0.3.178 (DT334), 0.3.177 (Srpski confirmed), 0.3.176 (DT337), 0.3.175 (B157, B158), 0.3.174 (DT336). Main is at the handover commit after it. Coach Milan starts Preview and Promote.
 - Last full run on main: 0.3.184, 234 of 234 (docs/qa/runs/0.3.184.json, 25 min). built.cjs and meal-edit.cjs passed on a rerun: built read a stale dist (built before the last built-facts), meal-edit's dinner checks now read the dinner alone, because DT340 gives a past meal with nothing planned I skipped it. Since then 0.3.185: Middle plus the German sweep, 24 of 24; 0.3.186: Light plus the German sweep, 10 of 10; 0.3.187: Light plus the German sweep, 12 of 12; 0.3.188: Light plus the German sweep, 15 of 15; 0.3.189: Light widened to every walkthrough with steps, 33 of 33; 0.3.190: the same plus the publish sheet, 36 of 36 (docs/qa/runs/0.3.190.json); 240 walkthroughs in all now.
@@ -134,8 +134,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - Stories291 B161 at x 0, y 76002, w 1290, h 2617.
 - Stories292 B167 at x 0, y 78739, w 2670, h 3578.
 - Stories293 B165 and B166 at x 0, y 82437, w 1790, h 6466.
-- Stories294 B168 at x 0, y 89023, w 1310, h 5107.
-- The next board on Page 6 goes at x 0, y 94250.
+- Stories294 B168 at x 0, y 89023, w 1790, h 5177.
+- The next board on Page 6 goes at x 0, y 94320.
 - A sheet that scrolls is drawn as one tall picture: shotDT339.cjs unroll() opens its scroll boxes at their real width.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.191; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json of 0.3.191. Two new lines in 0.3.191, Srpski confirmed by Claude, German in Beta.
