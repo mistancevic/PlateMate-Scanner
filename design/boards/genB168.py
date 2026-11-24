@@ -33,9 +33,9 @@ def req(t, words):
       ("Problem", t["problem"]), ("Story", t["story"]), ("In Coach Milan's words", words),
       ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]), ("Decision", t["decision"])]
 parts = [("Ticket", "B168. This board is the ticket. On the canvas page Kanban it is one short card with the label Board: B168, canvas Page 6."),
-  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> B168.1: Lazy Burek's PD card and its numbers, as in 0.3.192. B168.2: the same, new: the Plate's card, one portion first, + up to the whole recipe. B168.3: the Plate's card, for reference. A blue outline marks what each note is about.")] + \
-  req(t5, "24 November 07:04: whether the numbers table under One portion gets its own ticket: yes, we need to fix that. 07:07: draw it with one portion. 07:42: we need to have the same PD card layout as it is on the Plate; that should be also in the design system and components fixed. How to not lose the whole recipe numbers? Can we use + - to navigate what is considered for calculation? 07:48: A, the − and + in the card.") + [("3. The agreement", "In the wide block at the bottom of this board.")]
-n0 = len(B.html); storyCard(B, 30, "B168", "the PD card, one portion first", parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
+  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> B168.1: Lazy Burek's PD card and its numbers, as in 0.3.192. B168.2: the same, new, a variant: the card counts what Cook it is set to. A blue outline marks what each note is about.")] + \
+  req(t5, "24 November 07:04: whether the numbers table under One portion gets its own ticket: yes, we need to fix that. 07:07: draw it with one portion. 07:42: we need to have the same PD card layout as it is on the Plate; that should be also in the design system and components fixed. How to not lose the whole recipe numbers? Can we use + - to navigate what is considered for calculation? 07:48: A, the − and + in the card. 07:58: I dont want to have more navigations in the card. We already have + - portion feature. I wanted to use that one. Make it as a variant. For the PD card: ok, new design ticket then.") + [("3. The agreement", "In the wide block at the bottom of this board.")]
+n0 = len(B.html); storyCard(B, 30, "B168", "the card counts what Cook it is set to", parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
 X = lambda i: SX + i * (PW + G)
 def label(y, text, sub, n):
     lw = n * PW + (n - 1) * G
@@ -52,12 +52,10 @@ y = 30
 y = row(y, "B168.1 Before, 0.3.192", "the PD card, then its numbers", [
   ("68-1a", PW, "B168.1a Recipe page, PD card", "draft", "One portion in one small line."),
   ("68-1b", PW, "B168.1b The numbers", "draft", "Inside the card; Total 897 g: the whole recipe.")], ["the letters"])
-y = row(y, "B168.2 New", "the Plate's card, one portion first, + up to all 4", [
-  ("68-2a", PW, "B168.2a Recipe page, PD card", "changed", "The Plate's card; − One portion + in its title."),
-  ("68-2b", PW, "B168.2b The numbers", "changed", "Under the card; one portion, Total 224 g."),
-  ("68-2c", PW, "B168.2c All 4 portions", "changed", "The rows and the numbers count the whole recipe.")], ["the letters", "+ three times"])
-y = row(y, "B168.3 The Plate", "the card the recipe page takes, for reference", [
-  ("68-3a", PW, "B168.3a The Plate, PD card", "same", "As now; it becomes the shared PdCard.")], [])
+y = row(y, "B168.2 New, a variant", "the card follows Cook it", [
+  ("68-2a", PW, "B168.2a Recipe page, Cook it at 4", "changed", "All 4 portions: the card counts the whole recipe."),
+  ("68-2b", PW, "B168.2b Cook it at 1", "changed", "One portion: 549 kcal, 224 g."),
+  ("68-2c", PW, "B168.2c The numbers", "changed", "One portion: Total 224 g, 549 kcal.")], ["− three times", "the letters"])
 # every screen carries its id, for both tickets (rule 9); board() counts only the first id, so the count is made here
 html = "".join(B.html); ids = set(re.findall(r"B168\.\d+[a-z]", html)); imgs = html.count("<img")
 if len(ids) < imgs: raise SystemExit(f"{imgs} screens but {len(ids)} screen ids")

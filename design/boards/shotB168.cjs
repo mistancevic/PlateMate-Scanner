@@ -1,8 +1,8 @@
 // Board B168 (seen while drawing B166, 23 November 2026; Coach Milan 24 November 07:04 and 07:07: fix it, one portion).
-// The PD card says One portion, its numbers table showed the whole recipe. 07:42: the PD card as on the Plate, one component;
-// 07:48: option A, - and + in the card's title choose how many portions it counts. Before: main, 0.3.192 (BEFORE_ROOT, this
-// repo, built). New: one scratch build of main with PdCard and the portions (/home/claude/work/b168, not committed). The Plate is
-// shot from main, as the card the recipe page takes. Nothing in the repo changes.
+// The PD card says One portion, its numbers table showed the whole recipe. 07:58: no more navigation in the card; the card uses
+// the - and + the page already has (Cook it), drawn as a variant; the PD card's layout is a ticket of its own (DT349). Before: main,
+// 0.3.192 (BEFORE_ROOT, this repo, built). New: one scratch build of main where the card follows Cook it (/home/claude/work/b168,
+// not committed). Nothing in the repo changes.
 const path = require("node:path"), fs = require("node:fs"), { spawn } = require("node:child_process");
 const NEW_ROOT = process.env.BOARD_ROOT || "/home/claude/work/b168", OLD_ROOT = process.env.BEFORE_ROOT || path.resolve(__dirname, "../..");
 const { chromium } = require(NEW_ROOT + "/node_modules/playwright");
@@ -54,24 +54,18 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     await p.locator(".rq-readout .letters-row").click(); await sleep(500);
     console.log(await note(p, ".rq-readout", "The numbers open inside the card. Under <b>One portion</b> they say Total 897 g and 2,194 kcal: the whole recipe, 4 portions. The card says 549 kcal and 224 g; the Nutrition table below says 1 portion, 224 g.", [".rq-readout .nt-total", ROWS]));
     await shot(p, "68-1b", ".rq-readout", "section.nt-card"); await p.context().close();
-    // ---- B168.3 the Plate, main: the card the recipe page takes ----
-    p = await open("3719", "/plate");
-    for (const n of ["Skyr", "Oats", "Banana"]) { await (await require(path.join(OLD_ROOT, "tests/flows/more.cjs"))(p)).fill(n); await sleep(400); await p.locator(".row-food").filter({ hasText: n }).first().getByRole("button", { name: /Add/ }).click(); await sleep(700); }
-    const x = p.locator(".add-more-top button").first(); if (await x.count()) { await x.click(); await sleep(300); }
-    await p.locator(".readout .letters-row").first().click(); await sleep(500);
-    console.log(await note(p, ".plate-card .nt", "The Plate's PD card: Energy, Weight and Protein as rows, the numbers under the card. The recipe page takes this card.", [".plate-card .readout"]));
-    await shot(p, "68-3a", ".plate-card .readout", ".board-note"); await p.context().close();
     s1.kill();
-    // ---- B168.2 new, scratch build ----
+    // ---- B168.2 new, scratch build: the card follows Cook it ----
     s2 = await serve(NEW_ROOT, "3720");
     p = await open("3720");
-    console.log(await note(p, ".rq-readout", "<b>New:</b> the Plate's PD card. Energy, Weight and Protein as rows. − 1 portion + in its title: it starts at one portion. I tap the letters.", [".rq-readout .pd-portions", ROWS]));
+    const COOK = "section.rq-cook", COOKROW = "section.rq-cook .rq-cook-row", TITLE = "JS:document.querySelector('.rq-readout .readout-top span')";
+    console.log(await note(p, COOK, "<b>New:</b> the PD card counts what Cook it is set to. The page opens at 4 portions, as the recipe makes it: the card says All 4 portions, 2,194 kcal, 897 g. I tap − three times.", [TITLE, ROWS, COOKROW]));
     await shot(p, "68-2a", "main", ".board-note"); await clean(p);
+    for (let i = 0; i < 3; i++) { await p.locator(COOKROW).getByRole("button").first().click(); await sleep(300); }
+    console.log(await note(p, COOK, "<b>New:</b> Cook it at 1 portion: the card says One portion, 549 kcal, 224 g. No new buttons in the card. I tap the letters.", [TITLE, ROWS, COOKROW]));
+    await shot(p, "68-2b", "main", ".board-note"); await clean(p);
     await p.locator(".rq-readout .letters-row").click(); await sleep(500);
-    console.log(await note(p, ".rq-readout + .nt", "<b>New:</b> the numbers open under the card, as on the Plate, and count one portion: Total 224 g and 549 kcal, fat 34 g, protein 23 g. I tap + three times.", [".rq-readout + .nt .nt-total"]));
-    await shot(p, "68-2b", ".rq-readout", ".board-note"); await clean(p);
-    for (let i = 0; i < 3; i++) { await p.locator(".rq-readout .pd-step").last().click(); await sleep(250); }
-    console.log(await note(p, ".rq-readout + .nt", "<b>New:</b> All 4 portions: Energy 2,194 kcal, Weight 897 g, Protein 93 g, and the numbers count the whole recipe. PD and the letters stay: they are rates. − goes back.", [".rq-readout .pd-portions", ROWS, ".rq-readout + .nt .nt-total"]));
+    console.log(await note(p, ".rq-readout", "<b>New:</b> the numbers count one portion too: Total 224 g and 549 kcal. At 4 portions they count the whole recipe. PD and the letters stay: they are rates.", [".rq-readout .nt-total", TITLE]));
     await shot(p, "68-2c", ".rq-readout", ".board-note"); await p.context().close();
   } catch (e) { console.log("ERR", e.message.slice(0, 400)); } finally { await b.close(); s1?.kill(); s2?.kill(); }
 })();

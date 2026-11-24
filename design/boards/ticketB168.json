@@ -1,6 +1,6 @@
 {
   "id": "B168",
-  "boardTitle": "B168: the recipe's PD card as on the Plate, one portion first, - and + up to the whole recipe",
+  "boardTitle": "B168: the recipe's PD card counts what Cook it is set to",
   "title": "The numbers under One portion show the whole recipe",
   "opportunity": {
     "from": "Seen while drawing B166, 23 November 2026, on Lazy Burek's page; Coach Milan 24 November 07:04: yes, its own ticket, we need to fix that.",
@@ -9,62 +9,61 @@
     "why_now": "B166 made the table readable, so its numbers are now read."
   },
   "problem": "On a recipe that makes 4 portions, the PD card says One portion, 549 kcal and 224 g. Its numbers say Total 897 g and 2,194 kcal, fat 135 g: the whole recipe. The Nutrition table below says 1 portion, 224 g. Two places on one page disagree about one portion.",
-  "story": "When I read the numbers of a recipe, I want to see one portion first and step up to the whole recipe, in the same card I know from the Plate, so that I can trust what I plan, eat and cook.",
-  "now": "The recipe page's PD card has its own layout: one small line, 549 kcal · 23.3 g protein · 224 g, and its numbers open inside the card. The numbers are handed the whole recipe. The Plate's card has Energy, Weight and Protein as rows and opens its numbers under the card.",
-  "proposed": "1. The recipe page takes the Plate's PD card, one component for both (PdCard): PD with its tap to the scale, the words against your target, Energy, Weight and Protein as rows, the letters; the numbers open under the card, not inside it. 2. In the card's title, − and +: One portion first, then 2 portions, up to All 4 portions. Energy, Weight, Protein and the numbers follow; PD and the letters stay, they are rates. A recipe of one portion says All of it, with no − and +. 3. The design rules get the card as a rule (docs/rules/design.md D8: every PD card is PdCard; its numbers open under it), and design-rules.cjs checks it.",
-  "looked_at": "B: the card follows Cook it's − 4 portions +: not chosen (Coach Milan 07:48: A); the card would start at the whole recipe. A switch in the table: not chosen; the − and + in the title say what is counted. A food's PD card (FoodCard) has the same table inside its card: not in B168, a ticket of its own unless Coach Milan says.",
+  "story": "When I read the numbers of a recipe, I want them to count the portions I choose, one or the whole recipe, so that I can trust what I plan, eat and cook.",
+  "now": "The card says One portion, 549 kcal · 23.3 g protein · 224 g. Its numbers are handed the whole recipe: Total 897 g, 2,194 kcal. Cook it's − 4 portions + below the card changes only the foods to cook.",
+  "proposed": "Variant (Coach Milan 07:58): no new buttons in the card. The card counts what Cook it is set to, with the − and + the page already has. At 4 portions, as the recipe makes it: All 4 portions, 2,194 kcal · 93.4 g protein · 897 g, and the numbers the whole recipe. At 1: One portion, 549 kcal · 23.3 g protein · 224 g, and the numbers one portion. PD and the letters stay, they are rates. While the recipe is edited, and on a page with no Cook it, the card counts one portion. A recipe of one portion says All of it, as now.",
+  "looked_at": "A: − and + in the card's title (drawn 07:55): not chosen, Coach Milan 07:58: no more navigation in the card, use the − and + we have. The card always one portion (drawn 07:10): not chosen; the whole recipe's numbers would be lost. The Plate's PD card layout for the recipe page, one component, a design rule: its own ticket, DT349 (Coach Milan 07:58).",
   "decision": "Waiting for Coach Milan's Go.",
-  "short": "The recipe's PD card is the Plate's card, PdCard; one portion first, − and + up to the whole recipe; release 0.3.193",
+  "short": "The recipe's PD card and its numbers count what Cook it is set to; release 0.3.193",
   "ac": [
     {
       "id": "AC1",
-      "title": "One portion first",
-      "text": "Given Lazy Burek, 4 portions, when I open its page, then the PD card says One portion, Energy 549 kcal, Weight 224 g, Protein 23 g, as rows"
+      "title": "The card follows Cook it",
+      "text": "Given Lazy Burek with Cook it at 4 portions, as the recipe makes it, when I open its page, then the card says All 4 portions and 2,194 kcal · 93.4 g protein · 897 g"
     },
     {
       "id": "AC2",
-      "title": "The numbers under the card",
-      "text": "Given that card, when I tap the letters, then the numbers open under the card and say Total 224 g and 549 kcal"
+      "title": "Down to one portion",
+      "text": "Given that page, when I tap Cook it's − three times, then the card says One portion and 549 kcal · 23.3 g protein · 224 g"
     },
     {
       "id": "AC3",
-      "title": "Up to the whole recipe",
-      "text": "Given One portion, when I tap + three times, then the title says All 4 portions, the rows say 2,194 kcal, 897 g and 93 g, and the numbers Total 897 g and 2,194 kcal; + is off"
+      "title": "The numbers follow",
+      "text": "Given Cook it at 1, when I tap the letters, then the numbers say Total 224 g and 549 kcal; at 4 portions they say Total 897 g and 2,194 kcal"
     },
     {
       "id": "AC4",
       "title": "Rates stay",
-      "text": "Given All 4 portions, when I read PD and the letters, then they say 4.3 and F+ c- fi- p, as for one portion"
+      "text": "Given Cook it at 1 or at 4, when I read PD and the letters, then they say 4.3 and F+ c- fi- p"
     },
     {
       "id": "AC5",
-      "title": "Back down",
-      "text": "Given All 4 portions, when I tap − three times, then the card says One portion again and − is off"
+      "title": "More than the recipe makes",
+      "text": "Given Cook it at 6 portions, when I read the card, then it says 6 portions and 3,291 kcal"
     },
     {
       "id": "AC6",
-      "title": "A recipe of one portion",
-      "text": "Given a recipe that makes 1 portion, when I open its page, then the card says All of it, with no − and +"
+      "title": "Editing counts one portion",
+      "text": "Given Edit recipe open, when I read the card, then it says One portion, as the card follows the foods while I type"
     },
     {
       "id": "AC7",
-      "title": "One card",
-      "text": "Given the Plate and a recipe page, when I compare their PD cards, then both are PdCard: the same rows, the scale on a tap of PD, the numbers under the card"
+      "title": "A recipe of one portion",
+      "text": "Given a recipe that makes 1 portion, when I open its page, then the card says All of it, as now"
     }
   ],
   "unchanged": [
-    "The Plate's PD card looks and works as now: it becomes PdCard, nothing on it changes.",
+    "Cook it's − and +: the foods to cook follow, as now; its choice stays with the recipe, as now.",
     "The letters, F+ c- fi- p: per 100 kcal.",
     "The Nutrition table: 1 portion, All 4 and 100 g, as now.",
-    "Cook it's − 4 portions + cooks what it says, as now.",
+    "The card's layout, as now (its new layout is DT349).",
     "The colours of the table, as B166."
   ],
-  "checks": "Middle: the PD card on Recipes and the Plate (one component now), new words. The unit tests, the build, a new walkthrough for AC1 to AC7, and the walkthroughs that open a recipe's numbers or the Plate's card: chip-lines, fibre, pd-scale, recipe-changed, steps-and-parts, plate-landing, make-meal, design-rules, and the German sweep. About 15 minutes.",
+  "checks": "Middle: a behaviour on the recipe page (Recipes), new words. The unit tests, the build, a new walkthrough for AC1 to AC7, and the walkthroughs of the recipe page's card and of Cook it: chip-lines, fibre, recipe-centre, recipe-nutrition, recipe-import, recipe-photos, dish-first, oil-taken-up, two-breakfasts, batch-cook, recipe-mark, your-cooks, and the German sweep. About 15 minutes.",
   "details": [
-    "src/components/PdCard.tsx: title, pd, pdRef, fit, line, kcal, grams, protein, letters. The Plate (JourneyScreen readout) and NutritionCard (the recipe page, an imported recipe's page) use it. The numbers table is drawn by the caller under the card.",
-    "The portions: a count from 1 to the recipe's portions, 1 when the page opens; the foods at their grams times count divided by portions go to the rows and the numbers.",
-    "New words: nutrition.fewerPortions, nutrition.morePortions (the buttons' names), nutrition.nPortions (2 portions), nutrition.allPortions (All 4 portions); Srpski confirmed by Claude, German in Beta.",
-    "docs/rules/design.md D8; design-rules.cjs: every PD card on the Plate and a recipe page has .rd-rows, and no .nt inside a .readout.",
-    "The pictures: before from main, 0.3.192; new from one scratch build of main with PdCard and the portions, not committed."
+    "NutritionCard takes count: Cook it's number on the recipe page (meal.cook.n, or what the recipe makes); none while editing or on an imported recipe's page, which counts one portion. The rows and the numbers take the foods at their grams times count divided by the portions.",
+    "New words: nutrition.nPortions (2 portions), nutrition.allPortions (All 4 portions); Srpski confirmed by Claude, German in Beta.",
+    "Seen while drawing, not in B168: Cook it at 1 says 1 portions.",
+    "The pictures: before from main, 0.3.192; new from one scratch build of main where the card follows Cook it, not committed."
   ]
 }
