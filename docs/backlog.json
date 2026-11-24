@@ -4680,6 +4680,20 @@
       "why": "Coach Milan 24 November 2026, 17:38, on DT349's Cook for: later the exact number can turn into custom, even smart: 1 is the father, 2 the mother, 3 a kid of 10, 4 a kid of 3, so the total is calibrated dynamically. A kid's portion is smaller than an adult's. Not drawn."
     },
     {
+      "id": "DT351",
+      "title": "See a recipe as one of my meals: Just looking, or my portion for Breakfast, Lunch, Dinner or Snack",
+      "epic": "cook",
+      "state": "next",
+      "why": "Coach Milan 24 November 2026, 17:49 to 19:04, brainstorm on portions. A portion is mine: its weight, size and macros, calculated for the meal I pick and my day's plan; a recipe only splits the batch into equal shares. My Recipes keep my own numbers. A recipe from someone else shows its original numbers and math, and a row to see it for me: Just looking (the default, the original numbers, servings as written) or a meal (Breakfast, Lunch, Dinner, Snack: my portion for that meal in grams and macros, and how many of my portions the recipe makes, for example 2 of your dinner portions). The PD stays the same either way, it is a rate. Calculated only from the recipe's numbers and the reader's own setup; the author's goal is never shown (GDPR, 18:49 to 19:01). Not drawn."
+    },
+    {
+      "id": "DT352",
+      "title": "Find a recipe by meal and my PD target",
+      "epic": "cook",
+      "state": "later",
+      "why": "Coach Milan 24 November 2026, 19:04, after DT351: in the future a filter to search directly for, say, a lunch in the range of my PD target. Not drawn."
+    },
+    {
       "id": "B167",
       "title": "A dinner eaten at 18:28 is on Today but not in Plan",
       "epic": "plate",
