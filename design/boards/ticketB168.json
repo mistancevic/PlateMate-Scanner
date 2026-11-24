@@ -49,7 +49,7 @@
       "The line The whole recipe makes 4 portions · one portion 549 kcal.",
       "The colours of the table, as B166."
     ],
-    "checks": "Full, for B168 and DT349 together: the PD card becomes one component the Plate uses too, the photo block and the portions to cook change; new words. All walkthroughs, about 41 minutes, with a message at 50% and 90%; the new walkthrough for B168 AC1 to AC5 and DT349 AC1 to AC7; the German sweep.",
+    "checks": "Full, for B168 and DT349 together: the PD card becomes one component the Plate uses too, the photo block and the portions to cook change; new words. All walkthroughs, about 41 minutes, with a message at 50% and 90%; the new walkthrough for B168 AC1 to AC5 and DT349 AC1 to AC8; the German sweep.",
     "details": [
       "NutritionCard: the card and the numbers take the whole recipe's foods, as written; the title says All {n} {unit}, or All of it.",
       "New words: nutrition.allPortions (All 4 portions); Srpski confirmed by Claude, German in Beta.",
@@ -68,8 +68,8 @@
     "problem": "The recipe page's PD card has its own layout: one small line for kcal, protein and grams, its numbers inside the card. On the Plate the same card has rows and opens its numbers under it. Cook it, under the card, looks like a call to action and says 1 portions.",
     "story": "When I open a recipe, I want its header to show the meal the way the Plate shows a plate, and to choose how much I cook where the foods are, so that I find each in its place.",
     "now": "Recipe page: title, a No photo yet card with two buttons, the PD card (own layout: one small line, numbers inside), a Cook it card with − 4 portions + that looks like a button and says 1 portions, Foods, Nutrition, Steps with Start cooking.",
-    "proposed": "1. The header is the meal: title, photo, PD card, Nutrition (14:49). 2. No photo yet: a placeholder picture of a meal in the photo's place, with No photo yet, Let Chef Mealan draw one and Add my photo on it. 3. The PD card is the Plate's card, one component (PdCard): PD with its tap to the scale, the words against your target, Energy, Weight and Protein as rows, the letters; the numbers open under the card. 4. The portions to cook are chips at the top of Foods: 1, 2, 4 as written, 8, and the plan's number when it has one; one tap; saved with the recipe; the grams follow; Start cooking cooks it. 1 portion, not 1 portions. The Cook it card goes. 5. docs/rules/design.md D8: every PD card is PdCard and opens its numbers under it; design-rules.cjs checks it.",
-    "looked_at": "− and + for the portions: not chosen; a number is an answer, and in the design rules an answer is a chip; chips are one tap. The portions to cook above the PD card (14:00): not chosen, the header is the meal. The portions at Start cooking: not chosen, far from the foods they change. A food's PD card (FoodCard): not in DT349, unless Coach Milan says.",
+    "proposed": "1. The header is the meal: title, photo, PD card, Nutrition (14:49). 2. No photo yet: a placeholder picture of a meal in the photo's place, with No photo yet, Let Chef Mealan draw one and Add my photo on it. 3. The PD card is the Plate's card, one component (PdCard): PD with its tap to the scale, the words against your target, Energy, Weight and Protein as rows, the letters; the numbers open under the card. 4. Cook for, at the top of Foods: chips 1 to 5 for the usual cases (one person, a couple or two meals, a family of 3, 4 or 5; Coach Milan 15:14), the recipe's own number marked as written, the plan's number when it has one, and Other, which opens − and + for an exact number (17:38: we need both). One tap; saved with the recipe; the grams follow; Start cooking cooks it. 1 portion, not 1 portions. The Cook it card goes. 5. docs/rules/design.md D8: every PD card is PdCard and opens its numbers under it; design-rules.cjs checks it.",
+    "looked_at": "Only − and +: not chosen; three taps from 4 to 1, every time. Only chips: not chosen, 17:38: an exact number is needed too (Other). The portions to cook above the PD card (14:00): not chosen, the header is the meal. The portions at Start cooking: not chosen, far from the foods they change. Each person's own portion (a father, a mother, a kid of 10, a kid of 3): later, its own ticket, DT350 (17:38). A food's PD card (FoodCard): not in DT349, unless Coach Milan says.",
     "decision": "Waiting for Coach Milan's Go.",
     "short": "The recipe's header: the Plate's PD card (PdCard, D8), a placeholder photo with its buttons; the portions to cook as chips in Foods; with B168, 0.3.193",
     "ac": [
@@ -95,18 +95,23 @@
       },
       {
         "id": "AC5",
-        "title": "The portions as chips in Foods",
-        "text": "Given Lazy Burek, when I read Foods, then chips 1 portion, 2 portions, 4 portions, as written, 8 portions stand at its top, 4 chosen, and there is no Cook it card"
+        "title": "Cook for, chips 1 to 5",
+        "text": "Given Lazy Burek, when I read Foods, then Cook for shows chips 1, 2, 3, 4, as written, 5 and Other, 4 chosen, and there is no Cook it card"
       },
       {
         "id": "AC6",
         "title": "A chip sets the cooking",
-        "text": "Given those chips, when I tap 1 portion, then the foods say 63 g, 1 egg, 38 g, 94 g, the line says the foods are for 1, and opened again the page still has 1 portion chosen"
+        "text": "Given those chips, when I tap 1, then the foods say 63 g, 1 egg, 38 g, 94 g, the line says the foods are for 1, and opened again the page still has 1 chosen"
       },
       {
         "id": "AC7",
         "title": "One component",
         "text": "Given the Plate and a recipe page, when design-rules.cjs reads them, then both PD cards are PdCard and neither has its numbers inside it"
+      },
+      {
+        "id": "AC8",
+        "title": "Other, an exact number",
+        "text": "Given Cook for, when I tap Other and + to 10, then it says 10 portions and the foods are for 10: 625 g, 6 eggs, 375 g, 938 g; a number outside the chips opens with Other chosen"
       }
     ],
     "unchanged": [
@@ -117,8 +122,8 @@
     "checks": "Full, with B168: see B168's block.",
     "details": [
       "src/components/PdCard.tsx: title, pd, pdRef, fit, line, kcal, grams, protein, letters. JourneyScreen's readout and NutritionCard use it; the caller draws the numbers under it.",
-      "RecipePage: the No photo yet card becomes rq-nopic-ph, a 4 by 3 placeholder picture (one drawn plate, no photo of a real dish) with the text and buttons on it. The Cook it section goes; its count becomes chips at the top of Foods (1, 2, the recipe's number, double, the plan's number, the current one), setCook as now; Back to 4, as written and The plan takes 3 become chips.",
-      "New words: recipe.portionsFor (For), recipe.asWritten (as written), recipe.thePlan (the plan), recipe.makesFoodsFor without below; Srpski confirmed by Claude, German in Beta.",
+      "RecipePage: the No photo yet card becomes rq-nopic-ph, a 4 by 3 placeholder picture (one drawn plate, no photo of a real dish) with the text and buttons on it. The Cook it section goes; its count becomes Cook for at the top of Foods: chips 1 to 5, the recipe's number (as written), the plan's number (the plan), and Other with the − and + row (rq-cook-row), open when chosen or when the count is not a chip; setCook as now; Back to 4, as written and The plan takes 3 become chips.",
+      "New words: recipe.cookFor (Cook for), recipe.other (Other), recipe.asWritten (as written), recipe.thePlan (the plan), recipe.makesFoodsFor without below; Srpski confirmed by Claude, German in Beta.",
       "docs/rules/design.md D8; design-rules.cjs gains the check.",
       "Seen: a food's card (FoodCard) has its numbers inside its PD card; not in DT349."
     ]

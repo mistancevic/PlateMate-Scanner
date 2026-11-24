@@ -40,7 +40,7 @@ How you talk to me:
 - Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 - When this chat gets long, give me this full starter prompt again, updated, never a short one.
 
-Next: 0.3.192 (B165 and B166) is merged into main; I start Preview. B168 and DT349 are redrawn on canvas Page 6 and wait for my Go: the recipe's header is the meal (title, a placeholder photo with its buttons on it, the Plate's PD card for the whole meal with its numbers under it, Nutrition with 1 portion, All and 100 g); the portions to cook are chips at the top of Foods (saved, the grams follow); the Cook it card goes; PdCard and design rule D8. Checks Full, new words, release 0.3.193. After it, from Next: DT348 (one button to add a step), B164, DT346, DT347, DT344.
+Next: B168 and DT349 are drawn together on canvas Page 6 (one board) and wait for my Go. B168: the recipe's PD card and its numbers are the whole meal; one portion and 100 g stay in the Nutrition table. DT349: the recipe's header is the meal (title, a placeholder photo with its buttons on it, the Plate's PD card as one component, PdCard, design rule D8); Cook for at the top of Foods, chips 1 to 5, the recipe's number as written, Other with − and + for an exact number; the Cook it card goes. Checks Full, new words, release 0.3.193. The scratch build /home/claude/work/b168 is gone in a new chat: rebuild from the board and ticketB168.json. Later: DT350 (each person's own portion). Then from Next: DT348, B164, DT346, DT347, DT344.
 ```
 
 ## Standing rules (Coach Milan)
@@ -69,8 +69,9 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 24 November 2026, 15:05
+## State, 24 November 2026, 17:50
 
+- B168 and DT349 redrawn 24 November 17:50 (Coach Milan 15:14: the usual cases are 1 to 5; 17:38: we need both, chips for quick and an exact number; later custom, smart: each person's portion, DT350 Later). Cook for: chips 1, 2, 3, 4 as written, 5, the plan's number, Other (opens the − and + row). DT349 AC8. Stories294 h 6626.
 - B168 and DT349 redrawn 24 November 15:05 (Coach Milan 14:49: the header is the meal, a placeholder photo with the CTAs on it, portioning elsewhere as - + or chips; 14:50: yes, but the PD card is the whole meal, not one portion). Stories294 now h 6566. Scratch /home/claude/work/b168 holds it: PdCard, NutritionCard whole meal, rq-nopic-ph placeholder (an SVG plate), chips at the top of Foods (rq-portion-chips, choice). Numbers for and the cook row at Start cooking are out of the scratch.
 - B168 and DT349 first drawn together 24 November 14:00 (Stories294, w 2270, h 7374; Coach Milan 13:47 to 13:54: Cook it is a CTA; separate the whole recipe and cooking from the portion calculation of macros; draw, then we continue). Scratch /home/claude/work/b168 holds it all: src/components/PdCard.tsx, NutritionCard count, RecipePage readN (Numbers for, not saved) and the cook row in the Steps block (rq-cook-at). Not done in the scratch yet: the Plate on PdCard, design.md D8, the design-rules check, the words in en.json. Checks proposed Full.
 - B168 redrawn 24 November 08:05 as a variant (Coach Milan 07:58: no more navigation in the card, use Cook it's - and +; the PD card layout is a new design ticket, DT349): NutritionCard takes count, Cook it's cookN (meal.cook.n), none while editing; Stories294 now w 1790, h 4307. Scratch /home/claude/work/b168 holds this variant (PdCard was taken out of it). Seen: Cook it at 1 says 1 portions (not in B168).
@@ -137,8 +138,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - Stories291 B161 at x 0, y 76002, w 1290, h 2617.
 - Stories292 B167 at x 0, y 78739, w 2670, h 3578.
 - Stories293 B165 and B166 at x 0, y 82437, w 1790, h 6466.
-- Stories294 B168 and DT349 at x 0, y 89023, w 2270, h 6566.
-- The next board on Page 6 goes at x 0, y 95709.
+- Stories294 B168 and DT349 at x 0, y 89023, w 2270, h 6626.
+- The next board on Page 6 goes at x 0, y 95769.
 - A sheet that scrolls is drawn as one tall picture: shotDT339.cjs unroll() opens its scroll boxes at their real width.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.191; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json of 0.3.191. Two new lines in 0.3.191, Srpski confirmed by Claude, German in Beta.
