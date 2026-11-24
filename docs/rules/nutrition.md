@@ -36,6 +36,8 @@ N15. A plate far over its meal, more than 1.4 times its energy, is not that meal
 
 N16. Today shows only what counts towards the target, sorted by time and importance; the last two days stay visible, older days belong to the plan review. Code: src/screens/HomeScreen.tsx.
 
+N17. A serving and a portion are two different things (Coach Milan, 24 November 2026, 18:42 and 22:26). A serving is the recipe's equal share: the batch split as the recipe is written, the same for everyone who reads it ("Makes 4 servings", "Cook for 2 servings", "One serving" in the Nutrition table). A portion is mine: its weight, size and macros, calculated for the meal I pick and what is left of my day (N11, N12), so it is different for each person and each goal, and different for the same person at dinner and at a snack. The PD is a rate, so it is the same for a serving, a portion and the whole meal; only the grams change. A recipe page never says "your portion" unless the reader picks a meal (DT351); the author's goal is never shown. The words are kept apart in every language. To build with B168 and DT349 (0.3.193): the recipe's unit "portions" stays saved as it is and shows as servings (src/recipeWords.ts). A portion is calculated on the Plate and the plan; Members' recipes already show one for a meal (members.yourMealPortion), which DT351 takes in.
+
 ## 3. The target on the Plate
 
 N20. Fit to my target keeps the person's foods. A plate already on or above the target moves nothing and swaps nothing, and says so. Code: `mixWith` in src/App.tsx; the Plate.
@@ -113,3 +115,4 @@ N53. The app tells people Chef Mealan is an AI chef that can make mistakes: chec
 - 24 October: N12 for a meal, N24 the range, N33. First draft of this file.
 - 24 October, night: N26, the four letters (0.2.92).
 - 25 October: N27 to N30, the nutrition gate and Your day (0.2.98).
+- 24 November: N17, a serving and a portion (B168, DT349, DT351).
