@@ -4534,8 +4534,58 @@
       "id": "B168",
       "title": "The numbers under One portion show the whole recipe",
       "epic": "cook",
-      "state": "next",
-      "why": "Seen while drawing B166, 23 November 2026: on Lazy Burek's page the PD card says One portion, 549 kcal and 224 g, but its numbers table shows the whole recipe, 897 g and 2,194 kcal (NutritionCard hands NumbersTable aggregate(items) of the whole recipe; the letters are rates, so they are right). Coach Milan 24 November 2026, 07:04: yes, its own ticket, we need to fix that. Likely: the table under One portion shows one portion; the whole recipe stays in the Nutrition table below (ALL column). Not drawn."
+      "state": "now",
+      "why": "Seen while drawing B166, 23 November 2026: on Lazy Burek's page the PD card says One portion, 549 kcal and 224 g, but its numbers table shows the whole recipe, 897 g and 2,194 kcal (NutritionCard hands NumbersTable aggregate(items) of the whole recipe; the letters are rates, so they are right). Coach Milan 24 November 2026, 07:04: yes, its own ticket, we need to fix that. Likely: the table under One portion shows one portion; the whole recipe stays in the Nutrition table below (ALL column). Not drawn.",
+      "opportunity": {
+        "from": "Seen while drawing B166, 23 November 2026, on Lazy Burek's page; Coach Milan 24 November 07:04: yes, its own ticket, we need to fix that.",
+        "job": "Read what one portion of my recipe holds.",
+        "kind": "Says something not true: the table under One portion shows the whole recipe.",
+        "why_now": "B166 made the table readable, so its numbers are now read."
+      },
+      "story": "When I read the numbers of one portion of a recipe, I want them to be one portion, so that I can trust what I plan and eat.",
+      "proposed": "The numbers under One portion count one portion: Lazy Burek's Total 224 g and 549 kcal, fat 34 g, protein 23 g. A recipe that makes one portion (All of it) shows all of it, as now. The whole recipe stays in the Nutrition table, column All 4.",
+      "problem": "On a recipe that makes 4 portions, the PD card says One portion, 549 kcal and 224 g. Its numbers say Total 897 g and 2,194 kcal, fat 135 g: the whole recipe. The Nutrition table below says 1 portion, 224 g. Two places on one page disagree about one portion.",
+      "checks": "Light: one component, the numbers it is given; nothing else in what the app does changes, no new words. The unit tests, the build, a new walkthrough for AC1 to AC4, and the walkthroughs that open a recipe's numbers: chip-lines, fibre, pd-scale, recipe-changed, steps-and-parts. About 5 minutes. No German sweep: no on-screen words change.",
+      "decision": "Waiting for Coach Milan's Go.",
+      "now": "The card's line and the Nutrition table count one portion. The numbers table under the letters is given the whole recipe. The letters are per 100 kcal, so they are right either way.",
+      "looked_at": "A switch in the table between one portion and all of it: not chosen; the Nutrition table already shows both, side by side. The title of the table saying the whole recipe: not chosen; the card is about one portion, so its numbers should be too.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "One portion's numbers",
+          "text": "Given Lazy Burek, 4 portions, when I tap the letters in its PD card, then Total says 224 g and 549 kcal, the same as the card and the Nutrition table's 1 portion"
+        },
+        {
+          "id": "AC2",
+          "title": "Each line is one portion",
+          "text": "Given the numbers open, when I read fat and protein, then they say 34 g and 23 g, as 1 portion in the Nutrition table (33.6 g and 23.3 g)"
+        },
+        {
+          "id": "AC3",
+          "title": "A recipe of one portion",
+          "text": "Given a recipe that makes 1 portion, when I open its numbers, then they count all of it, as now"
+        },
+        {
+          "id": "AC4",
+          "title": "The fibre line, one portion",
+          "text": "Given a recipe of 4 portions with a food without a fibre value, when I open its numbers, then the line says at least the fibre of one portion"
+        }
+      ],
+      "unchanged": [
+        "The letters, F+ c- fi- p: per 100 kcal, as now.",
+        "The Nutrition table: 1 portion, All 4 and 100 g, as now.",
+        "The Plate's numbers and the PD scale, as now.",
+        "The colours of the table inside the PD card, as B166."
+      ],
+      "details": [
+        "NutritionCard: with more than one portion, the table gets the foods at their grams divided by the portions (the same share the card and the Nutrition table use). The same card is on an imported recipe's page (RecipeIn), so it is one portion there too.",
+        "The pictures: one scratch build of main, 0.3.192, not committed; the new pictures come from that build with the change behind a flag for the board."
+      ],
+      "short": "The numbers under One portion count one portion; release 0.3.193",
+      "open": [],
+      "board": "Stories294",
+      "where": "Page 6",
+      "rel": "Drawn 24 November 2026; waits for Go"
     },
     {
       "id": "B167",
