@@ -1,8 +1,8 @@
 // Board B168 (seen while drawing B166, 23 November 2026; Coach Milan 24 November 07:04 and 07:07: fix it, one portion).
-// The PD card says One portion, its numbers table showed the whole recipe. 07:58: no more navigation in the card; the card uses
-// the - and + the page already has (Cook it), drawn as a variant; the PD card's layout is a ticket of its own (DT349). Before: main,
-// 0.3.192 (BEFORE_ROOT, this repo, built). New: one scratch build of main where the card follows Cook it (/home/claude/work/b168,
-// not committed). Nothing in the repo changes.
+// With DT349 (13:44 to 13:54): the portions for the numbers are one thing, the cooking another. Numbers for − 1 portion + above
+// the PD card, not saved; the PD card is the Plate's (PdCard), its numbers under it; the cook's − 4 portions + moves to Start
+// cooking, saved as now, and the Cook it card goes. Before: main, 0.3.192 (BEFORE_ROOT, this repo, built). New: one scratch build
+// of main with all of it (/home/claude/work/b168, not committed). The Plate is shot from main. Nothing in the repo changes.
 const path = require("node:path"), fs = require("node:fs"), { spawn } = require("node:child_process");
 const NEW_ROOT = process.env.BOARD_ROOT || "/home/claude/work/b168", OLD_ROOT = process.env.BEFORE_ROOT || path.resolve(__dirname, "../..");
 const { chromium } = require(NEW_ROOT + "/node_modules/playwright");
@@ -40,7 +40,7 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     const t = pick(sel)[0]; if (!t) return "missing " + sel; const n = document.createElement("div"); n.className = "board-note"; n.style.cssText = NOTE; n.innerHTML = html; t.insertAdjacentElement(where, n); return "ok"; }, [sel, html, marks, MARK, NOTE, where]);
   const clean = (p) => p.evaluate(() => document.querySelectorAll(".board-note").forEach((n) => n.remove()));
   const shot = async (p, name, from, to) => { await sleep(400);
-    const r = await p.evaluate(([from, to]) => { const a = document.querySelector(from).getBoundingClientRect(), e = document.querySelector(to)?.getBoundingClientRect(); const notes = [...document.querySelectorAll(".board-note")].map((n) => n.getBoundingClientRect().bottom);
+    const r = await p.evaluate(([from, to]) => { const pick = (q) => (q.startsWith('JS:') ? eval(q.slice(3)) : document.querySelector(q)); const a = pick(from).getBoundingClientRect(), e = pick(to)?.getBoundingClientRect(); const notes = [...document.querySelectorAll(".board-note")].map((n) => n.getBoundingClientRect().bottom);
       return { y: a.top + scrollY - 12, h: Math.max(e ? e.bottom : a.bottom, ...notes) - a.top + 26 }; }, [from, to]);
     await p.screenshot({ path: `${R}/${name}.png`, fullPage: true, clip: { x: 0, y: Math.max(0, r.y), width: 390, height: r.h } }); console.log(name, Math.round(r.h)); };
   const ROWS = "JS:document.querySelector('.rq-readout .readout-mid small')";
@@ -53,19 +53,34 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     await shot(p, "68-1a", "main", ".board-note"); await clean(p);
     await p.locator(".rq-readout .letters-row").click(); await sleep(500);
     console.log(await note(p, ".rq-readout", "The numbers open inside the card. Under <b>One portion</b> they say Total 897 g and 2,194 kcal: the whole recipe, 4 portions. The card says 549 kcal and 224 g; the Nutrition table below says 1 portion, 224 g.", [".rq-readout .nt-total", ROWS]));
-    await shot(p, "68-1b", ".rq-readout", "section.nt-card"); await p.context().close();
+    await shot(p, "68-1b", ".rq-readout", "section.nt-card"); await clean(p);
+    for (let i = 0; i < 3; i++) { await p.locator("section.rq-cook .rq-cook-row").getByRole("button").first().click(); await sleep(300); }
+    console.log(await note(p, "section.rq-cook", "Cook it, three times −: it says <b>1 portions</b>, and the foods are for 1. It sits under the PD card, but the card does not follow it; it is about cooking, and looks like a button.", ["section.rq-cook .rq-cook-row"]));
+    await shot(p, "68-1c", "section.rq-cook", ".board-note"); await p.context().close();
+    // ---- the Plate, main: the card the recipe page takes ----
+    p = await open("3719", "/plate");
+    for (const n of ["Skyr", "Oats", "Banana"]) { await (await require(path.join(OLD_ROOT, "tests/flows/more.cjs"))(p)).fill(n); await sleep(400); await p.locator(".row-food").filter({ hasText: n }).first().getByRole("button", { name: /Add/ }).click(); await sleep(700); }
+    const x = p.locator(".add-more-top button").first(); if (await x.count()) { await x.click(); await sleep(300); }
+    await p.locator(".readout .letters-row").first().click(); await sleep(500);
+    console.log(await note(p, ".plate-card .nt", "The Plate's PD card: Energy, Weight and Protein as rows, the numbers under the card. The recipe page takes this card; the Plate becomes the same component, nothing on it changes.", [".plate-card .readout"]));
+    await shot(p, "68-3a", ".plate-card .readout", ".board-note"); await p.context().close();
     s1.kill();
-    // ---- B168.2 new, scratch build: the card follows Cook it ----
+    // ---- new, scratch build ----
     s2 = await serve(NEW_ROOT, "3720");
     p = await open("3720");
-    const COOK = "section.rq-cook", COOKROW = "section.rq-cook .rq-cook-row", TITLE = "JS:document.querySelector('.rq-readout .readout-top span')";
-    console.log(await note(p, COOK, "<b>New:</b> the PD card counts what Cook it is set to. The page opens at 4 portions, as the recipe makes it: the card says All 4 portions, 2,194 kcal, 897 g. I tap − three times.", [TITLE, ROWS, COOKROW]));
-    await shot(p, "68-2a", "main", ".board-note"); await clean(p);
-    for (let i = 0; i < 3; i++) { await p.locator(COOKROW).getByRole("button").first().click(); await sleep(300); }
-    console.log(await note(p, COOK, "<b>New:</b> Cook it at 1 portion: the card says One portion, 549 kcal, 224 g. No new buttons in the card. I tap the letters.", [TITLE, ROWS, COOKROW]));
-    await shot(p, "68-2b", "main", ".board-note"); await clean(p);
+    const NUMS = ".rq-portions", START = ".rq-start", COOKAT = ".rq-cook-at";
+    console.log(await note(p, NUMS, "<b>New:</b> Numbers for − 1 portion +, above the PD card: what the card and its numbers count. Not saved; the page opens at one portion.", [NUMS]));
+    console.log(await note(p, ".rq-readout", "<b>New:</b> the Plate's PD card: Energy, Weight and Protein as rows; PD's tap opens the scale.", [ROWS]));
+    console.log(await note(p, START, "<b>New:</b> the cooking: − 4 portions + sits at Start cooking, saved with the recipe as now; it sets the foods to cook and the cook. The Cook it card is gone. 1 portion, not 1 portions.", [COOKAT], "beforebegin"));
+    await shot(p, "68-2a", "main", ".rq-start"); await clean(p);
     await p.locator(".rq-readout .letters-row").click(); await sleep(500);
-    console.log(await note(p, ".rq-readout", "<b>New:</b> the numbers count one portion too: Total 224 g and 549 kcal. At 4 portions they count the whole recipe. PD and the letters stay: they are rates.", [".rq-readout .nt-total", TITLE]));
-    await shot(p, "68-2c", ".rq-readout", ".board-note"); await p.context().close();
+    console.log(await note(p, ".rq-readout + .nt", "<b>New:</b> the numbers open under the card, as on the Plate, and count one portion: Total 224 g and 549 kcal. I tap + three times.", [".rq-readout + .nt .nt-total"]));
+    await shot(p, "68-2b", NUMS, ".board-note"); await clean(p);
+    for (let i = 0; i < 3; i++) { await p.locator(NUMS).getByRole("button").last().click(); await sleep(250); }
+    console.log(await note(p, ".rq-readout + .nt", "<b>New:</b> Numbers for All 4 portions: the card says 2,194 kcal, 897 g, 93 g, the numbers the whole recipe. PD and the letters stay, they are rates. The cooking below is not changed.", [NUMS, ROWS, ".rq-readout + .nt .nt-total"]));
+    await shot(p, "68-2c", NUMS, ".board-note"); await clean(p);
+    for (let i = 0; i < 3; i++) { await p.locator(COOKAT + " .rq-cook-row").getByRole("button").first().click(); await sleep(300); }
+    console.log(await note(p, START, "<b>New:</b> the cooking at 1 portion: the foods are for 1; Numbers for stays All 4 portions. The numbers never change the batch, the batch never changes the numbers.", [COOKAT], "beforebegin"));
+    await shot(p, "68-2d", "JS:document.querySelector('.rq-start').closest('section')", ".rq-start"); await p.context().close();
   } catch (e) { console.log("ERR", e.message.slice(0, 400)); } finally { await b.close(); s1?.kill(); s2?.kill(); }
 })();

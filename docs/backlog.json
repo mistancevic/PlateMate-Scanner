@@ -4535,82 +4535,136 @@
       "title": "The numbers under One portion show the whole recipe",
       "epic": "cook",
       "state": "now",
-      "why": "Seen while drawing B166, 23 November 2026: on Lazy Burek's page the PD card says One portion, 549 kcal and 224 g, but its numbers table shows the whole recipe, 897 g and 2,194 kcal (NutritionCard hands NumbersTable aggregate(items) of the whole recipe; the letters are rates, so they are right). Coach Milan 24 November 2026, 07:04: yes, its own ticket, we need to fix that. Likely: the table under One portion shows one portion; the whole recipe stays in the Nutrition table below (ALL column). Not drawn. 07:42: the same PD card layout as on the Plate; - and + to choose what is counted. 07:48: A. 07:58: no more navigation in the card, use the - and + we have (Cook it), as a variant; the PD card layout is a new design ticket (DT349).",
+      "why": "Seen while drawing B166, 23 November 2026: on Lazy Burek's page the PD card says One portion, 549 kcal and 224 g, but its numbers table shows the whole recipe, 897 g and 2,194 kcal (NutritionCard hands NumbersTable aggregate(items) of the whole recipe; the letters are rates, so they are right). Coach Milan 24 November 2026, 07:04: yes, its own ticket, we need to fix that. Likely: the table under One portion shows one portion; the whole recipe stays in the Nutrition table below (ALL column). Not drawn. 07:42 to 13:54: the card as on the Plate, - and + to choose what is counted; not in the card (07:58); separate the whole recipe and cooking from the portion calculation of macros (13:53); draw (13:54).",
       "opportunity": {
         "from": "Seen while drawing B166, 23 November 2026, on Lazy Burek's page; Coach Milan 24 November 07:04: yes, its own ticket, we need to fix that.",
         "job": "Read what one portion of my recipe holds.",
         "kind": "Says something not true: the table under One portion shows the whole recipe.",
         "why_now": "B166 made the table readable, so its numbers are now read."
       },
-      "story": "When I read the numbers of a recipe, I want them to count the portions I choose, one or the whole recipe, so that I can trust what I plan, eat and cook.",
-      "proposed": "Variant (Coach Milan 07:58): no new buttons in the card. The card counts what Cook it is set to, with the − and + the page already has. At 4 portions, as the recipe makes it: All 4 portions, 2,194 kcal · 93.4 g protein · 897 g, and the numbers the whole recipe. At 1: One portion, 549 kcal · 23.3 g protein · 224 g, and the numbers one portion. PD and the letters stay, they are rates. While the recipe is edited, and on a page with no Cook it, the card counts one portion. A recipe of one portion says All of it, as now.",
+      "story": "When I read the numbers of a recipe, I want to choose how many portions they count, one or the whole recipe, without changing what I cook, so that I can trust what I plan and eat.",
+      "proposed": "Numbers for − 1 portion +, right above the PD card: how many portions the card and its numbers count, from 1 portion to All 4 portions. It opens at one portion each time and is not saved: reading changes nothing in the recipe. The card's rows and its numbers follow; PD and the letters stay, they are rates. The cooking has its own − and + (DT349), and neither changes the other.",
       "problem": "On a recipe that makes 4 portions, the PD card says One portion, 549 kcal and 224 g. Its numbers say Total 897 g and 2,194 kcal, fat 135 g: the whole recipe. The Nutrition table below says 1 portion, 224 g. Two places on one page disagree about one portion.",
-      "checks": "Middle: a behaviour on the recipe page (Recipes), new words. The unit tests, the build, a new walkthrough for AC1 to AC7, and the walkthroughs of the recipe page's card and of Cook it: chip-lines, fibre, recipe-centre, recipe-nutrition, recipe-import, recipe-photos, dish-first, oil-taken-up, two-breakfasts, batch-cook, recipe-mark, your-cooks, and the German sweep. About 15 minutes.",
+      "checks": "Full, for B168 and DT349 together: the PD card becomes one component the Plate uses too, and Cook it moves; new words. All walkthroughs, about 41 minutes, with a message at 50% and 90%; the new walkthrough for B168 AC1 to AC6 and DT349 AC1 to AC6; the German sweep.",
       "decision": "Waiting for Coach Milan's Go.",
-      "now": "The card says One portion, 549 kcal · 23.3 g protein · 224 g. Its numbers are handed the whole recipe: Total 897 g, 2,194 kcal. Cook it's − 4 portions + below the card changes only the foods to cook.",
-      "looked_at": "A: − and + in the card's title (drawn 07:55): not chosen, Coach Milan 07:58: no more navigation in the card, use the − and + we have. The card always one portion (drawn 07:10): not chosen; the whole recipe's numbers would be lost. The Plate's PD card layout for the recipe page, one component, a design rule: its own ticket, DT349 (Coach Milan 07:58).",
+      "now": "The card says One portion, 549 kcal · 23.3 g protein · 224 g. Its numbers are handed the whole recipe: Total 897 g, 2,194 kcal. Cook it's − 4 portions + sits under the card and changes only the foods to cook.",
+      "looked_at": "− and + inside the card's title (07:55): not chosen, no more navigation in the card (07:58). The card following Cook it (08:05, the variant): not chosen; reading the numbers would change the batch, which is saved with the recipe (13:53: separate the whole recipe and cooking from the portion calculation of macros). The card always one portion (07:10): not chosen; the whole recipe's numbers would be lost.",
       "ac": [
         {
           "id": "AC1",
-          "title": "The card follows Cook it",
-          "text": "Given Lazy Burek with Cook it at 4 portions, as the recipe makes it, when I open its page, then the card says All 4 portions and 2,194 kcal · 93.4 g protein · 897 g"
+          "title": "One portion first",
+          "text": "Given Lazy Burek, 4 portions, when I open its page, then Numbers for says 1 portion and the card says One portion, 549 kcal, 224 g, 23 g"
         },
         {
           "id": "AC2",
-          "title": "Down to one portion",
-          "text": "Given that page, when I tap Cook it's − three times, then the card says One portion and 549 kcal · 23.3 g protein · 224 g"
+          "title": "The numbers count it",
+          "text": "Given Numbers for at 1 portion, when I tap the letters, then the numbers say Total 224 g and 549 kcal"
         },
         {
           "id": "AC3",
-          "title": "The numbers follow",
-          "text": "Given Cook it at 1, when I tap the letters, then the numbers say Total 224 g and 549 kcal; at 4 portions they say Total 897 g and 2,194 kcal"
+          "title": "Up to the whole recipe",
+          "text": "Given 1 portion, when I tap Numbers for's + three times, then it says All 4 portions, the card 2,194 kcal, 897 g, 93 g, the numbers Total 897 g; + is off"
         },
         {
           "id": "AC4",
           "title": "Rates stay",
-          "text": "Given Cook it at 1 or at 4, when I read PD and the letters, then they say 4.3 and F+ c- fi- p"
+          "text": "Given 1 portion or All 4 portions, when I read PD and the letters, then they say 4.3 and F+ c- fi- p"
         },
         {
           "id": "AC5",
-          "title": "More than the recipe makes",
-          "text": "Given Cook it at 6 portions, when I read the card, then it says 6 portions and 3,291 kcal"
+          "title": "Reading changes nothing",
+          "text": "Given Numbers for at All 4 portions, when I leave the page and open it again, then it says 1 portion, and the cooking's portions and the foods are as before"
         },
         {
           "id": "AC6",
-          "title": "Editing counts one portion",
-          "text": "Given Edit recipe open, when I read the card, then it says One portion, as the card follows the foods while I type"
-        },
-        {
-          "id": "AC7",
-          "title": "A recipe of one portion",
-          "text": "Given a recipe that makes 1 portion, when I open its page, then the card says All of it, as now"
+          "title": "No Numbers for where it means nothing",
+          "text": "Given a recipe that makes 1 portion, or Edit recipe open, when I read the card, then there is no Numbers for; the card says All of it, or One portion while editing"
         }
       ],
       "unchanged": [
-        "Cook it's − and +: the foods to cook follow, as now; its choice stays with the recipe, as now.",
         "The letters, F+ c- fi- p: per 100 kcal.",
-        "The Nutrition table: 1 portion, All 4 and 100 g, as now.",
-        "The card's layout, as now (its new layout is DT349).",
+        "The Nutrition table: 1 portion, All 4 and 100 g.",
+        "The line The whole recipe makes 4 portions · one portion 549 kcal.",
         "The colours of the table, as B166."
       ],
       "details": [
-        "NutritionCard takes count: Cook it's number on the recipe page (meal.cook.n, or what the recipe makes); none while editing or on an imported recipe's page, which counts one portion. The rows and the numbers take the foods at their grams times count divided by the portions.",
-        "New words: nutrition.nPortions (2 portions), nutrition.allPortions (All 4 portions); Srpski confirmed by Claude, German in Beta.",
-        "Seen while drawing, not in B168: Cook it at 1 says 1 portions.",
-        "The pictures: before from main, 0.3.192; new from one scratch build of main where the card follows Cook it, not committed."
+        "RecipePage: readN, a count from 1 to the recipe's portions, 1 each time the page opens, not saved; NutritionCard takes it as count and hands the rows and the numbers the foods at their grams times count divided by the portions.",
+        "New words: recipe.numbersFor (Numbers for), nutrition.nPortions (2 portions), nutrition.allPortions (All 4 portions), the buttons' names (Fewer portions, More portions); Srpski confirmed by Claude, German in Beta.",
+        "The pictures: before from main, 0.3.192; new from one scratch build of main with B168 and DT349, not committed."
       ],
-      "short": "The recipe's PD card and its numbers count what Cook it is set to; release 0.3.193",
+      "short": "Numbers for − 1 portion + above the PD card: what the card and its numbers count, not saved; with DT349 in one release, 0.3.193",
       "open": [],
       "board": "Stories294",
       "where": "Page 6",
-      "rel": "Drawn 24 November 2026; waits for Go"
+      "rel": "Drawn 24 November 2026, 14:00, with DT349 on one board; waits for Go"
     },
     {
       "id": "DT349",
-      "title": "One PD card: the recipe page takes the Plate's card, in the design rules and as one component",
+      "title": "The recipe page: the Plate's PD card, and the cooking at Start cooking",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 24 November 2026, 07:42: we need to have the same PD card layout as it is on the Plate; that should be also in the design system and components fixed. 07:58: ok, a new design ticket. Drawn first inside B168 at 07:55 (PdCard: Energy, Weight and Protein as rows, PD's tap to the scale, the numbers under the card; docs/rules/design.md D8 and a design-rules.cjs check). Open: whether a food's PD card (FoodCard) is in it. Not drawn as its own board."
+      "state": "now",
+      "why": "Coach Milan 24 November 2026, 07:42: we need to have the same PD card layout as it is on the Plate; that should be also in the design system and components fixed. 07:58: ok, a new design ticket. 13:47 to 13:54: Cook it is more like a CTA; separate it from the portions for the numbers; drawn with B168 on one board.",
+      "opportunity": {
+        "from": "Coach Milan 24 November 2026, 07:42, looking at the board B168; 13:44 to 13:54, brainstorm on the − and +.",
+        "job": "Read a recipe's numbers the way I read a plate, and cook the batch I choose.",
+        "kind": "Did not find it or did not understand it: the recipe's PD card looks different from the Plate's; Cook it looks like a button and sits by the numbers, which it does not change.",
+        "why_now": "B168 makes the card count a chosen number of portions, so the card and the cooking need their own places."
+      },
+      "story": "When I open a recipe, I want its PD card to read like the Plate's and the cooking to sit where I cook, so that I find each in its place.",
+      "proposed": "1. The recipe page takes the Plate's PD card, one component for both (PdCard): PD with its tap to the scale, the words against your target, Energy, Weight and Protein as rows, the letters; the numbers open under the card. 2. The Cook it card goes; its − 4 portions + moves to Start cooking, saved with the recipe as now, with its lines (As the recipe makes it, Back to 4, as written, the plan's count). It says 1 portion, 2 portions. 3. docs/rules/design.md D8: every PD card is PdCard and opens its numbers under it; design-rules.cjs checks it.",
+      "problem": "The recipe page's PD card has its own layout: one small line for kcal, protein and grams, its numbers inside the card. On the Plate the same card has rows and opens its numbers under it. Cook it, under the card, looks like a call to action and says 1 portions.",
+      "checks": "Full, with B168: see B168's block.",
+      "decision": "Waiting for Coach Milan's Go.",
+      "now": "Recipe page: PD card (own layout), Cook it card with − 4 portions + under it, Start cooking at the end of the Steps.",
+      "looked_at": "The PD card's layout and B168 on two boards: not chosen, one page redesign (13:51). A food's PD card (FoodCard): not in DT349, unless Coach Milan says.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "The Plate's card",
+          "text": "Given Lazy Burek's page, when I read its PD card, then Energy, Weight and Protein are rows, as on the Plate"
+        },
+        {
+          "id": "AC2",
+          "title": "The numbers under the card",
+          "text": "Given that card, when I tap the letters, then the numbers open under the card, not inside it"
+        },
+        {
+          "id": "AC3",
+          "title": "The scale",
+          "text": "Given that card, when I tap PD, then the PD scale opens in the card, as on the Plate"
+        },
+        {
+          "id": "AC4",
+          "title": "The cooking at Start cooking",
+          "text": "Given the page, when I read the Steps, then − 4 portions + and As the recipe makes it sit above Start cooking, and there is no Cook it card"
+        },
+        {
+          "id": "AC5",
+          "title": "The cooking is saved, and only the cooking",
+          "text": "Given the cooking at 1 portion, when I read the page, then it says 1 portion, the foods are for 1, Numbers for is unchanged; opened again, the cooking still says 1 portion"
+        },
+        {
+          "id": "AC6",
+          "title": "One component",
+          "text": "Given the Plate and a recipe page, when design-rules.cjs reads them, then both PD cards are PdCard and neither has its numbers inside it"
+        }
+      ],
+      "unchanged": [
+        "The Plate's PD card looks and works as now; it becomes PdCard.",
+        "The cooking's count, saved with the recipe, and what Start cooking cooks.",
+        "The plan's count (The plan takes 3) and Back to 4, as written."
+      ],
+      "details": [
+        "src/components/PdCard.tsx: title, pd, pdRef, fit, line, kcal, grams, protein, letters. JourneyScreen's readout and NutritionCard use it; the caller draws the numbers under it.",
+        "RecipePage: the Cook it section goes; its row and lines go into the Steps block above Start cooking (rq-cook-at); recipe.makesFoodsFor says the foods are for {cook}, without below.",
+        "docs/rules/design.md D8; design-rules.cjs gains the check.",
+        "Seen: a food's card (FoodCard) has its numbers inside its PD card; not in DT349."
+      ],
+      "short": "The recipe page takes the Plate's PD card (PdCard, design rule D8); the cooking's − and + moves to Start cooking; with B168, 0.3.193",
+      "open": [],
+      "board": "Stories294",
+      "where": "Page 6",
+      "rel": "Drawn 24 November 2026, 14:00, with B168 on one board; waits for Go"
     },
     {
       "id": "B167",
