@@ -4531,6 +4531,13 @@
       "why": "Coach Milan 23 November 2026, 23:50, looking at the board B165 and B166: + Add a step and + Step here are two different buttons for the same job; should they be one kind? 23:59: yes, add it as Next. Proposed: + Step here between steps and after the last one; + Add a step goes. Wherever steps are written: Edit recipe and the publish sheet. Not drawn."
     },
     {
+      "id": "B168",
+      "title": "The numbers under One portion show the whole recipe",
+      "epic": "cook",
+      "state": "next",
+      "why": "Seen while drawing B166, 23 November 2026: on Lazy Burek's page the PD card says One portion, 549 kcal and 224 g, but its numbers table shows the whole recipe, 897 g and 2,194 kcal (NutritionCard hands NumbersTable aggregate(items) of the whole recipe; the letters are rates, so they are right). Coach Milan 24 November 2026, 07:04: yes, its own ticket, we need to fix that. Likely: the table under One portion shows one portion; the whole recipe stays in the Nutrition table below (ALL column). Not drawn."
+    },
+    {
       "id": "B167",
       "title": "A dinner eaten at 18:28 is on Today but not in Plan",
       "epic": "plate",
