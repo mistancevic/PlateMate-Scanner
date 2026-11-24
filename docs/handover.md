@@ -19,7 +19,7 @@ Read these before anything else:
 1. docs/handover.md in the repo: the state, the open tickets, the canvas and the release steps.
 2. docs/ticket-form.md in the repo, and the Project note claude/chef-mealan-ticket-form.md: how a ticket and its board are written.
 3. docs/backlog.json in the repo: every ticket, with its state.
-4. The newest claude/chef-mealan-handover-2026-11-23-*.md note in this Project, if it is newer than the repo's handover.
+4. The newest claude/chef-mealan-handover-*.md note in this Project, if it is newer than the repo's handover.
 Do not ask me again what these answer.
 
 How we work:
