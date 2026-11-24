@@ -70,19 +70,20 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     p = await open("3720");
     const FOODS = "section.rq-foods", CHIPS = ".rq-portion-chips";
     console.log(await note(p, ".rq-nopic", "<b>New:</b> no photo yet is a placeholder picture of a meal, in the photo's place; its two buttons sit on it.", [".rq-nopic"]));
-    console.log(await note(p, ".rq-readout", "<b>New:</b> the PD card is the whole meal, as the recipe makes it: All 4 portions, 2,194 kcal, 897 g, 93 g. The Plate's card: rows, PD's tap to the scale.", [ROWS, "JS:document.querySelector('.rq-readout .readout-top span')"]));
-    console.log(await note(p, FOODS, "<b>New:</b> Cook for, at the top of Foods: chips 1 to 5 for the usual cases, 4 marked as written, and Other for an exact number. The grams follow; it is saved with the recipe; Start cooking cooks it. No Cook it card.", [CHIPS]));
-    await shot(p, "68-2a", "main", "JS:document.querySelectorAll('.board-note')[2]"); await clean(p);
+    console.log(await note(p, ".rq-readout", "<b>New:</b> the PD card is the whole meal, as the recipe makes it: All 4 servings, 2,194 kcal, 897 g, 93 g. The Plate's card: rows, PD's tap to the scale.", [ROWS, "JS:document.querySelector('.rq-readout .readout-top span')"]));
+    console.log(await note(p, FOODS, "<b>New:</b> Cook for, at the top of Foods: the servings to cook. Chips 1 to 5 for the usual cases, 4 marked as written, and Other for an exact number. The grams follow; it is saved with the recipe; Start cooking cooks it. No Cook it card.", [CHIPS]));
+    console.log(await note(p, "section.nt-card", "<b>New word:</b> 1 SERVING, the recipe's equal share, the same for everyone; ALL 4 and 100 g beside it, for comparison. A portion is yours, calculated for a meal (nutrition rule N17, DT351).", ["JS:document.querySelector('section.nt-card .nt-row.nt-th')"]));
+    await shot(p, "68-2a", "main", "JS:document.querySelectorAll('.board-note')[3]"); await clean(p);
     await p.locator(".rq-readout .letters-row").click(); await sleep(500);
-    console.log(await note(p, ".rq-readout + .nt", "<b>New:</b> the numbers open under the card, as on the Plate, and count the whole meal: Total 897 g and 2,194 kcal, as the card says. One portion and 100 g are in the Nutrition table.", [".rq-readout + .nt .nt-total"]));
+    console.log(await note(p, ".rq-readout + .nt", "<b>New:</b> the numbers open under the card, as on the Plate, and count the whole meal: Total 897 g and 2,194 kcal, as the card says. One serving and 100 g are in the Nutrition table, under 1 SERVING.", [".rq-readout + .nt .nt-total"]));
     await shot(p, "68-2b", ".rq-readout", ".board-note"); await clean(p);
     await p.locator(".rq-readout .letters-row").click(); await sleep(300);
     await p.locator(CHIPS + " .choice").first().click(); await sleep(500);
-    console.log(await note(p, FOODS, "<b>New:</b> 1 chosen: the foods are for 1: 63 g, 1 egg, 38 g, 94 g. The header stays the meal as the recipe makes it.", [CHIPS]));
+    console.log(await note(p, FOODS, "<b>New:</b> 1 serving chosen: the foods are for 1: 63 g, 1 egg, 38 g, 94 g. The header stays the meal as the recipe makes it.", [CHIPS]));
     await shot(p, "68-2c", FOODS, ".board-note"); await clean(p);
     await p.locator(CHIPS + " .choice").filter({ hasText: "Other" }).click(); await sleep(400);
     for (let i = 0; i < 9; i++) { await p.locator(CHIPS + " .rq-cook-row").getByRole("button").last().click(); await sleep(150); }
-    console.log(await note(p, FOODS, "<b>New:</b> Other opens − and + for an exact number: 10 portions, for a week of meal prep. The foods are for 10.", [CHIPS]));
+    console.log(await note(p, FOODS, "<b>New:</b> Other opens − and + for an exact number: 10 servings, for a week of meal prep. The foods are for 10.", [CHIPS]));
     await shot(p, "68-2d", FOODS, ".board-note"); await p.context().close();
   } catch (e) { console.log("ERR", e.message.slice(0, 400)); } finally { await b.close(); s1?.kill(); s2?.kill(); }
 })();

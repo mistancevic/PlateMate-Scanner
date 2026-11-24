@@ -40,7 +40,7 @@ How you talk to me:
 - Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 - When this chat gets long, give me this full starter prompt again, updated, never a short one.
 
-Next: B168 and DT349 are drawn together on canvas Page 6 (one board) and wait for my Go. B168: the recipe's PD card and its numbers are the whole meal; one portion and 100 g stay in the Nutrition table. DT349: the recipe's header is the meal (title, a placeholder photo with its buttons on it, the Plate's PD card as one component, PdCard, design rule D8); Cook for at the top of Foods, chips 1 to 5, the recipe's number as written, Other with − and + for an exact number; the Cook it card goes. Checks Full, new words, release 0.3.193. The scratch build /home/claude/work/b168 is gone in a new chat: rebuild from the board and ticketB168.json. Later: DT350 (each person's own portion). Then from Next: DT348, B164, DT346, DT347, DT344.
+Next: B168 and DT349 are drawn together on canvas Page 6 (one board) and wait for my Go. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). B168: the recipe's PD card and its numbers are the whole meal; one serving and 100 g stay in the Nutrition table; the recipe's count says servings. DT349: the recipe's header is the meal (title, a placeholder photo with its buttons on it, the Plate's PD card as one component, PdCard, design rule D8); Cook for at the top of Foods, the servings to cook, chips 1 to 5, the recipe's number as written, Other with − and + for an exact number; the Cook it card goes. Checks Full, new words, release 0.3.193. The scratch build /home/claude/work/b168 is gone in a new chat: rebuild from the board and ticketB168.json. Srpski and German keep serving and portion apart (today both say porcija and Portion): propose the words at the Go. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target). Then from Next: DT351 (see a recipe as one of my meals), DT348, B164, DT346, DT347, DT344.
 ```
 
 ## Standing rules (Coach Milan)
@@ -69,7 +69,10 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 24 November 2026, 17:50
+## State, 24 November 2026, 22:45
+
+- B168 and DT349 redrawn 24 November 22:40 with servings (Coach Milan 22:26: yes; the difference between portion and serving matters, between people and their goals). Nutrition rule N17 in docs/rules/nutrition.md: a serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for the meal I pick and my day. B168 AC6: The whole recipe makes 4 servings, 1 SERVING in the Nutrition table. The app's saved unit portions stays saved, its word on screen becomes serving and servings (recipe.unit.portions, recipe.portion, recipe.portions, recipe.wholeByWeight). New words: nutrition.allServings, recipe.cookFor, recipe.other, recipe.asWritten, recipe.thePlan; recipe.makesFoodsFor without below. Stories294 h 7548; the pictures are new canvas assets (assetsB168.json). Scratch /home/claude/work/b168 holds it all this chat: src/components/PdCard.tsx, the Plate's readout on PdCard, NutritionCard whole meal with the numbers under the card, rq-nopic-ph placeholder, Cook for chips (rq-portion-chips) with Other's − and + row, the Cook it card gone. Not in the scratch yet: design.md D8, the design-rules check, Srpski and German words.
+- Brainstorm 17:49 to 19:04 (Coach Milan): a portion depends on the person, the meal and the day, so it is never the recipe's; a recipe from someone else shows its original numbers and, on request, mine. DT351 Next: See it as: Just looking (the default, the original numbers) or Breakfast, Lunch, Dinner, Snack (my portion for that meal, and how many of my portions the recipe makes); the author's goal is never shown (GDPR, 18:49). The Members' recipes list already shows your portion for the meal ahead (members.yourMealPortion); DT351 builds on it. DT352 Later: find a recipe by meal and my PD target. Both in docs/backlog.json, not on the Kanban yet.
 
 - B168 and DT349 redrawn 24 November 17:50 (Coach Milan 15:14: the usual cases are 1 to 5; 17:38: we need both, chips for quick and an exact number; later custom, smart: each person's portion, DT350 Later). Cook for: chips 1, 2, 3, 4 as written, 5, the plan's number, Other (opens the − and + row). DT349 AC8. Stories294 h 6626.
 - B168 and DT349 redrawn 24 November 15:05 (Coach Milan 14:49: the header is the meal, a placeholder photo with the CTAs on it, portioning elsewhere as - + or chips; 14:50: yes, but the PD card is the whole meal, not one portion). Stories294 now h 6566. Scratch /home/claude/work/b168 holds it: PdCard, NutritionCard whole meal, rq-nopic-ph placeholder (an SVG plate), chips at the top of Foods (rq-portion-chips, choice). Numbers for and the cook row at Start cooking are out of the scratch.
@@ -138,8 +141,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - Stories291 B161 at x 0, y 76002, w 1290, h 2617.
 - Stories292 B167 at x 0, y 78739, w 2670, h 3578.
 - Stories293 B165 and B166 at x 0, y 82437, w 1790, h 6466.
-- Stories294 B168 and DT349 at x 0, y 89023, w 2270, h 6626.
-- The next board on Page 6 goes at x 0, y 95769.
+- Stories294 B168 and DT349 at x 0, y 89023, w 2270, h 7548.
+- The next board on Page 6 goes at x 0, y 96691.
 - A sheet that scrolls is drawn as one tall picture: shotDT339.cjs unroll() opens its scroll boxes at their real width.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.191; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json of 0.3.191. Two new lines in 0.3.191, Srpski confirmed by Claude, German in Beta.
