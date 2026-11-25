@@ -68,14 +68,20 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     console.log(await note(p, ".plate-card .nt", "The Plate's PD card: Energy, Weight and Protein as rows, the numbers under the card. The recipe page takes this card; the Plate becomes the same component, nothing on it changes.", [".plate-card .readout"]));
     await shot(p, "68-4a", ".plate-card .readout", ".board-note"); await p.context().close();
     s1.kill();
-    // ---- new, scratch build ----
+    // ---- the Plate, new: the same card, the words against the target on their own line ----
     s2 = await serve(NEW_ROOT, "3720");
+    p = await open("3720", "/plate");
+    for (const n of ["Skyr", "Oats", "Banana"]) { await (await require(path.join(OLD_ROOT, "tests/flows/more.cjs"))(p)).fill(n); await sleep(400); await p.locator(".row-food").filter({ hasText: n }).first().getByRole("button", { name: /Add/ }).click(); await sleep(700); }
+    const x2 = p.locator(".add-more-top button").first(); if (await x2.count()) { await x2.click(); await sleep(300); }
+    console.log(await note(p, ".plate-card .readout", "<b>New:</b> the same card, PdCard. The words against the target have their own line, the full width of the card, under the PD and its rows. A long line no longer squeezes the rows.", [".plate-card .readout .pd-line"]));
+    await shot(p, "68-4b", ".plate-card .readout", ".board-note"); await p.context().close();
+    // ---- new, scratch build ----
     p = await open("3720");
     const FOODS = "section.rq-foods", HOW = "section.rq-howmuch", LINE = ".rq-choice-line", ACT = "section.rq-actions";
     const chip = (text) => p.locator(`${HOW} .choice`).filter({ hasText: text }).first();
     console.log(await note(p, ".rq-nopic", "<b>New:</b> no photo yet is a placeholder picture of a meal, in the photo's place; its two buttons sit on it.", [".rq-nopic"]));
-    console.log(await note(p, ".rq-readout", "<b>New, fixed:</b> the PD card is the Plate's card, for the whole recipe as written: 2,194 kcal, 897 g, 93 g. A short title, as the card's template. It never follows a choice below.", [".rq-readout"]));
-    console.log(await note(p, HOW, "<b>New:</b> Servings, the one choice on the page: 1 to 5 and Other, only numbers. The line gives the numbers for the choice. No Cook it card.", [HOW]));
+    console.log(await note(p, ".rq-readout", "<b>New, fixed:</b> the PD card is the Plate's card, for the whole recipe as written: 2,194 kcal, 897 g, 93 g. A short title; the words against my target on their own line. It never follows a choice below.", [".rq-readout"]));
+    console.log(await note(p, HOW, "<b>New:</b> Servings, the one choice on the page. A chip is one tap: 1 to 5. Under them − and + for an exact number, grey until used. The line gives the numbers for the choice. No Cook it card.", [HOW]));
     console.log(await note(p, FOODS, "<b>New:</b> Foods is one block, only the list, in grams for the servings chosen.", []));
     console.log(await note(p, "section.nt-card", "<b>New word:</b> 1 SERVING, the recipe's equal share, the same for everyone; ALL 4 and 100 g beside it. Fixed, as the top (nutrition rule N17).", ["JS:document.querySelector('section.nt-card .nt-row.nt-th')"]));
     await shot(p, "68-2a", "main", "JS:document.querySelectorAll('.board-note')[4]"); await clean(p);
@@ -87,9 +93,8 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     console.log(await note(p, ".rq-readout", "<b>Fixed:</b> the top is the recipe as written. It does not move.", []));
     console.log(await note(p, FOODS, "<b>New:</b> 2 servings: the line says 1,097 kcal, 449 g, and Foods for 2 servings follows: 125 g, 1 egg, 75 g, 188 g. Saved with the recipe; Start cooking cooks it.", [HOW]));
     await shot(p, "68-2c", ".rq-readout", "JS:document.querySelectorAll('.board-note')[1]"); await clean(p);
-    await chip("Other").click(); await sleep(400);
     for (let i = 0; i < 8; i++) { await p.locator(HOW + " .rq-cook-row").getByRole("button").last().click(); await sleep(150); }
-    console.log(await note(p, FOODS, "<b>New:</b> Other opens − and + for an exact number: 10 servings, for a week of meal prep. The line and the foods are for 10.", [HOW]));
+    console.log(await note(p, FOODS, "<b>New:</b> + tapped until 10: − and + are in use, no chip is chosen. 10 servings, for a week of meal prep. The line and the foods are for 10.", [HOW]));
     await shot(p, "68-2d", HOW, ".board-note"); await p.context().close();
     // ---- B168.3: what do you do with it ----
     p = await open("3720");
