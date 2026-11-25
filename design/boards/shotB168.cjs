@@ -36,10 +36,10 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
   };
   const note = (p, sel, html, marks = [], where = "afterend") => p.evaluate(([sel, html, marks, MARK, NOTE, where]) => {
     const pick = (s) => (s.startsWith("JS:") ? [eval(s.slice(3))].flat().filter(Boolean) : [...document.querySelectorAll(s)]);
-    for (const m of marks) pick(m).forEach((e) => (e.style.cssText += ";" + MARK));
+    for (const m of marks) pick(m).forEach((e) => { e.dataset.bm = "1"; e.style.cssText += ";" + MARK; });
     const t = pick(sel)[0]; if (!t) return "missing " + sel; const n = document.createElement("div"); n.className = "board-note"; n.style.cssText = NOTE; n.innerHTML = html; t.insertAdjacentElement(where, n); return "ok"; }, [sel, html, marks, MARK, NOTE, where]);
-  const clean = (p) => p.evaluate(() => document.querySelectorAll(".board-note").forEach((n) => n.remove()));
-  const shot = async (p, name, from, to) => { await sleep(400);
+  const clean = (p) => p.evaluate(() => { document.querySelectorAll(".board-note").forEach((n) => n.remove()); document.querySelectorAll("[data-bm]").forEach((e) => { e.style.outline = ""; e.style.outlineOffset = ""; delete e.dataset.bm; }); });
+  const shot = async (p, name, from, to) => { await p.mouse.move(2, 2); await p.evaluate(() => document.activeElement && document.activeElement.blur()); await sleep(400);
     const r = await p.evaluate(([from, to]) => { const pick = (q) => (q.startsWith('JS:') ? eval(q.slice(3)) : document.querySelector(q)); const a = pick(from).getBoundingClientRect(), e = pick(to)?.getBoundingClientRect(); const notes = [...document.querySelectorAll(".board-note")].map((n) => n.getBoundingClientRect().bottom);
       return { y: a.top + scrollY - 12, h: Math.max(e ? e.bottom : a.bottom, ...notes) - a.top + 26 }; }, [from, to]);
     await p.screenshot({ path: `${R}/${name}.png`, fullPage: true, clip: { x: 0, y: Math.max(0, r.y), width: 390, height: r.h } }); console.log(name, Math.round(r.h)); };
@@ -63,27 +63,45 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     const x = p.locator(".add-more-top button").first(); if (await x.count()) { await x.click(); await sleep(300); }
     await p.locator(".readout .letters-row").first().click(); await sleep(500);
     console.log(await note(p, ".plate-card .nt", "The Plate's PD card: Energy, Weight and Protein as rows, the numbers under the card. The recipe page takes this card; the Plate becomes the same component, nothing on it changes.", [".plate-card .readout"]));
-    await shot(p, "68-3a", ".plate-card .readout", ".board-note"); await p.context().close();
+    await shot(p, "68-4a", ".plate-card .readout", ".board-note"); await p.context().close();
     s1.kill();
     // ---- new, scratch build ----
     s2 = await serve(NEW_ROOT, "3720");
     p = await open("3720");
-    const FOODS = "section.rq-foods", CHIPS = ".rq-portion-chips";
+    const FOODS = "section.rq-foods", HOW = "section.rq-howmuch", SEE = ".rq-see", COUNT = ".rq-count", LINE = ".rq-choice-line";
+    const chip = (box, text) => p.locator(`${box} .choice`).filter({ hasText: text }).first();
+    const TOP = "<b>Fixed:</b> the top is the recipe as written. It never moves, whatever is chosen below.";
     console.log(await note(p, ".rq-nopic", "<b>New:</b> no photo yet is a placeholder picture of a meal, in the photo's place; its two buttons sit on it.", [".rq-nopic"]));
-    console.log(await note(p, ".rq-readout", "<b>New:</b> the PD card is the whole meal, as the recipe makes it: All 4 servings, 2,194 kcal, 897 g, 93 g. The Plate's card: rows, PD's tap to the scale.", [ROWS, "JS:document.querySelector('.rq-readout .readout-top span')"]));
-    console.log(await note(p, FOODS, "<b>New:</b> Cook for, at the top of Foods: the servings to cook. Chips 1 to 5 for the usual cases, 4 marked as written, and Other for an exact number. The grams follow; it is saved with the recipe; Start cooking cooks it. No Cook it card.", [CHIPS]));
-    console.log(await note(p, "section.nt-card", "<b>New word:</b> 1 SERVING, the recipe's equal share, the same for everyone; ALL 4 and 100 g beside it, for comparison. A portion is yours, calculated for a meal (nutrition rule N17, DT351).", ["JS:document.querySelector('section.nt-card .nt-row.nt-th')"]));
-    await shot(p, "68-2a", "main", "JS:document.querySelectorAll('.board-note')[3]"); await clean(p);
+    console.log(await note(p, ".rq-readout", "<b>New, fixed:</b> the PD card is the whole recipe, as written: makes 4 servings, 2,194 kcal, 897 g, 93 g. The Plate's card: rows, PD's tap to the scale. It never follows the choice below.", [ROWS, "JS:document.querySelector('.rq-readout .readout-top span')"]));
+    console.log(await note(p, HOW, "<b>New:</b> How much, one block where everything follows the choice. <b>See it as</b>: Just looking, or one of my meals. Just looking counts the recipe's <b>servings</b>: 1 to 5, 4 as written, Other. The line gives the numbers for the choice. No Cook it card.", [SEE, COUNT, LINE]));
+    console.log(await note(p, FOODS, "<b>New:</b> Foods is one block, only the list, in grams for the choice above.", []));
+    console.log(await note(p, "section.nt-card", "<b>New word:</b> 1 SERVING, the recipe's equal share, the same for everyone; ALL 4 and 100 g beside it. Fixed, as the top (nutrition rule N17).", ["JS:document.querySelector('section.nt-card .nt-row.nt-th')"]));
+    await shot(p, "68-2a", "main", "JS:document.querySelectorAll('.board-note')[4]"); await clean(p);
     await p.locator(".rq-readout .letters-row").click(); await sleep(500);
-    console.log(await note(p, ".rq-readout + .nt", "<b>New:</b> the numbers open under the card, as on the Plate, and count the whole meal: Total 897 g and 2,194 kcal, as the card says. One serving and 100 g are in the Nutrition table, under 1 SERVING.", [".rq-readout + .nt .nt-total"]));
+    console.log(await note(p, ".rq-readout + .nt", "<b>New:</b> the numbers open under the card, as on the Plate, and count the whole recipe: Total 897 g and 2,194 kcal, as the card says.", [".rq-readout + .nt .nt-total"]));
     await shot(p, "68-2b", ".rq-readout", ".board-note"); await clean(p);
     await p.locator(".rq-readout .letters-row").click(); await sleep(300);
-    await p.locator(CHIPS + " .choice").first().click(); await sleep(500);
-    console.log(await note(p, FOODS, "<b>New:</b> 1 serving chosen: the foods are for 1: 63 g, 1 egg, 38 g, 94 g. The header stays the meal as the recipe makes it.", [CHIPS]));
-    await shot(p, "68-2c", FOODS, ".board-note"); await clean(p);
-    await p.locator(CHIPS + " .choice").filter({ hasText: "Other" }).click(); await sleep(400);
-    for (let i = 0; i < 9; i++) { await p.locator(CHIPS + " .rq-cook-row").getByRole("button").last().click(); await sleep(150); }
-    console.log(await note(p, FOODS, "<b>New:</b> Other opens − and + for an exact number: 10 servings, for a week of meal prep. The foods are for 10.", [CHIPS]));
-    await shot(p, "68-2d", FOODS, ".board-note"); await p.context().close();
+    await chip(COUNT, "2").click(); await sleep(500);
+    console.log(await note(p, ".rq-readout", TOP, []));
+    console.log(await note(p, FOODS, "<b>New:</b> 2 servings chosen: the line says 1,097 kcal, 449 g, and Foods for 2 servings follows: 125 g, 1 egg, 75 g, 188 g. Saved with the recipe; Start cooking cooks it.", [COUNT, LINE]));
+    await shot(p, "68-2c", ".rq-readout", "JS:document.querySelectorAll('.board-note')[1]"); await clean(p);
+    await chip(COUNT, "Other").click(); await sleep(400);
+    for (let i = 0; i < 8; i++) { await p.locator(COUNT + " .rq-cook-row").getByRole("button").last().click(); await sleep(150); }
+    console.log(await note(p, FOODS, "<b>New:</b> Other opens − and + for an exact number: 10 servings, for a week of meal prep. The line and the foods are for 10.", [COUNT, LINE]));
+    await shot(p, "68-2d", HOW, ".board-note"); await p.context().close();
+    // ---- B168.3: see it as one of my meals ----
+    p = await open("3720");
+    console.log(await note(p, HOW, "The same page as B168.2a. I tap <b>Dinner</b>.", [SEE]));
+    await shot(p, "68-3a", ".rq-readout", ".board-note"); await clean(p);
+    await chip(SEE, "Dinner").click(); await sleep(500);
+    console.log(await note(p, ".rq-readout", TOP, []));
+    console.log(await note(p, FOODS, "<b>New:</b> seen as Dinner, the count is <b>portions</b>, mine: my dinner portion in grams, kcal and protein, calculated from my dinner today. The PD is the recipe's, 4.3. The line says how many of my portions the whole recipe is. Foods for 1 dinner portion follows. Someone else gets other grams from the same recipe. Not saved: it depends on the day.", [SEE, COUNT, LINE]));
+    await shot(p, "68-3b", ".rq-readout", "JS:document.querySelectorAll('.board-note')[1]"); await clean(p);
+    await chip(COUNT, "2").click(); await sleep(500);
+    console.log(await note(p, FOODS, "<b>New:</b> 2 portions: two of my dinners, today's and tomorrow's. The line and the foods are for both.", [COUNT, LINE]));
+    await shot(p, "68-3c", HOW, ".board-note"); await clean(p);
+    await chip(SEE, "Snack").click(); await sleep(500);
+    console.log(await note(p, FOODS, "<b>New:</b> the same recipe seen as a Snack: a smaller portion, the same PD.", [SEE, LINE]));
+    await shot(p, "68-3d", HOW, ".board-note"); await p.context().close();
   } catch (e) { console.log("ERR", e.message.slice(0, 400)); } finally { await b.close(); s1?.kill(); s2?.kill(); }
 })();
