@@ -13,7 +13,7 @@
  "now": "Sam (an invented name) shares Lazy Burek with three scanned packs. In Members: Mix 250 g körniger frischkäse tworog 2,5% fett, 2 eggs (L) and 150 g feta leicht; 2,194 kcal. I have my own Frischer Blätterteig (another size, 330 kcal): after Save to My recipes the copy uses mine and says 1,932 kcal.",
  "proposed": "Sharing keeps each food's source, barcode and basic food; the server checks them (a source is a short word, a barcode 8 to 14 digits, a basic food an id) and still drops notes and photos. Taking a recipe (Save to My recipes, Put it on the Plate, the Plate's idea from Members) matches a food by barcode first, then by basic food, then by name and brand; a pack with another barcode stays its own food. Old shares: the app already sends a shared recipe again when what it sends changes (CO4b), so the first time the owner opens Recipes after the update, each shared recipe goes once more, with the new fields.",
  "looked_at": "Fix only new and changed shares (A, 19:37): needs extra code to keep the new fields out of the fingerprint that sends changes, so that old shares are not sent again; not chosen, 19:39 to 19:44: the path that sends changes does it already. A one-time resend written for this (B): the same path does it, no new code.",
- "decision": "Waiting for Coach Milan's Go.",
+ "decision": "Go 25 November 2026, 20:01; checks Middle, 10 of 10 (docs/qa/runs/0.3.196.json), 787 unit tests. Built in 0.3.196.",
  "short": "A shared recipe keeps each food's source, barcode and basic food; foods match by barcode first; release 0.3.196",
  "ac": [
   {

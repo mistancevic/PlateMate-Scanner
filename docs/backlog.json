@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.196",
     "0.3.195",
     "0.3.194",
     "0.3.193",
@@ -4818,8 +4819,8 @@
       "id": "B170",
       "title": "A shared recipe drops where each food came from and its barcode",
       "epic": "cook",
-      "state": "next",
-      "why": "Seen while drawing DT353, 25 November 2026: cleanShared in src/members.ts keeps a food's name, values and grams, but not its source or barcode. So a member's recipe writes a pack's name in small letters in its steps (körniger frischkäse tworog), on the member's page and in the copy after Save to My recipes; and the copy's foods match my own foods by name only. The numbers are right. Proposed: sharing keeps the source (label, Reference table) and the barcode. Coach Milan 16:57: ok, its own ticket. Not drawn. 18:37: yes, brainstorm. 19:37: A (fix new and changed shares only); 19:39 to 19:44: the path that sends a change already sends old shares once, so that is the scope. 19:44: draw. Drawn 19:52.",
+      "state": "done",
+      "why": "Seen while drawing DT353, 25 November 2026: cleanShared in src/members.ts keeps a food's name, values and grams, but not its source or barcode. So a member's recipe writes a pack's name in small letters in its steps (körniger frischkäse tworog), on the member's page and in the copy after Save to My recipes; and the copy's foods match my own foods by name only. The numbers are right. Proposed: sharing keeps the source (label, Reference table) and the barcode. Coach Milan 16:57: ok, its own ticket. Not drawn. 18:37: yes, brainstorm. 19:37: A (fix new and changed shares only); 19:39 to 19:44: the path that sends a change already sends old shares once, so that is the scope. 19:44: draw. Drawn 19:52. 20:01: Go. Built in 0.3.196.",
       "problem": "Sharing sends each food's name, values and grams, but not its source (read from a label, or a basic food), its barcode or its basic food. So on a member's page and in a copy saved from it, the steps write a pack in small letters: körniger frischkäse tworog. And when I save or cook a member's recipe, its foods match mine by name and brand only: if I have a pack with the same name, my pack's values replace the member's, and the copy says 1,932 kcal where the member's page says 2,194.",
       "story": "When I take a recipe a member shared, I want it with the member's packs and numbers, named as printed, so that I cook what they cooked.",
       "unchanged": [
@@ -4831,7 +4832,7 @@
       "open": [],
       "board": "Stories297",
       "where": "Page 6",
-      "rel": "Drawn 25 November 2026 with its agreement; waits for Go",
+      "rel": "Built in 0.3.196; Go 25 November 2026, 20:01",
       "ac": [
         {
           "id": "AC1",
@@ -4868,7 +4869,8 @@
           "title": "Old shares, once",
           "text": "Given Lazy Burek shared before this release, when Sam opens Recipes after the update, then the app sends it once more with the new fields, its place in Members stays the same, and opening Recipes again sends nothing"
         }
-      ]
+      ],
+      "version": "0.3.196"
     },
     {
       "id": "B169",
