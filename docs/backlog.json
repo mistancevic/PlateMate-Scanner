@@ -2935,8 +2935,8 @@
       "id": "DT332",
       "title": "Plan it on a recipe page",
       "epic": "plate",
-      "state": "next",
-      "why": "Coach Milan 20 November 20:02 to 20:08, on B151: Plan it leaves the Plate; Save it puts the plate into My recipes, and there Plan it alongside putting it on the Plate or Prepare it closes the loop. Its own ticket by the scope rule.",
+      "state": "done",
+      "why": "Coach Milan 20 November 20:02 to 20:08, on B151: Plan it leaves the Plate; Save it puts the plate into My recipes, and there Plan it alongside putting it on the Plate or Prepare it closes the loop. Its own ticket by the scope rule. 25 November 18:20: closed as done in 0.3.193 (DT349).",
       "opportunity": {
         "from": "Coach Milan's own look at the B151 board, 20 November 2026, 20:02.",
         "job": "Plan a dish I saved for a meal of a coming day.",
@@ -2945,7 +2945,9 @@
       },
       "problem": "A recipe page offers Change it first, Start cooking and Edit recipe. To plan a saved dish for Thursday's lunch I have to go to the Plan and look for it there.",
       "story": "When I look at a recipe I saved, I want to put it on a coming meal from there, so that the dish I kept turns into a plan without searching for it again.",
-      "decision": "Open. To be drawn after B151."
+      "decision": "Closed 25 November 2026, 18:20 (Coach Milan: yes): done in 0.3.193 by DT349, whose recipe page has Plan it (days and meals, my portion, Put it in the plan). Not drawn on its own board; DT349's board Stories294 shows it.",
+      "version": "0.3.193",
+      "rel": "Done in 0.3.193 by DT349; closed 25 November 2026, 18:20"
     },
     {
       "id": "DT333",

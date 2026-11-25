@@ -40,7 +40,7 @@ How you talk to me:
 - Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 - When this chat gets long, give me this full starter prompt again, updated, never a short one.
 
-Next: 0.3.193 (B168 and DT349), 0.3.194 (B169) and 0.3.195 (DT353) are merged into main; I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). Plan it is one component for both recipe pages (src/components/PlanIt.tsx). A member's recipe opens as the member wrote it, with a note and Plan it, Put it on the Plate, Save to My recipes. Ask me whether DT332 (Plan it on a recipe page) can close as done in 0.3.193. Then from Next: B170, DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target). Propose a full run at the end of a day with lighter runs merged (ticket form, checks rule 6).
+Next: 0.3.193 (B168 and DT349), 0.3.194 (B169) and 0.3.195 (DT353) are merged into main; I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). Plan it is one component for both recipe pages (src/components/PlanIt.tsx). A member's recipe opens as the member wrote it, with a note and Plan it, Put it on the Plate, Save to My recipes. DT332 (Plan it on a recipe page) is closed as done in 0.3.193. Then from Next: B170, DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target). Propose a full run at the end of a day with lighter runs merged (ticket form, checks rule 6).
 ```
 
 ## Standing rules (Coach Milan)
@@ -69,7 +69,7 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 25 November 2026, 17:55
+## State, 25 November 2026, 18:20
 
 - 0.3.195 (DT353) is merged into main as 9992379803 (merge of pm195) and tagged v0.3.195 (local tag); Go 25 November 17:27, checks Middle with the German sweep: member-page (new, AC1 to AC10), covers-and-members, recipe-servings, recipe-centre, design-rules, accessibility, deutsch, language, 8 of 8 (docs/qa/runs/0.3.195.json); 784 unit tests. Built: MemberPage in src/components/Members.tsx opens on the recipe as written (NutritionCard readoutOnly, Foods, the Nutrition table, Steps at the recipe's amounts), then rq-actions with the note members.decideLine, Plan it, Put it on the Plate (my portion for the meal ahead, as Make it did) and Save to My recipes (members.saveToMine, as Keep in mine did). Plan it moved out of RecipePage into src/components/PlanIt.tsx (planFor, PlanIt) and carries span.pi-go, ⌄ closed and ⌃ open. Words gone: members.makeIt, keepInMine, foodsForYourPortion, yourPortionOfTotal and the three tile words. covers-and-members CO3 and recipe-servings AC9 changed with the story, each with a note naming DT353. Board Stories296 marked built; Kanban: DT353 Done. Srpski and Deutsch tables published.
 - A stray app server from an earlier run held a lane's port and made covers-and-members fail CO4 in the Middle run (its member list had 17 recipes from old runs). Stopped by hand; the rerun passed. If a walkthrough sees old data, look first for a leftover `dist/server.cjs`:
@@ -78,7 +78,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ps -eo pid,etime,args | grep "dist/server.cjs" | grep -v grep
 ```
 
-- Open question for Coach Milan: close DT332 (Plan it on a recipe page) as done in 0.3.193?
+- DT332 closed 18:20 (Coach Milan: yes): done in 0.3.193 by DT349's Plan it. Backlog state done; Kanban Done.
 
 - DT353 redrawn 17:15 (Coach Milan 17:11: 2c, should Plan it turn blue because it is active, or stay white? 17:12: draw to see). Drawn: Plan it stays white with an arrow (span.pi-go, ⌄ closed, ⌃ open), the one filled button is Put it in the plan (design rules D1, D6); the same on my own recipe's Plan it. AC10. Stories296 h 5590. Scratch /home/claude/work/b353 has it in Members.tsx and RecipePage.tsx.
 
@@ -186,7 +186,7 @@ ps -eo pid,etime,args | grep "dist/server.cjs" | grep -v grep
 
 ### Still open
 
-- OP9 (the app sends mail), OP8 (needs a board), DT333 (later), DT332 (to draw), B152 (board).
+- OP9 (the app sends mail), OP8 (needs a board), DT333 (later), B152 (board).
 - Open from releases: DT340's skip on Today's page; DT319's Change it on Plan's meal card; DT335's words for the new goal's sheet and page (drafted, for Coach Milan's look); whether recipe fits should name Gain healthy weight.
 - Asked, no answer yet: whether the empty It makes field on Eat gets its own ticket.
 - The repo tracks `node_modules` as a symlink; after `npm ci` git shows it deleted. Never commit that: add files by name.
