@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.193",
     "0.3.192",
     "0.3.191",
     "0.3.190",
@@ -4534,7 +4535,7 @@
       "id": "B168",
       "title": "The numbers under One portion show the whole recipe",
       "epic": "cook",
-      "state": "now",
+      "state": "done",
       "why": "Seen while drawing B166, 23 November 2026: on Lazy Burek's page the PD card says One portion, 549 kcal and 224 g, but its numbers table shows the whole recipe, 897 g and 2,194 kcal (NutritionCard hands NumbersTable aggregate(items) of the whole recipe; the letters are rates, so they are right). Coach Milan 24 November 2026, 07:04: yes, its own ticket, we need to fix that. Likely: the table under One portion shows one portion; the whole recipe stays in the Nutrition table below (ALL column). Not drawn. 07:42 to 13:54: the card as on the Plate, - and + to choose what is counted; not in the card (07:58); separate the whole recipe and cooking from the portion calculation of macros (13:53); draw (13:54). 14:49 to 14:50: the header is the meal (title, photo, PD card for the whole meal, Nutrition with portion, all and 100 g); a placeholder photo with the CTAs on it; portioning elsewhere, as chips. 22:26: a serving and a portion are two things (nutrition rule N17): the recipe's equal shares are servings, One serving in the Nutrition table; a portion is mine, calculated for a meal. Board to redraw with servings.",
       "opportunity": {
         "from": "Seen while drawing B166, 23 November 2026, on Lazy Burek's page; Coach Milan 24 November 07:04: yes, its own ticket, we need to fix that.",
@@ -4596,13 +4597,14 @@
       "open": [],
       "board": "Stories294",
       "where": "Page 6",
-      "rel": "Redrawn 25 November 2026, 14:45, with DT349 on one board; waits for Go"
+      "rel": "Built in 0.3.193; Go 25 November 2026, 14:38",
+      "version": "0.3.193"
     },
     {
       "id": "DT349",
       "title": "The recipe page: the recipe as written on top, Servings and Foods, and What do you do with it? (Plan it, Put it on the Plate)",
       "epic": "cook",
-      "state": "now",
+      "state": "done",
       "why": "Coach Milan 24 November 2026, 07:42: we need to have the same PD card layout as it is on the Plate; that should be also in the design system and components fixed. 07:58: ok, a new design ticket. 13:47 to 13:54: Cook it is more like a CTA; separate it from the portions for the numbers; drawn with B168 on one board. 14:49 to 14:50: the header is the meal (title, photo, PD card for the whole meal, Nutrition with portion, all and 100 g); a placeholder photo with the CTAs on it; portioning elsewhere, as chips. 15:14 and 17:38: Cook for, chips 1 to 5 for the usual cases and Other for an exact number: we need both. 22:26: Cook for counts servings (Makes 4 servings, Cook for 2 servings), never portions (nutrition rule N17). Board to redraw. 25 November 07:54 to 08:02: the page in two zones, the recipe as written on top, fixed; How much below, with See it as (Just looking counts servings, a meal counts my portions); Foods one block; the words Cook for go; DT351 merged in. Redrawn 08:30. 08:31 to 08:42: the card's title short; Servings with only numbers; no meal chips on the page; What do you do with it? with Plan it (the Plate's day and meal block, then my portion) and Put it on the Plate; Just looking is the page's state. Redrawn 09:00. 13:06: a chip is one tap, − and + always under the chips, grey until used, no Other chip; the PD card's words against the target on their own line, on the Plate too. Redrawn 13:30. 13:16 to 13:17: the PD card in two columns, each label heading its own (the rows under the title, the PD and its words under PD); three variations drawn (B168.5). Redrawn 13:50. 14:26: B (PD and its words on the left, the title and the rows on the right). Redrawn 14:45.",
       "opportunity": {
         "from": "Coach Milan 24 November 2026, 07:42, looking at the board B168; 13:44 to 14:50, brainstorm on the header and the portions.",
@@ -4702,7 +4704,8 @@
       "open": [],
       "board": "Stories294",
       "where": "Page 6",
-      "rel": "Redrawn 25 November 2026, 14:45, with B168 on one board; waits for Go"
+      "rel": "Built in 0.3.193; Go 25 November 2026, 14:38",
+      "version": "0.3.193"
     },
     {
       "id": "DT350",
@@ -4715,10 +4718,12 @@
       "id": "DT351",
       "title": "Merged into DT349: see a recipe as one of my meals",
       "epic": "cook",
-      "state": "now",
+      "state": "done",
       "why": "Coach Milan 24 November 2026, 17:49 to 19:04, brainstorm on portions. A portion is mine: its weight, size and macros, calculated for the meal I pick and my day's plan; a recipe only splits the batch into equal shares. My Recipes keep my own numbers. A recipe from someone else shows its original numbers and math, and a row to see it for me: Just looking (the default, the original numbers, servings as written) or a meal (Breakfast, Lunch, Dinner, Snack: my portion for that meal in grams and macros, and how many of my portions the recipe makes, for example 2 of your dinner portions). The PD stays the same either way, it is a rate. Calculated only from the recipe's numbers and the reader's own setup; the author's goal is never shown (GDPR, 18:49 to 19:01). Not drawn. Seen 24 November 22:30: the Members' recipes list already shows your portion for the meal ahead (members.yourMealPortion in src/components/Members.tsx); DT351 builds on it. 25 November 2026, 08:02, Coach Milan: yes, merged into DT349 (See it as, in How much). Built and released with DT349; not a card of its own. 08:42: it lives in DT349 as Plan it: my portion shows once a day and a meal are picked.",
       "board": "Stories294",
-      "where": "Page 6"
+      "where": "Page 6",
+      "version": "0.3.193",
+      "rel": "Built in 0.3.193 as part of DT349 (Plan it); Go 25 November 2026, 14:38"
     },
     {
       "id": "DT352",
