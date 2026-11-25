@@ -1,7 +1,7 @@
 {
   "name": "chefmealan",
   "private": true,
-  "version": "0.3.195",
+  "version": "0.3.196",
   "type": "module",
   "scripts": {
     "dev": "node --import tsx server.ts",
