@@ -4738,7 +4738,27 @@
       "title": "A member's recipe page in the same structure as my own recipe's",
       "epic": "cook",
       "state": "next",
-      "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn."
+      "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn. 25 November 16:25: yes, brainstorm; 16:26: draw so we discuss it. Drawn 16:45, for discussion.",
+      "opportunity": {
+        "from": "Found while drawing DT349, 25 November 2026; Coach Milan 16:25: yes, brainstorm; 16:26: draw so we discuss it.",
+        "job": "Read a recipe another member shared, and decide what to do with it.",
+        "kind": "Did not find it or did not understand it: the same kind of page works two different ways.",
+        "why_now": "0.3.193 gave my own recipes the recipe as written on top and What do you do with it? at the end; a member's recipe still opens on my portion, with its own tiles and buttons."
+      },
+      "problem": "A member's recipe opens on my portion for the meal ahead: Your dinner: 300 g of the 897 g it makes, three tiles for my portion, Foods for your portion, the steps for my portion, Make it and Keep in mine. My own recipe opens on the recipe as written, with the Plate's PD card, and asks what I do with it. The member's own numbers are not on the page at all.",
+      "story": "When I open a recipe a member shared, I want to read it as they wrote it and then decide what to do with it, the same way as with my own recipes, so that I know where everything is.",
+      "unchanged": [
+        "The list's tile: my portion for the meal ahead.",
+        "Put it on the Plate does what Make it did: my portion for the meal ahead goes on the Plate.",
+        "Save to My recipes does what Keep in mine did: a copy in Mine."
+      ],
+      "open": [
+        "A shared recipe carries no makes N, so the page has no Servings card and no One serving column. Should sharing send how many it makes (a change in what a share carries, on the server too)?",
+        "Seen on both pages: the steps of a shared recipe write a pack's name in small letters (körniger frischkäse tworog), because a shared food arrives without its source. Its own bug, or in this ticket?"
+      ],
+      "board": "Stories296",
+      "where": "Page 6",
+      "rel": "Drawn 25 November 2026 for discussion; no decision yet"
     },
     {
       "id": "B169",

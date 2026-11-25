@@ -1,0 +1,32 @@
+{
+  "id": "DT353",
+  "title": "A member's recipe page in the same structure as my own recipe's",
+  "boardTitle": "DT353: a member's recipe page in the same structure as my own recipe's",
+  "opportunity": {
+    "from": "Found while drawing DT349, 25 November 2026; Coach Milan 16:25: yes, brainstorm; 16:26: draw so we discuss it.",
+    "job": "Read a recipe another member shared, and decide what to do with it.",
+    "kind": "Did not find it or did not understand it: the same kind of page works two different ways.",
+    "why_now": "0.3.193 gave my own recipes the recipe as written on top and What do you do with it? at the end; a member's recipe still opens on my portion, with its own tiles and buttons."
+  },
+  "problem": "A member's recipe opens on my portion for the meal ahead: Your dinner: 300 g of the 897 g it makes, three tiles for my portion, Foods for your portion, the steps for my portion, Make it and Keep in mine. My own recipe opens on the recipe as written, with the Plate's PD card, and asks what I do with it. The member's own numbers are not on the page at all.",
+  "story": "When I open a recipe a member shared, I want to read it as they wrote it and then decide what to do with it, the same way as with my own recipes, so that I know where everything is.",
+  "now": "Members, a recipe: Your dinner: 300 g of the 897 g it makes; three tiles, 732 kcal, 31 g protein, PD 4.3; Foods for your portion; the steps with my portion's amounts; Make it (my portion goes on the Plate); Keep in mine.",
+  "proposed": "1. The page opens on the recipe as the member wrote it: title, who shared it, the photo when there is one, the Plate's PD card for the whole recipe (PdCard, design rule D14), Foods, the Nutrition table, the steps with the recipe's amounts. 2. What do you do with it?, at the end: Plan it (the Plate's day and meal block, then my portion for that meal, then Put it in the plan), Put it on the Plate (was Make it: my portion for the meal ahead goes on the Plate, as now), Save to My recipes (was Keep in mine). 3. The list's tile keeps my portion for the meal ahead: that is where I browse. 4. The page shows no portion of mine until I pick a meal (nutrition rule N17).",
+  "looked_at": "Keep opening on my portion: not chosen in this drawing, Coach Milan 24 November 19:01: recipes from others show the original numbers and math first. Servings chips as on my own page: not drawn; a shared recipe does not carry how many it makes (open below).",
+  "decision": "For discussion (Coach Milan 16:26: draw so we discuss it).",
+  "open": [
+    "A shared recipe carries no makes N, so the page has no Servings card and no One serving column. Should sharing send how many it makes (a change in what a share carries, on the server too)?",
+    "Seen on both pages: the steps of a shared recipe write a pack's name in small letters (körniger frischkäse tworog), because a shared food arrives without its source. Its own bug, or in this ticket?"
+  ],
+  "short": "A member's recipe page: the recipe as written on top, What do you do with it? at the end",
+  "ac": [],
+  "unchanged": [
+    "The list's tile: my portion for the meal ahead.",
+    "Put it on the Plate does what Make it did: my portion for the meal ahead goes on the Plate.",
+    "Save to My recipes does what Keep in mine did: a copy in Mine."
+  ],
+  "checks": "Not agreed yet: proposed Middle, Recipes and Members (covers-and-members and every walkthrough that opens a member's recipe), plus the German sweep (new and moved words).",
+  "details": [
+    "The pictures: before from main, 0.3.194; new from a scratch build of main with the change, not committed. The members' list is a mock with one recipe, Lazy Burek, shared by Sam (an invented name)."
+  ]
+}
