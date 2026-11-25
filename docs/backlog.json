@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.195",
     "0.3.194",
     "0.3.193",
     "0.3.192",
@@ -4737,8 +4738,8 @@
       "id": "DT353",
       "title": "A member's recipe page in the same structure as my own recipe's",
       "epic": "cook",
-      "state": "now",
-      "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn. 25 November 16:25: yes, brainstorm; 16:26: draw so we discuss it. Drawn 16:45, for discussion. 16:39: the page is for deciding whether to plan it as is or take it to the Plate; 16:41: no Servings card, a note before the actions. Redrawn. 16:59: the agreement block written (AC1 to AC9, checks Middle plus the German sweep, release 0.3.195). 17:11 to 17:12: Plan it stays white with an arrow (⌄ closed, ⌃ open), AC10; redrawn.",
+      "state": "done",
+      "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn. 25 November 16:25: yes, brainstorm; 16:26: draw so we discuss it. Drawn 16:45, for discussion. 16:39: the page is for deciding whether to plan it as is or take it to the Plate; 16:41: no Servings card, a note before the actions. Redrawn. 16:59: the agreement block written (AC1 to AC9, checks Middle plus the German sweep, release 0.3.195). 17:11 to 17:12: Plan it stays white with an arrow (⌄ closed, ⌃ open), AC10; redrawn. 17:27: Go, checks Middle with the German sweep. Built in 0.3.195.",
       "opportunity": {
         "from": "Found while drawing DT349, 25 November 2026; Coach Milan 16:25: yes, brainstorm; 16:26: draw so we discuss it.",
         "job": "Read a recipe another member shared, and decide what to do with it.",
@@ -4756,7 +4757,7 @@
       "open": [],
       "board": "Stories296",
       "where": "Page 6",
-      "rel": "Drawn 25 November 2026 with its agreement; waits for Go",
+      "rel": "Built in 0.3.195; Go 25 November 2026, 17:27",
       "ac": [
         {
           "id": "AC1",
@@ -4808,7 +4809,8 @@
           "title": "Plan it open and closed",
           "text": "Given Plan it, when I tap it, then it stays white and says Plan it ⌃, the days and meals open under it, and a second tap closes them and it says Plan it ⌄; on my own recipe's page too"
         }
-      ]
+      ],
+      "version": "0.3.195"
     },
     {
       "id": "B170",

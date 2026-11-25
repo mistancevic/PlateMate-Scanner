@@ -29,7 +29,7 @@ parts = [("Ticket", "DT353. This board is the ticket: everything about it is her
   ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> DT353.1: Members, a recipe, as in main, 0.3.194. DT353.2: the same, new, and Plan it. A blue outline marks what each note is about."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "24 November 19:01: recipes from others should show the original macros and math, and be customized for the others looking at it. 25 November 16:25: yes (brainstorm DT353). 16:26: draw so we discuss it. 16:35: so the recipe stays as is from the creator and we calculate the portion, but how do the foods\' weights change for a new person and their portion size? 16:39: basically we use this page for the user to decide if it is worthy to take it to the Plate or already plan it as is. 16:41: yes (no Servings); we can make a note there, so that is part of the insight, and below is the CTA for them to proceed. 16:57: ok (B170 its own bug). 16:59: yes (write the agreement). 17:11: 2c, should the button change to blue because it is active, or stay white? 17:12: draw to see."),
+  ("In Coach Milan's words", "24 November 19:01: recipes from others should show the original macros and math, and be customized for the others looking at it. 25 November 16:25: yes (brainstorm DT353). 16:26: draw so we discuss it. 16:35: so the recipe stays as is from the creator and we calculate the portion, but how do the foods\' weights change for a new person and their portion size? 16:39: basically we use this page for the user to decide if it is worthy to take it to the Plate or already plan it as is. 16:41: yes (no Servings); we can make a note there, so that is part of the insight, and below is the CTA for them to proceed. 16:57: ok (B170 its own bug). 16:59: yes (write the agreement). 17:11: 2c, should the button change to blue because it is active, or stay white? 17:12: draw to see. 17:27: Go."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ] + ([("Open", "<br>".join(f"{k + 1}. {x}" for k, x in enumerate(t["open"])))] if t["open"] else []) + [
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
@@ -54,9 +54,9 @@ tap(0, y, "the tile"); tap(1, y, "Plan it, Dinner")
 RB = r2
 bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
-acTable(B, y, W - 40, {**t, "rel": "Proposed; not agreed until Coach Milan says Go"})
+acTable(B, y, W - 40, {**t, "rel": "Go 25 November 2026, 17:27; built in 0.3.195"})
 Hc = y + HT.get("ac", 900) + 40
-board("Stories296.dc.html", t["boardTitle"], "Drawn 25 November 2026, for the Go of Coach Milan. Ticket DT353, Kanban column Now. Pictures from the real app: before on main, 0.3.194; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories295.dc.html")
+board("Stories296.dc.html", t["boardTitle"], "Drawn 25 November 2026; Go 17:27, built in 0.3.195. Ticket DT353, Kanban column Done. Pictures from the real app: before on main, 0.3.194; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories295.dc.html")
 inner = B.render(W, Hc)
 json.dump({"DT353": {"file": "Stories296.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outDT353.json"), "w"))
 print("DT353", W, Hc + 230)
