@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { stepText, stepParts, tokenOf, missingFoods, usedIds, chipKeep } from "./steps";
+import { stepText, stepParts, tokenOf, missingFoods, usedIds, chipKeep, shortName, amountFor } from "./steps";
 
 const food = (name: string) => ({ id: name, name, brand: "", calories: 100, protein: 10, carbs: 1, fats: 1, fiber: 0 } as any);
 const items = [{ id: "a", food: food("Eggs"), grams: 120 }, { id: "b", food: food("Milk 1.5%"), grams: 100 }, { id: "c", food: food("Chicken breast, cooked"), grams: 80 }] as any[];
@@ -33,4 +33,17 @@ test("B165: a chip keeps its amount with the food's first word; the rest may go 
   assert.deepEqual(chipKeep("2 eggs (L)"), ["2 eggs (L)", ""]);
   assert.deepEqual(chipKeep("salt"), ["salt", ""]);
   assert.equal(chipKeep("150 g Feta Leicht").join(""), "150 g Feta Leicht");
+});
+
+test("B169: a first starter food (typical values, check your pack) is a basic food: small letters in a step", () => {
+  assert.equal(shortName({ name: "Chicken breast, cooked", brand: "typical values, check your pack", source: "label" }), "chicken breast");
+  assert.equal(shortName({ name: "Frischer Blätterteig", brand: "", source: "label" }), "Frischer Blätterteig");
+  assert.equal(shortName({ name: "Frischer Blätterteig", barcode: "4056489000002", source: "label" }), "Frischer Blätterteig");
+});
+
+test("B169: a step saved with Chicken breast, as the app wrote it since B163, follows the food: chicken breast", () => {
+  const food = { id: "f-chicken", name: "Chicken breast, cooked", brand: "typical values, check your pack", source: "label", calories: 165, protein: 31, fats: 3.6, carbs: 0 } as any;
+  const items = [{ id: "c", food, grams: 100, locked: false }] as any;
+  assert.equal(amountFor("c", "Chicken breast", items), "100 g chicken breast");
+  assert.equal(amountFor("c", "chicken", items), "100 g chicken");
 });
