@@ -1,6 +1,6 @@
 {
-  "release": "0.3.193",
-  "at": "2026-11-25T14:08:28.439Z",
+  "release": "0.3.195",
+  "at": "2026-11-25T16:31:04.648Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -3434,27 +3434,6 @@
       "beta": true,
       "release": "0.3.101",
       "order": 900117,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.members.yourPortionOfTotal",
-      "kind": "screen",
-      "key": "members.yourPortionOfTotal",
-      "en": "Your {meal}: {grams} g of the {total} g it makes",
-      "forms": "plain",
-      "slots": [
-        "grams",
-        "meal",
-        "total"
-      ],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "{meal}, tvoja porcija: {grams} g od {total} g koliko recept daje",
-      "de": "{meal}, deine Portion: {grams} g von den {total} g, die es ergibt",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900118,
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
@@ -53338,6 +53317,42 @@
       "release": "0.3.193",
       "order": 900000,
       "at": "2026-11-25T14:08:28.439Z"
+    },
+    {
+      "id": "screen.members.saveToMine",
+      "kind": "screen",
+      "key": "members.saveToMine",
+      "en": "Save to My recipes",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Sačuvaj u Moje recepte",
+      "de": "In Meine Rezepte speichern",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.195",
+      "order": 900000,
+      "at": "2026-11-25T16:31:04.648Z"
+    },
+    {
+      "id": "screen.members.decideLine",
+      "kind": "screen",
+      "key": "members.decideLine",
+      "en": "{whose} recipe, as written. Plan it as it is, at your portion; put it on the Plate to change foods first; or save it to My recipes to cook more or fewer servings.",
+      "forms": "plain",
+      "slots": [
+        "whose"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "{whose} recept, kako je napisan. Planiraj ga takvog, u tvojoj količini; stavi ga na Tanjir da prvo promeniš namirnice; ili ga sačuvaj u Moje recepte da kuvaš više ili manje porcija.",
+      "de": "{whose} Rezept, wie geschrieben. Plane es so, wie es ist, in deiner Menge; leg es auf den Teller, um zuerst Lebensmittel zu ändern; oder speichere es in Meine Rezepte, um mehr oder weniger Portionen zu kochen.",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.195",
+      "order": 900001,
+      "at": "2026-11-25T16:31:04.648Z"
     }
   ]
 }

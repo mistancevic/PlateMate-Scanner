@@ -5301,28 +5301,8 @@
       "text": "Mitglieder",
       "checked": true
     },
-    "members.kcal": {
-      "text": "kcal",
-      "checked": true
-    },
-    "members.gProtein": {
-      "text": "g Protein",
-      "checked": true
-    },
-    "members.proteinDensity": {
-      "text": "Proteindichte",
-      "checked": true
-    },
     "members.steps": {
       "text": "Schritte",
-      "checked": true
-    },
-    "members.makeIt": {
-      "text": "Zubereiten",
-      "checked": true
-    },
-    "members.keepInMine": {
-      "text": "Bei mir behalten",
       "checked": true
     },
     "members.forMembers": {
@@ -5391,10 +5371,6 @@
     },
     "members.membersRecipesSetYourGoal": {
       "text": "Rezepte der Mitglieder. Leg dein Ziel fest, dann zeigt jedes Rezept deine Portion.",
-      "checked": true
-    },
-    "members.foodsForYourPortion": {
-      "text": "Lebensmittel für deine Portion",
       "checked": true
     },
     "members.theMember": {
@@ -12507,10 +12483,6 @@
     },
     "members.allOfRecipes": {
       "text": "Alle Rezepte von {name} ›",
-      "checked": true
-    },
-    "members.yourPortionOfTotal": {
-      "text": "{meal}, deine Portion: {grams} g von den {total} g, die es ergibt",
       "checked": true
     },
     "members.foods": {
@@ -23327,6 +23299,14 @@
     },
     "nutrition.oneServing": {
       "text": "1 {one}",
+      "checked": true
+    },
+    "members.saveToMine": {
+      "text": "In Meine Rezepte speichern",
+      "checked": true
+    },
+    "members.decideLine": {
+      "text": "{whose} Rezept, wie geschrieben. Plane es so, wie es ist, in deiner Menge; leg es auf den Teller, um zuerst Lebensmittel zu ändern; oder speichere es in Meine Rezepte, um mehr oder weniger Portionen zu kochen.",
       "checked": true
     }
   }

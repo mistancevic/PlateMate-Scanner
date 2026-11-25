@@ -2233,28 +2233,8 @@
       "text": "Članovi",
       "checked": true
     },
-    "members.kcal": {
-      "text": "kcal",
-      "checked": true
-    },
-    "members.gProtein": {
-      "text": "g proteina",
-      "checked": true
-    },
-    "members.proteinDensity": {
-      "text": "gustina proteina",
-      "checked": true
-    },
     "members.steps": {
       "text": "Koraci",
-      "checked": true
-    },
-    "members.makeIt": {
-      "text": "Napravi ga",
-      "checked": true
-    },
-    "members.keepInMine": {
-      "text": "Zadrži kod mene",
       "checked": true
     },
     "members.forMembers": {
@@ -2323,10 +2303,6 @@
     },
     "members.membersRecipesSetYourGoal": {
       "text": "Recepti članova. Postavi cilj i svaki recept pokazuje tvoju porciju.",
-      "checked": true
-    },
-    "members.foodsForYourPortion": {
-      "text": "Namirnice za tvoju porciju",
       "checked": true
     },
     "members.theMember": {
@@ -12507,10 +12483,6 @@
     },
     "members.allOfRecipes": {
       "text": "Svi recepti: {name} ›",
-      "checked": true
-    },
-    "members.yourPortionOfTotal": {
-      "text": "{meal}, tvoja porcija: {grams} g od {total} g koliko recept daje",
       "checked": true
     },
     "members.foods": {
@@ -23327,6 +23299,14 @@
     },
     "nutrition.oneServing": {
       "text": "1 {one}",
+      "checked": true
+    },
+    "members.saveToMine": {
+      "text": "Sačuvaj u Moje recepte",
+      "checked": true
+    },
+    "members.decideLine": {
+      "text": "{whose} recept, kako je napisan. Planiraj ga takvog, u tvojoj količini; stavi ga na Tanjir da prvo promeniš namirnice; ili ga sačuvaj u Moje recepte da kuvaš više ili manje porcija.",
       "checked": true
     }
   }

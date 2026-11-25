@@ -1,3 +1,5 @@
+import { NutritionCard } from "./NutritionCard";
+import { PlanIt, planFor } from "./PlanIt";
 // Members on the Recipes tab (0.2.11, canvas board CO, CO2 to CO4b; Milan 16 October 2026, 15:37 to 16:24).
 import { w, wn, wIn, wordV, mealV, dateText, type Val, type WordKey } from "../words";
 // a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
@@ -92,34 +94,42 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown, toCook }: { r:
   useEffect(() => { log("members", { how: "open" }); }, [r.id]);
   const x = portionOf(r, ahead && !ahead.full ? ahead.kcal : null);
   const steps = r.steps ?? [];
+  // DT353 (0.3.195, board DT353, canvas Page 6; Coach Milan 25 November 2026, 16:26 to 17:27): the same structure as my own
+  // recipe's page (DT349). The page is for deciding (16:39): the recipe as the member wrote it on top, Foods, the Nutrition
+  // table, the steps with the recipe's amounts; then What do you do with it?, a note first (16:41), then Plan it (my portion
+  // for the meal picked), Put it on the Plate (my portion for the meal ahead, as Make it did) and Save to My recipes (as Keep in
+  // mine did). No Servings card: the servings to cook are chosen after Save to My recipes.
+  const whole = portionOf(r, null);
+  const plan = planFor(p, r.title, whole.items);
   return (
     <div className="rq">
       <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> {w("members.members")}</button>
-      {r.cover ? <figure className="rq-hero"><img src={r.cover} alt={w("members.theCoverOf", { title: r.title })} /><span className="rq-drawn">{tag(r)}</span></figure> : null}
       <h2 className="rq-name rq-name-fixed">{r.title}</h2>
       <small className="muted mb-by">{byLine(r)}{r.made ? ` ${w("members.byMembers")}` : ""}</small>
       {r.source && <small className="muted mb-by">{w("members.adaptedFrom", { source: r.source })}</small>}
       {r.name && !r.mine && toCook && <button className="link mb-cook-link" onClick={() => toCook(r.name)}>{w("members.allOfRecipes", { name: r.name })}</button>}
-      {ahead && !ahead.full && <small className="mb-yours">{w("members.yourPortionOfTotal", { meal: mealV(ahead.name, true), grams: fmt(x.grams, 0), total: fmt(x.total, 0) })}</small>}
-      <div className="rp-stats">
-        <span><b>{fmt(x.kcal, 0)}</b><small>{w("members.kcal")}</small></span>
-        <span><b>{fmt(x.protein, 0)}</b><small>{w("members.gProtein")}</small></span>
-        <span className="wide"><b>{pdText(x.pd)}</b><small>{w("members.proteinDensity")}</small></span>
-      </div>
+      {r.cover ? <figure className="rq-hero"><img src={r.cover} alt={w("members.theCoverOf", { title: r.title })} /><span className="rq-drawn">{tag(r)}</span></figure> : null}
+      <NutritionCard readoutOnly rates={p.rates} items={whole.items} serves={1} one="" all="" stated={null} pdRef={p.pdRef ?? null} fitPd={p.fitPd} />
       <section className="card rq-foods">
-        <b>{ahead && !ahead.full ? w("members.foodsForYourPortion") : w("members.foods")}</b>
-        {x.items.map((it, k) => [it.part && (k === 0 || x.items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null, <div className="sheet-row rq-food" key={it.id}><small>{it.food.name}</small><b>{fmt(it.grams, 0)} g</b></div>])}
+        <b>{w("members.foods")}</b>
+        {whole.items.map((it, k) => [it.part && (k === 0 || whole.items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null, <div className="sheet-row rq-food" key={it.id}><small>{it.food.name}</small><b>{fmt(it.grams, 0)} g</b></div>])}
       </section>
+      <NutritionCard tableOnly items={whole.items} serves={1} one="" all="" stated={null} pdRef={null} />
       <section className="card rq-steps">
         <b>{w("members.steps")}</b>
         {steps.length
-          ? <ol className="rp-steps">{steps.map((s, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(s), x.items).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</div></li>)}</ol>
+          ? <ol className="rp-steps">{steps.map((s, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(s), whole.items).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</div></li>)}</ol>
           : <small className="muted">{w("members.sharedNoSteps", { name: r.name || wordV("members.theMember") })}</small>}
       </section>
-      <button className="pill pill-wide pill-primary" onClick={() => { close(); p.takeMember(r, "make", x.items); }}>{w("members.makeIt")}</button>
-      <small className="muted rq-under">{w("members.yourPortionGoesOn", { grams: fmt(x.grams, 0), kcal: fmt(x.kcal, 0) })}</small>
-      {!r.mine && <><button className="pill pill-wide" onClick={() => { close(); p.takeMember(r, "keep"); }}>{w("members.keepInMine")}</button>
-        <small className="muted rq-under">{w("members.aCopyInMine", { whose: r.name ? lineV("members.nameS", { name: r.name }) : wordV("members.theMemberS") })}</small></>}
+      <section className="card rq-actions" aria-label={w("recipe.whatDo")}>
+        <b>{w("recipe.whatDo")}</b>
+        <p className="mb-decide">{w("members.decideLine", { whose: r.name ? lineV("members.nameS", { name: r.name }) : wordV("members.theMemberS") })}</p>
+        {plan && <PlanIt items={whole.items} plan={plan} />}
+        <button className="pill pill-wide" onClick={() => { close(); p.takeMember(r, "make", x.items); }}>{w("recipe.putOnPlate")}</button>
+        <small className="muted rq-under">{w("members.yourPortionGoesOn", { grams: fmt(x.grams, 0), kcal: fmt(x.kcal, 0) })}</small>
+        {!r.mine && <><button className="pill pill-wide" onClick={() => { close(); p.takeMember(r, "keep"); }}>{w("members.saveToMine")}</button>
+          <small className="muted rq-under">{w("members.aCopyInMine", { whose: r.name ? lineV("members.nameS", { name: r.name }) : wordV("members.theMemberS") })}</small></>}
+      </section>
       {owner && !r.mine && <ConfirmButton className="pill pill-small pill-danger-line rq-delete" label={w("members.takeItDownOwner")} confirmLabel={w("members.sureItGoesForEvery")} onConfirm={takeDown} />}
     </div>
   );

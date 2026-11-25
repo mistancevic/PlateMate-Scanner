@@ -122,22 +122,24 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   await page.getByRole("button", { name: /^Kitchen: Mediterranean/ }).click(); await page.waitForTimeout(200);
   await page.locator(".rb-line").filter({ hasText: "All kitchens" }).click(); await page.waitForTimeout(200);
 
-  // CO3: a member's recipe at your portion
+  // CO3: a member's recipe. Changed by DT353 (0.3.195): the page opens on the recipe as the member wrote it; my portion comes
+  // with Plan it or on the Plate; Make it is Put it on the Plate, Keep in mine is Save to My recipes
   await tiles.filter({ hasText: "stir-fry" }).click(); await page.waitForTimeout(500);
   const pageText = (await page.locator(".rq").textContent()).replace(/\s+/g, " ");
-  ok(/Your dinner: [\d,]+ g of the 1,360 g it makes/.test(pageText) && /Foods for your portion/.test(pageText), "CO3: the recipe opens at your dinner");
+  ok(/The whole recipe/.test(pageText) && !/Your dinner: /.test(pageText) && !/Foods for your portion/.test(pageText), "CO3: the recipe opens as the member wrote it (DT353)");
   const grams = (await page.locator(".rq-food b").allTextContents()).map((x) => Number(x.replace(/[^\d]/g, "")));
   const stepTxt = (await page.locator(".rp-steps li").first().textContent()).replace(/\s+/g, " ");
-  ok(stepTxt.includes(`${grams[0]} g chicken breast`) && stepTxt.includes(`${grams[1]} g broccoli`), "CO3: the amounts in the steps are your portion's: " + stepTxt);
-  ok(await page.getByRole("button", { name: "Keep in mine" }).count() === 1 && await page.getByRole("button", { name: /Take it down/ }).count() === 1, "CO3: Keep in mine; the owner can take it down");
-  await page.getByRole("button", { name: "Keep in mine" }).click(); await page.waitForTimeout(500);
+  ok(stepTxt.includes(`${grams[0]} g chicken breast`) && stepTxt.includes(`${grams[1]} g broccoli`), "CO3: the amounts in the steps are the recipe's, as its foods (DT353): " + stepTxt);
+  ok(await page.getByRole("button", { name: "Save to My recipes" }).count() === 1 && await page.getByRole("button", { name: /Take it down/ }).count() === 1, "CO3: Save to My recipes; the owner can take it down");
+  await page.getByRole("button", { name: "Save to My recipes" }).click(); await page.waitForTimeout(500);
   const kept = (await st()).meals.find((m) => m.memberOf);
-  ok(kept && kept.from === "members" && kept.title === "Chicken and broccoli stir-fry with rice" && kept.items[0].grams === 400 && coverOf(kept) === kept.coverSig, "CO3: Keep in mine copies the recipe, its amounts and its drawn cover");
+  ok(kept && kept.from === "members" && kept.title === "Chicken and broccoli stir-fry with rice" && kept.items[0].grams === 400 && coverOf(kept) === kept.coverSig, "CO3: Save to My recipes copies the recipe, its amounts and its drawn cover");
   await recipes(); await page.waitForTimeout(600);
   await tiles.filter({ hasText: "stir-fry" }).click(); await page.waitForTimeout(400);
-  await page.getByRole("button", { name: "Make it" }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: "Put it on the Plate" }).click(); await page.waitForTimeout(800);
   const plate = await st();
-  ok(plate.title === "Chicken and broccoli stir-fry with rice" && plate.items.map((i) => i.grams).join() === grams.join(), "CO3: Make it puts your portion on the plate");
+  const onPlate = plate.items.reduce((n, i) => n + i.grams, 0);
+  ok(plate.title === "Chicken and broccoli stir-fry with rice" && onPlate > 0 && onPlate < 1360, "CO3: Put it on the Plate puts your portion on the plate, not the whole 1,360 g: " + Math.round(onPlate) + " g");
   ok((await api("/api/members")).d.recipes.find((r) => r.title.includes("stir-fry")).made === 1, "CO3: made counts once for the cook");
   // the owner's take down
   await recipes(); await page.waitForTimeout(600);

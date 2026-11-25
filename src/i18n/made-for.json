@@ -545,12 +545,7 @@
     "screen.publish.theLivePageChangesWhen": {"en":"The live page changes when you publish.","area":"Recipes","where":"Publish a recipe"},
     "screen.publish.nothingIsLiveYet": {"en":"Nothing is live yet.","area":"Recipes","where":"Publish a recipe"},
     "screen.members.members": {"en":"Members","area":"Recipes","where":"Members' recipes"},
-    "screen.members.kcal": {"en":"kcal","area":"Recipes","where":"Members' recipes"},
-    "screen.members.gProtein": {"en":"g protein","area":"Recipes","where":"Members' recipes"},
-    "screen.members.proteinDensity": {"en":"protein density","area":"Recipes","where":"Members' recipes"},
     "screen.members.steps": {"en":"Steps","area":"Recipes","where":"Members' recipes"},
-    "screen.members.makeIt": {"en":"Make it","area":"Recipes","where":"Members' recipes"},
-    "screen.members.keepInMine": {"en":"Keep in mine","area":"Recipes","where":"Members' recipes"},
     "screen.members.forMembers": {"en":"For members","area":"Recipes","where":"Members' recipes"},
     "screen.members.theCoverMembersSee": {"en":"The cover members see","area":"Recipes","where":"Members' recipes"},
     "screen.members.changeTheCover": {"en":"Change the cover","area":"Recipes","where":"Members' recipes"},
@@ -568,7 +563,6 @@
     "screen.members.photoByAMember": {"en":"Photo by a member","area":"Recipes","where":"Members' recipes"},
     "screen.members.membersRecipesEachAsThe": {"en":"Members' recipes, each as the whole recipe: your day is planned in full. Make it puts your portion on the Plate.","area":"Recipes","where":"Members' recipes"},
     "screen.members.membersRecipesSetYourGoal": {"en":"Members' recipes. Set your goal and every recipe shows your portion.","area":"Recipes","where":"Members' recipes"},
-    "screen.members.foodsForYourPortion": {"en":"Foods for your portion","area":"Recipes","where":"Members' recipes"},
     "screen.members.theMember": {"en":"The member","area":"Recipes","where":"Members' recipes"},
     "screen.members.theMemberS": {"en":"The member's","area":"Recipes","where":"Members' recipes"},
     "screen.members.thatNameDidnTWork": {"en":"That name didn't work. Try another.","area":"Recipes","where":"Members' recipes"},
@@ -3120,7 +3114,6 @@
     "screen.members.byMembers": {"en":"by members","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.members.adaptedFrom": {"en":"Adapted from {source}","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.members.allOfRecipes": {"en":"All of {name}'s recipes ›","area":"Recipes","where":"Recipes","release":"0.3.101"},
-    "screen.members.yourPortionOfTotal": {"en":"Your {meal}: {grams} g of the {total} g it makes","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.members.foods": {"en":"Foods","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.members.sharedNoSteps": {"en":"{name} shared no steps.","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.members.yourPortionGoesOn": {"en":"Your portion goes on the Plate: {grams} g, {kcal} kcal. Fit to my target can still move it.","area":"Recipes","where":"Recipes","release":"0.3.101"},
@@ -5831,6 +5824,8 @@
     "screen.recipe.inPlan": {"en":"In the plan: {day}, {meal}, {grams} g.","area":"Recipes","where":"Recipes","release":"0.3.193"},
     "screen.recipe.planHolds": {"en":"{day}'s {meal} already holds {title}.","area":"Recipes","where":"Recipes","release":"0.3.193"},
     "screen.recipe.replaceInPlan": {"en":"Put it in its place","area":"Recipes","where":"Recipes","release":"0.3.193"},
-    "screen.nutrition.oneServing": {"en":"One {one}","area":"Recipes","where":"Recipes","release":"0.3.193"}
+    "screen.nutrition.oneServing": {"en":"One {one}","area":"Recipes","where":"Recipes","release":"0.3.193"},
+    "screen.members.saveToMine": {"en":"Save to My recipes","area":"Recipes","where":"Recipes","release":"0.3.195"},
+    "screen.members.decideLine": {"en":"{whose} recipe, as written. Plan it as it is, at your portion; put it on the Plate to change foods first; or save it to My recipes to cook more or fewer servings.","area":"Recipes","where":"Recipes","release":"0.3.195"}
   }
 }
