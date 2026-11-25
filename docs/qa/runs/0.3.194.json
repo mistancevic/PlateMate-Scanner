@@ -1,0 +1,4049 @@
+{
+ "version": "0.3.194",
+ "commit": "030d2a3",
+ "at": "2026-11-25T15:18:55.184Z",
+ "minutes": 8,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 66,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "busy-times.cjs",
+   "about": "DT179 and DT179a (0.3.23, boards Stories127 and Stories128; Coach Milan 31 October 09:07 Go): from your calendar to the HOWTO: busyDay (DT260): this walkthrough follows How to's situation busyDay; when it fails after a screen changed, update that situation's steps in src/i18n/en.json app, and which meals go in. Read when I'm busy, off at first: busy times only, kept on the phone. Plan shows a busy block and asks where it meets the day: a meal in a meeting, a late evening, a full day, training. A meal moved in Google comes back. Which meals: every slot, or only the planned ones. Google is a stand-in: an in-memory calendar with busy times.",
+   "pass": true,
+   "seconds": 40,
+   "checks": [
+    {
+     "ok": true,
+     "text": "on, with a token: the calendar is made and filled: 49"
+    },
+    {
+     "ok": true,
+     "text": "the page says the time once (no second Up to date line)"
+    },
+    {
+     "ok": true,
+     "text": "Which meals, under Meals: every meal slot at first"
+    },
+    {
+     "ok": true,
+     "text": "only meals I planned: open slots out, Monday's dinner and its cooking in"
+    },
+    {
+     "ok": true,
+     "text": "training stays"
+    },
+    {
+     "ok": true,
+     "text": "every meal slot again"
+    },
+    {
+     "ok": true,
+     "text": "From your calendar to the app: Read when I'm busy, off at first"
+    },
+    {
+     "ok": true,
+     "text": "busy and free only, said"
+    },
+    {
+     "ok": true,
+     "text": "on: busy times read once, for the main calendar"
+    },
+    {
+     "ok": true,
+     "text": "kept on the phone"
+    },
+    {
+     "ok": true,
+     "text": "Monday: one busy row, 13:00 to 14:30, no title: 13:00to 14:30Busy in your calendar"
+    },
+    {
+     "ok": true,
+     "text": "lunch asks: CHEF MEALANLunch at 13:15 is in a busy block, 13:00 to 14:30. Move it for Monday?12:3014:30Keep 13:15"
+    },
+    {
+     "ok": true,
+     "text": "12:30, 14:30, Keep 13:15, each 44 px or more: 44,44,44"
+    },
+    {
+     "ok": true,
+     "text": "lunch at 12:30 on Monday only"
+    },
+    {
+     "ok": true,
+     "text": "Back to 13:15 under it"
+    },
+    {
+     "ok": true,
+     "text": "Google: Monday's lunch at 12:30, Tuesday's as usual"
+    },
+    {
+     "ok": true,
+     "text": "the question is gone once answered"
+    },
+    {
+     "ok": true,
+     "text": "Wednesday asks: CHEF MEALANBusy until 19:30. Dinner at 20:00 leaves 30 minutes to cook. A quick dinner, or cook on Tuesday and warm it up?Quick dinner ideasCook ahead on TuesdayKeep it"
+    },
+    {
+     "ok": true,
+     "text": "Google: cooking on Tuesday, none on Wednesday"
+    },
+    {
+     "ok": true,
+     "text": "Wednesday's dinner says cooked ahead on Tuesday"
+    },
+    {
+     "ok": true,
+     "text": "a full day: take lunch along"
+    },
+    {
+     "ok": true,
+     "text": "training asks, Move to 20:00"
+    },
+    {
+     "ok": true,
+     "text": "rest day: Thursday's training leaves the calendar"
+    },
+    {
+     "ok": true,
+     "text": "Lunch to carry asks Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "moved in Google: Friday's dinner at 21:00 here too"
+    },
+    {
+     "ok": true,
+     "text": "Plan says it was moved in Google Calendar"
+    },
+    {
+     "ok": true,
+     "text": "Back to 20:00: here and in Google"
+    },
+    {
+     "ok": true,
+     "text": "off: the busy times are forgotten on the phone"
+    },
+    {
+     "ok": true,
+     "text": "Plan without busy rows"
+    },
+    {
+     "ok": true,
+     "text": "the privacy notice says it"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "chip-lines.cjs",
+   "about": "B165 and B166 (0.3.192, board Stories293; Coach Milan, Go 24 November 2026, 00:13). B165: a food chip in a step flows like a word; one too long for the line goes on to the next line like text, open where it breaks, with the comma straight after it and 250 g kept with Körniger; a chip that fits moves down whole; lines of chips do not touch; the page stays 390 px wide; a tap on the food under the steps still takes the whole chip out; the publish sheet's steps do the same. B166: inside a recipe's PD card, the numbers' note, the fibre line and Per 100 kcal's lines read in the table's colours, never white on white.",
+   "pass": true,
+   "seconds": 14,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B165 AC1: the page stays 390 px wide (390)"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC1: the long chip goes on to the next line inside the field (2 lines)"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC3: 150 g Feta Leicht and 2 eggs (L) stay whole, one line each"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC6: the comma is right after 2,5% Fett, on the same line"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC7: 250 g stays on the same line as Körniger"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC5: space between 2 eggs (L) and 150 g Feta Leicht on the line under it (6 px)"
+    },
+    {
+     "ok": true,
+     "text": "B165: the step reads as before: Preheat your oven to 200 °C. Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 2 eggs (L) and 150 g Feta Leicht in a bowl."
+    },
+    {
+     "ok": true,
+     "text": "B165 AC2: a tap on its food takes the whole long chip out of the step"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC2: put back, it lands in the step and the page stays 390 px wide"
+    },
+    {
+     "ok": true,
+     "text": "B165 AC4: in the publish sheet the long chip goes on to the next line too"
+    },
+    {
+     "ok": true,
+     "text": "B166 AC1: the note under Total reads in grey, not white (rgb(83, 98, 127))"
+    },
+    {
+     "ok": true,
+     "text": "B166 AC2: Per 100 kcal's 5 lines read in the table's colours"
+    },
+    {
+     "ok": true,
+     "text": "B166 AC3: the fibre line reads in dark text: * Fibre: at least 0 g. 1 food without a value: Granola Crunchy Mix."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 62 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "cook-ask.cjs",
+   "about": "DT175 (0.3.17, board Stories122; Coach Milan 30 October 19:36 Go): Chef, ... in cook mode goes to Chef Mealan with the recipe, the step and the amounts cooked, answered under the step and read aloud; typed when voice is off; Say what you have on the Plate lands the foods named as estimates. Chef Mealan's answers are stubbed; what the app sends is checked. Earlier lines: DT174 (0.3.16, board Stories121; Coach Milan 30 October 16:39 Go): two doors on a recipe, Cook it as written straight to Make and Change it first through the Plate; Start cooking on Make opens cook mode: one big step, read aloud, steered by voice or by tap; timers from the step; how much from the amounts cooked; every finished step ticked on Make; voice asked once. The browser's speech is stood in for: a stand-in recognition hears what the walkthrough says, a stand-in voice records.",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "on step 4"
+    },
+    {
+     "ok": true,
+     "text": "said without Chef: nothing sent; the screen says to start with Chef (DT221: small, under Sorry, say that again?)"
+    },
+    {
+     "ok": true,
+     "text": "Chef, ...: the question is sent"
+    },
+    {
+     "ok": true,
+     "text": "with the question, step 4, the six steps at the cooked amounts, the items, the tools and the title"
+    },
+    {
+     "ok": true,
+     "text": "and how they eat, as every food request"
+    },
+    {
+     "ok": true,
+     "text": "the answer shows under the step, about step 4"
+    },
+    {
+     "ok": true,
+     "text": "and is read aloud"
+    },
+    {
+     "ok": true,
+     "text": "the step and the amounts stay as they were"
+    },
+    {
+     "ok": true,
+     "text": "typed: sent too, with the earlier question and answer as history"
+    },
+    {
+     "ok": true,
+     "text": "answered under the step"
+    },
+    {
+     "ok": true,
+     "text": "an empty Plate has no Say what you have tile any more"
+    },
+    {
+     "ok": true,
+     "text": "Chef Mealan's chat has a microphone"
+    },
+    {
+     "ok": true,
+     "text": "it listens"
+    },
+    {
+     "ok": true,
+     "text": "the words show as they come"
+    },
+    {
+     "ok": true,
+     "text": "a second tap sends the words and the names of your foods"
+    },
+    {
+     "ok": true,
+     "text": "his answer starts with Your foods; nothing lands before your tap"
+    },
+    {
+     "ok": true,
+     "text": "the cook still open asks once (DT240)"
+    },
+    {
+     "ok": true,
+     "text": "the four foods land on the plate"
+    },
+    {
+     "ok": true,
+     "text": "Fit to my target is next; the chat is closed"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 29 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "cook-mode.cjs",
+   "about": "DT211 v8 (0.3.53): Start cooking in the recipe's Steps block opens cook mode. Earlier: DT174 (0.3.16, board Stories121; Coach Milan 30 October 16:39 Go): two doors on a recipe, Cook it as written straight to HOWTO: fitTarget (DT260): this walkthrough follows How to's situation fitTarget; when it fails after a screen changed, update that situation's steps in src/i18n/en.json Make and Change it first through the Plate; Start cooking on Make opens cook mode: one big step, read aloud, steered by voice or by tap; timers from the step; how much from the amounts cooked; every finished step ticked on Make; voice asked once. The browser's speech is stood in for: a stand-in recognition hears what the walkthrough says, a stand-in voice records. changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?",
+   "pass": true,
+   "seconds": 59,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the recipe has Start cooking in its Steps block, and Put it on the Plate (changed by DT349, 0.3.193: it was Put it on the Plate)"
+    },
+    {
+     "ok": true,
+     "text": "Make it is now Put it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "Put it on the Plate opens the Plate to edit"
+    },
+    {
+     "ok": true,
+     "text": "a plate with foods on it asks first"
+    },
+    {
+     "ok": true,
+     "text": "Start cooking goes straight to Make"
+    },
+    {
+     "ok": true,
+     "text": "Make lists the recipe's 6 steps to tick"
+    },
+    {
+     "ok": true,
+     "text": "with the recipe's amounts"
+    },
+    {
+     "ok": true,
+     "text": "Start cooking opens cook mode on step 1 of 6"
+    },
+    {
+     "ok": true,
+     "text": "cook mode asks the phone to keep the screen on"
+    },
+    {
+     "ok": true,
+     "text": "the first time, voice is asked for, with where the voice goes"
+    },
+    {
+     "ok": true,
+     "text": "nothing is read aloud before voice is on"
+    },
+    {
+     "ok": true,
+     "text": "a step that names minutes offers its timer"
+    },
+    {
+     "ok": true,
+     "text": "voice on: the step is read aloud, amounts in words"
+    },
+    {
+     "ok": true,
+     "text": "the ask goes, and the screen says it is listening"
+    },
+    {
+     "ok": true,
+     "text": "next: step 2, read aloud"
+    },
+    {
+     "ok": true,
+     "text": "its own words heard back: nothing said, nothing done, no circle"
+    },
+    {
+     "ok": true,
+     "text": "while it reads, its own words do nothing"
+    },
+    {
+     "ok": true,
+     "text": "next cuts in: the reading stops, step 3"
+    },
+    {
+     "ok": true,
+     "text": "back cuts in too: step 2"
+    },
+    {
+     "ok": true,
+     "text": "how much rice: the amount cooked, and its step"
+    },
+    {
+     "ok": true,
+     "text": "back: step 1"
+    },
+    {
+     "ok": true,
+     "text": "what's left: how many, and the next step"
+    },
+    {
+     "ok": true,
+     "text": "two timers run side by side, named after their step"
+    },
+    {
+     "ok": true,
+     "text": "a timer that ends shows done and says which"
+    },
+    {
+     "ok": true,
+     "text": "DT221: something else said: the phone says only Sorry, say that again?; the words you can say stay on the screen, not read aloud"
+    },
+    {
+     "ok": true,
+     "text": "two steps on"
+    },
+    {
+     "ok": true,
+     "text": "stop closes cook mode; the two finished steps are ticked on Make"
+    },
+    {
+     "ok": true,
+     "text": "Make says Go on cooking"
+    },
+    {
+     "ok": true,
+     "text": "it goes on at step 3, and voice is not asked again"
+    },
+    {
+     "ok": true,
+     "text": "the last step's Done: done"
+    },
+    {
+     "ok": true,
+     "text": "DT222: Make: step photos and notes, a small link: every step ticked"
+    },
+    {
+     "ok": true,
+     "text": "the rest of Make is as before: Cooked. Next: Eat"
+    },
+    {
+     "ok": true,
+     "text": "a recipe that makes 4, as written: the whole pot's amounts on Make"
+    },
+    {
+     "ok": true,
+     "text": "and in cook mode"
+    },
+    {
+     "ok": true,
+     "text": "no speech recognition: no ask, the buttons steer"
+    },
+    {
+     "ok": true,
+     "text": "Next works without voice"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 52 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "cook-moves.cjs",
+   "about": "DT216 and DT217 v2 (0.3.56, board Stories163; Coach Milan 2 November 15:54 to 16:38, Go): a plate with flour or a raw egg is cooked and never gets the bowl steps; a recipe that kept the bowl steps gets new ones, and Lock the recipe keeps them. Cook mode keeps the whole step on top and reads it one move at a time under it: one food, or one action; Next and Back go move by move, the last move ticks the step. The AI is off here: the steps are written by hand, the moves made in code.",
+   "pass": true,
+   "seconds": 17,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT230: the Plate says Prepare it ›; Plate's white button says where it goes: How to make it ›"
+    },
+    {
+     "ok": true,
+     "text": "flour and eggs: How to make it, never the bowl ways; the title says the dish (0.3.64)"
+    },
+    {
+     "ok": true,
+     "text": "the bowl steps the recipe kept are not shown; Write my own is offered (the AI is off here)"
+    },
+    {
+     "ok": true,
+     "text": "the line says the recipe had the bowl steps, and Lock it and cook keeps the new ones (DT220)"
+    },
+    {
+     "ok": true,
+     "text": "DT220: one line says what the steps are for; the button says what comes next"
+    },
+    {
+     "ok": true,
+     "text": "Lock it and cook keeps the new steps with the recipe; the bowl way is gone"
+    },
+    {
+     "ok": true,
+     "text": "the whole step stays on top"
+    },
+    {
+     "ok": true,
+     "text": "under it the moves: 1 of 4"
+    },
+    {
+     "ok": true,
+     "text": "one food a move, then the action: [\"▶Add 104 g eggs.\",\"Add 100 g milk.\",\"Add 35 g flour.\",\"Whisk them until smooth.\"]"
+    },
+    {
+     "ok": true,
+     "text": "Next: the next move; the one before ticked"
+    },
+    {
+     "ok": true,
+     "text": "Back: the move before"
+    },
+    {
+     "ok": true,
+     "text": "Next on the last move ticks step 1; step 2 has one move: the step itself"
+    },
+    {
+     "ok": true,
+     "text": "Back from step 2 goes to step 1's last move"
+    },
+    {
+     "ok": true,
+     "text": "a number button jumps to a step's first move; Next until its last move"
+    },
+    {
+     "ok": true,
+     "text": "the last move of the last step says Done"
+    },
+    {
+     "ok": true,
+     "text": "DT222: done, the steps, and the next step; no paragraph: 3 steps. Now a photo of your plate, then eat."
+    },
+    {
+     "ok": true,
+     "text": "DT222: Photo of your meal, Cooked. Next: Eat, and two small links"
+    },
+    {
+     "ok": true,
+     "text": "DT222: the photo shows, Take it again under it"
+    },
+    {
+     "ok": true,
+     "text": "DT222: Cooked. Next: Eat opens Eat, with the meal's photo"
+    },
+    {
+     "ok": true,
+     "text": "step 1, one food: the step itself, with its timer"
+    },
+    {
+     "ok": true,
+     "text": "DT223: a step without a picture: Add a photo of this step"
+    },
+    {
+     "ok": true,
+     "text": "DT223: the photo on top of its step, kept with the recipe; Add another photo (DT276 step 2)"
+    },
+    {
+     "ok": true,
+     "text": "step 3, three foods from the recipe's chips: Add each, then the action: [\"▶Add 80 g rice.\",\"Add 160 g chicken.\",\"Add 120 g spinach.\",\"Put them in a bowl and stir.\"]"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 52 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "cook-old-ate.cjs",
+   "about": "Story DT317 (0.3.161, board DT317; Coach Milan, Go 18 November 19:13): Start cooking with a plate from earlier on the Plate. Chef Mealan asks about the old plate first: Ate it, Save for later, Clear it, Cancel. Ate it now asks the meal, as it does on the Plate since DT314: the calendar opens under the buttons on the day the plate was started, the nearest meal marked, and nothing is logged yet. A tap on a meal logs the plate there, at the time it was started, and the recipe opens to cook. Save for later, Clear it and Cancel are as before. The checks name the acceptance criteria of the board (DT317 AC1, AC2).",
+   "pass": true,
+   "seconds": 27,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Start cooking with Saturday's plate on the Plate: Chef Mealan asks, with Ate it, Save for later, Clear it, Cancel"
+    },
+    {
+     "ok": true,
+     "text": "no calendar before Ate it"
+    },
+    {
+     "ok": true,
+     "text": "DT317 AC1: Ate it opens the calendar on Sat 14 with Dinner marked: Sat 14 / ✓ Dinner 20:00 · not eaten"
+    },
+    {
+     "ok": true,
+     "text": "DT317 AC1: nothing is logged, the plate is still there and nothing is cooking"
+    },
+    {
+     "ok": true,
+     "text": "the calendar stands under the buttons, above the help line: bubble mealan chef-line | ca-go | ca-links | old-ate-cal | SMALL"
+    },
+    {
+     "ok": true,
+     "text": "DT317 AC2: a tap on Dinner logs the plate to Saturday's dinner at 19:10: {\"date\":\"2026-11-14\",\"slotId\":\"dinner\",\"name\":\"Dinner\",\"time\":\"20:00\"} 2026-11-14 19:10"
+    },
+    {
+     "ok": true,
+     "text": "the logged meal is the old plate: skyr and oats"
+    },
+    {
+     "ok": true,
+     "text": "DT317 AC2: and the recipe opens to cook: Chicken and rice bowl"
+    },
+    {
+     "ok": true,
+     "text": "Cancel: back on the recipe, the plate as it was, nothing logged"
+    },
+    {
+     "ok": true,
+     "text": "Save for later: the plate waits under Saved for later and the cooking starts, as before"
+    },
+    {
+     "ok": true,
+     "text": "Clear it: the plate is gone and the cooking starts, as before"
+    },
+    {
+     "ok": true,
+     "text": "save check: 101 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "cover-video.cjs",
+   "about": "DT254 (0.3.105, board Stories187; Coach Milan 7 November 12:16 to 13:24, Go): the cover is the recipe's video. A recipe whose every step has a picture: the page opens and the cover plays the steps once, without sound, the step under the picture; a tap opens the player with the words; then it rests on the cover with ▶ in the middle, and ▶ plays it again. Its tile in Recipes has ▶ in the middle of its cover. A phone set to reduce motion does not play by itself. Fewer pictures: a photo.",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the page opens and the cover plays"
+    },
+    {
+     "ok": true,
+     "text": "step 1's picture, which step under it, a bar of four"
+    },
+    {
+     "ok": true,
+     "text": "nothing on the picture while it plays"
+    },
+    {
+     "ok": true,
+     "text": "5 seconds: step 2"
+    },
+    {
+     "ok": true,
+     "text": "the separate Watch the steps card is gone"
+    },
+    {
+     "ok": true,
+     "text": "after the last step it rests on the cover, ▶ in the middle"
+    },
+    {
+     "ok": true,
+     "text": "Watch with the words, 4 steps, about 20 seconds; Cover"
+    },
+    {
+     "ok": true,
+     "text": "▶ is a large button"
+    },
+    {
+     "ok": true,
+     "text": "▶ plays it again, from step 1"
+    },
+    {
+     "ok": true,
+     "text": "a tap while it plays opens the player with the words, and it stops"
+    },
+    {
+     "ok": true,
+     "text": "Watch with the words opens the player too"
+    },
+    {
+     "ok": true,
+     "text": "reduce motion: it rests on the cover with ▶; nothing plays by itself"
+    },
+    {
+     "ok": true,
+     "text": "three pictures of four: the cover stays a photo"
+    },
+    {
+     "ok": true,
+     "text": "the tile of the recipe with a video has ▶; the other none"
+    },
+    {
+     "ok": true,
+     "text": "▶ sits in the middle of the cover"
+    },
+    {
+     "ok": true,
+     "text": "nothing scrolls sideways at 360"
+    },
+    {
+     "ok": true,
+     "text": "save check: 104 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "covers-and-members.cjs",
+   "about": "A cover drawn by Chef Mealan and Members (0.2.11, canvas board CO, CO1 to CO4b; Milan 16 October 2026, 15:23 to 16:48). The drawing itself is Google's (no AI in the walkthroughs): /api/cover answers with a fixed picture here. What is checked is the app's part: which recipes get a picture and when, the label, the photo ask on the meal card, Use as cover, the For members panel, Share, a change reaching members, Take it back, the Members tab at your portion, allergies, the order, a member's recipe, Make it, Keep in mine, and the owner's take down. Members runs on the real local server.",
+   "pass": true,
+   "seconds": 29,
+   "checks": [
+    {
+     "ok": true,
+     "text": "CO1: Chef Mealan is asked for a picture of each recipe without a photo, with its foods and amounts: m-sopska, m-crepes, m-salad"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the recipe whose card holds a plate photo gets no drawing"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the picture is the recipe's cover, known as drawn"
+    },
+    {
+     "ok": true,
+     "text": "CO1: past the day's ten, the recipe waits for tomorrow"
+    },
+    {
+     "ok": true,
+     "text": "CO1: drawn once: nothing is asked again after a reload"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the tile says Drawn by Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the waiting recipe's tile says Picture tomorrow"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the page shows the drawn cover, labelled, with Add my photo"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the line says how it was drawn"
+    },
+    {
+     "ok": true,
+     "text": "CO4: Not shared; the cover members see is the drawn picture"
+    },
+    {
+     "ok": true,
+     "text": "CO4: Show my first name is off until switched on"
+    },
+    {
+     "ok": true,
+     "text": "CO4: shared, without the name, in the Balkan kitchen"
+    },
+    {
+     "ok": true,
+     "text": "CO4b: Shared, as a member, with the picture by Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "CO4: members get the recipe and the cover, no name, no rating"
+    },
+    {
+     "ok": true,
+     "text": "CO4b: a change to the recipe reaches members, with the same cover"
+    },
+    {
+     "ok": true,
+     "text": "CO2: no tabs; Made by: All members, and the address says so: http://127.0.0.1:3409/my-recipes?made=members"
+    },
+    {
+     "ok": true,
+     "text": "CO2: the line says the meal ahead, its size and the target: Members' recipes, calculated for your day. Dinner is about 936 kcal at PD 6.4 or more, so these come first."
+    },
+    {
+     "ok": true,
+     "text": "CO2: a recipe with your declared allergy is not shown"
+    },
+    {
+     "ok": true,
+     "text": "CO2: at or above your target first: Chicken and broccoli stir-fry with rice | Salmon with lemon potatoes"
+    },
+    {
+     "ok": true,
+     "text": "CO2: Nina's stir-fry at your dinner, within 5 % of its size: Drawn by Chef MealanChicken and broccoli stir-fry with riceBalkan · shared by NinaYour dinner: 780 g · 930 kcal · PD 9.2"
+    },
+    {
+     "ok": true,
+     "text": "CO2: the salmon is marked under your target, with a member's photo"
+    },
+    {
+     "ok": true,
+     "text": "CO2: your own shared recipe is not repeated under members"
+    },
+    {
+     "ok": true,
+     "text": "CO2: under Made by me it says Shared with members"
+    },
+    {
+     "ok": true,
+     "text": "CO2: A member without a name: the salmon (the toast is held back by your allergy)"
+    },
+    {
+     "ok": true,
+     "text": "CO2: a kitchen filters the list, and the line says so"
+    },
+    {
+     "ok": true,
+     "text": "CO3: the recipe opens at your dinner"
+    },
+    {
+     "ok": true,
+     "text": "CO3: the amounts in the steps are your portion's: 1Fry 230 g chicken breast with 230 g broccoli."
+    },
+    {
+     "ok": true,
+     "text": "CO3: Keep in mine; the owner can take it down"
+    },
+    {
+     "ok": true,
+     "text": "CO3: Keep in mine copies the recipe, its amounts and its drawn cover"
+    },
+    {
+     "ok": true,
+     "text": "CO3: Make it puts your portion on the plate"
+    },
+    {
+     "ok": true,
+     "text": "CO3: made counts once for the cook"
+    },
+    {
+     "ok": true,
+     "text": "the owner takes a recipe down for every member"
+    },
+    {
+     "ok": true,
+     "text": "CO4b: Take it back removes it from Members"
+    },
+    {
+     "ok": true,
+     "text": "CO1b: the meal card asks once for a photo of the plate"
+    },
+    {
+     "ok": true,
+     "text": "CO1c: with the photo: Use as cover, or Keep it just for me"
+    },
+    {
+     "ok": true,
+     "text": "CO1c: your photo is the cover; the drawn picture stays behind it"
+    },
+    {
+     "ok": true,
+     "text": "CO1c: the card asks no more"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 36 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "design-rules.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 20 October 2026, 07:06 to 07:30, boards DS1 and DS2): the design system's button rules. A: one filled, wide button per screen, the main step; every other action is outlined. B: a card's buttons share one row under everything else in the card, the card's full width. C: an answer is a chip, never a button. D: Today has no wide button; a next meal with nothing planned is a card with Pick a meal and Make it on the Plate. E: Back sits top left, above the step bar, and says where it goes. Never rewrite these lines to fit a change. Added by stories DS4 G and DS5 H (Milan 08:49 to 09:30, boards DS4 and DS5): a page's title comes first, under Back: a recipe's name before its photo. On /built a link inside a sentence is underlined, and each part has one filled button. Added by story DT305 (Coach Milan 16 November 2026, 10:04 to 10:49, boards Stories230 and Stories231; written down in docs/rules/design.md as D6 and D7): an answer to tick sits under its question in its own block; the buttons of a section sit under the whole section in one row. Guarded on the read of a photo, in photo-read.cjs. Added by story DT349 (Coach Milan 24 November 2026, 07:42; 25 November 13:16 and 14:26; written down as D14): I, every PD card is PdCard, PD and its words on the left, the title and its rows on the right, its numbers under the card.",
+   "pass": true,
+   "seconds": 30,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B: I ate it and Change it share one row, the card's full width, equal widths"
+    },
+    {
+     "ok": true,
+     "text": "B: Did you have it? I ate it, Change it, Skipped it, one row, edge to edge"
+    },
+    {
+     "ok": true,
+     "text": "C: How did it carry you? answers are chips"
+    },
+    {
+     "ok": true,
+     "text": "A: Sarma has no steps yet: Start cooking is grey, nothing else is filled: "
+    },
+    {
+     "ok": true,
+     "text": "A, B: Write my own is a button next to the other way, not a link"
+    },
+    {
+     "ok": true,
+     "text": "E: the recipe page's Back, Recipes, sits top left above the photo"
+    },
+    {
+     "ok": true,
+     "text": "G: the recipe's name comes first, under Back, before the photo"
+    },
+    {
+     "ok": true,
+     "text": "I: the recipe page's PD card is PdCard"
+    },
+    {
+     "ok": true,
+     "text": "I: the recipe page: PD and its number on the left, the title and Energy, Weight, Protein on the right: [[\"The whole recipe\",248],[\"PD\",38]]"
+    },
+    {
+     "ok": true,
+     "text": "I: the recipe's numbers open under the card, not inside it"
+    },
+    {
+     "ok": true,
+     "text": "A: on the Plate no Add in the food list is filled: "
+    },
+    {
+     "ok": true,
+     "text": "I: the Plate's PD card is PdCard"
+    },
+    {
+     "ok": true,
+     "text": "I: the Plate: PD and its number on the left, the title and Energy, Weight, Protein on the right: [[\"This plate\",274],[\"PD\",55]]"
+    },
+    {
+     "ok": true,
+     "text": "I: no numbers inside the Plate's card"
+    },
+    {
+     "ok": true,
+     "text": "E: Back sits top left, above the step bar: Back to the plate"
+    },
+    {
+     "ok": true,
+     "text": "E: no Back at the bottom of the step"
+    },
+    {
+     "ok": true,
+     "text": "D: in the evening Today has no wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: the Tomorrow card still opens tomorrow's plan"
+    },
+    {
+     "ok": true,
+     "text": "D: lunch with nothing planned is a card, not a wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: Pick a meal, Make it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "D: Make it on the Plate opens the Plate for lunch"
+    },
+    {
+     "ok": true,
+     "text": "F: 11+ of 93 g fat, and the note: Why the +: Protein bar has no fat or carbs value, so fat and carbs are counted without it."
+    },
+    {
+     "ok": true,
+     "text": "F: its name opens it in Foods"
+    },
+    {
+     "ok": true,
+     "text": "H: a link inside a sentence is underlined"
+    },
+    {
+     "ok": true,
+     "text": "H: one filled button per part: [[\"Try it: the calculator on the home page\",true],[\"See it work\",false],[\"Read Worth Building\",false],[\"Notify me\",true],[\"Email Milan\",true],[\"Connect on LinkedIn\",false]]"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 118 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "dish-parts.cjs",
+   "about": "Dishes in parts, and optional foods inside them (0.2.19, canvas boards IM, IM15 to IM18; Milan 17 October 2026, 11:08 to 11:26). A protein cheesecake from Instagram, read by Chef Mealan (faked here: no AI key), in three parts with an optional chocolate in the topping: the plate in parts (IM15), Leave it out and Put it back (IM16b), Change one part (IM16), + Add inside a part, the steps part by part (IM17). Then a bowl of your own put into parts on the plate, kept with its parts (IM18, IM18b). Changed by story R21 (Milan 22:27, board RS20): one slice is the recipe divided by what it makes, from the exact grams, so the kcal read one lower (284, 175, 301). Everything else is unchanged. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs). changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it? changed by DT349 (0.3.193, AC13, design rule D14): the PD card has two columns; Energy, Weight and Protein are .rd-rows, the words against the target .pd-short or .pd-line",
+   "pass": true,
+   "seconds": 24,
+   "checks": [
+    {
+     "ok": true,
+     "text": "IM15: the plate in the recipe's parts (Base,Filling,Topping)"
+    },
+    {
+     "ok": true,
+     "text": "IM15: the optional chocolate sits inside the topping, with + Add"
+    },
+    {
+     "ok": true,
+     "text": "IM15: one slice, 284 kcal (284)"
+    },
+    {
+     "ok": true,
+     "text": "IM16b: the base left out with its numbers: 175 kcal (175)"
+    },
+    {
+     "ok": true,
+     "text": "IM16b: the filling can still go"
+    },
+    {
+     "ok": true,
+     "text": "IM16b: the last part with foods can't be left out"
+    },
+    {
+     "ok": true,
+     "text": "IM16b: Put it back brings both back, as they were"
+    },
+    {
+     "ok": true,
+     "text": "IM16: Chef Mealan gets the part to change and every food's part, at this plate's grams"
+    },
+    {
+     "ok": true,
+     "text": "IM16: the filling changed, with its note: 237 kcal (237)"
+    },
+    {
+     "ok": true,
+     "text": "IM16: the base stays as the recipe makes it"
+    },
+    {
+     "ok": true,
+     "text": "IM16: Back to the original undoes it"
+    },
+    {
+     "ok": true,
+     "text": "IM12b: the chocolate in the topping, 3 g: 301 kcal (301)"
+    },
+    {
+     "ok": true,
+     "text": "IM15: the recipe page lists the foods in their parts"
+    },
+    {
+     "ok": true,
+     "text": "IM17: Chef Mealan gets the parts and the optional chocolate in the topping"
+    },
+    {
+     "ok": true,
+     "text": "IM17: the steps part by part"
+    },
+    {
+     "ok": true,
+     "text": "IM17: the parts are kept with the steps; the optional chocolate with its part"
+    },
+    {
+     "ok": true,
+     "text": "IM18: Optional takes the sour cream out of the numbers (668)"
+    },
+    {
+     "ok": true,
+     "text": "IM18b: your bowl in its parts, the sour cream optional in Toppings (Rice,Chicken,Toppings)"
+    },
+    {
+     "ok": true,
+     "text": "IM18b: the recipe keeps its parts and the optional sour cream; the plate is clear"
+    },
+    {
+     "ok": true,
+     "text": "IM18b: next time it opens like this"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 64 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "dish-proportions.cjs",
+   "about": "JOURNEY (0.2.131, DT150, rule C52, board Stories102; Coach Milan 29 October 00:19 to 00:24, Go at 08:33): a dish keeps its proportions. A baked cheesecake cup of your own, no parts: the Plate asks Is this one dish?, with the parts suggested (base: oats, butter; filling: quark, eggs, honey; topping: strawberries). Grouped, Fit sizes the filling as a whole, quark to egg kept, the base and the topping stay; Undo puts the grams back. The steps, written for quark, say so when quark is swapped for Greek yogurt, with Redraft; a change of amounts keeps them. The culinary gate reads the dish with its amounts and parts and says when it won't hold. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.",
+   "pass": true,
+   "seconds": 24,
+   "checks": [
+    {
+     "ok": true,
+     "text": "a cooked plate of your own with no parts asks: Is this one dish?"
+    },
+    {
+     "ok": true,
+     "text": "the parts suggested: Base: oats, butter · Filling: quark, eggs, honey · Topping: strawberries"
+    },
+    {
+     "ok": true,
+     "text": "grouped: base, filling, topping"
+    },
+    {
+     "ok": true,
+     "text": "the question goes once it is answered"
+    },
+    {
+     "ok": true,
+     "text": "the base and the topping stay"
+    },
+    {
+     "ok": true,
+     "text": "the filling grows as a whole, quark to egg kept: 200 to 104"
+    },
+    {
+     "ok": true,
+     "text": "the line says what Fit did: Fit sized the filling as a whole, twice as much: quark, eggs and honey keep their proportions. The base and topping stay. Rounded to whole eggs. Undo"
+    },
+    {
+     "ok": true,
+     "text": "Undo puts the filling back"
+    },
+    {
+     "ok": true,
+     "text": "Chef Mealan reads the dish with its parts and amounts"
+    },
+    {
+     "ok": true,
+     "text": "the steps are on the Plate, for a dish in parts too"
+    },
+    {
+     "ok": true,
+     "text": "a change of amounts keeps the steps"
+    },
+    {
+     "ok": true,
+     "text": "the steps say the foods changed: The steps were written before you changed the foods: Quark out, Greek yogurt 2% 213 g in, Eggs 52 to 104 g, Honey 15 to 30 g."
+    },
+    {
+     "ok": true,
+     "text": "Redraft for these foods, or Keep them"
+    },
+    {
+     "ok": true,
+     "text": "Keep them: the steps stand for these foods"
+    },
+    {
+     "ok": true,
+     "text": "Chef Mealan says the filling won't set, and how to fix it"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "gallery.cjs",
+   "about": "DT280 (0.3.132, board Stories207; Coach Milan 11 November 07:46 to 18:12, Go): one gallery for the recipe. Every photo of the recipe in one row, the cover first; a step number on a step's photo. The cover is chosen in the gallery: a tap picks a photo, and under the row come Make it the cover, On step (or No step) and Delete this photo. 12 photos per recipe, steps included: when 12 are in, Add goes and the line says the gallery is full; a photo taken while cooking then stays with the cook. Srpski and German fit 360 px. DT283 (0.3.137): a picked photo asks Who made it?; Drawn by AI shows as an AI tag in the gallery, AI · Beta on the cover and on its step.",
+   "pass": true,
+   "seconds": 24,
+   "checks": [
+    {
+     "ok": true,
+     "text": "one gallery: five photos, the cover first"
+    },
+    {
+     "ok": true,
+     "text": "the cover says Cover; the step photos carry 1, 1 and 3; the dish photos carry none"
+    },
+    {
+     "ok": true,
+     "text": "the line under it: Photos: 5 of 12, the first is the cover"
+    },
+    {
+     "ok": true,
+     "text": "no second row On the steps, no × and no ‹ › on the photos"
+    },
+    {
+     "ok": true,
+     "text": "the cover picked: This photo is the cover, no Make it the cover"
+    },
+    {
+     "ok": true,
+     "text": "a step photo picked: Make it the cover, On step with step 1 on, Delete this photo"
+    },
+    {
+     "ok": true,
+     "text": "the picked photo shows large"
+    },
+    {
+     "ok": true,
+     "text": "every choice is 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "Make it the cover: it is first, says Cover, and keeps its step number"
+    },
+    {
+     "ok": true,
+     "text": "it stays on its step; the gallery shows it once (five photos); the old cover is the second"
+    },
+    {
+     "ok": true,
+     "text": "the choices close; the cover shows large"
+    },
+    {
+     "ok": true,
+     "text": "a photo of the dish: No step is on"
+    },
+    {
+     "ok": true,
+     "text": "On step 2: it is on step 2 and out of the dish photos; still five photos"
+    },
+    {
+     "ok": true,
+     "text": "step 2 shows it on the page"
+    },
+    {
+     "ok": true,
+     "text": "No step: off step 2, a photo of the dish again"
+    },
+    {
+     "ok": true,
+     "text": "a tap on step 3's photo picks it in the gallery"
+    },
+    {
+     "ok": true,
+     "text": "Delete this photo asks Sure? first"
+    },
+    {
+     "ok": true,
+     "text": "the second tap deletes it: Photos: 4 of 12"
+    },
+    {
+     "ok": true,
+     "text": "12 photos: no Add in the gallery"
+    },
+    {
+     "ok": true,
+     "text": "the line says the gallery is full; Add photos to the steps is off"
+    },
+    {
+     "ok": true,
+     "text": "a full gallery: a photo taken while cooking shows on its step in Make, and stays with the cook"
+    },
+    {
+     "ok": true,
+     "text": "a picked photo asks Who made it?; My photo is chosen; no AI tags"
+    },
+    {
+     "ok": true,
+     "text": "Drawn by AI: the photo carries the AI tag in the gallery"
+    },
+    {
+     "ok": true,
+     "text": "the recipe keeps which own photo was drawn by AI"
+    },
+    {
+     "ok": true,
+     "text": "as the cover, the big photo says AI · Beta"
+    },
+    {
+     "ok": true,
+     "text": "opened again: still marked"
+    },
+    {
+     "ok": true,
+     "text": "a step photo marked Drawn by AI: its step says AI · Beta"
+    },
+    {
+     "ok": true,
+     "text": "back to My photo: the mark goes"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the gallery and its choices in the language, fit 390 px: Stavi je za naslovnuNa koraku123Bez korakaKo je napravio sliku?Moja slikaNacrtao"
+    },
+    {
+     "ok": true,
+     "text": "de: the gallery and its choices in the language, fit 360 px: Als Titelbild nehmenBei Schritt123Kein SchrittWer hat es gemacht?Mein FotoVon KI"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 125 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "get-it-ready.cjs",
+   "about": "DT251 (0.3.104, board Stories186; Coach Milan 7 November 08:07 to 12:28, Go): Get it ready. Cook mode opens on the foods before step 1: each with its amount, read aloud one at a time; next ticks it and reads the next, repeat says it again, a tap ticks one too. All ticked: All ready. Step 1 next. Then step 1. Step 1 › skips it at any time.",
+   "pass": true,
+   "seconds": 21,
+   "checks": [
+    {
+     "ok": true,
+     "text": "cook mode opens on Get it ready, before step 1"
+    },
+    {
+     "ok": true,
+     "text": "the top says Get it ready; no step is current yet"
+    },
+    {
+     "ok": true,
+     "text": "Get it ready · 1 of 4, Put out what you need"
+    },
+    {
+     "ok": true,
+     "text": "every food with its amount: 180 g salmon fillet … 10 g olive oil"
+    },
+    {
+     "ok": true,
+     "text": "44 px or more: 180 g salmon fillet"
+    },
+    {
+     "ok": true,
+     "text": "44 px or more: Step 1 ›"
+    },
+    {
+     "ok": true,
+     "text": "voice on: Get it ready, then the first food, in words: \"Get it ready. 180 grams salmon fillet\""
+    },
+    {
+     "ok": true,
+     "text": "next: the first is ticked, the second read"
+    },
+    {
+     "ok": true,
+     "text": "repeat says it again"
+    },
+    {
+     "ok": true,
+     "text": "a tap ticks another food; the one being read stays"
+    },
+    {
+     "ok": true,
+     "text": "next skips the ticked one: olive oil"
+    },
+    {
+     "ok": true,
+     "text": "all ticked: All ready. Step 1 next."
+    },
+    {
+     "ok": true,
+     "text": "Step 1 › to go on"
+    },
+    {
+     "ok": true,
+     "text": "next: step 1, read aloud as before"
+    },
+    {
+     "ok": true,
+     "text": "Step 1 › skips it: step 1"
+    },
+    {
+     "ok": true,
+     "text": "translated: 180 g Lachs, 150 g Reis as the steps name them; a food no step names keeps its name"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch: the same four foods"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch: the head in German, German voice; the English recipe's food in English: [[\"Alles bereitlegen.\",\"de-DE\"],[\"180 grams salmon fillet\",\"en-GB\"]]"
+    },
+    {
+     "ok": true,
+     "text": "nothing scrolls sideways at 360"
+    },
+    {
+     "ok": true,
+     "text": "save check: 100 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "google-calendar.cjs",
+   "about": "DT178 (0.3.21, board Stories126; Coach Milan 31 October 00:08 Go): Chef Mealan's own calendar in Google. Me > Google Calendar, off at first: what goes in (Weigh in and Check-in off), what an event says, Connect. On: the calendar Chef Mealan is made and the next 14 days go in, names and times and a link, no numbers. A change goes across within seconds; Plan says so once; a shopping list gets Shop on; without a token one tap updates; a calendar link opens that day on Plan; Turn off removes the calendar or keeps it. Google is a stand-in here: an in-memory calendar answering the same API.",
+   "pass": true,
+   "seconds": 56,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Me: Google Calendar, off"
+    },
+    {
+     "ok": true,
+     "text": "under Training week: Profile, Goal, Lifestyle, Training week, Google Calendar, Where I shop and cook, Your summary, My coach, Account"
+    },
+    {
+     "ok": true,
+     "text": "its own address, /me/calendar"
+    },
+    {
+     "ok": true,
+     "text": "what goes in: meals, cooking, training, shopping on; weigh in and check-in off; the dish's name on"
+    },
+    {
+     "ok": true,
+     "text": "what an event says"
+    },
+    {
+     "ok": true,
+     "text": "every control 44 px or more: 55,74,56,74,76,76,55,52"
+    },
+    {
+     "ok": true,
+     "text": "while writing, the page says how far: 📅Writing to Google Calendar: 20 of 45."
+    },
+    {
+     "ok": true,
+     "text": "the calendar is noted as soon as Google makes it"
+    },
+    {
+     "ok": true,
+     "text": "events are written a few at a time: 4"
+    },
+    {
+     "ok": true,
+     "text": "on, with the calendar's id kept"
+    },
+    {
+     "ok": true,
+     "text": "a calendar of its own, called Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "every call carries the token"
+    },
+    {
+     "ok": true,
+     "text": "tonight's dinner is in: 2026-10-30T06:30:00 Breakfast | 2026-10-30T13:15:00 Lunch | 2026-10-30T20:00:00 Dinner"
+    },
+    {
+     "ok": true,
+     "text": "Monday's training at 17:30"
+    },
+    {
+     "ok": true,
+     "text": "Monday: dinner with its dish, and cooking before it"
+    },
+    {
+     "ok": true,
+     "text": "no weigh in, no check-in"
+    },
+    {
+     "ok": true,
+     "text": "each event: a link to the day, no numbers"
+    },
+    {
+     "ok": true,
+     "text": "the next 14 days: 14"
+    },
+    {
+     "ok": true,
+     "text": "the page says on, 14 days"
+    },
+    {
+     "ok": true,
+     "text": "the dish's name off: Dinner and Cook dinner, within seconds"
+    },
+    {
+     "ok": true,
+     "text": "weigh in on: one a day, before breakfast"
+    },
+    {
+     "ok": true,
+     "text": "weigh in off again: taken out"
+    },
+    {
+     "ok": true,
+     "text": "Plan: also in your Google Calendar"
+    },
+    {
+     "ok": true,
+     "text": "the list has Shop on"
+    },
+    {
+     "ok": true,
+     "text": "Shopping list 1, Saturday 10:00, in the calendar"
+    },
+    {
+     "ok": true,
+     "text": "the calendar's link opens Monday on Plan"
+    },
+    {
+     "ok": true,
+     "text": "without a token nothing goes across by itself"
+    },
+    {
+     "ok": true,
+     "text": "Plan: Update Google Calendar"
+    },
+    {
+     "ok": true,
+     "text": "the button is 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "one tap: training taken out, the line is back"
+    },
+    {
+     "ok": true,
+     "text": "never reached Google: said in plain words"
+    },
+    {
+     "ok": true,
+     "text": "back in front: it goes again by itself and is done"
+    },
+    {
+     "ok": true,
+     "text": "Turn off asks: remove, or keep"
+    },
+    {
+     "ok": true,
+     "text": "removed from Google; off"
+    },
+    {
+     "ok": true,
+     "text": "the kinds you chose are kept for next time"
+    },
+    {
+     "ok": true,
+     "text": "Me says off again"
+    },
+    {
+     "ok": true,
+     "text": "the privacy notice says it"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "kitchens-and-steps.cjs",
+   "about": "What a kitchen means, and recipe steps drafted by Chef Mealan (0.2.10, canvas board CH, CH5, CH7 and CH7b; Milan, 16 October 2026). Chef Mealan's answers are fixed here (no AI in the walkthroughs); what is checked is the app's part: the kitchen line and its three dishes, Another and Undo, the taste kept and sent to Chef Mealan, and for the steps, the checks on the draft, the one retry with the reason, and the steps kept with the recipe's own amounts. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "CH7: a block for each kitchen picked: 2"
+    },
+    {
+     "ok": true,
+     "text": "CH7: Balkan, with the line on what it means"
+    },
+    {
+     "ok": true,
+     "text": "CH7: the three Balkan dishes: Šopska salad with grilled chicken, Sarma, Ćevapi with ajvar and onion"
+    },
+    {
+     "ok": true,
+     "text": "CH7b: Another puts stuffed peppers in its place and says what is not for you"
+    },
+    {
+     "ok": true,
+     "text": "CH7b: the taste is kept"
+    },
+    {
+     "ok": true,
+     "text": "CH7b: Undo brings it back"
+    },
+    {
+     "ok": true,
+     "text": "CH7b: Another on Sarma instead"
+    },
+    {
+     "ok": true,
+     "text": "CH7b: when the dishes run out, it says so and Another goes"
+    },
+    {
+     "ok": true,
+     "text": "Undo walks back one dish at a time, Sarma stays swapped away"
+    },
+    {
+     "ok": true,
+     "text": "the taste is sent: cook toward the dishes kept, leave out Sarma"
+    },
+    {
+     "ok": true,
+     "text": "CH5: no steps yet: Draft the steps with Chef Mealan, or Write my own"
+    },
+    {
+     "ok": true,
+     "text": "CH5: Chef Mealan gets the title, the foods in order with their amounts, and the kitchens"
+    },
+    {
+     "ok": true,
+     "text": "CH5: the draft that left a food out goes back once, with why: no step names mascarpone"
+    },
+    {
+     "ok": true,
+     "text": "CH5: the banner says who drafted it"
+    },
+    {
+     "ok": true,
+     "text": "CH5: the amounts in the steps are the recipe's: 1Whisk 200 g Protein flour into 500 g Protein milk until smooth."
+    },
+    {
+     "ok": true,
+     "text": "CH5: nothing is saved before Keep these steps"
+    },
+    {
+     "ok": true,
+     "text": "CH5: Keep these steps saves them as the recipe's food chips"
+    },
+    {
+     "ok": true,
+     "text": "CH5: the steps are the recipe's now"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "original-steps.cjs",
+   "about": "DT256 and DT257 (0.3.111, boards Stories191 and Stories192; Coach Milan 8 November 00:06 and 00:09, Go). A recipe from a screenshot whose original steps work with your foods as they are: Start cooking cooks them as written, and the first cook makes them the recipe's own (one list, no Yours or Original). Foods that differ: Start cooking waits, as before. A step's photo asks Camera or Gallery; the gallery opens the phone's photos (no camera only), Cancel closes the choice.",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the original works with your foods: Start cooking opens"
+    },
+    {
+     "ok": true,
+     "text": "3 steps, as the original writes them"
+    },
+    {
+     "ok": true,
+     "text": "cook mode reads the original's step 1"
+    },
+    {
+     "ok": true,
+     "text": "the first cook makes the original's steps the recipe's own"
+    },
+    {
+     "ok": true,
+     "text": "Add a photo of this step asks Camera or Gallery"
+    },
+    {
+     "ok": true,
+     "text": "Camera opens the camera; Gallery the phone's photos"
+    },
+    {
+     "ok": true,
+     "text": "44 px: 📷 Camera"
+    },
+    {
+     "ok": true,
+     "text": "44 px: 🖼 Gallery"
+    },
+    {
+     "ok": true,
+     "text": "44 px: Cancel"
+    },
+    {
+     "ok": true,
+     "text": "Cancel closes the choice"
+    },
+    {
+     "ok": true,
+     "text": "a picture from the gallery goes on step 1"
+    },
+    {
+     "ok": true,
+     "text": "one list, the original's line, no Yours or Original"
+    },
+    {
+     "ok": true,
+     "text": "foods that differ from the original's: Start cooking waits, as before"
+    },
+    {
+     "ok": true,
+     "text": "save check: 50 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "recipe-after.cjs",
+   "about": "The recipe after it came in, and units (0.2.18, canvas boards IM, IM8 to IM11, and UN; Milan 17 October 2026, 09:10 to 09:42). Milan's cookie from Instagram, read by Chef Mealan (faked here: no AI key): the optional foods stay with the recipe in their own list (IM8); the original steps are kept for him only (IM9b); Chef Mealan's steps say how each relates to the original (IM9); what he cooks with, and a plain \"can't\" when there is no sensible way (IM10, IM10b); one picture try when kept, then Draw a picture with the day's count, no retries overnight (IM11, IM11b). Then °F, lb and ft and in on Profile (UN). changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?",
+   "pass": true,
+   "seconds": 29,
+   "checks": [
+    {
+     "ok": true,
+     "text": "IM8: the three optional foods stay with the recipe, out of its foods"
+    },
+    {
+     "ok": true,
+     "text": "IM9b: the original steps are kept with where it came from"
+    },
+    {
+     "ok": true,
+     "text": "IM11: one picture try when the recipe is kept"
+    },
+    {
+     "ok": true,
+     "text": "IM8, IM14: Optional, not in the numbers: each with its words and grams; the plate adds them, not this page"
+    },
+    {
+     "ok": true,
+     "text": "IM14: the recipe's numbers leave them out; Make it, and add them on the plate"
+    },
+    {
+     "ok": true,
+     "text": "RP1 (was IM9b): the original is the steps, no longer folded under Where it came from"
+    },
+    {
+     "ok": true,
+     "text": "UN: the original's 350 degrees Fahrenheit shows as 175 °C (the account starts metric)"
+    },
+    {
+     "ok": true,
+     "text": "IM11: No picture yet, with the day's count: 3 of 10"
+    },
+    {
+     "ok": true,
+     "text": "IM11: nothing tried again on its own"
+    },
+    {
+     "ok": true,
+     "text": "IM11: Draw a picture is one tap; the picture is the cover"
+    },
+    {
+     "ok": true,
+     "text": "IM9, IM10: the original steps, oven, stovetop and microwave, and how many it makes go to Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "IM9: the steps say they come from the original"
+    },
+    {
+     "ok": true,
+     "text": "IM9: each step marked: Adapted, Added, As the original"
+    },
+    {
+     "ok": true,
+     "text": "IM9: the marks are kept with the steps"
+    },
+    {
+     "ok": true,
+     "text": "IM10: What you cook with: oven, stovetop and microwave on at the start"
+    },
+    {
+     "ok": true,
+     "text": "IM10: kept as picked"
+    },
+    {
+     "ok": true,
+     "text": "IM9: saving the recipe with the same steps keeps the marks, and its 2 servings"
+    },
+    {
+     "ok": true,
+     "text": "IM10b: Chef Mealan gets what you cook with"
+    },
+    {
+     "ok": true,
+     "text": "IM10b: no sensible way: said plainly, asked once"
+    },
+    {
+     "ok": true,
+     "text": "IM13: Make it from Recipes: the foods one by one, with the two portions, not one locked block"
+    },
+    {
+     "ok": true,
+     "text": "IM12: the three optional foods under the foods, out of the numbers"
+    },
+    {
+     "ok": true,
+     "text": "IM12b: + Add puts it on the plate as a food like the others; the numbers move"
+    },
+    {
+     "ok": true,
+     "text": "IM12b: still the recipe's plate, with its two portions"
+    },
+    {
+     "ok": true,
+     "text": "IM12b: Leave it out sends it back; the numbers as before"
+    },
+    {
+     "ok": true,
+     "text": "UN1: Units on Profile, metric at the start"
+    },
+    {
+     "ok": true,
+     "text": "UN1: what °C means, in a line"
+    },
+    {
+     "ok": true,
+     "text": "UN2: 95 kg is 209.4 lb; 182 cm is 6 ft 0 in; food stays in grams"
+    },
+    {
+     "ok": true,
+     "text": "UN2: the profile asks in ft and in, and lb"
+    },
+    {
+     "ok": true,
+     "text": "UN2: the account still keeps 95 kg and 182 cm"
+    },
+    {
+     "ok": true,
+     "text": "UN2: the weigh-in line in lb"
+    },
+    {
+     "ok": true,
+     "text": "UN2: 208.0 lb typed is kept as 94.35 kg, and shows as 208.0 lb"
+    },
+    {
+     "ok": true,
+     "text": "UN2: with °F chosen, the original's oven heat is 350 °F"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 30 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-cook.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 8 October 2026, canvas boards RG0, RG1, RG3 and RG5): Cook is a permission, not a role. A client publishes only when their coach made them a cook, and what they send waits for their coach: the coach sees the page, then makes it live or sends it back with a note the cook sees. Changes to a cook's live recipe wait the same way, and the live page stays as it was until then. The cook can take their own recipe down. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 22,
+   "checks": [
+    {
+     "ok": true,
+     "text": "a client who isn't a cook has no Publish"
+    },
+    {
+     "ok": true,
+     "text": "their coach makes them a cook"
+    },
+    {
+     "ok": true,
+     "text": "a cook's button says Send to their coach: Send to your coach"
+    },
+    {
+     "ok": true,
+     "text": "sent: Waiting for the coach, and it can't be sent again while it waits"
+    },
+    {
+     "ok": true,
+     "text": "nothing is on the site while it waits"
+    },
+    {
+     "ok": true,
+     "text": "it waits for the coach, with its photo to see the page"
+    },
+    {
+     "ok": true,
+     "text": "the coach sends it back with a note"
+    },
+    {
+     "ok": true,
+     "text": "the tile says Sent back"
+    },
+    {
+     "ok": true,
+     "text": "the cook sees Sent back, and the note"
+    },
+    {
+     "ok": true,
+     "text": "sent again; the coach makes it live"
+    },
+    {
+     "ok": true,
+     "text": "DT196: the public recipe has no note, status, recipe id or author id: slug,title,lines,makes,servingName,minutes,items,steps,rating,who,per100,perServing,all,pd,proteinShare,fits,hasPhoto,photoAi,cooked,author,publishedAt,updatedAt"
+    },
+    {
+     "ok": true,
+     "text": "My recipes: Live"
+    },
+    {
+     "ok": true,
+     "text": "while the change waits, the live page stays as it was"
+    },
+    {
+     "ok": true,
+     "text": "the coach sees the change"
+    },
+    {
+     "ok": true,
+     "text": "made live: the page has the change"
+    },
+    {
+     "ok": true,
+     "text": "the cook can take their own recipe down"
+    },
+    {
+     "ok": true,
+     "text": "once the coach switches Cook off, nothing more can be sent"
+    },
+    {
+     "ok": true,
+     "text": "DT196: section 4 says 12 months and 30 days"
+    },
+    {
+     "ok": true,
+     "text": "the page's footer says the app's version: © 2026 Milan Stancevic · Impressum · Privacy · Disclaimer · Who's behind it · Version 0.3.194"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-lang.cjs",
+   "about": "DT250 (0.3.99, board Stories185; Coach Milan 7 November 06:14 to 08:05, Go): a recipe in your language. The app in English, a HOWTO: otherLang (DT260): this walkthrough follows How to's situation otherLang; when it fails after a screen changed, update that situation's steps in src/i18n/en.json recipe written in Srpski: its page offers once (Show it in English, or Keep it in Srpski); translated, it shows in English with a switch to the original; Start cooking asks once and cook mode reads the version picked; a recipe that just came in from a link is read into English by itself, with Original ›. Chef Mealan's translation is stubbed; what the app sends and keeps is checked.",
+   "pass": true,
+   "seconds": 25,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the page offers once: Show it in English?"
+    },
+    {
+     "ok": true,
+     "text": "Chef Mealan gets the steps and the foods, to English"
+    },
+    {
+     "ok": true,
+     "text": "the recipe shows in English"
+    },
+    {
+     "ok": true,
+     "text": "Translated by Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "0.3.100: the foods' new names are no changed foods"
+    },
+    {
+     "ok": true,
+     "text": "the original is kept, the translation with it"
+    },
+    {
+     "ok": true,
+     "text": "Original, Srpski: as written"
+    },
+    {
+     "ok": true,
+     "text": "and back to English"
+    },
+    {
+     "ok": true,
+     "text": "the switch is 44 px"
+    },
+    {
+     "ok": true,
+     "text": "cook mode shows the English steps"
+    },
+    {
+     "ok": true,
+     "text": "translated once"
+    },
+    {
+     "ok": true,
+     "text": "Start cooking asks once: Cook it in English?"
+    },
+    {
+     "ok": true,
+     "text": "Cook it as written: cook mode in Srpski"
+    },
+    {
+     "ok": true,
+     "text": "it is kept as written, nothing translated"
+    },
+    {
+     "ok": true,
+     "text": "and the page does not offer again"
+    },
+    {
+     "ok": true,
+     "text": "Cook it in English: translated, and cook mode in English"
+    },
+    {
+     "ok": true,
+     "text": "Keep it in Srpski: as written, no offer"
+    },
+    {
+     "ok": true,
+     "text": "it came in already in English"
+    },
+    {
+     "ok": true,
+     "text": "and says so: From a link, in English. The page is in Srpski; Chef Mealan read it in your language. Original ›"
+    },
+    {
+     "ok": true,
+     "text": "Original ›: as written, with the switch"
+    },
+    {
+     "ok": true,
+     "text": "nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "save check: 125 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "recipe-photos.cjs",
+   "about": "The recipe's page (0.2.5+r11, canvas board S3, R7 to R11, Milan 12 October 2026). R7: a tile is one tap, no buttons, the cover and where the recipe is. R8: the recipe's page, photos first: × deletes after Sure?, Add adds, the plate photos from the times it was made are offered. R9: ‹ › move the picked photo; first place is the cover. R10: Make it (the recipe on the Plate, unchanged) and Edit recipe. R11: edit mode, grams, × a food, Add a food, steps, Save changes or Cancel. A long name never makes the page wider than the phone. A live recipe whose page has a photo and the app none takes the page's photo once as its cover, and a removed cover never comes back from the page. changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it? changed by DT349 (0.3.193, design rule D14): the PD card has two columns; Energy, Weight and Protein are .rd-rows, whole grams",
+   "pass": true,
+   "seconds": 17,
+   "checks": [
+    {
+     "ok": true,
+     "text": "R4: the live recipe takes its page's photo as the cover (1 fetch)"
+    },
+    {
+     "ok": true,
+     "text": "R7: no buttons on the tile; it says Live on chefmealan.com"
+    },
+    {
+     "ok": true,
+     "text": "R7: a recipe without photos of its own still shows its card's plate photo"
+    },
+    {
+     "ok": true,
+     "text": "R8: the page opens with the cover large"
+    },
+    {
+     "ok": true,
+     "text": "the long name never makes the page wider than the phone (360 px)"
+    },
+    {
+     "ok": true,
+     "text": "R8: the recipe's numbers: 365 kcal, 44 g protein"
+    },
+    {
+     "ok": true,
+     "text": "R9: × asks Sure? first; nothing is deleted on the first tap"
+    },
+    {
+     "ok": true,
+     "text": "R9: the second tap deletes the photo"
+    },
+    {
+     "ok": true,
+     "text": "R4: a removed cover never comes back from the page"
+    },
+    {
+     "ok": true,
+     "text": "R8: Add adds a photo, twice"
+    },
+    {
+     "ok": true,
+     "text": "DT280: Make it the cover: the picked photo is the cover"
+    },
+    {
+     "ok": true,
+     "text": "R11: Editing the recipe"
+    },
+    {
+     "ok": true,
+     "text": "R11: the numbers follow as you type: 398 kcal, 50 g protein, PD 12.6"
+    },
+    {
+     "ok": true,
+     "text": "R11: Cancel leaves the recipe as it was"
+    },
+    {
+     "ok": true,
+     "text": "R13a: a tap on a food puts it in the step with its amount; a food in no step is named: Fold in 100 g chicken breast  | Skyr, natural is not in any step yet."
+    },
+    {
+     "ok": true,
+     "text": "R13a: every food in a step says so"
+    },
+    {
+     "ok": true,
+     "text": "R13b: the amount in the step follows the foods: 120 g"
+    },
+    {
+     "ok": true,
+     "text": "R11: a live recipe says the live page changes only with Change live page"
+    },
+    {
+     "ok": true,
+     "text": "R11: Save changes keeps the foods, the grams and the steps: Eggs 120, Chicken breast, cooked 100, Skyr, natural 100"
+    },
+    {
+     "ok": true,
+     "text": "R13: the steps read with the amounts on the recipe's page: Steps1Whisk 2 eggs (L)2Fold in 100 g chicken breast and cook slowly.3Serve with 100 g SkyrPhotos for the steps come from cooking: + Photo on a step in Make. Tap a photo to change or remove it.Add photos to the stepsPick several at once from your phone. Then you place each one on its step.Start cooking3 steps, read aloud. Say next, back or "
+    },
+    {
+     "ok": true,
+     "text": "R10: Make it opens the recipe on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "R10: Make it leaves the recipe as it is"
+    },
+    {
+     "ok": true,
+     "text": "the photos stay after a reload, the cover first"
+    },
+    {
+     "ok": true,
+     "text": "0.3.134: the plate photo from the time it was made is the cover by itself; nothing left to offer"
+    },
+    {
+     "ok": true,
+     "text": "IM22: Delete recipe says what goes first: its photo"
+    },
+    {
+     "ok": true,
+     "text": "IM22: Delete recipe deletes the recipe and goes back to Recipes, saying what was done"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-servings.cjs",
+   "about": "B168 and DT349 (0.3.193, board B168 and DT349, canvas Page 6; Coach Milan, Go 25 November 2026, 14:38 and 14:42; nutrition rule N17, design rule D14). The recipe page is for reading and deciding. On top, fixed, the recipe as written: the PD card is the Plate's card (PdCard) for the whole recipe, its numbers open under it, and the Nutrition table keeps one serving, all and 100 g. Servings is the one choice: chips 1 to 5, one tap each, and − and + always under them, grey until used; the line and Foods follow it, saved with the recipe. At the end, What do you do with it?: Plan it opens the Plate's day and meal block, shows my portion for the meal picked, and puts it in the plan, asking first when that meal holds something already; Put it on the Plate was Change it first. A serving is the recipe's equal share; a portion is mine.",
+   "pass": true,
+   "seconds": 16,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B168 AC1: the PD card says The whole recipe, 2,194 kcal, 897 g, 93 g: The whole recipePD | Energy2,194 kcalWeight897 gProtein93 g"
+    },
+    {
+     "ok": true,
+     "text": "B168 AC2: the numbers say Total 897 g and 2,194 kcal: Total8972,194100"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC2: the numbers open under the card, not inside it"
+    },
+    {
+     "ok": true,
+     "text": "B168 AC3, AC6: the Nutrition table shows 1 SERVING, ALL 4 and 100 g: 1 SERVING224 gALL 4897 g100 G"
+    },
+    {
+     "ok": true,
+     "text": "B168 AC6: The whole recipe makes 4 servings · one serving 549 kcal"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC1: the Plate's card, Energy, Weight and Protein as rows"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC3: a tap on PD opens the PD scale in the card"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC4: a placeholder picture of a meal with No photo yet and its two buttons on it"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC5: chips 1 to 5, only numbers: 1,2,3,4,5"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC5: 4 chosen, − 4 servings + under the chips in grey"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC5: the line: 4 servings: 2,194 kcal · 897 g · 93 g protein · PD 4.3"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC5: no Cook it card, no Other chip"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC6: 2 servings: 1,097 kcal · 449 g, Foods for 2 servings: 2 servings: 1,097 kcal · 449 g · 47 g protein · PD 4.3"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC6: the foods for 2: 125 g, 1 eggL · 61 g, 75 g, 188 g"
+    },
+    {
+     "ok": true,
+     "text": "B168 AC4: at 2 servings the card still says 2,194 kcal and the table 1 serving 549 kcal"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC6: opened again, 2 is still chosen"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC8: + until 10: − and + in use, no chip chosen, 10 servings"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC8: the foods for 10: 625 g, 6 eggsM · 305 g, 375 g, 938 g"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC8: a tap on a chip greys − and + again"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC9: What do you do with it? Plan it, Put it on the Plate; no Change it first: Plan it, Put it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC10: the days and the meals show in place; no day before today: [[\"Mon 23\",true],[\"Tue 24, today\",false],[\"Wed 25\",false],[\"Thu 26\",false]]"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC11: my dinner portion: Your dinner portion on Tuesday: 300 g · 733 kcal · 31 g protein · PD 4.3"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC12: in the plan, Tuesday's dinner, 733 kcal: {\"title\":\"Lazy Burek\",\"kcal\":733}"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC12: the recipe's servings and foods are as they were"
+    },
+    {
+     "ok": true,
+     "text": "DT349: a planned meal is asked about first: Put it in its place"
+    },
+    {
+     "ok": true,
+     "text": "B168 AC5: a recipe of one serving: the card says The whole recipe, no Servings"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC13: on the Plate, PD on the left, Energy, Weight and Protein on the right"
+    },
+    {
+     "ok": true,
+     "text": "DT349 AC13: the words against the target (High+, far above your plan) stand under both columns, the full width"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 62 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-swap.cjs",
+   "about": "JOURNEY INVARIANT (DT83, Milan 23 October 2026, 16:49 and 20:00): a food in a recipe can be swapped, and the new one takes the old one's place with an amount the person chooses: The same energy or The same weight, both with their grams. The same food in another state (cooked rice to raw rice) leads with the same energy; a different food leads with the same weight. While editing, one line says what changed for one portion, before and after, and Undo takes back the last change; more than a fifth apart turns it amber. Add right after a Remove asks whether the new food takes the removed one's place; a food of its own asks for its grams and the recipe is not saved without them. The steps follow a swap (Milan 21:56): the food that takes another's place takes its place in the steps, and Undo takes that back too. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 13,
+   "checks": [
+    {
+     "ok": true,
+     "text": "nothing changed yet, no line"
+    },
+    {
+     "ok": true,
+     "text": "the search says what it swaps"
+    },
+    {
+     "ok": true,
+     "text": "raw for cooked: the same energy first, both with grams: The same energy: 105 g Rice, white, raw | The same weight: 300 g Rice, white, raw | Cancel"
+    },
+    {
+     "ok": true,
+     "text": "it says why"
+    },
+    {
+     "ok": true,
+     "text": "raw rice takes its place, 105 g"
+    },
+    {
+     "ok": true,
+     "text": "the steps follow: step 2 names the raw rice, 105 g: Mix the 500 g beef mince with the 105 g rice and the 150 g onion."
+    },
+    {
+     "ok": true,
+     "text": "no food is left out of the steps"
+    },
+    {
+     "ok": true,
+     "text": "the line says the steps followed"
+    },
+    {
+     "ok": true,
+     "text": "the line says what changed for one sarma: Out: Rice, cooked, 300 g. In: Rice, white, raw, 105 g.One sarma: 216 to 215 kcal, 14 to 14 g protein, PD 6.6 to 6.5.The steps follow: one step names Rice, white, raw where it named Rice, cooked.Undo"
+    },
+    {
+     "ok": true,
+     "text": "Undo takes it back, in the steps too"
+    },
+    {
+     "ok": true,
+     "text": "a different food: the same weight first"
+    },
+    {
+     "ok": true,
+     "text": "within a fifth: not amber"
+    },
+    {
+     "ok": true,
+     "text": "more than a fifth apart: amber, and it says to check"
+    },
+    {
+     "ok": true,
+     "text": "Add after Remove asks if it takes the onion's place"
+    },
+    {
+     "ok": true,
+     "text": "a removed food still named in a step is said: onion is in a step but no longer in the recipe. Change the step, or tap the food that takes its place."
+    },
+    {
+     "ok": true,
+     "text": "a food of its own comes without grams, not 100 g"
+    },
+    {
+     "ok": true,
+     "text": "Save waits for the grams"
+    },
+    {
+     "ok": true,
+     "text": "saved in place: Cabbage, raw 800 | Chicken breast, cooked 500 | Rice, cooked 300 | Oats 40"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "scan-while-cooking.cjs",
+   "about": "0.3.69 (Coach Milan 3 November 13:31 to 13:34, Go): a food scanned while a cook runs. The question has three answers: use it in the dish, put it on the Plate (the Plate is free while you cook), or keep it in your foods. And Make shows only steps written for the foods it cooks: the Protein Pancake once read the steps Chef Mealan had drafted for a cucumber, feta and chicken plate.",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Chef Mealan asks: use it, put it on the Plate, or keep it"
+    },
+    {
+     "ok": true,
+     "text": "the answer Use it in Protein Pancake"
+    },
+    {
+     "ok": true,
+     "text": "the answer Put it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "the answer Keep it in my foods"
+    },
+    {
+     "ok": true,
+     "text": "Put it on the Plate: the skyr is on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "the cook goes on as it was, its three foods with it"
+    },
+    {
+     "ok": true,
+     "text": "the question is gone; the Plate shows"
+    },
+    {
+     "ok": true,
+     "text": "Use it: Make for Protein Pancake asks what the skyr replaces"
+    },
+    {
+     "ok": true,
+     "text": "no steps from the cucumber, feta and chicken plate"
+    },
+    {
+     "ok": true,
+     "text": "after the answer, still none of them"
+    },
+    {
+     "ok": true,
+     "text": "the dish back on the Plate (Craft, no bar): write the steps for these foods"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 56 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "second-screen.cjs",
+   "about": "DT177 (0.3.20, board Stories125; Coach Milan 30 October 22:16 Go): a second phone on the counter. Use another screen in cook mode opens a session with a 4-letter code and a QR code; another phone joins at /cook with no sign-in, once; both screens move together (step, ticks); the kitchen screen sees the recipe and the steps only; Chef, look sends one photo with the step; End on the cooking phone closes the kitchen screen, which keeps nothing.",
+   "pass": true,
+   "seconds": 24,
+   "checks": [
+    {
+     "ok": true,
+     "text": "cook mode offers Use another screen"
+    },
+    {
+     "ok": true,
+     "text": "a 4-letter code: WDG7"
+    },
+    {
+     "ok": true,
+     "text": "and a QR code for /cook with the code"
+    },
+    {
+     "ok": true,
+     "text": "it says the code works once, for 10 minutes"
+    },
+    {
+     "ok": true,
+     "text": "/cook asks for the code, no sign-in"
+    },
+    {
+     "ok": true,
+     "text": "joined: the recipe on step 1 of 6"
+    },
+    {
+     "ok": true,
+     "text": "with the amounts cooked"
+    },
+    {
+     "ok": true,
+     "text": "nothing about the person: no kcal, protein, PD or goal: "
+    },
+    {
+     "ok": true,
+     "text": "the cooking phone says the kitchen screen is on"
+    },
+    {
+     "ok": true,
+     "text": "a second join with the same code: already used"
+    },
+    {
+     "ok": true,
+     "text": "Next on the kitchen screen: the phone follows to step 2, step 1 ticked"
+    },
+    {
+     "ok": true,
+     "text": "a step tapped on the phone: the kitchen screen follows to step 4"
+    },
+    {
+     "ok": true,
+     "text": "the line says step 4"
+    },
+    {
+     "ok": true,
+     "text": "Chef, look sends one photo with step 4 and the session's token"
+    },
+    {
+     "ok": true,
+     "text": "the answer shows under the step"
+    },
+    {
+     "ok": true,
+     "text": "Chef, look is on the kitchen screen only"
+    },
+    {
+     "ok": true,
+     "text": "without the token, the session can't be read: 403"
+    },
+    {
+     "ok": true,
+     "text": "End: the line goes, Use another screen is back"
+    },
+    {
+     "ok": true,
+     "text": "the kitchen screen: the session ended, nothing kept"
+    },
+    {
+     "ok": true,
+     "text": "a new code each time"
+    },
+    {
+     "ok": true,
+     "text": "closing cook mode ends the session"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 78 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "served.cjs",
+   "about": "DT268 steps 1 to 3 (0.3.118 to 0.3.120, board Stories201; Coach Milan 9 November 21:46 to 23:44, Go): Served. A plate read as Exploring is kept on its own: the name and the dish as Chef Mealan read them; Scan another plate, mine or someone else's, joins the visit; nothing is logged. Recipes shows the visit as one card with its note; a Served plate opens with its photo, the honest line its numbers each with a range, and its foods; Share the numbers draws the picture and opens the share sheet; I ate this asks the day and the meal and puts your dishes in as one meal. The read is a stand-in (no AI here). Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo waits on the photo screen, which has no chips, and Read the plate reads it. Just looking is chosen behind the pencil of the meal line. After a read of your own meal the read shows alone; Change the foods opens the plate. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: Just looking is the last row of the calendar behind the pencil (just-looking.cjs), in place of the chip under What is it for; a meal is tapped in that calendar, and with a meal set the X clears it first. Changed by DT318 (0.3.160, board DT318; Coach Milan 19 November 01:00, Go): the link Wrong foods? Help Chef Mealan read it is gone; the form opens with one more photo of the same plate, behind ＋ Photo (one-more-photo.cjs). Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): Just looking and No meal selected are one state, and a photo read with no meal selected is a photo of yours. A plate is kept as Served with Don't count it (not-counted.cjs): it starts as not counted, someone else's, with Main picked by hand, and a tap on Mine makes it mine. Scan another plate reads the dish as before. changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?",
+   "pass": true,
+   "seconds": 72,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the Plate says the plate is kept, marked Served"
+    },
+    {
+     "ok": true,
+     "text": "kept by itself: the name and the dish as read, the foods, the photo"
+    },
+    {
+     "ok": true,
+     "text": "changed by B150: the name says filled by Chef Mealan; the dish is Main, not read for a plate kept with Don't count it"
+    },
+    {
+     "ok": true,
+     "text": "five dishes, Main set by the read"
+    },
+    {
+     "ok": true,
+     "text": "nothing is logged"
+    },
+    {
+     "ok": true,
+     "text": "the idea's buttons stay as they were"
+    },
+    {
+     "ok": true,
+     "text": "the Plate's block has Share the numbers"
+    },
+    {
+     "ok": true,
+     "text": "Whose plate: Mine or Someone else's; the first plate starts as Mine"
+    },
+    {
+     "ok": true,
+     "text": "a tap says it is someone else's, on the kept plate too"
+    },
+    {
+     "ok": true,
+     "text": "and a tap makes it mine again"
+    },
+    {
+     "ok": true,
+     "text": "a tap corrects the dish, and the dish no longer says filled by Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "the name you type is the plate's name, one plate still"
+    },
+    {
+     "ok": true,
+     "text": "every button and field at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "Another dish of mine asks Camera or Gallery"
+    },
+    {
+     "ok": true,
+     "text": "the first plate stays; the second is kept as a starter of mine, in the same visit"
+    },
+    {
+     "ok": true,
+     "text": "the Plate now holds the second plate, still Just looking"
+    },
+    {
+     "ok": true,
+     "text": "a third plate, someone else's, in the same visit; still nothing logged"
+    },
+    {
+     "ok": true,
+     "text": "Recipes has the Served group: Served · 1 visit, 3 plates"
+    },
+    {
+     "ok": true,
+     "text": "above Made by me"
+    },
+    {
+     "ok": true,
+     "text": "with no note the visit is the day and the meal: Saturday 7 November, lunch"
+    },
+    {
+     "ok": true,
+     "text": "your dishes in the order of a meal with their dish, then the others: Bruschetta about 184 kcal · 6 g protein Starter | Meatballs, mine about 465 kcal · 27 g protein Main | Marko's quesadilla about 411 kcal · 32 g protein"
+    },
+    {
+     "ok": true,
+     "text": "Mine with its total, then Others at the table: Mine · about 649 kcal · 34 g protein"
+    },
+    {
+     "ok": true,
+     "text": "the Served chip shows the Served group alone"
+    },
+    {
+     "ok": true,
+     "text": "and off again shows the recipes too"
+    },
+    {
+     "ok": true,
+     "text": "the note is the visit's title, the day under it, on every plate of the visit"
+    },
+    {
+     "ok": true,
+     "text": "Recipes fits the width"
+    },
+    {
+     "ok": true,
+     "text": "the visit has Add a photo of the menu"
+    },
+    {
+     "ok": true,
+     "text": "the menu opens with its photo"
+    },
+    {
+     "ok": true,
+     "text": "the read gets the menu's photo and the plates as names and foods, no photo of them"
+    },
+    {
+     "ok": true,
+     "text": "five lines as printed; the two matched ones marked"
+    },
+    {
+     "ok": true,
+     "text": "each plate with its line, weight and course; one not sure: Bruschetta Brusketi sa paradajzom, 150 g · starter ✓ matched | Meatballs, mine Ćufte u paradajz sosu, pire, 300 g · main ✓ matched | Marko's quesadilla Kesadilja sa piletinom / Kesadilja sa sirom not sure"
+    },
+    {
+     "ok": true,
+     "text": "the menu's weight is the plate's total (245 g read, 300 g printed), with the menu's tighter range"
+    },
+    {
+     "ok": true,
+     "text": "the menu is kept with the visit, one question open"
+    },
+    {
+     "ok": true,
+     "text": "the one question: which of the two, or Neither"
+    },
+    {
+     "ok": true,
+     "text": "the limit is said: a menu weight is the kitchen's word"
+    },
+    {
+     "ok": true,
+     "text": "every button at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "the answer matches the plate and the question goes"
+    },
+    {
+     "ok": true,
+     "text": "the menu fits the width"
+    },
+    {
+     "ok": true,
+     "text": "back on Recipes the visit says The menu"
+    },
+    {
+     "ok": true,
+     "text": "the plate opens: its name, the Served mark, the visit"
+    },
+    {
+     "ok": true,
+     "text": "the honest line"
+    },
+    {
+     "ok": true,
+     "text": "the photo and the foods as read"
+    },
+    {
+     "ok": true,
+     "text": "the plate says its line on the menu, and that its amounts follow the menu"
+    },
+    {
+     "ok": true,
+     "text": "energy, protein, fat, carbs and PD, each about a number with its range: Energy about 677 kcal 570 to 830 | Protein about 53 g 44 to 61 g | Fat about 17 g 14 to 24 g | Carbs about 74 g 63 to 85 g | PD about 7.8 5.5 to 10.6"
+    },
+    {
+     "ok": true,
+     "text": "the range holds the number; fat reaches further up than down (14, 17, 24)"
+    },
+    {
+     "ok": true,
+     "text": "the line under the table says it is a guess"
+    },
+    {
+     "ok": true,
+     "text": "Share the numbers draws the picture"
+    },
+    {
+     "ok": true,
+     "text": "the picture is 1080 by 1350: 1080x1350"
+    },
+    {
+     "ok": true,
+     "text": "Send it hands one picture to the share sheet: [{\"title\":\"Marko's quesadilla\",\"files\":[{\"name\":\"marko-s-quesadilla.jpg\",\"type\":\"image/jpeg\",\"size\":119132}]}]"
+    },
+    {
+     "ok": true,
+     "text": "its buttons are at least 44 px"
+    },
+    {
+     "ok": true,
+     "text": "Back returns to the plate"
+    },
+    {
+     "ok": true,
+     "text": "no cooking; I ate this and Put it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "every button at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "Not this takes the match off; the amounts are the photo's again, with its wider range for their size (about 677, 570 to 830 was; about 411, 320 to 570 now)"
+    },
+    {
+     "ok": true,
+     "text": "the open plate says it is someone else's"
+    },
+    {
+     "ok": true,
+     "text": "a tap makes it mine"
+    },
+    {
+     "ok": true,
+     "text": "and someone else's again"
+    },
+    {
+     "ok": true,
+     "text": "Remove asks first"
+    },
+    {
+     "ok": true,
+     "text": "it asks when; your two dishes and the one meal's total, not Marko's"
+    },
+    {
+     "ok": true,
+     "text": "the meal's range under the total: 640 to 990 kcal"
+    },
+    {
+     "ok": true,
+     "text": "the day of the photo and the meal by its time are set"
+    },
+    {
+     "ok": true,
+     "text": "the button says where it goes: Put it in Saturday's lunch, eaten"
+    },
+    {
+     "ok": true,
+     "text": "one meal logged: four foods, named after the main, in Saturday's lunch"
+    },
+    {
+     "ok": true,
+     "text": "the plates stay in Served; yours say they were eaten"
+    },
+    {
+     "ok": true,
+     "text": "the open plate says it is in your day"
+    },
+    {
+     "ok": true,
+     "text": "an eaten plate said to be someone else's: the meal stays in your day"
+    },
+    {
+     "ok": true,
+     "text": "Today shows the meal with its photo"
+    },
+    {
+     "ok": true,
+     "text": "Remove this plate takes it off and goes back to Recipes"
+    },
+    {
+     "ok": true,
+     "text": "Put it on the Plate: its foods are on the Plate, the plate stays in Served"
+    },
+    {
+     "ok": true,
+     "text": "a dish the read cannot name is a main; a plate soon after joins the visit"
+    },
+    {
+     "ok": true,
+     "text": "Don't keep it: off the list, the Plate keeps its foods and says so"
+    },
+    {
+     "ok": true,
+     "text": "Read it again on a plate you did not keep: still not kept"
+    },
+    {
+     "ok": true,
+     "text": "a plate kept as Served"
+    },
+    {
+     "ok": true,
+     "text": "the pencil's sheet says what each choice does (changed by B150: No meal selected, and Don't count it keeps a photo's plate)"
+    },
+    {
+     "ok": true,
+     "text": "the pencil on Dinner: your meal again, out of Served, the foods stay, nothing logged"
+    },
+    {
+     "ok": true,
+     "text": "the Served card is gone and the meal's read asks Did you eat it? (changed by B150 and DT318: the photo was read as yours, so its read shows)"
+    },
+    {
+     "ok": true,
+     "text": "changed by B150: the row No meal selected: no meal, and the plate is not kept as Served by it"
+    },
+    {
+     "ok": true,
+     "text": "changed by B150: Don't count it: kept as Served, not counted; nothing logged"
+    },
+    {
+     "ok": true,
+     "text": "the Served card shows and the buttons are a kept plate's"
+    },
+    {
+     "ok": true,
+     "text": "the dish was not read for this plate, so only the name says filled by Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "a recipe as a new plate: the Plate has the recipe, the Served plate keeps its own foods: Apple strudel"
+    },
+    {
+     "ok": true,
+     "text": "the Served card is off the Plate"
+    },
+    {
+     "ok": true,
+     "text": "emptying the Plate leaves the kept plate in Served"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the group in the language: Posluženo · 1 poseta, 3 tanjira"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: Recipes fits the width"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the plate in the language, fits the width: 390/390 "
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: I ate this in the language, fits the width: Upiši kao pojedeno: subota, ručak"
+    },
+    {
+     "ok": true,
+     "text": "de: the group in the language: Serviert · 1 Besuch, 3 Teller"
+    },
+    {
+     "ok": true,
+     "text": "de: Recipes fits the width"
+    },
+    {
+     "ok": true,
+     "text": "de: the plate in the language, fits the width: 360/360 "
+    },
+    {
+     "ok": true,
+     "text": "de: I ate this in the language, fits the width: Als gegessen eintragen: Samstag, Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 34 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "step-names.cjs",
+   "about": "B163 (0.3.189, board Stories290; Coach Milan, Go 23 November 2026, 20:57): a food's name in a step is cut only at a comma with a space after it, so Körniger Frischkäse Tworog 2,5% Fett stays whole; a pack's name (a barcode, or read from a label) stays as printed, with its capitals; a basic food is in small letters (2 eggs); the name comes from the food each time, so steps written before read right, on the recipe, in Edit recipe and in Start cooking. B169 (0.3.194, board B169, canvas Page 6; Coach Milan, Go 25 November 2026, 16:04): the app's first starter foods (typical values, check your pack) were saved as read from a label; they are basic foods, so a step names them in small letters.",
+   "pass": true,
+   "seconds": 3,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B163 AC1: the decimal comma stays: Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 3 g Alpen JodSalz and 2 eggs (L)."
+    },
+    {
+     "ok": true,
+     "text": "B163 AC2: a pack's name as printed"
+    },
+    {
+     "ok": true,
+     "text": "B163 AC3: basic foods in small letters, cut at a comma with a space"
+    },
+    {
+     "ok": true,
+     "text": "B169 AC1: a first starter food in small letters: Bake at 200 °C for 25 minutes and serve with 100 g rice."
+    },
+    {
+     "ok": true,
+     "text": "B169 AC3: a pack's name as printed, as before"
+    },
+    {
+     "ok": true,
+     "text": "B169 AC2: in Edit recipe too: Bake at 200 °C for 25 minutes and serve with 100 g rice."
+    },
+    {
+     "ok": true,
+     "text": "B163 AC4: steps written before, in Edit recipe: Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 3 g Alpen JodSalz and 2 eggs (L)."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 29 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "step-pics.cjs",
+   "about": "DT276 (board Stories205; Coach Milan 10 November 21:24 to 22:37, Go). Step 1 (0.3.127): a step's picture is the recipe's and every place shows it: the recipe page, cook mode and Make's tick list. Step 2 (0.3.129): a step can have two or more pictures. A new photo is added next to the others, nothing is replaced, nothing is asked; the first is the one the recipe page shows; a picture can be made the first or taken off the step; the step pictures show among the recipe's photos.",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the recipe page shows step 1's first picture, and 1 of 2"
+    },
+    {
+     "ok": true,
+     "text": "DT281: the number at the top left, the photo wide beside it, the words under it; a step with no photo has none: {\"numLeft\":true,\"top\":true,\"under\":true,\"wide\":true,\"noPic\":true}"
+    },
+    {
+     "ok": true,
+     "text": "DT281: 1 of 2 shows the second"
+    },
+    {
+     "ok": true,
+     "text": "DT280: the two step pictures are in the recipe's one gallery, each with its step number"
+    },
+    {
+     "ok": true,
+     "text": "cook mode shows step 1's first picture, 1 of 2"
+    },
+    {
+     "ok": true,
+     "text": "a tap shows the second, 2 of 2"
+    },
+    {
+     "ok": true,
+     "text": "the link says Add another photo, not Take it again"
+    },
+    {
+     "ok": true,
+     "text": "Make lists the three steps"
+    },
+    {
+     "ok": true,
+     "text": "Make's tick list shows both pictures of step 1, the same first one"
+    },
+    {
+     "ok": true,
+     "text": "step 1 still has + Photo for one more"
+    },
+    {
+     "ok": true,
+     "text": "DT281: on every step the photos and + Photo sit above the words, aligned with them; the tick at the top left beside the photos: true,true,true"
+    },
+    {
+     "ok": true,
+     "text": "steps 2 and 3 have no picture and say + Photo"
+    },
+    {
+     "ok": true,
+     "text": "a new photo on a pictured step is the third; the two stay"
+    },
+    {
+     "ok": true,
+     "text": "nothing is asked"
+    },
+    {
+     "ok": true,
+     "text": "the first photo of step 2 sits at step 2's place"
+    },
+    {
+     "ok": true,
+     "text": "a tap on the third shows it large, with Make it first and why"
+    },
+    {
+     "ok": true,
+     "text": "its buttons are 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "it is the first now; the old first is still on the step"
+    },
+    {
+     "ok": true,
+     "text": "the first picture has no Make it first"
+    },
+    {
+     "ok": true,
+     "text": "removed: two left, and the next one took the first place"
+    },
+    {
+     "ok": true,
+     "text": "Make's list with a picture open fits 360 px"
+    },
+    {
+     "ok": true,
+     "text": "the gallery has the three photos, with their step numbers"
+    },
+    {
+     "ok": true,
+     "text": "a tap on a step's photo picks it in the gallery, with its choices"
+    },
+    {
+     "ok": true,
+     "text": "On step 3: it leaves step 1 and is on step 3"
+    },
+    {
+     "ok": true,
+     "text": "Delete this photo asks Sure? first"
+    },
+    {
+     "ok": true,
+     "text": "the second tap deletes it: two photos left"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the recipe page in the language, fits the width: Dodaj slike koracima"
+    },
+    {
+     "ok": true,
+     "text": "de: the recipe page in the language, fits the width: Fotos zu den Schritten hinzufügen"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "step-pictures.cjs",
+   "about": "DT175a (0.3.18, board Stories123 v2; Coach Milan 30 October 20:16 Go): a picture per step, Beta. Added from the gallery (or the camera), who made it asked, the checks shown, Keep it; AI · Beta under the thumbnail; Watch the steps once every step has one, playing them with words under the picture, numbers to jump, Cook it as written; in cook mode the picture on top of the step with its label under it; six step buttons to jump (only Next ticks), and go to step N by voice. Pictures are files: they survive a reload and leave the saved data. Nothing goes to members.",
+   "pass": true,
+   "seconds": 49,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the recipe shows the step photos; no + slots"
+    },
+    {
+     "ok": true,
+     "text": "AI · Beta under step 1's picture, no label under your photo of step 2"
+    },
+    {
+     "ok": true,
+     "text": "every picture button is 44 px or more: 215,215,215,215,215,215"
+    },
+    {
+     "ok": true,
+     "text": "labels 12 px or more: 12"
+    },
+    {
+     "ok": true,
+     "text": "the cover plays the steps, without sound, which step under it"
+    },
+    {
+     "ok": true,
+     "text": "then it rests on the cover, ▶ in the middle; 6 steps, about 30 seconds, drawn by AI"
+    },
+    {
+     "ok": true,
+     "text": "saved data: fingerprints and who made each, not the pictures"
+    },
+    {
+     "ok": true,
+     "text": "after a reload the six pictures are back"
+    },
+    {
+     "ok": true,
+     "text": "it plays from step 1, the words, the timer and the label under the picture"
+    },
+    {
+     "ok": true,
+     "text": "about 5 seconds later, step 2; Your photo under it"
+    },
+    {
+     "ok": true,
+     "text": "a number jumps to its step"
+    },
+    {
+     "ok": true,
+     "text": "Pause holds the step"
+    },
+    {
+     "ok": true,
+     "text": "Start cooking from the player goes straight to Make, cook mode open"
+    },
+    {
+     "ok": true,
+     "text": "cook mode: the step's picture on top, its label under it"
+    },
+    {
+     "ok": true,
+     "text": "six step buttons, 44 px high"
+    },
+    {
+     "ok": true,
+     "text": "tap 4: step 4, read aloud"
+    },
+    {
+     "ok": true,
+     "text": "jumping ahead ticks nothing"
+    },
+    {
+     "ok": true,
+     "text": "Next ticks step 4"
+    },
+    {
+     "ok": true,
+     "text": "go to step 2, by voice; Your photo under its picture"
+    },
+    {
+     "ok": true,
+     "text": "a step that isn't there: says how many there are"
+    },
+    {
+     "ok": true,
+     "text": "a picture removed: five left, the cover is a photo again until the sixth"
+    },
+    {
+     "ok": true,
+     "text": "step 1 rewritten: its picture goes; the other four stay with their steps"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "step-typing.cjs",
+   "about": "B161 (0.3.190, board Stories291; Coach Milan 23 November 2026, 21:39: implement it and we will see): with Samsung Keyboard a space at the end of a step dropped the cursor. The keyboard builds each word in a draft (composition); nothing is read while a word is built, the steps go up a moment after the last key or when the field is left. Typed here with the browser's own keyboard commands, a space then a word built letter by letter: the cursor stays, the word is kept, Save changes keeps it.",
+   "pass": true,
+   "seconds": 5,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B161 AC1: after a space at the end, the cursor is still in step 2"
+    },
+    {
+     "ok": true,
+     "text": "B161 AC1: words built by the keyboard, the cursor stays"
+    },
+    {
+     "ok": true,
+     "text": "B161 AC1: the step holds the new words: Put baking paper and lay out 375 g Frischer Blätterteig on the tray."
+    },
+    {
+     "ok": true,
+     "text": "B161 AC3: the food's button keeps its tick"
+    },
+    {
+     "ok": true,
+     "text": "B161 AC2: Save changes keeps it: Put baking paper and lay out [[i:b|frischer blätterteig]] on the tray."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "steps-and-parts.cjs",
+   "about": "DT345 and B162 (0.3.188, boards Stories289 and Stories288; Coach Milan, Go 23 November 2026, 20:36), from his recipe Lazy burek: in Edit recipe, + Step here between two steps puts an empty step there with the cursor in it, saved in its place; + Add a step still adds at the end; an empty step goes on save. The recipe page shows each part once, in the order the parts first come; foods with no part last, under Other; a recipe with no parts shows no heading.",
+   "pass": true,
+   "seconds": 8,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B162 AC1, AC2: each part once, no part last under Other: #Filling | Grainy cream cheese | Salt | Eggs | Feta, light | Avocado oil | #Base | Puff pastry | #Other | Sesame seeds"
+    },
+    {
+     "ok": true,
+     "text": "B162: nothing stored changes"
+    },
+    {
+     "ok": true,
+     "text": "DT345: + Step here between each two of five steps: 4"
+    },
+    {
+     "ok": true,
+     "text": "DT345: 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "DT345 AC1: an empty step 4, the cursor in it: Step 4"
+    },
+    {
+     "ok": true,
+     "text": "DT345 AC1: six steps now"
+    },
+    {
+     "ok": true,
+     "text": "DT345 AC2, AC3, AC4: saved in its place, the end step at the end, the empty one gone: 7"
+    },
+    {
+     "ok": true,
+     "text": "B162 AC3: no parts, no heading"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 66 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "steps-own-amounts.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 18 October 2026, 15:50 to 15:59, story R14 on canvas board RS11): a recipe can hold one food twice, like flour in the dough and flour for dusting. Each step names its own one, with its own amount: on How to make it for the whole recipe and for just your plate, the dusting step says what the plate lists for dusting, never the dough's flour. Never rewrite these lines to fit a change. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters.",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the plate lists both flours, the dough's and the dusting's: [61,3]"
+    },
+    {
+     "ok": true,
+     "text": "the whole recipe: 563 g in the dough, 31 g for dusting"
+    },
+    {
+     "ok": true,
+     "text": "just your plate: each flour as the plate lists it (61 g all-purpose flour; 3 g all-purpose flour)"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 33 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "the-cook.cjs",
+   "about": "DT211 v9, DT212 v4 and DT214 v2 (0.3.53, boards Stories158, Stories159 and Stories162; Coach Milan 2 November 12:52 to 12:54, all as proposed, Go): one cook, from Start cooking to how it carried you. Start cooking sits in the recipe's Steps block and opens cook mode; Make has + Photo on each step, the final photo and How did the cooking go?, Chef Mealan's line; leaving keeps everything and a strip says where it stands; coming back, Chef Mealan asks to go on; Eat asks how much and how it tasted; 30 minutes on, the last answer closes the cook. A plate from earlier asks Did you eat it?, alone; Save for later waits at the top of the Plate with Continue; Start cooking never adds to a plate; a food while cooking asks where it goes. Changed by story DT313 (0.3.159, board Stories250; Coach Milan, Go 18 November 15:56): check 10 reads the question a recipe gets now, on the photo's screen: the question is the line under Chef Mealan's, and the two buttons are as before. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs). changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?",
+   "pass": true,
+   "seconds": 77,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Start cooking sits at the end of the Steps block"
+    },
+    {
+     "ok": true,
+     "text": "its line says what it does"
+    },
+    {
+     "ok": true,
+     "text": "Cook it as written is gone; Put it on the Plate stays"
+    },
+    {
+     "ok": true,
+     "text": "Put it on the Plate is there"
+    },
+    {
+     "ok": true,
+     "text": "no + slots on the recipe; photos come from cooking"
+    },
+    {
+     "ok": true,
+     "text": "Photo is the one word: no Picture on the recipe"
+    },
+    {
+     "ok": true,
+     "text": "no steps: Start cooking is grey, with why"
+    },
+    {
+     "ok": true,
+     "text": "Start cooking opens cook mode, the steps read aloud"
+    },
+    {
+     "ok": true,
+     "text": "the steps are Prep, Make, Eat (DT230)"
+    },
+    {
+     "ok": true,
+     "text": "the steps block says what the ticks are for"
+    },
+    {
+     "ok": true,
+     "text": "each step has + Photo beside its tick"
+    },
+    {
+     "ok": true,
+     "text": "the photo shows on its step"
+    },
+    {
+     "ok": true,
+     "text": "the final photo, then Chef Mealan asks how the cooking went"
+    },
+    {
+     "ok": true,
+     "text": "Make ends on Cooked. Next: Eat"
+    },
+    {
+     "ok": true,
+     "text": "the cook keeps the ticks and the photo from the first tap"
+    },
+    {
+     "ok": true,
+     "text": "the step photo is the recipe's step photo, the step had none"
+    },
+    {
+     "ok": true,
+     "text": "Today: Cooking now, the dish, the step"
+    },
+    {
+     "ok": true,
+     "text": "the strip sits under the My goal block, never above the title"
+    },
+    {
+     "ok": true,
+     "text": "the Plate is free; the dish waits with the cook"
+    },
+    {
+     "ok": true,
+     "text": "the Plate is empty, with the cook's strip"
+    },
+    {
+     "ok": true,
+     "text": "Chef Mealan asks: use it in the dish, put it on the Plate, or keep it in your foods"
+    },
+    {
+     "ok": true,
+     "text": "Use it: what it replaces, or Add it"
+    },
+    {
+     "ok": true,
+     "text": "the steps follow: the skyr in the spinach's place"
+    },
+    {
+     "ok": true,
+     "text": "no strip on Recipes (Coach Milan 19:00: Today and the Plate only)"
+    },
+    {
+     "ok": true,
+     "text": "no strip on Plan either"
+    },
+    {
+     "ok": true,
+     "text": "Go on: Chef Mealan picks up where you left off"
+    },
+    {
+     "ok": true,
+     "text": "the ticks and the photo are all there"
+    },
+    {
+     "ok": true,
+     "text": "the app closed and opened again: nothing lost"
+    },
+    {
+     "ok": true,
+     "text": "Eat: how was it?, Back to making it"
+    },
+    {
+     "ok": true,
+     "text": "Chef Mealan asks how much, then how it tasted"
+    },
+    {
+     "ok": true,
+     "text": "DT225: Eat asks for your words, kept on the recipe, only for you"
+    },
+    {
+     "ok": true,
+     "text": "eaten: the cook waits for the last question; the card keeps the step's photo with its step"
+    },
+    {
+     "ok": true,
+     "text": "the strip says when Chef Mealan asks"
+    },
+    {
+     "ok": true,
+     "text": "DT218: after eating the strip has a ✕, 44 px"
+    },
+    {
+     "ok": true,
+     "text": "DT218: Go on lands on Today with the question open on the meal's card"
+    },
+    {
+     "ok": true,
+     "text": "no strip on Explorer (Coach Milan 18:30)"
+    },
+    {
+     "ok": true,
+     "text": "30 minutes on: his line on the meal's card"
+    },
+    {
+     "ok": true,
+     "text": "the answer closes the cook, it says so"
+    },
+    {
+     "ok": true,
+     "text": "answered: the strip goes, the card keeps it all"
+    },
+    {
+     "ok": true,
+     "text": "the recipe collects its cooks"
+    },
+    {
+     "ok": true,
+     "text": "DT225: the row of this meal, under Edit recipe: Every time you ate itOnly you see this. Your coach sees a meal you share.Today, 12:00 · cooked1 portion, 368 g · DaaM good · carried you: light and awake“I felt so energized.”›"
+    },
+    {
+     "ok": true,
+     "text": "a plate from earlier opens on one question, Chef Mealan's line"
+    },
+    {
+     "ok": true,
+     "text": "the question shows alone; the foods wait behind it"
+    },
+    {
+     "ok": true,
+     "text": "Ate it, Save for later, Keep working on it, Clear it"
+    },
+    {
+     "ok": true,
+     "text": "it waits at the top of the Plate, with Continue"
+    },
+    {
+     "ok": true,
+     "text": "the Plate is free"
+    },
+    {
+     "ok": true,
+     "text": "DT227: a ✕ on the row; the hint about swiping is gone"
+    },
+    {
+     "ok": true,
+     "text": "DT227: ✕ asks once more: Tap again to remove, or Keep"
+    },
+    {
+     "ok": true,
+     "text": "DT227: Keep keeps it"
+    },
+    {
+     "ok": true,
+     "text": "Continue puts it back"
+    },
+    {
+     "ok": true,
+     "text": "back as it was, from yesterday, so it asks again"
+    },
+    {
+     "ok": true,
+     "text": "Keep working on it opens it as it is"
+    },
+    {
+     "ok": true,
+     "text": "and that plate is not asked about again"
+    },
+    {
+     "ok": true,
+     "text": "Start cooking with foods on the Plate: save yours for later, or clear it"
+    },
+    {
+     "ok": true,
+     "text": "the recipe on its own plate, cooking; your plate waits for later"
+    },
+    {
+     "ok": true,
+     "text": "DT227: Saved for later stays off a Plate that is being worked on"
+    },
+    {
+     "ok": true,
+     "text": "DT227: the recipe says its draft waits on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "DT227: Continue opens the draft on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "the plate question: Chef Mealan says what arrives, and the question stands under his line"
+    },
+    {
+     "ok": true,
+     "text": "its buttons stay inside, one under the other"
+    },
+    {
+     "ok": true,
+     "text": "and it shows alone"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 114 account writes from 4 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "travel-mode.cjs",
+   "about": "DT176 (0.3.19, board Stories124; Coach Milan 30 October 20:51 Go): Travel mode, a manual switch on Me. On asks where and what kitchen; a banner on every tab with Turn off; weigh-in pauses; the Plate says where it serves you; a hotel hides Start cooking; Chef Mealan is told the kitchen and the place with every food request; Your summary says so; days away are marked; off keeps the trip and says welcome back once. Nothing in the profile changes.",
+   "pass": true,
+   "seconds": 19,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Me: Travel mode, off, with Turn on"
+    },
+    {
+     "ok": true,
+     "text": "weigh-in as usual"
+    },
+    {
+     "ok": true,
+     "text": "where: every place but home"
+    },
+    {
+     "ok": true,
+     "text": "Turn on waits for what you have there"
+    },
+    {
+     "ok": true,
+     "text": "Where do you stay? and the three choices fit the phone"
+    },
+    {
+     "ok": true,
+     "text": "every button 44 px or more: 44,44,44,44,44,44,44,44,44,44,88,55,73,44,48"
+    },
+    {
+     "ok": true,
+     "text": "on: Belgrade, hotel, weigh-in paused; the profile unchanged"
+    },
+    {
+     "ok": true,
+     "text": "Me says it is on, since today"
+    },
+    {
+     "ok": true,
+     "text": "weigh-in paused"
+    },
+    {
+     "ok": true,
+     "text": "home stays Munich"
+    },
+    {
+     "ok": true,
+     "text": "Today: the travel banner"
+    },
+    {
+     "ok": true,
+     "text": "Plan: the travel banner"
+    },
+    {
+     "ok": true,
+     "text": "Plate: the travel banner"
+    },
+    {
+     "ok": true,
+     "text": "Recipes: the travel banner"
+    },
+    {
+     "ok": true,
+     "text": "the Plate says where it serves you and what the kitchen allows"
+    },
+    {
+     "ok": true,
+     "text": "Chef Mealan is told: a hotel with no kitchen, in Belgrade"
+    },
+    {
+     "ok": true,
+     "text": "a hotel: Start cooking is off; the steps stay to tick"
+    },
+    {
+     "ok": true,
+     "text": "the banner says since Tuesday"
+    },
+    {
+     "ok": true,
+     "text": "an earlier day says Travelling · Belgrade"
+    },
+    {
+     "ok": true,
+     "text": "Your summary shows Travel mode"
+    },
+    {
+     "ok": true,
+     "text": "Turn off: the banner goes"
+    },
+    {
+     "ok": true,
+     "text": "the trip is kept: Belgrade, 27 to 30 October, 4 days"
+    },
+    {
+     "ok": true,
+     "text": "Me: welcome back, 4 days, Belgrade"
+    },
+    {
+     "ok": true,
+     "text": "weigh-in is back"
+    },
+    {
+     "ok": true,
+     "text": "OK: the card is back to Turn on"
+    },
+    {
+     "ok": true,
+     "text": "the trip's days stay marked"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "voice-and-photos.cjs",
+   "about": "DT248 and DT249 (0.3.98, board Stories184; Coach Milan 7 November 05:54 to 06:14, Go). DT248: cook mode in Srpski with an English recipe: what it says of its own is in Srpski, with a Srpski voice; the step's own words in the recipe's language; it listens in Srpski. In English nothing changes: one utterance, Step 1. and the step. Say what you have on the Plate listens in the app's language. DT249: the photo of the meal as it is, nothing over it; every photo of the meal under it, a tap swaps it with the big one; the foods under the photos.",
+   "pass": true,
+   "seconds": 24,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Korak 1., with a Srpski voice: [\"Korak 1.\",\"sr-RS\"]"
+    },
+    {
+     "ok": true,
+     "text": "the step's own words in the recipe's language, English: [\"Cook the rice in salted water for 12 minutes.\",\"en-GB\"]"
+    },
+    {
+     "ok": true,
+     "text": "it listens in Srpski"
+    },
+    {
+     "ok": true,
+     "text": "Schritt 1., German voice; the English recipe's step, English voice: [[\"Schritt 1.\",\"de-DE\"],[\"Cook the rice in salted water for 12 minutes.\",\"en-GB\"]]"
+    },
+    {
+     "ok": true,
+     "text": "not caught: in German"
+    },
+    {
+     "ok": true,
+     "text": "weiter: Schritt 2., then the step in English"
+    },
+    {
+     "ok": true,
+     "text": "in English: Step 1. and the step, as one: [\"Step 1. Cook the rice in salted water for 12 minutes.\",\"en-GB\"]"
+    },
+    {
+     "ok": true,
+     "text": "Chef Mealan's chat listens in Srpski"
+    },
+    {
+     "ok": true,
+     "text": "nothing is drawn over the photo"
+    },
+    {
+     "ok": true,
+     "text": "the photo is shown as it is, not cut"
+    },
+    {
+     "ok": true,
+     "text": "both photos of the meal are under it"
+    },
+    {
+     "ok": true,
+     "text": "the small photos are 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "the foods are under the photos, each with its amount"
+    },
+    {
+     "ok": true,
+     "text": "a tap swaps the second photo in, big"
+    },
+    {
+     "ok": true,
+     "text": "and back"
+    },
+    {
+     "ok": true,
+     "text": "nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "save check: 123 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "voice-commands.cjs",
+   "about": "DT255 (0.3.110, board Stories190; Coach Milan 7 November 22:25, Go): cook mode hears its commands in Srpski and German. HOWTO: handsFree (DT260): this walkthrough follows How to's situation handsFree; when it fails after a screen changed, update that situation's steps in src/i18n/en.json A timer by voice, a step's own minutes with their timer button, what is left, a step by its number, a food in any ending.",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Get it ready says each food by its own name, not as a step bends it (na ulju): 250 g pasulj🔊 | 120 g crni luk | 15 g suncokretovo ulje"
+    },
+    {
+     "ok": true,
+     "text": "Srpski: the step's 10 minuta gets its timer button"
+    },
+    {
+     "ok": true,
+     "text": "tajmer 5 minuta: a timer, said back in Srpski: Tajmer (Crni luk): 5 minuta."
+    },
+    {
+     "ok": true,
+     "text": "koliko pasulja finds pasulj: 250 g pasulj. U koraku 2."
+    },
+    {
+     "ok": true,
+     "text": "šta je ostalo says what is left: Posle ovog još 1 korak. Sledeći: Dodaj 250 g pasulj, sve stavi u vatrostalnu posudu i peci 40 minuta na 200 °C."
+    },
+    {
+     "ok": true,
+     "text": "idi na korak dva goes to step 2"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch, a translated recipe's foods as its steps name them: 250 g Bohnen🔊 | 120 g Zwiebel | 15 g Öl"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch: the step's 10 Minuten gets its timer button"
+    },
+    {
+     "ok": true,
+     "text": "Timer auf zehn Minuten: Timer (Zwiebel): 10 Minuten."
+    },
+    {
+     "ok": true,
+     "text": "wie viel Bohnen: 250 g Bohnen. In Schritt 2."
+    },
+    {
+     "ok": true,
+     "text": "was fehlt noch: Danach noch 1 Schritt. Als Nächstes: Gib die 250 g Bohnen dazu, gib alles in eine Auflaufform und backe es 40 Minuten bei 200 °C."
+    },
+    {
+     "ok": true,
+     "text": "Schritt 2 goes to step 2"
+    },
+    {
+     "ok": true,
+     "text": "save check: 50 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "voice-settings.cjs",
+   "about": "DT215 v3 (0.3.66, board Stories162b; Coach Milan 2 November 23:22 to 23:37, Go): Settings in the Menu, a list like Me: Voice while cooking (its line says what is set), Language and Units Coming soon. Voice while cooking: Read aloud, the phone's voices with ▶ Sample, Speed, Cut in. Cook mode reads with the voice and speed chosen, and its Voice › opens the same page; Back to cooking returns to the step. The phone's voices are stand-ins here.",
+   "pass": true,
+   "seconds": 9,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the Menu has Settings under Foods, its line says what is in it"
+    },
+    {
+     "ok": true,
+     "text": "Settings: Voice while cooking with its line; Language and Units Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "the phone's voices, English first, five then Show all: Daniel, Karen, Moira, Samantha, Serena"
+    },
+    {
+     "ok": true,
+     "text": "▶ Sample reads one step with that voice"
+    },
+    {
+     "ok": true,
+     "text": "the choice is kept on this phone: Serena, faster, cut in off"
+    },
+    {
+     "ok": true,
+     "text": "back on Settings, the line says what is set"
+    },
+    {
+     "ok": true,
+     "text": "cook mode reads with Serena, faster: {\"text\":\"Step 2. Fry 160 grams chicken 6 minutes.\",\"rate\":1.15,\"voice\":\"Serena\"}"
+    },
+    {
+     "ok": true,
+     "text": "Voice › opens Voice while cooking over the cook"
+    },
+    {
+     "ok": true,
+     "text": "Back to cooking: the same step"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "B169 Light, widened to every walkthrough with steps (the recipe's steps, Edit recipe, Start cooking, Get it ready) and recipe-photos"
+}
