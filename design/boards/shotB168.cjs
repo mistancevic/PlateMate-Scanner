@@ -56,7 +56,10 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     await shot(p, "68-1b", ".rq-readout", "section.nt-card"); await clean(p);
     for (let i = 0; i < 3; i++) { await p.locator("section.rq-cook .rq-cook-row").getByRole("button").first().click(); await sleep(300); }
     console.log(await note(p, "section.rq-cook", "Cook it, three times −: it says <b>1 portions</b>, and the foods are for 1. It sits under the PD card, but the card does not follow it; it is about cooking, and looks like a button.", ["section.rq-cook .rq-cook-row"]));
-    await shot(p, "68-1c", "section.rq-cook", ".board-note"); await p.context().close();
+    await shot(p, "68-1c", "section.rq-cook", ".board-note"); await clean(p);
+    const CIF = "JS:[...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'Change it first')";
+    console.log(await note(p, CIF.replace("JS:", "JS:(") + ").nextElementSibling", "The same page, at its end: <b>Change it first</b> takes the recipe to the Plate. There is no way to plan the recipe from here.", [CIF]));
+    await shot(p, "68-1d", CIF, ".board-note"); await p.context().close();
     // ---- the Plate, main: the card the recipe page takes ----
     p = await open("3719", "/plate");
     for (const n of ["Skyr", "Oats", "Banana"]) { await (await require(path.join(OLD_ROOT, "tests/flows/more.cjs"))(p)).fill(n); await sleep(400); await p.locator(".row-food").filter({ hasText: n }).first().getByRole("button", { name: /Add/ }).click(); await sleep(700); }
@@ -68,40 +71,38 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     // ---- new, scratch build ----
     s2 = await serve(NEW_ROOT, "3720");
     p = await open("3720");
-    const FOODS = "section.rq-foods", HOW = "section.rq-howmuch", SEE = ".rq-see", COUNT = ".rq-count", LINE = ".rq-choice-line";
-    const chip = (box, text) => p.locator(`${box} .choice`).filter({ hasText: text }).first();
-    const TOP = "<b>Fixed:</b> the top is the recipe as written. It never moves, whatever is chosen below.";
+    const FOODS = "section.rq-foods", HOW = "section.rq-howmuch", LINE = ".rq-choice-line", ACT = "section.rq-actions";
+    const chip = (text) => p.locator(`${HOW} .choice`).filter({ hasText: text }).first();
     console.log(await note(p, ".rq-nopic", "<b>New:</b> no photo yet is a placeholder picture of a meal, in the photo's place; its two buttons sit on it.", [".rq-nopic"]));
-    console.log(await note(p, ".rq-readout", "<b>New, fixed:</b> the PD card is the whole recipe, as written: makes 4 servings, 2,194 kcal, 897 g, 93 g. The Plate's card: rows, PD's tap to the scale. It never follows the choice below.", [ROWS, "JS:document.querySelector('.rq-readout .readout-top span')"]));
-    console.log(await note(p, HOW, "<b>New:</b> How much, one block where everything follows the choice. <b>See it as</b>: Just looking, or one of my meals. Just looking counts the recipe's <b>servings</b>: 1 to 5, 4 as written, Other. The line gives the numbers for the choice. No Cook it card.", [SEE, COUNT, LINE]));
-    console.log(await note(p, FOODS, "<b>New:</b> Foods is one block, only the list, in grams for the choice above.", []));
+    console.log(await note(p, ".rq-readout", "<b>New, fixed:</b> the PD card is the Plate's card, for the whole recipe as written: 2,194 kcal, 897 g, 93 g. A short title, as the card's template. It never follows a choice below.", [".rq-readout"]));
+    console.log(await note(p, HOW, "<b>New:</b> Servings, the one choice on the page: 1 to 5 and Other, only numbers. The line gives the numbers for the choice. No Cook it card.", [HOW]));
+    console.log(await note(p, FOODS, "<b>New:</b> Foods is one block, only the list, in grams for the servings chosen.", []));
     console.log(await note(p, "section.nt-card", "<b>New word:</b> 1 SERVING, the recipe's equal share, the same for everyone; ALL 4 and 100 g beside it. Fixed, as the top (nutrition rule N17).", ["JS:document.querySelector('section.nt-card .nt-row.nt-th')"]));
     await shot(p, "68-2a", "main", "JS:document.querySelectorAll('.board-note')[4]"); await clean(p);
     await p.locator(".rq-readout .letters-row").click(); await sleep(500);
     console.log(await note(p, ".rq-readout + .nt", "<b>New:</b> the numbers open under the card, as on the Plate, and count the whole recipe: Total 897 g and 2,194 kcal, as the card says.", [".rq-readout + .nt .nt-total"]));
     await shot(p, "68-2b", ".rq-readout", ".board-note"); await clean(p);
     await p.locator(".rq-readout .letters-row").click(); await sleep(300);
-    await chip(COUNT, "2").click(); await sleep(500);
-    console.log(await note(p, ".rq-readout", TOP, []));
-    console.log(await note(p, FOODS, "<b>New:</b> 2 servings chosen: the line says 1,097 kcal, 449 g, and Foods for 2 servings follows: 125 g, 1 egg, 75 g, 188 g. Saved with the recipe; Start cooking cooks it.", [COUNT, LINE]));
+    await chip("2").click(); await sleep(500);
+    console.log(await note(p, ".rq-readout", "<b>Fixed:</b> the top is the recipe as written. It does not move.", []));
+    console.log(await note(p, FOODS, "<b>New:</b> 2 servings: the line says 1,097 kcal, 449 g, and Foods for 2 servings follows: 125 g, 1 egg, 75 g, 188 g. Saved with the recipe; Start cooking cooks it.", [HOW]));
     await shot(p, "68-2c", ".rq-readout", "JS:document.querySelectorAll('.board-note')[1]"); await clean(p);
-    await chip(COUNT, "Other").click(); await sleep(400);
-    for (let i = 0; i < 8; i++) { await p.locator(COUNT + " .rq-cook-row").getByRole("button").last().click(); await sleep(150); }
-    console.log(await note(p, FOODS, "<b>New:</b> Other opens − and + for an exact number: 10 servings, for a week of meal prep. The line and the foods are for 10.", [COUNT, LINE]));
+    await chip("Other").click(); await sleep(400);
+    for (let i = 0; i < 8; i++) { await p.locator(HOW + " .rq-cook-row").getByRole("button").last().click(); await sleep(150); }
+    console.log(await note(p, FOODS, "<b>New:</b> Other opens − and + for an exact number: 10 servings, for a week of meal prep. The line and the foods are for 10.", [HOW]));
     await shot(p, "68-2d", HOW, ".board-note"); await p.context().close();
-    // ---- B168.3: see it as one of my meals ----
+    // ---- B168.3: what do you do with it ----
     p = await open("3720");
-    console.log(await note(p, HOW, "The same page as B168.2a. I tap <b>Dinner</b>.", [SEE]));
-    await shot(p, "68-3a", ".rq-readout", ".board-note"); await clean(p);
-    await chip(SEE, "Dinner").click(); await sleep(500);
-    console.log(await note(p, ".rq-readout", TOP, []));
-    console.log(await note(p, FOODS, "<b>New:</b> seen as Dinner, the count is <b>portions</b>, mine: my dinner portion in grams, kcal and protein, calculated from my dinner today. The PD is the recipe's, 4.3. The line says how many of my portions the whole recipe is. Foods for 1 dinner portion follows. Someone else gets other grams from the same recipe. Not saved: it depends on the day.", [SEE, COUNT, LINE]));
-    await shot(p, "68-3b", ".rq-readout", "JS:document.querySelectorAll('.board-note')[1]"); await clean(p);
-    await chip(COUNT, "2").click(); await sleep(500);
-    console.log(await note(p, FOODS, "<b>New:</b> 2 portions: two of my dinners, today's and tomorrow's. The line and the foods are for both.", [COUNT, LINE]));
-    await shot(p, "68-3c", HOW, ".board-note"); await clean(p);
-    await chip(SEE, "Snack").click(); await sleep(500);
-    console.log(await note(p, FOODS, "<b>New:</b> the same recipe seen as a Snack: a smaller portion, the same PD.", [SEE, LINE]));
-    await shot(p, "68-3d", HOW, ".board-note"); await p.context().close();
+    console.log(await note(p, ACT, "<b>New:</b> the same page, at its end: What do you do with it? <b>Plan it</b> is new. <b>Put it on the Plate</b> was Change it first, moved in here. Start cooking stays at the steps, above. I tap Plan it.", [ACT]));
+    await shot(p, "68-3a", ACT, ".board-note"); await clean(p);
+    await p.locator(ACT).getByRole("button", { name: "Plan it" }).click(); await sleep(500);
+    console.log(await note(p, ACT, "<b>New:</b> the Plate's day and meal block opens in place: the days, and that day's meals with their time and state. I tap Dinner.", [ACT + " .pcal"]));
+    await shot(p, "68-3b", ACT, ".board-note"); await clean(p);
+    await p.locator(ACT + " .pcal-rows").getByText("Dinner").first().click(); await sleep(500);
+    console.log(await note(p, ACT, "<b>New:</b> with a day and a meal, my <b>portion</b> is calculated: the grams, kcal and protein for my dinner that day. The PD is the recipe's. Someone else gets other grams from the same recipe. I tap Put it in the plan.", [ACT + " " + LINE]));
+    await shot(p, "68-3c", ACT, ".board-note"); await clean(p);
+    await p.locator(ACT).getByRole("button", { name: "Put it in the plan" }).click(); await sleep(500);
+    console.log(await note(p, ACT, "<b>New:</b> it is in the plan, at my portion. The recipe page stays as it was.", [ACT + " " + LINE]));
+    await shot(p, "68-3d", ACT, ".board-note"); await p.context().close();
   } catch (e) { console.log("ERR", e.message.slice(0, 400)); } finally { await b.close(); s1?.kill(); s2?.kill(); }
 })();
