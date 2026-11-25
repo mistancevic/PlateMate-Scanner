@@ -4596,14 +4596,14 @@
       "open": [],
       "board": "Stories294",
       "where": "Page 6",
-      "rel": "Redrawn 25 November 2026, 13:50, with DT349 on one board; waits for Go"
+      "rel": "Redrawn 25 November 2026, 14:45, with DT349 on one board; waits for Go"
     },
     {
       "id": "DT349",
       "title": "The recipe page: the recipe as written on top, Servings and Foods, and What do you do with it? (Plan it, Put it on the Plate)",
       "epic": "cook",
       "state": "now",
-      "why": "Coach Milan 24 November 2026, 07:42: we need to have the same PD card layout as it is on the Plate; that should be also in the design system and components fixed. 07:58: ok, a new design ticket. 13:47 to 13:54: Cook it is more like a CTA; separate it from the portions for the numbers; drawn with B168 on one board. 14:49 to 14:50: the header is the meal (title, photo, PD card for the whole meal, Nutrition with portion, all and 100 g); a placeholder photo with the CTAs on it; portioning elsewhere, as chips. 15:14 and 17:38: Cook for, chips 1 to 5 for the usual cases and Other for an exact number: we need both. 22:26: Cook for counts servings (Makes 4 servings, Cook for 2 servings), never portions (nutrition rule N17). Board to redraw. 25 November 07:54 to 08:02: the page in two zones, the recipe as written on top, fixed; How much below, with See it as (Just looking counts servings, a meal counts my portions); Foods one block; the words Cook for go; DT351 merged in. Redrawn 08:30. 08:31 to 08:42: the card's title short; Servings with only numbers; no meal chips on the page; What do you do with it? with Plan it (the Plate's day and meal block, then my portion) and Put it on the Plate; Just looking is the page's state. Redrawn 09:00. 13:06: a chip is one tap, − and + always under the chips, grey until used, no Other chip; the PD card's words against the target on their own line, on the Plate too. Redrawn 13:30. 13:16 to 13:17: the PD card in two columns, each label heading its own (the rows under the title, the PD and its words under PD); three variations drawn (B168.5). Redrawn 13:50.",
+      "why": "Coach Milan 24 November 2026, 07:42: we need to have the same PD card layout as it is on the Plate; that should be also in the design system and components fixed. 07:58: ok, a new design ticket. 13:47 to 13:54: Cook it is more like a CTA; separate it from the portions for the numbers; drawn with B168 on one board. 14:49 to 14:50: the header is the meal (title, photo, PD card for the whole meal, Nutrition with portion, all and 100 g); a placeholder photo with the CTAs on it; portioning elsewhere, as chips. 15:14 and 17:38: Cook for, chips 1 to 5 for the usual cases and Other for an exact number: we need both. 22:26: Cook for counts servings (Makes 4 servings, Cook for 2 servings), never portions (nutrition rule N17). Board to redraw. 25 November 07:54 to 08:02: the page in two zones, the recipe as written on top, fixed; How much below, with See it as (Just looking counts servings, a meal counts my portions); Foods one block; the words Cook for go; DT351 merged in. Redrawn 08:30. 08:31 to 08:42: the card's title short; Servings with only numbers; no meal chips on the page; What do you do with it? with Plan it (the Plate's day and meal block, then my portion) and Put it on the Plate; Just looking is the page's state. Redrawn 09:00. 13:06: a chip is one tap, − and + always under the chips, grey until used, no Other chip; the PD card's words against the target on their own line, on the Plate too. Redrawn 13:30. 13:16 to 13:17: the PD card in two columns, each label heading its own (the rows under the title, the PD and its words under PD); three variations drawn (B168.5). Redrawn 13:50. 14:26: B (PD and its words on the left, the title and the rows on the right). Redrawn 14:45.",
       "opportunity": {
         "from": "Coach Milan 24 November 2026, 07:42, looking at the board B168; 13:44 to 14:50, brainstorm on the header and the portions.",
         "job": "Read a recipe's numbers the way I read a plate, and cook the batch I choose.",
@@ -4681,7 +4681,7 @@
         {
           "id": "AC13",
           "title": "The card's columns",
-          "text": "Given a PD card on the Plate or on a recipe page, when I read it, then Energy, Weight and Protein stand under the title, the PD and its words against my target (0.5 under your 4.8) under PD, and a long line such as High+, far above your plan stands under both, the full width of the card"
+          "text": "Given a PD card on the Plate or on a recipe page, when I read it, then the PD and its words against my target (0.5 under your 4.8) stand on the left under PD, Energy, Weight and Protein on the right under the title, and a long line such as High+, far above your plan stands under both, the full width of the card"
         }
       ],
       "unchanged": [
@@ -4702,7 +4702,7 @@
       "open": [],
       "board": "Stories294",
       "where": "Page 6",
-      "rel": "Redrawn 25 November 2026, 13:50, with B168 on one board; waits for Go"
+      "rel": "Redrawn 25 November 2026, 14:45, with B168 on one board; waits for Go"
     },
     {
       "id": "DT350",
@@ -4726,6 +4726,13 @@
       "epic": "cook",
       "state": "later",
       "why": "Coach Milan 24 November 2026, 19:04, after DT351: in the future a filter to search directly for, say, a lunch in the range of my PD target. Not drawn."
+    },
+    {
+      "id": "DT353",
+      "title": "A member's recipe page in the same structure as my own recipe's",
+      "epic": "cook",
+      "state": "next",
+      "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn."
     },
     {
       "id": "B167",
