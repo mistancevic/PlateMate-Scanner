@@ -40,7 +40,7 @@ How you talk to me:
 - Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 - When this chat gets long, give me this full starter prompt again, updated, never a short one.
 
-Next: B168 and DT349 are built in 0.3.193 and merged into main (dd5a8a7); I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). B169 is drawn on canvas Page 6 and waits for my Go: a starter food (typical values, check your pack) counts as a basic food, so a step says chicken breast in small letters (option A); it mends recipe-photos as written. Checks Light, every walkthrough with steps, release 0.3.194. The scratch build /home/claude/work/b169 is gone in a new chat: the change is one line in shortName, src/steps.ts. Then from Next: DT353 (a member's recipe page in the same structure), DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target).
+Next: 0.3.193 (B168 and DT349) and 0.3.194 (B169) are merged into main; I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). From Next: DT353 (a member's recipe page in the same structure), DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target). Propose a full run at the end of a day with lighter runs merged (ticket form, checks rule 6).
 ```
 
 ## Standing rules (Coach Milan)
@@ -69,7 +69,9 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 25 November 2026, 16:15
+## State, 25 November 2026, 16:25
+
+- 0.3.194 (B169) is merged into main as 2f73e1c (merge of pm194) and tagged v0.3.194 (local tag); Go 25 November 16:04, checks Light, every walkthrough with steps and recipe-photos, 37 of 37 (docs/qa/runs/0.3.194.json, 8 min). shortName in src/steps.ts: a food with brand typical values, check your pack is a basic food, small letters. Found while building: amountFor also lets a name the app wrote as printed (Chicken breast, steps saved from 0.3.189 to 0.3.193) follow the food. step-names.cjs has B169 AC1 to AC3 (a starter rice); recipe-photos passes as written (AC4). Unit tests 784. No new words, so the language tables stay at 0.3.193. With it every walkthrough passes on main: 0.3.193's full run plus this Light run. Coach Milan starts Preview and Promote.
 
 - B169 drawn 25 November 16:10 (Stories295, Page 6, x 0, y 97014, w 1310, h 3017; Coach Milan 15:55: its own ticket, first thing next; 15:59: A). Cause: the app's first starter foods were saved with source label and the line typical values, check your pack; since B163 (0.3.189) a name from a label stays as printed, so a step says Chicken breast. recipe-photos' chicken is such a food. Fix drawn: shortName treats that line as a basic food. Scratch /home/claude/work/b169 holds it. Board tools: shotB169.cjs, genB169.py, ticketB169.json, heightsB169.json, assetsB169.json. Checks proposed: Light, every walkthrough with steps (as B163), about 10 minutes; no new words. Lesson: B163 went out with Light checks and recipe-photos did not run for four releases.
 
@@ -158,8 +160,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - Stories292 B167 at x 0, y 78739, w 2670, h 3578.
 - Stories293 B165 and B166 at x 0, y 82437, w 1790, h 6466.
 - Stories294 B168 and DT349 at x 0, y 89023, w 4240, h 7871.
-- Stories295 B169 at x 0, y 97014, w 1310, h 3017.
-- The next board on Page 6 goes at x 0, y 100151.
+- Stories295 B169 at x 0, y 97014, w 1310, h 3100.
+- The next board on Page 6 goes at x 0, y 100234.
 - A sheet that scrolls is drawn as one tall picture: shotDT339.cjs unroll() opens its scroll boxes at their real width.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.193; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json of 0.3.193. 19 new or changed lines in 0.3.193, Srpski confirmed by Claude, German in Beta.
