@@ -40,7 +40,7 @@ How you talk to me:
 - Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 - When this chat gets long, give me this full starter prompt again, updated, never a short one.
 
-Next: 0.3.193 (B168 and DT349) and 0.3.194 (B169) are merged into main; I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). DT353 (a member's recipe page in the same structure as my own) is drawn on canvas Page 6 for discussion: the recipe as written on top, What do you do with it? (Plan it, Put it on the Plate, Save to My recipes); agreed so far: the page is for deciding (plan it as is, or take it to the Plate first), no Servings card, a note before the actions; no open question left (the pack names in small letters in a shared recipe's steps are their own bug, B170, Next; Coach Milan 16:57). Its agreement block is written (AC1 to AC9; checks Middle, Recipes and Members, plus the German sweep; release 0.3.195) and it waits for my Go. Plan it becomes one component for both pages (src/components/PlanIt.tsx). The scratch build /home/claude/work/b353 is gone in a new chat: MemberPage in src/components/Members.tsx was rewritten there. Then from Next: B170, DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target). Propose a full run at the end of a day with lighter runs merged (ticket form, checks rule 6).
+Next: 0.3.193 (B168 and DT349) and 0.3.194 (B169) are merged into main; I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). DT353 (a member's recipe page in the same structure as my own) is drawn on canvas Page 6 for discussion: the recipe as written on top, What do you do with it? (Plan it, Put it on the Plate, Save to My recipes); agreed so far: the page is for deciding (plan it as is, or take it to the Plate first), no Servings card, a note before the actions; no open question left (the pack names in small letters in a shared recipe's steps are their own bug, B170, Next; Coach Milan 16:57). Its agreement block is written (AC1 to AC10; Plan it stays white with an arrow, ⌄ closed and ⌃ open, on both pages; checks Middle, Recipes and Members, plus the German sweep; release 0.3.195) and it waits for my Go. Plan it becomes one component for both pages (src/components/PlanIt.tsx). The scratch build /home/claude/work/b353 is gone in a new chat: MemberPage in src/components/Members.tsx was rewritten there. Then from Next: B170, DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target). Propose a full run at the end of a day with lighter runs merged (ticket form, checks rule 6).
 ```
 
 ## Standing rules (Coach Milan)
@@ -69,7 +69,9 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 25 November 2026, 17:05
+## State, 25 November 2026, 17:20
+
+- DT353 redrawn 17:15 (Coach Milan 17:11: 2c, should Plan it turn blue because it is active, or stay white? 17:12: draw to see). Drawn: Plan it stays white with an arrow (span.pi-go, ⌄ closed, ⌃ open), the one filled button is Put it in the plan (design rules D1, D6); the same on my own recipe's Plan it. AC10. Stories296 h 5590. Scratch /home/claude/work/b353 has it in Members.tsx and RecipePage.tsx.
 
 - DT353's agreement block written 17:00 (Coach Milan 16:59: yes): AC1 to AC9, Checks Middle (a new walkthrough; covers-and-members and recipe-centre read the member's page and change with the story; recipe-servings, design-rules) plus the German sweep; release 0.3.195. Stories296 h 5510; Kanban column Now. B170 in Next (16:57). DT332 (Plan it on a recipe page) is still in Next though 0.3.193 built Plan it on my own recipes; proposed to close it as done in 0.3.193, not asked yet.
 
@@ -167,8 +169,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - Stories293 B165 and B166 at x 0, y 82437, w 1790, h 6466.
 - Stories294 B168 and DT349 at x 0, y 89023, w 4240, h 7871.
 - Stories295 B169 at x 0, y 97014, w 1310, h 3100.
-- Stories296 DT353 at x 0, y 100234, w 1790, h 5510.
-- The next board on Page 6 goes at x 0, y 105864.
+- Stories296 DT353 at x 0, y 100234, w 1790, h 5590.
+- The next board on Page 6 goes at x 0, y 105944.
 - A sheet that scrolls is drawn as one tall picture: shotDT339.cjs unroll() opens its scroll boxes at their real width.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.193; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json of 0.3.193. 19 new or changed lines in 0.3.193, Srpski confirmed by Claude, German in Beta.

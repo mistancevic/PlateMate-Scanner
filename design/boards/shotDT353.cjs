@@ -61,11 +61,11 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     await shot(p, "53-2a", TILE, ".board-note"); await clean(p); await tileOpen(p);
     console.log(await note(p, ".rq-readout", "<b>New:</b> the page opens on the recipe as the member wrote it: the PD card is PdCard, the whole recipe. The same as my own recipe's page (DT349).", [".rq-readout"]));
     console.log(await note(p, "section.rq-foods", "<b>New:</b> Foods as written; the steps say the recipe's amounts. A shared recipe does not carry how many it makes, so there is no Servings card (open, see the board).", ["section.rq-foods"]));
-    console.log(await note(p, "section.rq-actions", "<b>New:</b> What do you do with it? First a note: Sam's recipe as written, and where each way leads. Then the actions: Plan it as it is, Put it on the Plate (was Make it) to change foods, Save to My recipes (was Keep in mine) to choose the servings. No Servings card on this page: it is for deciding. I tap Plan it.", ["section.rq-actions .mb-decide", "section.rq-actions"]));
+    console.log(await note(p, "section.rq-actions", "<b>New:</b> What do you do with it? First a note: Sam's recipe as written, and where each way leads. Then the actions: Plan it as it is, Put it on the Plate (was Make it) to change foods, Save to My recipes (was Keep in mine) to choose the servings. Plan it has ⌄: it opens in place. No Servings card on this page: it is for deciding. I tap Plan it.", ["section.rq-actions .mb-decide", "section.rq-actions"]));
     await shot(p, "53-2b", ".rq", ".rq"); await clean(p);
     await p.locator("section.rq-actions").getByRole("button", { name: "Plan it" }).click(); await sleep(500);
     await p.locator("section.rq-actions .pcal-rows").getByText("Dinner").first().click(); await sleep(500);
-    console.log(await note(p, "section.rq-actions", "<b>New:</b> with a day and a meal, my <b>portion</b> is calculated: grams, kcal and protein for my dinner. The PD is the recipe's. Then Put it in the plan.", ["section.rq-actions .rq-choice-line"]));
+    console.log(await note(p, "section.rq-actions", "<b>New:</b> Plan it stays white, with ⌃: it is open, a tap closes it. With a day and a meal, my <b>portion</b> is calculated: grams, kcal and protein for my dinner. The PD is the recipe's. The one filled button is the main step, Put it in the plan (design rules D1, D6).", ["section.rq-actions .rq-choice-line", "JS:[...document.querySelectorAll('section.rq-actions button')].find((b) => /Plan it/.test(b.textContent))"]));
     await shot(p, "53-2c", "section.rq-actions", ".board-note"); await p.context().close();
   } catch (e) { console.log("ERR", e.message.slice(0, 300)); } finally { await b.close(); s1?.kill(); s2?.kill(); }
 })();

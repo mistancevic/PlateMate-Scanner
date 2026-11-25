@@ -29,7 +29,7 @@ parts = [("Ticket", "DT353. This board is the ticket: everything about it is her
   ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> DT353.1: Members, a recipe, as in main, 0.3.194. DT353.2: the same, new, and Plan it. A blue outline marks what each note is about."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "24 November 19:01: recipes from others should show the original macros and math, and be customized for the others looking at it. 25 November 16:25: yes (brainstorm DT353). 16:26: draw so we discuss it. 16:35: so the recipe stays as is from the creator and we calculate the portion, but how do the foods\' weights change for a new person and their portion size? 16:39: basically we use this page for the user to decide if it is worthy to take it to the Plate or already plan it as is. 16:41: yes (no Servings); we can make a note there, so that is part of the insight, and below is the CTA for them to proceed. 16:57: ok (B170 its own bug). 16:59: yes (write the agreement)."),
+  ("In Coach Milan's words", "24 November 19:01: recipes from others should show the original macros and math, and be customized for the others looking at it. 25 November 16:25: yes (brainstorm DT353). 16:26: draw so we discuss it. 16:35: so the recipe stays as is from the creator and we calculate the portion, but how do the foods\' weights change for a new person and their portion size? 16:39: basically we use this page for the user to decide if it is worthy to take it to the Plate or already plan it as is. 16:41: yes (no Servings); we can make a note there, so that is part of the insight, and below is the CTA for them to proceed. 16:57: ok (B170 its own bug). 16:59: yes (write the agreement). 17:11: 2c, should the button change to blue because it is active, or stay white? 17:12: draw to see."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ] + ([("Open", "<br>".join(f"{k + 1}. {x}" for k, x in enumerate(t["open"])))] if t["open"] else []) + [
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
@@ -49,7 +49,7 @@ tap(0, y, "the tile")
 y = max(r1) + 70
 label(y, "DT353.2 New", "the recipe as written, then What do you do with it?", 0, 3)
 y += 60
-r2 = [shot(X(0), y, "53-2a", PW, "DT353.2a Recipes, Members", "same", "The tile: as now."), shot(X(1), y, "53-2b", PW, "DT353.2b A member's recipe", "changed", "The recipe as written; a note, then the three actions."), shot(X(2), y, "53-2c", PW, "DT353.2c Plan it, Dinner", "changed", "My portion for that dinner.")]
+r2 = [shot(X(0), y, "53-2a", PW, "DT353.2a Recipes, Members", "same", "The tile: as now."), shot(X(1), y, "53-2b", PW, "DT353.2b A member's recipe", "changed", "The recipe as written; a note, then the three actions."), shot(X(2), y, "53-2c", PW, "DT353.2c Plan it, Dinner", "changed", "My portion for that dinner; Plan it white, with ⌃.")]
 tap(0, y, "the tile"); tap(1, y, "Plan it, Dinner")
 RB = r2
 bs = RB
