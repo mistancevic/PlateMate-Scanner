@@ -43,6 +43,18 @@ export function aheadOf(p: AppApi): Ahead | null {
   const share = mealShare(slots, slot.id, { kcal: nums.kcal, protein: nums.protein }, { kcal: rec.kcal, protein: rec.protein }, closed);
   return share ? { name: slot.name.toLowerCase(), kcal: share.kcal, target: p.dayPd ?? p.pdRef, ...(share.kcal < 50 ? { full: true } : {}) } : null;
 }
+// DT349 (board B168 and DT349): the size of one meal on one day, for Plan it on a recipe page. The same rule as the meal
+// ahead (N11): what is left of that day shared over the meals still to come, a snack counts half.
+export function mealSizeOn(p: AppApi, date: string, slotId: string): number | null {
+  const slots = slotsOn(lifestyleOf(p.personal), p.personal.timesOn, date);
+  const nums = p.numbersFor(new Date(`${date}T12:00:00`));
+  if (!nums) return null;
+  const today = ymd(new Date());
+  const rec = dayRecord(slots, p.planned[date], date === today ? dayLog(p.state.feedback, new Date()).logged : [], date);
+  const closed = date === today ? closedSlots(slots, rec, answersFor(date)) : new Set<string>();
+  const sh = mealShare(slots, slotId, { kcal: nums.kcal, protein: nums.protein }, { kcal: date === today ? rec.kcal : 0, protein: date === today ? rec.protein : 0 }, closed);
+  return sh && sh.kcal >= 50 ? sh.kcal : null;
+}
 export const cooksOf = (list: SharedRecipe[]) => { const n = new Map<string, number>(); for (const r of list) if (r.name && !r.mine) n.set(r.name, (n.get(r.name) ?? 0) + 1); return [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map((x) => x[0]); };
 const byLine = (r: SharedRecipe) => [r.kitchen, r.mine ? (r.name ? w("members.sharedByYou") : w("members.sharedByYouWithoutName")) : r.name ? w("members.sharedBy", { name: r.name }) : w("members.sharedByAMember"), r.made ? wn("members.madeTimes", r.made) : ""].filter(Boolean).join(" · ");
 const tag = (r: SharedRecipe) => (r.coverKind === "photo" ? (r.name ? w("members.photoBy", { name: r.name }) : r.mine ? w("members.yourPhoto") : w("members.photoByAMember")) : w("members.drawnByChef"));

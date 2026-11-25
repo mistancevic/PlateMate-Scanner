@@ -1733,10 +1733,6 @@
       "text": "Pogledaj korake",
       "checked": true
     },
-    "recipe.cookIt": {
-      "text": "Skuvaj",
-      "checked": true
-    },
     "recipe.foods": {
       "text": "Namirnice",
       "checked": true
@@ -1861,10 +1857,6 @@
       "text": "Objavljeno na chefmealan.com: objavljena strana se menja samo sa Promeni objavljenu stranu.",
       "checked": true
     },
-    "recipe.changeItFirst": {
-      "text": "Prvo ga promeni",
-      "checked": true
-    },
     "recipe.onThePlateChangeFoods": {
       "text": "Na Tanjiru: promeni namirnice, ili Uklopi u moj cilj postavlja današnje količine. Onda Napravi. Recept ostaje kakav jeste.",
       "checked": true
@@ -1987,10 +1979,6 @@
     },
     "recipe.yourOwnPhotoIsAlways": {
       "text": "Tvoja slika je uvek bolja.",
-      "checked": true
-    },
-    "recipe.asTheRecipeMakesIt": {
-      "text": "Kako ga recept pravi.",
       "checked": true
     },
     "recipe.theSameEnergy": {
@@ -13125,14 +13113,6 @@
       "text": "Gustina proteina",
       "checked": true
     },
-    "nutrition.oneServing": {
-      "text": "1 {one}",
-      "checked": true
-    },
-    "nutrition.allOfIt": {
-      "text": "Sve",
-      "checked": true
-    },
     "nutrition.pd": {
       "text": "PD",
       "checked": true
@@ -13147,10 +13127,6 @@
     },
     "nutrition.underYour": {
       "text": "{under} ispod tvog {target}",
-      "checked": true
-    },
-    "nutrition.kcalProteinGrams": {
-      "text": "{kcal} kcal · {protein} g proteina · {grams} g",
       "checked": true
     },
     "nutrition.nutrition": {
@@ -15199,18 +15175,6 @@
     },
     "recipe.oneMore": {
       "text": "1 {unit} više",
-      "checked": true
-    },
-    "recipe.makesFoodsFor": {
-      "text": "Recept daje {n}; namirnice ispod su za {cook}.",
-      "checked": true
-    },
-    "recipe.planTakes": {
-      "text": "Plan traži {n}: skuvaj {n}",
-      "checked": true
-    },
-    "recipe.backToAsWritten": {
-      "text": "Nazad na {n}, kako piše",
       "checked": true
     },
     "recipe.forCookingNotCounted": {
@@ -23303,6 +23267,62 @@
     },
     "plan.eatenAt": {
       "text": "✓ Pojedeno u {time}",
+      "checked": true
+    },
+    "nutrition.wholeRecipe": {
+      "text": "Ceo recept",
+      "checked": true
+    },
+    "recipe.servingsLabel": {
+      "text": "Porcije",
+      "checked": true
+    },
+    "recipe.servingsLine": {
+      "text": "{n} {unit}: {kcal} kcal · {grams} g · {protein} g proteina · PD {pd}",
+      "checked": true
+    },
+    "recipe.foodsFor": {
+      "text": "Namirnice za {what}",
+      "checked": true
+    },
+    "recipe.whatDo": {
+      "text": "Šta radiš s tim?",
+      "checked": true
+    },
+    "recipe.planIt": {
+      "text": "Planiraj",
+      "checked": true
+    },
+    "recipe.putOnPlate": {
+      "text": "Stavi na Tanjir",
+      "checked": true
+    },
+    "recipe.planWhich": {
+      "text": "Koji dan i obrok?",
+      "checked": true
+    },
+    "recipe.planPortion": {
+      "text": "Tvoja količina ({meal}, {day}): {grams} g · {kcal} kcal · {protein} g proteina · PD {pd}",
+      "checked": true
+    },
+    "recipe.planWhy": {
+      "text": "Izračunato prema obroku ({meal}) tog dana, oko {size} kcal. Ceo recept je {x} puta toliko.",
+      "checked": true
+    },
+    "recipe.putInPlan": {
+      "text": "Stavi u plan",
+      "checked": true
+    },
+    "recipe.inPlan": {
+      "text": "U planu: {day}, {meal}, {grams} g.",
+      "checked": true
+    },
+    "recipe.planHolds": {
+      "text": "U planu je tu već {title} ({meal}, {day}).",
+      "checked": true
+    },
+    "recipe.replaceInPlan": {
+      "text": "Stavi ga na to mesto",
       "checked": true
     }
   }

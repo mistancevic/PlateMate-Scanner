@@ -4801,10 +4801,6 @@
       "text": "Schritte ansehen",
       "checked": true
     },
-    "recipe.cookIt": {
-      "text": "Kochen",
-      "checked": true
-    },
     "recipe.foods": {
       "text": "Lebensmittel",
       "checked": true
@@ -4929,10 +4925,6 @@
       "text": "Live auf chefmealan.com: Die veröffentlichte Seite ändert sich nur mit Veröffentlichte Seite ändern.",
       "checked": true
     },
-    "recipe.changeItFirst": {
-      "text": "Erst ändern",
-      "checked": true
-    },
     "recipe.onThePlateChangeFoods": {
       "text": "Auf dem Teller: Ändere Lebensmittel, oder An mein Ziel anpassen legt die heutigen Mengen fest. Dann Zubereiten. Das Rezept bleibt, wie es ist.",
       "checked": true
@@ -5055,10 +5047,6 @@
     },
     "recipe.yourOwnPhotoIsAlways": {
       "text": "Dein eigenes Foto ist immer besser.",
-      "checked": true
-    },
-    "recipe.asTheRecipeMakesIt": {
-      "text": "So, wie das Rezept es macht.",
       "checked": true
     },
     "recipe.theSameEnergy": {
@@ -13125,14 +13113,6 @@
       "text": "Proteindichte",
       "checked": true
     },
-    "nutrition.oneServing": {
-      "text": "1 {one}",
-      "checked": true
-    },
-    "nutrition.allOfIt": {
-      "text": "Alles",
-      "checked": true
-    },
     "nutrition.pd": {
       "text": "PD",
       "checked": true
@@ -13147,10 +13127,6 @@
     },
     "nutrition.underYour": {
       "text": "{under} unter deinem {target}",
-      "checked": true
-    },
-    "nutrition.kcalProteinGrams": {
-      "text": "{kcal} kcal · {protein} g Protein · {grams} g",
       "checked": true
     },
     "nutrition.nutrition": {
@@ -15199,18 +15175,6 @@
     },
     "recipe.oneMore": {
       "text": "1 {unit} mehr",
-      "checked": true
-    },
-    "recipe.makesFoodsFor": {
-      "text": "Das Rezept ergibt {n}; die Lebensmittel unten sind für {cook}.",
-      "checked": true
-    },
-    "recipe.planTakes": {
-      "text": "Der Plan braucht {n}: koche {n}",
-      "checked": true
-    },
-    "recipe.backToAsWritten": {
-      "text": "Zurück auf {n}, wie geschrieben",
       "checked": true
     },
     "recipe.forCookingNotCounted": {
@@ -23303,6 +23267,62 @@
     },
     "plan.eatenAt": {
       "text": "✓ Gegessen um {time}",
+      "checked": true
+    },
+    "nutrition.wholeRecipe": {
+      "text": "Das ganze Rezept",
+      "checked": true
+    },
+    "recipe.servingsLabel": {
+      "text": "Portionen",
+      "checked": true
+    },
+    "recipe.servingsLine": {
+      "text": "{n} {unit}: {kcal} kcal · {grams} g · {protein} g Protein · PD {pd}",
+      "checked": true
+    },
+    "recipe.foodsFor": {
+      "text": "Lebensmittel für {what}",
+      "checked": true
+    },
+    "recipe.whatDo": {
+      "text": "Was machst du damit?",
+      "checked": true
+    },
+    "recipe.planIt": {
+      "text": "Planen",
+      "checked": true
+    },
+    "recipe.putOnPlate": {
+      "text": "Auf den Teller legen",
+      "checked": true
+    },
+    "recipe.planWhich": {
+      "text": "Welcher Tag und welche Mahlzeit?",
+      "checked": true
+    },
+    "recipe.planPortion": {
+      "text": "Deine Menge ({meal}, {day}): {grams} g · {kcal} kcal · {protein} g Protein · PD {pd}",
+      "checked": true
+    },
+    "recipe.planWhy": {
+      "text": "Berechnet aus deiner Mahlzeit ({meal}) an dem Tag, etwa {size} kcal. Das ganze Rezept ist {x}-mal so viel.",
+      "checked": true
+    },
+    "recipe.putInPlan": {
+      "text": "In den Plan legen",
+      "checked": true
+    },
+    "recipe.inPlan": {
+      "text": "Im Plan: {day}, {meal}, {grams} g.",
+      "checked": true
+    },
+    "recipe.planHolds": {
+      "text": "Im Plan steht dort schon {title} ({meal}, {day}).",
+      "checked": true
+    },
+    "recipe.replaceInPlan": {
+      "text": "An seine Stelle legen",
       "checked": true
     }
   }
