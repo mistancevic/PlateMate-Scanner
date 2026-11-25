@@ -5,6 +5,7 @@
 // DAYS and its squares are those days, today last. Never rewrite these lines to fit a change.
 // Changed by story DS6 K (Milan 10:21 to 11:26, board DS6): the record box goes; the plan card's row says how the day went
 // (Today went by the plan) and Today's meals says the extras.
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -59,7 +60,7 @@ const U = "http://127.0.0.1:3238";
     await page.getByRole("dialog").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
     await page.locator(".recipe-tile").filter({ hasText: "fritters" }).first().click(); await page.waitForTimeout(700);
-    await page.getByRole("button", { name: "Change it first" }).first().click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: "Put it on the Plate" }).first().click(); await page.waitForTimeout(900);
     const one = page.getByRole("button", { name: /One fritter, as the recipe makes it/ }); if (await one.count()) { await one.click(); await page.waitForTimeout(700); }
     const plate = (await page.locator("main").textContent()) ?? "";
     ok(new RegExp(`One fritter is ${N} kcal`).test(plate), `the Plate: one fritter is ${N} kcal`);

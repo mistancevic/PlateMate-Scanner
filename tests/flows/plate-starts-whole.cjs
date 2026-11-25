@@ -3,6 +3,8 @@
 // or sized for your meal. One fritter is one share of the recipe: the line and the card give one number; a tiny amount keeps
 // its tenth of a gram. With the whole recipe on the plate, How to make it makes all of it and asks nothing.
 // Never rewrite these lines to fit a change.
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
+// changed by DT349 (0.3.193, AC13, design rule D14): the PD card has two columns; Energy, Weight and Protein are .rd-rows, the words against the target .pd-short or .pd-line
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -36,7 +38,7 @@ const U = "http://127.0.0.1:3229";
   await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
   await page.route("**/api/recipe/read", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(fritters) }));
   const text = (sel) => page.locator(sel).first().textContent().then((t) => t.replace(/\s+/g, " "));
-  const card = async () => ({ title: (await text(".plate-card .readout-top")).trim(), kcal: Number((await text(".plate-card .readout-mid small")).match(/([\d,]+) kcal/)[1].replace(/,/g, "")) });
+  const card = async () => ({ title: (await text(".plate-card .readout-top")).trim(), kcal: Number((await text(".plate-card .readout .rd-rows")).match(/([\d,]+) kcal/)[1].replace(/,/g, "")) });
   const chipOn = () => page.locator(".in-portion .choice.on").textContent();
   try {
     await page.goto(U + "/"); await page.waitForTimeout(900);
@@ -60,7 +62,7 @@ const U = "http://127.0.0.1:3229";
     // Make it from Recipes starts whole too
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(600);
     await page.locator(".recipe-tile").filter({ hasText: "Homemade apple fritters" }).click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(1200);
+    await page.getByRole("button", { name: "Put it on the Plate", exact: true }).click(); await page.waitForTimeout(1200);
     c = await card();
     ok((await chipOn()).includes("The whole recipe") && /^The whole recipe/.test(c.title), "Make it from Recipes starts with the whole recipe too");
   } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n").slice(0, 3).join(" / ")); }

@@ -5,6 +5,8 @@
 // the Plate there opens the Plate for the slot, as the row did. Everything after is unchanged.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line says the meal, the day and the moment, or No meal selected; it no longer names A dish.
 // Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
+// changed by DT349 (0.3.193, AC13, design rule D14): the PD card has two columns; Energy, Weight and Protein are .rd-rows, the words against the target .pd-short or .pd-line
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -39,7 +41,7 @@ seed.items = [];
   if (await page.locator(".rq-slot").count()) { await page.locator(".rq-slot").getByRole("button", { name: "Change it on the Plate" }).click(); await page.waitForTimeout(600); }
   ok(await page.locator(".dish-row").count() === 1 && /1 of 8/.test(await page.locator(".dish-portions").textContent()), "the recipe is one row, 1 of 8 portions");
   ok(/^Lunch\s/.test((await page.locator(".plan-line").innerText()).trim().replace(/^\s*meal and day\s*/i, "")) && !/A dish/.test(await page.locator(".plan-line").innerText()) && await page.locator(".plan-line .plan-line-x").count() === 0, "changed by DT308.1 and B150: the line says the meal and its day, with no X; it no longer names A dish (the dish is a row of the plate)");
-  const kcalOf = async () => { const t = await page.locator(".readout-mid small").first().textContent(); const m = t.match(/([\d,.]+)\s*kcal/); if (!m) throw new Error("no kcal in: " + t); return Number(m[1].replace(/[,.]/g, "")); };
+  const kcalOf = async () => { const t = await page.locator(".readout .rd-rows").first().textContent(); const m = t.match(/([\d,.]+)\s*kcal/); if (!m) throw new Error("no kcal in: " + t); return Number(m[1].replace(/[,.]/g, "")); };
   const kcal1 = await kcalOf();
   await page.getByRole("button", { name: "One portion more" }).click(); await page.waitForTimeout(300);
   const kcal2 = await kcalOf();
@@ -56,7 +58,7 @@ seed.items = [];
   // from Recipes, Make it (0.2.5+r11, R10): the dish again, a side next to it; Fit moves the side, never the recipe
   await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);
   await page.locator(".recipe-tile").first().click(); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: "Put it on the Plate", exact: true }).click(); await page.waitForTimeout(600);
   await (await require("./more.cjs")(page)).fill("Skyr"); await page.waitForTimeout(300); // DT308 Release 2 (0.3.155): found under + Add more to your plate
   await page.locator(".row-food", { hasText: "Skyr" }).first().getByRole("button").click(); await page.waitForTimeout(300);
   await click(/^(Fit to my target|Make it an? \w+)$/); await page.waitForTimeout(1200);

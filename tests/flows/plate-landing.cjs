@@ -6,6 +6,7 @@
 // one row with its name and weight, its foods under it. DT310: a choice is a white chip; chosen, it is light blue with a dark
 // blue border and a tick. Not in this release: the meal line No meal selected, the calendar, What do you do with it?
 // 0.3.157 (DT308, the meal model, and DT311; Coach Milan, Go 18 November 11:14), changed by the stories: Empty plate stands in the row above the foods, and the card's top says only On your plate (DT311). The read ends with What do you do with it?, three white choices; Ate it and the marked meal bring Did you eat it? back, whose chips this walkthrough looks at (DT308.4).
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -88,7 +89,7 @@ const READ = { dish: "Grilled chicken with rice", foods: [
     await page.getByRole("button", { name: /Empty plate/ }).click(); await page.getByRole("button", { name: /Tap again to empty/ }).click(); await page.waitForTimeout(500);
     await page.locator("nav.bottom-nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(700);
     await page.locator(".recipe-tile").filter({ hasText: "Oat bowl with banana" }).click(); await page.waitForTimeout(600);
-    await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: "Put it on the Plate", exact: true }).click(); await page.waitForTimeout(900);
     const dish = page.locator(".plate-card .dish-one");
     ok(await dish.count() === 1 && (await dish.locator("b").textContent()) === "Oat bowl with banana" && /^\d+ g$/.test((await dish.locator("small").textContent()).trim()) && await page.locator(".plate-card .rows.dish-foods .swipe-fg, .plate-card .rows.dish-foods .row-food").count() >= 3, "DT308.3: a dish is one row with its name and weight; its foods stand under it: " + (await dish.textContent()));
     const db = await dish.boundingBox(), fr = await page.locator(".plate-card .rows.dish-foods").boundingBox();

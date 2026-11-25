@@ -5,6 +5,8 @@
 // Changed by story R21 (Milan 22:27, board RS20): one slice is the recipe divided by what it makes, from the exact grams, so
 // the kcal read one lower (284, 175, 301). Everything else is unchanged.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
+// changed by DT349 (0.3.193, AC13, design rule D14): the PD card has two columns; Energy, Weight and Protein are .rd-rows, the words against the target .pd-short or .pd-line
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -42,7 +44,7 @@ const U = "http://127.0.0.1:3211";
     return page;
   };
   const text = (page, sel) => page.locator(sel).first().textContent().then((t) => t.replace(/\s+/g, " "));
-  const kcalOf = async (page) => Number((await text(page, ".plate-card .readout .readout-mid small")).match(/([\d,]+) kcal/)[1].replace(",", ""));
+  const kcalOf = async (page) => Number((await text(page, ".plate-card .readout .rd-rows")).match(/([\d,]+) kcal/)[1].replace(",", ""));
   const heads = (page) => page.locator(".plate-card .pt-h b").allTextContents();
 
   // ---- the cheesecake ----
@@ -127,7 +129,7 @@ const U = "http://127.0.0.1:3211";
   ok(kept && JSON.stringify(kept.items.map((i) => i.part)) === JSON.stringify(["Rice", "Chicken", "Chicken", "Toppings"]) && kept.optional?.[0]?.name === "Sour cream" && kept.optional[0].part === "Toppings" && !s2.optional, "IM18b: the recipe keeps its parts and the optional sour cream; the plate is clear");
   await p2.locator("nav button").filter({ hasText: "Recipes" }).click(); await p2.waitForTimeout(700);
   await p2.getByText("Burrito bowl", { exact: true }).last().click(); await p2.waitForTimeout(900);
-  await p2.getByRole("button", { name: "Change it first", exact: true }).click(); await p2.waitForTimeout(1000);
+  await p2.getByRole("button", { name: "Put it on the Plate", exact: true }).click(); await p2.waitForTimeout(1000);
   ok(JSON.stringify(await heads(p2)) === JSON.stringify(["Rice", "Chicken", "Toppings"]) && await p2.getByRole("button", { name: "Add Sour cream" }).count() === 1, "IM18b: next time it opens like this");
   ok(errs.length === 0, "no page errors " + errs.join(" | "));
   await b.close(); server.kill();

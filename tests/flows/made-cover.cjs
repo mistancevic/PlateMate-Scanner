@@ -4,6 +4,7 @@
 // says so, Change the cover, and Remove it behind a second tap. A cover of your own stays. Share with the coach sits in the
 // Made today line only for a person with a coach. Never rewrite these lines to fit a change.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -26,7 +27,7 @@ seed.meals = [bowl("bowl", "Chicken rice bowl"), bowl("mine", "Rice bowl with a 
   const make = async (title) => {
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(600);
     await page.getByText(title, { exact: true }).last().click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: /^(Make it|Change it first)$/ }).first().click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: /^(Make it|Put it on the Plate)$/ }).first().click(); await page.waitForTimeout(900);
     await page.getByRole("button", { name: /^(Keep it as it is|Make it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).first().click(); await page.waitForTimeout(800);
     await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(500);
     await page.locator(".plate-photo").filter({ hasText: "Add a photo of the meal" }).click(); await page.locator(".pp-camera input").setInputFiles([{ name: "plate.jpg", mimeType: "image/jpeg", buffer: PHOTO }]); await page.waitForTimeout(900);

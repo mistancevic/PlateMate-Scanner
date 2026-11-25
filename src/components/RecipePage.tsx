@@ -1,7 +1,7 @@
 import { PastMeal } from "./PastMeal";
 import { tasteWord } from "./YourCooks";
 import { StepPicWide, StepPicSheet, StepPhotosPlace, StepPlayer, CoverVideo } from "./StepPics";
-import { w, wn, wIn, wordV, dateText, mealV, mealName, type Val, type WordKey } from "../words";
+import { w, wn, dec, wIn, wordV, dateText, mealV, mealName, type Val, type WordKey } from "../words";
 import { fromMeal, getPlanned } from "../planned";
 import { suitsOf, MEAL_KINDS, type MealKind } from "../mealFit";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
@@ -16,7 +16,9 @@ import { Camera, ChevronLeft, Plus, X } from "lucide-react";
 import type { Feedback, Food, Ingredient, Meal, StepMark } from "../pilot";
 import { aggregate, density, sizedFor } from "../pilot";
 import { findReference, referenceFood } from "../reference";
-import { fmt, pdText } from "../ui";
+import { fmt, pdText, pdVal } from "../ui";
+import { plateCal } from "../screens/PlateCalendar";
+import { servingChips, stepping, portionShare, portionsInWhole } from "../servings";
 import { recipePhotosOf, withRecipePhotos } from "../photos";
 import { resizeImageBase64 } from "../utils/image";
 import { useBack, recipePath } from "../back";
@@ -56,7 +58,8 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 // a line of its own as a value in another line, in that line's language (or null, and the whole line stays English)
 const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 
-export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, beforeSteps = null, atStart = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null }: {
+export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, beforeSteps = null, atStart = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null, plan = null }: {
+  plan?: { today: string; infoOf: (date: string) => import("../screens/PlateCalendar").CalInfo; kcalFor: (date: string, slotId: string) => number | null; put: (date: string, slotId: string, share: number) => void } | null;
   // DT227 (0.3.61, board Stories167): a draft of this recipe saved for later on the Plate
   saved?: { sub: string; go: () => void } | null;
   // B160 (0.3.187): Save as a new recipe from Edit recipe: the changes become a new recipe, this one stays as it is
@@ -151,6 +154,15 @@ export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards,
   // DT81: how many to cook next time; the foods below follow it, eggs and bananas whole
   const makesN = meal.makes && meal.makes.n >= 2 ? meal.makes.n : 0;
   const cookN = makesN ? meal.cook?.n ?? makesN : 0;
+  const [cookOther, setCookOther] = useState(false);
+  const shownItems = !cookN || cookN === makesN ? meal.items : sizedFor(meal, cookN);
+  // DT349: Plan it. The Plate's calendar opens in place; a meal picked shows my portion for that meal on that day, then it goes into the plan
+  const [planOpen, setPlanOpen] = useState(false);
+  const [planDay, setPlanDay] = useState<string | null>(null);
+  const [planMore, setPlanMore] = useState(false);
+  const [planPick, setPlanPick] = useState<{ date: string; id: string; name: string; kcal: number } | null>(null);
+  const [planDone, setPlanDone] = useState<string | null>(null);
+  const wholeT = aggregate(meal.items.filter((i) => i.grams > 0));
   const setCook = (n: number) => { if (!makesN) return; const c = Math.max(1, Math.min(200, n)); onPatch({ cook: c === makesN ? undefined : { n: c } }); };
   const [extraParts, setExtraParts] = useState<string[]>([]);
   const [find, setFind] = useState<string | null>(null);
@@ -387,7 +399,10 @@ export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards,
       {picture && list.length === 0 && !drawn && (() => {
         const c = picture.count, out = c ? c.used >= c.limit : false;
         return (
-          <section className="card rq-nopic" aria-label={w("recipe.noPhotoYet2")}>
+          // DT349: no photo yet is a placeholder picture of a meal in the photo's place (one drawn plate, never a real dish),
+          // with its words and buttons on it
+          <section className="card rq-nopic rq-nopic-ph" aria-label={w("recipe.noPhotoYet2")}>
+            <svg className="rq-ph-art" viewBox="0 0 400 300" aria-hidden="true" preserveAspectRatio="xMidYMid slice"><rect width="400" height="300" fill="#eaf1fb" /><ellipse cx="200" cy="128" rx="128" ry="74" fill="#ffffff" stroke="#c9d8ee" strokeWidth="4" /><ellipse cx="200" cy="124" rx="84" ry="46" fill="#f6f9fe" stroke="#dbe6f5" strokeWidth="3" /><circle cx="176" cy="116" r="18" fill="#f3c98b" /><circle cx="214" cy="126" r="14" fill="#9cc98a" /><circle cx="232" cy="108" r="11" fill="#e98f7a" /><path d="M58 80v70M50 80v26a8 8 0 0 0 16 0V80" stroke="#c9d8ee" strokeWidth="5" fill="none" strokeLinecap="round" /><path d="M342 80c10 0 14 18 14 34s-6 22-14 22v14" stroke="#c9d8ee" strokeWidth="5" fill="none" strokeLinecap="round" /></svg>
             <b>{w("recipe.noPhotoYet")}</b>
             <div className="button-row">
               <button className="pill pill-small" disabled={out || picture.drawing} onClick={picture.draw}>{picture.drawing ? w("recipe.chefIsDrawing") : w("recipe.letChefDraw")}</button>
@@ -425,22 +440,30 @@ export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards,
       <NutritionCard readoutOnly rates={rates} items={items} serves={serves} one={oneWord} all={allWord} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
       {/* IM21: one serving first, when the recipe makes more than one */}
       {/* RP2 (0.2.25): the three tiles gave way to the PD readout above the Nutrition table */}
-      {/* DT81: Cook it. The recipe stays as written; this batch can be bigger or smaller, and the foods below follow */}
-      {!edit && makesN > 0 && (
-        <section className="card rq-cook" aria-label={w("recipe.cookIt")}>
-          <b>{w("recipe.cookIt")}</b>
-          <div className="rq-cook-row">
-            <button type="button" className="icon" aria-label={w("recipe.oneLess", { unit: unitV(meal.makes!.unit, 1, ONE.notSs) })} disabled={cookN <= 1} onClick={() => setCook(cookN - 1)}>−</button>
-            <b>{cookN} {unitWord(meal.makes!.unit, 2)}</b>
-            <button type="button" className="icon" aria-label={w("recipe.oneMore", { unit: unitV(meal.makes!.unit, 1, ONE.notSs) })} onClick={() => setCook(cookN + 1)}>+</button>
-          </div>
-          <small className="muted">{cookN === makesN ? w("recipe.asTheRecipeMakesIt") : w("recipe.makesFoodsFor", { n: makesN, cook: cookN })}</small>
-          {!!plannedCount && plannedCount !== cookN && <button type="button" className="link rq-cook-plan" onClick={() => setCook(plannedCount)}>{w("recipe.planTakes", { n: plannedCount })}</button>}
-          {cookN !== makesN && <button type="button" className="link rq-cook-back" onClick={() => setCook(makesN)}>{w("recipe.backToAsWritten", { n: makesN })}</button>}
-        </section>
-      )}
+      {/* DT349 (board B168 and DT349, canvas Page 6; Coach Milan 25 November 07:54 to 08:42): the top is the recipe as written
+          and never moves. Servings is the one choice on the page: chips 1 to 5, and − and + for an exact number; saved with
+          the recipe, as the Cook it card's count was. One line gives the numbers for the choice, and Foods below follows. */}
+      {!edit && makesN > 0 && (() => {
+        // 25 November 13:06: a chip is one tap. The − and + row is always under the chips, grey until it is used; no Other chip
+        const chips = servingChips(makesN, plannedCount), inUse = stepping(cookN, chips, cookOther);
+        const t = aggregate(shownItems.filter((i) => i.grams > 0));
+        return (
+          <section className="card rq-howmuch rq-portion-chips rq-count" role="group" aria-label={w("recipe.servingsLabel")}>
+            <b>{w("recipe.servingsLabel")}</b>
+            <div className="rq-chips">
+              {chips.map((c) => <button key={c} type="button" className={`choice ${!inUse && cookN === c ? "on" : ""}`} aria-pressed={!inUse && cookN === c} onClick={() => { setCookOther(false); setCook(c); }}>{c}</button>)}
+            </div>
+            <div className={`rq-cook-row${inUse ? "" : " idle"}`}>
+              <button type="button" className="icon" aria-label={w("recipe.oneLess", { unit: unitV(meal.makes!.unit, 1, ONE.notSs) })} disabled={cookN <= 1} onClick={() => { setCookOther(true); setCook(cookN - 1); }}>−</button>
+              <b>{cookN} {unitWord(meal.makes!.unit, cookN, ONE.s)}</b>
+              <button type="button" className="icon" aria-label={w("recipe.oneMore", { unit: unitV(meal.makes!.unit, 1, ONE.notSs) })} onClick={() => { setCookOther(true); setCook(cookN + 1); }}>+</button>
+            </div>
+            <p className="rq-choice-line"><b>{w("recipe.servingsLine", { n: cookN, unit: unitV(meal.makes!.unit, cookN, ONE.s), kcal: fmt(t.calories ?? 0, 0), grams: fmt(t.weight ?? 0, 0), protein: fmt(t.protein ?? 0, 0), pd: pdVal(density(t.protein, t.calories)) })}</b></p>
+          </section>
+        );
+      })()}
       <section className={`card rq-foods ${edit ? "editing" : ""}`}>
-        <b>{w("recipe.foods")}</b>
+        <b>{edit || !makesN || cookN === makesN ? w("recipe.foods") : w("recipe.foodsFor", { what: `${cookN} ${unitWord(meal.makes!.unit, cookN, ONE.s)}` })}</b>
         {/* DT91 (0.2.88): what the dish uses for cooking, not counted */}
         {!edit && meal.cooking?.length ? <small className="muted rq-cook-line"><b>{w("recipe.forCookingNotCounted")}</b> {meal.cooking.join(", ")}.</small> : null}
         {edit && (
@@ -462,7 +485,7 @@ export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards,
         {edit && !partsShown && <button type="button" className="link rq-parts-open" onClick={() => setPartsOpen(true)}>{w("recipe.partsAndOptionalFoods")}</button>}
         {edit && partsShown && <div className="pt-h pt-mode"><span><small>{w("recipe.partsGiveAFoodIts")}</small></span><span className="pt-acts">{newPart === null ? <button className="pill pill-small pill-action" onClick={() => setNewPart("")}>{w("recipe.newPart")}</button> : <input className="pt-new" autoFocus aria-label={w("recipe.nameOfTheNewPart")} placeholder={w("recipe.toppingPlaceholder")} value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
         {/* B162 (0.3.188, board Stories288): each part once; foods with no part last, under Other; nothing stored changes */}
-        {(edit ? items : byParts(!cookN || cookN === makesN ? items : sizedFor(meal, cookN))).map((it, k, arr) => {
+        {(edit ? items : byParts(shownItems)).map((it, k, arr) => {
           const head = !edit && (k === 0 || (arr[k - 1].part ?? "") !== (it.part ?? "")) && (it.part || partsOf(arr).length > 0) ? <div className="rq-part" key={`h${k}`}>{it.part ? partName(it.part) : w("recipe.otherPart")}</div> : null;
           return [head, (
           <div className="sheet-row rq-food" key={it.id}>
@@ -635,10 +658,30 @@ export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards,
           {/* DT174 (0.3.16, board Stories121; Milan 30 October 16:21 to 16:31): the recipe is for reading and deciding, the Plate
               is the editor. Two doors into the Plate's Make step: as written, or through the Plate's changes first */}
           {/* DT211 v8 (0.3.53): Cook it as written gave way to Start cooking, in the Steps block */}
-          {!makeAs && onCookIt ? (<>
-            <button className="pill pill-wide" onClick={() => onMakeIt()}>{w("recipe.changeItFirst")}</button>
-            <small className="muted rq-under">{w("recipe.onThePlateChangeFoods")}</small>
-          </>) : (<>
+          {!makeAs && onCookIt ? (
+            /* DT349: What do you do with it? Plan it (new) and Put it on the Plate (it was Change it first). My portion is
+               calculated where a day and a meal exist: here once a meal is picked, or on the Plate. */
+            <section className="card rq-actions" aria-label={w("recipe.whatDo")}>
+              <b>{w("recipe.whatDo")}</b>
+              {plan && <button className="pill pill-wide" aria-expanded={planOpen} onClick={() => { setPlanOpen(!planOpen); setPlanPick(null); setPlanDone(null); }}>{w("recipe.planIt")}</button>}
+              {plan && planOpen && !planDone && plateCal({ mode: "plan", day: planDay ?? plan.today, setDay: (d) => { setPlanDay(d); setPlanPick(null); }, more: planMore, setMore: setPlanMore, now: new Date(), today: plan.today, infoOf: plan.infoOf, title: w("recipe.planWhich"),
+                marked: planPick ? { date: planPick.date, id: planPick.id } : null,
+                onPick: (date, r) => { if (!r.id) return; const k = plan.kcalFor(date, r.id); const sl = plan.infoOf(date).slots.find((x) => x.id === r.id); if (k && sl) setPlanPick({ date, id: r.id, name: sl.name, kcal: k }); } })}
+              {plan && planOpen && planPick && !planDone && (() => {
+                const share = portionShare(planPick.kcal, wholeT.calories), held = plan.infoOf(planPick.date).planned?.[planPick.id], holds = held && !held.skipped ? held.title : null, day = dateText(new Date(`${planPick.date}T12:00:00`), { weekday: "long" });
+                return (<>
+                  <p className="rq-choice-line"><b>{w("recipe.planPortion", { meal: mealV(planPick.name, true), day, grams: fmt((wholeT.weight ?? 0) * share, 0), kcal: fmt((wholeT.calories ?? 0) * share, 0), protein: fmt((wholeT.protein ?? 0) * share, 0), pd: pdVal(density(wholeT.protein, wholeT.calories)) })}</b></p>
+                  <small className="muted">{w("recipe.planWhy", { meal: mealV(planPick.name, true), size: fmt(planPick.kcal, 0), x: dec(portionsInWhole(share), 1) })}</small>
+                  {/* a meal that already holds something in the plan is asked about first, as Plan does (Coach Milan 25 November 14:42) */}
+                  {holds && <p className="rq-plan-holds">{w("recipe.planHolds", { day, meal: mealV(planPick.name, true), title: holds })}</p>}
+                  <button className="pill pill-wide pill-primary" onClick={() => { plan.put(planPick.date, planPick.id, share); setPlanDone(w("recipe.inPlan", { day, meal: mealV(planPick.name, true), grams: fmt((wholeT.weight ?? 0) * share, 0) })); }}>{holds ? w("recipe.replaceInPlan") : w("recipe.putInPlan")}</button>
+                </>);
+              })()}
+              {planDone && <p className="rq-choice-line"><b>✓ {planDone}</b></p>}
+              <button className="pill pill-wide" onClick={() => onMakeIt()}>{w("recipe.putOnPlate")}</button>
+              <small className="muted rq-under">{w("recipe.onThePlateChangeFoods")}</small>
+            </section>
+          ) : (<>
             <button className={`pill pill-wide${makeAs ? "" : " pill-primary"}`} onClick={() => onMakeIt()}>{makeAs ? makeAs.label : w("recipe.makeIt")}</button>
             <small className="muted rq-under">{makeAs ? makeAs.hint : w("recipe.cookItNowTheRecipe")}</small>
           </>)}

@@ -1,6 +1,6 @@
 # Design rules
 
-Version 1, 16 November 2026. Written down from the walkthrough that guards them (tests/flows/design-rules.cjs, boards DS1, DS2, DS4, DS5; Milan, 20 October 2026) and from the rules Coach Milan repeats in every session. Added on 16 November with DT305 (boards Stories230 and Stories231): D6 and D7.
+Version 1, 16 November 2026. Written down from the walkthrough that guards them (tests/flows/design-rules.cjs, boards DS1, DS2, DS4, DS5; Milan, 20 October 2026) and from the rules Coach Milan repeats in every session. Added on 16 November with DT305 (boards Stories230 and Stories231): D6 and D7. Added on 25 November with DT349 (board B168 and DT349, canvas Page 6): D14.
 
 ## Buttons and answers
 
@@ -17,6 +17,10 @@ D5. Back sits top left, above the step bar, and says where it goes. A page's tit
 D6. An answer to tick always sits under its question, in its own block. A chip is white until it is chosen, and blue with a check mark once it is. A filled button never stands for an answer: filled reads as chosen. Guarded: photo-read.cjs (the read: Did you eat it?).
 
 D7. The buttons of a section sit under the whole section, in one row, side by side: the second action on the left with the blue border, the main action on the right, filled. They do not sit inside the block of one question. Guarded: photo-read.cjs (the read: Save in My recipes, Done).
+
+## Cards
+
+D14. Every PD card is one component, PdCard (src/components/PdCard.tsx): the Plate's, a recipe page's and any new one. Each label heads its own column: on the left, under PD, the number and the short words against the target; on the right, under the title, Energy, Weight and Protein. A long line takes the full width under both. The letters under them. The card's numbers open under the card, never inside it. Coach Milan 24 November 2026, 07:42 (the same PD card on the Plate and in the design system); 25 November 13:16 (the columns), 14:26 (variation B). Guarded: design-rules.cjs, rule I.
 
 ## Standing rules, not yet guarded by a walkthrough of their own
 

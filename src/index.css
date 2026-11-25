@@ -3703,3 +3703,37 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 .recipe-ask { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; } .recipe-ask .button-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; } .recipe-saved-line { font-weight: 800; }
 /* DT345 (0.3.188): + Step here between two steps */
 .st-between { display: block; margin: 2px 0 2px 34px; padding: 6px 12px; border: 1.5px dashed #b8c9e6; border-radius: 999px; background: transparent; color: var(--brand); font-weight: 800; font-size: 13px; min-height: 44px; }
+/* B168 and DT349 (0.3.193, board B168 and DT349, canvas Page 6). No photo yet is a placeholder picture with its words and
+   buttons on it. */
+.rq-nopic-ph { position: relative; overflow: hidden; aspect-ratio: 4 / 3; justify-content: flex-end; padding: 14px 16px; border: 0; background: var(--tint); }
+.rq-nopic-ph .rq-ph-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.rq-nopic-ph > :not(svg) { position: relative; }
+.rq-nopic-ph > b { font-size: var(--fs-card); color: var(--navy); }
+.rq-nopic-ph .button-row .pill { background: var(--surface); }
+.rq-nopic-ph > small.muted { color: var(--ink); background: rgba(255, 255, 255, .82); border-radius: 8px; padding: 4px 8px; align-self: flex-start; }
+/* Servings: chips, one tap each; − and + always under them, grey until used; the line with the numbers for the choice */
+.rq-howmuch { display: flex; flex-direction: column; gap: 8px; margin: 0 0 14px; }
+.rq-howmuch > b { font-size: var(--fs-card); }
+.rq-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.rq-chips .choice { min-width: 44px; height: 44px; justify-content: center; }
+.rq-howmuch .rq-cook-row { display: flex; align-items: center; gap: 12px; }
+.rq-howmuch .rq-cook-row button.icon { width: 44px; height: 44px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-size: 18px; font-weight: 900; line-height: 1; color: var(--brand-text); }
+.rq-howmuch .rq-cook-row button.icon:disabled { opacity: .4; }
+.rq-howmuch .rq-cook-row b { font-size: var(--fs-card); }
+.rq-howmuch .rq-cook-row.idle b { color: var(--muted); font-weight: 700; }
+.rq-howmuch .rq-cook-row.idle button.icon { color: var(--muted); }
+.rq-choice-line { margin: 4px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--tint); color: var(--navy); font-size: var(--fs-label); line-height: 1.4; }
+/* What do you do with it? */
+.rq-plan-holds { margin: 0; font-size: var(--fs-label); font-weight: 700; color: var(--ink); }
+.rq-actions { display: flex; flex-direction: column; gap: 10px; }
+.rq-actions > b { font-size: var(--fs-card); }
+/* PdCard (design rule D14): two columns, each label heading its own (Coach Milan 25 November 13:16; variation B 14:26). On the
+   left, under PD, the number and its short words against the target; on the right, under the title, Energy, Weight, Protein.
+   A long line takes the full width under both. */
+.pd-card .readout-top { flex-direction: row-reverse; }
+.pd-cols { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-top: 6px; }
+.pd-cols small.rd-rows { display: inline-grid; grid-template-columns: auto auto auto; column-gap: 5px; row-gap: 2px; align-items: baseline; white-space: nowrap; color: var(--surface); font-size: var(--fs-label); font-weight: 600; line-height: 1.35; }
+.pd-num { display: flex; flex-direction: column; align-items: flex-start; text-align: left; min-width: 0; }
+.pd-num > b { font-size: var(--fs-hero); font-weight: 900; line-height: 0.95; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.pd-short { margin-top: 8px; font-size: var(--fs-body); font-weight: 900; line-height: 1.25; }
+.readout .pd-line { margin: 10px 0 0; font-size: var(--fs-body); font-weight: 900; line-height: 1.3; color: var(--surface); }

@@ -1,4 +1,4 @@
-import { PdScale } from "../components/PdScale";
+import { PdCard } from "../components/PdCard";
 import { w, wn, wIn, dec, mealV, mealName, wordV, dateV, dateText, type Val, type WordKey } from "../words";
 import { samePhotoMeal, updateWith, deleteCard as deleteCardIn } from "../pastMeal";
 import { eatenIn } from "../planEaten";
@@ -2017,21 +2017,16 @@ export function JourneyScreen(p: AppApi) {
   // mapped, a plate kept as Just looking, a plate already recorded, or a meal opened from Plan (those keep their buttons)
   const endShown = !liveOn && step === "in" && items.length > 0 && !(imported && rec) && state.photo?.who !== "idea" && p.pick !== "exploring" && !p.recordNow && (!p.filling || p.filling.by === "line") && !mpSay;
   const canScale = pd !== null && pdRef !== null && !tooBig;
+  // DT349 (board B168 and DT349): the Plate's card is PdCard, the same component a recipe page uses (design rule D14)
   const readoutEl = items.length > 0 ? (
-    <section className={`readout readout-fit-${p.fitPd(pd)}`}>
-      <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? w("make.theWholeRecipe") : mealSlot ? mealName(mealSlot.name) : madeBy || (imported && mealNeed) ? w("plate.thisMeal", { meal: mealW }) : unset ? w("plate.thisPlate") : w("plate.asItStands")}</span><span>{pdTag()}</span></div>
-      <div className="readout-mid">
-        {/* DT338 (0.3.179, Stories279): a tap on the PD number opens the scale with a mark where this plate sits; a second closes it */}
-        {canScale ? <b className="pd-tap" role="button" tabIndex={0} aria-expanded={scaleOpen} aria-label={w("plate.pdScaleOpen")} onClick={() => setScaleOpen((x) => !x)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setScaleOpen((x) => !x); } }}>{pdVal(pd)}</b> : <b>{pdVal(pd)}</b>}
-        {/* DT93, rule 3: a plate far over the meal says so, instead of going to the maths */}
-        {/* DT338 AC4: above On plan the words say the band: High, above your plan; High+, far above your plan */}
-        <div><span>{tooBig ? w("plate.notYet", { meal: mealW }) : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? (p.fitPd(pd) === "high" ? w("plate.highPlan") : p.fitPd(pd) === "top" ? w("plate.topPlan") : w("plate.fitsPlan")) : w("plate.underYour", { gap: fixed(pdRef - pd), target: fixed(pdRef) })) : w("plate.noTarget")}</span><small className="rd-rows"><span>{w("plate.energy")}</span><b>{fmt(t.calories, 0)}</b> <span>{w("plate.kcal")}</span><span>{w("plate.weight")}</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>{w("plate.protein")}</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
-      </div>
-      {canScale && scaleOpen ? <div className="pd-scale-box"><PdScale target={pdRef} pd={pd} title={w("plate.pdScaleTitle", { t: pdVal(pdRef), pd: pdVal(pd) })} /></div> : null}
-      {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
-      {/* DT116 (0.2.98) and 0.2.99: the letters with their grams, one block; sugars, saturates and salt in the tap */}
-      {p.rates ? <Letters n={numbersOfTotals(t)} rates={p.rates} who={w("letters.thePlate")} extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)}
-    </section>
+    <PdCard fit={p.fitPd(pd)} pd={pd} kcal={t.calories ?? 0} grams={t.weight ?? 0} protein={t.protein ?? 0}
+      title={imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? w("make.theWholeRecipe") : mealSlot ? mealName(mealSlot.name) : madeBy || (imported && mealNeed) ? w("plate.thisMeal", { meal: mealW }) : unset ? w("plate.thisPlate") : w("plate.asItStands")}
+      /* DT93, rule 3: a plate far over the meal says so; DT338 AC4: above On plan the words say the band */
+      line={tooBig ? w("plate.notYet", { meal: mealW }) : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? (p.fitPd(pd) === "high" ? w("plate.highPlan") : p.fitPd(pd) === "top" ? w("plate.topPlan") : w("plate.fitsPlan")) : w("plate.underYour", { gap: fixed(pdRef - pd), target: fixed(pdRef) })) : w("plate.noTarget")}
+      /* DT338 (0.3.179): a tap on the PD number opens the scale; a second closes it */
+      scale={canScale ? { target: pdRef!, title: w("plate.pdScaleTitle", { t: pdVal(pdRef), pd: pdVal(pd) }) } : null} scaleOpen={scaleOpen} setScaleOpen={setScaleOpen}
+      /* DT108, DT116: the letters; the numbers open under the card */
+      letters={p.rates ? <Letters n={numbersOfTotals(t)} rates={p.rates} who={w("letters.thePlate")} extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)} />
   ) : null;
   // DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November, Go 11:35): the read alone. The photo and its
   // foods with Change the foods under them, always the result, what you said, Chef Mealan's word. One question in its own

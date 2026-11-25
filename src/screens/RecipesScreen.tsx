@@ -51,11 +51,14 @@ import { localAs, isPreviewHost } from "../recipes";
 import { useMetricsOwner } from "./MenuScreen";
 import { resizeImageBase64 } from "../utils/image";
 import { type PubState } from "../components/RecipePage";
+import { slotsOn } from "../slots";
+import { lifestyleOf } from "../personal";
+import { aggregate as aggregateAll } from "../pilot";
 import { LangRecipePage } from "../components/RecipeLang";
 import { fromDraft } from "../steps";
 import { recipePhotosOf, recipeHasPhotos, sig, allStepPics, stepPicOf } from "../photos";
 import { coverIsDrawn, isDrawnPhoto } from "../covers";
-import { MemberPage, MemberTile, SharePanel, aheadOf, membersLead, rowOfShared, MEMBERS_CACHE, forgetMembers } from "../components/Members";
+import { MemberPage, MemberTile, SharePanel, aheadOf, mealSizeOn, membersLead, rowOfShared, MEMBERS_CACHE, forgetMembers } from "../components/Members";
 import { sharedOf, contentSig, type SharedRecipe } from "../members";
 import { DeleteRecipe, type DeleteChoice } from "../components/DeleteRecipe";
 import { deletePlan, deletedLine, forgetRecipe } from "../recipeDelete";
@@ -357,7 +360,10 @@ export function RecipesScreen(p: AppApi) {
         membersPanel={opened.from === "coach" || opened.from === "members" ? null
           : <SharePanel key={opened.id} meal={opened} p={p} made={opened.members ? memberList?.find((r) => r.id === opened.members!.id)?.made ?? null : null} onPatch={(patch) => patchMeal(opened.id, patch)} />}
         picture={p.ai.on && !opened.from && canDrawCover(opened) ? { count: p.cover.count, drawing: p.cover.drawing === opened.id, draw: () => p.cover.draw(opened), refresh: p.cover.refresh } : null}
-        originalFoods={originalFoodsOf(opened, state.meals)} pdRef={p.pdRef} fitPd={p.fitPd} rates={p.rates}
+        originalFoods={originalFoodsOf(opened, state.meals)} pdRef={p.pdRef} fitPd={p.fitPd} rates={p.rates} plan={!p.numbersFor(new Date()) ? null : { today: ymd(new Date()),
+          infoOf: (date: string) => { const eaten: Record<string, string[]> = {}; for (const f of state.feedback) if (f.status === "eaten" && f.slot?.date === date) (eaten[f.slot.slotId] ??= []).push(f.meal.title); return { slots: slotsOn(lifestyleOf(p.personal), p.personal.timesOn, date), eaten, planned: p.planned[date] }; },
+          kcalFor: (date: string, slotId: string) => mealSizeOn(p, date, slotId),
+          put: (date: string, slotId: string, share: number) => { const items = opened.items.map((i) => ({ ...i, grams: i.grams * share })), t = aggregateAll(items); p.fill(date, slotId, { title: opened.title, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), source: "mine", mealId: opened.id, items, portion: Math.round(t.weight ?? 0) }); } }}
         draft={p.ai.on ? () => { const d = diffFoods(foodNames(opened.items), originalFoodsOf(opened, state.meals)); return draftSteps(opened, { library: state.foods.map((f) => f.name), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [], tastes: tasteForReq(p.personal.tasteChips, state.preferences), ...(d ? { changed: [...d.added.map((x) => `${x}: new`), ...d.gone.map((x) => `${x}: not in it any more`)] } : {}) }); } : null} />
       {sheet}
     </>

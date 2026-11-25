@@ -2,6 +2,7 @@
 // their names and ranges in the person's own numbers, under the PD target on Me, Goal (AC1); on the Plate a tap on the PD
 // number opens it with a mark where the plate sits (AC2), a second tap closes it (AC3); the words under the number say
 // the band above On plan (AC4); the ranges follow the goal: Recomposition and Build muscle, Steady (AC5).
+// changed by DT349 (0.3.193, AC13, design rule D14): the PD card has two columns; Energy, Weight and Protein are .rd-rows, the words against the target .pd-short or .pd-line
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -35,7 +36,7 @@ const PORT = "3604", U = `http://127.0.0.1:${PORT}`;
     await p.goto(U + "/plate"); await p.waitForTimeout(1300);
     await require("./set-meal.cjs")(p, "Breakfast"); await p.waitForTimeout(400);
   };
-  const words = (p) => p.locator(".readout .readout-mid > div > span").first().innerText();
+  const words = (p) => p.locator(".readout .pd-short, .readout .pd-line").first().innerText();
   try {
     // AC1: the scale on the Goal page, target 5.3 (106 g protein in 2000 kcal)
     let p = await open({ band: "maintain", calories: 2000, protein: 106 });
@@ -49,7 +50,7 @@ const PORT = "3604", U = `http://127.0.0.1:${PORT}`;
     await plate(p);
     ok((await p.locator(".readout .pd-scale").count()) === 0, "DT338 AC2: the scale is closed until I tap");
     ok((await words(p)).trim() === "High, above your plan", "DT338 AC4: at PD 8.4 the words say High, above your plan: " + (await words(p)));
-    const num = p.locator(".readout-mid .pd-tap").first();
+    const num = p.locator(".readout .pd-tap").first();
     ok((await num.innerText()).trim() === "8.4", "DT338 AC2: the PD number is 8.4");
     await num.click(); await p.waitForTimeout(300);
     s = await scaleOf(p, ".readout");
@@ -70,7 +71,7 @@ const PORT = "3604", U = `http://127.0.0.1:${PORT}`;
     p = await open({ band: "recomp", calories: 2300, protein: 145 }); await plate(p);
     ok((await words(p)).trim() === "fits your plan", "DT338 AC4: on plan the words say fits your plan, as before: " + (await words(p)));
     // AC5: Recomposition, target 6.3
-    await p.locator(".readout-mid .pd-tap").first().click(); await p.waitForTimeout(300);
+    await p.locator(".readout .pd-tap").first().click(); await p.waitForTimeout(300);
     s = await scaleOf(p, ".readout");
     ok(s.here === "On plan", "DT338 AC5: Recomposition, the egg at PD 8.4 is On plan: " + s.here);
     await p.goto(U + "/me/goal"); await p.waitForTimeout(1300);
@@ -83,7 +84,7 @@ const PORT = "3604", U = `http://127.0.0.1:${PORT}`;
     s = await scaleOf(p, ".goal-head");
     ok(s.ranges[2] === "4.5 to 7.5" && /target 5\.0$/.test((await p.locator(".goal-head .pd-scale-title").innerText()).trim()), "DT338 AC5: Build muscle, target 5.0, On plan 4.5 to 7.5: " + s.ranges.join(" | "));
     await plate(p);
-    await p.locator(".readout-mid .pd-tap").first().click(); await p.waitForTimeout(300);
+    await p.locator(".readout .pd-tap").first().click(); await p.waitForTimeout(300);
     s = await scaleOf(p, ".readout");
     ok(s.here === "High", "DT338 AC5: Build muscle, the same egg is High: " + s.here);
     await p.context().close();

@@ -8,6 +8,8 @@
 // Added by story DT305 (Coach Milan 16 November 2026, 10:04 to 10:49, boards Stories230 and Stories231; written down in
 // docs/rules/design.md as D6 and D7): an answer to tick sits under its question in its own block; the buttons of a section sit
 // under the whole section in one row. Guarded on the read of a photo, in photo-read.cjs.
+// Added by story DT349 (Coach Milan 24 November 2026, 07:42; 25 November 13:16 and 14:26; written down as D14): I, every PD
+// card is PdCard, PD and its words on the left, the title and its rows on the right, its numbers under the card.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -73,13 +75,30 @@ const U = "http://127.0.0.1:3242";
     ok(rb && hero && rb.y < hero.y && rb.x < 60, "E: the recipe page's Back, Recipes, sits top left above the photo");
     const nb2 = await page.locator(".rq-name").first().boundingBox();
     ok(nb2 && rb && hero && nb2.y > rb.y && nb2.y < hero.y, "G: the recipe's name comes first, under Back, before the photo");
+    // ---- I (D14, DT349 AC7): the recipe page's PD card is PdCard, and its numbers open under it ----
+    const pdCardOk = async (card, what) => {
+      const c = await card.boundingBox(), n = await card.locator(".pd-num > b").boundingBox(), r = await card.locator(".rd-rows").boundingBox();
+      const tops = await card.locator(".readout-top span").evaluateAll((ss) => ss.map((x) => [x.textContent.trim(), Math.round(x.getBoundingClientRect().left)]));
+      ok(c && n && r && n.x < r.x && tops.length === 2 && tops[0][1] > tops[1][1] && tops[1][0] === "PD", `I: ${what}: PD and its number on the left, the title and Energy, Weight, Protein on the right: ${JSON.stringify(tops)}`);
+    };
+    const rc = page.locator(".rq-readout").first();
+    ok(await rc.evaluate((x) => x.classList.contains("pd-card")), "I: the recipe page's PD card is PdCard");
+    await pdCardOk(rc, "the recipe page");
+    if (await rc.locator(".letters-row").count()) { await rc.locator(".letters-row").click(); await page.waitForTimeout(400);
+      ok(await rc.locator(".nt").count() === 0 && await page.locator(".rq-readout + .nt").count() === 1, "I: the recipe's numbers open under the card, not inside it");
+      await rc.locator(".letters-row").click(); await page.waitForTimeout(300); }
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(800);
     const f0 = await filled(page);
     ok(f0.length <= 1 && !f0.some((t) => /Add/.test(t)), "A: on the Plate no Add in the food list is filled: " + f0.join(", "));
     // ---- E: Back on a Plate step, top left above the step bar, and where it goes ----
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(700);
     await page.locator(".recipe-tile, .recipe-card").filter({ hasText: "Sarma" }).first().click(); await page.waitForTimeout(900);
-    await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(1200);
+    // changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
+    await page.getByRole("button", { name: "Put it on the Plate", exact: true }).click(); await page.waitForTimeout(1200);
+    // ---- I (D14, DT349 AC7): the Plate's PD card is the same component ----
+    const pc = page.locator("main .readout.pd-card").first();
+    ok(await pc.count() === 1, "I: the Plate's PD card is PdCard");
+    if (await pc.count()) { await pdCardOk(pc, "the Plate"); ok(await pc.locator(".nt").count() === 0, "I: no numbers inside the Plate's card"); }
     // changed by DT337 (0.3.176, AC6): Fit with no meal set asks which meal first: the walkthrough picks the meal the clock is in
     for (let i = 0; i < 3 && !(await page.locator(".step-head .back-top").count()); i++) { if (await page.locator(".meal-line-open").count()) { await require("./set-meal.cjs")(page); await page.waitForTimeout(2500); continue; } const go = page.getByRole("button", { name: /^(Make it as it is|Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Fit to my target)$/ }).first(); if (await go.count()) { await go.click(); await page.waitForTimeout(1000); } }
     const bk = page.locator(".step-head .back-top").first();

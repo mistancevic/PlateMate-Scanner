@@ -4,6 +4,8 @@
 // (the recipe on the Plate, unchanged) and Edit recipe. R11: edit mode, grams, × a food, Add a food, steps, Save changes
 // or Cancel. A long name never makes the page wider than the phone. A live recipe whose page has a photo and the app none
 // takes the page's photo once as its cover, and a removed cover never comes back from the page.
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
+// changed by DT349 (0.3.193, design rule D14): the PD card has two columns; Energy, Weight and Protein are .rd-rows, whole grams
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -49,7 +51,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   await tile("Eggs, Milk").click(); await page.waitForTimeout(500);
   ok(await page.locator(".rq-hero img").count() === 1 && /Cover/.test(await page.locator(".rq-hero").textContent()), "R8: the page opens with the cover large");
   ok(await wide() <= 0, "the long name never makes the page wider than the phone (360 px)");
-  ok(/365/.test(await page.locator(".rq-readout").textContent()) && /43\.8/.test(await page.locator(".rq-readout").textContent()), "R8: the recipe's numbers: 365 kcal, 43.8 g protein");
+  ok(/Energy\s*365\s*kcal/.test(await page.locator(".rq-readout").textContent()) && /Protein\s*44\s*g/.test(await page.locator(".rq-readout").textContent()), "R8: the recipe's numbers: 365 kcal, 44 g protein");
   // × asks Sure? before deleting
   // Changed by DT280 (0.3.132): a tap picks the photo in the gallery; Delete this photo is under the row, Sure? first
   await page.locator(".rq-thumbs .publish-photo:not(.add)").first().click(); await page.waitForTimeout(150);
@@ -74,7 +76,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(200);
   ok(await page.locator(".rq-editing").count() === 1, "R11: Editing the recipe");
   await page.getByLabel("Grams of Chicken breast, cooked").fill("100"); await page.waitForTimeout(150);
-  ok(/398/.test(await page.locator(".rq-readout").textContent()) && /50(\.0)?\s*g protein/.test(await page.locator(".rq-readout").textContent()) && /12\.6/.test(await page.locator(".rq-readout").textContent()), "R11: the numbers follow as you type: 398 kcal, 50 g protein, PD 12.6");
+  ok(/Energy\s*398\s*kcal/.test(await page.locator(".rq-readout").textContent()) && /Protein\s*50\s*g/.test(await page.locator(".rq-readout").textContent()) && /12\.6/.test(await page.locator(".rq-readout").textContent()), "R11: the numbers follow as you type: 398 kcal, 50 g protein, PD 12.6");
   await page.getByRole("button", { name: "Cancel" }).click(); await page.waitForTimeout(200);
   ok((await meal("m-emc")).items.find((i) => i.id === "c").grams === 80, "R11: Cancel leaves the recipe as it was");
   await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(200);
@@ -105,7 +107,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   ok(m1.items.map((i) => `${i.food.name}:${i.grams}`).join(",") === "Eggs:120,Chicken breast, cooked:100,Skyr, natural:100" && m1.steps.length === 3 && /\[\[i:c\|chicken breast\]\]/.test(m1.steps[1]) && m1.portion === 320, "R11: Save changes keeps the foods, the grams and the steps: " + m1.items.map((i) => `${i.food.name} ${i.grams}`).join(", "));
   ok(/Whisk 2 eggs \(L\)/.test(await page.locator(".rq-steps").textContent()) && /Fold in 100 g chicken breast and cook slowly\./.test(await page.locator(".rq-steps").textContent()), "R13: the steps read with the amounts on the recipe's page: " + (await page.locator(".rq-steps").textContent()));
   // R10: Make it puts the recipe on the Plate and leaves the recipe as it is
-  await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: "Put it on the Plate", exact: true }).click(); await page.waitForTimeout(600);
   ok(new URL(page.url()).pathname === "/plate" && await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count() === 1, "R10: Make it opens the recipe on the Plate");
   ok(JSON.stringify((await meal("m-emc")).items) === JSON.stringify(m1.items), "R10: Make it leaves the recipe as it is");
   // the photos stay after a reload, the cover first; the oats are offered their plate photo

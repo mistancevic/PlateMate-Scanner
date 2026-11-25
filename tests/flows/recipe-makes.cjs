@@ -1,6 +1,7 @@
 // What a recipe makes (DT80, Milan 23 October 12:26 and 12:27, board DT80). A sarma recipe saved from the Plate says nothing
 // about what it makes, so the Plate divides it by weight into portions. Edit recipe, Makes 8 sarma: the page counts one sarma,
 // a lunch already planned turns into the sarmas that keep its kcal, Plan counts in sarmas, and the page says what the plan takes.
+// changed by B168 (0.3.193): the recipe page's PD card is the whole recipe as written; one serving is in the Nutrition table
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -48,7 +49,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", po
   await page.getByLabel("How many it makes").fill("8"); await page.getByLabel("Of what").fill("sarma");
   await page.getByRole("button", { name: "Save changes" }).click(); await page.waitForTimeout(800);
   const pageText = await txt(".rq");
-  ok(/The whole recipe makes 8 sarmas · one sarma \d+ kcal/.test(pageText) && /One sarma/.test(pageText), "the page: Makes 8 sarmas, and one sarma's numbers: " + pageText.slice(0, 200));
+  ok(/The whole recipe makes 8 sarmas · one sarma \d+ kcal/.test(pageText) && /1 SARMA/.test(pageText), "the page: Makes 8 sarmas, and one sarma's numbers in the Nutrition table: " + pageText.slice(0, 200));
   ok(/^8 sarmas: \d+ on \w+ lunch\. \d+ sarmas? left\./.test(await txt(".rq-planned")), "the page says what the plan takes: " + await txt(".rq-planned"));
   // Plan: the lunch is now in sarmas, about the same kcal
   await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(700);

@@ -2,6 +2,7 @@
 // serving; the table is worked out by code in the EU label order with exact counts (All 8, All 2), PD and a line by part; the
 // recipe's own numbers sit under ours. A sweetener with no energy and carbohydrate (erythritol) is a real food, counted as
 // polyols: read from a recipe, it never makes the stored data unreadable.
+// changed by B168 (0.3.193): the recipe page's PD card is the whole recipe as written; one serving is in the Nutrition table
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -59,7 +60,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   ok(!/could not be read/.test(await text(page, "main")), "A sweetener with no energy and carbohydrate is a real food: the stored data reads back");
   await openRecipe(page, "Protein cheesecake");
   const stats = await text(page, ".rq-readout");
-  ok(/One slice/.test(stats) && /kcal · [\d.]+ g protein · \d+ g/.test(stats), `RP2 (was IM21): the readout says one slice, with its weight (${stats})`);
+  ok(/The whole recipe/.test(stats) && /Energy\s*[\d,]+\s*kcal\s*Weight\s*[\d,]+\s*g\s*Protein\s*[\d,]+\s*g/.test(stats), `RP2 (was IM21): the readout says the whole recipe, with its weight (${stats})`);
   const head = (await page.locator('[aria-label="Nutrition"] .nt-th').first().textContent()).replace(/\s+/g, " ").trim();
   ok(/^1 SLICE\d+ gALL 8[\d,]+ g100 G$/.test(head), `IM21, RP2: columns: 1 slice, All 8, 100 g, each with its weight (${head})`);
   const labels = await page.locator('[aria-label="Nutrition"] .nt-row > span').allTextContents();

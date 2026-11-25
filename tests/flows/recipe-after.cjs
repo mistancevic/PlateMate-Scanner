@@ -3,6 +3,7 @@
 // own list (IM8); the original steps are kept for him only (IM9b); Chef Mealan's steps say how each relates to the original
 // (IM9); what he cooks with, and a plain "can't" when there is no sensible way (IM10, IM10b); one picture try when kept,
 // then Draw a picture with the day's count, no retries overnight (IM11, IM11b). Then °F, lb and ft and in on Profile (UN).
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -105,7 +106,7 @@ const U = "http://127.0.0.1:3210";
   ok(steps.length === before + 1 && /This needs an oven; the air fryer would burn the top before the middle is done\./.test(await text(".rq-steps")) && !/didn't pass the checks/.test(await text(".rq-steps")), "IM10b: no sensible way: said plainly, asked once");
 
   // IM13, IM12, IM12b: Make it opens the plate of the first time, with the optional foods; + Add puts one on, Leave it out sends it back
-  await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Put it on the Plate", exact: true }).click(); await page.waitForTimeout(1200);
   ok(await page.locator(".plate-card .in-portion").count() === 1 && await page.locator(".plate-card .dish-row").count() === 0 && await page.locator('.plate-card .rows input[aria-label^="Grams of"]').count() + await page.locator(".plate-card .rows .ct-num").count() === 5, "IM13: Make it from Recipes: the foods one by one, with the two portions, not one locked block");
   ok(/Optional, not on the plate/.test(await text(".pt-optlist")) && await page.locator(".pt-optlist .pt-opt").count() === 3, "IM12: the three optional foods under the foods, out of the numbers");
   const kcal0 = await text(".plate-card .readout");
