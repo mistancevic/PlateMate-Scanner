@@ -82,7 +82,8 @@ const PORT = "3618", U = `http://127.0.0.1:${PORT}`;
     ok(await p.locator("section.rq-howmuch .rq-cook-row.idle").count() === 1, "DT349 AC8: a tap on a chip greys − and + again");
     // ---- DT349: What do you do with it? ----
     const act = p.locator("section.rq-actions");
-    const acts = (await act.getByRole("button").allTextContents()).map((t) => t.trim());
+    // changed by DT353 (0.3.195, AC10): Plan it carries its arrow, ⌄ closed
+    const acts = (await act.getByRole("button").allTextContents()).map((t) => t.replace(/[⌄⌃]/g, "").trim());
     ok(/What do you do with it\?/.test(await txt(act)) && JSON.stringify(acts) === JSON.stringify(["Plan it", "Put it on the Plate"]) && !(await p.getByRole("button", { name: "Change it first" }).count()), "DT349 AC9: What do you do with it? Plan it, Put it on the Plate; no Change it first: " + acts.join(", "));
     await act.getByRole("button", { name: "Plan it" }).click(); await p.waitForTimeout(500);
     const days = await act.locator(".pcal-day:not(.pcal-more)").evaluateAll((ds) => ds.map((d) => [d.textContent.trim(), d.disabled]));

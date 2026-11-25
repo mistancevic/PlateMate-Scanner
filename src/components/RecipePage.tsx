@@ -17,8 +17,8 @@ import type { Feedback, Food, Ingredient, Meal, StepMark } from "../pilot";
 import { aggregate, density, sizedFor } from "../pilot";
 import { findReference, referenceFood } from "../reference";
 import { fmt, pdText, pdVal } from "../ui";
-import { plateCal } from "../screens/PlateCalendar";
-import { servingChips, stepping, portionShare, portionsInWhole } from "../servings";
+import { PlanIt } from "./PlanIt";
+import { servingChips, stepping } from "../servings";
 import { recipePhotosOf, withRecipePhotos } from "../photos";
 import { resizeImageBase64 } from "../utils/image";
 import { useBack, recipePath } from "../back";
@@ -59,7 +59,7 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 
 export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, beforeSteps = null, atStart = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null, plan = null }: {
-  plan?: { today: string; infoOf: (date: string) => import("../screens/PlateCalendar").CalInfo; kcalFor: (date: string, slotId: string) => number | null; put: (date: string, slotId: string, share: number) => void } | null;
+  plan?: import("./PlanIt").PlanApi | null;
   // DT227 (0.3.61, board Stories167): a draft of this recipe saved for later on the Plate
   saved?: { sub: string; go: () => void } | null;
   // B160 (0.3.187): Save as a new recipe from Edit recipe: the changes become a new recipe, this one stays as it is
@@ -156,13 +156,6 @@ export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards,
   const cookN = makesN ? meal.cook?.n ?? makesN : 0;
   const [cookOther, setCookOther] = useState(false);
   const shownItems = !cookN || cookN === makesN ? meal.items : sizedFor(meal, cookN);
-  // DT349: Plan it. The Plate's calendar opens in place; a meal picked shows my portion for that meal on that day, then it goes into the plan
-  const [planOpen, setPlanOpen] = useState(false);
-  const [planDay, setPlanDay] = useState<string | null>(null);
-  const [planMore, setPlanMore] = useState(false);
-  const [planPick, setPlanPick] = useState<{ date: string; id: string; name: string; kcal: number } | null>(null);
-  const [planDone, setPlanDone] = useState<string | null>(null);
-  const wholeT = aggregate(meal.items.filter((i) => i.grams > 0));
   const setCook = (n: number) => { if (!makesN) return; const c = Math.max(1, Math.min(200, n)); onPatch({ cook: c === makesN ? undefined : { n: c } }); };
   const [extraParts, setExtraParts] = useState<string[]>([]);
   const [find, setFind] = useState<string | null>(null);
@@ -663,21 +656,7 @@ export function RecipePage({ onSaveNew, onCardChange, onCardDelete, meal, cards,
                calculated where a day and a meal exist: here once a meal is picked, or on the Plate. */
             <section className="card rq-actions" aria-label={w("recipe.whatDo")}>
               <b>{w("recipe.whatDo")}</b>
-              {plan && <button className="pill pill-wide" aria-expanded={planOpen} onClick={() => { setPlanOpen(!planOpen); setPlanPick(null); setPlanDone(null); }}>{w("recipe.planIt")}</button>}
-              {plan && planOpen && !planDone && plateCal({ mode: "plan", day: planDay ?? plan.today, setDay: (d) => { setPlanDay(d); setPlanPick(null); }, more: planMore, setMore: setPlanMore, now: new Date(), today: plan.today, infoOf: plan.infoOf, title: w("recipe.planWhich"),
-                marked: planPick ? { date: planPick.date, id: planPick.id } : null,
-                onPick: (date, r) => { if (!r.id) return; const k = plan.kcalFor(date, r.id); const sl = plan.infoOf(date).slots.find((x) => x.id === r.id); if (k && sl) setPlanPick({ date, id: r.id, name: sl.name, kcal: k }); } })}
-              {plan && planOpen && planPick && !planDone && (() => {
-                const share = portionShare(planPick.kcal, wholeT.calories), held = plan.infoOf(planPick.date).planned?.[planPick.id], holds = held && !held.skipped ? held.title : null, day = dateText(new Date(`${planPick.date}T12:00:00`), { weekday: "long" });
-                return (<>
-                  <p className="rq-choice-line"><b>{w("recipe.planPortion", { meal: mealV(planPick.name, true), day, grams: fmt((wholeT.weight ?? 0) * share, 0), kcal: fmt((wholeT.calories ?? 0) * share, 0), protein: fmt((wholeT.protein ?? 0) * share, 0), pd: pdVal(density(wholeT.protein, wholeT.calories)) })}</b></p>
-                  <small className="muted">{w("recipe.planWhy", { meal: mealV(planPick.name, true), size: fmt(planPick.kcal, 0), x: dec(portionsInWhole(share), 1) })}</small>
-                  {/* a meal that already holds something in the plan is asked about first, as Plan does (Coach Milan 25 November 14:42) */}
-                  {holds && <p className="rq-plan-holds">{w("recipe.planHolds", { day, meal: mealV(planPick.name, true), title: holds })}</p>}
-                  <button className="pill pill-wide pill-primary" onClick={() => { plan.put(planPick.date, planPick.id, share); setPlanDone(w("recipe.inPlan", { day, meal: mealV(planPick.name, true), grams: fmt((wholeT.weight ?? 0) * share, 0) })); }}>{holds ? w("recipe.replaceInPlan") : w("recipe.putInPlan")}</button>
-                </>);
-              })()}
-              {planDone && <p className="rq-choice-line"><b>✓ {planDone}</b></p>}
+              {plan && <PlanIt items={meal.items} plan={plan} />}
               <button className="pill pill-wide" onClick={() => onMakeIt()}>{w("recipe.putOnPlate")}</button>
               <small className="muted rq-under">{w("recipe.onThePlateChangeFoods")}</small>
             </section>
