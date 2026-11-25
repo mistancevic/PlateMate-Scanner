@@ -12,11 +12,9 @@
   "story": "When I open a recipe a member shared, I want to read it as they wrote it and then decide what to do with it, the same way as with my own recipes, so that I know where everything is.",
   "now": "Members, a recipe: Your dinner: 300 g of the 897 g it makes; three tiles, 732 kcal, 31 g protein, PD 4.3; Foods for your portion; the steps with my portion's amounts; Make it (my portion goes on the Plate); Keep in mine.",
   "proposed": "1. The page opens on the recipe as the member wrote it: title, who shared it, the photo when there is one, the Plate's PD card for the whole recipe (PdCard, design rule D14), Foods, the Nutrition table, the steps with the recipe's amounts. 2. What do you do with it?, at the end, starts with a note: Sam's recipe, as written, and where each way leads (Coach Milan 16:41). Then the actions: Plan it (the Plate's day and meal block, then my portion for that meal, then Put it in the plan), Put it on the Plate (was Make it: my portion for the meal ahead goes on the Plate, as now), Save to My recipes (was Keep in mine). 3. The list's tile keeps my portion for the meal ahead: that is where I browse. 4. The page shows no portion of mine until I pick a meal (nutrition rule N17). 5. No Servings card on this page: it is for deciding; the servings to cook are chosen after Save to My recipes (16:39 to 16:41).",
-  "looked_at": "Keep opening on my portion: not chosen in this drawing, Coach Milan 24 November 19:01: recipes from others show the original numbers and math first. Servings chips as on my own page, with sharing sending how many a recipe makes: not chosen, 16:41: the page is for deciding; the servings come after Save to My recipes.",
+  "looked_at": "Keep opening on my portion: not chosen in this drawing, Coach Milan 24 November 19:01: recipes from others show the original numbers and math first. Servings chips as on my own page, with sharing sending how many a recipe makes: not chosen, 16:41: the page is for deciding; the servings come after Save to My recipes. The pack names in small letters in a shared recipe's steps: not in DT353, its own bug, B170 (16:57).",
   "decision": "For discussion (16:26). Agreed so far: the page is for deciding (16:39); no Servings card, a note before the actions (16:41).",
-  "open": [
-    "Seen on both pages: the steps of a shared recipe write a pack's name in small letters (körniger frischkäse tworog), because a shared food arrives without its source. Its own bug, or in this ticket?"
-  ],
+  "open": [],
   "short": "A member's recipe page: the recipe as written on top, What do you do with it? at the end",
   "ac": [],
   "unchanged": [

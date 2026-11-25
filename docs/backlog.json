@@ -4760,6 +4760,13 @@
       "rel": "Redrawn 25 November 2026 for discussion; agreed so far: the page is for deciding, no Servings, a note before the actions"
     },
     {
+      "id": "B170",
+      "title": "A shared recipe drops where each food came from and its barcode",
+      "epic": "cook",
+      "state": "next",
+      "why": "Seen while drawing DT353, 25 November 2026: cleanShared in src/members.ts keeps a food's name, values and grams, but not its source or barcode. So a member's recipe writes a pack's name in small letters in its steps (körniger frischkäse tworog), on the member's page and in the copy after Save to My recipes; and the copy's foods match my own foods by name only. The numbers are right. Proposed: sharing keeps the source (label, Reference table) and the barcode. Coach Milan 16:57: ok, its own ticket. Not drawn."
+    },
+    {
       "id": "B169",
       "title": "recipe-photos fails: a food's name in a step keeps its capital (Chicken breast)",
       "epic": "cook",
