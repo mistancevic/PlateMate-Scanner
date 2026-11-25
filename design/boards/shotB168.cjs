@@ -73,14 +73,22 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     p = await open("3720", "/plate");
     for (const n of ["Skyr", "Oats", "Banana"]) { await (await require(path.join(OLD_ROOT, "tests/flows/more.cjs"))(p)).fill(n); await sleep(400); await p.locator(".row-food").filter({ hasText: n }).first().getByRole("button", { name: /Add/ }).click(); await sleep(700); }
     const x2 = p.locator(".add-more-top button").first(); if (await x2.count()) { await x2.click(); await sleep(300); }
-    console.log(await note(p, ".plate-card .readout", "<b>New:</b> the same card, PdCard. The words against the target have their own line, the full width of the card, under the PD and its rows. A long line no longer squeezes the rows.", [".plate-card .readout .pd-line"]));
+    console.log(await note(p, ".plate-card .readout", "<b>New:</b> the same card, PdCard. Each label heads its column: Energy, Weight and Protein under the title; the PD and its words against the target under PD.", [".plate-card .readout .pd-cols"]));
     await shot(p, "68-4b", ".plate-card .readout", ".board-note"); await p.context().close();
+    // ---- B168.5: the PD card, variations: each with a short line and a long one (High+, far above your plan, the Plate's own words) ----
+    for (const v of ["a", "b", "c"]) for (const [k, line] of [["s", ""], ["l", "High+, far above your plan"]]) {
+      p = await open("3720");
+      await p.evaluate(([v, line]) => { if (v !== "a") localStorage.setItem("board-pd-variant", v); if (line) localStorage.setItem("board-pd-line", line); }, [v, line]);
+      await p.reload(); await sleep(1500);
+      await p.evaluate(() => { const st = document.createElement("style"); st.textContent = ".bottom-nav, .chat-fab, [class*='fab'] { display: none !important; }"; document.head.append(st); }); await sleep(200);
+      await p.locator(".rq-readout").screenshot({ path: `${R}/68-5${v}-${k}.png` }); await p.context().close();
+    }
     // ---- new, scratch build ----
     p = await open("3720");
     const FOODS = "section.rq-foods", HOW = "section.rq-howmuch", LINE = ".rq-choice-line", ACT = "section.rq-actions";
     const chip = (text) => p.locator(`${HOW} .choice`).filter({ hasText: text }).first();
     console.log(await note(p, ".rq-nopic", "<b>New:</b> no photo yet is a placeholder picture of a meal, in the photo's place; its two buttons sit on it.", [".rq-nopic"]));
-    console.log(await note(p, ".rq-readout", "<b>New, fixed:</b> the PD card is the Plate's card, for the whole recipe as written: 2,194 kcal, 897 g, 93 g. A short title; the words against my target on their own line. It never follows a choice below.", [".rq-readout"]));
+    console.log(await note(p, ".rq-readout", "<b>New, fixed:</b> the PD card is the Plate's card, for the whole recipe as written: 2,194 kcal, 897 g, 93 g. A short title. Each label heads its column: the rows under The whole recipe, 4.3 and 0.5 under your 4.8 under PD. It never follows a choice below.", [".rq-readout"]));
     console.log(await note(p, HOW, "<b>New:</b> Servings, the one choice on the page. A chip is one tap: 1 to 5. Under them − and + for an exact number, grey until used. The line gives the numbers for the choice. No Cook it card.", [HOW]));
     console.log(await note(p, FOODS, "<b>New:</b> Foods is one block, only the list, in grams for the servings chosen.", []));
     console.log(await note(p, "section.nt-card", "<b>New word:</b> 1 SERVING, the recipe's equal share, the same for everyone; ALL 4 and 100 g beside it. Fixed, as the top (nutrition rule N17).", ["JS:document.querySelector('section.nt-card .nt-row.nt-th')"]));
