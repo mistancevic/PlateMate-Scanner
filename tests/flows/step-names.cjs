@@ -2,6 +2,8 @@
 // with a space after it, so Körniger Frischkäse Tworog 2,5% Fett stays whole; a pack's name (a barcode, or read from a
 // label) stays as printed, with its capitals; a basic food is in small letters (2 eggs); the name comes from the food each
 // time, so steps written before read right, on the recipe, in Edit recipe and in Start cooking.
+// B169 (0.3.194, board B169, canvas Page 6; Coach Milan, Go 25 November 2026, 16:04): the app's first starter foods (typical
+// values, check your pack) were saved as read from a label; they are basic foods, so a step names them in small letters.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -11,10 +13,11 @@ const food = (id, name, calories, protein, carbs, fats, fiber, extra = {}) => ({
 const Q = food("q", "Körniger Frischkäse Tworog 2,5% Fett", 100, 12, 3, 4.5, 0, { barcode: "4056489000001" }), P = food("p", "Frischer Blätterteig", 400, 6, 36, 25, 1.5, { barcode: "4056489000002" }),
   S = food("s", "Alpen JodSalz", 0, 0, 0, 0, 0), E = food("e", "Eggs", 143, 12.6, 0.7, 9.5, 0, { source: "Reference table", refId: "egg" }), C = food("c", "Chicken breast, cooked", 165, 31, 0, 3.6, 0, { source: "Reference table", refId: "chicken" });
 const it = (id, f, g) => ({ id, food: f, grams: g, locked: false });
-const I = { q: it("a", Q, 250), p: it("b", P, 375), s: it("c", S, 3), e: it("d", E, 122), c: it("k", C, 150) };
+const RICE = seed.foods.find((f) => f.id === "f-rice"); // a first starter food: source label, generic, check your package
+const I = { q: it("a", Q, 250), p: it("b", P, 375), s: it("c", S, 3), e: it("d", E, 122), c: it("k", C, 150), r: it("r", RICE, 100) };
 const tok = (x, n) => `[[i:${x.id}|${n}]]`;
 const recipe = { id: "m-burek", title: "Lazy Burek", items: Object.values(I), makes: { n: 4, unit: "portions" }, portion: 225, savedAt: "2026-11-23T16:00:00Z",
-  steps: [`Mix ${tok(I.q, "körniger frischkäse tworog 2")}, ${tok(I.s, "alpen jodsalz")} and ${tok(I.e, "eggs")}.`, `Lay out ${tok(I.p, "frischer blätterteig")} and add ${tok(I.c, "chicken breast")}.`, "Bake at 200 °C for 25 minutes."] };
+  steps: [`Mix ${tok(I.q, "körniger frischkäse tworog 2")}, ${tok(I.s, "alpen jodsalz")} and ${tok(I.e, "eggs")}.`, `Lay out ${tok(I.p, "frischer blätterteig")} and add ${tok(I.c, "chicken breast")}.`, `Bake at 200 °C for 25 minutes and serve with ${tok(I.r, "Rice")}.`] };
 const PORT = "3614", U = `http://127.0.0.1:${PORT}`;
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
@@ -36,7 +39,11 @@ const PORT = "3614", U = `http://127.0.0.1:${PORT}`;
     ok(/250 g Körniger Frischkäse Tworog 2,5% Fett/.test(steps), "B163 AC1: the decimal comma stays: " + (steps.match(/Mix [^\n]*/) || [""])[0]);
     ok(/3 g Alpen JodSalz/.test(steps) && /375 g Frischer Blätterteig/.test(steps), "B163 AC2: a pack's name as printed");
     ok(/2 eggs \(L\)/.test(steps) && /150 g chicken breast/.test(steps), "B163 AC3: basic foods in small letters, cut at a comma with a space");
+    ok(/serve with 100 g rice\b/.test(steps) && !/100 g Rice/.test(steps), "B169 AC1: a first starter food in small letters: " + (steps.match(/Bake [^\n]*/) || [""])[0]);
+    ok(/375 g Frischer Blätterteig/.test(steps), "B169 AC3: a pack's name as printed, as before");
     await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(500);
+    const f3 = await page.getByRole("textbox", { name: "Step 3" }).innerText();
+    ok(/100 g rice/.test(f3) && !/Rice/.test(f3), "B169 AC2: in Edit recipe too: " + f3.replace(/\s+/g, " "));
     const field = await page.getByRole("textbox", { name: "Step 1" }).innerText();
     ok(/Körniger Frischkäse Tworog 2,5% Fett/.test(field), "B163 AC4: steps written before, in Edit recipe: " + field.replace(/\s+/g, " "));
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
