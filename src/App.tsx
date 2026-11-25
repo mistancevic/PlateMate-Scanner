@@ -88,7 +88,7 @@ const PHONE_OWNER = "chefmealan-phone-owner";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
 import { logPhoto, photosOf, withPhotos, withoutStored, looseIn, loosePhotosOf, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn, recipePhotosOf, withRecipePhotos, recipeHasPhotos } from "./photos";
 import { coversFromCooks, needsCover, cardHasPhoto } from "./covers";
-import { itemsOf as itemsOfShared, type SharedRecipe } from "./members";
+import { itemsOf as itemsOfShared, foodMatcher, type SharedRecipe } from "./members";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { BuiltScreen } from "./screens/BuiltScreen";
 import { BookScreen } from "./screens/BookScreen";
@@ -2546,10 +2546,10 @@ export default function App() {
     takeMember: (r: SharedRecipe, how: "make" | "keep", portion?: Ingredient[]) => {
       // foods she doesn't have come along with their values, as from a coach's recipe
       setState((s) => {
-        const key = (n: string, b: string) => `${n}|${b}`.toLowerCase();
-        const have = new Map(s.foods.map((f) => [key(f.name, f.brand), f] as const));
         const fresh: Food[] = [];
-        const libOf = (i: Ingredient) => { const k = key(i.food.name, i.food.brand); let f = have.get(k); if (!f) { f = { ...i.food, id: uid(), icon: i.food.icon || iconFor(i.food.name) }; have.set(k, f); fresh.push(f); } return f; };
+        // B170 (0.3.196): the same pack by its barcode, then the same basic food, then the name and brand (foodMatcher)
+        const lib = foodMatcher(s.foods);
+        const libOf = (i: Ingredient) => { let f = lib.find(i.food); if (!f) { f = { ...i.food, id: uid(), icon: i.food.icon || iconFor(i.food.name) }; lib.add(f); fresh.push(f); } return f; };
         const src = how === "make" && portion ? portion : itemsOfShared(r);
         const items = src.map((i) => ({ ...i, food: libOf(i), locked: how === "make" }));
         const foods = [...s.foods, ...fresh];

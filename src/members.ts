@@ -7,7 +7,9 @@ import { aggregate, density } from "./pilot";
 import { blockedByAllergy } from "./safety";
 import { cleanPart } from "./parts";
 
-export type SharedFood = Pick<Food, "name" | "brand" | "calories" | "protein" | "fats" | "carbs" | "fiber" | "readyToEat"> & { icon?: string; serving?: Food["serving"] };
+// B170 (0.3.196): a shared food keeps where it came from (source), its barcode and its basic food (refId): a pack keeps its name as
+// printed in the steps, and a member's foods match mine by barcode first
+export type SharedFood = Pick<Food, "name" | "brand" | "calories" | "protein" | "fats" | "carbs" | "fiber" | "readyToEat"> & { icon?: string; serving?: Food["serving"]; source?: string; barcode?: string; refId?: string };
 export type SharedItem = { id: string; grams: number; food: SharedFood; part?: string };
 export type SharedRecipe = {
   id: string; title: string; items: SharedItem[]; steps: string[]; kitchen: string | null; source?: string;
@@ -31,6 +33,10 @@ export function cleanShared(r: any): Omit<SharedRecipe, "id" | "name" | "cover" 
       calories: num(i?.food?.calories), protein: num(i?.food?.protein), fats: num(i?.food?.fats), carbs: num(i?.food?.carbs), fiber: num(i?.food?.fiber),
       readyToEat: Boolean(i?.food?.readyToEat), ...(typeof i?.food?.icon === "string" && i.food.icon.length <= 8 ? { icon: i.food.icon } : {}),
       ...(i?.food?.serving && num(i.food.serving.grams) ? { serving: { grams: num(i.food.serving.grams)!, name: str(i.food.serving.name, 30) } } : {}),
+      // B170: what the food is, never anything about the person: a short word for its source, the barcode's digits, the basic food's id
+      ...(/^[A-Za-z][A-Za-z ]{0,29}$/.test(str(i?.food?.source, 200)) ? { source: str(i.food.source, 30) } : {}),
+      ...(/^\d{8,14}$/.test(str(i?.food?.barcode, 200)) ? { barcode: str(i.food.barcode, 14) } : {}),
+      ...(/^[A-Za-z0-9_-]{1,40}$/.test(str(i?.food?.refId, 200)) ? { refId: str(i.food.refId, 40) } : {}),
     },
   })).filter((i: SharedItem) => i.food.name && i.grams > 0 && i.food.calories !== null);
   if (!title || !items.length) return null;
@@ -45,7 +51,7 @@ export function cleanShared(r: any): Omit<SharedRecipe, "id" | "name" | "cover" 
 export function sharedOf(m: Meal, kitchen: string | null) {
   return {
     title: m.title,
-    items: m.items.filter((i) => i.grams > 0).map((i) => ({ id: i.id, grams: i.grams, food: { name: i.food.name, brand: i.food.brand, calories: i.food.calories, protein: i.food.protein, fats: i.food.fats, carbs: i.food.carbs, fiber: i.food.fiber, readyToEat: i.food.readyToEat, icon: i.food.icon, serving: i.food.serving }, ...(i.part ? { part: i.part } : {}) })),
+    items: m.items.filter((i) => i.grams > 0).map((i) => ({ id: i.id, grams: i.grams, food: { name: i.food.name, brand: i.food.brand, calories: i.food.calories, protein: i.food.protein, fats: i.food.fats, carbs: i.food.carbs, fiber: i.food.fiber, readyToEat: i.food.readyToEat, icon: i.food.icon, serving: i.food.serving, source: i.food.source, barcode: i.food.barcode, refId: i.food.refId }, ...(i.part ? { part: i.part } : {}) })),
     steps: m.steps ?? [],
     kitchen,
     ...(m.source?.name ? { source: m.source.name } : {}),
@@ -61,8 +67,26 @@ export function contentSig(x: unknown): string {
 export const firstName = (name: string | null | undefined) => String(name ?? "").trim().split(/\s+/)[0] ?? "";
 
 // A shared food as a food of yours: the values, no photos, no notes
-export const foodOf = (f: SharedFood, id: string): Food => ({ id, name: f.name, brand: f.brand ?? "", calories: f.calories, protein: f.protein, fats: f.fats, carbs: f.carbs, fiber: f.fiber, basis: "100g", source: "members", notes: "", reviewedAt: new Date().toISOString(), readyToEat: f.readyToEat, ...(f.icon ? { icon: f.icon } : {}), ...(f.serving ? { serving: f.serving } : {}) });
+export const foodOf = (f: SharedFood, id: string): Food => ({ id, name: f.name, brand: f.brand ?? "", calories: f.calories, protein: f.protein, fats: f.fats, carbs: f.carbs, fiber: f.fiber, basis: "100g", source: f.source || "members", notes: "", reviewedAt: new Date().toISOString(), readyToEat: f.readyToEat, ...(f.icon ? { icon: f.icon } : {}), ...(f.serving ? { serving: f.serving } : {}), ...(f.barcode ? { barcode: f.barcode } : {}), ...(f.refId ? { refId: f.refId } : {}) });
 export const itemsOf = (r: Pick<SharedRecipe, "items">): Ingredient[] => r.items.map((i) => ({ id: i.id, grams: i.grams, locked: false, food: foodOf(i.food, `m-${i.id}`), ...(i.part ? { part: i.part } : {}) }));
+
+// B170 (0.3.196): a member's food as one of mine: the same pack by its barcode, then the same basic food, then the name and
+// brand; a pack with another barcode is another food, so the member's numbers stay
+export function foodMatcher(foods: Food[]) {
+  const key = (n: string, b: string) => `${n}|${b}`.toLowerCase();
+  const byName = new Map(foods.map((f) => [key(f.name, f.brand), f] as const));
+  const byCode = new Map(foods.filter((f) => f.barcode).map((f) => [f.barcode!, f] as const));
+  const byRef = new Map(foods.filter((f) => f.refId).map((f) => [f.refId!, f] as const));
+  return {
+    find: (g: Pick<Food, "name" | "brand" | "barcode" | "refId">): Food | undefined => {
+      const f = (g.barcode && byCode.get(g.barcode)) || (g.refId && byRef.get(g.refId)) || undefined;
+      if (f) return f;
+      const h = byName.get(key(g.name, g.brand));
+      return h && !(g.barcode && h.barcode && h.barcode !== g.barcode) ? h : undefined;
+    },
+    add: (f: Food) => { byName.set(key(f.name, f.brand), f); if (f.barcode) byCode.set(f.barcode, f); if (f.refId) byRef.set(f.refId, f); },
+  };
+}
 
 // The recipe at your portion: every food scaled by the same factor, to the nearest 5 g (at least 5 g)
 export function portionOf(r: Pick<SharedRecipe, "items">, need: number | null) {

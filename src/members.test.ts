@@ -25,3 +25,36 @@ test("what a shared recipe may carry: names, values, amounts, steps and a kitche
   assert.equal(cleanShared({ title: "", items: [] }), null);
   assert.equal(firstName("Milan Stancevic"), "Milan");
 });
+
+// B170 (0.3.196, board B170, canvas Page 6; Coach Milan, Go 25 November 2026, 20:01)
+import { sharedOf, foodMatcher, itemsOf } from "./members";
+const pack = (id: string, name: string, calories: number, barcode?: string) => ({ id, name, brand: "", calories, protein: 6, fats: 25, carbs: 36, fiber: 1.5, basis: "100g" as const, source: "label", notes: "my note", reviewedAt: "2026-11-20T10:00:00Z", readyToEat: false, photo: "data:image/jpeg;base64,x", ...(barcode ? { barcode } : {}) });
+test("B170 AC1: sharing keeps a pack's source and barcode and a basic food's source and id; no notes, no photos", () => {
+  const eggs = { ...pack("e", "Eggs", 143), source: "Reference table", refId: "egg-whole" };
+  const meal: any = { id: "m", title: "Lazy Burek", items: [{ id: "b", grams: 375, locked: false, food: pack("t", "Frischer Blätterteig", 400, "4000000000035") }, { id: "d", grams: 122, locked: false, food: eggs }], steps: [] };
+  const c = cleanShared(JSON.parse(JSON.stringify(sharedOf(meal, "Balkan"))))!;
+  assert.deepEqual([c.items[0].food.source, c.items[0].food.barcode, c.items[0].food.refId], ["label", "4000000000035", undefined]);
+  assert.deepEqual([c.items[1].food.source, c.items[1].food.barcode, c.items[1].food.refId], ["Reference table", undefined, "egg-whole"]);
+  assert.equal((c.items[0].food as any).notes, undefined); assert.equal((c.items[0].food as any).photo, undefined);
+  const mine = itemsOf(c)[0].food;
+  assert.deepEqual([mine.source, mine.barcode], ["label", "4000000000035"]);
+  assert.equal(itemsOf({ items: [{ id: "x", grams: 10, food: { name: "Salt", brand: "", calories: 0, protein: 0, fats: 0, carbs: 0, fiber: 0, readyToEat: false } }] })[0].food.source, "members");
+});
+test("B170 AC2: a wrong barcode, source or basic food id is dropped; the food stays", () => {
+  const c = cleanShared({ title: "X", items: [{ id: "a", grams: 100, food: { ...pack("t", "Teig", 400), barcode: "abc12", source: "x".repeat(200), refId: "<b>" } }] })!;
+  assert.equal(c.items.length, 1); assert.equal(c.items[0].food.name, "Teig");
+  assert.deepEqual([c.items[0].food.barcode, c.items[0].food.source, c.items[0].food.refId], [undefined, undefined, undefined]);
+  assert.equal(cleanShared({ title: "X", items: [{ id: "a", grams: 100, food: { ...pack("t", "Teig", 400), barcode: "1234567" } }] })!.items[0].food.barcode, undefined);
+});
+test("B170 AC4 and AC5: by barcode first; my pack with another barcode is another food; the same barcode is mine once", () => {
+  const myTeig = pack("f-teig", "Frischer Blätterteig", 330, "4000000000042"), myTyped = pack("f-typed", "Feta Leicht", 175);
+  const lib = foodMatcher([myTeig, myTyped]);
+  assert.equal(lib.find({ name: "Frischer Blätterteig", brand: "", barcode: "4000000000035" }), undefined);
+  assert.equal(lib.find({ name: "Anything", brand: "", barcode: "4000000000042" }), myTeig);
+  assert.equal(lib.find({ name: "Frischer Blätterteig", brand: "" }), myTeig);
+  assert.equal(lib.find({ name: "Feta Leicht", brand: "", barcode: "4000000000028" }), myTyped, "a food of mine with no barcode still matches by name and brand");
+  const egg = { ...pack("f-egg", "Ei", 140), refId: "egg-whole" }; const lib2 = foodMatcher([egg]);
+  assert.equal(lib2.find({ name: "Eggs", brand: "", refId: "egg-whole" }), egg);
+  const sams = pack("n1", "Frischer Blätterteig", 400, "4000000000035"); lib.add(sams);
+  assert.equal(lib.find({ name: "Frischer Blätterteig", brand: "", barcode: "4000000000035" }), sams);
+});
