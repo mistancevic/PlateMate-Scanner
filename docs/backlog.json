@@ -4819,7 +4819,56 @@
       "title": "A shared recipe drops where each food came from and its barcode",
       "epic": "cook",
       "state": "next",
-      "why": "Seen while drawing DT353, 25 November 2026: cleanShared in src/members.ts keeps a food's name, values and grams, but not its source or barcode. So a member's recipe writes a pack's name in small letters in its steps (körniger frischkäse tworog), on the member's page and in the copy after Save to My recipes; and the copy's foods match my own foods by name only. The numbers are right. Proposed: sharing keeps the source (label, Reference table) and the barcode. Coach Milan 16:57: ok, its own ticket. Not drawn."
+      "why": "Seen while drawing DT353, 25 November 2026: cleanShared in src/members.ts keeps a food's name, values and grams, but not its source or barcode. So a member's recipe writes a pack's name in small letters in its steps (körniger frischkäse tworog), on the member's page and in the copy after Save to My recipes; and the copy's foods match my own foods by name only. The numbers are right. Proposed: sharing keeps the source (label, Reference table) and the barcode. Coach Milan 16:57: ok, its own ticket. Not drawn. 18:37: yes, brainstorm. 19:37: A (fix new and changed shares only); 19:39 to 19:44: the path that sends a change already sends old shares once, so that is the scope. 19:44: draw. Drawn 19:52.",
+      "problem": "Sharing sends each food's name, values and grams, but not its source (read from a label, or a basic food), its barcode or its basic food. So on a member's page and in a copy saved from it, the steps write a pack in small letters: körniger frischkäse tworog. And when I save or cook a member's recipe, its foods match mine by name and brand only: if I have a pack with the same name, my pack's values replace the member's, and the copy says 1,932 kcal where the member's page says 2,194.",
+      "story": "When I take a recipe a member shared, I want it with the member's packs and numbers, named as printed, so that I cook what they cooked.",
+      "unchanged": [
+        "Copies members saved before: they are their own recipes and stay as they are.",
+        "What is never shared: notes, photos, anything about the person; the first name only when switched on.",
+        "The tile in the list, the cover, the member's page as DT353 built it.",
+        "A food of mine with the same name and no barcode still matches by name and brand, as now."
+      ],
+      "open": [],
+      "board": "Stories297",
+      "where": "Page 6",
+      "rel": "Drawn 25 November 2026 with its agreement; waits for Go",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "Sharing keeps where a food came from",
+          "text": "Given Sam's Lazy Burek with three scanned packs and eggs from the basic foods, when Sam shares it, then members get each pack's source and barcode and the eggs' source and basic food, and still no notes and no photos"
+        },
+        {
+          "id": "AC2",
+          "title": "The server checks",
+          "text": "Given a shared food with the barcode abc12 or a source of 200 letters, when it is shared, then those fields are dropped and the food is kept with its name, values and grams"
+        },
+        {
+          "id": "AC3",
+          "title": "Packs as printed in Members",
+          "text": "Given Sam's shared Lazy Burek, when I open it in Members, then step 1 reads Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 2 eggs (L) and 150 g Feta Leicht, and the card says 2,194 kcal"
+        },
+        {
+          "id": "AC4",
+          "title": "My copy keeps Sam's packs",
+          "text": "Given my own Frischer Blätterteig with another barcode, 330 kcal, when I tap Save to My recipes, then my copy says 2,194 kcal, as Sam's page, its steps name the packs as printed, and my foods hold both packs"
+        },
+        {
+          "id": "AC5",
+          "title": "The same pack once",
+          "text": "Given my own pack with the same barcode as Sam's, when I save the copy, then the copy uses my food and no second one is added"
+        },
+        {
+          "id": "AC6",
+          "title": "Put it on the Plate",
+          "text": "Given my own Frischer Blätterteig with another barcode, when I tap Put it on the Plate on Sam's page, then the Plate holds Sam's pack, 400 kcal per 100 g"
+        },
+        {
+          "id": "AC7",
+          "title": "Old shares, once",
+          "text": "Given Lazy Burek shared before this release, when Sam opens Recipes after the update, then the app sends it once more with the new fields, its place in Members stays the same, and opening Recipes again sends nothing"
+        }
+      ]
     },
     {
       "id": "B169",
