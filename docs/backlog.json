@@ -4737,8 +4737,8 @@
       "id": "DT353",
       "title": "A member's recipe page in the same structure as my own recipe's",
       "epic": "cook",
-      "state": "next",
-      "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn. 25 November 16:25: yes, brainstorm; 16:26: draw so we discuss it. Drawn 16:45, for discussion. 16:39: the page is for deciding whether to plan it as is or take it to the Plate; 16:41: no Servings card, a note before the actions. Redrawn.",
+      "state": "now",
+      "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn. 25 November 16:25: yes, brainstorm; 16:26: draw so we discuss it. Drawn 16:45, for discussion. 16:39: the page is for deciding whether to plan it as is or take it to the Plate; 16:41: no Servings card, a note before the actions. Redrawn. 16:59: the agreement block written (AC1 to AC9, checks Middle plus the German sweep, release 0.3.195).",
       "opportunity": {
         "from": "Found while drawing DT349, 25 November 2026; Coach Milan 16:25: yes, brainstorm; 16:26: draw so we discuss it.",
         "job": "Read a recipe another member shared, and decide what to do with it.",
@@ -4749,15 +4749,61 @@
       "story": "When I open a recipe a member shared, I want to read it as they wrote it and then decide what to do with it, the same way as with my own recipes, so that I know where everything is.",
       "unchanged": [
         "The list's tile: my portion for the meal ahead.",
-        "Put it on the Plate does what Make it did: my portion for the meal ahead goes on the Plate.",
-        "Save to My recipes does what Keep in mine did: a copy in Mine."
+        "My own recipe's page (DT349), its Plan it and its actions.",
+        "A recipe of mine in Members (shared by me): no Save to My recipes, as now no Keep in mine.",
+        "The owner's Take it down."
       ],
-      "open": [
-        "Seen on both pages: the steps of a shared recipe write a pack's name in small letters (körniger frischkäse tworog), because a shared food arrives without its source. Its own bug, or in this ticket?"
-      ],
+      "open": [],
       "board": "Stories296",
       "where": "Page 6",
-      "rel": "Redrawn 25 November 2026 for discussion; agreed so far: the page is for deciding, no Servings, a note before the actions"
+      "rel": "Drawn 25 November 2026 with its agreement; waits for Go",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "The recipe as written",
+          "text": "Given Lazy Burek shared by Sam, when I open it from Members, then the PD card says The whole recipe, 2,194 kcal, 897 g, 93 g, PD 4.3, Foods say 250 g, 122 g, 150 g, 375 g, and there is no Your dinner line and no three tiles"
+        },
+        {
+          "id": "AC2",
+          "title": "The numbers under the card",
+          "text": "Given that card, when I tap the letters, then the numbers open under the card, Total 897 g and 2,194 kcal"
+        },
+        {
+          "id": "AC3",
+          "title": "The Nutrition table",
+          "text": "Given the page, when I read the Nutrition table, then it shows ALL 897 g and 100 g"
+        },
+        {
+          "id": "AC4",
+          "title": "Steps with the recipe's amounts",
+          "text": "Given the steps, when I read step 1, then it says 250 g, 2 eggs (L) and 150 g, the recipe's amounts"
+        },
+        {
+          "id": "AC5",
+          "title": "A note, then the actions",
+          "text": "Given the end of the page, when I read What do you do with it?, then it starts with Sam's recipe, as written, and where each way leads, and has Plan it, Put it on the Plate and Save to My recipes; no Make it, no Keep in mine"
+        },
+        {
+          "id": "AC6",
+          "title": "Plan it: my portion",
+          "text": "Given my dinner on Wednesday is about 733 kcal, when I tap Plan it and Dinner, then it says Your dinner portion on Wednesday: 300 g · 733 kcal · 31 g protein · PD 4.3 and The whole recipe is 3.0 of these portions"
+        },
+        {
+          "id": "AC7",
+          "title": "Into the plan",
+          "text": "Given that portion, when I tap Put it in the plan, then Plan shows Lazy Burek in Wednesday's dinner at 733 kcal; a dinner that holds something already is asked about first, as on my own recipes"
+        },
+        {
+          "id": "AC8",
+          "title": "Put it on the Plate",
+          "text": "Given the page, when I tap Put it on the Plate, then my portion for the meal ahead is on the Plate, 300 g, as Make it did"
+        },
+        {
+          "id": "AC9",
+          "title": "Save to My recipes",
+          "text": "Given the page, when I tap Save to My recipes, then a copy is in Mine, as Keep in mine did"
+        }
+      ]
     },
     {
       "id": "B170",

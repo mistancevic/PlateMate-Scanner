@@ -13,17 +13,68 @@
   "now": "Members, a recipe: Your dinner: 300 g of the 897 g it makes; three tiles, 732 kcal, 31 g protein, PD 4.3; Foods for your portion; the steps with my portion's amounts; Make it (my portion goes on the Plate); Keep in mine.",
   "proposed": "1. The page opens on the recipe as the member wrote it: title, who shared it, the photo when there is one, the Plate's PD card for the whole recipe (PdCard, design rule D14), Foods, the Nutrition table, the steps with the recipe's amounts. 2. What do you do with it?, at the end, starts with a note: Sam's recipe, as written, and where each way leads (Coach Milan 16:41). Then the actions: Plan it (the Plate's day and meal block, then my portion for that meal, then Put it in the plan), Put it on the Plate (was Make it: my portion for the meal ahead goes on the Plate, as now), Save to My recipes (was Keep in mine). 3. The list's tile keeps my portion for the meal ahead: that is where I browse. 4. The page shows no portion of mine until I pick a meal (nutrition rule N17). 5. No Servings card on this page: it is for deciding; the servings to cook are chosen after Save to My recipes (16:39 to 16:41).",
   "looked_at": "Keep opening on my portion: not chosen in this drawing, Coach Milan 24 November 19:01: recipes from others show the original numbers and math first. Servings chips as on my own page, with sharing sending how many a recipe makes: not chosen, 16:41: the page is for deciding; the servings come after Save to My recipes. The pack names in small letters in a shared recipe's steps: not in DT353, its own bug, B170 (16:57).",
-  "decision": "For discussion (16:26). Agreed so far: the page is for deciding (16:39); no Servings card, a note before the actions (16:41).",
+  "decision": "Waiting for Coach Milan's Go. Agreed so far: the page is for deciding (16:39); no Servings card, a note before the actions (16:41); the agreement block written (16:59).",
   "open": [],
-  "short": "A member's recipe page: the recipe as written on top, What do you do with it? at the end",
-  "ac": [],
+  "short": "A member's recipe page: the recipe as written on top, a note, then What do you do with it?; release 0.3.195",
+  "ac": [
+    {
+      "id": "AC1",
+      "title": "The recipe as written",
+      "text": "Given Lazy Burek shared by Sam, when I open it from Members, then the PD card says The whole recipe, 2,194 kcal, 897 g, 93 g, PD 4.3, Foods say 250 g, 122 g, 150 g, 375 g, and there is no Your dinner line and no three tiles"
+    },
+    {
+      "id": "AC2",
+      "title": "The numbers under the card",
+      "text": "Given that card, when I tap the letters, then the numbers open under the card, Total 897 g and 2,194 kcal"
+    },
+    {
+      "id": "AC3",
+      "title": "The Nutrition table",
+      "text": "Given the page, when I read the Nutrition table, then it shows ALL 897 g and 100 g"
+    },
+    {
+      "id": "AC4",
+      "title": "Steps with the recipe's amounts",
+      "text": "Given the steps, when I read step 1, then it says 250 g, 2 eggs (L) and 150 g, the recipe's amounts"
+    },
+    {
+      "id": "AC5",
+      "title": "A note, then the actions",
+      "text": "Given the end of the page, when I read What do you do with it?, then it starts with Sam's recipe, as written, and where each way leads, and has Plan it, Put it on the Plate and Save to My recipes; no Make it, no Keep in mine"
+    },
+    {
+      "id": "AC6",
+      "title": "Plan it: my portion",
+      "text": "Given my dinner on Wednesday is about 733 kcal, when I tap Plan it and Dinner, then it says Your dinner portion on Wednesday: 300 g · 733 kcal · 31 g protein · PD 4.3 and The whole recipe is 3.0 of these portions"
+    },
+    {
+      "id": "AC7",
+      "title": "Into the plan",
+      "text": "Given that portion, when I tap Put it in the plan, then Plan shows Lazy Burek in Wednesday's dinner at 733 kcal; a dinner that holds something already is asked about first, as on my own recipes"
+    },
+    {
+      "id": "AC8",
+      "title": "Put it on the Plate",
+      "text": "Given the page, when I tap Put it on the Plate, then my portion for the meal ahead is on the Plate, 300 g, as Make it did"
+    },
+    {
+      "id": "AC9",
+      "title": "Save to My recipes",
+      "text": "Given the page, when I tap Save to My recipes, then a copy is in Mine, as Keep in mine did"
+    }
+  ],
   "unchanged": [
     "The list's tile: my portion for the meal ahead.",
-    "Put it on the Plate does what Make it did: my portion for the meal ahead goes on the Plate.",
-    "Save to My recipes does what Keep in mine did: a copy in Mine."
+    "My own recipe's page (DT349), its Plan it and its actions.",
+    "A recipe of mine in Members (shared by me): no Save to My recipes, as now no Keep in mine.",
+    "The owner's Take it down."
   ],
-  "checks": "Not agreed yet: proposed Middle, Recipes and Members (covers-and-members and every walkthrough that opens a member's recipe), plus the German sweep (new and moved words).",
+  "checks": "Middle: Recipes and Members. The unit tests; the build; a new walkthrough for AC1 to AC9; covers-and-members and recipe-centre (they read the member's page; changed by the story, each with a note), recipe-servings and design-rules (the shared Plan it and the PD card); the German sweep (new words). About 15 minutes.",
   "details": [
+    "MemberPage in src/components/Members.tsx: NutritionCard for the whole recipe (PdCard), Foods, the Nutrition table, Steps with the recipe's amounts, the card rq-actions with the note members.decideLine first.",
+    "Plan it is one component for both pages (src/components/PlanIt.tsx): the Plate's day and meal block, the portion line, Put it in the plan, Put it in its place. A member's recipe goes into the plan with its foods at my share and no recipe id, as a meal of its own.",
+    "New words: members.saveToMine (Save to My recipes), members.decideLine; members.makeIt and members.keepInMine go when nothing else uses them. Srpski confirmed by Claude, German in Beta.",
+    "Not in DT353: a shared food's source and barcode (B170).",
     "The pictures: before from main, 0.3.194; new from a scratch build of main with the change, not committed. The members' list is a mock with one recipe, Lazy Burek, shared by Sam (an invented name)."
   ]
 }
