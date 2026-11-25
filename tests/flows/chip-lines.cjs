@@ -74,20 +74,21 @@ const WHITE = "rgb(255, 255, 255)";
       ok(s.a && s.a.long && s.a.rs.length >= 2 && s.width <= 390, "B165 AC4: in the publish sheet the long chip goes on to the next line too");
     } else ok(false, "B165 AC4: the publish sheet with its steps opens: " + (await page.locator("main").innerText()).replace(/\s+/g, " ").slice(0, 200));
     await page.context().close();
-    // B166 on Lazy Burek's page
+    // B166 on Lazy Burek's page. Changed by DT349 (0.3.193, design rule D14): the numbers open under the PD card, not inside it,
+    // so they are read under the card
     page = await open("/my-recipes/m-burek");
     await page.locator(".rq-readout .letters-row").click(); await page.waitForTimeout(500);
     const colour = (sel) => page.evaluate((sel) => [...document.querySelectorAll(sel)].map((e) => getComputedStyle(e).color), sel);
-    const note = await colour(".rq-readout .nt-note");
+    const note = await colour(".rq-readout + .nt .nt-note");
     ok(note.length === 1 && note[0] !== WHITE, `B166 AC1: the note under Total reads in grey, not white (${note[0]})`);
-    await page.locator(".rq-readout .nt-more").click(); await page.waitForTimeout(400);
-    const lines100 = await colour(".rq-readout .letters-lines small");
+    await page.locator(".rq-readout + .nt .nt-more").click(); await page.waitForTimeout(400);
+    const lines100 = await colour(".rq-readout + .nt .letters-lines small");
     ok(lines100.length >= 4 && lines100.every((c) => c !== WHITE), `B166 AC2: Per 100 kcal's ${lines100.length} lines read in the table's colours`);
     await page.context().close();
     // B166 AC3: a food with no fibre value
     page = await open("/my-recipes/m-bowl");
     await page.locator(".rq-readout .letters-row").click(); await page.waitForTimeout(500);
-    const fib = await page.evaluate(() => [...document.querySelectorAll(".rq-readout .nt-fibre")].map((e) => [e.textContent, getComputedStyle(e).color]));
+    const fib = await page.evaluate(() => [...document.querySelectorAll(".rq-readout + .nt .nt-fibre")].map((e) => [e.textContent, getComputedStyle(e).color]));
     ok(fib.length === 1 && fib[0][1] !== WHITE && /at least/.test(fib[0][0]), `B166 AC3: the fibre line reads in dark text: ${fib[0]?.[0]}`);
     await page.context().close();
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));

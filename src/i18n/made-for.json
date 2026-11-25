@@ -5830,6 +5830,7 @@
     "screen.recipe.putInPlan": {"en":"Put it in the plan","area":"Recipes","where":"Recipes","release":"0.3.193"},
     "screen.recipe.inPlan": {"en":"In the plan: {day}, {meal}, {grams} g.","area":"Recipes","where":"Recipes","release":"0.3.193"},
     "screen.recipe.planHolds": {"en":"{day}'s {meal} already holds {title}.","area":"Recipes","where":"Recipes","release":"0.3.193"},
-    "screen.recipe.replaceInPlan": {"en":"Put it in its place","area":"Recipes","where":"Recipes","release":"0.3.193"}
+    "screen.recipe.replaceInPlan": {"en":"Put it in its place","area":"Recipes","where":"Recipes","release":"0.3.193"},
+    "screen.nutrition.oneServing": {"en":"One {one}","area":"Recipes","where":"Recipes","release":"0.3.193"}
   }
 }

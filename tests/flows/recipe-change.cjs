@@ -2,6 +2,7 @@
 // recipe and changed asks once at Put it in: Update my recipe, Save as a new recipe (its own name), or Only for this day.
 // Update: one recipe, the plate's foods, Plan's slot as the recipe is now. Before, a second recipe with the same name.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -36,7 +37,7 @@ const PORT = "3306", U = `http://127.0.0.1:${PORT}`;
   await page.locator(".pick-sheet").getByRole("button", { name: /^Skyr breakfast/ }).click(); await page.waitForTimeout(500);
   const bf = page.locator(".plan-slot-wrap").first();
   await bf.getByText("Skyr breakfast").first().click(); await page.waitForTimeout(800);
-  await page.getByRole("button", { name: /^(Make it|Change it first)$/ }).click(); await page.waitForTimeout(1000);
+  await page.getByRole("button", { name: /^(Make it|Put it on the Plate)$/ }).click(); await page.waitForTimeout(1000);
   const oats = page.getByLabel("Grams of Oats").first();
   await oats.fill("60"); await oats.press("Enter"); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›/ }).click(); await page.waitForTimeout(800);

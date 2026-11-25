@@ -7,6 +7,7 @@
 // (Today went by the plan) and Today's meals says the extras.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: the meal line is the new one (a planned meal: the meal, its day and time, with an X; the Plate on its own: No meal selected). The meal from outside has no meal set, so Save on Eat asks; this walkthrough taps Snack, which is off the plan, and it counts as the extra as before.
 // Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): the meal line has a small title, Meal and day, and always a pencil; the X that took the meal off is gone (the row No meal selected, behind the pencil, does it); unset it says No meal selected; a tap on a meal keeps edit mode open, and the X in the pencil's place closes it.
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -99,7 +100,7 @@ seed.items = [];
   const meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.map((m) => m.title));
   ok(meals.length === 3 && meals.filter((t) => t === "Skyr at noon").length === 1, "eating a planned recipe as it stands saves no copy; the extra was saved: " + meals.join(", "));
   await page.locator(".recipe-tile", { hasText: "Skyr at noon" }).click(); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: "Put it on the Plate", exact: true }).click(); await page.waitForTimeout(600);
   const head = await page.evaluate(() => { const i = document.querySelector(".title-input"); return i ? "input:" + i.value : "h2:" + (document.querySelector("h2")?.textContent ?? ""); }); ok(/Skyr at noon|Chicken bowl/.test(head), "the Plate opens with the recipe's name: " + head);
   ok(await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count() === 1, "on the first step, with Fit to my target");
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");

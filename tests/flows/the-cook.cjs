@@ -7,6 +7,7 @@
 // Changed by story DT313 (0.3.159, board Stories250; Coach Milan, Go 18 November 15:56): check 10 reads the question a
 // recipe gets now, on the photo's screen: the question is the line under Chef Mealan's, and the two buttons are as before.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -54,8 +55,8 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     const steps = page.locator(".rq-steps");
     ok(await steps.getByRole("button", { name: "Start cooking", exact: true }).count() === 1, "Start cooking sits at the end of the Steps block");
     ok(/4 steps, read aloud\. Say next, back or repeat\. A second phone can show them\./.test(await steps.textContent()), "its line says what it does");
-    ok(await page.getByRole("button", { name: "Cook it as written" }).count() === 0, "Cook it as written is gone; Change it first stays");
-    ok(await page.getByRole("button", { name: "Change it first" }).count() === 1, "Change it first is there");
+    ok(await page.getByRole("button", { name: "Cook it as written" }).count() === 0, "Cook it as written is gone; Put it on the Plate stays");
+    ok(await page.getByRole("button", { name: "Put it on the Plate" }).count() === 1, "Put it on the Plate is there");
     ok(/Photos for the steps come from cooking/.test(await steps.textContent()) && await steps.locator(".rq-step-pic").count() === 0, "no + slots on the recipe; photos come from cooking");
     ok(!/No picture yet|Draw a picture|\+ Picture/.test(await page.locator("main").textContent()), "Photo is the one word: no Picture on the recipe");
     await toRecipe(page, "Skyr bowl");
@@ -197,7 +198,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     ({ ctx, page } = await open({ ...PLATE, plateAt: "2026-11-02T11:40:00" }));
     await page.setViewportSize({ width: 360, height: 780 });
     await toRecipe(page);
-    await page.getByRole("button", { name: "Change it first" }).click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: "Put it on the Plate" }).click(); await page.waitForTimeout(900);
     ok(/The recipe is .+, from My recipes: \d+ foods?\./.test(await page.locator(".plate-ask .chef-line").first().textContent()) && /Add it to your plate, or start a new plate\?/.test(await page.locator(".plate-ask .pa-ask-q").textContent()), "the plate question: Chef Mealan says what arrives, and the question stands under his line");
     const box = await page.locator(".plate-ask").boundingBox(), btns = await page.locator(".plate-ask .ca-go button").evaluateAll((bs) => bs.map((x) => { const r = x.getBoundingClientRect(); return [r.left, r.right, r.top]; }));
     ok(btns.length === 2 && btns.every(([l, r]) => l >= box.x - 1 && r <= box.x + box.width + 1) && btns[1][2] > btns[0][2], "its buttons stay inside, one under the other");

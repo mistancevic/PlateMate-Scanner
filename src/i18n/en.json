@@ -3264,6 +3264,7 @@
   "letters.noteDay": "% day: against your planned day.",
   "letters.per100kcal": "Per 100 kcal",
   "nutrition.proteinDensity": "Protein density",
+  "nutrition.oneServing": "One {one}",
   "nutrition.wholeRecipe": "The whole recipe",
   "nutrition.pd": "PD",
   "nutrition.noTargetSet": "no target set",

@@ -23324,6 +23324,10 @@
     "recipe.replaceInPlan": {
       "text": "An seine Stelle legen",
       "checked": true
+    },
+    "nutrition.oneServing": {
+      "text": "1 {one}",
+      "checked": true
     }
   }
 }

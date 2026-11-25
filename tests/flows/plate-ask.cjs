@@ -13,6 +13,7 @@
 // Changed by story DT313 (0.3.159, board Stories250; Coach Milan, Go 18 November 15:56): a recipe from Recipes asks on the
 // same screen as a photo. Add to my plate comes first, Keep my plate is gone, and Back to the recipe takes its place:
 // nothing lands, and you are on the recipe's page.
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -113,7 +114,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await typed();
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(1200);
   await page.getByText("Lentil soup").first().click(); await page.waitForTimeout(900);
-  await page.getByRole("button", { name: /^(Make it|Change it first)/ }).first().click(); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: /^(Make it|Put it on the Plate)/ }).first().click(); await page.waitForTimeout(900);
   const ask2 = await text("main");
   ok(/Your plate is not empty\s?It already has Chicken and rice, and the recipe brings its own foods/.test(ask2) && /The recipe is Lentil soup, from My recipes: 2 foods\./.test(ask2) && (await page.locator(".plate-ask .pa-go button").allTextContents()).join() === "Add to my plate,Start a new plate" && !/Keep my plate/.test(ask2), "DT131, as DT313 changed it: a recipe asks on the photo's screen: Add to my plate first, then Start a new plate, no Keep my plate: " + ask2.slice(0, 140));
   await page.locator(".ask-back").click(); await page.waitForTimeout(600);

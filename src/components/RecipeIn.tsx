@@ -116,7 +116,7 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
         <small className="in-strong">{unitWord(r.servingsUnit, r.servings, ONE.s)}</small>
         <small className="muted">· {r.servingsHow === "recipe" ? w("recipein.onTheRecipe") : <span className="in-tag">{w("recipein.guessed")}</span>}</small>
       </div>
-      <NutritionCard readoutOnly items={asItems} serves={r.servings} one={one} all={unitWord(r.servingsUnit, 2)} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
+      <NutritionCard readoutOnly perServing items={asItems} serves={r.servings} one={one} all={unitWord(r.servingsUnit, 2)} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
       {st && <small className={`in-stated ${statedDiffers(st, mine) ? "differs" : ""}`}>{[w("recipein.recipeSays", { kcal: fmt(st.kcal, 0), protein: fmt(st.protein, 1), pd: pdText(pd(st.kcal, st.protein)), one: unitV(r.servingsUnit, 1, ONE.s) }), statedDiffers(st, mine) ? w(mine > st.kcal ? "recipein.estimateHigher" : "recipein.estimateLower", { n: Math.round(Math.abs(mine - st.kcal) / st.kcal * 100) }) : w("recipein.estimateAgrees")].join(" ")}</small>}
       {/* R2 (0.2.32, Milan 10:08): the foods under the recipe's own groups, with the plate's part heading; no groups, one list */}
       <div className="rows">

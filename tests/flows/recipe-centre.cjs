@@ -4,6 +4,8 @@
 // says its weight. How to make it says what you make and what you eat. A changed dish: the line says what differs.
 // Every recipe made ends on its page; a plate that is no recipe ends on Today. Today has no camera; Manual, then Scan.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs).
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
+// changed by B168 (0.3.193): the recipe page's PD card is the whole recipe as written; one serving is in the Nutrition table
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -78,7 +80,7 @@ const U = "http://127.0.0.1:3217";
   const ro = await text(".rq-readout");
   // changed by DT113 (0.2.94): the four letters sit under the readout, so it ends with against your day
   // Changed by story DT129 (0.2.109): the letters on one line, › to open the numbers
-  ok(/One slice/.test(ro) && /PD/.test(ro) && / g\s*[Ff][+?-]?[Cc][+?-]?[Ff]i[+?-]?[Pp][+?-]?\s*›$/.test(ro.trim()), `RP2: the readout above the table, one slice, then the four letters (${ro})`);
+  ok(/The whole recipe/.test(ro) && /PD/.test(ro) && / g\s*[Ff][+?-]?[Cc][+?-]?[Ff]i[+?-]?[Pp][+?-]?\s*›$/.test(ro.trim()), `RP2: the readout above the table, the whole recipe, then the four letters (${ro})`);
   const th = await text(".nt-card .nt-th");
   ok(/1 SLICE\s*\d+ g/.test(th) && /ALL 12\s*1,131 g/.test(th), `RP2: each column says its weight (${th})`);
   ok(await page.locator(".nt-card .nt-pd").count() === 0, "RP2: PD is no row of the table");
@@ -92,9 +94,9 @@ const U = "http://127.0.0.1:3217";
   await shot("rp1c", ".rq-steps");
 
   // RP3, RP1b: Make it, Change the dish, How to make it
-  await page.getByRole("button", { name: /^(Prepare it( as it is)? ›|Change it first)$/ }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: /^(Prepare it( as it is)? ›|Put it on the Plate)$/ }).click(); await page.waitForTimeout(1200);
   await page.getByRole("button", { name: "Change the recipe" }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: /^(Prepare it( as it is)? ›|Change it first)$/ }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^(Prepare it( as it is)? ›|Put it on the Plate)$/ }).click(); await page.waitForTimeout(800);
   t = await text("main");
   ok(/Your dish has light cream cheese and vanilla whey protein powder\. The original has cream cheese\./.test(t) && await page.getByRole("button", { name: "Write the steps for my dish" }).count() === 1 && /The original, for the original foods/.test(t), `RP1b: your dish differs: the line says how; the original for the original foods (${t.slice(0, 200)})`);
   ok(/You make the whole recipe\s*[\d,]+ g · [\d,]+ kcal/.test(t) && /You eat your plate\s*\d+ g · [\d,]+ kcal · PD/.test(t), "RP3: You make, You eat, each with weight and energy");
@@ -108,8 +110,8 @@ const U = "http://127.0.0.1:3217";
   // the original, made again: it ends on its page too
   await page.locator(".rq-back").click(); await page.waitForTimeout(500);
   await page.getByText("No-bake cheesecake", { exact: true }).last().click(); await page.waitForTimeout(800);
-  await page.getByRole("button", { name: /^(Prepare it( as it is)? ›|Change it first)$/ }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: /^(Prepare it( as it is)? ›|Change it first)$/ }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^(Prepare it( as it is)? ›|Put it on the Plate)$/ }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: /^(Prepare it( as it is)? ›|Put it on the Plate)$/ }).click(); await page.waitForTimeout(800);
   await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();

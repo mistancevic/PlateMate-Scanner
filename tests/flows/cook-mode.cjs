@@ -3,6 +3,7 @@
 // Make and Change it first through the Plate; Start cooking on Make opens cook mode: one big step, read aloud, steered by voice
 // or by tap; timers from the step; how much from the amounts cooked; every finished step ticked on Make; voice asked once.
 // The browser's speech is stood in for: a stand-in recognition hears what the walkthrough says, a stand-in voice records.
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -61,11 +62,11 @@ const PORT = "3194", B = `http://127.0.0.1:${PORT}`;
     const toRecipe = async () => { await page.goto(B + "/"); await page.waitForTimeout(900); await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500); await page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }).click(); await page.waitForTimeout(500); };
     await toRecipe();
     // DT211 v8 (0.3.53): Cook it as written gave way to Start cooking, at the end of the Steps block; it opens cook mode
-    ok(await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).count() === 1 && await page.getByRole("button", { name: "Change it first", exact: true }).count() === 1 && await page.getByRole("button", { name: "Cook it as written" }).count() === 0, "the recipe has Start cooking in its Steps block, and Change it first");
-    ok(await page.getByRole("button", { name: "Make it", exact: true }).count() === 0, "Make it is now Change it first");
+    ok(await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).count() === 1 && await page.getByRole("button", { name: "Put it on the Plate", exact: true }).count() === 1 && await page.getByRole("button", { name: "Cook it as written" }).count() === 0, "the recipe has Start cooking in its Steps block, and Put it on the Plate (changed by DT349, 0.3.193: it was Put it on the Plate)");
+    ok(await page.getByRole("button", { name: "Make it", exact: true }).count() === 0, "Make it is now Put it on the Plate");
     // Change it first: the Plate, to edit
-    await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(1000);
-    ok(await page.getByRole("button", { name: "Fit to my target" }).count() > 0 && !/Make: /.test(await page.locator("h2").first().textContent().catch(() => "")), "Change it first opens the Plate to edit");
+    await page.getByRole("button", { name: "Put it on the Plate", exact: true }).click(); await page.waitForTimeout(1000);
+    ok(await page.getByRole("button", { name: "Fit to my target" }).count() > 0 && !/Make: /.test(await page.locator("h2").first().textContent().catch(() => "")), "Put it on the Plate opens the Plate to edit");
     // Start cooking: straight to Make, cook mode open
     await toRecipe();
     await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(1000);

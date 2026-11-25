@@ -14,7 +14,7 @@ import { partName } from "../recipeWords";
 const lineV = (k: WordKey, v?: Record<string, Val>): Val => (l) => wIn(l, k, v);
 
 // IM21, IM21b: Nutrition, worked out by code from the foods and their grams, in the EU label order; exact counts (All 2)
-export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, readoutOnly, tableOnly, rates }: { rates?: import("../letters").Rates | null; items: Ingredient[]; serves: number; one: string; all: string; stated: Meal["stated"] | null; pdRef: number | null; fitPd?: (pd: number | null) => string; readoutOnly?: boolean; tableOnly?: boolean }) {
+export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, readoutOnly, tableOnly, rates, perServing = false }: { perServing?: boolean; rates?: import("../letters").Rates | null; items: Ingredient[]; serves: number; one: string; all: string; stated: Meal["stated"] | null; pdRef: number | null; fitPd?: (pd: number | null) => string; readoutOnly?: boolean; tableOnly?: boolean }) {
   const n = nutritionOf(items, serves);
   const [numbersOpen, setNumbersOpen] = useState(false);
   if (!n) return null;
@@ -34,11 +34,13 @@ export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, r
     {/* R6 (0.2.43): on the read card the table stands alone; the card has its own PD line */}
     {/* B168 and DT349 (board B168 and DT349, canvas Page 6): the card is the whole meal, as the recipe makes it, and it is the
         Plate's card, PdCard; the numbers open under it (design rule D14). One serving and 100 g stay in the table below. */}
-    {!tableOnly && (() => { const t = aggregate(items); return (<>
+    {/* perServing: the read card of a recipe added from a link keeps one serving, as before (not on the board B168 and DT349);
+        its numbers then count one serving too, so the card and its numbers say the same */}
+    {!tableOnly && (() => { const one1 = perServing && many, t = aggregate(one1 ? items.map((i) => ({ ...i, grams: i.grams / serves })) : items); return (<>
       <PdCard className="rq-readout" label={w("nutrition.proteinDensity")} fit={fitPd ? fitPd(n.pd) : "plan"} pd={pd1}
-        title={w("nutrition.wholeRecipe")}
+        title={one1 ? w("nutrition.oneServing", { one }) : w("nutrition.wholeRecipe")}
         line={pd1 === null || pdRef === null ? w("nutrition.noTargetSet") : n.pd! >= pdRef ? w("nutrition.fitsYourPlan") : w("nutrition.underYour", { under: dec(Math.round((pdRef - n.pd!) * 10) / 10, 1), target: dec(pdRef, 1) })}
-        kcal={n.rows[0].all} grams={grams} protein={prot?.all ?? null}
+        kcal={one1 ? n.rows[0].serving : n.rows[0].all} grams={one1 ? grams / serves : grams} protein={(one1 ? prot?.serving : prot?.all) ?? null}
         scale={pdRef !== null && pd1 !== null ? { target: pdRef, title: w("plate.pdScaleTitle", { t: pdVal(pdRef), pd: pdVal(pd1) }) } : null}
         /* DT113 (0.2.94): the four letters, rates, the same for a serving or the whole meal */
         letters={rates && t.calories ? <Letters n={numbersOfTotals(t)} rates={rates} who={w("letters.thisRecipe")} open={numbersOpen} setOpen={setNumbersOpen} /> : null} />

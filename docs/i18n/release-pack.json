@@ -1,6 +1,6 @@
 {
   "release": "0.3.193",
-  "at": "2026-11-25T13:50:25.681Z",
+  "at": "2026-11-25T14:08:28.439Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -53319,6 +53319,25 @@
       "release": "0.3.193",
       "order": 900017,
       "at": "2026-11-25T13:50:25.681Z"
+    },
+    {
+      "id": "screen.nutrition.oneServing",
+      "kind": "screen",
+      "key": "nutrition.oneServing",
+      "en": "One {one}",
+      "forms": "plain",
+      "slots": [
+        "one"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "1 {one}",
+      "de": "1 {one}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.193",
+      "order": 900000,
+      "at": "2026-11-25T14:08:28.439Z"
     }
   ]
 }

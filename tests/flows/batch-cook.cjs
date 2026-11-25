@@ -41,9 +41,10 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await nav("Recipes");
   await page.getByText("Sarma", { exact: true }).last().click(); await page.waitForTimeout(900);
   ok(/The whole recipe makes 8 sarmas · one sarma \d+ kcal/.test(await txt(".rq-label")), "the label under the name: " + await txt(".rq-label"));
-  ok(/^Cook it\s*−\s*8 sarmas\s*\+\s*As the recipe makes it\./.test(await txt(".rq-cook")), "Cook it starts as written: " + (await txt(".rq-cook")).slice(0, 60));
-  await page.getByRole("button", { name: `The plan takes ${planned}: cook ${planned}` }).click(); await page.waitForTimeout(500);
-  ok(new RegExp(`${planned} sarmas\\s*\\+\\s*The recipe makes 8; the foods below are for ${planned}\\.`).test(await txt(".rq-cook")), "Cook it takes the plan's number: " + (await txt(".rq-cook")).slice(0, 90));
+  // changed by DT349 (0.3.193): the Cook it card is Servings, chips one tap; the plan's number is a chip of its own
+  ok(/^8$/.test(await txt(".rq-howmuch .choice.on")) && /^8 sarmas: /.test(await txt(".rq-howmuch .rq-choice-line")), "Servings starts as written: " + (await txt(".rq-howmuch .rq-choice-line")).slice(0, 60));
+  await page.locator(".rq-howmuch .rq-chips .choice").filter({ hasText: new RegExp(`^${planned}$`) }).click(); await page.waitForTimeout(500);
+  ok(new RegExp(`^${planned} sarmas: `).test(await txt(".rq-howmuch .rq-choice-line")) && new RegExp(`Foods for ${planned} sarmas`).test(await txt(".rq-foods")), "Servings takes the plan's number: " + (await txt(".rq-howmuch .rq-choice-line")).slice(0, 90));
   ok(new RegExp(`${Math.round(400 * planned / 8)} g`).test(await txt(".rq-foods")), `the foods follow: rice ${Math.round(400 * planned / 8)} g for ${planned}`);
   ok((await store()).cook?.n === planned, "the recipe keeps the batch to cook; the recipe itself stays at 8");
   // the shopping list buys for that batch
@@ -54,7 +55,8 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   // cook it on the Plate, count what it made: one more
   await nav("Recipes");
   await page.getByText("Sarma", { exact: true }).last().click(); await page.waitForTimeout(900);
-  await page.getByRole("button", { name: "Change it first" }).first().click(); await page.waitForTimeout(900);
+  // changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate
+  await page.getByRole("button", { name: "Put it on the Plate" }).first().click(); await page.waitForTimeout(900);
   const plateG = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.reduce((s, i) => s + i.grams, 0));
   ok(Math.abs(plateG - 1060 * planned / 8) <= 2, `the Plate holds the batch for ${planned}: ${Math.round(plateG)} g`);
   await page.getByRole("button", { name: /^Make it( as it is)?$|^Keep it as it is$|^(?:Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).first().click(); await page.waitForTimeout(900);

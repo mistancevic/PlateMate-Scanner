@@ -6,6 +6,7 @@
 // A plate of now takes one food with no question, and an empty plate is never asked.
 // The checks name the acceptance criteria of the board (DT313 AC1 to AC10). AC8, foods said in words onto a plate that has
 // foods, has no check: in the app foods are said only on an empty Plate, so the case cannot be reached by hand.
+// changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?
 const start = require("./plate157.cjs");
 const PORT = "3568";
 const F = (sd, n) => sd.foods.find((f) => f.name.startsWith(n));
@@ -14,17 +15,17 @@ const seedRec = (sd) => { sd.meals = [{ id: "r1", title: "Chicken and rice bowl"
 const names = (s) => s.items.map((i) => i.food.name.split(",")[0]).join(", ");
 (async () => { const h = await start(PORT); const { ok } = h; try {
   const toRecipe = async (p) => { await h.tab(p, "Recipes"); await p.locator(".recipe-tile").first().click(); await p.waitForTimeout(800); };
-  const change = async (p) => { await p.getByRole("button", { name: "Change it first" }).click(); await p.waitForTimeout(1000); };
+  const change = async (p) => { await p.getByRole("button", { name: "Put it on the Plate" }).click(); await p.waitForTimeout(1000); };
   const asked = async (p) => ({ m: await h.main(p), go: (await p.locator(".pa-go .pill").allInnerTexts()).map((t) => t.trim()).join(" | "), back: await p.locator(".ask-back").count() ? (await p.locator(".ask-back").innerText()).trim() : "" });
   // ---- AC1 to AC3: a recipe from Recipes
   let p = await h.open({ seed: seedRec });
   await toRecipe(p); await change(p);
   let q = await asked(p);
-  ok(/Your plate is not empty It already has Skyr, Oats & Banana, and the recipe brings its own foods/.test(q.m) && /The recipe is Chicken and rice bowl, from My recipes: 2 foods\./.test(q.m) && /Add it to your plate, or start a new plate\?/.test(q.m) && await p.locator(".plate-ask-photo").count() === 1 && await p.locator(".plate-ask-head .warn-title").count() === 1, "DT313 AC1: Change it first on a recipe: Your plate is not empty, my plate by name, and the recipe with where it comes from");
+  ok(/Your plate is not empty It already has Skyr, Oats & Banana, and the recipe brings its own foods/.test(q.m) && /The recipe is Chicken and rice bowl, from My recipes: 2 foods\./.test(q.m) && /Add it to your plate, or start a new plate\?/.test(q.m) && await p.locator(".plate-ask-photo").count() === 1 && await p.locator(".plate-ask-head .warn-title").count() === 1, "DT313 AC1: Put it on the Plate on a recipe: Your plate is not empty, my plate by name, and the recipe with where it comes from");
   ok(q.go === "Add to my plate | Start a new plate" && !/Keep my plate/.test(q.m) && /Skyr, Oats & Banana is saved in My recipes, so nothing is lost\.$/.test(q.m.trim()) && (await h.st(p)).items.length === 3, "DT313 AC1: Add to my plate, then Start a new plate; no Keep my plate; nothing has landed yet");
   ok(q.back === "Back to the recipe", "DT313 AC2: with Back to the recipe");
   await p.locator(".ask-back").click(); await p.waitForTimeout(700);
-  ok(/Chicken and rice bowl/.test(await h.main(p)) && await p.getByRole("button", { name: "Change it first" }).count() === 1 && names(await h.st(p)) === "Skyr, Oats, Banana", "DT313 AC2: Back: I am on the recipe's page and my plate holds what it held");
+  ok(/Chicken and rice bowl/.test(await h.main(p)) && await p.getByRole("button", { name: "Put it on the Plate" }).count() === 1 && names(await h.st(p)) === "Skyr, Oats, Banana", "DT313 AC2: Back: I am on the recipe's page and my plate holds what it held");
   await change(p);
   await p.getByRole("button", { name: "Add to my plate" }).click(); await p.waitForTimeout(800);
   let s = await h.st(p);

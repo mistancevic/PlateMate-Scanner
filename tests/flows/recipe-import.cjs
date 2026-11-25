@@ -8,6 +8,7 @@
 // Changed by story R21 (Milan 22:27, board RS20): one pizza keeps the exact grams, 2.5 g of the 5 g, shown to a tenth.
 // Everything else is unchanged.
 // 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs). no meal is guessed, so this walkthrough sets the meal with the pencil first (set-meal.cjs), where a meal's size matters. Changed by DT311 too: Empty plate stands in the row above the foods, not at the top of the card.
+// changed by DT349 (0.3.193, design rule D14): the PD card has two columns; Energy, Weight and Protein are .rd-rows, whole grams
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -83,7 +84,7 @@ const U = "http://127.0.0.1:3209";
   // IM3: what Chef Mealan read
   t = await card();
   ok(/Margherita pizza/.test(t) && /From @account_name on Instagram, read from your 2 screenshots/.test(t), "IM3: the dish, and where it came from, read from the screenshots");
-  ok(/Makes\s*−?\s*2\s*\+?\s*pizzas/.test(t) && /on the recipe/.test(t) && /^One pizza/.test(await page.locator(".in-card .rq-readout .readout-top").textContent()) && (await page.locator(".in-card .rq-readout .readout-mid > b").textContent()) === "4.1" && /^1,121 kcal · 4[56]\.\d g protein/.test(await page.locator(".in-card .rq-readout .readout-mid small").textContent()), "IM3: makes 2 pizzas, one pizza 1,121 kcal, PD 4.1 (R16: in the PD block)");
+  ok(/Makes\s*−?\s*2\s*\+?\s*pizzas/.test(t) && /on the recipe/.test(t) && /^One pizza/.test(await page.locator(".in-card .rq-readout .readout-top").textContent()) && (await page.locator(".in-card .rq-readout .pd-num > b").textContent()) === "4.1" && /Energy\s*1,121\s*kcal/.test(await page.locator(".in-card .rq-readout .rd-rows").textContent()) && /Protein\s*4[56]\s*g/.test(await page.locator(".in-card .rq-readout .rd-rows").textContent()), "IM3: makes 2 pizzas, one pizza 1,121 kcal, PD 4.1 (R16: in the PD block)");
   ok(/The recipe says: 1,100 kcal · 46 g protein · PD 4\.2 per pizza\. Our estimate agrees\./.test(t), "0.2.17: the recipe's own numbers next to ours");
   ok(/Chili oil/.test(t) && /optional/.test(t) && /Left out: 1 optional, as the recipe's numbers do/.test(t) && /The whole recipe: 2,242 kcal/.test(t), "0.2.17: an optional ingredient is marked and left out of the numbers");
   await page.getByRole("button", { name: "Add it" }).click(); await page.waitForTimeout(200);
