@@ -4740,6 +4740,13 @@
       "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn."
     },
     {
+      "id": "B169",
+      "title": "recipe-photos fails: a food's name in a step keeps its capital (Chicken breast)",
+      "epic": "cook",
+      "state": "next",
+      "why": "Found in the full run of 0.3.193, 25 November 2026: recipe-photos.cjs fails R13a, R13b, R11 and R13 the same way on main 0.3.192, so it is older than B168 and DT349. A tap on a food puts Fold in 100 g Chicken breast in the step; the walkthrough expects chicken breast. Likely since B163 (0.3.189: a pack's name stays as printed, the rest in small letters), released with Light checks, so the walkthrough did not run. To find out: is the app wrong (a reference food named with a capital) or the walkthrough (it expects the old small letters)? Coach Milan 15:55: yes, its own ticket. Not drawn."
+    },
+    {
       "id": "B167",
       "title": "A dinner eaten at 18:28 is on Today but not in Plan",
       "epic": "plate",
