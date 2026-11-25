@@ -1,0 +1,56 @@
+{
+ "id": "DT348",
+ "title": "One button to add a step: + Step here, also after the last step",
+ "boardTitle": "DT348: one button to add a step, + Step here, also after the last step",
+ "opportunity": {
+  "from": "Coach Milan 23 November 2026, 23:50, looking at the board B165 and B166: + Add a step and + Step here are two different buttons for the same job. 23:59: Next.",
+  "job": "Write a recipe's steps: add a step where it belongs.",
+  "kind": "Two kinds of button for one job: the eye has to learn both.",
+  "why_now": "DT345 (0.3.188) added + Step here between steps; the end of the list still has the older button."
+ },
+ "problem": "Writing steps, a step between two steps comes from + Step here, a dashed button under the step. A step after the last one comes from + Add a step, a filled button of another kind and another place. Same job, two looks, two words.",
+ "story": "When I write a recipe's steps, I want one button to add a step wherever it goes, so that I learn it once.",
+ "now": "Edit recipe, Steps: 1, + Step here, 2, then + Add a step. The publish sheet writes steps with the same editor, so it is the same there.",
+ "proposed": "+ Step here after the last step too, the same dashed button, in the same place under the step; + Add a step goes. Its label for a screen reader: Add a step after step 2. Enter in a step still adds the next one. One editor (StepsEditor), so Edit recipe and the publish sheet change together.",
+ "looked_at": "Keep + Add a step and make + Step here look like it: not chosen, the dashed button sits where the step will go, which is what it says.",
+ "decision": "Waiting for Coach Milan's Go.",
+ "short": "+ Step here after the last step too; + Add a step goes; release 0.3.197",
+ "ac": [
+  {
+   "id": "AC1",
+   "title": "The same button after the last step",
+   "text": "Given Banana porridge with 2 steps, when I open Edit recipe, then under step 1 and under step 2 there is + Step here, the same dashed button, and there is no + Add a step"
+  },
+  {
+   "id": "AC2",
+   "title": "It adds step 3",
+   "text": "Given that, when I tap + Step here under step 2, then step 3 opens, empty, with the cursor in it, and + Step here is under step 3"
+  },
+  {
+   "id": "AC3",
+   "title": "For a screen reader",
+   "text": "Given 2 steps, when a screen reader reads the button under step 2, then it says Add a step after step 2"
+  },
+  {
+   "id": "AC4",
+   "title": "The publish sheet",
+   "text": "Given the same recipe in the publish sheet, when I read its steps, then the same: + Step here between and after the last, no + Add a step"
+  },
+  {
+   "id": "AC5",
+   "title": "In every language",
+   "text": "Given Srpski or German, when I open Edit recipe, then the button after the last step has the same words as the one between steps, and its screen reader label is in that language"
+  }
+ ],
+ "unchanged": [
+  "+ Step here between steps (DT345), and where it adds the step.",
+  "Enter in a step adds the next step.",
+  "The foods under the steps, and the notes about foods in no step.",
+  "Start cooking and the steps as read on the recipe page."
+ ],
+ "checks": "Light plus the German sweep: one component (StepsEditor) and its words. The unit tests; the build; a new walkthrough for AC1 to AC5; the six walkthroughs that tap + Add a step today (day-levels, past-and-plan, recipe-photos, steps-and-parts, explore-photo, tester-fixes) change with the story, each with a note; deutsch, language and design-rules. About 10 walkthroughs, 4 minutes. Words: steps.addAStep goes; steps.addAfter is new (Srpski and German).",
+ "details": [
+  "src/components/StepsEditor.tsx: the last button is st-between st-after with steps.stepHere and the label steps.addAfter; src/index.css: .st-after keeps its width (align-self: flex-start).",
+  "The pictures: before from main, 0.3.196; new from a scratch build of main with the change, not committed. The publish sheet opens for a coach (chefmealan-coach)."
+ ]
+}
