@@ -40,7 +40,7 @@ How you talk to me:
 - Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 - When this chat gets long, give me this full starter prompt again, updated, never a short one.
 
-Next: 0.3.193 (B168 and DT349) and 0.3.194 (B169) are merged into main; I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). DT353 (a member's recipe page in the same structure as my own) is drawn on canvas Page 6 for discussion: the recipe as written on top, What do you do with it? (Plan it, Put it on the Plate, Save to My recipes); two open questions on its board (a shared recipe carries no makes N; a shared food's name in small letters in the steps). The scratch build /home/claude/work/b353 is gone in a new chat: MemberPage in src/components/Members.tsx was rewritten there. Then from Next: DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target). Propose a full run at the end of a day with lighter runs merged (ticket form, checks rule 6).
+Next: 0.3.193 (B168 and DT349) and 0.3.194 (B169) are merged into main; I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). DT353 (a member's recipe page in the same structure as my own) is drawn on canvas Page 6 for discussion: the recipe as written on top, What do you do with it? (Plan it, Put it on the Plate, Save to My recipes); agreed so far: the page is for deciding (plan it as is, or take it to the Plate first), no Servings card, a note before the actions; one open question on its board (a shared food's name in small letters in the steps: own bug or in DT353?). The scratch build /home/claude/work/b353 is gone in a new chat: MemberPage in src/components/Members.tsx was rewritten there. Then from Next: DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target). Propose a full run at the end of a day with lighter runs merged (ticket form, checks rule 6).
 ```
 
 ## Standing rules (Coach Milan)
@@ -69,7 +69,9 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 25 November 2026, 16:50
+## State, 25 November 2026, 16:55
+
+- DT353 redrawn 16:50 (Coach Milan 16:39: the page is for the user to decide if it is worth taking to the Plate or planning as is; 16:41: yes, no Servings; a note as part of the insight, the CTA below). The note: members.decideLine, {whose} recipe, as written, and where each action leads. Stories296 h 4902. Still open: a shared food arrives without its source, so pack names are in small letters in the steps.
 
 - DT353 drawn 25 November 16:45 for discussion (Coach Milan 16:26: draw so we discuss it): Stories296, Page 6, x 0, y 100234, w 1790, h 4774. DT353.1: Members, a recipe, in main 0.3.194 (opens on my portion; Make it, Keep in mine). DT353.2: the tile as now; the page opens on the recipe as written (PdCard whole recipe, Foods, Nutrition, Steps with the recipe's amounts); What do you do with it?: Plan it (plateCal, my portion), Put it on the Plate (was Make it), Save to My recipes (was Keep in mine, new word members.saveToMine). Open: a shared recipe carries no makes N (no Servings card); a shared food arrives without its source, so pack names are in small letters in the steps on both pages. Scratch /home/claude/work/b353; the members' list is a mock (one recipe shared by Sam, an invented name). Board tools: shotDT353.cjs, genDT353.py, ticketDT353.json, heightsDT353.json, assetsDT353.json. No agreement block yet; Checks proposed Middle plus the German sweep.
 
@@ -163,8 +165,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - Stories293 B165 and B166 at x 0, y 82437, w 1790, h 6466.
 - Stories294 B168 and DT349 at x 0, y 89023, w 4240, h 7871.
 - Stories295 B169 at x 0, y 97014, w 1310, h 3100.
-- Stories296 DT353 at x 0, y 100234, w 1790, h 4774.
-- The next board on Page 6 goes at x 0, y 105128.
+- Stories296 DT353 at x 0, y 100234, w 1790, h 4902.
+- The next board on Page 6 goes at x 0, y 105256.
 - A sheet that scrolls is drawn as one tall picture: shotDT339.cjs unroll() opens its scroll boxes at their real width.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.193; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json of 0.3.193. 19 new or changed lines in 0.3.193, Srpski confirmed by Claude, German in Beta.

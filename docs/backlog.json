@@ -4738,7 +4738,7 @@
       "title": "A member's recipe page in the same structure as my own recipe's",
       "epic": "cook",
       "state": "next",
-      "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn. 25 November 16:25: yes, brainstorm; 16:26: draw so we discuss it. Drawn 16:45, for discussion.",
+      "why": "Found while drawing DT349, 25 November 2026: a member's recipe has its own page (MemberPage in src/components/Members.tsx), which shows your portion for the meal ahead at once, with Make it and Keep in mine. Proposed: the same structure as DT349: the recipe as written on top (PdCard), Servings and Foods, and What do you do with it? with Plan it, Put it on the Plate and Save to My recipes; my portion only once a day and a meal are picked (nutrition rule N17; Coach Milan 08:34 to 08:42). Asked twice on 25 November whether it belongs in DT349, no answer; kept out of DT349. Not drawn. 25 November 16:25: yes, brainstorm; 16:26: draw so we discuss it. Drawn 16:45, for discussion. 16:39: the page is for deciding whether to plan it as is or take it to the Plate; 16:41: no Servings card, a note before the actions. Redrawn.",
       "opportunity": {
         "from": "Found while drawing DT349, 25 November 2026; Coach Milan 16:25: yes, brainstorm; 16:26: draw so we discuss it.",
         "job": "Read a recipe another member shared, and decide what to do with it.",
@@ -4753,12 +4753,11 @@
         "Save to My recipes does what Keep in mine did: a copy in Mine."
       ],
       "open": [
-        "A shared recipe carries no makes N, so the page has no Servings card and no One serving column. Should sharing send how many it makes (a change in what a share carries, on the server too)?",
         "Seen on both pages: the steps of a shared recipe write a pack's name in small letters (körniger frischkäse tworog), because a shared food arrives without its source. Its own bug, or in this ticket?"
       ],
       "board": "Stories296",
       "where": "Page 6",
-      "rel": "Drawn 25 November 2026 for discussion; no decision yet"
+      "rel": "Redrawn 25 November 2026 for discussion; agreed so far: the page is for deciding, no Servings, a note before the actions"
     },
     {
       "id": "B169",
