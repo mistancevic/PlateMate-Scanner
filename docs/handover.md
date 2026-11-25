@@ -40,7 +40,7 @@ How you talk to me:
 - Plain English, light style. No en or em dashes. Never the words floor, lamp, corridor. "Calculate", not "work out". Commands in code blocks.
 - When this chat gets long, give me this full starter prompt again, updated, never a short one.
 
-Next: B168 and DT349 are built in 0.3.193 and merged into main (dd5a8a7); I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). Open, asked: recipe-photos fails R13a, R13b, R11 and R13 on main since before 0.3.193 (a pack's food name kept as printed, Chicken breast); a bug ticket? Then from Next: DT353 (a member's recipe page in the same structure), DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target).
+Next: B168 and DT349 are built in 0.3.193 and merged into main (dd5a8a7); I start Preview and Promote. A serving is the recipe's equal share, the same for everyone; a portion is mine, calculated for a meal and my day (nutrition rule N17). Every PD card is PdCard (design rule D14). B169 is drawn on canvas Page 6 and waits for my Go: a starter food (typical values, check your pack) counts as a basic food, so a step says chicken breast in small letters (option A); it mends recipe-photos as written. Checks Light, every walkthrough with steps, release 0.3.194. The scratch build /home/claude/work/b169 is gone in a new chat: the change is one line in shortName, src/steps.ts. Then from Next: DT353 (a member's recipe page in the same structure), DT348, B164, DT346, DT347, DT344. Later: DT350 (each person's own portion), DT352 (find a recipe by meal and my PD target).
 ```
 
 ## Standing rules (Coach Milan)
@@ -69,7 +69,9 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
-## State, 25 November 2026, 16:00
+## State, 25 November 2026, 16:15
+
+- B169 drawn 25 November 16:10 (Stories295, Page 6, x 0, y 97014, w 1310, h 3017; Coach Milan 15:55: its own ticket, first thing next; 15:59: A). Cause: the app's first starter foods were saved with source label and the line typical values, check your pack; since B163 (0.3.189) a name from a label stays as printed, so a step says Chicken breast. recipe-photos' chicken is such a food. Fix drawn: shortName treats that line as a basic food. Scratch /home/claude/work/b169 holds it. Board tools: shotB169.cjs, genB169.py, ticketB169.json, heightsB169.json, assetsB169.json. Checks proposed: Light, every walkthrough with steps (as B163), about 10 minutes; no new words. Lesson: B163 went out with Light checks and recipe-photos did not run for four releases.
 
 - 0.3.193 (B168 and DT349, DT351 inside DT349) is merged into main as dd5a8a7 (merge of pm193) and tagged v0.3.193 (local tag); Go 25 November 14:38 and 14:42, checks Full: 243 walkthroughs, 242 pass (docs/qa/runs/0.3.193.json, 49 min plus reruns). 12 failed on the first pass, all reading what this story changes (Change it first, the Cook it card, the card's one-serving numbers, the card's layout); each updated with a note naming B168 or DT349, rerun with MERGE=1, passed. recipe-photos fails the same four checks on main 0.3.192: older than this story, not touched. The German sweep (accessibility, deutsch, language) passed. 19 new or changed lines; Srpski confirmed by Claude (serving stays porcija, my portion is tvoja količina), German Beta (Portion, deine Menge); the Srpski and Deutsch tables have app-sr.json and release-pack.json of 0.3.193. Coach Milan starts Preview and Promote.
 - What was built: src/components/PdCard.tsx (variation B; a line over 22 letters is pd-line, full width), the Plate's readout and NutritionCard on it; src/servings.ts (servingChips, stepping, portionShare, portionsInWhole) with src/servings.test.ts; RecipePage: rq-nopic-ph, the Servings card (rq-howmuch), Foods named for the choice, What do you do with it? (rq-actions: Plan it with plateCal, the portion line, Put it in the plan, or Put it in its place when the meal holds something; Put it on the Plate); mealSizeOn in Members.tsx; RecipesScreen passes plan only on a day with numbers. Design rule D14 (D8 was taken), guarded by design-rules.cjs rule I. New walkthrough tests/flows/recipe-servings.cjs (PORT 3618). Kept as before, not on the board: the read card of a recipe added from a link (RecipeIn) shows one serving, now in the PdCard layout (NutritionCard perServing); its numbers count one serving too.
@@ -156,7 +158,8 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 - Stories292 B167 at x 0, y 78739, w 2670, h 3578.
 - Stories293 B165 and B166 at x 0, y 82437, w 1790, h 6466.
 - Stories294 B168 and DT349 at x 0, y 89023, w 4240, h 7871.
-- The next board on Page 6 goes at x 0, y 97014.
+- Stories295 B169 at x 0, y 97014, w 1310, h 3017.
+- The next board on Page 6 goes at x 0, y 100151.
 - A sheet that scrolls is drawn as one tall picture: shotDT339.cjs unroll() opens its scroll boxes at their real width.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.193; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json of 0.3.193. 19 new or changed lines in 0.3.193, Srpski confirmed by Claude, German in Beta.

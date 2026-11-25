@@ -4743,8 +4743,47 @@
       "id": "B169",
       "title": "recipe-photos fails: a food's name in a step keeps its capital (Chicken breast)",
       "epic": "cook",
-      "state": "next",
-      "why": "Found in the full run of 0.3.193, 25 November 2026: recipe-photos.cjs fails R13a, R13b, R11 and R13 the same way on main 0.3.192, so it is older than B168 and DT349. A tap on a food puts Fold in 100 g Chicken breast in the step; the walkthrough expects chicken breast. Likely since B163 (0.3.189: a pack's name stays as printed, the rest in small letters), released with Light checks, so the walkthrough did not run. To find out: is the app wrong (a reference food named with a capital) or the walkthrough (it expects the old small letters)? Coach Milan 15:55: yes, its own ticket. Not drawn."
+      "state": "now",
+      "why": "Found in the full run of 0.3.193, 25 November 2026: recipe-photos.cjs fails R13a, R13b, R11 and R13 the same way on main 0.3.192, so it is older than B168 and DT349. A tap on a food puts Fold in 100 g Chicken breast in the step; the walkthrough expects chicken breast. Likely since B163 (0.3.189: a pack's name stays as printed, the rest in small letters), released with Light checks, so the walkthrough did not run. To find out: is the app wrong (a reference food named with a capital) or the walkthrough (it expects the old small letters)? Coach Milan 15:55: yes, its own ticket. Not drawn. 15:59: A, the app: a starter food counts as a basic food. Drawn 16:10.",
+      "opportunity": {
+        "from": "The full walkthrough run of 0.3.193, 25 November 2026: recipe-photos fails the same way on main 0.3.192. Coach Milan 15:55: its own ticket, first thing next.",
+        "job": "Read a recipe's steps with the foods I have.",
+        "kind": "Looks broken: a basic food named with a capital in the middle of a sentence.",
+        "why_now": "Accounts from the pilot still hold the first starter foods, so their steps say Chicken breast; and a walkthrough that fails hides the next failure."
+      },
+      "problem": "The app's first starter foods (Chicken breast, cooked, Rice, cooked, Oats, with the line typical values, check your pack) were saved as read from a label. Since B163 (0.3.189) a name read from a label stays as printed, so a step says Fold in 100 g Chicken breast. A food from today's basic foods says chicken breast. B163 went out with Light checks, so recipe-photos did not run and it stayed unseen for four releases.",
+      "story": "When I read a recipe's steps, I want a basic food named the same way whether it came with the app or from the food table, so that the steps read like a recipe.",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "A starter food in small letters",
+          "text": "Given a recipe with Chicken breast, cooked, one of the first starter foods, when I read its steps, then step 2 reads Fold in 100 g chicken breast and cook slowly"
+        },
+        {
+          "id": "AC2",
+          "title": "Everywhere the steps show",
+          "text": "Given the same recipe, when I open Edit recipe or Start cooking, then the step says chicken breast too"
+        },
+        {
+          "id": "AC3",
+          "title": "A pack as printed",
+          "text": "Given Frischer Blätterteig from a barcode in the same recipe, when I read the steps, then it reads Frischer Blätterteig, as now"
+        },
+        {
+          "id": "AC4",
+          "title": "recipe-photos as written",
+          "text": "Given recipe-photos.cjs, when it runs on this build, then R13a, R13b, R11 and R13 pass with the walkthrough unchanged"
+        }
+      ],
+      "unchanged": [
+        "B163: a pack's name as printed, a decimal comma kept, a name cut only at a comma with a space.",
+        "Counted foods: 2 eggs (L).",
+        "The list under Edit recipe's steps names each food as saved."
+      ],
+      "board": "Stories295",
+      "where": "Page 6",
+      "rel": "Drawn 25 November 2026, 16:10; waits for Go",
+      "open": []
     },
     {
       "id": "B167",
