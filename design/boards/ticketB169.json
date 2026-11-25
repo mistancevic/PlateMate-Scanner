@@ -13,13 +13,29 @@
   "now": "Step 2 of a recipe with the starter chicken: Fold in 100 g Chicken breast and cook slowly. The same in Edit recipe's steps. A pack, Frischer Blätterteig, as printed.",
   "proposed": "A food with the starter foods' line (typical values, check your pack) counts as a basic food: its name in a step is in small letters, chicken breast. A pack keeps its name as printed, as B163. Nothing saved changes: the name comes from the food each time the step is shown.",
   "looked_at": "Change only the walkthrough's test food to a food from the food table, as B163 did in five walkthroughs (option B, 15:58): not chosen, 15:59: the old starter foods would keep their capitals on real phones.",
-  "decision": "Waiting for Coach Milan's Go.",
+  "decision": "Go 25 November 2026, 16:04; checks Light, every walkthrough with steps and recipe-photos, 37 of 37 (docs/qa/runs/0.3.194.json). Built in 0.3.194.",
   "short": "A starter food is a basic food: small letters in a step, chicken breast; release 0.3.194",
   "ac": [
-    {"id": "AC1", "title": "A starter food in small letters", "text": "Given a recipe with Chicken breast, cooked, one of the first starter foods, when I read its steps, then step 2 reads Fold in 100 g chicken breast and cook slowly"},
-    {"id": "AC2", "title": "Everywhere the steps show", "text": "Given the same recipe, when I open Edit recipe or Start cooking, then the step says chicken breast too"},
-    {"id": "AC3", "title": "A pack as printed", "text": "Given Frischer Blätterteig from a barcode in the same recipe, when I read the steps, then it reads Frischer Blätterteig, as now"},
-    {"id": "AC4", "title": "recipe-photos as written", "text": "Given recipe-photos.cjs, when it runs on this build, then R13a, R13b, R11 and R13 pass with the walkthrough unchanged"}
+    {
+      "id": "AC1",
+      "title": "A starter food in small letters",
+      "text": "Given a recipe with Chicken breast, cooked, one of the first starter foods, when I read its steps, then step 2 reads Fold in 100 g chicken breast and cook slowly"
+    },
+    {
+      "id": "AC2",
+      "title": "Everywhere the steps show",
+      "text": "Given the same recipe, when I open Edit recipe or Start cooking, then the step says chicken breast too"
+    },
+    {
+      "id": "AC3",
+      "title": "A pack as printed",
+      "text": "Given Frischer Blätterteig from a barcode in the same recipe, when I read the steps, then it reads Frischer Blätterteig, as now"
+    },
+    {
+      "id": "AC4",
+      "title": "recipe-photos as written",
+      "text": "Given recipe-photos.cjs, when it runs on this build, then R13a, R13b, R11 and R13 pass with the walkthrough unchanged"
+    }
   ],
   "unchanged": [
     "B163: a pack's name as printed, a decimal comma kept, a name cut only at a comma with a space.",
@@ -29,6 +45,7 @@
   "checks": "Light: one function, the names in the steps (shortName in src/steps.ts). The unit tests with a new one for a starter food; the build; recipe-photos for AC4 and a new check in step-names for AC1 to AC3; and every walkthrough with steps, as for B163, about 33 and 10 minutes. No new words on screen.",
   "details": [
     "shortName in src/steps.ts: a food with brand typical values, check your pack (TYPICAL in src/pilot.ts; repairState turns the older generic, check your package into it) counts as a basic food.",
-    "The pictures: before from main, 0.3.193; new from a scratch build of main with the change, not committed. The recipe holds two starter foods, eggs and chicken, and one pack."
+    "The pictures: before from main, 0.3.193; new from a scratch build of main with the change, not committed. The recipe holds two starter foods, eggs and chicken, and one pack.",
+    "Found while building: steps saved from 0.3.189 to 0.3.193 hold the name as the app wrote it then (Chicken breast); amountFor now lets that name follow the food too, so they read chicken breast. A name a recipe chose itself still stays."
   ]
 }

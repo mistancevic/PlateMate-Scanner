@@ -29,7 +29,7 @@ parts = [("Ticket", "B169. This board is the ticket: everything about it is here
   ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> B169.1: a recipe with the starter chicken as in main, 0.3.193: its steps, then Edit recipe. B169.2: the same, new. A blue outline marks what each note is about."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "25 November 15:55: yes, its own ticket; should we do it the first thing next? 15:56: yes, draw. 15:59: A, the app: a starter food counts as a basic food."),
+  ("In Coach Milan's words", "25 November 15:55: yes, its own ticket; should we do it the first thing next? 15:56: yes, draw. 15:59: A, the app: a starter food counts as a basic food. 16:04: Go."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "B169", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -52,9 +52,9 @@ arrow(X(0) + PW, y + 260, "→"); B.html.append(f'<div style="position:absolute;
 RB = r2
 bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
-acTable(B, y, W - 40, {**t, "rel": "Proposed; not agreed until Coach Milan says Go"})
+acTable(B, y, W - 40, {**t, "rel": "Go 25 November 2026, 16:04; built in 0.3.194"})
 Hc = y + HT.get("ac", 900) + 40
-board("Stories295.dc.html", t["boardTitle"], "Drawn 25 November 2026, 16:10, for the Go of Coach Milan. Ticket B169, Kanban column Now. Pictures from the real app: before on main, 0.3.193; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories294.dc.html")
+board("Stories295.dc.html", t["boardTitle"], "Drawn 25 November 2026; Go 16:04, built in 0.3.194. Ticket B169, Kanban column Done. Pictures from the real app: before on main, 0.3.193; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories294.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B169": {"file": "Stories295.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outB169.json"), "w"))
 print("B169", W, Hc + 230)

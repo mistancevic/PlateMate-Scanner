@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.194",
     "0.3.193",
     "0.3.192",
     "0.3.191",
@@ -4743,7 +4744,7 @@
       "id": "B169",
       "title": "recipe-photos fails: a food's name in a step keeps its capital (Chicken breast)",
       "epic": "cook",
-      "state": "now",
+      "state": "done",
       "why": "Found in the full run of 0.3.193, 25 November 2026: recipe-photos.cjs fails R13a, R13b, R11 and R13 the same way on main 0.3.192, so it is older than B168 and DT349. A tap on a food puts Fold in 100 g Chicken breast in the step; the walkthrough expects chicken breast. Likely since B163 (0.3.189: a pack's name stays as printed, the rest in small letters), released with Light checks, so the walkthrough did not run. To find out: is the app wrong (a reference food named with a capital) or the walkthrough (it expects the old small letters)? Coach Milan 15:55: yes, its own ticket. Not drawn. 15:59: A, the app: a starter food counts as a basic food. Drawn 16:10.",
       "opportunity": {
         "from": "The full walkthrough run of 0.3.193, 25 November 2026: recipe-photos fails the same way on main 0.3.192. Coach Milan 15:55: its own ticket, first thing next.",
@@ -4782,8 +4783,9 @@
       ],
       "board": "Stories295",
       "where": "Page 6",
-      "rel": "Drawn 25 November 2026, 16:10; waits for Go",
-      "open": []
+      "rel": "Built in 0.3.194; Go 25 November 2026, 16:04",
+      "open": [],
+      "version": "0.3.194"
     },
     {
       "id": "B167",
