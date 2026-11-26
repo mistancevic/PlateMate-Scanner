@@ -29,7 +29,7 @@ parts = [("Ticket", "B164. This board is the ticket: everything about it is here
   ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> B164.1 as in main, 0.3.197: Recipes, idle, and the list after a tap on the line under my recipes. B164.2 the same, new. A blue outline marks what each note is about; the numbers are measured on the page."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "23 November 19:03: the link below the list that shows more of my recipes is almost invisible. 26 November 10:32: yes, the Recipes batch in Now, B164, DT347, DT346, with the design rules applied. 10:33: yes, draw."),
+  ("In Coach Milan's words", "23 November 19:03: the link below the list that shows more of my recipes is almost invisible. 26 November 10:32: yes, the Recipes batch in Now, B164, DT347, DT346, with the design rules applied. 10:33: yes, draw. 10:43: since we are touching the design on this page, fix the titles too, Made by me, Made by members; now they are so tiny and easy to miss."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "B164", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -42,12 +42,12 @@ def arrow(x, y, ch="→"):
     B.html.append(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{G}px;text-align:center;font-size:40px;font-weight:900;color:#2a72d9">{ch}</div>')
 label(y, "B164.1 In main, 0.3.197", "Recipes, then the rest of mine", 0, 2)
 y += 60
-r1 = [shot(X(0), y, "64-1a", PW, "B164.1a Recipes", "draft", "3 more of mine ›: a small text link."), shot(X(1), y, "64-1b", PW, "B164.1b Recipes, Made by: me", "draft", "All 5 of mine.")]
+r1 = [shot(X(0), y, "64-1a", PW, "B164.1a Recipes", "draft", "Titles in small type; 3 more of mine ›, a small text link."), shot(X(1), y, "64-1b", PW, "B164.1b Recipes, Made by: me", "draft", "All 5 of mine.")]
 arrow(X(0) + PW, y + 560, "→"); B.html.append(f'<div style="position:absolute;left:{X(0) + PW}px;top:{y + 605}px;width:{G}px;text-align:center;font-size:12.5px;font-weight:800;color:#2a72d9">tap<br>3 more<br>of mine</div>')
 y = max(r1) + 70
 label(y, "B164.2 New", "the same, with a button", 0, 2)
 y += 60
-r2 = [shot(X(0), y, "64-2a", PW, "B164.2a Recipes", "changed", "Show all 5 of mine: the outlined button."), shot(X(1), y, "64-2b", PW, "B164.2b Recipes, Made by: me", "same", "All 5 of mine.")]
+r2 = [shot(X(0), y, "64-2a", PW, "B164.2a Recipes", "changed", "Titles as headings; Show all 5 of mine, the outlined button."), shot(X(1), y, "64-2b", PW, "B164.2b Recipes, Made by: me", "same", "All 5 of mine.")]
 arrow(X(0) + PW, y + 560, "→"); B.html.append(f'<div style="position:absolute;left:{X(0) + PW}px;top:{y + 605}px;width:{G}px;text-align:center;font-size:12.5px;font-weight:800;color:#2a72d9">tap<br>Show all<br>5 of mine</div>')
 RB = r2
 bs = RB

@@ -1,17 +1,17 @@
 {
  "id": "B164",
- "title": "The link to show more of my recipes is almost invisible",
- "boardTitle": "B164: the line that shows the rest of a group becomes a button",
+ "title": "The link to show more of my recipes is almost invisible, and the groups' titles too",
+ "boardTitle": "B164: the groups on Recipes: a title you see, and a button for the rest",
  "opportunity": {
   "from": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): on Recipes, the link below the list that shows more of my recipes is almost invisible. 26 November 10:32: Now, with the Recipes batch (B164, DT347, DT346) and the design rules of DT354.",
   "job": "Find a recipe of mine that is not among the first two.",
   "kind": "Looks like plain text: a small link where a button is needed.",
   "why_now": "Recipes is the first page to clear under the design rules (DT354)."
  },
- "problem": "Recipes, idle, groups the list by who made it: two recipes per group, then a line for the rest, 3 more of mine ›. The line is a small text link, 20 px high, 20 px under the last recipe while two recipes are 34 px apart. It acts (it switches Made by to me), so by the design rules it is a button (D9), 44 px or more (D10), with even space (D15).",
+ "problem": "Recipes, idle, groups the list by who made it: two recipes per group, then a line for the rest, 3 more of mine ›. The line is a small text link, 20 px high, 20 px under the last recipe while two recipes are 34 px apart. It acts (it switches Made by to me), so by the design rules it is a button (D9), 44 px or more (D10), with even space (D15). The group's title, Made by me · 5, is in small label type, 13 px: easy to miss (Coach Milan 26 November 10:43).",
  "story": "When I look for one of my recipes on Recipes, I want to see at once how to open the rest, so that I don't miss the recipes past the first two.",
- "now": "Made by me · 5: two recipes, then 3 more of mine ›, a text link in small type, 20 px high, 20 px under the last recipe. The same for 2 more from members › and more from my coach.",
- "proposed": "Under the two recipes, the app's outlined button across the whole row (D9), 44 px high (D10), 34 px under the last recipe, the same as between two recipes (D15): Show all 5 of mine; Show all 4 from members; Show all 3 from your coach. The number is the whole group. A tap does what the line did: Made by switches to that group and the list opens.",
+ "now": "Made by me · 5: two recipes, then 3 more of mine ›, a text link in small type, 20 px high, 20 px under the last recipe. The same for 2 more from members › and more from my coach. Each group's title is in label type, 13 px.",
+ "proposed": "Under the two recipes, the app's outlined button across the whole row (D9), 44 px high (D10), 34 px under the last recipe, the same as between two recipes (D15): Show all 5 of mine; Show all 4 from members; Show all 3 from your coach. The number is the whole group. A tap does what the line did: Made by switches to that group and the list opens. Coach Milan 10:43: the titles too: each group's title is a section heading, 18 px and bold, as a card's heading (--fs-section), 18 px above it.",
  "looked_at": "Keep the text link and make it bigger and darker: not chosen, it acts, and text links only navigate (D9). Show the whole group at once: not chosen, the idle page would be long with many recipes (DT126c).",
  "decision": "Waiting for Coach Milan's Go.",
  "short": "Show all 5 of mine, the outlined button, 44 px, the same space as between recipes; release 0.3.198",
@@ -33,6 +33,11 @@
   },
   {
    "id": "AC4",
+   "title": "A title you see",
+   "text": "Given Recipes idle, when I look at the groups, then each title, Made by me · 5, Made by members · 4, is a section heading, 18 px and bold"
+  },
+  {
+   "id": "AC5",
    "title": "In every language",
    "text": "Given Srpski or German, when I look under Made by me, then the button says the same in that language, with the number"
   }
@@ -42,9 +47,9 @@
   "The groups, their titles and counts.",
   "A search or a filter shows every hit."
  ],
- "checks": "Light plus the German sweep: one line of Recipes and its words. The unit tests; the build; recipes-bar with new checks for AC1 to AC4 (it covers the groups, DT126c); covers-and-members and members-names tap the line and change with the story, each with a note; design-rules, accessibility, deutsch, language. About 8 walkthroughs, 3 minutes. Words: recipes.moreOfMine, moreFromCoach, moreFromMembers go; recipes.allOfMine, allFromCoach, allFromMembers are new (Srpski and German).",
+ "checks": "Light plus the German sweep: one line of Recipes and its words. The unit tests; the build; recipes-bar with new checks for AC1 to AC5 (it covers the groups, DT126c); covers-and-members and members-names tap the line and change with the story, each with a note; design-rules, accessibility, deutsch, language. About 8 walkthroughs, 3 minutes. Words: recipes.moreOfMine, moreFromCoach, moreFromMembers go; recipes.allOfMine, allFromCoach, allFromMembers are new (Srpski and German).",
  "details": [
-  "src/screens/RecipesScreen.tsx: the line is pill pill-action rc-more with the whole group's count; src/index.css: .rc-more full width, 44 px, margin-top 12 px (the list's gap of 10 px plus 12 px, as between two tiles: 34 px).",
+  "src/screens/RecipesScreen.tsx: the line is pill pill-action rc-more with the whole group's count; src/index.css: .rc-more full width, 44 px, margin-top 12 px (the list's gap of 10 px plus 12 px, as between two tiles: 34 px). .rc-group-title: --fs-section (18 px), bold, ink, margin-top 18 px.",
   "The pictures: before from main, 0.3.197; new from a scratch build of main with the change, not committed. Members' names are invented (Sam, Ana)."
  ]
 }

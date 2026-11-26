@@ -59,6 +59,10 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
       console.log(await note(p, first, isNew
         ? `<b>New:</b> <b>Show all 5 of mine</b>, the outlined button (D9), the whole row, ${m.h} px high (D10), ${m.above} px under the last recipe, the same as between two recipes, ${m.between} px (D15). It does what the line did: Made by switches to me and the list opens. I tap it.`
         : `Under two of my recipes: <b>3 more of mine ›</b>, a small text link, ${m.h} px high, ${m.above} px under the last recipe (${m.between} px between two recipes). It acts: Made by switches to me. Text links only navigate (D9); a button is 44 px or more (D10). I tap it.`, [MORE]));
+      const tt = await p.evaluate(() => { const t = document.querySelector(".rc-group-title"); return { size: getComputedStyle(t).fontSize, weight: getComputedStyle(t).fontWeight }; });
+      console.log(await note(p, "JS:document.querySelector('.rc-group-title')", isNew
+        ? `<b>New:</b> the group's title is a section heading, ${tt.size} and bold, as a card's heading (--fs-section): Made by me · 5.`
+        : `The group's title, <b>Made by me · 5</b>, is in small label type, ${tt.size}: easy to miss.`, ["JS:[...document.querySelectorAll('.rc-group-title')]"]));
       await shot(p, `64-${row}a`, ".rc-group", "JS:[...document.querySelectorAll('.rc-group')].pop()");
       await p.evaluate(() => document.querySelectorAll(".board-note").forEach((n) => n.remove()));
       await p.locator(".rc-more").first().click(); await sleep(800);

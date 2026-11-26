@@ -4326,11 +4326,11 @@
     },
     {
       "id": "B164",
-      "title": "The link to show more of my recipes is almost invisible",
+      "title": "The link to show more of my recipes is almost invisible, and the groups' titles too",
       "epic": "cook",
       "state": "now",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): on Recipes, the link below the list that shows more of my recipes is almost invisible. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches. 10:33: draw. Drawn 11:05 with its agreement.",
-      "problem": "Recipes, idle, groups the list by who made it: two recipes per group, then a line for the rest, 3 more of mine ›. The line is a small text link, 20 px high, 20 px under the last recipe while two recipes are 34 px apart. It acts (it switches Made by to me), so by the design rules it is a button (D9), 44 px or more (D10), with even space (D15).",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): on Recipes, the link below the list that shows more of my recipes is almost invisible. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches. 10:33: draw. Drawn 11:05 with its agreement. 10:43: fix the groups' titles too (Made by me, Made by members), so tiny and easy to miss. Redrawn 11:20.",
+      "problem": "Recipes, idle, groups the list by who made it: two recipes per group, then a line for the rest, 3 more of mine ›. The line is a small text link, 20 px high, 20 px under the last recipe while two recipes are 34 px apart. It acts (it switches Made by to me), so by the design rules it is a button (D9), 44 px or more (D10), with even space (D15). The group's title, Made by me · 5, is in small label type, 13 px: easy to miss (Coach Milan 26 November 10:43).",
       "story": "When I look for one of my recipes on Recipes, I want to see at once how to open the rest, so that I don't miss the recipes past the first two.",
       "unchanged": [
         "Two recipes per group while nothing is searched or filtered; a group of three or fewer shows whole.",
@@ -4359,6 +4359,11 @@
         },
         {
           "id": "AC4",
+          "title": "A title you see",
+          "text": "Given Recipes idle, when I look at the groups, then each title, Made by me · 5, Made by members · 4, is a section heading, 18 px and bold"
+        },
+        {
+          "id": "AC5",
           "title": "In every language",
           "text": "Given Srpski or German, when I look under Made by me, then the button says the same in that language, with the number"
         }
@@ -4432,7 +4437,7 @@
       "title": "Recipes: the newest first, and the filters as chips that open and close",
       "epic": "cook",
       "state": "now",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches."
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches. 26 November 10:43 (Coach Milan): Sort, should these be chips as well? Newest as the first one and the default. A design proposal for them instead of text, or keep text for now? Any idea how to solve the tension of so many chips at once? Proposed 11:25: at rest one row of three chips under the search: Made by ▾, Filters ▾ (with the number set, Filters · 2), Newest ▾ (the sort, showing its choice). A tap opens its choices under the row as chips, white until chosen, blue with a check (D3, D6); Kitchen, Moment, Fits my day, No cooking and With my foods move inside Filters. Newest is the first sort and the default. About 12 things on screen at rest become 3."
     },
     {
       "id": "B165",
