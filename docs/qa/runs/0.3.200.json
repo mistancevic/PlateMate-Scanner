@@ -1,0 +1,541 @@
+{
+ "version": "0.3.200",
+ "commit": "4091fd9",
+ "at": "2026-11-26T12:47:55.974Z",
+ "minutes": 1,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 64,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 13,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipes-bar.cjs",
+   "about": "JOURNEY (0.2.105 and 0.2.106, boards Stories72 and Stories74, DT126 and DT126c; Milan 25 October 13:48 to 15:12): Recipes is one list under one bar, no tabs. One search over the title, the foods (in any of the pilot's languages) and the cook; Made by and Kitchen as drop-downs with counts; chips that stack; a sort; the line that says what is shown of what. Idle, the list is grouped by who made it, two rows per group and a line for the rest. A recipe shared without a name is found by the search and counted under A member without a name; a recipe of yours shared without your name says so on its tile.",
+   "pass": true,
+   "seconds": 35,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT126c: no tabs; one bar on top of Recipes"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: idle, three groups with counts: Made by me · 4 | Made by your coach · 1 | Made by members · 5"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: two rows per group and a line for the rest; the line says 10 recipes"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: the rest behind a button per group (B164)"
+    },
+    {
+     "ok": true,
+     "text": "B164 AC1: Show all 4 of mine, the outlined button across the row, 44 px, as far under the last recipe as two recipes are apart: {\"h\":44,\"full\":true,\"outlined\":true,\"above\":34,\"between\":34,\"size\":\"18px\",\"weight\":900}"
+    },
+    {
+     "ok": true,
+     "text": "B164 AC4: each group's title is a section heading, 18 px and bold: 18px 900"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: the members' group says your portion for the meal ahead: Members' recipes, calculated for your day. Lunch is about 917 kcal at PD 6.5 or more, so these come first."
+    },
+    {
+     "ok": true,
+     "text": "DT126c: your recipe shared without your name says so on its tile"
+    },
+    {
+     "ok": true,
+     "text": "DT126c and B164 AC2: Show all 5 from members opens Made by: members, all five"
+    },
+    {
+     "ok": true,
+     "text": "DT126: tuna finds Tuna salata by its food, in Slovenian, under its group: Tuna salata"
+    },
+    {
+     "ok": true,
+     "text": "DT126: shared without a name, it says shared by a member"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: quark: the hits of two groups, every one shown, the empty group gone"
+    },
+    {
+     "ok": true,
+     "text": "DT126: the cook's name finds her recipe"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: Made by: all, me, the coach, the cooks with counts, a member without a name: All10,Me4, one shared without your name,Your coach1,All members5,Darinka1,Marko1,Nina1,A member without a name2"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: A member without a name shows the two unnamed"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: Made by: your coach, and the address says made=coach"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Fits my day drops Darinka's sarma, PD 5.9 under your 6.5; your own sarma stays: 9 of 10 recipes · Fits my day · Clear all"
+    },
+    {
+     "ok": true,
+     "text": "DT126: No cooking stacks on it, and the line names both: 5 of 10 recipes · Fits my day · No cooking · Clear all"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Clear all brings the idle list back"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Highest PD: Protein first, Tuna salata, ... Sarma last: Protein first | Tuna salata | Nina's chicken stir fry | Overnight oats with skyr | Sarma"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Most made puts the oats, made 4 times, first"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Kitchen: one line per kitchen with its count, over the rows the other filters leave: All kitchens10,Asian1,Balkan1,Mediterranean1"
+    },
+    {
+     "ok": true,
+     "text": "DT126 and DT347: the pick shows in the line, and the chip says Filters · 1"
+    },
+    {
+     "ok": true,
+     "text": "DT126: With my foods keeps the recipes whose every food is in your list"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: a recipe of yours shared with members is one row, under me: Made by me · 4 | Made by your coach · 1 | Made by members · 3"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC1: one row, Newest, Made by: All, Filters, 44 px; nothing else at rest: Newest ▾ | Made by: All ▾ | Filters ▾ 44,44,44"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC2: Newest by default: my newest recipe, saved 24 October, leads Made by me: Quark with apple | Quark bowl, berries | Tuna salata"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC3: six sort chips, Newest first and chosen: Newest,For your day,Most made,Highest PD,Quickest,A to Z"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC3: a tap picks Highest PD and closes the chips"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC4: the panel: Kitchen, Meal, PD, For me as 18 px headings, Show 10 recipes: Kitchen,Meal,PD,For me"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC6: PD by ranges: Any PD,PD under 4,PD 4 to 6,PD 6 to 8your target 6.5,PD 8 and more"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC4: For me holds the three, as rows"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC5: Show 4 recipes closes the panel; the chip says Filters · 2: 4 of 10 recipes · No cooking · With my foods · Clear all"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC6: PD 4 to 6 filters the list and the line says so: 1 of 10 recipes · PD 4 to 6 · Clear all"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC7: Made by: me"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC8 sr-Latn: Najnoviji ▾ | Od: Sve ▾ | Filteri ▾ / Kuhinja, Obrok, PD, Za mene / Prikaži 10 recepata"
+    },
+    {
+     "ok": true,
+     "text": "B172 (0.3.200): Srpski Made by is neutral, Od: Sve: Od: Sve ▾"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC8 de: Neueste ▾ | Erstellt von: Alle ▾ | Filter ▾ / Küche, Mahlzeit, PD, Für mich / 10 Rezepte zeigen"
+    },
+    {
+     "ok": true,
+     "text": "B164 AC5 sr-Latn: Prikaži sve moje (4)"
+    },
+    {
+     "ok": true,
+     "text": "B164 AC5 de: Alle 4 von mir zeigen"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 174 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "B172 Light: Srpski words on Recipes"
+}

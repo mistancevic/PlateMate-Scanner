@@ -7618,7 +7618,7 @@
       "checked": true
     },
     "recipebar.madeBy": {
-      "text": "Napravio",
+      "text": "Od",
       "checked": true
     },
     "recipebar.fitsMyDay": {
@@ -10830,7 +10830,7 @@
       "checked": true
     },
     "rf.madeByCoach": {
-      "text": "Napravio: {coach}",
+      "text": "Od: {coach}",
       "checked": true
     },
     "rf.madeByMembers": {
@@ -10846,7 +10846,7 @@
       "checked": true
     },
     "rf.madeByIs": {
-      "text": "Napravio: {who}",
+      "text": "Od: {who}",
       "checked": true
     },
     "rf.kitchenIs": {

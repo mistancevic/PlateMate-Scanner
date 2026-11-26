@@ -166,6 +166,7 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
     await q.locator(".rb-filters-chip").click(); await q.waitForTimeout(300);
     const heads = (await q.locator("#rb-filters .rb-sheet-title").allTextContents()).map((x) => x.trim()); const show = (await q.locator("#rb-filters .rb-panel-actions .pill-primary").textContent()).trim();
     ok(row.length === 3 && !row.some((x) => /^(Newest|Filters)/.test(x)) && heads.length === 4 && !/Show/.test(show), `DT347 AC8 ${lang}: ${row.join(" | ")} / ${heads.join(", ")} / ${show}`);
+    if (lang === "sr-Latn") ok(row[1] === "Od: Sve ▾", "B172 (0.3.200): Srpski Made by is neutral, Od: Sve: " + row[1]);
     await q.close();
   }
   // B164 AC5: in Srpski and German, the same button with the number
