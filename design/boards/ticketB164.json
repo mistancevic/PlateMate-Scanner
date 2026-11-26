@@ -13,7 +13,7 @@
  "now": "Made by me · 5: two recipes, then 3 more of mine ›, a text link in small type, 20 px high, 20 px under the last recipe. The same for 2 more from members › and more from my coach. Each group's title is in label type, 13 px.",
  "proposed": "Under the two recipes, the app's outlined button across the whole row (D9), 44 px high (D10), 34 px under the last recipe, the same as between two recipes (D15): Show all 5 of mine; Show all 4 from members; Show all 3 from your coach. The number is the whole group. A tap does what the line did: Made by switches to that group and the list opens. Coach Milan 10:43: the titles too: each group's title is a section heading, 18 px and bold, as a card's heading (--fs-section), 18 px above it.",
  "looked_at": "Keep the text link and make it bigger and darker: not chosen, it acts, and text links only navigate (D9). Show the whole group at once: not chosen, the idle page would be long with many recipes (DT126c).",
- "decision": "Waiting for Coach Milan's Go.",
+ "decision": "Go 26 November 2026, 10:52; checks Light plus the German sweep, 9 of 9 (docs/qa/runs/0.3.198.json), 787 unit tests. Built in 0.3.198.",
  "short": "Show all 5 of mine, the outlined button, 44 px, the same space as between recipes; release 0.3.198",
  "ac": [
   {

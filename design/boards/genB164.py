@@ -29,7 +29,7 @@ parts = [("Ticket", "B164. This board is the ticket: everything about it is here
   ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> B164.1 as in main, 0.3.197: Recipes, idle, and the list after a tap on the line under my recipes. B164.2 the same, new. A blue outline marks what each note is about; the numbers are measured on the page."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "23 November 19:03: the link below the list that shows more of my recipes is almost invisible. 26 November 10:32: yes, the Recipes batch in Now, B164, DT347, DT346, with the design rules applied. 10:33: yes, draw. 10:43: since we are touching the design on this page, fix the titles too, Made by me, Made by members; now they are so tiny and easy to miss."),
+  ("In Coach Milan's words", "23 November 19:03: the link below the list that shows more of my recipes is almost invisible. 26 November 10:32: yes, the Recipes batch in Now, B164, DT347, DT346, with the design rules applied. 10:33: yes, draw. 10:43: since we are touching the design on this page, fix the titles too, Made by me, Made by members; now they are so tiny and easy to miss. 10:52: Go."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "B164", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -52,9 +52,9 @@ arrow(X(0) + PW, y + 560, "→"); B.html.append(f'<div style="position:absolute;
 RB = r2
 bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
-acTable(B, y, W - 40, {**t, "rel": "Proposed; not agreed until Coach Milan says Go"})
+acTable(B, y, W - 40, {**t, "rel": "Go 26 November 2026, 10:52; built in 0.3.198"})
 Hc = y + HT.get("ac", 900) + 40
-board("Stories299.dc.html", t["boardTitle"], "Drawn 26 November 2026, for the Go of Coach Milan. Ticket B164, Kanban column Now. Pictures from the real app: before on main, 0.3.197; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories298.dc.html")
+board("Stories299.dc.html", t["boardTitle"], "Drawn 26 November 2026; Go 10:52, built in 0.3.198. Ticket B164, Kanban column Done. Pictures from the real app: before on main, 0.3.197; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories298.dc.html")
 inner = B.render(W, Hc)
 json.dump({"B164": {"file": "Stories299.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outB164.json"), "w"))
 print("B164", W, Hc + 230)
