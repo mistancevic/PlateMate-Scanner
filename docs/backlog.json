@@ -4632,6 +4632,13 @@
       "why": "Coach Milan 26 November 2026, 08:46: when I want to cook by the recipe and use the voice assistant, getting there is complex and I am lost on the way; I can imagine how hard it is for other users; it needs a general approach. 10:28: I started from the recipe, because that was the path that would for sure have cooking with voice; draw all the possible scenarios related to cooking with voice, then we analyse the process and the possibilities; a ticket for Next. Found 08:50 in main 0.3.197, from a recipe: Recipes, the recipe, Start cooking (at the bottom of the Steps card, under Add photos to the steps; the page's actions are Plan it and Put it on the Plate), then cook mode on the Plate (Back to making it) asks Turn voice on or Buttons only. Other ways in to draw: the Plate (Prep, Make), a planned meal on Today and in Plan, a member's recipe, an idea from Chef Mealan, Voice settings in the Menu. Near: DT252 (voice through the kitchen flow, later), VO1 (AI voices, later). Not drawn."
     },
     {
+      "id": "B171",
+      "title": "Testers' first names in the public repo: invented names instead",
+      "epic": "trust",
+      "state": "next",
+      "why": "Seen while drawing B164, 26 November 2026: tests/flows/recipes-bar.cjs names members after testers in its mock list. Coach Milan 11:26: invented names, yes; in the end those can match real ones; a first name alone is not critical, but invent them. Found 11:30, a wider search: testers' first names in 7 walkthroughs (chat-ticks, chat-fails, idea-and-swap, places, recipes-bar, served, sign-in-email), 28 board scripts in design/boards, src/recipeFilter.test.ts and two comments in src (chatFail.ts, recipeFilter.ts), scripts/record-home-clips.cjs (a check that a name is absent), CHANGELOG.md, one folder name in docs/qa/blind and the records in docs/qa/runs, which copy the walkthroughs' opening comments. Git history keeps the old text either way. To decide: the code, tests and comments only, or the records and the changelog too. Not drawn: no screen changes."
+    },
+    {
       "id": "B168",
       "title": "The numbers under One portion show the whole recipe",
       "epic": "cook",
