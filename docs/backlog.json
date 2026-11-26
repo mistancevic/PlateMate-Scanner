@@ -4576,6 +4576,13 @@
       ]
     },
     {
+      "id": "DT354",
+      "title": "Design rules checked while drawing and in code: spacing, button shape and height",
+      "epic": "design",
+      "state": "next",
+      "why": "Coach Milan 26 November 2026, 08:00, after DT348's spacing check: how do we make sure design rules are considered during drawing and especially during coding? 08:03: yes, make a ticket. Found: only D1 to D5 are guarded by design-rules.cjs; D8 to D13 are written down, not checked; spacing is no rule. So DT345's dashed + Step here (fully round, like a chip) and the 36 px + Add a step got through, drawn and built, and + Step here sat 10 px under one step and 2 px over the next. Proposed, 08:00: 1. write D15 (an item in a list has the same space above and below) and D16 (a button has 14 px corners; fully round is a chip); 2. design-rules.cjs walks the main screens and fails on a button under 44 px (D10), a fully round button (D16), uneven space (D15), in every check level; 3. each board's shot script measures the new elements against the rules and prints it on the board; 4. the ticket form's agreement gets Design rules touched. The first run lists where the app breaks them today, one bug ticket each. Not drawn; draw after DT348."
+    },
+    {
       "id": "B168",
       "title": "The numbers under One portion show the whole recipe",
       "epic": "cook",
