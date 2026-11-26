@@ -115,10 +115,12 @@ const READS = [
     ok(rows.length === 3 && /Bruschetta/.test(rows[0]) && /Starter/.test(rows[0]) && /Meatballs, mine/.test(rows[1]) && /Main/.test(rows[1]) && /Marko's quesadilla/.test(rows[2]) && !/Main|Starter/.test(rows[2]), "your dishes in the order of a meal with their dish, then the others: " + rows.map((x) => x.replace(/\n/g, " ")).join(" | "));
     ok(/Mine · about [\d,]+ kcal · \d+ g protein/.test(await text(".sv-part")) && /Others at the table/.test(await text(".sv-visit")), "Mine with its total, then Others at the table: " + await text(".sv-part"));
     // the chip shows Served alone
-    await page.locator(".rb-served button").click(); await page.waitForTimeout(400);
-    ok(/Served · 3/.test(await text(".rb-served")) && await page.locator(".rc-group").count() === 1, "the Served chip shows the Served group alone");
-    await page.locator(".rb-served button").click(); await page.waitForTimeout(300);
-    ok(await page.locator(".rc-group").count() === 2, "and off again shows the recipes too");
+    // changed by DT347 (0.3.199): Served is a row of the Filters panel, under For me; Show N recipes closes the panel
+    const servedRow = async () => { await page.locator(".rb-filters-chip").click(); await page.waitForTimeout(300); await page.locator("#rb-filters .rb-line").filter({ hasText: /^Served · 3/ }).click(); await page.waitForTimeout(400); await page.locator("#rb-filters .rb-panel-actions .pill-primary").click(); await page.waitForTimeout(800); };
+    await servedRow();
+    ok(/Filters · 1/.test(await text(".rb-filters-chip")) && await page.locator(".rc-group").count() === 1, "the Served row shows the Served group alone (DT347: in the Filters panel)");
+    await servedRow(); await page.waitForFunction(() => document.querySelectorAll(".rc-group").length === 2, null, { timeout: 5000 }).catch(() => {});
+    ok(await page.locator(".rc-group").count() === 2, "and off again shows the recipes too: " + await page.locator(".rc-group").count() + " " + await text(".rb-filters-chip"));
     // the note
     await g.locator(".sv-note-edit").click(); await page.waitForTimeout(200);
     await g.locator(".sv-note").fill("Café Jadran"); await g.getByRole("button", { name: "Save" }).click(); await page.waitForTimeout(400);

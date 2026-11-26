@@ -47,3 +47,16 @@ test("DT126: the moment by the portion's share of the day; the sorts", () => {
   assert.equal(countLine(2, 5, { ...EMPTY, nocook: true, day: true, madeBy: ME }, "Coach Milan"), "2 of 5 recipes · Made by: me · Fits my day · No cooking");
   assert.equal(countLine(5, 5, EMPTY, "Coach Milan"), "5 recipes");
 });
+
+// DT347 (0.3.199, board DT347, canvas Page 6; Coach Milan, Go 26 November 2026, 12:52)
+import { SORTS as SORTS347, PDS, pdRangeOf, pdRangeLabel } from "./recipeFilter";
+test("DT347 AC2 and AC3: the sorts, Newest first", () => {
+  assert.deepEqual(SORTS347.map((s) => s.id), ["new", "fit", "made", "pd", "quick", "az"]);
+});
+test("DT347 AC6: PD by ranges, whole numbers; a recipe falls in one range; the filter keeps only that range", () => {
+  assert.deepEqual(PDS.map((r) => pdRangeLabel(r.id)), ["PD under 4", "PD 4 to 6", "PD 6 to 8", "PD 8 and more"]);
+  assert.deepEqual([3.1, 4, 5.99, 6, 7.9, 8, 12].map(pdRangeOf), ["lt4", "4to6", "4to6", "6to8", "6to8", "8up", "8up"]);
+  const at = (id: string, pd: number | null) => R(id, "R" + id, ["Oats"], { pd });
+  const ctx = { target: 4.8, dayKcal: 2400, myFoods: [], needsCooking: () => false };
+  assert.deepEqual(applyFilters([at("a", 3.1), at("b", 4.3), at("c", 6.9), at("d", 8.7), at("e", null)], { ...EMPTY, pd: "6to8" }, ctx).map((r) => r.id), ["c"]);
+});

@@ -5714,7 +5714,7 @@
       "checked": true
     },
     "recipebar.anyMoment": {
-      "text": "Jederzeit",
+      "text": "Jede Mahlzeit",
       "checked": true
     },
     "steps.tapAFoodToPut": {
@@ -23307,6 +23307,46 @@
     },
     "recipes.allFromMembers": {
       "text": "Alle {n} von Mitgliedern zeigen",
+      "checked": true
+    },
+    "recipebar.sortIs": {
+      "text": "Sortierung: {sort}",
+      "checked": true
+    },
+    "recipebar.filtersN": {
+      "text": "Filter · {n}",
+      "checked": true
+    },
+    "recipebar.more": {
+      "text": "Für mich",
+      "checked": true
+    },
+    "rf.pdTitle": {
+      "text": "{tag}",
+      "checked": true
+    },
+    "rf.pdAny": {
+      "text": "{tag} beliebig",
+      "checked": true
+    },
+    "rf.pd.under": {
+      "text": "{tag} unter {v}",
+      "checked": true
+    },
+    "rf.pd.range": {
+      "text": "{tag} {a} bis {b}",
+      "checked": true
+    },
+    "rf.pd.over": {
+      "text": "{tag} {v} und mehr",
+      "checked": true
+    },
+    "rf.pd.yours": {
+      "text": "dein Ziel {v}",
+      "checked": true
+    },
+    "recipebar.showN": {
+      "text": "{n} Rezept zeigen|{n} Rezepte zeigen",
       "checked": true
     }
   }

@@ -201,7 +201,7 @@ export function RecipesScreen(p: AppApi) {
   // DT126 and DT126c: the one filter set, the rows of every source, the groups
   const [bar, setBarState] = useState<Filters>(() => ({ ...EMPTY, madeBy: madeFromUrl() }));
   const setBar = (f: Filters) => { setBarState(f); if (f.madeBy !== bar.madeBy) toUrl(f.madeBy); };
-  const [sort, setSort] = useState<Sort>("fit"); // For your day: the order each source has today (ideas first, members at or above your PD first)
+  const [sort, setSort] = useState<Sort>("new"); // DT347 (0.3.199, Coach Milan 26 November 10:43): Newest is the default; For your day keeps each source's own order
   const rowOfMeal = (m: Meal): RecipeRow => { const o = portionOf(m); return { id: m.id, title: m.title, foods: m.items.map((i) => i.food.name), steps: m.steps ?? [], kitchen: m.kitchen ?? null, source: m.from === "coach" ? "coach" : "me", cook: "", unnamed: Boolean(m.members && !m.members.named), at: m.savedAt, made: madeTimes(m), kcal: o ? Math.round(o.kcal) : null, pd: o?.pd ?? null }; };
   // the members' rows: the allergy filter and the rank for your day first (membersFor); a recipe of yours shared with members is one row, under me
   const safeMembers = memberList ? membersFor(memberList.filter((r) => !r.mine), { target: ahead?.target ?? null, kitchens: p.personal.kitchens ?? [], allergies: p.safety.allergies ?? [], kitchen: null }) : [];
@@ -375,7 +375,7 @@ export function RecipesScreen(p: AppApi) {
       {recipeIn.inFlow
         ? <RecipeInFlow flow={recipeIn} put={(f) => void saveRead(f)} putLabel={w("recipes.saveInMyRecipes")} />
         : (<>
-          {(rows.length > 0 || bar.madeBy) && <RecipeBar f={bar} set={setBar} sort={sort} setSort={setSort} kitchens={kitchenLines(applyFilters(rows, { ...bar, kitchen: null }, ctx))} madeBy={madeByLines(applyFilters(rows, { ...bar, madeBy: null }, ctx), p.coachLabel)} shown={kept.length} total={rows.length} coachLabel={p.coachLabel} served={{ n: servedN, on: servedOn, toggle: () => setServedOn((x) => !x) }} />}
+          {(rows.length > 0 || bar.madeBy) && <RecipeBar f={bar} set={setBar} sort={sort} setSort={setSort} kitchens={kitchenLines(applyFilters(rows, { ...bar, kitchen: null }, ctx))} madeBy={madeByLines(applyFilters(rows, { ...bar, madeBy: null }, ctx), p.coachLabel)} shown={kept.length} total={rows.length} coachLabel={p.coachLabel} target={ctx.target} served={{ n: servedN, on: servedOn, toggle: () => setServedOn((x) => !x) }} />}
           <section className="card plate-card recipe-add" aria-label={w("recipes.addARecipe")}>
             <div className="card-top"><span>{w("recipes.addARecipe")}</span></div>
             <small className="muted">{w("recipes.fromALinkOrScreenshots")}</small>

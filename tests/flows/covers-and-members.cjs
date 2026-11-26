@@ -99,6 +99,8 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   const head = (await page.locator(".rc-lead").textContent()).replace(/\s+/g, " ");
   const need = Number((head.match(/about ([\d,]+) kcal/) || [])[1]?.replace(",", ""));
   ok(/Dinner is about [\d,]+ kcal at PD 6\.4 or more/.test(head), "CO2: the line says the meal ahead, its size and the target: " + head);
+  // changed by DT347 (0.3.199): Newest is the default sort; For your day keeps the members at or above your target first
+  await page.locator(".rb-sort-chip").click(); await page.waitForTimeout(200); await page.locator("#rb-sort").getByRole("button", { name: "For your day", exact: true }).click(); await page.waitForTimeout(400);
   const tiles = page.locator(".recipe-tile");
   const titles = await tiles.locator(".tile-name").allTextContents();
   ok(!titles.includes("Toast with peanut butter"), "CO2: a recipe with your declared allergy is not shown");
@@ -116,11 +118,13 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   ok((await tiles.locator(".tile-name").allTextContents()).join() === "Salmon with lemon potatoes", "CO2: A member without a name: the salmon (the toast is held back by your allergy)");
   await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: /^All members/ }).click(); await page.waitForTimeout(400);
   // Changed by story DT126 (0.2.105, board Stories72): Kitchen is a drop-down in the bar, one line per kitchen with its count
-  await page.getByRole("button", { name: /^Kitchen/ }).click(); await page.waitForTimeout(200);
-  await page.locator(".rb-line").filter({ hasText: "Mediterranean" }).click(); await page.waitForTimeout(300);
+  // changed by DT347 (0.3.199): Kitchen is a block of the Filters panel, closed with Show N recipes
+  const showN = async () => { await page.locator("#rb-filters .rb-panel-actions .pill-primary").click(); await page.waitForTimeout(400); };
+  await page.locator(".rb-filters-chip").click(); await page.waitForTimeout(200);
+  await page.locator("#rb-filters .rb-line").filter({ hasText: "Mediterranean" }).click(); await page.waitForTimeout(300); await showN();
   ok((await tiles.locator(".tile-name").allTextContents()).join() === "Salmon with lemon potatoes" && /Kitchen: Mediterranean/.test(await page.locator(".rb-count").textContent()), "CO2: a kitchen filters the list, and the line says so");
-  await page.getByRole("button", { name: /^Kitchen: Mediterranean/ }).click(); await page.waitForTimeout(200);
-  await page.locator(".rb-line").filter({ hasText: "All kitchens" }).click(); await page.waitForTimeout(200);
+  await page.locator(".rb-filters-chip").click(); await page.waitForTimeout(200);
+  await page.locator("#rb-filters .rb-line").filter({ hasText: "All kitchens" }).click(); await page.waitForTimeout(200); await showN();
 
   // CO3: a member's recipe. Changed by DT353 (0.3.195): the page opens on the recipe as the member wrote it; my portion comes
   // with Plan it or on the Plate; Make it is Put it on the Plate, Keep in mine is Save to My recipes

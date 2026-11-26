@@ -1,0 +1,1653 @@
+{
+ "version": "0.3.199",
+ "commit": "7a02232",
+ "at": "2026-11-26T12:27:47.462Z",
+ "minutes": 4,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 62,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "covers-and-members.cjs",
+   "about": "A cover drawn by Chef Mealan and Members (0.2.11, canvas board CO, CO1 to CO4b; Milan 16 October 2026, 15:23 to 16:48). The drawing itself is Google's (no AI in the walkthroughs): /api/cover answers with a fixed picture here. What is checked is the app's part: which recipes get a picture and when, the label, the photo ask on the meal card, Use as cover, the For members panel, Share, a change reaching members, Take it back, the Members tab at your portion, allergies, the order, a member's recipe, Make it, Keep in mine, and the owner's take down. Members runs on the real local server.",
+   "pass": true,
+   "seconds": 28,
+   "checks": [
+    {
+     "ok": true,
+     "text": "CO1: Chef Mealan is asked for a picture of each recipe without a photo, with its foods and amounts: m-sopska, m-crepes, m-salad"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the recipe whose card holds a plate photo gets no drawing"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the picture is the recipe's cover, known as drawn"
+    },
+    {
+     "ok": true,
+     "text": "CO1: past the day's ten, the recipe waits for tomorrow"
+    },
+    {
+     "ok": true,
+     "text": "CO1: drawn once: nothing is asked again after a reload"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the tile says Drawn by Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the waiting recipe's tile says Picture tomorrow"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the page shows the drawn cover, labelled, with Add my photo"
+    },
+    {
+     "ok": true,
+     "text": "CO1: the line says how it was drawn"
+    },
+    {
+     "ok": true,
+     "text": "CO4: Not shared; the cover members see is the drawn picture"
+    },
+    {
+     "ok": true,
+     "text": "CO4: Show my first name is off until switched on"
+    },
+    {
+     "ok": true,
+     "text": "CO4: shared, without the name, in the Balkan kitchen"
+    },
+    {
+     "ok": true,
+     "text": "CO4b: Shared, as a member, with the picture by Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "CO4: members get the recipe and the cover, no name, no rating"
+    },
+    {
+     "ok": true,
+     "text": "CO4b: a change to the recipe reaches members, with the same cover"
+    },
+    {
+     "ok": true,
+     "text": "CO2: no tabs; Made by: All members, and the address says so: http://127.0.0.1:3412/my-recipes?made=members"
+    },
+    {
+     "ok": true,
+     "text": "CO2: the line says the meal ahead, its size and the target: Members' recipes, calculated for your day. Dinner is about 936 kcal at PD 6.4 or more, so these come first."
+    },
+    {
+     "ok": true,
+     "text": "CO2: a recipe with your declared allergy is not shown"
+    },
+    {
+     "ok": true,
+     "text": "CO2: at or above your target first: Chicken and broccoli stir-fry with rice | Salmon with lemon potatoes"
+    },
+    {
+     "ok": true,
+     "text": "CO2: Nina's stir-fry at your dinner, within 5 % of its size: Drawn by Chef MealanChicken and broccoli stir-fry with riceBalkan · shared by NinaYour dinner: 780 g · 930 kcal · PD 9.2"
+    },
+    {
+     "ok": true,
+     "text": "CO2: the salmon is marked under your target, with a member's photo"
+    },
+    {
+     "ok": true,
+     "text": "CO2: your own shared recipe is not repeated under members"
+    },
+    {
+     "ok": true,
+     "text": "CO2: under Made by me it says Shared with members"
+    },
+    {
+     "ok": true,
+     "text": "CO2: A member without a name: the salmon (the toast is held back by your allergy)"
+    },
+    {
+     "ok": true,
+     "text": "CO2: a kitchen filters the list, and the line says so"
+    },
+    {
+     "ok": true,
+     "text": "CO3: the recipe opens as the member wrote it (DT353)"
+    },
+    {
+     "ok": true,
+     "text": "CO3: the amounts in the steps are the recipe's, as its foods (DT353): 1Fry 400 g chicken breast with 400 g broccoli."
+    },
+    {
+     "ok": true,
+     "text": "CO3: Save to My recipes; the owner can take it down"
+    },
+    {
+     "ok": true,
+     "text": "CO3: Save to My recipes copies the recipe, its amounts and its drawn cover"
+    },
+    {
+     "ok": true,
+     "text": "CO3: Put it on the Plate puts your portion on the plate, not the whole 1,360 g: 780 g"
+    },
+    {
+     "ok": true,
+     "text": "CO3: made counts once for the cook"
+    },
+    {
+     "ok": true,
+     "text": "the owner takes a recipe down for every member"
+    },
+    {
+     "ok": true,
+     "text": "CO4b: Take it back removes it from Members"
+    },
+    {
+     "ok": true,
+     "text": "CO1b: the meal card asks once for a photo of the plate"
+    },
+    {
+     "ok": true,
+     "text": "CO1c: with the photo: Use as cover, or Keep it just for me"
+    },
+    {
+     "ok": true,
+     "text": "CO1c: your photo is the cover; the drawn picture stays behind it"
+    },
+    {
+     "ok": true,
+     "text": "CO1c: the card asks no more"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 36 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "design-rules.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 20 October 2026, 07:06 to 07:30, boards DS1 and DS2): the design system's button rules. A: one filled, wide button per screen, the main step; every other action is outlined. B: a card's buttons share one row under everything else in the card, the card's full width. C: an answer is a chip, never a button. D: Today has no wide button; a next meal with nothing planned is a card with Pick a meal and Make it on the Plate. E: Back sits top left, above the step bar, and says where it goes. Never rewrite these lines to fit a change. Added by stories DS4 G and DS5 H (Milan 08:49 to 09:30, boards DS4 and DS5): a page's title comes first, under Back: a recipe's name before its photo. On /built a link inside a sentence is underlined, and each part has one filled button. Added by story DT305 (Coach Milan 16 November 2026, 10:04 to 10:49, boards Stories230 and Stories231; written down in docs/rules/design.md as D6 and D7): an answer to tick sits under its question in its own block; the buttons of a section sit under the whole section in one row. Guarded on the read of a photo, in photo-read.cjs. Added by story DT349 (Coach Milan 24 November 2026, 07:42; 25 November 13:16 and 14:26; written down as D14): I, every PD card is PdCard, PD and its words on the left, the title and its rows on the right, its numbers under the card.",
+   "pass": true,
+   "seconds": 29,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B: I ate it and Change it share one row, the card's full width, equal widths"
+    },
+    {
+     "ok": true,
+     "text": "B: Did you have it? I ate it, Change it, Skipped it, one row, edge to edge"
+    },
+    {
+     "ok": true,
+     "text": "C: How did it carry you? answers are chips"
+    },
+    {
+     "ok": true,
+     "text": "A: Sarma has no steps yet: Start cooking is grey, nothing else is filled: "
+    },
+    {
+     "ok": true,
+     "text": "A, B: Write my own is a button next to the other way, not a link"
+    },
+    {
+     "ok": true,
+     "text": "E: the recipe page's Back, Recipes, sits top left above the photo"
+    },
+    {
+     "ok": true,
+     "text": "G: the recipe's name comes first, under Back, before the photo"
+    },
+    {
+     "ok": true,
+     "text": "I: the recipe page's PD card is PdCard"
+    },
+    {
+     "ok": true,
+     "text": "I: the recipe page: PD and its number on the left, the title and Energy, Weight, Protein on the right: [[\"The whole recipe\",248],[\"PD\",38]]"
+    },
+    {
+     "ok": true,
+     "text": "I: the recipe's numbers open under the card, not inside it"
+    },
+    {
+     "ok": true,
+     "text": "A: on the Plate no Add in the food list is filled: "
+    },
+    {
+     "ok": true,
+     "text": "I: the Plate's PD card is PdCard"
+    },
+    {
+     "ok": true,
+     "text": "I: the Plate: PD and its number on the left, the title and Energy, Weight, Protein on the right: [[\"This plate\",274],[\"PD\",55]]"
+    },
+    {
+     "ok": true,
+     "text": "I: no numbers inside the Plate's card"
+    },
+    {
+     "ok": true,
+     "text": "E: Back sits top left, above the step bar: Back to the plate"
+    },
+    {
+     "ok": true,
+     "text": "E: no Back at the bottom of the step"
+    },
+    {
+     "ok": true,
+     "text": "D: in the evening Today has no wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: the Tomorrow card still opens tomorrow's plan"
+    },
+    {
+     "ok": true,
+     "text": "D: lunch with nothing planned is a card, not a wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: Pick a meal, Make it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "D: Make it on the Plate opens the Plate for lunch"
+    },
+    {
+     "ok": true,
+     "text": "F: 11+ of 93 g fat, and the note: Why the +: Protein bar has no fat or carbs value, so fat and carbs are counted without it."
+    },
+    {
+     "ok": true,
+     "text": "F: its name opens it in Foods"
+    },
+    {
+     "ok": true,
+     "text": "H: a link inside a sentence is underlined"
+    },
+    {
+     "ok": true,
+     "text": "H: one filled button per part: [[\"Try it: the calculator on the home page\",true],[\"See it work\",false],[\"Read Worth Building\",false],[\"Notify me\",true],[\"Email Milan\",true],[\"Connect on LinkedIn\",false]]"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 118 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 13,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "foundations.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 20 October 2026, 07:30 to 08:21, board DS3): the foundations. The app's font is Nunito, served from chefmealan.com, never from Google. Every colour on the app's screens is one of the 20 named colours (or black for the camera), every text size one of 8 (84, 24, 18, 16, 15, 13, 12.5, 11.5), every weight one of 4 (400, 600, 700, 900). Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 11,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the font comes from the app's own address, never Google: 4 files"
+    },
+    {
+     "ok": true,
+     "text": "Nunito is loaded: 400, 600, 700, 900"
+    },
+    {
+     "ok": true,
+     "text": "Today: every colour is a named one"
+    },
+    {
+     "ok": true,
+     "text": "Today: every text size is one of 8"
+    },
+    {
+     "ok": true,
+     "text": "Today: every weight is 400, 600, 700 or 900"
+    },
+    {
+     "ok": true,
+     "text": "Plan: every colour is a named one"
+    },
+    {
+     "ok": true,
+     "text": "Plan: every text size is one of 8"
+    },
+    {
+     "ok": true,
+     "text": "Plan: every weight is 400, 600, 700 or 900"
+    },
+    {
+     "ok": true,
+     "text": "Plate: every colour is a named one"
+    },
+    {
+     "ok": true,
+     "text": "Plate: every text size is one of 8"
+    },
+    {
+     "ok": true,
+     "text": "Plate: every weight is 400, 600, 700 or 900"
+    },
+    {
+     "ok": true,
+     "text": "Recipes: every colour is a named one"
+    },
+    {
+     "ok": true,
+     "text": "Recipes: every text size is one of 8"
+    },
+    {
+     "ok": true,
+     "text": "Recipes: every weight is 400, 600, 700 or 900"
+    },
+    {
+     "ok": true,
+     "text": "the recipe page: every colour is a named one"
+    },
+    {
+     "ok": true,
+     "text": "the recipe page: every text size is one of 8"
+    },
+    {
+     "ok": true,
+     "text": "the recipe page: every weight is 400, 600, 700 or 900"
+    },
+    {
+     "ok": true,
+     "text": "Me: every colour is a named one"
+    },
+    {
+     "ok": true,
+     "text": "Me: every text size is one of 8"
+    },
+    {
+     "ok": true,
+     "text": "Me: every weight is 400, 600, 700 or 900"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 28 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "idea-and-swap.cjs",
+   "about": "JOURNEY (0.2.129, DT148, board Stories100 version 2; Tester 3, UX2 and Bug 1; Coach Milan 28 October 23:10 and 23:39 Go): Marko asked for a cheesecake from the box on top of the Plate. While Chef Mealan works, a card that moves and counts the seconds. The idea is to read: its foods as points with grams, How to make it, then Put it on my plate; nothing to edit on the card. Chef Mealan is told where you shop. On the Plate, one line says swipe left to swap, right to remove; + Add a food sits right under the last food and opens the search there. Swap (rule C51) lists the same kind first, your foods before the basic foods sold where you shop, never the food swapped away under another name; other kinds wait behind one line. One word: + Add. Changed by story DT301 (0.3.149, board Stories223; Coach Milan 14 November 21:02 and 21:08 Go): Find ideas asks Chef Mealan; an idea is kept with its steps when it goes on the plate (or on Save in My recipes), not by itself.",
+   "pass": true,
+   "seconds": 22,
+   "checks": [
+    {
+     "ok": true,
+     "text": "a thinking card: the hat, the bar"
+    },
+    {
+     "ok": true,
+     "text": "the hat stirs: hat-stir"
+    },
+    {
+     "ok": true,
+     "text": "it says what and counts the seconds: Chef Mealan is making an idea for cheesecakeFrom your foods, sold in Limassol · 2 s"
+    },
+    {
+     "ok": true,
+     "text": "Chef Mealan is told where you shop: Limassol"
+    },
+    {
+     "ok": true,
+     "text": "the foods as points with their grams: 200 g Quark, low fat (Magerquark), 30 g Oats, 120 g Strawberries, 10 g Honey"
+    },
+    {
+     "ok": true,
+     "text": "How to make it, in steps"
+    },
+    {
+     "ok": true,
+     "text": "nothing to edit on the page"
+    },
+    {
+     "ok": true,
+     "text": "on the plate, the idea is kept with its steps"
+    },
+    {
+     "ok": true,
+     "text": "one line says how to swap and remove"
+    },
+    {
+     "ok": true,
+     "text": "+ Add more to your plate sits right under the last food"
+    },
+    {
+     "ok": true,
+     "text": "the search opens there, with your foods; no Take it"
+    },
+    {
+     "ok": true,
+     "text": "a basic food: + Add, and the line says it joins your foods"
+    },
+    {
+     "ok": true,
+     "text": "+ Add puts it on the plate"
+    },
+    {
+     "ok": true,
+     "text": "no Quark under another name: Skyr, natural, Cottage cheese (Hüttenkäse), Milk 1.5%, Cream cheese, Trahanas, dried (cracked wheat and sour milk)"
+    },
+    {
+     "ok": true,
+     "text": "the same kind first, your foods first: Skyr, natural, Cottage cheese (Hüttenkäse), Milk 1.5%, Cream cheese"
+    },
+    {
+     "ok": true,
+     "text": "a Cypriot food sold in Limassol is offered"
+    },
+    {
+     "ok": true,
+     "text": "other kinds wait behind one line"
+    },
+    {
+     "ok": true,
+     "text": "the line says where it is sold and that it joins your foods"
+    },
+    {
+     "ok": true,
+     "text": "picked: it takes Quark's place and joins your foods"
+    },
+    {
+     "ok": true,
+     "text": "no Take it in the Plate's search"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "member-page.cjs",
+   "about": "DT353 (0.3.195, board DT353, canvas Page 6; Coach Milan, Go 25 November 2026, 17:27). A member's recipe page is for deciding: it opens on the recipe as the member wrote it (the PD card for the whole recipe, Foods, the Nutrition table, the steps with the recipe's amounts), then What do you do with it?, a note first, then Plan it (my portion for the meal picked), Put it on the Plate (my portion for the meal ahead) and Save to My recipes. Plan it stays white, with ⌄ closed and ⌃ open, on my own recipe's page too. The members' list is served by a mock: one recipe shared by Sam, an invented name. B170 (0.3.196): a shared recipe keeps each food's source, barcode and basic food (AC1, AC3, AC4, AC6, AC7 at the end).",
+   "pass": true,
+   "seconds": 39,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT353 AC1: the PD card is the whole recipe: Energy 2,194 kcal Weight 897 g Protein 93 g"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC1: Foods as written, no Your dinner line, no three tiles: 250 g, 122 g, 150 g, 375 g"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC2: the numbers open under the card: Total 897 2,194 100"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC3: the Nutrition table shows ALL 897 g and 100 g: ALL 897 g 100 G"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC4: step 1 with the recipe's amounts: 1 Mix 250 g körniger frischkäse tworog, 2 eggs (L) and 150 g feta leicht."
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC5: a note, then Plan it, Put it on the Plate, Save to My recipes: Plan it, Put it on the Plate, Save to My recipes"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC10: Plan it is white, with ⌄ when closed"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC10: open, it says Plan it ⌃, stays white, the days and meals under it"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC6: my dinner portion: Your dinner portion on Wednesday: 300 g · 733 kcal · 31 g protein · PD 4.3"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC10: the one filled button is Put it in the plan"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC7: in Wednesday's dinner at 733 kcal: {\"kcal\":733}"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC7: a dinner that holds something is asked about first"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC10: a second tap closes it: Plan it ⌄"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC8: my portion for the meal ahead is on the Plate: 303 g"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC9: a copy is in Mine: Lazy Burek, Skyr cup"
+    },
+    {
+     "ok": true,
+     "text": "DT353 AC10: my own recipe's Plan it, white, with ⌄"
+    },
+    {
+     "ok": true,
+     "text": "B170 AC1: members get the pack's source and barcode and the eggs' basic food"
+    },
+    {
+     "ok": true,
+     "text": "B170 AC3: packs as printed in Members, 2,194 kcal: 1 Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 2 eggs (L) and 150 g Feta Leicht."
+    },
+    {
+     "ok": true,
+     "text": "B170 AC4: my copy keeps Sam's pack, 2194 kcal; my foods hold both packs: 4000000000035, 4000000000042"
+    },
+    {
+     "ok": true,
+     "text": "B170 AC4: my copy's steps name the packs as printed"
+    },
+    {
+     "ok": true,
+     "text": "B170 AC6: the Plate holds Sam's pack, 400 kcal per 100 g, and no third pack is added"
+    },
+    {
+     "ok": true,
+     "text": "B170 AC7: an old share goes once more, with the barcode and source (1 sent)"
+    },
+    {
+     "ok": true,
+     "text": "B170 AC7: opening Recipes again sends nothing"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 85 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "members-names.cjs",
+   "about": "JOURNEY (0.2.61, board MB; Milan 16:46 to 17:11): one name per cook in Members, checked by the server; a cook's kitchen; the Recipes tab and the cook in the address, so a reload keeps them; sharing with your name asks for it once.",
+   "pass": true,
+   "seconds": 65,
+   "checks": [
+    {
+     "ok": true,
+     "text": "MB: Tester3 takes his name"
+    },
+    {
+     "ok": true,
+     "text": "MB: tester3 is taken, whatever the capitals"
+    },
+    {
+     "ok": true,
+     "text": "MB: too short or with a space is refused"
+    },
+    {
+     "ok": true,
+     "text": "MB: an earlier first name share gets that name; no name stays no name; who holds it never leaves the server"
+    },
+    {
+     "ok": true,
+     "text": "MB: Made by: all, me, the cooks with their counts, the unnamed: All7,Me2,Your coach1,All members4,Tester32,Nina1,A member without a name1"
+    },
+    {
+     "ok": true,
+     "text": "MB: Tester3's recipes, his two, in the address, and the line says 2 of 7: http://127.0.0.1:3246/my-recipes?made=Tester3"
+    },
+    {
+     "ok": true,
+     "text": "MB: a reload keeps Tester3's recipes"
+    },
+    {
+     "ok": true,
+     "text": "MB: All of Tester3's recipes › opens his recipes: http://127.0.0.1:3246/my-recipes?made=Tester3"
+    },
+    {
+     "ok": true,
+     "text": "MB: a taken name says so, and Share waits"
+    },
+    {
+     "ok": true,
+     "text": "MB: Milan is free"
+    },
+    {
+     "ok": true,
+     "text": "MB: shared as Milan; the name is mine"
+    },
+    {
+     "ok": true,
+     "text": "MB: For members says the name"
+    },
+    {
+     "ok": true,
+     "text": "MB: a new name reaches my recipe; Milan is free again; Tester3 can't take Milan.S"
+    },
+    {
+     "ok": true,
+     "text": "save check: 27 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-centre.cjs",
+   "about": "The recipe page at the centre (0.2.25, canvas board RP, RP1 to RP5b; Milan 17 October 2026, 17:42 to 18:23). A recipe from a link: the original is the steps, numbered, headings in bold, the page's signs read as letters; a line says the original works with your foods; Chef Mealan's way on a tap, then a toggle. PD sits above the table, as on the Plate; each column says its weight. How to make it says what you make and what you eat. A changed dish: the line says what differs. Every recipe made ends on its page; a plate that is no recipe ends on Today. Today has no camera; Manual, then Scan. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs). changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it? changed by B168 (0.3.193): the recipe page's PD card is the whole recipe as written; one serving is in the Nutrition table",
+   "pass": true,
+   "seconds": 29,
+   "checks": [
+    {
+     "ok": true,
+     "text": "RP5: Today has no Scan food"
+    },
+    {
+     "ok": true,
+     "text": "RP5b: Recipe photo, Recipe link, and Photo or scan on the right (Recipe link | Photo or scan)"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the read card shows the steps with the foods"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the Plate shows the recipe's steps to review before Make it"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the original is the steps, numbered"
+    },
+    {
+     "ok": true,
+     "text": "RP1b: the page's signs read as letters; a range reads 10 to 20"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the page's heading in bold"
+    },
+    {
+     "ok": true,
+     "text": "RP1: a line says the original works; Chef Mealan's way on a tap"
+    },
+    {
+     "ok": true,
+     "text": "RP2: the three tiles gave way"
+    },
+    {
+     "ok": true,
+     "text": "RP2: the readout above the table, the whole recipe, then the four letters (The whole recipePD1.31.2 under your 2.5Energy4,548 kcalWeight1,131 gProtein58 gfc-fi?p-›)"
+    },
+    {
+     "ok": true,
+     "text": "RP2: each column says its weight (1 SLICE94 gALL 121,131 g100 G)"
+    },
+    {
+     "ok": true,
+     "text": "RP2: PD is no row of the table"
+    },
+    {
+     "ok": true,
+     "text": "RP1c: Chef Mealan's steps and the original, one tap apart"
+    },
+    {
+     "ok": true,
+     "text": "RP1c: the original is one tap away"
+    },
+    {
+     "ok": true,
+     "text": "RP1b: your dish differs: the line says how; the original for the original foods (No longer No-bake cheesecake: its foods are gone. The plate is yours. Back to the platePrepMakeEatHow to make No-bake cheesecake, more proteinNo steps yet for your changed dish.What you makeThe whole )"
+    },
+    {
+     "ok": true,
+     "text": "RP3: You make, You eat, each with weight and energy"
+    },
+    {
+     "ok": true,
+     "text": "RP4: the changed dish, saved, opens on its page"
+    },
+    {
+     "ok": true,
+     "text": "RP4: a recipe made again ends on its page"
+    },
+    {
+     "ok": true,
+     "text": "RP4: a plate that is no recipe ends on Today (/today)"
+    },
+    {
+     "ok": true,
+     "text": "No page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 35 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipes-bar.cjs",
+   "about": "JOURNEY (0.2.105 and 0.2.106, boards Stories72 and Stories74, DT126 and DT126c; Milan 25 October 13:48 to 15:12): Recipes is one list under one bar, no tabs. One search over the title, the foods (in any of the pilot's languages) and the cook; Made by and Kitchen as drop-downs with counts; chips that stack; a sort; the line that says what is shown of what. Idle, the list is grouped by who made it, two rows per group and a line for the rest. A recipe shared without a name is found by the search and counted under A member without a name; a recipe of yours shared without your name says so on its tile.",
+   "pass": true,
+   "seconds": 34,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT126c: no tabs; one bar on top of Recipes"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: idle, three groups with counts: Made by me · 4 | Made by your coach · 1 | Made by members · 5"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: two rows per group and a line for the rest; the line says 10 recipes"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: the rest behind a button per group (B164)"
+    },
+    {
+     "ok": true,
+     "text": "B164 AC1: Show all 4 of mine, the outlined button across the row, 44 px, as far under the last recipe as two recipes are apart: {\"h\":44,\"full\":true,\"outlined\":true,\"above\":34,\"between\":34,\"size\":\"18px\",\"weight\":900}"
+    },
+    {
+     "ok": true,
+     "text": "B164 AC4: each group's title is a section heading, 18 px and bold: 18px 900"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: the members' group says your portion for the meal ahead: Members' recipes, calculated for your day. Lunch is about 917 kcal at PD 6.5 or more, so these come first."
+    },
+    {
+     "ok": true,
+     "text": "DT126c: your recipe shared without your name says so on its tile"
+    },
+    {
+     "ok": true,
+     "text": "DT126c and B164 AC2: Show all 5 from members opens Made by: members, all five"
+    },
+    {
+     "ok": true,
+     "text": "DT126: tuna finds Tuna salata by its food, in Slovenian, under its group: Tuna salata"
+    },
+    {
+     "ok": true,
+     "text": "DT126: shared without a name, it says shared by a member"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: quark: the hits of two groups, every one shown, the empty group gone"
+    },
+    {
+     "ok": true,
+     "text": "DT126: the cook's name finds her recipe"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: Made by: all, me, the coach, the cooks with counts, a member without a name: All10,Me4, one shared without your name,Your coach1,All members5,Darinka1,Marko1,Nina1,A member without a name2"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: A member without a name shows the two unnamed"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: Made by: your coach, and the address says made=coach"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Fits my day drops Darinka's sarma, PD 5.9 under your 6.5; your own sarma stays: 9 of 10 recipes · Fits my day · Clear all"
+    },
+    {
+     "ok": true,
+     "text": "DT126: No cooking stacks on it, and the line names both: 5 of 10 recipes · Fits my day · No cooking · Clear all"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Clear all brings the idle list back"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Highest PD: Protein first, Tuna salata, ... Sarma last: Protein first | Tuna salata | Nina's chicken stir fry | Overnight oats with skyr | Sarma"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Most made puts the oats, made 4 times, first"
+    },
+    {
+     "ok": true,
+     "text": "DT126: Kitchen: one line per kitchen with its count, over the rows the other filters leave: All kitchens10,Asian1,Balkan1,Mediterranean1"
+    },
+    {
+     "ok": true,
+     "text": "DT126 and DT347: the pick shows in the line, and the chip says Filters · 1"
+    },
+    {
+     "ok": true,
+     "text": "DT126: With my foods keeps the recipes whose every food is in your list"
+    },
+    {
+     "ok": true,
+     "text": "DT126c: a recipe of yours shared with members is one row, under me: Made by me · 4 | Made by your coach · 1 | Made by members · 3"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC1: one row, Newest, Made by: All, Filters, 44 px; nothing else at rest: Newest ▾ | Made by: All ▾ | Filters ▾ 44,44,44"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC2: Newest by default: my newest recipe, saved 24 October, leads Made by me: Quark with apple | Quark bowl, berries | Tuna salata"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC3: six sort chips, Newest first and chosen: Newest,For your day,Most made,Highest PD,Quickest,A to Z"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC3: a tap picks Highest PD and closes the chips"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC4: the panel: Kitchen, Meal, PD, For me as 18 px headings, Show 10 recipes: Kitchen,Meal,PD,For me"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC6: PD by ranges: Any PD,PD under 4,PD 4 to 6,PD 6 to 8your target 6.5,PD 8 and more"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC4: For me holds the three, as rows"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC5: Show 4 recipes closes the panel; the chip says Filters · 2: 4 of 10 recipes · No cooking · With my foods · Clear all"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC6: PD 4 to 6 filters the list and the line says so: 1 of 10 recipes · PD 4 to 6 · Clear all"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC7: Made by: me"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC8 sr-Latn: Najnoviji ▾ | Napravio: Sve ▾ | Filteri ▾ / Kuhinja, Obrok, PD, Za mene / Prikaži 10 recepata"
+    },
+    {
+     "ok": true,
+     "text": "DT347 AC8 de: Neueste ▾ | Erstellt von: Alle ▾ | Filter ▾ / Küche, Mahlzeit, PD, Für mich / 10 Rezepte zeigen"
+    },
+    {
+     "ok": true,
+     "text": "B164 AC5 sr-Latn: Prikaži sve moje (4)"
+    },
+    {
+     "ok": true,
+     "text": "B164 AC5 de: Alle 4 von mir zeigen"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 145 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "served.cjs",
+   "about": "DT268 steps 1 to 3 (0.3.118 to 0.3.120, board Stories201; Coach Milan 9 November 21:46 to 23:44, Go): Served. A plate read as Exploring is kept on its own: the name and the dish as Chef Mealan read them; Scan another plate, mine or someone else's, joins the visit; nothing is logged. Recipes shows the visit as one card with its note; a Served plate opens with its photo, the honest line its numbers each with a range, and its foods; Share the numbers draws the picture and opens the share sheet; I ate this asks the day and the meal and puts your dishes in as one meal. The read is a stand-in (no AI here). Changed by story DT305 (0.3.151, boards Stories230 and Stories231; Coach Milan 16 November 2026, Go 11:35): a photo waits on the photo screen, which has no chips, and Read the plate reads it. Just looking is chosen behind the pencil of the meal line. After a read of your own meal the read shows alone; Change the foods opens the plate. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: Just looking is the last row of the calendar behind the pencil (just-looking.cjs), in place of the chip under What is it for; a meal is tapped in that calendar, and with a meal set the X clears it first. Changed by DT318 (0.3.160, board DT318; Coach Milan 19 November 01:00, Go): the link Wrong foods? Help Chef Mealan read it is gone; the form opens with one more photo of the same plate, behind ＋ Photo (one-more-photo.cjs). Changed by B150 (0.3.160, board B150; Coach Milan 19 November 01:00, Go): Just looking and No meal selected are one state, and a photo read with no meal selected is a photo of yours. A plate is kept as Served with Don't count it (not-counted.cjs): it starts as not counted, someone else's, with Main picked by hand, and a tap on Mine makes it mine. Scan another plate reads the dish as before. changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it?",
+   "pass": true,
+   "seconds": 73,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the Plate says the plate is kept, marked Served"
+    },
+    {
+     "ok": true,
+     "text": "kept by itself: the name and the dish as read, the foods, the photo"
+    },
+    {
+     "ok": true,
+     "text": "changed by B150: the name says filled by Chef Mealan; the dish is Main, not read for a plate kept with Don't count it"
+    },
+    {
+     "ok": true,
+     "text": "five dishes, Main set by the read"
+    },
+    {
+     "ok": true,
+     "text": "nothing is logged"
+    },
+    {
+     "ok": true,
+     "text": "the idea's buttons stay as they were"
+    },
+    {
+     "ok": true,
+     "text": "the Plate's block has Share the numbers"
+    },
+    {
+     "ok": true,
+     "text": "Whose plate: Mine or Someone else's; the first plate starts as Mine"
+    },
+    {
+     "ok": true,
+     "text": "a tap says it is someone else's, on the kept plate too"
+    },
+    {
+     "ok": true,
+     "text": "and a tap makes it mine again"
+    },
+    {
+     "ok": true,
+     "text": "a tap corrects the dish, and the dish no longer says filled by Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "the name you type is the plate's name, one plate still"
+    },
+    {
+     "ok": true,
+     "text": "every button and field at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "Another dish of mine asks Camera or Gallery"
+    },
+    {
+     "ok": true,
+     "text": "the first plate stays; the second is kept as a starter of mine, in the same visit"
+    },
+    {
+     "ok": true,
+     "text": "the Plate now holds the second plate, still Just looking"
+    },
+    {
+     "ok": true,
+     "text": "a third plate, someone else's, in the same visit; still nothing logged"
+    },
+    {
+     "ok": true,
+     "text": "Recipes has the Served group: Served · 1 visit, 3 plates"
+    },
+    {
+     "ok": true,
+     "text": "above Made by me"
+    },
+    {
+     "ok": true,
+     "text": "with no note the visit is the day and the meal: Saturday 7 November, lunch"
+    },
+    {
+     "ok": true,
+     "text": "your dishes in the order of a meal with their dish, then the others: Bruschetta about 184 kcal · 6 g protein Starter | Meatballs, mine about 465 kcal · 27 g protein Main | Marko's quesadilla about 411 kcal · 32 g protein"
+    },
+    {
+     "ok": true,
+     "text": "Mine with its total, then Others at the table: Mine · about 649 kcal · 34 g protein"
+    },
+    {
+     "ok": true,
+     "text": "the Served row shows the Served group alone (DT347: in the Filters panel)"
+    },
+    {
+     "ok": true,
+     "text": "and off again shows the recipes too: 2 Filters ▾"
+    },
+    {
+     "ok": true,
+     "text": "the note is the visit's title, the day under it, on every plate of the visit"
+    },
+    {
+     "ok": true,
+     "text": "Recipes fits the width"
+    },
+    {
+     "ok": true,
+     "text": "the visit has Add a photo of the menu"
+    },
+    {
+     "ok": true,
+     "text": "the menu opens with its photo"
+    },
+    {
+     "ok": true,
+     "text": "the read gets the menu's photo and the plates as names and foods, no photo of them"
+    },
+    {
+     "ok": true,
+     "text": "five lines as printed; the two matched ones marked"
+    },
+    {
+     "ok": true,
+     "text": "each plate with its line, weight and course; one not sure: Bruschetta Brusketi sa paradajzom, 150 g · starter ✓ matched | Meatballs, mine Ćufte u paradajz sosu, pire, 300 g · main ✓ matched | Marko's quesadilla Kesadilja sa piletinom / Kesadilja sa sirom not sure"
+    },
+    {
+     "ok": true,
+     "text": "the menu's weight is the plate's total (245 g read, 300 g printed), with the menu's tighter range"
+    },
+    {
+     "ok": true,
+     "text": "the menu is kept with the visit, one question open"
+    },
+    {
+     "ok": true,
+     "text": "the one question: which of the two, or Neither"
+    },
+    {
+     "ok": true,
+     "text": "the limit is said: a menu weight is the kitchen's word"
+    },
+    {
+     "ok": true,
+     "text": "every button at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "the answer matches the plate and the question goes"
+    },
+    {
+     "ok": true,
+     "text": "the menu fits the width"
+    },
+    {
+     "ok": true,
+     "text": "back on Recipes the visit says The menu"
+    },
+    {
+     "ok": true,
+     "text": "the plate opens: its name, the Served mark, the visit"
+    },
+    {
+     "ok": true,
+     "text": "the honest line"
+    },
+    {
+     "ok": true,
+     "text": "the photo and the foods as read"
+    },
+    {
+     "ok": true,
+     "text": "the plate says its line on the menu, and that its amounts follow the menu"
+    },
+    {
+     "ok": true,
+     "text": "energy, protein, fat, carbs and PD, each about a number with its range: Energy about 677 kcal 570 to 830 | Protein about 53 g 44 to 61 g | Fat about 17 g 14 to 24 g | Carbs about 74 g 63 to 85 g | PD about 7.8 5.5 to 10.6"
+    },
+    {
+     "ok": true,
+     "text": "the range holds the number; fat reaches further up than down (14, 17, 24)"
+    },
+    {
+     "ok": true,
+     "text": "the line under the table says it is a guess"
+    },
+    {
+     "ok": true,
+     "text": "Share the numbers draws the picture"
+    },
+    {
+     "ok": true,
+     "text": "the picture is 1080 by 1350: 1080x1350"
+    },
+    {
+     "ok": true,
+     "text": "Send it hands one picture to the share sheet: [{\"title\":\"Marko's quesadilla\",\"files\":[{\"name\":\"marko-s-quesadilla.jpg\",\"type\":\"image/jpeg\",\"size\":119132}]}]"
+    },
+    {
+     "ok": true,
+     "text": "its buttons are at least 44 px"
+    },
+    {
+     "ok": true,
+     "text": "Back returns to the plate"
+    },
+    {
+     "ok": true,
+     "text": "no cooking; I ate this and Put it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "every button at least 44 px: "
+    },
+    {
+     "ok": true,
+     "text": "Not this takes the match off; the amounts are the photo's again, with its wider range for their size (about 677, 570 to 830 was; about 411, 320 to 570 now)"
+    },
+    {
+     "ok": true,
+     "text": "the open plate says it is someone else's"
+    },
+    {
+     "ok": true,
+     "text": "a tap makes it mine"
+    },
+    {
+     "ok": true,
+     "text": "and someone else's again"
+    },
+    {
+     "ok": true,
+     "text": "Remove asks first"
+    },
+    {
+     "ok": true,
+     "text": "it asks when; your two dishes and the one meal's total, not Marko's"
+    },
+    {
+     "ok": true,
+     "text": "the meal's range under the total: 640 to 990 kcal"
+    },
+    {
+     "ok": true,
+     "text": "the day of the photo and the meal by its time are set"
+    },
+    {
+     "ok": true,
+     "text": "the button says where it goes: Put it in Saturday's lunch, eaten"
+    },
+    {
+     "ok": true,
+     "text": "one meal logged: four foods, named after the main, in Saturday's lunch"
+    },
+    {
+     "ok": true,
+     "text": "the plates stay in Served; yours say they were eaten"
+    },
+    {
+     "ok": true,
+     "text": "the open plate says it is in your day"
+    },
+    {
+     "ok": true,
+     "text": "an eaten plate said to be someone else's: the meal stays in your day"
+    },
+    {
+     "ok": true,
+     "text": "Today shows the meal with its photo"
+    },
+    {
+     "ok": true,
+     "text": "Remove this plate takes it off and goes back to Recipes"
+    },
+    {
+     "ok": true,
+     "text": "Put it on the Plate: its foods are on the Plate, the plate stays in Served"
+    },
+    {
+     "ok": true,
+     "text": "a dish the read cannot name is a main; a plate soon after joins the visit"
+    },
+    {
+     "ok": true,
+     "text": "Don't keep it: off the list, the Plate keeps its foods and says so"
+    },
+    {
+     "ok": true,
+     "text": "Read it again on a plate you did not keep: still not kept"
+    },
+    {
+     "ok": true,
+     "text": "a plate kept as Served"
+    },
+    {
+     "ok": true,
+     "text": "the pencil's sheet says what each choice does (changed by B150: No meal selected, and Don't count it keeps a photo's plate)"
+    },
+    {
+     "ok": true,
+     "text": "the pencil on Dinner: your meal again, out of Served, the foods stay, nothing logged"
+    },
+    {
+     "ok": true,
+     "text": "the Served card is gone and the meal's read asks Did you eat it? (changed by B150 and DT318: the photo was read as yours, so its read shows)"
+    },
+    {
+     "ok": true,
+     "text": "changed by B150: the row No meal selected: no meal, and the plate is not kept as Served by it"
+    },
+    {
+     "ok": true,
+     "text": "changed by B150: Don't count it: kept as Served, not counted; nothing logged"
+    },
+    {
+     "ok": true,
+     "text": "the Served card shows and the buttons are a kept plate's"
+    },
+    {
+     "ok": true,
+     "text": "the dish was not read for this plate, so only the name says filled by Chef Mealan"
+    },
+    {
+     "ok": true,
+     "text": "a recipe as a new plate: the Plate has the recipe, the Served plate keeps its own foods: Apple strudel"
+    },
+    {
+     "ok": true,
+     "text": "the Served card is off the Plate"
+    },
+    {
+     "ok": true,
+     "text": "emptying the Plate leaves the kept plate in Served"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the group in the language: Posluženo · 1 poseta, 3 tanjira"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: Recipes fits the width"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: the plate in the language, fits the width: 390/390 "
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn: I ate this in the language, fits the width: Upiši kao pojedeno: subota, ručak"
+    },
+    {
+     "ok": true,
+     "text": "de: the group in the language: Serviert · 1 Besuch, 3 Teller"
+    },
+    {
+     "ok": true,
+     "text": "de: Recipes fits the width"
+    },
+    {
+     "ok": true,
+     "text": "de: the plate in the language, fits the width: 360/360 "
+    },
+    {
+     "ok": true,
+     "text": "de: I ate this in the language, fits the width: Als gegessen eintragen: Samstag, Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 34 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "DT347 Light plus the German sweep: the Recipes bar and its words"
+}

@@ -7,6 +7,7 @@ import { fold } from "./foodId";
 import { w, wn, type WordKey } from "./words";
 import { optWord } from "./optWords";
 import { synonymsOf } from "./reference";
+import { pdTag, pdUnit } from "./ui";
 
 // what the bar needs of a recipe, the same for a recipe of yours and a member's
 export type Source = "me" | "coach" | "member";
@@ -22,12 +23,18 @@ export type RecipeRow = {
 };
 export type Moment = "breakfast" | "lunch" | "snack";
 // madeBy: ME, COACH, MEMBERS (all of them), a member's name, or NONE (shared without a name)
-export type Filters = { q: string; kitchen: string | null; madeBy: string | null; moment: Moment | null; day: boolean; nocook: boolean; withMine: boolean };
+// DT347 (0.3.199, Coach Milan 26 November 12:41): PD by ranges, whole numbers that hold the five goals' bands (N5)
+export type PdRange = "lt4" | "4to6" | "6to8" | "8up";
+export const PDS: { id: PdRange; lo: number; hi: number }[] = [{ id: "lt4", lo: 0, hi: 4 }, { id: "4to6", lo: 4, hi: 6 }, { id: "6to8", lo: 6, hi: 8 }, { id: "8up", lo: 8, hi: Infinity }];
+const whole = (n: number) => String(pdUnit() === "pct" ? Math.round(n * 4) : n);
+export const pdRangeLabel = (id: PdRange) => { const r = PDS.find((x) => x.id === id)!; return r.lo === 0 ? w("rf.pd.under", { tag: pdTag(), v: whole(r.hi) }) : r.hi === Infinity ? w("rf.pd.over", { tag: pdTag(), v: whole(r.lo) }) : w("rf.pd.range", { tag: pdTag(), a: whole(r.lo), b: whole(r.hi) }); };
+export const pdRangeOf = (pd: number) => PDS.find((r) => pd >= r.lo && pd < r.hi)!.id;
+export type Filters = { q: string; kitchen: string | null; madeBy: string | null; moment: Moment | null; pd: PdRange | null; day: boolean; nocook: boolean; withMine: boolean };
 export type Sort = "fit" | "new" | "made" | "pd" | "quick" | "az";
-export const EMPTY: Filters = { q: "", kitchen: null, madeBy: null, moment: null, day: false, nocook: false, withMine: false };
+export const EMPTY: Filters = { q: "", kitchen: null, madeBy: null, moment: null, pd: null, day: false, nocook: false, withMine: false };
 // "fit" keeps the order each source has today: yours with Chef Mealan's ideas first, members' at or above your PD target
 // first, then your kitchens (membersFor). The default.
-export const SORTS: { id: Sort; label: string }[] = (["fit", "new", "made", "pd", "quick", "az"] as Sort[]).map((id) => ({ id, get label() { return w(`rf.sort.${id}` as WordKey); } }));
+export const SORTS: { id: Sort; label: string }[] = (["new", "fit", "made", "pd", "quick", "az"] as Sort[]) /* DT347 (0.3.199): Newest first */.map((id) => ({ id, get label() { return w(`rf.sort.${id}` as WordKey); } }));
 export const MOMENTS: { id: Moment; label: string }[] = (["breakfast", "lunch", "snack"] as Moment[]).map((id) => ({ id, get label() { return w(`rf.moment.${id}` as WordKey); } }));
 // the Made by drop-down's keys: me, the coach, all members, a member's name, or the ones shared without a name
 export const ME = "me", COACH = "coach", MEMBERS = "members", NONE = "none";
@@ -63,6 +70,7 @@ export function applyFilters(rows: RecipeRow[], f: Filters, c: Context): RecipeR
     if (f.madeBy === NONE && (r.source !== "member" || r.cook)) return false;
     if (f.madeBy && ![ME, COACH, MEMBERS, NONE].includes(f.madeBy) && (r.source !== "member" || fold(r.cook) !== fold(f.madeBy))) return false;
     if (f.moment && !momentsOf(r.kcal, c.dayKcal).includes(f.moment)) return false;
+    if (f.pd && (r.pd === null || pdRangeOf(r.pd) !== f.pd)) return false;
     if (f.day && c.target !== null && (r.pd === null || r.pd < c.target - 0.05)) return false;
     if (f.nocook && (r.foods.some((n) => c.needsCooking(n)) || r.steps.some((s) => /\b(fry|boil|bake|roast|grill|simmer|cook|saut|sear|steam|oven|pan|pot)/i.test(s)))) return false;
     if (f.withMine && !r.foods.every((n) => foodIn(c.myFoods, n))) return false;
@@ -78,7 +86,7 @@ export function sortRows(rows: RecipeRow[], s: Sort): RecipeRow[] {
   if (s === "az") out.sort((a, b) => a.title.localeCompare(b.title));
   return out;
 }
-export const activeCount = (f: Filters) => [f.kitchen, f.madeBy, f.moment].filter(Boolean).length + [f.day, f.nocook, f.withMine].filter(Boolean).length;
+export const activeCount = (f: Filters) => [f.kitchen, f.madeBy, f.moment, f.pd].filter(Boolean).length + [f.day, f.nocook, f.withMine].filter(Boolean).length;
 export const isIdle = (f: Filters) => !f.q.trim() && activeCount(f) === 0;
 
 // the drop-downs' lines, with counts over the rows the other filters leave (so a line never promises an empty list)
@@ -116,6 +124,7 @@ export function countLine(shown: number, total: number, f: Filters, coachLabel: 
   if (f.madeBy) parts.push(w("rf.madeByIs", { who: madeByLabel(f.madeBy, coachLabel) }));
   if (f.kitchen) parts.push(w("rf.kitchenIs", { kitchen: optWord(f.kitchen) }));
   if (f.moment) parts.push(MOMENTS.find((m) => m.id === f.moment)!.label);
+  if (f.pd) parts.push(pdRangeLabel(f.pd));
   if (f.day) parts.push(w("recipebar.fitsMyDay"));
   if (f.nocook) parts.push(w("recipebar.noCooking"));
   if (f.withMine) parts.push(w("recipebar.withMyFoods"));

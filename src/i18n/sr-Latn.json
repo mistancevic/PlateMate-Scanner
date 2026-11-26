@@ -7638,7 +7638,7 @@
       "checked": true
     },
     "recipebar.anyMoment": {
-      "text": "Bilo kad",
+      "text": "Bilo koji obrok",
       "checked": true
     },
     "steps.tapAFoodToPut": {
@@ -10858,7 +10858,7 @@
       "checked": true
     },
     "rb.moment": {
-      "text": "Trenutak",
+      "text": "Obrok",
       "checked": true
     },
     "rb.all": {
@@ -23307,6 +23307,46 @@
     },
     "recipes.allFromMembers": {
       "text": "Prikaži sve od članova ({n})",
+      "checked": true
+    },
+    "recipebar.sortIs": {
+      "text": "Redosled: {sort}",
+      "checked": true
+    },
+    "recipebar.filtersN": {
+      "text": "Filteri · {n}",
+      "checked": true
+    },
+    "recipebar.more": {
+      "text": "Za mene",
+      "checked": true
+    },
+    "rf.pdTitle": {
+      "text": "{tag}",
+      "checked": true
+    },
+    "rf.pdAny": {
+      "text": "Bilo koji {tag}",
+      "checked": true
+    },
+    "rf.pd.under": {
+      "text": "{tag} ispod {v}",
+      "checked": true
+    },
+    "rf.pd.range": {
+      "text": "{tag} od {a} do {b}",
+      "checked": true
+    },
+    "rf.pd.over": {
+      "text": "{tag} {v} i više",
+      "checked": true
+    },
+    "rf.pd.yours": {
+      "text": "tvoj cilj {v}",
+      "checked": true
+    },
+    "recipebar.showN": {
+      "text": "Prikaži {n} recept|Prikaži {n} recepta|Prikaži {n} recepata",
       "checked": true
     }
   }
