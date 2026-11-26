@@ -12245,18 +12245,6 @@
       "text": "In Meine Rezepte speichern",
       "checked": true
     },
-    "recipes.moreOfMine": {
-      "text": "{n} weitere von mir ›",
-      "checked": true
-    },
-    "recipes.moreFromCoach": {
-      "text": "{n} weitere von {coach} ›",
-      "checked": true
-    },
-    "recipes.moreFromMembers": {
-      "text": "{n} weitere von Mitgliedern ›",
-      "checked": true
-    },
     "recipes.loadingWhatMembersShared": {
       "text": "Lade, was Mitglieder geteilt haben…",
       "checked": true
@@ -23307,6 +23295,18 @@
     },
     "steps.addAfter": {
       "text": "Einen Schritt nach Schritt {n} einfügen",
+      "checked": true
+    },
+    "recipes.allOfMine": {
+      "text": "Alle {n} von mir zeigen",
+      "checked": true
+    },
+    "recipes.allFromCoach": {
+      "text": "Alle {n} von {coach} zeigen",
+      "checked": true
+    },
+    "recipes.allFromMembers": {
+      "text": "Alle {n} von Mitgliedern zeigen",
       "checked": true
     }
   }

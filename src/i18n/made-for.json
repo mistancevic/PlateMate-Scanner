@@ -3054,9 +3054,6 @@
     "screen.recipes.goneByHint": {"en":"{day}'s {meal} is gone by: change it to what you ate, and it is added at {time}. The recipe stays as it is.","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.recipes.isDeleted": {"en":"{title} is deleted.","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.recipes.saveInMyRecipes": {"en":"Save in My recipes","area":"Recipes","where":"Recipes","release":"0.3.101"},
-    "screen.recipes.moreOfMine": {"en":"{n} more of mine ›","area":"Recipes","where":"Recipes","release":"0.3.101"},
-    "screen.recipes.moreFromCoach": {"en":"{n} more from {coach} ›","area":"Recipes","where":"Recipes","release":"0.3.101"},
-    "screen.recipes.moreFromMembers": {"en":"{n} more from members ›","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.recipes.loadingWhatMembersShared": {"en":"Loading what members shared…","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.recipes.slotByThePlanToday": {"en":"{meal}, {time} · by the plan · today","area":"Recipes","where":"Recipes","release":"0.3.101"},
     "screen.recipes.slotPlannedNotAdded": {"en":"{day}'s {meal}, {time} · planned, not added","area":"Recipes","where":"Recipes","release":"0.3.101"},
@@ -5826,6 +5823,9 @@
     "screen.nutrition.oneServing": {"en":"One {one}","area":"Recipes","where":"Recipes","release":"0.3.193"},
     "screen.members.saveToMine": {"en":"Save to My recipes","area":"Recipes","where":"Recipes","release":"0.3.195"},
     "screen.members.decideLine": {"en":"{whose} recipe, as written. Plan it as it is, at your portion; put it on the Plate to change foods first; or save it to My recipes to cook more or fewer servings.","area":"Recipes","where":"Recipes","release":"0.3.195"},
-    "screen.steps.addAfter": {"en":"Add a step after step {n}","area":"Recipes","where":"Recipes","release":"0.3.197"}
+    "screen.steps.addAfter": {"en":"Add a step after step {n}","area":"Recipes","where":"Recipes","release":"0.3.197"},
+    "screen.recipes.allOfMine": {"en":"Show all {n} of mine","area":"Recipes","where":"Recipes","release":"0.3.198"},
+    "screen.recipes.allFromCoach": {"en":"Show all {n} from {coach}","area":"Recipes","where":"Recipes","release":"0.3.198"},
+    "screen.recipes.allFromMembers": {"en":"Show all {n} from members","area":"Recipes","where":"Recipes","release":"0.3.198"}
   }
 }

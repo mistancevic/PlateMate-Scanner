@@ -1,6 +1,6 @@
 {
-  "release": "0.3.197",
-  "at": "2026-11-26T07:04:32.034Z",
+  "release": "0.3.198",
+  "at": "2026-11-26T09:53:43.493Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -2337,64 +2337,6 @@
       "beta": true,
       "release": "0.3.101",
       "order": 900057,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.recipes.moreOfMine",
-      "kind": "screen",
-      "key": "recipes.moreOfMine",
-      "en": "{n} more of mine ›",
-      "forms": "plain",
-      "slots": [
-        "n"
-      ],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "Još {n} mojih ›",
-      "de": "{n} weitere von mir ›",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900058,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.recipes.moreFromCoach",
-      "kind": "screen",
-      "key": "recipes.moreFromCoach",
-      "en": "{n} more from {coach} ›",
-      "forms": "plain",
-      "slots": [
-        "coach",
-        "n"
-      ],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "Još {n} od: {coach} ›",
-      "de": "{n} weitere von {coach} ›",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900059,
-      "at": "2026-11-07T08:52:54.841Z"
-    },
-    {
-      "id": "screen.recipes.moreFromMembers",
-      "kind": "screen",
-      "key": "recipes.moreFromMembers",
-      "en": "{n} more from members ›",
-      "forms": "plain",
-      "slots": [
-        "n"
-      ],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "Još {n} od članova ›",
-      "de": "{n} weitere von Mitgliedern ›",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.101",
-      "order": 900060,
       "at": "2026-11-07T08:52:54.841Z"
     },
     {
@@ -53355,6 +53297,64 @@
       "release": "0.3.197",
       "order": 900000,
       "at": "2026-11-26T07:04:32.034Z"
+    },
+    {
+      "id": "screen.recipes.allOfMine",
+      "kind": "screen",
+      "key": "recipes.allOfMine",
+      "en": "Show all {n} of mine",
+      "forms": "plain",
+      "slots": [
+        "n"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Prikaži sve moje ({n})",
+      "de": "Alle {n} von mir zeigen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.198",
+      "order": 900000,
+      "at": "2026-11-26T09:53:43.493Z"
+    },
+    {
+      "id": "screen.recipes.allFromCoach",
+      "kind": "screen",
+      "key": "recipes.allFromCoach",
+      "en": "Show all {n} from {coach}",
+      "forms": "plain",
+      "slots": [
+        "coach",
+        "n"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Prikaži sve od: {coach} ({n})",
+      "de": "Alle {n} von {coach} zeigen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.198",
+      "order": 900001,
+      "at": "2026-11-26T09:53:43.493Z"
+    },
+    {
+      "id": "screen.recipes.allFromMembers",
+      "kind": "screen",
+      "key": "recipes.allFromMembers",
+      "en": "Show all {n} from members",
+      "forms": "plain",
+      "slots": [
+        "n"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Prikaži sve od članova ({n})",
+      "de": "Alle {n} von Mitgliedern zeigen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.198",
+      "order": 900002,
+      "at": "2026-11-26T09:53:43.493Z"
     }
   ]
 }
