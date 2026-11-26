@@ -76,7 +76,7 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
         await p.locator("#rb-sort").getByRole("button", { name: "Newest" }).click(); await sleep(300);
         await p.locator(".rb-filters-chip").click(); await sleep(400);
         await p.locator("#rb-filters").getByRole("button", { name: "No cooking" }).click(); await sleep(300); await p.locator("#rb-filters").getByRole("button", { name: "With my foods" }).click(); await sleep(400);
-        console.log(await note(p, ".rb-panel-actions", "<b>New:</b> Filters opens downwards with every filter, top to bottom: Kitchen, Moment, then More: Fits my day, No cooking, With my foods. Here No cooking and With my foods are chosen, blue with a check (D6). At the end: Clear all, and <b>Show 6 recipes</b>, the main step, filled, on the right (D7, D8): it says what you get and closes the panel. I tap it.", ["#rb-filters"]));
+        console.log(await note(p, ".rb-panel-actions", "<b>New:</b> Filters opens downwards with every filter, top to bottom: Kitchen, Moment, then More: Fits my day, No cooking, With my foods, all as the same rows; in More several can be on. Here No cooking and With my foods are on, with a check. At the end: Clear all, and <b>Show 6 recipes</b>, the main step, filled, on the right (D7, D8): it says what you get and closes the panel. I tap it.", ["#rb-filters"]));
         await shot(p, "47-2c", RB, RB); await clean();
         await p.locator(".rb-panel-actions .pill-primary").click(); await sleep(500);
         console.log(await note(p, RB, "<b>New:</b> the panel is closed; the chip says <b>Filters · 2</b>, blue, and the line under says 6 of 9 recipes · No cooking · With my foods, with Clear all.", [".rb-filters-chip"]));
