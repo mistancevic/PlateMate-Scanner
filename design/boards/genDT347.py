@@ -26,10 +26,10 @@ B = Board(); PW = 390; G = 90
 W = SX + 4 * PW + 3 * G + 40
 ASSETS = json.load(open(f"{HERE}/assetsDT347.json")) if os.path.exists(f"{HERE}/assetsDT347.json") else {}
 parts = [("Ticket", "DT347. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT347, canvas Page 6."),
-  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> DT347.1 as in main, 0.3.198: the Recipes bar at rest, Kitchen open, the sort. DT347.2 new: the bar at rest, Filters open, the sort open, two filters set. A blue outline marks what each note is about; the numbers are measured on the page."),
+  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> DT347.1 as in main, 0.3.198: the Recipes bar at rest, Kitchen open, the sort. DT347.2 new, redrawn 12:10: the bar at rest, the sort open, Made by open, the filters swiped with two chosen. A blue outline marks what each note is about; the numbers are measured on the page."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "23 November 19:03: sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it. 26 November 10:43: Sort, these should be chips as well? I would put Newest as the first one and as default. Do you have some design proposal for them instead of text, or better keep text for now? Any idea how to solve the tension from so many chips displayed at once. 11:26: DT347, draw."),
+  ("In Coach Milan's words", "23 November 19:03: sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it. 26 November 10:43: Sort, these should be chips as well? I would put Newest as the first one and as default. Do you have some design proposal for them instead of text, or better keep text for now? Any idea how to solve the tension from so many chips displayed at once. 11:26: DT347, draw. 11:46: sort based on the time stamp seems like the starting one; second Made by, and already preselected; filter is the only one for several options to select, maybe that can be a longer scroll at once. 11:58: Made by should already have a default selection; let's draw it."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "DT347", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -46,16 +46,16 @@ y += 60
 r1 = [shot(X(0), y, "47-1a", PW, "DT347.1a Recipes, the bar", "draft", "Twelve things to tap; the sort as text."), shot(X(1), y, "47-1b", PW, "DT347.1b Kitchen open", "draft", "Its list under the chips."), shot(X(2), y, "47-1c", PW, "DT347.1c The sort", "draft", "Six text links, For your day chosen.")]
 arrow(X(0) + PW, y + 160, "tap<br>Kitchen ▾"); arrow(X(1) + PW, y + 160, "tap<br>Kitchen ▾<br>again")
 y = max(r1) + 70
-label(y, "DT347.2 New", "three chips at rest", 0, 4)
+label(y, "DT347.2 New, redrawn 26 November 12:10", "the sort and Made by, then the filters in one row", 0, 4)
 y += 60
-r2 = [shot(X(0), y, "47-2a", PW, "DT347.2a Recipes, the bar", "changed", "Made by, Filters, Newest."), shot(X(1), y, "47-2b", PW, "DT347.2b Filters open", "changed", "Kitchen, Moment and the chips."), shot(X(2), y, "47-2c", PW, "DT347.2c The sort open", "changed", "Six chips, Newest first."), shot(X(3), y, "47-2d", PW, "DT347.2d Two filters set", "changed", "Filters · 2.")]
-arrow(X(0) + PW, y + 160, "tap<br>Filters ▾"); arrow(X(1) + PW, y + 160, "tap<br>Newest ▾"); arrow(X(2) + PW, y + 160, "tap Newest,<br>Filters, Fits<br>my day, No<br>cooking,<br>Filters")
+r2 = [shot(X(0), y, "47-2a", PW, "DT347.2a Recipes, the bar", "changed", "Newest, Made by: All; the filters in one row."), shot(X(1), y, "47-2b", PW, "DT347.2b The sort open", "changed", "Six chips, Newest first."), shot(X(2), y, "47-2c", PW, "DT347.2c Made by open", "same", "Its list, All chosen."), shot(X(3), y, "47-2d", PW, "DT347.2d The filters swiped", "changed", "Two chosen, with a check.")]
+arrow(X(0) + PW, y + 160, "tap<br>Newest ▾"); arrow(X(1) + PW, y + 160, "tap Newest,<br>then Made<br>by: All ▾"); arrow(X(2) + PW, y + 160, "close it,<br>tap No<br>cooking, With<br>my foods,<br>swipe")
 RB = r2
 bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, {**t, "rel": "Proposed; not agreed until Coach Milan says Go"})
 Hc = y + HT.get("ac", 900) + 40
-board("Stories300.dc.html", t["boardTitle"], "Drawn 26 November 2026, for the Go of Coach Milan. Ticket DT347, Kanban column Now. Pictures from the real app: before on main, 0.3.198; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories299.dc.html")
+board("Stories300.dc.html", t["boardTitle"], "Drawn 26 November 2026, redrawn 12:10, for the Go of Coach Milan. Ticket DT347, Kanban column Now. Pictures from the real app: before on main, 0.3.198; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories299.dc.html")
 inner = B.render(W, Hc)
 json.dump({"DT347": {"file": "Stories300.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outDT347.json"), "w"))
 print("DT347", W, Hc + 230)

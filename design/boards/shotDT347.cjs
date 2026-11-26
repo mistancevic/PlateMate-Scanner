@@ -57,26 +57,33 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
     try {
       s = await serve(root, port); const p = await open(port);
       const c = await count(p); console.log(row, JSON.stringify(c));
-      console.log(await note(p, RB, isNew
-        ? `<b>New:</b> at rest, under the search, three chips: <b>Made by ▾</b>, <b>Filters ▾</b>, <b>Newest ▾</b> (the sort, showing its choice). ${c.n} things to tap, the bar ${c.h} px high. Chips are ${c.chip} px (D10), round (D16). <b>Newest</b> is the default sort. I tap Filters.`
-        : `At rest the bar shows ${c.n} things to tap: Made by, Kitchen, Moment, Fits my day, No cooking, With my foods, then Sort with six words in a row. The bar is ${c.h} px high, its chips ${c.chip} px. The sort is text, its default For your day. I tap Kitchen.`, [RB]));
-      await shot(p, `47-${row}a`, RB, RB); await p.evaluate(() => document.querySelectorAll(".board-note").forEach((n) => n.remove()));
-      if (isNew) { await p.locator(".rb-chips").first().getByRole("button", { name: /^Filters/ }).click(); await sleep(500);
-        console.log(await note(p, "#rb-filters", "<b>New:</b> Filters opens under the row: Kitchen ▾, Moment ▾ and the chips Fits my day, No cooking, With my foods. White until chosen, blue with a check when chosen (D6). With two set, the chip says <b>Filters · 2</b>. I tap Newest ▾.", ["#rb-filters"])); }
-      else { await p.getByRole("button", { name: /^Kitchen/ }).first().click(); await sleep(500);
-        console.log(await note(p, "#rb-kitchen", "Kitchen opens its list under the chips; the chips and the sort stay on screen.", ["#rb-kitchen"])); }
-      await shot(p, `47-${row}b`, RB, RB); await p.evaluate(() => document.querySelectorAll(".board-note").forEach((n) => n.remove()));
-      if (isNew) { await p.locator(".rb-sort-chip").click(); await sleep(500);
-        console.log(await note(p, "#rb-sort", "<b>New:</b> the sort opens as chips, Newest first: Newest, For your day, Most made, Highest PD, Quickest, A to Z. One is chosen; a tap picks and closes it.", ["#rb-sort"])); }
-      else { await p.getByRole("button", { name: /^Kitchen/ }).first().click(); await sleep(300);
-        console.log(await note(p, ".rb-sort", "The sort: six words as text links, For your day underlined as chosen. A choice of one is a chip (D3).", [".rb-sort"])); }
-      await shot(p, `47-${row}c`, RB, RB);
-      if (isNew) { await p.evaluate(() => document.querySelectorAll(".board-note").forEach((n) => n.remove())); await p.locator("#rb-sort").getByRole("button", { name: "Newest" }).click(); await sleep(300);
-        await p.locator(".rb-chips").first().getByRole("button", { name: /^Filters/ }).click(); await sleep(300);
-        await p.locator("#rb-filters").getByRole("button", { name: "Fits my day" }).click(); await sleep(300); await p.locator("#rb-filters").getByRole("button", { name: "No cooking" }).click(); await sleep(300);
-        await p.locator(".rb-chips").first().getByRole("button", { name: /^Filters/ }).click(); await sleep(500);
-        console.log(await note(p, RB, "<b>New:</b> with Fits my day and No cooking chosen and Filters closed, the chip says <b>Filters · 2</b>, blue; the line under says what is shown, with Clear all.", [".rb-chips .rb-drop.on"]));
-        await shot(p, `47-${row}d`, RB, RB); }
+      const clean = () => p.evaluate(() => { document.querySelectorAll(".board-note").forEach((n) => n.remove()); document.querySelectorAll("[data-bm]").forEach((e) => { e.style.outline = ""; delete e.dataset.bm; }); });
+      if (!isNew) {
+        console.log(await note(p, RB, `At rest the bar shows ${c.n} things to tap: Made by, Kitchen, Moment, Fits my day, No cooking, With my foods, then Sort with six words in a row. The bar is ${c.h} px high, its chips ${c.chip} px. The sort is text, its default For your day. I tap Kitchen.`, [RB]));
+        await shot(p, "47-1a", RB, RB); await clean();
+        await p.getByRole("button", { name: /^Kitchen/ }).first().click(); await sleep(500);
+        console.log(await note(p, "#rb-kitchen", "Kitchen opens its list under the chips; the chips and the sort stay on screen.", ["#rb-kitchen"]));
+        await shot(p, "47-1b", RB, RB); await clean();
+        await p.getByRole("button", { name: /^Kitchen/ }).first().click(); await sleep(300);
+        console.log(await note(p, ".rb-sort", "The sort: six words as text links, For your day underlined as chosen. A choice of one is a chip (D3).", [".rb-sort"]));
+        await shot(p, "47-1c", RB, RB);
+      } else {
+        const rows = await p.evaluate(() => [...document.querySelectorAll(".rb .rb-chips")].map((r) => Math.round(r.getBoundingClientRect().height)));
+        console.log(await note(p, RB, `<b>New:</b> first row: <b>Newest ▾</b>, the sort, and <b>Made by: All ▾</b>, both showing their choice, blue (Coach Milan 11:46 to 11:58). Second row: the filters, the one place to pick several, in one line that scrolls sideways: Kitchen ▾, Moment ▾, Fits my day, No cooking, With my foods. Chips ${c.chip} px (D10), round (D16). The bar ${c.h} px high. I tap Newest ▾.`, [".rb .rb-chips"]));
+        await shot(p, "47-2a", RB, RB); await clean();
+        await p.locator(".rb-sort-chip").click(); await sleep(500);
+        console.log(await note(p, "#rb-sort", "<b>New:</b> the sort opens as chips under the first row, Newest first: Newest, For your day, Most made, Highest PD, Quickest, A to Z. A tap picks one and closes it. I tap Newest, then Made by: All ▾.", ["#rb-sort"]));
+        await shot(p, "47-2b", RB, RB); await clean();
+        await p.locator("#rb-sort").getByRole("button", { name: "Newest" }).click(); await sleep(300);
+        await p.getByRole("button", { name: /^Made by/ }).first().click(); await sleep(500);
+        console.log(await note(p, "#rb-madeBy", "<b>No change</b> in what it does: Made by opens its list with counts, All chosen. I close it and swipe the filters.", ["#rb-madeBy"]));
+        await shot(p, "47-2c", RB, RB); await clean();
+        await p.getByRole("button", { name: /^Made by/ }).first().click(); await sleep(300);
+        await p.locator(".rb-filters").getByRole("button", { name: "No cooking" }).click(); await sleep(300); await p.locator(".rb-filters").getByRole("button", { name: "With my foods" }).click(); await sleep(300);
+        await p.evaluate(() => { const r = document.querySelector(".rb-filters"); r.scrollLeft = r.scrollWidth; }); await sleep(400);
+        console.log(await note(p, RB, "<b>New:</b> swiped to the end: No cooking and With my foods chosen, blue with a check (D6). The line under says what is shown, with Clear all.", [".rb-filters"]));
+        await shot(p, "47-2d", RB, RB);
+      }
       await p.context().close();
     } catch (e) { console.log("ERR", e.message.slice(0, 300)); } finally { s?.kill(); }
   }
