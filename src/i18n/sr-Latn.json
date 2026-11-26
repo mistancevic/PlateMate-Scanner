@@ -23221,10 +23221,6 @@
       "text": "i",
       "checked": true
     },
-    "steps.stepHere": {
-      "text": "+ Korak ovde",
-      "checked": true
-    },
     "steps.addBetween": {
       "text": "Dodaj korak između koraka {a} i koraka {b}",
       "checked": true
@@ -23307,6 +23303,10 @@
     },
     "members.decideLine": {
       "text": "{whose} recept, kako je napisan. Planiraj ga takvog, u tvojoj količini; stavi ga na Tanjir da prvo promeniš namirnice; ili ga sačuvaj u Moje recepte da kuvaš više ili manje porcija.",
+      "checked": true
+    },
+    "steps.addAfter": {
+      "text": "Dodaj korak posle koraka {n}",
       "checked": true
     }
   }

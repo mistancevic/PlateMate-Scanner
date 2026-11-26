@@ -23221,10 +23221,6 @@
       "text": "und",
       "checked": true
     },
-    "steps.stepHere": {
-      "text": "+ Schritt hier",
-      "checked": true
-    },
     "steps.addBetween": {
       "text": "Einen Schritt zwischen Schritt {a} und Schritt {b} einfügen",
       "checked": true
@@ -23307,6 +23303,10 @@
     },
     "members.decideLine": {
       "text": "{whose} Rezept, wie geschrieben. Plane es so, wie es ist, in deiner Menge; leg es auf den Teller, um zuerst Lebensmittel zu ändern; oder speichere es in Meine Rezepte, um mehr oder weniger Portionen zu kochen.",
+      "checked": true
+    },
+    "steps.addAfter": {
+      "text": "Einen Schritt nach Schritt {n} einfügen",
       "checked": true
     }
   }

@@ -5805,7 +5805,6 @@
     "screen.recipechange.kept": {"en":"The meal of {when} keeps its foods, as you ate it.|The meals of {when} keep their foods, as you ate them.","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
     "screen.recipechange.older": {"en":"{n} meal eaten before keeps its foods: what you ate stays as it was.|{n} meals eaten before keep their foods: what you ate stays as it was.","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
     "screen.recipechange.and": {"en":"and","area":"Words used across the app","where":"Across the app","release":"0.3.187"},
-    "screen.steps.stepHere": {"en":"+ Step here","area":"Recipes","where":"Recipes","release":"0.3.188"},
     "screen.steps.addBetween": {"en":"Add a step between step {a} and step {b}","area":"Recipes","where":"Recipes","release":"0.3.188"},
     "screen.recipe.otherPart": {"en":"Other","area":"Recipes","where":"Recipes","release":"0.3.188"},
     "screen.sameask.slotEaten": {"en":"{meal} is already eaten today.","area":"Words used across the app","where":"Across the app","release":"0.3.190"},
@@ -5826,6 +5825,7 @@
     "screen.recipe.replaceInPlan": {"en":"Put it in its place","area":"Recipes","where":"Recipes","release":"0.3.193"},
     "screen.nutrition.oneServing": {"en":"One {one}","area":"Recipes","where":"Recipes","release":"0.3.193"},
     "screen.members.saveToMine": {"en":"Save to My recipes","area":"Recipes","where":"Recipes","release":"0.3.195"},
-    "screen.members.decideLine": {"en":"{whose} recipe, as written. Plan it as it is, at your portion; put it on the Plate to change foods first; or save it to My recipes to cook more or fewer servings.","area":"Recipes","where":"Recipes","release":"0.3.195"}
+    "screen.members.decideLine": {"en":"{whose} recipe, as written. Plan it as it is, at your portion; put it on the Plate to change foods first; or save it to My recipes to cook more or fewer servings.","area":"Recipes","where":"Recipes","release":"0.3.195"},
+    "screen.steps.addAfter": {"en":"Add a step after step {n}","area":"Recipes","where":"Recipes","release":"0.3.197"}
   }
 }

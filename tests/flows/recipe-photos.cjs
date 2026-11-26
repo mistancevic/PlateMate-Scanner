@@ -95,7 +95,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   await page.getByRole("textbox", { name: "Step 2" }).type("Fold in "); await page.getByRole("button", { name: /^Put 100 g Chicken/ }).click(); await page.waitForTimeout(150);
   ok(/100 g chicken breast/.test(await page.getByRole("textbox", { name: "Step 2" }).textContent()) && /Skyr, natural is not in any step yet/.test(await page.locator(".st-note").textContent()), "R13a: a tap on a food puts it in the step with its amount; a food in no step is named: " + (await page.getByRole("textbox", { name: "Step 2" }).textContent()) + " | " + (await page.locator(".st-note").allTextContents()).join("/"));
   await page.getByRole("textbox", { name: "Step 2" }).press("End"); await page.getByRole("textbox", { name: "Step 2" }).type("and cook slowly.");
-  await page.getByRole("button", { name: "+ Add a step" }).click(); await page.waitForTimeout(150);
+  await page.getByRole("button", { name: /^Add a step after step \d+$/ }).click(); /* DT348 (0.3.197): its label says where */ await page.waitForTimeout(150);
   await page.getByRole("textbox", { name: "Step 3" }).type("Serve with "); await page.getByRole("button", { name: /^Put 100 g Skyr/ }).click(); await page.waitForTimeout(150);
   ok(/Every food is in a step/.test(await page.locator(".st-note").textContent()), "R13a: every food in a step says so");
   await page.getByLabel("Grams of Chicken breast, cooked").fill("120"); await page.waitForTimeout(200);

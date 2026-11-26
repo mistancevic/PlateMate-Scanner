@@ -1458,7 +1458,8 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .st-food { display: inline; background: var(--base); border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 2px 7px; white-space: nowrap; -webkit-box-decoration-break: slice; box-decoration-break: slice; }
 .st-food.st-long { white-space: normal; overflow-wrap: anywhere; } .st-food .st-keep { white-space: nowrap; }
 .st-food.gone, .st-amt.gone { color: var(--close-text); background: var(--close-soft); border-color: var(--mid); }
-.st-add { align-self: flex-start; font-weight: 900; }
+/* DT348 (0.3.197): one button to add a step, 44 px (D10), under the step, 8 px above and below */
+.st-step { align-self: flex-start; font-weight: 900; height: 44px; margin-left: 34px; }
 .st-foods { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; } .st-foods small { font-weight: 900; color: var(--muted); }
 .st-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .st-chip { min-height: 34px; padding: 0 12px; border-radius: var(--r-chip); border: 1.5px solid var(--brand); background: var(--brand); color: var(--surface); font: inherit; font-size: var(--fs-label); font-weight: 900; cursor: pointer; }
@@ -3702,7 +3703,7 @@ section.read-view .button-row.rv-go.rv-end > .rv-done { min-width: 150px; }
 /* B160 (0.3.187): a recipe changed after meals were logged from it asks once */
 .recipe-ask { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; } .recipe-ask .button-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; } .recipe-saved-line { font-weight: 800; }
 /* DT345 (0.3.188): + Step here between two steps */
-.st-between { display: block; margin: 2px 0 2px 34px; padding: 6px 12px; border: 1.5px dashed #b8c9e6; border-radius: 999px; background: transparent; color: var(--brand); font-weight: 800; font-size: 13px; min-height: 44px; }
+.st-between { margin-top: 0; margin-bottom: 8px; }
 /* B168 and DT349 (0.3.193, board B168 and DT349, canvas Page 6). No photo yet is a placeholder picture with its words and
    buttons on it. */
 .rq-nopic-ph { position: relative; overflow: hidden; aspect-ratio: 4 / 3; justify-content: flex-end; padding: 14px 16px; border: 0; background: var(--tint); }
