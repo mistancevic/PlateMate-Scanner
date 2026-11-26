@@ -13,7 +13,7 @@
  "now": "Edit recipe, Steps: 1, + Step here (a dashed button, fully round like a chip, 10 px under step 1 and 2 px over step 2), 2, then + Add a step (white, blue border, 14 px corners, 36 px high). The publish sheet writes steps with the same editor, so it is the same there.",
  "proposed": "Coach Milan 26 November 01:40 to 01:41: one button, + Add a step, the app's outlined action button (white, blue border, 14 px corners, design rule D9), between steps and after the last one; + Step here goes. Each is 44 px high (D10) and sits under its step, with the same space, 8 px, above and below (26 November 07:51: double check the spaces). Its label for a screen reader says where: Add a step between step 1 and step 2, Add a step after step 2. Enter in a step still adds the next one. One editor (StepsEditor), so Edit recipe and the publish sheet change together.",
  "looked_at": "+ Step here everywhere, the dashed round button (drawn 25 November 20:50): not chosen, 26 November 01:41: a button says what the tap does (D10), the place shows where; fully round is the look of a chip (D3), and the dashed look is the only one of its kind.",
- "decision": "Waiting for Coach Milan's Go.",
+ "decision": "Go 26 November 2026, 08:03; checks Light plus the German sweep, 12 of 12 (docs/qa/runs/0.3.197.json), 787 unit tests. Built in 0.3.197.",
  "short": "+ Add a step between steps and after the last, the outlined button; + Step here goes; release 0.3.197",
  "ac": [
   {
