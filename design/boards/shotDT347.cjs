@@ -68,20 +68,18 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
         console.log(await note(p, ".rb-sort", "The sort: six words as text links, For your day underlined as chosen. A choice of one is a chip (D3).", [".rb-sort"]));
         await shot(p, "47-1c", RB, RB);
       } else {
-        const rows = await p.evaluate(() => [...document.querySelectorAll(".rb .rb-chips")].map((r) => Math.round(r.getBoundingClientRect().height)));
-        console.log(await note(p, RB, `<b>New:</b> first row: <b>Newest ▾</b>, the sort, and <b>Made by: All ▾</b>, both showing their choice, blue (Coach Milan 11:46 to 11:58). Second row: the filters, the one place to pick several, in one line that scrolls sideways: Kitchen ▾, Moment ▾, Fits my day, No cooking, With my foods. Chips ${c.chip} px (D10), round (D16). The bar ${c.h} px high. I tap Newest ▾.`, [".rb .rb-chips"]));
+        console.log(await note(p, RB, `<b>New:</b> one row under the search: <b>Newest ▾</b> (the sort), <b>Made by: All ▾</b>, both showing their choice, blue; then <b>Filters ▾</b>, the one place to pick several (Coach Milan 11:46 to 12:16). Chips ${c.chip} px (D10), round (D16). ${c.n} things to tap, the bar ${c.h} px high. I tap Newest ▾.`, [".rb .rb-chips"]));
         await shot(p, "47-2a", RB, RB); await clean();
         await p.locator(".rb-sort-chip").click(); await sleep(500);
-        console.log(await note(p, "#rb-sort", "<b>New:</b> the sort opens as chips under the first row, Newest first: Newest, For your day, Most made, Highest PD, Quickest, A to Z. A tap picks one and closes it. I tap Newest, then Made by: All ▾.", ["#rb-sort"]));
+        console.log(await note(p, "#rb-sort", "<b>New:</b> the sort opens as chips under the row, Newest first: Newest, For your day, Most made, Highest PD, Quickest, A to Z. A tap picks one and closes it. I tap Newest, then Filters ▾.", ["#rb-sort"]));
         await shot(p, "47-2b", RB, RB); await clean();
         await p.locator("#rb-sort").getByRole("button", { name: "Newest" }).click(); await sleep(300);
-        await p.getByRole("button", { name: /^Made by/ }).first().click(); await sleep(500);
-        console.log(await note(p, "#rb-madeBy", "<b>No change</b> in what it does: Made by opens its list with counts, All chosen. I close it and swipe the filters.", ["#rb-madeBy"]));
+        await p.locator(".rb-filters-chip").click(); await sleep(400);
+        await p.locator("#rb-filters").getByRole("button", { name: "No cooking" }).click(); await sleep(300); await p.locator("#rb-filters").getByRole("button", { name: "With my foods" }).click(); await sleep(400);
+        console.log(await note(p, ".rb-panel-actions", "<b>New:</b> Filters opens downwards with every filter, top to bottom: Kitchen, Moment, then More: Fits my day, No cooking, With my foods. Here No cooking and With my foods are chosen, blue with a check (D6). At the end: Clear all, and <b>Show 6 recipes</b>, the main step, filled, on the right (D7, D8): it says what you get and closes the panel. I tap it.", ["#rb-filters"]));
         await shot(p, "47-2c", RB, RB); await clean();
-        await p.getByRole("button", { name: /^Made by/ }).first().click(); await sleep(300);
-        await p.locator(".rb-filters").getByRole("button", { name: "No cooking" }).click(); await sleep(300); await p.locator(".rb-filters").getByRole("button", { name: "With my foods" }).click(); await sleep(300);
-        await p.evaluate(() => { const r = document.querySelector(".rb-filters"); r.scrollLeft = r.scrollWidth; }); await sleep(400);
-        console.log(await note(p, RB, "<b>New:</b> swiped to the end: No cooking and With my foods chosen, blue with a check (D6). The line under says what is shown, with Clear all.", [".rb-filters"]));
+        await p.locator(".rb-panel-actions .pill-primary").click(); await sleep(500);
+        console.log(await note(p, RB, "<b>New:</b> the panel is closed; the chip says <b>Filters · 2</b>, blue, and the line under says 6 of 9 recipes · No cooking · With my foods, with Clear all.", [".rb-filters-chip"]));
         await shot(p, "47-2d", RB, RB);
       }
       await p.context().close();

@@ -4439,7 +4439,7 @@
       "title": "Recipes: the newest first, and the filters as chips that open and close",
       "epic": "cook",
       "state": "now",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches. 26 November 10:43 (Coach Milan): Sort, should these be chips as well? Newest as the first one and the default. A design proposal for them instead of text, or keep text for now? Any idea how to solve the tension of so many chips at once? Proposed 11:25: at rest one row of three chips under the search: Made by ▾, Filters ▾ (with the number set, Filters · 2), Newest ▾ (the sort, showing its choice). A tap opens its choices under the row as chips, white until chosen, blue with a check (D3, D6); Kitchen, Moment, Fits my day, No cooking and With my foods move inside Filters. Newest is the first sort and the default. About 12 things on screen at rest become 3. 11:26: draw. Drawn 11:55 with its agreement. 11:46 to 11:58: the sort first, then Made by, both preselected (Made by: All); the filters, the one place to pick several, in one longer row. Redrawn 12:10.",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches. 26 November 10:43 (Coach Milan): Sort, should these be chips as well? Newest as the first one and the default. A design proposal for them instead of text, or keep text for now? Any idea how to solve the tension of so many chips at once? Proposed 11:25: at rest one row of three chips under the search: Made by ▾, Filters ▾ (with the number set, Filters · 2), Newest ▾ (the sort, showing its choice). A tap opens its choices under the row as chips, white until chosen, blue with a check (D3, D6); Kitchen, Moment, Fits my day, No cooking and With my foods move inside Filters. Newest is the first sort and the default. About 12 things on screen at rest become 3. 11:26: draw. Drawn 11:55 with its agreement. 11:46 to 11:58: the sort first, then Made by, both preselected (Made by: All); the filters, the one place to pick several, in one longer row. Redrawn 12:10. 12:12 to 12:16: not sideways but downwards: a third chip, Filters, a drop-down with all the options and a close at the bottom (Show N recipes). Redrawn 12:25.",
       "problem": "At rest the Recipes bar shows twelve things to tap under the search: Made by ▾, Kitchen ▾, Moment ▾, Fits my day, No cooking, With my foods, then Sort with six words as text links. The bar is 250 px high, its chips 32 px. The sort is text, though picking one of six is an answer (a chip, D3), and its default is For your day, so the recipe I just made is not on top.",
       "story": "When I open Recipes, I want the list right under a short bar, with the newest first, so that I find the recipe I just made and open the filters only when I need them.",
       "unchanged": [
@@ -4455,8 +4455,8 @@
       "ac": [
         {
           "id": "AC1",
-          "title": "Two rows at rest",
-          "text": "Given Recipes with 9 recipes, when I open it, then under the search the first row is Newest ▾ and Made by: All ▾, both blue, and the second row is Kitchen ▾, Moment ▾, Fits my day, No cooking, With my foods in one line; every chip 44 px high; no Sort words as text"
+          "title": "One row at rest",
+          "text": "Given Recipes with 9 recipes, when I open it, then under the search there is one row, Newest ▾ and Made by: All ▾ (both blue) and Filters ▾, each 44 px high; no Kitchen, Moment, Fits my day, No cooking, With my foods or Sort words on screen"
         },
         {
           "id": "AC2",
@@ -4466,27 +4466,27 @@
         {
           "id": "AC3",
           "title": "The sort as chips",
-          "text": "Given that, when I tap Newest ▾, then six chips open under the first row, Newest, For your day, Most made, Highest PD, Quickest, A to Z, Newest blue with a check; when I tap Highest PD, they close, the chip says Highest PD ▾ and the list follows"
+          "text": "Given that, when I tap Newest ▾, then six chips open under the row, Newest, For your day, Most made, Highest PD, Quickest, A to Z, Newest blue with a check; when I tap Highest PD, they close, the chip says Highest PD ▾ and the list follows"
         },
         {
           "id": "AC4",
-          "title": "Made by keeps its list",
-          "text": "Given that, when I tap Made by: All ▾, then its list opens with counts, All chosen; when I tap Me, the chip says Made by: Me ▾"
+          "title": "Filters opens a panel",
+          "text": "Given that, when I tap Filters ▾, then a panel opens downwards with Kitchen and its list, Moment and its list, and More: Fits my day, No cooking, With my foods, and at the end Clear all and Show 9 recipes"
         },
         {
           "id": "AC5",
-          "title": "The filters in one row",
-          "text": "Given a phone 390 px wide, when I look at the filters, then they stay in one line that I can swipe sideways, the last one partly in sight; when I tap No cooking and With my foods, both turn blue with a check and the line under says 6 of 9 recipes · No cooking · With my foods with Clear all"
+          "title": "Show N recipes",
+          "text": "Given the panel, when I tap No cooking and With my foods, then both turn blue with a check and the button says Show 6 recipes; when I tap it, the panel closes, the chip says Filters · 2, blue, and the line under says 6 of 9 recipes · No cooking · With my foods with Clear all"
         },
         {
           "id": "AC6",
-          "title": "Kitchen and Moment",
-          "text": "Given that, when I tap Kitchen ▾ and Balkan, then Kitchen says Kitchen: Balkan and the list shows Balkan recipes"
+          "title": "Made by keeps its list",
+          "text": "Given that, when I tap Made by: All ▾ and Me, then the chip says Made by: Me ▾ and only my recipes are listed"
         },
         {
           "id": "AC7",
           "title": "In every language",
-          "text": "Given Srpski or German, when I open Recipes, then the chips and the sort chips are in that language, and the filters still sit in one row"
+          "text": "Given Srpski or German, when I open Recipes and Filters, then the chips, the panel and Show N recipes are in that language, with the right ending for the number"
         }
       ]
     },
