@@ -167,8 +167,8 @@
       "id": "DT203",
       "title": "Languages: Serbian and German after English",
       "epic": "lang",
-      "state": "now",
-      "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first. 19:24: Serbian Latin, Chef Mealan first, screens English for a while. Board v2 with the table; Go at 19:39. Release 1 in 0.3.76: Settings, Language; his lines and safety lines in Serbian once ticked in the table; his AI answers in Serbian; cook mode hears dalje, nazad, ponovi, koliko. Board Stories176 (release 3, the Plate in Srpski) approved 4 November 00:00; release 2 Go 00:04, in phases (04:38). Phase 1 in 0.3.77: words.ts and en.json, the Plate's words, the bar, numbers by language, he|she and counts, three plate lines of Chef Mealan, the guard test. Next: Milan ticks the Plate in his table; then phase 2, Today. Phase 2 in 0.3.78: Today. Phase 3 in 0.3.79: Plan. Phase 4 in 0.3.80: Recipes. Phase 5 in 0.3.81: Cooking, with Milan's first ticked lines in the app (332). Phase 6 in 0.3.82: Foods, search, scan and camera (219 lines). Each area's rows sit in the table as one pack. Phase 7 in 0.3.83: Me and setup (294 lines). Phase 8 in 0.3.84: Clients, Settings, Menu and the small pages (528 lines). Explorer, the home page, the book page, the public recipe pages, the legal pages, the crash screen and the owner's pages (Built, Metrics, Evals, Running costs, Admin) stay English. 8 phases (Plate, Today, Plan, Recipes, Cooking, Foods, Me and setup, Clients and the rest). Translating in context is DT234; the page's language for screen readers goes with each phase (DT235).",
+      "state": "done",
+      "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first. 19:24: Serbian Latin, Chef Mealan first, screens English for a while. Board v2 with the table; Go at 19:39. Release 1 in 0.3.76: Settings, Language; his lines and safety lines in Serbian once ticked in the table; his AI answers in Serbian; cook mode hears dalje, nazad, ponovi, koliko. Board Stories176 (release 3, the Plate in Srpski) approved 4 November 00:00; release 2 Go 00:04, in phases (04:38). Phase 1 in 0.3.77: words.ts and en.json, the Plate's words, the bar, numbers by language, he|she and counts, three plate lines of Chef Mealan, the guard test. Next: Milan ticks the Plate in his table; then phase 2, Today. Phase 2 in 0.3.78: Today. Phase 3 in 0.3.79: Plan. Phase 4 in 0.3.80: Recipes. Phase 5 in 0.3.81: Cooking, with Milan's first ticked lines in the app (332). Phase 6 in 0.3.82: Foods, search, scan and camera (219 lines). Each area's rows sit in the table as one pack. Phase 7 in 0.3.83: Me and setup (294 lines). Phase 8 in 0.3.84: Clients, Settings, Menu and the small pages (528 lines). Explorer, the home page, the book page, the public recipe pages, the legal pages, the crash screen and the owner's pages (Built, Metrics, Evals, Running costs, Admin) stay English. 8 phases (Plate, Today, Plan, Recipes, Cooking, Foods, Me and setup, Clients and the rest). Translating in context is DT234; the page's language for screen readers goes with each phase (DT235). Coach Milan 26 November 2026, 10:32: done (all 8 phases shipped by 0.3.84; what stays English stays English on purpose).",
       "board": 175
     },
     {
@@ -215,8 +215,8 @@
       "id": "EV1",
       "title": "Photo evals: about 20 weighed plates from Milan and Tester 3",
       "epic": "ops",
-      "state": "now",
-      "why": "7 November 20:59: Coach Milan and Marko collect about 20 weighed plates on the page Weighed plates (artifact 7f329dcc-3307-4df2-90ba-a798e2334749: db plates, photos as assets). Then Claude runs the photo reading on each and compares food by food."
+      "state": "next",
+      "why": "7 November 20:59: Coach Milan and Marko collect about 20 weighed plates on the page Weighed plates (artifact 7f329dcc-3307-4df2-90ba-a798e2334749: db plates, photos as assets). Then Claude runs the photo reading on each and compares food by food. Coach Milan 26 November 2026, 10:32: to Next; it waits on the weighed plates being collected."
     },
     {
       "id": "OP1",
@@ -1058,9 +1058,9 @@
       "id": "CR1a",
       "title": "Creator: Make a post from a cooked meal (0.4.0)",
       "epic": "cook",
-      "state": "now",
+      "state": "next",
       "board": "Stories199",
-      "why": "Coach Milan 9 November: the first Creator phase. Drawn; waits for Go. It starts 0.4.0. Roles and pricing go to a new chat."
+      "why": "Coach Milan 9 November: the first Creator phase. Drawn; waits for Go. It starts 0.4.0. Roles and pricing go to a new chat. Coach Milan 26 November 2026, 10:32: to Next; 0.4.0 comes after the current fixes."
     },
     {
       "id": "B133",
@@ -4328,8 +4328,41 @@
       "id": "B164",
       "title": "The link to show more of my recipes is almost invisible",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): on Recipes, the link below the list that shows more of my recipes is almost invisible."
+      "state": "now",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): on Recipes, the link below the list that shows more of my recipes is almost invisible. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches. 10:33: draw. Drawn 11:05 with its agreement.",
+      "problem": "Recipes, idle, groups the list by who made it: two recipes per group, then a line for the rest, 3 more of mine ›. The line is a small text link, 20 px high, 20 px under the last recipe while two recipes are 34 px apart. It acts (it switches Made by to me), so by the design rules it is a button (D9), 44 px or more (D10), with even space (D15).",
+      "story": "When I look for one of my recipes on Recipes, I want to see at once how to open the rest, so that I don't miss the recipes past the first two.",
+      "unchanged": [
+        "Two recipes per group while nothing is searched or filtered; a group of three or fewer shows whole.",
+        "The groups, their titles and counts.",
+        "A search or a filter shows every hit."
+      ],
+      "open": [],
+      "board": "Stories299",
+      "where": "Page 6",
+      "rel": "Drawn 26 November 2026 with its agreement; waits for Go",
+      "ac": [
+        {
+          "id": "AC1",
+          "title": "A button under the group",
+          "text": "Given Recipes with 5 recipes of mine and 4 from members, when I look under Made by me, then after two recipes there is Show all 5 of mine, the outlined button across the row, 44 px high, 34 px under the last recipe, as between two recipes"
+        },
+        {
+          "id": "AC2",
+          "title": "It opens the group",
+          "text": "Given that, when I tap Show all 5 of mine, then Made by says me and all 5 of my recipes are listed, as the line did"
+        },
+        {
+          "id": "AC3",
+          "title": "Every group",
+          "text": "Given the members' group with 4 recipes, when I look under its two, then it says Show all 4 from members, the same button; and the coach's group says Show all 3 from your coach"
+        },
+        {
+          "id": "AC4",
+          "title": "In every language",
+          "text": "Given Srpski or German, when I look under Made by me, then the button says the same in that language, with the number"
+        }
+      ]
     },
     {
       "id": "DT345",
@@ -4391,15 +4424,15 @@
       "id": "DT346",
       "title": "Editing a recipe and making a new one look different",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): confusing when the recipe is in edit mode and when the Plate is not editing it but making a new recipe."
+      "state": "now",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): confusing when the recipe is in edit mode and when the Plate is not editing it but making a new recipe. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches."
     },
     {
       "id": "DT347",
       "title": "Recipes: the newest first, and the filters as chips that open and close",
       "epic": "cook",
-      "state": "next",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it."
+      "state": "now",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches."
     },
     {
       "id": "B165",
