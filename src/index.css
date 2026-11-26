@@ -2274,8 +2274,14 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .rb { display: flex; flex-direction: column; gap: 8px; }
 .rb .clear-field > input.search { margin: 0; }
 .rb-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.rb-chips .choice { height: 32px; padding: 0 10px; font-size: var(--fs-small); }
-.rb-chips .choice.on::before { content: none; }
+/* DT347 (0.3.199): the bar's chips are 44 px (D10), round as chips (D16); a sheet's list sits under its chips */
+.rb-panel { display: flex; flex-direction: column; gap: 4px; } .rb-panel .rb-sheet-title { margin-top: 18px; } .rb-panel .rb-sheet-title:first-child { margin-top: 0; }
+/* DT347 (Coach Milan 12:40): a block's heading is a section heading, 18 px bold, as the groups' titles on Recipes (B164) */
+.rb .rb-sheet-title { font-size: var(--fs-section); font-weight: 900; color: var(--ink); text-transform: none; letter-spacing: 0; padding: 2px 0 4px; }
+.rb-panel-actions { display: flex; gap: 8px; margin-top: 14px; } .rb-panel-actions .pill { flex: 1; height: 44px; }
+.rb-chips .choice { height: 44px; padding: 0 12px; font-size: var(--fs-small); }
+/* DT347: a chosen chip shows its check (D6); a drop-down chip says its choice instead */
+.rb-chips .rb-drop.on::before { content: none; }
 .rb-sheet { display: flex; flex-direction: column; border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--tint); padding: 6px 10px; }
 .rb-sheet-title { font-weight: 700; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; font-size: var(--fs-caps); padding: 4px 0; }
 .rb-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 0; border-top: 1px solid var(--line); background: transparent; padding: 9px 0; font: inherit; font-weight: 600; color: var(--ink); text-align: left; }
@@ -2289,7 +2295,7 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 /* DT126c (0.2.106, board Stories74): no tabs; the one list in groups by who made it */
 .rc-group { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
 /* B164 (0.3.198): a group's title is a section heading (--fs-section, 18 px) */
-.rc-group-title { margin: 18px 0 0; font-size: var(--fs-section); font-weight: 800; color: var(--ink); }
+.rc-group-title { margin: 18px 0 0; font-size: var(--fs-section); font-weight: 900; color: var(--ink); }
 .rc-lead { display: block; margin-top: -4px; }
 .rc-more { width: 100%; height: 44px; font-weight: 800; margin-top: 12px; }
 

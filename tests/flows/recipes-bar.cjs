@@ -50,6 +50,12 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   const titles = (page) => page.locator(".recipe-tile .tile-name").allTextContents();
   const count = (page) => page.locator(".rb-count").textContent();
   const lines = async (page) => (await page.locator(".rb-line").allTextContents()).map((x) => x.replace(/\s+/g, " ").trim());
+  // DT347 (0.3.199): the filters sit in the Filters panel, closed with Show N recipes; the sort is a chip that opens six chips
+  const panel = async (page) => { if (!(await page.locator("#rb-filters").count())) { await page.locator(".rb-filters-chip").click(); await page.waitForTimeout(200); } return page.locator("#rb-filters"); };
+  const closePanel = async (page) => { if (await page.locator("#rb-filters").count()) { await page.locator("#rb-filters .rb-panel-actions .pill-primary").click(); await page.waitForTimeout(300); } };
+  const filt = async (page, name) => { await (await panel(page)).getByRole("button", { name, exact: true }).click(); await page.waitForTimeout(300); await closePanel(page); };
+  const sortBy = async (page, name) => { await page.locator(".rb-sort-chip").click(); await page.waitForTimeout(200); await page.locator("#rb-sort").getByRole("button", { name, exact: true }).click(); await page.waitForTimeout(300); };
+  const section = (page, title) => page.evaluate((title) => { const out = []; let on = false; for (const el of document.querySelectorAll("#rb-filters > *")) { if (el.classList.contains("rb-sheet-title")) { on = el.textContent.trim() === title; continue; } if (on && el.classList.contains("rb-line")) out.push(el.textContent.replace(/\s+/g, " ").trim()); } return out; }, title);
 
   const groupTitles = (page) => page.locator(".rc-group-title").allTextContents();
   // idle: no tabs, one bar, the groups
@@ -90,9 +96,9 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   ok((await titles(page)).join() === "Quark bowl, berries" && /made=coach/.test(page.url()), "DT126c: Made by: your coach, and the address says made=coach");
   await page.getByRole("button", { name: "Clear all" }).click(); await page.waitForTimeout(300);
   // chips stack; the count line names them
-  await page.getByRole("button", { name: "Fits my day" }).click(); await page.waitForTimeout(300);
+  await filt(page, "Fits my day"); // changed by DT347: inside Filters
   ok((await titles(page)).filter((t) => t === "Sarma").length === 1 && /9 of 10 recipes · Fits my day/.test(await count(page)), "DT126: Fits my day drops Darinka's sarma, PD 5.9 under your 6.5; your own sarma stays: " + await count(page));
-  await page.getByRole("button", { name: "No cooking" }).click(); await page.waitForTimeout(300);
+  await filt(page, "No cooking");
   const nc = await titles(page);
   ok(!nc.includes("Protein first") && !nc.includes("Nina's chicken stir fry") && nc.includes("Tuna salata") && /Fits my day · No cooking/.test(await count(page)), "DT126: No cooking stacks on it, and the line names both: " + await count(page));
   await page.getByRole("button", { name: "Clear all" }).click(); await page.waitForTimeout(300);
@@ -101,18 +107,18 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: "Marko" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Made by: Marko/ }).click(); await page.locator(".rb-line").filter({ hasText: "All" }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Show all 5 from members" }).click(); await page.waitForTimeout(300); // B164
-  await page.getByRole("button", { name: "Highest PD" }).click(); await page.waitForTimeout(300);
+  await sortBy(page, "Highest PD"); // changed by DT347: the sort is a chip
   const byPd = await titles(page);
   ok(byPd[0] === "Protein first" && byPd[1] === "Tuna salata" && byPd[4] === "Sarma", "DT126: Highest PD: Protein first, Tuna salata, ... Sarma last: " + byPd.join(" | "));
-  await page.getByRole("button", { name: "Most made" }).click(); await page.waitForTimeout(300);
+  await sortBy(page, "Most made");
   ok((await titles(page))[0] === "Overnight oats with skyr", "DT126: Most made puts the oats, made 4 times, first");
-  await page.getByRole("button", { name: /^Kitchen/ }).click(); await page.waitForTimeout(200);
-  ok((await lines(page)).join(",") === "All kitchens10,Asian1,Balkan1,Mediterranean1", "DT126: Kitchen: one line per kitchen with its count, over the rows the other filters leave: " + (await lines(page)).join(","));
-  await page.locator(".rb-line").filter({ hasText: "Balkan" }).click(); await page.waitForTimeout(300);
-  ok((await titles(page)).join() === "Sarma" && /Kitchen: Balkan/.test(await count(page)) && /Kitchen: Balkan/.test(await page.getByRole("button", { name: /^Kitchen/ }).textContent()), "DT126: the pick shows in the chip and in the line");
+  await panel(page); // changed by DT347: Kitchen is a block of the Filters panel
+  ok((await section(page, "Kitchen")).join(",") === "All kitchens10,Asian1,Balkan1,Mediterranean1", "DT126: Kitchen: one line per kitchen with its count, over the rows the other filters leave: " + (await section(page, "Kitchen")).join(","));
+  await page.locator("#rb-filters .rb-line").filter({ hasText: "Balkan" }).click(); await page.waitForTimeout(300); await closePanel(page);
+  ok((await titles(page)).join() === "Sarma" && /Kitchen: Balkan/.test(await count(page)) && /Filters · 1/.test(await page.locator(".rb-filters-chip").textContent()), "DT126 and DT347: the pick shows in the line, and the chip says Filters · 1");
   await page.getByRole("button", { name: "Clear all" }).click(); await page.waitForTimeout(300);
   // the chips on mine: With my foods
-  await page.getByRole("button", { name: "With my foods" }).click(); await page.waitForTimeout(300);
+  await filt(page, "With my foods");
   ok((await titles(page)).includes("Chocolate quark pudding") && !(await titles(page)).includes("Protein first") && /With my foods/.test(await count(page)), "DT126: With my foods keeps the recipes whose every food is in your list");
   await page.close();
 
@@ -122,6 +128,46 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   ok((await groupTitles(page)).join(" | ") === "Made by me · 4 | Made by your coach · 1 | Made by members · 3", "DT126c: a recipe of yours shared with members is one row, under me: " + (await groupTitles(page)).join(" | "));
   await page.close();
 
+  // DT347 (0.3.199, board DT347, canvas Page 6; Coach Milan, Go 26 November 2026, 12:52): the bar
+  { const q = await open(SHARED); const R = q.locator(".rb");
+    const row = (await R.locator(".rb-chips").first().getByRole("button").allTextContents()).map((x) => x.trim());
+    const hs = await R.locator(".rb-chips").first().getByRole("button").evaluateAll((bs) => bs.map((b) => Math.round(b.getBoundingClientRect().height)));
+    ok(JSON.stringify(row) === JSON.stringify(["Newest ▾", "Made by: All ▾", "Filters ▾"]) && hs.every((h) => h >= 44) && !(await R.getByRole("button", { name: "Fits my day" }).count()) && !(await R.locator(".rb-sort").count()), "DT347 AC1: one row, Newest, Made by: All, Filters, 44 px; nothing else at rest: " + row.join(" | ") + " " + hs.join(","));
+    const all = await q.evaluate(() => [...document.querySelectorAll(".rc-group")].map((g) => g.querySelector(".recipe-tile .tile-name")?.textContent));
+    ok(all[0] === "Quark with apple", "DT347 AC2: Newest by default: my newest recipe, saved 24 October, leads Made by me: " + all.join(" | "));
+    await q.locator(".rb-sort-chip").click(); await q.waitForTimeout(200);
+    const sorts = (await q.locator("#rb-sort .choice").allTextContents()).map((x) => x.replace("✓", "").trim());
+    ok(sorts.join(",") === "Newest,For your day,Most made,Highest PD,Quickest,A to Z" && /on/.test(await q.locator("#rb-sort .choice").first().getAttribute("class")), "DT347 AC3: six sort chips, Newest first and chosen: " + sorts.join(","));
+    await q.locator("#rb-sort").getByRole("button", { name: "Highest PD", exact: true }).click(); await q.waitForTimeout(300);
+    ok((await q.locator(".rb-sort-chip").textContent()).trim() === "Highest PD ▾" && !(await q.locator("#rb-sort").count()), "DT347 AC3: a tap picks Highest PD and closes the chips");
+    await q.locator(".rb-filters-chip").click(); await q.waitForTimeout(300);
+    const heads = (await q.locator("#rb-filters .rb-sheet-title").allTextContents()).map((x) => x.trim());
+    const hstyle = await q.locator("#rb-filters .rb-sheet-title").first().evaluate((e) => getComputedStyle(e).fontSize);
+    ok(heads.join(",") === "Kitchen,Meal,PD,For me" && hstyle === "18px" && /Show 10 recipes/.test(await q.locator("#rb-filters .rb-panel-actions").textContent()), "DT347 AC4: the panel: Kitchen, Meal, PD, For me as 18 px headings, Show 10 recipes: " + heads.join(","));
+    ok((await section(q, "PD")).join(",").startsWith("Any PD,PD under 4,PD 4 to 6") && (await section(q, "PD")).join(",").includes("PD 8 and more"), "DT347 AC6: PD by ranges: " + (await section(q, "PD")).join(","));
+    ok((await section(q, "For me")).join(",") === "Fits my day,No cooking,With my foods", "DT347 AC4: For me holds the three, as rows");
+    await q.locator("#rb-filters").getByRole("button", { name: "No cooking", exact: true }).click(); await q.waitForTimeout(300);
+    await q.locator("#rb-filters").getByRole("button", { name: "With my foods", exact: true }).click(); await q.waitForTimeout(300);
+    const show = (await q.locator("#rb-filters .rb-panel-actions .pill-primary").textContent()).trim();
+    await q.locator("#rb-filters .rb-panel-actions .pill-primary").click(); await q.waitForTimeout(300);
+    ok(/^Show \d+ recipes?$/.test(show) && !(await q.locator("#rb-filters").count()) && (await q.locator(".rb-filters-chip").textContent()).trim() === "Filters · 2 ▾" && /No cooking · With my foods/.test(await count(q)), `DT347 AC5: ${show} closes the panel; the chip says Filters · 2: ` + await count(q));
+    await q.locator(".rb-filters-chip").click(); await q.waitForTimeout(200);
+    await q.locator("#rb-filters").getByRole("button", { name: "Clear all" }).click(); await q.waitForTimeout(200);
+    await q.locator("#rb-filters .rb-line").filter({ hasText: /^PD 4 to 6/ }).click(); await q.waitForTimeout(300);
+    await q.locator("#rb-filters .rb-panel-actions .pill-primary").click(); await q.waitForTimeout(300);
+    ok(/PD 4 to 6/.test(await count(q)) && (await q.locator(".recipe-tile").count()) >= 1, "DT347 AC6: PD 4 to 6 filters the list and the line says so: " + await count(q));
+    await q.locator(".rb-count").getByRole("button", { name: "Clear all" }).click(); await q.waitForTimeout(300);
+    await q.getByRole("button", { name: /^Made by/ }).first().click(); await q.waitForTimeout(200); await q.locator("#rb-madeBy .rb-line").filter({ hasText: /^Me/ }).first().click(); await q.waitForTimeout(300);
+    ok(/^Made by: me ▾$/i.test((await q.getByRole("button", { name: /^Made by/ }).first().textContent()).trim()), "DT347 AC7: Made by: me");
+    await q.close(); }
+  for (const [lang, sortWord] of [["sr-Latn", null], ["de", null]]) {
+    const q = await open(SHARED); await q.evaluate((l) => localStorage.setItem("chefmealan-lang", l), lang); await q.reload(); await q.waitForTimeout(1500);
+    const row = (await q.locator(".rb .rb-chips").first().getByRole("button").allTextContents()).map((x) => x.trim());
+    await q.locator(".rb-filters-chip").click(); await q.waitForTimeout(300);
+    const heads = (await q.locator("#rb-filters .rb-sheet-title").allTextContents()).map((x) => x.trim()); const show = (await q.locator("#rb-filters .rb-panel-actions .pill-primary").textContent()).trim();
+    ok(row.length === 3 && !row.some((x) => /^(Newest|Filters)/.test(x)) && heads.length === 4 && !/Show/.test(show), `DT347 AC8 ${lang}: ${row.join(" | ")} / ${heads.join(", ")} / ${show}`);
+    await q.close();
+  }
   // B164 AC5: in Srpski and German, the same button with the number
   for (const [lang, want] of [["sr-Latn", "Prikaži sve moje (4)"], ["de", "Alle 4 von mir zeigen"]]) {
     const q = await open(SHARED); await q.evaluate((l) => localStorage.setItem("chefmealan-lang", l), lang); await q.reload(); await q.waitForTimeout(1500);

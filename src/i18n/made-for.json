@@ -1890,7 +1890,7 @@
     "screen.recipebar.noCooking": {"en":"No cooking","area":"Recipes","where":"Recipe filters"},
     "screen.recipebar.withMyFoods": {"en":"With my foods","area":"Recipes","where":"Recipe filters"},
     "screen.recipebar.allKitchens": {"en":"All kitchens","area":"Recipes","where":"Recipe bar"},
-    "screen.recipebar.anyMoment": {"en":"Any moment","area":"Recipes","where":"Recipe bar"},
+    "screen.recipebar.anyMoment": {"en":"Any meal","area":"Recipes","where":"Recipe bar","release":"0.3.199"},
     "screen.steps.tapAFoodToPut": {"en":"Tap a food to put it in the step, with its amount","area":"Recipes","where":"Steps editor"},
     "screen.steps.whiskTheEggsWithThe": {"en":"Whisk the eggs with the milk.","area":"Recipes","where":"Steps editor"},
     "screen.langpanel.theLanguageChefMealanSpeaks": {"en":"The language Chef Mealan speaks to you. The screens follow, part by part.","area":"Menu and settings","where":"Language"},
@@ -2701,7 +2701,7 @@
     "screen.rf.madeByIs": {"en":"Made by: {who}","area":"Recipes","where":"Recipe filters"},
     "screen.rf.kitchenIs": {"en":"Kitchen: {kitchen}","area":"Recipes","where":"Recipe filters"},
     "screen.rb.kitchen": {"en":"Kitchen","area":"Recipes","where":"Recipe bar"},
-    "screen.rb.moment": {"en":"Moment","area":"Recipes","where":"Recipe bar"},
+    "screen.rb.moment": {"en":"Meal","area":"Recipes","where":"Recipe bar","release":"0.3.199"},
     "screen.rb.all": {"en":"All","area":"Recipes","where":"Recipe bar"},
     "screen.slot.trainingAt": {"en":"training at {time}","area":"Plan","where":"Training line"},
     "screen.slot.trainingNoTime": {"en":"training, no time set","area":"Plan","where":"Training line"},
@@ -5826,6 +5826,16 @@
     "screen.steps.addAfter": {"en":"Add a step after step {n}","area":"Recipes","where":"Recipes","release":"0.3.197"},
     "screen.recipes.allOfMine": {"en":"Show all {n} of mine","area":"Recipes","where":"Recipes","release":"0.3.198"},
     "screen.recipes.allFromCoach": {"en":"Show all {n} from {coach}","area":"Recipes","where":"Recipes","release":"0.3.198"},
-    "screen.recipes.allFromMembers": {"en":"Show all {n} from members","area":"Recipes","where":"Recipes","release":"0.3.198"}
+    "screen.recipes.allFromMembers": {"en":"Show all {n} from members","area":"Recipes","where":"Recipes","release":"0.3.198"},
+    "screen.recipebar.sortIs": {"en":"Sort: {sort}","area":"Words used across the app","where":"Across the app","release":"0.3.199"},
+    "screen.recipebar.filtersN": {"en":"Filters · {n}","area":"Words used across the app","where":"Across the app","release":"0.3.199"},
+    "screen.recipebar.more": {"en":"For me","area":"Words used across the app","where":"Across the app","release":"0.3.199"},
+    "screen.rf.pdTitle": {"en":"{tag}","area":"Recipes","where":"Recipes","release":"0.3.199"},
+    "screen.rf.pdAny": {"en":"Any {tag}","area":"Recipes","where":"Recipes","release":"0.3.199"},
+    "screen.rf.pd.under": {"en":"{tag} under {v}","area":"Recipes","where":"Recipes","release":"0.3.199"},
+    "screen.rf.pd.range": {"en":"{tag} {a} to {b}","area":"Recipes","where":"Recipes","release":"0.3.199"},
+    "screen.rf.pd.over": {"en":"{tag} {v} and more","area":"Recipes","where":"Recipes","release":"0.3.199"},
+    "screen.rf.pd.yours": {"en":"your target {v}","area":"Recipes","where":"Recipes","release":"0.3.199"},
+    "screen.recipebar.showN": {"en":"Show {n} recipe|Show {n} recipes","area":"Words used across the app","where":"Across the app","release":"0.3.199"}
   }
 }

@@ -1,6 +1,6 @@
 {
-  "release": "0.3.198",
-  "at": "2026-11-26T09:53:43.493Z",
+  "release": "0.3.199",
+  "at": "2026-11-26T12:03:40.695Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -53355,6 +53355,234 @@
       "release": "0.3.198",
       "order": 900002,
       "at": "2026-11-26T09:53:43.493Z"
+    },
+    {
+      "id": "screen.recipebar.anyMoment",
+      "kind": "screen",
+      "key": "recipebar.anyMoment",
+      "en": "Any meal",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipe bar",
+      "enBefore": "Any moment",
+      "sr": "Bilo koji obrok",
+      "de": "Jede Mahlzeit",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900000,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.recipebar.sortIs",
+      "kind": "screen",
+      "key": "recipebar.sortIs",
+      "en": "Sort: {sort}",
+      "forms": "plain",
+      "slots": [
+        "sort"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Redosled: {sort}",
+      "de": "Sortierung: {sort}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900001,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.recipebar.filtersN",
+      "kind": "screen",
+      "key": "recipebar.filtersN",
+      "en": "Filters · {n}",
+      "forms": "plain",
+      "slots": [
+        "n"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Filteri · {n}",
+      "de": "Filter · {n}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900002,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.recipebar.more",
+      "kind": "screen",
+      "key": "recipebar.more",
+      "en": "For me",
+      "forms": "plain",
+      "slots": [],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Za mene",
+      "de": "Für mich",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900003,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.rf.pdTitle",
+      "kind": "screen",
+      "key": "rf.pdTitle",
+      "en": "{tag}",
+      "forms": "plain",
+      "slots": [
+        "tag"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "{tag}",
+      "de": "{tag}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900004,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.rf.pdAny",
+      "kind": "screen",
+      "key": "rf.pdAny",
+      "en": "Any {tag}",
+      "forms": "plain",
+      "slots": [
+        "tag"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Bilo koji {tag}",
+      "de": "{tag} beliebig",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900005,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.rf.pd.under",
+      "kind": "screen",
+      "key": "rf.pd.under",
+      "en": "{tag} under {v}",
+      "forms": "plain",
+      "slots": [
+        "tag",
+        "v"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "{tag} ispod {v}",
+      "de": "{tag} unter {v}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900006,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.rf.pd.range",
+      "kind": "screen",
+      "key": "rf.pd.range",
+      "en": "{tag} {a} to {b}",
+      "forms": "plain",
+      "slots": [
+        "a",
+        "b",
+        "tag"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "{tag} od {a} do {b}",
+      "de": "{tag} {a} bis {b}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900007,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.rf.pd.over",
+      "kind": "screen",
+      "key": "rf.pd.over",
+      "en": "{tag} {v} and more",
+      "forms": "plain",
+      "slots": [
+        "tag",
+        "v"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "{tag} {v} i više",
+      "de": "{tag} {v} und mehr",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900008,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.rf.pd.yours",
+      "kind": "screen",
+      "key": "rf.pd.yours",
+      "en": "your target {v}",
+      "forms": "plain",
+      "slots": [
+        "v"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "tvoj cilj {v}",
+      "de": "dein Ziel {v}",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900009,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.recipebar.showN",
+      "kind": "screen",
+      "key": "recipebar.showN",
+      "en": "Show {n} recipe|Show {n} recipes",
+      "forms": "count",
+      "slots": [
+        "n"
+      ],
+      "area": "Words used across the app",
+      "where": "Across the app",
+      "sr": "Prikaži {n} recept|Prikaži {n} recepta|Prikaži {n} recepata",
+      "de": "{n} Rezept zeigen|{n} Rezepte zeigen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900010,
+      "at": "2026-11-26T12:03:40.695Z"
+    },
+    {
+      "id": "screen.rb.moment",
+      "kind": "screen",
+      "key": "rb.moment",
+      "en": "Meal",
+      "forms": "plain",
+      "slots": [],
+      "area": "Recipes",
+      "where": "Recipe bar",
+      "enBefore": "Moment",
+      "sr": "Obrok",
+      "de": "Mahlzeit",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.199",
+      "order": 900011,
+      "at": "2026-11-26T12:03:40.695Z"
     }
   ]
 }
