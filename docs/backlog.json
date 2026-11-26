@@ -43,6 +43,7 @@
     }
   },
   "versions": [
+    "0.3.199",
     "0.3.198",
     "0.3.197",
     "0.3.196",
@@ -4438,8 +4439,8 @@
       "id": "DT347",
       "title": "Recipes: the newest first, and the filters as chips that open and close",
       "epic": "cook",
-      "state": "now",
-      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches. 26 November 10:43 (Coach Milan): Sort, should these be chips as well? Newest as the first one and the default. A design proposal for them instead of text, or keep text for now? Any idea how to solve the tension of so many chips at once? Proposed 11:25: at rest one row of three chips under the search: Made by ▾, Filters ▾ (with the number set, Filters · 2), Newest ▾ (the sort, showing its choice). A tap opens its choices under the row as chips, white until chosen, blue with a check (D3, D6); Kitchen, Moment, Fits my day, No cooking and With my foods move inside Filters. Newest is the first sort and the default. About 12 things on screen at rest become 3. 11:26: draw. Drawn 11:55 with its agreement. 11:46 to 11:58: the sort first, then Made by, both preselected (Made by: All); the filters, the one place to pick several, in one longer row. Redrawn 12:10. 12:12 to 12:16: not sideways but downwards: a third chip, Filters, a drop-down with all the options and a close at the bottom (Show N recipes). Redrawn 12:25. 12:29: the panel continues the same way to the end (More as rows, not chips). Redrawn 12:35. 12:35: no More, a filter with its own name (drawn as For me); Moment is not our word, Meal. Redrawn 12:45. 12:40: the block's heading more prominent: 18 px bold section headings. Redrawn 12:50. 12:41: add the PD filter by ranges: PD under 4, 4 to 6, 6 to 8, 8 and more, the range with my target marked. Redrawn 13:00.",
+      "state": "done",
+      "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): sort the recipes newest first by default; the filter section is a big block, maybe chips or another way to show and hide it. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches. 26 November 10:43 (Coach Milan): Sort, should these be chips as well? Newest as the first one and the default. A design proposal for them instead of text, or keep text for now? Any idea how to solve the tension of so many chips at once? Proposed 11:25: at rest one row of three chips under the search: Made by ▾, Filters ▾ (with the number set, Filters · 2), Newest ▾ (the sort, showing its choice). A tap opens its choices under the row as chips, white until chosen, blue with a check (D3, D6); Kitchen, Moment, Fits my day, No cooking and With my foods move inside Filters. Newest is the first sort and the default. About 12 things on screen at rest become 3. 11:26: draw. Drawn 11:55 with its agreement. 11:46 to 11:58: the sort first, then Made by, both preselected (Made by: All); the filters, the one place to pick several, in one longer row. Redrawn 12:10. 12:12 to 12:16: not sideways but downwards: a third chip, Filters, a drop-down with all the options and a close at the bottom (Show N recipes). Redrawn 12:25. 12:29: the panel continues the same way to the end (More as rows, not chips). Redrawn 12:35. 12:35: no More, a filter with its own name (drawn as For me); Moment is not our word, Meal. Redrawn 12:45. 12:40: the block's heading more prominent: 18 px bold section headings. Redrawn 12:50. 12:41: add the PD filter by ranges: PD under 4, 4 to 6, 6 to 8, 8 and more, the range with my target marked. Redrawn 13:00. 12:52: Go. Built in 0.3.199.",
       "problem": "At rest the Recipes bar shows twelve things to tap under the search: Made by ▾, Kitchen ▾, Moment ▾, Fits my day, No cooking, With my foods, then Sort with six words as text links. The bar is 250 px high, its chips 32 px. The sort is text, though picking one of six is an answer (a chip, D3), and its default is For your day, so the recipe I just made is not on top.",
       "story": "When I open Recipes, I want the list right under a short bar, with the newest first, so that I find the recipe I just made and open the filters only when I need them.",
       "unchanged": [
@@ -4451,7 +4452,7 @@
       "open": [],
       "board": "Stories300",
       "where": "Page 6",
-      "rel": "Drawn 26 November 2026 with its agreement; waits for Go",
+      "rel": "Built in 0.3.199; Go 26 November 2026, 12:52",
       "ac": [
         {
           "id": "AC1",
@@ -4493,7 +4494,8 @@
           "title": "In every language",
           "text": "Given Srpski or German, when I open Recipes and Filters, then the chips, the panel and Show N recipes are in that language, with the right ending for the number"
         }
-      ]
+      ],
+      "version": "0.3.199"
     },
     {
       "id": "B165",
