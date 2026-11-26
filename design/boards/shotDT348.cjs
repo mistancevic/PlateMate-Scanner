@@ -53,8 +53,8 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
       const p = await open(port);
       await p.getByRole("button", { name: "Edit recipe", exact: true }).click(); await sleep(900);
       console.log(await note(p, "JS:document.querySelector('section.rq-steps .st-between')", isNew
-        ? "<b>New:</b> between two steps, the same button as after the last step: <b>+ Add a step</b>, white with a blue border and 14 px corners, like every action button (D9). Its screen reader label still says where: Add a step between step 1 and step 2."
-        : "Between two steps: <b>+ Step here</b>, a dashed button, fully round like a chip.", [BETWEEN]));
+        ? "<b>New:</b> between two steps, the same button as after the last step: <b>+ Add a step</b>, white with a blue border and 14 px corners, like every action button (D9). Its screen reader label still says where: Add a step between step 1 and step 2. The same space, 8 px, above and below each button (main: 10 px above, 2 px below, so it stuck to the next step)."
+        : "Between two steps: <b>+ Step here</b>, a dashed button, fully round like a chip: 10 px under step 1, 2 px over step 2.", [BETWEEN]));
       console.log(await note(p, LAST, isNew
         ? "<b>New:</b> + Add a step after the last step keeps its words and look; it is now 44 px high (D10) and sits under the step like the others, and its screen reader label says Add a step after step 2. One kind of button for one job. I tap it."
         : "After the last step: <b>+ Add a step</b>, a button of another kind (white, blue border, 14 px corners, 36 px high), for the same job. I tap it.", [LAST]));

@@ -4534,7 +4534,7 @@
       "title": "One button to add a step: + Add a step, between steps and after the last",
       "epic": "cook",
       "state": "next",
-      "why": "Coach Milan 23 November 2026, 23:50, looking at the board B165 and B166: + Add a step and + Step here are two different buttons for the same job; should they be one kind? 23:59: yes, add it as Next. Proposed: + Step here between steps and after the last one; + Add a step goes. Wherever steps are written: Edit recipe and the publish sheet. Not drawn. 25 November 20:18: draw. Drawn 20:50 with its agreement. 26 November 01:28 to 01:41: the buttons are not the same again; + Add a step is the better label, the app's outlined button (not round like a chip); yes, redraw. Redrawn 01:55.",
+      "why": "Coach Milan 23 November 2026, 23:50, looking at the board B165 and B166: + Add a step and + Step here are two different buttons for the same job; should they be one kind? 23:59: yes, add it as Next. Proposed: + Step here between steps and after the last one; + Add a step goes. Wherever steps are written: Edit recipe and the publish sheet. Not drawn. 25 November 20:18: draw. Drawn 20:50 with its agreement. 26 November 01:28 to 01:41: the buttons are not the same again; + Add a step is the better label, the app's outlined button (not round like a chip); yes, redraw. Redrawn 01:55. 07:51: double check the spaces; between buttons sat 10 px under one step and 2 px over the next; now 8 px above and below. Redrawn 08:00.",
       "problem": "Writing steps, a step between two steps comes from + Step here, a dashed button under the step. A step after the last one comes from + Add a step, a filled button of another kind and another place. Same job, two looks, two words.",
       "story": "When I write a recipe's steps, I want one button to add a step wherever it goes, so that I learn it once.",
       "unchanged": [
@@ -4551,7 +4551,7 @@
         {
           "id": "AC1",
           "title": "One button, between and after",
-          "text": "Given Banana porridge with 2 steps, when I open Edit recipe, then under step 1 and under step 2 there is + Add a step, the same outlined button, 44 px high, and there is no + Step here"
+          "text": "Given Banana porridge with 2 steps, when I open Edit recipe, then under step 1 and under step 2 there is + Add a step, the same outlined button, 44 px high, 8 px from the step above and the step below, and there is no + Step here"
         },
         {
           "id": "AC2",

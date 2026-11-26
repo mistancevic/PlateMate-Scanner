@@ -10,8 +10,8 @@
  },
  "problem": "Writing steps, a step between two steps comes from + Step here, a dashed button under the step. A step after the last one comes from + Add a step, a filled button of another kind and another place. Same job, two looks, two words.",
  "story": "When I write a recipe's steps, I want one button to add a step wherever it goes, so that I learn it once.",
- "now": "Edit recipe, Steps: 1, + Step here (a dashed button, fully round like a chip), 2, then + Add a step (white, blue border, 14 px corners, 36 px high). The publish sheet writes steps with the same editor, so it is the same there.",
- "proposed": "Coach Milan 26 November 01:40 to 01:41: one button, + Add a step, the app's outlined action button (white, blue border, 14 px corners, design rule D9), between steps and after the last one; + Step here goes. Each is 44 px high (D10) and sits under its step. Its label for a screen reader says where: Add a step between step 1 and step 2, Add a step after step 2. Enter in a step still adds the next one. One editor (StepsEditor), so Edit recipe and the publish sheet change together.",
+ "now": "Edit recipe, Steps: 1, + Step here (a dashed button, fully round like a chip, 10 px under step 1 and 2 px over step 2), 2, then + Add a step (white, blue border, 14 px corners, 36 px high). The publish sheet writes steps with the same editor, so it is the same there.",
+ "proposed": "Coach Milan 26 November 01:40 to 01:41: one button, + Add a step, the app's outlined action button (white, blue border, 14 px corners, design rule D9), between steps and after the last one; + Step here goes. Each is 44 px high (D10) and sits under its step, with the same space, 8 px, above and below (26 November 07:51: double check the spaces). Its label for a screen reader says where: Add a step between step 1 and step 2, Add a step after step 2. Enter in a step still adds the next one. One editor (StepsEditor), so Edit recipe and the publish sheet change together.",
  "looked_at": "+ Step here everywhere, the dashed round button (drawn 25 November 20:50): not chosen, 26 November 01:41: a button says what the tap does (D10), the place shows where; fully round is the look of a chip (D3), and the dashed look is the only one of its kind.",
  "decision": "Waiting for Coach Milan's Go.",
  "short": "+ Add a step between steps and after the last, the outlined button; + Step here goes; release 0.3.197",
@@ -19,7 +19,7 @@
   {
    "id": "AC1",
    "title": "One button, between and after",
-   "text": "Given Banana porridge with 2 steps, when I open Edit recipe, then under step 1 and under step 2 there is + Add a step, the same outlined button, 44 px high, and there is no + Step here"
+   "text": "Given Banana porridge with 2 steps, when I open Edit recipe, then under step 1 and under step 2 there is + Add a step, the same outlined button, 44 px high, 8 px from the step above and the step below, and there is no + Step here"
   },
   {
    "id": "AC2",
@@ -50,7 +50,7 @@
  ],
  "checks": "Light plus the German sweep: one component (StepsEditor) and its words. The unit tests; the build; a new walkthrough for AC1 to AC5; the walkthroughs that tap + Step here or + Add a step today (DT345's, day-levels, past-and-plan, recipe-photos, steps-and-parts, explore-photo, tester-fixes) change with the story where they read the button's words, each with a note; deutsch, language and design-rules. About 12 walkthroughs, 5 minutes. Words: steps.stepHere goes; steps.addAfter is new (Srpski and German); steps.addAStep and steps.addBetween stay.",
  "details": [
-  "src/components/StepsEditor.tsx: the buttons between steps are pill pill-small pill-action st-add st-between with steps.addAStep and the label steps.addBetween; the last has the label steps.addAfter; src/index.css: .st-add 44 px high and under the step (margin-left 34 px); .st-between drops its dashed look.",
+  "src/components/StepsEditor.tsx: the buttons between steps are pill pill-small pill-action st-add st-between with steps.addAStep and the label steps.addBetween; the last has the label steps.addAfter; src/index.css: .st-add 44 px high and under the step (margin-left 34 px); .st-between drops its dashed look and has margin-top 0 and margin-bottom 8 px, so with the list's gap of 8 px each button has 8 px above and below.",
   "The pictures: before from main, 0.3.196; new from a scratch build of main with the change, not committed. The publish sheet opens for a coach (chefmealan-coach)."
  ]
 }

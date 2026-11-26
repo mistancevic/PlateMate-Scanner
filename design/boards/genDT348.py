@@ -29,7 +29,7 @@ parts = [("Ticket", "DT348. This board is the ticket: everything about it is her
   ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> DT348.1 as in main, 0.3.196: Edit recipe's steps, a tap on the button after the last step, and the publish sheet's steps. DT348.2 the same, new. A blue outline marks what each note is about."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "23 November 23:50: + Add a step and + Step here are two different buttons for the same job; should they be one kind? 23:59: yes, add it as Next. 25 November 20:18: yes (a full run first), but draw if it is not done yet: DT348. 26 November 01:28: I think we already had a design for these buttons. 01:40: but the buttons are not the same again; what is the better label, + Step here or + Add a step? Round or more squared? 01:41: yes (+ Add a step, the outlined button, between and after)."),
+  ("In Coach Milan's words", "23 November 23:50: + Add a step and + Step here are two different buttons for the same job; should they be one kind? 23:59: yes, add it as Next. 25 November 20:18: yes (a full run first), but draw if it is not done yet: DT348. 26 November 01:28: I think we already had a design for these buttons. 01:40: but the buttons are not the same again; what is the better label, + Step here or + Add a step? Round or more squared? 01:41: yes (+ Add a step, the outlined button, between and after). 07:51: double check the spaces between buttons and steps."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Decision", t["decision"]), ("3. The agreement", "In the wide block at the bottom of this board.")]
 n0 = len(B.html); storyCard(B, 30, "DT348", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -57,7 +57,7 @@ bs = RB
 y = max(bs + [30 + HT.get("card", 1500)]) + 80
 acTable(B, y, W - 40, {**t, "rel": "Proposed; not agreed until Coach Milan says Go"})
 Hc = y + HT.get("ac", 900) + 40
-board("Stories298.dc.html", t["boardTitle"], "Drawn 25 November 2026, redrawn 26 November 01:50, for the Go of Coach Milan. Ticket DT348, Kanban column Next. Pictures from the real app: before on main, 0.3.196; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories297.dc.html")
+board("Stories298.dc.html", t["boardTitle"], "Drawn 25 November 2026, redrawn 26 November 01:50 and 08:00, for the Go of Coach Milan. Ticket DT348, Kanban column Next. Pictures from the real app: before on main, 0.3.196; new on a scratch build of main with the change. Nothing in the app is changed yet.", B, W, Hc, "Stories297.dc.html")
 inner = B.render(W, Hc)
 json.dump({"DT348": {"file": "Stories298.dc.html", "w": W, "h": min(8000, Hc + 230), "inner": inner}}, open(os.environ.get("BOARDS_OUT", "/home/claude/boards/outDT348.json"), "w"))
 print("DT348", W, Hc + 230)
