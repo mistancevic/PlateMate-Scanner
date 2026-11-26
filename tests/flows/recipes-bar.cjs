@@ -57,13 +57,20 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   ok(await page.getByRole("tab").count() === 0 && await page.locator(".rb").count() === 1, "DT126c: no tabs; one bar on top of Recipes");
   ok((await groupTitles(page)).join(" | ") === "Made by me · 4 | Made by your coach · 1 | Made by members · 5", "DT126c: idle, three groups with counts: " + (await groupTitles(page)).join(" | "));
   ok((await titles(page)).length === 2 + 1 + 2 && /10 recipes/.test(await count(page)), "DT126c: two rows per group and a line for the rest; the line says 10 recipes");
-  ok(await page.getByRole("button", { name: "2 more of mine ›" }).count() === 1 && await page.getByRole("button", { name: "3 more from members ›" }).count() === 1, "DT126c: the rest behind a line per group");
+  // changed by B164 (0.3.198): the line is a button with the whole group's count, Show all 4 of mine
+  ok(await page.getByRole("button", { name: "Show all 4 of mine" }).count() === 1 && await page.getByRole("button", { name: "Show all 5 from members" }).count() === 1, "DT126c: the rest behind a button per group (B164)");
+  // B164 (0.3.198, board B164, canvas Page 6; Coach Milan, Go 26 November 2026, 10:52): the button and the titles, measured
+  const b164 = await page.evaluate(() => { const m = document.querySelector(".rc-more"), g = m.closest(".rc-group"), t = [...g.querySelectorAll(".recipe-tile")], r = m.getBoundingClientRect();
+    const title = getComputedStyle(document.querySelector(".rc-group-title"));
+    return { h: Math.round(r.height), full: Math.abs(r.width - g.getBoundingClientRect().width) < 2, outlined: m.classList.contains("pill") && !m.classList.contains("pill-primary"), above: Math.round(r.top - t[t.length - 1].getBoundingClientRect().bottom), between: Math.round(t[1].getBoundingClientRect().top - t[0].getBoundingClientRect().bottom), size: title.fontSize, weight: Number(title.fontWeight) }; });
+  ok(b164.h >= 44 && b164.full && b164.outlined && b164.above === b164.between, "B164 AC1: Show all 4 of mine, the outlined button across the row, 44 px, as far under the last recipe as two recipes are apart: " + JSON.stringify(b164));
+  ok(b164.size === "18px" && b164.weight >= 700, "B164 AC4: each group's title is a section heading, 18 px and bold: " + b164.size + " " + b164.weight);
   ok(/is about|Set your goal|planned in full/.test(await page.locator(".rc-lead").textContent({ timeout: 3000 }).catch(() => "")), "DT126c: the members' group says your portion for the meal ahead: " + await page.locator(".rc-lead").textContent({ timeout: 1000 }).catch(() => "(none)"));
   await page.getByLabel("Search recipes").fill("pudding"); await page.waitForTimeout(400);
   ok(/Shared with members, without your name/.test(await page.locator(".recipe-tile").filter({ hasText: "Chocolate quark pudding" }).textContent()), "DT126c: your recipe shared without your name says so on its tile");
   await page.getByLabel("Clear the search").click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: "3 more from members ›" }).click(); await page.waitForTimeout(400);
-  ok((await titles(page)).length === 5 && /5 of 10 recipes · Made by: members/.test(await count(page)) && /Made by: members/.test(await page.getByRole("button", { name: /^Made by/ }).textContent()), "DT126c: more from members opens Made by: members, all five");
+  await page.getByRole("button", { name: "Show all 5 from members" }).click(); await page.waitForTimeout(400);
+  ok((await titles(page)).length === 5 && /5 of 10 recipes · Made by: members/.test(await count(page)) && /Made by: members/.test(await page.getByRole("button", { name: /^Made by/ }).textContent()), "DT126c and B164 AC2: Show all 5 from members opens Made by: members, all five");
   // the search
   await page.getByRole("button", { name: "Clear all" }).click(); await page.waitForTimeout(300);
   await page.getByLabel("Search recipes").fill("tuna"); await page.waitForTimeout(400);
@@ -93,7 +100,7 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   // the sort, inside the members' group
   await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: "Marko" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Made by: Marko/ }).click(); await page.locator(".rb-line").filter({ hasText: "All" }).first().click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: "3 more from members ›" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Show all 5 from members" }).click(); await page.waitForTimeout(300); // B164
   await page.getByRole("button", { name: "Highest PD" }).click(); await page.waitForTimeout(300);
   const byPd = await titles(page);
   ok(byPd[0] === "Protein first" && byPd[1] === "Tuna salata" && byPd[4] === "Sarma", "DT126: Highest PD: Protein first, Tuna salata, ... Sarma last: " + byPd.join(" | "));
@@ -115,6 +122,12 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   ok((await groupTitles(page)).join(" | ") === "Made by me · 4 | Made by your coach · 1 | Made by members · 3", "DT126c: a recipe of yours shared with members is one row, under me: " + (await groupTitles(page)).join(" | "));
   await page.close();
 
+  // B164 AC5: in Srpski and German, the same button with the number
+  for (const [lang, want] of [["sr-Latn", "Prikaži sve moje (4)"], ["de", "Alle 4 von mir zeigen"]]) {
+    const q = await open(SHARED); await q.evaluate((l) => localStorage.setItem("chefmealan-lang", l), lang); await q.reload(); await q.waitForTimeout(1500);
+    const txt = ((await q.locator(".rc-more").first().textContent()) || "").trim();
+    ok(txt === want, `B164 AC5 ${lang}: ${txt}`); await q.close();
+  }
   ok(errors.length === 0, "no page errors" + (errors.length ? ": " + errors.join(" | ") : ""));
   await b.close(); server.kill();
   if (fails.length) { console.log(`${fails.length} FAILED`); process.exit(1); } else console.log("all ok");

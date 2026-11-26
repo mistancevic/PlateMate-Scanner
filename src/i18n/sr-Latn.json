@@ -12245,18 +12245,6 @@
       "text": "Sačuvaj u Moje recepte",
       "checked": true
     },
-    "recipes.moreOfMine": {
-      "text": "Još {n} mojih ›",
-      "checked": true
-    },
-    "recipes.moreFromCoach": {
-      "text": "Još {n} od: {coach} ›",
-      "checked": true
-    },
-    "recipes.moreFromMembers": {
-      "text": "Još {n} od članova ›",
-      "checked": true
-    },
     "recipes.loadingWhatMembersShared": {
       "text": "Učitava se ono što su članovi podelili…",
       "checked": true
@@ -23307,6 +23295,18 @@
     },
     "steps.addAfter": {
       "text": "Dodaj korak posle koraka {n}",
+      "checked": true
+    },
+    "recipes.allOfMine": {
+      "text": "Prikaži sve moje ({n})",
+      "checked": true
+    },
+    "recipes.allFromCoach": {
+      "text": "Prikaži sve od: {coach} ({n})",
+      "checked": true
+    },
+    "recipes.allFromMembers": {
+      "text": "Prikaži sve od članova ({n})",
       "checked": true
     }
   }

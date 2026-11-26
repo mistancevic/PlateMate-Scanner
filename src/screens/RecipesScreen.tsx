@@ -399,7 +399,8 @@ export function RecipesScreen(p: AppApi) {
                 <p className="label rc-group-title">{g.title} · {g.rows.length}</p>
                 {g.key === "member" && <small className="muted rc-lead">{membersLead(ahead)}</small>}
                 {shownRows.map((r) => (g.key === "member" ? <MemberTile key={r.id} r={sharedOfId.get(r.id)!} ahead={ahead} open={setMemberOpen} /> : mealTile(mealOf.get(r.id)!)))}
-                {more > 0 && <button type="button" className="link rc-more" onClick={() => setBar({ ...bar, madeBy: g.key === "me" ? ME : g.key === "coach" ? COACH : MEMBERS })}>{g.key === "me" ? w("recipes.moreOfMine", { n: more }) : g.key === "coach" ? w("recipes.moreFromCoach", { n: more, coach: p.coachLabel }) : w("recipes.moreFromMembers", { n: more })}</button>}
+                {/* B164 (0.3.198): an action, so a button (D9), 44 px (D10), the same space as between the recipes (D15) */}
+                {more > 0 && <button type="button" className="pill pill-action rc-more" onClick={() => setBar({ ...bar, madeBy: g.key === "me" ? ME : g.key === "coach" ? COACH : MEMBERS })}>{g.key === "me" ? w("recipes.allOfMine", { n: g.rows.length }) : g.key === "coach" ? w("recipes.allFromCoach", { n: g.rows.length, coach: p.coachLabel }) : w("recipes.allFromMembers", { n: g.rows.length })}</button>}
               </section>
             );
           })}

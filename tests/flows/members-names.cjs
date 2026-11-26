@@ -66,7 +66,7 @@ const R = {
   await page.reload(); await page.waitForTimeout(1500);
   ok(await page.locator(".recipe-tile").count() === 2 && /Made by: Tester3/.test(await page.locator(".rb-count").textContent()), "MB: a reload keeps Tester3's recipes");
   await page.getByRole("button", { name: /^Made by: Tester3/ }).click(); await page.locator(".rb-line").filter({ hasText: "All" }).first().click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /more from members/ }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /^Show all \d+ from members$/ }).click(); /* B164 (0.3.198): the line is a button */ await page.waitForTimeout(300);
   await page.getByRole("button", { name: `Open ${R.koupepia.title}` }).click(); await page.waitForTimeout(700);
   await page.getByRole("button", { name: "All of Tester3's recipes ›" }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".recipe-tile").count() === 2 && /made=Tester3/.test(page.url()), "MB: All of Tester3's recipes › opens his recipes: " + page.url());
