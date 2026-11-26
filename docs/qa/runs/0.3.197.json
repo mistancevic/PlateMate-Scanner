@@ -1,0 +1,989 @@
+{
+ "version": "0.3.197",
+ "commit": "d7ebe03",
+ "at": "2026-11-26T07:08:34.829Z",
+ "minutes": 2,
+ "flows": [
+  {
+   "file": "accessibility.cjs",
+   "about": "0.3.109 (Coach Milan 7 November 21:03): an automatic accessibility check at every release, so nothing gets worse. axe-core runs the WCAG 2.2 AA rules (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) on every main screen in English, and on the most used ones in Srpski and German, then on the home page in all three. A finding names the screen, the rule and an example. The full manual pass (screen readers, large text) is parked until there is a reason for it (DT235).",
+   "pass": true,
+   "seconds": 63,
+   "checks": [
+    {
+     "ok": true,
+     "text": "en /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /my-recipes: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/profile: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/goal: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/lifestyle: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/training-week: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/shop: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/coach: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/summary: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/calendar: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /me/account: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/support: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en /menu/about: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "en cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "sr-Latn cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /today: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plan: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /plate: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /foods: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de /me: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de the recipe page: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "de cook mode: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /sr?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "the home page /de?home: WCAG 2.2 AA, automatic"
+    },
+    {
+     "ok": true,
+     "text": "save check: 87 account writes from 6 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "ai-label-and-try.cjs",
+   "about": "The AI label and the realistic photo test (0.2.13, Milan 16 October 2026, 18:43). A drawn cover published on chefmealan.com says Picture made with AI, on the page and in the list; a photo the cook marks as made with AI says so too; a page published before the label shows the label as a change to publish. The owner can try a realistic photo on the preview (here, with the test switch on); nothing is kept unless Use as cover. About sits at the bottom of the Menu.",
+   "pass": true,
+   "seconds": 18,
+   "checks": [
+    {
+     "ok": true,
+     "text": "About is the last item of the Menu: Me, How to, Foods, Settings, Share Chef Mealan, Support, Evals, Metrics, Running costs, About"
+    },
+    {
+     "ok": true,
+     "text": "a cook"
+    },
+    {
+     "ok": true,
+     "text": "the Publish sheet opens"
+    },
+    {
+     "ok": true,
+     "text": "a drawn cover is marked made with AI, and stays marked"
+    },
+    {
+     "ok": true,
+     "text": "the coach makes it live"
+    },
+    {
+     "ok": true,
+     "text": "the page knows its photo is made with AI"
+    },
+    {
+     "ok": true,
+     "text": "the page says Picture made with AI"
+    },
+    {
+     "ok": true,
+     "text": "the list says it too"
+    },
+    {
+     "ok": true,
+     "text": "the owner can try a realistic photo, with three models"
+    },
+    {
+     "ok": true,
+     "text": "a test asks for a realistic photo from the model picked"
+    },
+    {
+     "ok": true,
+     "text": "the test picture shows, and nothing is kept yet"
+    },
+    {
+     "ok": true,
+     "text": "Use as cover: the realistic picture leads, known as made with AI"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "design-rules.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 20 October 2026, 07:06 to 07:30, boards DS1 and DS2): the design system's button rules. A: one filled, wide button per screen, the main step; every other action is outlined. B: a card's buttons share one row under everything else in the card, the card's full width. C: an answer is a chip, never a button. D: Today has no wide button; a next meal with nothing planned is a card with Pick a meal and Make it on the Plate. E: Back sits top left, above the step bar, and says where it goes. Never rewrite these lines to fit a change. Added by stories DS4 G and DS5 H (Milan 08:49 to 09:30, boards DS4 and DS5): a page's title comes first, under Back: a recipe's name before its photo. On /built a link inside a sentence is underlined, and each part has one filled button. Added by story DT305 (Coach Milan 16 November 2026, 10:04 to 10:49, boards Stories230 and Stories231; written down in docs/rules/design.md as D6 and D7): an answer to tick sits under its question in its own block; the buttons of a section sit under the whole section in one row. Guarded on the read of a photo, in photo-read.cjs. Added by story DT349 (Coach Milan 24 November 2026, 07:42; 25 November 13:16 and 14:26; written down as D14): I, every PD card is PdCard, PD and its words on the left, the title and its rows on the right, its numbers under the card.",
+   "pass": true,
+   "seconds": 29,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B: I ate it and Change it share one row, the card's full width, equal widths"
+    },
+    {
+     "ok": true,
+     "text": "B: Did you have it? I ate it, Change it, Skipped it, one row, edge to edge"
+    },
+    {
+     "ok": true,
+     "text": "C: How did it carry you? answers are chips"
+    },
+    {
+     "ok": true,
+     "text": "A: Sarma has no steps yet: Start cooking is grey, nothing else is filled: "
+    },
+    {
+     "ok": true,
+     "text": "A, B: Write my own is a button next to the other way, not a link"
+    },
+    {
+     "ok": true,
+     "text": "E: the recipe page's Back, Recipes, sits top left above the photo"
+    },
+    {
+     "ok": true,
+     "text": "G: the recipe's name comes first, under Back, before the photo"
+    },
+    {
+     "ok": true,
+     "text": "I: the recipe page's PD card is PdCard"
+    },
+    {
+     "ok": true,
+     "text": "I: the recipe page: PD and its number on the left, the title and Energy, Weight, Protein on the right: [[\"The whole recipe\",248],[\"PD\",38]]"
+    },
+    {
+     "ok": true,
+     "text": "I: the recipe's numbers open under the card, not inside it"
+    },
+    {
+     "ok": true,
+     "text": "A: on the Plate no Add in the food list is filled: "
+    },
+    {
+     "ok": true,
+     "text": "I: the Plate's PD card is PdCard"
+    },
+    {
+     "ok": true,
+     "text": "I: the Plate: PD and its number on the left, the title and Energy, Weight, Protein on the right: [[\"This plate\",274],[\"PD\",55]]"
+    },
+    {
+     "ok": true,
+     "text": "I: no numbers inside the Plate's card"
+    },
+    {
+     "ok": true,
+     "text": "E: Back sits top left, above the step bar: Back to the plate"
+    },
+    {
+     "ok": true,
+     "text": "E: no Back at the bottom of the step"
+    },
+    {
+     "ok": true,
+     "text": "D: in the evening Today has no wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: the Tomorrow card still opens tomorrow's plan"
+    },
+    {
+     "ok": true,
+     "text": "D: lunch with nothing planned is a card, not a wide button"
+    },
+    {
+     "ok": true,
+     "text": "D: Pick a meal, Make it on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "D: Make it on the Plate opens the Plate for lunch"
+    },
+    {
+     "ok": true,
+     "text": "F: 11+ of 93 g fat, and the note: Why the +: Protein bar has no fat or carbs value, so fat and carbs are counted without it."
+    },
+    {
+     "ok": true,
+     "text": "F: its name opens it in Foods"
+    },
+    {
+     "ok": true,
+     "text": "H: a link inside a sentence is underlined"
+    },
+    {
+     "ok": true,
+     "text": "H: one filled button per part: [[\"Try it: the calculator on the home page\",true],[\"See it work\",false],[\"Read Worth Building\",false],[\"Notify me\",true],[\"Email Milan\",true],[\"Connect on LinkedIn\",false]]"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 118 account writes from 5 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "deutsch.cjs",
+   "about": "DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta). Settings, Language has three choices; Deutsch is kept on this phone, the page says lang=\"de\", the app's calls say de, and the screens are in German. German words are long, so the layout gets four fixes in German only: Today's buttons wrap into rows and stay on one line each, the Plate's Fit and Prepare go one under the other, a wide button takes two lines, and on a 360 px phone the goal line goes under a long title. No button's words are cut. English does not move.",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "in English the page says lang=en"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch (Beta) is a choice"
+    },
+    {
+     "ok": true,
+     "text": "Deutsch is kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the page says lang=de"
+    },
+    {
+     "ok": true,
+     "text": "the Language page is in German"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls say de, so Chef Mealan answers in German"
+    },
+    {
+     "ok": true,
+     "text": "the bar is in German: Heute"
+    },
+    {
+     "ok": true,
+     "text": "each Today button stays on one line: Mahlzeit wählen: Mittagessen (1), Tag planen (1), Gegessenes eintragen (1)"
+    },
+    {
+     "ok": true,
+     "text": "the main button takes its own row, after the other two"
+    },
+    {
+     "ok": true,
+     "text": "the meal keeps its capital: Mahlzeit wählen: Mittagessen"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on Today"
+    },
+    {
+     "ok": true,
+     "text": "no button is cut on the Plate: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/foods at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/plan at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/today at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: the goal line is whole, the menu button on the screen"
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: no button is cut: "
+    },
+    {
+     "ok": true,
+     "text": "/my-recipes at 360 px: nothing scrolls sideways"
+    },
+    {
+     "ok": true,
+     "text": "in English Today's three buttons stay on one row"
+    },
+    {
+     "ok": true,
+     "text": "save check: 72 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    }
+   ]
+  },
+  {
+   "file": "language.cjs",
+   "about": "DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English, Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "Language is a row that opens, no longer Coming soon"
+    },
+    {
+     "ok": true,
+     "text": "in English the app's calls carry no language"
+    },
+    {
+     "ok": true,
+     "text": "three choices"
+    },
+    {
+     "ok": true,
+     "text": "English, Srpski (latinica), Deutsch (Beta) (0.3.92)"
+    },
+    {
+     "ok": true,
+     "text": "English is chosen at first"
+    },
+    {
+     "ok": true,
+     "text": "each choice is at least 44 px: 75, 93, 92"
+    },
+    {
+     "ok": true,
+     "text": "Srpski is chosen, ticked"
+    },
+    {
+     "ok": true,
+     "text": "kept on this phone"
+    },
+    {
+     "ok": true,
+     "text": "the app's calls now say the language, so his AI answers come in Serbian"
+    },
+    {
+     "ok": true,
+     "text": "the Settings line says what is in Serbian so far"
+    },
+    {
+     "ok": true,
+     "text": "still Srpski after opening again"
+    },
+    {
+     "ok": true,
+     "text": "in Srpski the header's PD has a decimal comma: TanjirOdržavanje · PD 4,8 danas"
+    },
+    {
+     "ok": true,
+     "text": "the header and the bar say the same: Danas"
+    },
+    {
+     "ok": true,
+     "text": "a ticked line shows in Srpski: Na tvom tanjiru"
+    },
+    {
+     "ok": true,
+     "text": "English again: a decimal point"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 24 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "publish-names.cjs",
+   "about": "JOURNEY INVARIANT (Milan, 23 October 2026, 23:27, after Sarma's live page still said Rice, cooked once rice was swapped for oats): the names a recipe's page gives its foods belong to the foods, not to their places in the list. A food that takes another's place gets its own name on the page, never the old food's; a name the person gave a food stays with that food. Never rewrite these lines to fit a change.",
+   "pass": true,
+   "seconds": 7,
+   "checks": [
+    {
+     "ok": true,
+     "text": "the oats row is named Oats, not the rice it replaced: Oats"
+    },
+    {
+     "ok": true,
+     "text": "a name the person gave a food stays with it: White cabbage"
+    },
+    {
+     "ok": true,
+     "text": "the draft keeps each name with its food's id: [[\"White cabbage\",\"Beef mince\",\"Porridge oats\"],[\"cab\",\"min\",\"oat\"]]"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 25 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-centre.cjs",
+   "about": "The recipe page at the centre (0.2.25, canvas board RP, RP1 to RP5b; Milan 17 October 2026, 17:42 to 18:23). A recipe from a link: the original is the steps, numbered, headings in bold, the page's signs read as letters; a line says the original works with your foods; Chef Mealan's way on a tap, then a toggle. PD sits above the table, as on the Plate; each column says its weight. How to make it says what you make and what you eat. A changed dish: the line says what differs. Every recipe made ends on its page; a plate that is no recipe ends on Today. Today has no camera; Manual, then Scan. 0.3.157 (DT308, the meal model; Coach Milan, Go 18 November 11:14), changed by the story: no meal is guessed, so Save on Eat asks for the meal; this walkthrough taps the marked one (eat-save.cjs). changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it? changed by B168 (0.3.193): the recipe page's PD card is the whole recipe as written; one serving is in the Nutrition table",
+   "pass": true,
+   "seconds": 29,
+   "checks": [
+    {
+     "ok": true,
+     "text": "RP5: Today has no Scan food"
+    },
+    {
+     "ok": true,
+     "text": "RP5b: Recipe photo, Recipe link, and Photo or scan on the right (Recipe link | Photo or scan)"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the read card shows the steps with the foods"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the Plate shows the recipe's steps to review before Make it"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the original is the steps, numbered"
+    },
+    {
+     "ok": true,
+     "text": "RP1b: the page's signs read as letters; a range reads 10 to 20"
+    },
+    {
+     "ok": true,
+     "text": "RP1: the page's heading in bold"
+    },
+    {
+     "ok": true,
+     "text": "RP1: a line says the original works; Chef Mealan's way on a tap"
+    },
+    {
+     "ok": true,
+     "text": "RP2: the three tiles gave way"
+    },
+    {
+     "ok": true,
+     "text": "RP2: the readout above the table, the whole recipe, then the four letters (The whole recipePD1.31.2 under your 2.5Energy4,548 kcalWeight1,131 gProtein58 gfc-fi?p-›)"
+    },
+    {
+     "ok": true,
+     "text": "RP2: each column says its weight (1 SLICE94 gALL 121,131 g100 G)"
+    },
+    {
+     "ok": true,
+     "text": "RP2: PD is no row of the table"
+    },
+    {
+     "ok": true,
+     "text": "RP1c: Chef Mealan's steps and the original, one tap apart"
+    },
+    {
+     "ok": true,
+     "text": "RP1c: the original is one tap away"
+    },
+    {
+     "ok": true,
+     "text": "RP1b: your dish differs: the line says how; the original for the original foods (No longer No-bake cheesecake: its foods are gone. The plate is yours. Back to the platePrepMakeEatHow to make No-bake cheesecake, more proteinNo steps yet for your changed dish.What you makeThe whole )"
+    },
+    {
+     "ok": true,
+     "text": "RP3: You make, You eat, each with weight and energy"
+    },
+    {
+     "ok": true,
+     "text": "RP4: the changed dish, saved, opens on its page"
+    },
+    {
+     "ok": true,
+     "text": "RP4: a recipe made again ends on its page"
+    },
+    {
+     "ok": true,
+     "text": "RP4: a plate that is no recipe ends on Today (/today)"
+    },
+    {
+     "ok": true,
+     "text": "No page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 35 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "recipe-photos.cjs",
+   "about": "The recipe's page (0.2.5+r11, canvas board S3, R7 to R11, Milan 12 October 2026). R7: a tile is one tap, no buttons, the cover and where the recipe is. R8: the recipe's page, photos first: × deletes after Sure?, Add adds, the plate photos from the times it was made are offered. R9: ‹ › move the picked photo; first place is the cover. R10: Make it (the recipe on the Plate, unchanged) and Edit recipe. R11: edit mode, grams, × a food, Add a food, steps, Save changes or Cancel. A long name never makes the page wider than the phone. A live recipe whose page has a photo and the app none takes the page's photo once as its cover, and a removed cover never comes back from the page. changed by DT349 (0.3.193, AC9): Change it first is Put it on the Plate, in What do you do with it? changed by DT349 (0.3.193, design rule D14): the PD card has two columns; Energy, Weight and Protein are .rd-rows, whole grams",
+   "pass": true,
+   "seconds": 16,
+   "checks": [
+    {
+     "ok": true,
+     "text": "R4: the live recipe takes its page's photo as the cover (1 fetch)"
+    },
+    {
+     "ok": true,
+     "text": "R7: no buttons on the tile; it says Live on chefmealan.com"
+    },
+    {
+     "ok": true,
+     "text": "R7: a recipe without photos of its own still shows its card's plate photo"
+    },
+    {
+     "ok": true,
+     "text": "R8: the page opens with the cover large"
+    },
+    {
+     "ok": true,
+     "text": "the long name never makes the page wider than the phone (360 px)"
+    },
+    {
+     "ok": true,
+     "text": "R8: the recipe's numbers: 365 kcal, 44 g protein"
+    },
+    {
+     "ok": true,
+     "text": "R9: × asks Sure? first; nothing is deleted on the first tap"
+    },
+    {
+     "ok": true,
+     "text": "R9: the second tap deletes the photo"
+    },
+    {
+     "ok": true,
+     "text": "R4: a removed cover never comes back from the page"
+    },
+    {
+     "ok": true,
+     "text": "R8: Add adds a photo, twice"
+    },
+    {
+     "ok": true,
+     "text": "DT280: Make it the cover: the picked photo is the cover"
+    },
+    {
+     "ok": true,
+     "text": "R11: Editing the recipe"
+    },
+    {
+     "ok": true,
+     "text": "R11: the numbers follow as you type: 398 kcal, 50 g protein, PD 12.6"
+    },
+    {
+     "ok": true,
+     "text": "R11: Cancel leaves the recipe as it was"
+    },
+    {
+     "ok": true,
+     "text": "R13a: a tap on a food puts it in the step with its amount; a food in no step is named: Fold in 100 g chicken breast  | Skyr, natural is not in any step yet."
+    },
+    {
+     "ok": true,
+     "text": "R13a: every food in a step says so"
+    },
+    {
+     "ok": true,
+     "text": "R13b: the amount in the step follows the foods: 120 g"
+    },
+    {
+     "ok": true,
+     "text": "R11: a live recipe says the live page changes only with Change live page"
+    },
+    {
+     "ok": true,
+     "text": "R11: Save changes keeps the foods, the grams and the steps: Eggs 120, Chicken breast, cooked 100, Skyr, natural 100"
+    },
+    {
+     "ok": true,
+     "text": "R13: the steps read with the amounts on the recipe's page: Steps1Whisk 2 eggs (L)2Fold in 100 g chicken breast and cook slowly.3Serve with 100 g SkyrPhotos for the steps come from cooking: + Photo on a step in Make. Tap a photo to change or remove it.Add photos to the stepsPick several at once from your phone. Then you place each one on its step.Start cooking3 steps, read aloud. Say next, back or "
+    },
+    {
+     "ok": true,
+     "text": "R10: Make it opens the recipe on the Plate"
+    },
+    {
+     "ok": true,
+     "text": "R10: Make it leaves the recipe as it is"
+    },
+    {
+     "ok": true,
+     "text": "the photos stay after a reload, the cover first"
+    },
+    {
+     "ok": true,
+     "text": "0.3.134: the plate photo from the time it was made is the cover by itself; nothing left to offer"
+    },
+    {
+     "ok": true,
+     "text": "IM22: Delete recipe says what goes first: its photo"
+    },
+    {
+     "ok": true,
+     "text": "IM22: Delete recipe deletes the recipe and goes back to Recipes, saying what was done"
+    },
+    {
+     "ok": true,
+     "text": "no page errors "
+    },
+    {
+     "ok": true,
+     "text": "save check: 26 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "step-names.cjs",
+   "about": "B163 (0.3.189, board Stories290; Coach Milan, Go 23 November 2026, 20:57): a food's name in a step is cut only at a comma with a space after it, so Körniger Frischkäse Tworog 2,5% Fett stays whole; a pack's name (a barcode, or read from a label) stays as printed, with its capitals; a basic food is in small letters (2 eggs); the name comes from the food each time, so steps written before read right, on the recipe, in Edit recipe and in Start cooking. B169 (0.3.194, board B169, canvas Page 6; Coach Milan, Go 25 November 2026, 16:04): the app's first starter foods (typical values, check your pack) were saved as read from a label; they are basic foods, so a step names them in small letters.",
+   "pass": true,
+   "seconds": 3,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B163 AC1: the decimal comma stays: Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 3 g Alpen JodSalz and 2 eggs (L)."
+    },
+    {
+     "ok": true,
+     "text": "B163 AC2: a pack's name as printed"
+    },
+    {
+     "ok": true,
+     "text": "B163 AC3: basic foods in small letters, cut at a comma with a space"
+    },
+    {
+     "ok": true,
+     "text": "B169 AC1: a first starter food in small letters: Bake at 200 °C for 25 minutes and serve with 100 g rice."
+    },
+    {
+     "ok": true,
+     "text": "B169 AC3: a pack's name as printed, as before"
+    },
+    {
+     "ok": true,
+     "text": "B169 AC2: in Edit recipe too: Bake at 200 °C for 25 minutes and serve with 100 g rice."
+    },
+    {
+     "ok": true,
+     "text": "B163 AC4: steps written before, in Edit recipe: Mix 250 g Körniger Frischkäse Tworog 2,5% Fett, 3 g Alpen JodSalz and 2 eggs (L)."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 29 account writes from 1 phone state, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "steps-and-parts.cjs",
+   "about": "DT345 and B162 (0.3.188, boards Stories289 and Stories288; Coach Milan, Go 23 November 2026, 20:36), from his recipe Lazy burek: in Edit recipe, + Step here between two steps puts an empty step there with the cursor in it, saved in its place; + Add a step still adds at the end; an empty step goes on save. The recipe page shows each part once, in the order the parts first come; foods with no part last, under Other; a recipe with no parts shows no heading.",
+   "pass": true,
+   "seconds": 7,
+   "checks": [
+    {
+     "ok": true,
+     "text": "B162 AC1, AC2: each part once, no part last under Other: #Filling | Grainy cream cheese | Salt | Eggs | Feta, light | Avocado oil | #Base | Puff pastry | #Other | Sesame seeds"
+    },
+    {
+     "ok": true,
+     "text": "B162: nothing stored changes"
+    },
+    {
+     "ok": true,
+     "text": "DT345: a button between each two of five steps (+ Add a step since DT348, 0.3.197): 4"
+    },
+    {
+     "ok": true,
+     "text": "DT345: 44 px or more"
+    },
+    {
+     "ok": true,
+     "text": "DT345 AC1: an empty step 4, the cursor in it: Step 4"
+    },
+    {
+     "ok": true,
+     "text": "DT345 AC1: six steps now"
+    },
+    {
+     "ok": true,
+     "text": "DT345 AC2, AC3, AC4: saved in its place, the end step at the end, the empty one gone: 7"
+    },
+    {
+     "ok": true,
+     "text": "B162 AC3: no parts, no heading"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 66 account writes from 2 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "steps-one-button.cjs",
+   "about": "DT348 (0.3.197, board DT348, canvas Page 6; Coach Milan, Go 26 November 2026, 08:03). One button to add a step: + Add a step, the app's outlined button (14 px corners, D9), 44 px high (D10), under each step with 8 px above and below, between steps and after the last; + Step here is gone. Its screen reader label says where. The publish sheet writes steps with the same editor.",
+   "pass": true,
+   "seconds": 12,
+   "checks": [
+    {
+     "ok": true,
+     "text": "DT348 AC1: + Add a step under step 1 and step 2, the same outlined button, 44 px, 14 px corners; no + Step here: [[\"+ Add a step\",44,\"14px\"],[\"+ Add a step\",44,\"14px\"]]"
+    },
+    {
+     "ok": true,
+     "text": "DT348 AC1: 8 px above and below each button: 8, 8, 8, "
+    },
+    {
+     "ok": true,
+     "text": "DT348 AC3: the labels say where: Add a step between step 1 and step 2 | Add a step after step 2"
+    },
+    {
+     "ok": true,
+     "text": "DT348 AC2: step 3 opens with the cursor in it; + Add a step between 2 and 3 and under 3: Step 3"
+    },
+    {
+     "ok": true,
+     "text": "DT348 AC4: the publish sheet: + Add a step between and after, no + Step here"
+    },
+    {
+     "ok": true,
+     "text": "DT348 AC5 sr-Latn: the same words on both buttons, labels in sr-Latn: + Dodaj korak | Dodaj korak između koraka 1 i koraka 2 | Dodaj korak posle koraka 2"
+    },
+    {
+     "ok": true,
+     "text": "DT348 AC5 de: the same words on both buttons, labels in de: + Schritt hinzufügen | Einen Schritt zwischen Schritt 1 und Schritt 2 einfügen | Einen Schritt nach Schritt 2 einfügen"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 75 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  },
+  {
+   "file": "tester-fixes.cjs",
+   "about": "0.3.134 (Coach Milan 11 November 20:42 to 20:57, on a call with a tester; Go 20:46). On her recipe: (1) a recipe with no photo of its own takes its latest cook's photo as its cover, by itself; a cover you delete does not come back from that cook. (2) A recipe with no photo at all has one place to add one (the card), not three. (3) A pack's piece with no name of its own says piece in the language, no English s, decimals in the language. (4) In Edit, eggs are counted. (5) The food buttons under the steps say the amount as the step does (4 eggs (M)). (6) A tap on a food that is in a step takes it out.",
+   "pass": true,
+   "seconds": 10,
+   "checks": [
+    {
+     "ok": true,
+     "text": "(1) the recipe with no photo took its cook's photo as its cover; the cook is marked used"
+    },
+    {
+     "ok": true,
+     "text": "(1) the page opens with the photo large, as the cover"
+    },
+    {
+     "ok": true,
+     "text": "(1) a cover you delete does not come back from that cook"
+    },
+    {
+     "ok": true,
+     "text": "(3) a piece with no name says 2 pieces, not 2 1s: Roggen Vollkornbrot            2 pieces100 g | Eggs            4 eggsM · 208 g | Orijenta salata            0.7 pieces20"
+    },
+    {
+     "ok": true,
+     "text": "(4) in Edit, eggs are counted: 4 eggs, with − and +"
+    },
+    {
+     "ok": true,
+     "text": "(4) + makes it 5 eggs"
+    },
+    {
+     "ok": true,
+     "text": "(5) the button says + 4 eggs (M), not 208 g Eggs: + 100 g Roggen Vollkornbrot | + 4 eggs (M) | + 20 g Orijenta salata"
+    },
+    {
+     "ok": true,
+     "text": "(6) the bread is in the step; its button says ✓"
+    },
+    {
+     "ok": true,
+     "text": "(6) a tap on ✓ takes it out of the step; the button says + again"
+    },
+    {
+     "ok": true,
+     "text": "(6) a food in a step is never put in a second time by its ✓ button"
+    },
+    {
+     "ok": true,
+     "text": "(2) no photo: the card is the one place to add one, no empty box, no Add tile"
+    },
+    {
+     "ok": true,
+     "text": "(2) exactly one place to add a photo"
+    },
+    {
+     "ok": true,
+     "text": "(3) Srpski: 2 kom. and 0,7 kom.: Roggen Vollkornbrot            2 kom.100 g | Eggs            4 jajetaM · 208 g | Orijenta salata            0,7 kom.20 g"
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
+    },
+    {
+     "ok": true,
+     "text": "save check: 81 account writes from 3 phone states, nothing the account refuses, no photo as text, the account's copy under 50 KB"
+    }
+   ]
+  }
+ ],
+ "reduced": "DT348 Light plus the German sweep: the step editor and its words"
+}
