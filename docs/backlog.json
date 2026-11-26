@@ -4531,14 +4531,14 @@
     },
     {
       "id": "DT348",
-      "title": "One button to add a step: + Step here, also after the last step",
+      "title": "One button to add a step: + Add a step, between steps and after the last",
       "epic": "cook",
       "state": "next",
-      "why": "Coach Milan 23 November 2026, 23:50, looking at the board B165 and B166: + Add a step and + Step here are two different buttons for the same job; should they be one kind? 23:59: yes, add it as Next. Proposed: + Step here between steps and after the last one; + Add a step goes. Wherever steps are written: Edit recipe and the publish sheet. Not drawn. 25 November 20:18: draw. Drawn 20:50 with its agreement.",
+      "why": "Coach Milan 23 November 2026, 23:50, looking at the board B165 and B166: + Add a step and + Step here are two different buttons for the same job; should they be one kind? 23:59: yes, add it as Next. Proposed: + Step here between steps and after the last one; + Add a step goes. Wherever steps are written: Edit recipe and the publish sheet. Not drawn. 25 November 20:18: draw. Drawn 20:50 with its agreement. 26 November 01:28 to 01:41: the buttons are not the same again; + Add a step is the better label, the app's outlined button (not round like a chip); yes, redraw. Redrawn 01:55.",
       "problem": "Writing steps, a step between two steps comes from + Step here, a dashed button under the step. A step after the last one comes from + Add a step, a filled button of another kind and another place. Same job, two looks, two words.",
       "story": "When I write a recipe's steps, I want one button to add a step wherever it goes, so that I learn it once.",
       "unchanged": [
-        "+ Step here between steps (DT345), and where it adds the step.",
+        "Where a button between steps adds the step (DT345).",
         "Enter in a step adds the next step.",
         "The foods under the steps, and the notes about foods in no step.",
         "Start cooking and the steps as read on the recipe page."
@@ -4550,28 +4550,28 @@
       "ac": [
         {
           "id": "AC1",
-          "title": "The same button after the last step",
-          "text": "Given Banana porridge with 2 steps, when I open Edit recipe, then under step 1 and under step 2 there is + Step here, the same dashed button, and there is no + Add a step"
+          "title": "One button, between and after",
+          "text": "Given Banana porridge with 2 steps, when I open Edit recipe, then under step 1 and under step 2 there is + Add a step, the same outlined button, 44 px high, and there is no + Step here"
         },
         {
           "id": "AC2",
           "title": "It adds step 3",
-          "text": "Given that, when I tap + Step here under step 2, then step 3 opens, empty, with the cursor in it, and + Step here is under step 3"
+          "text": "Given that, when I tap + Add a step under step 2, then step 3 opens, empty, with the cursor in it, and + Add a step is between step 2 and step 3 and under step 3"
         },
         {
           "id": "AC3",
           "title": "For a screen reader",
-          "text": "Given 2 steps, when a screen reader reads the button under step 2, then it says Add a step after step 2"
+          "text": "Given 2 steps, when a screen reader reads the buttons, then they say Add a step between step 1 and step 2 and Add a step after step 2"
         },
         {
           "id": "AC4",
           "title": "The publish sheet",
-          "text": "Given the same recipe in the publish sheet, when I read its steps, then the same: + Step here between and after the last, no + Add a step"
+          "text": "Given the same recipe in the publish sheet, when I read its steps, then the same: + Add a step between and after the last, no + Step here"
         },
         {
           "id": "AC5",
           "title": "In every language",
-          "text": "Given Srpski or German, when I open Edit recipe, then the button after the last step has the same words as the one between steps, and its screen reader label is in that language"
+          "text": "Given Srpski or German, when I open Edit recipe, then every button to add a step has the same words, and its screen reader label is in that language"
         }
       ]
     },

@@ -1,5 +1,6 @@
 // Board DT348 (Coach Milan 23 November 2026, 23:50 to 23:59, Next; 25 November 20:18: draw). One button to add a step:
-// + Step here between steps and after the last one; + Add a step goes. One editor (StepsEditor) writes the steps in Edit recipe
+// + Add a step, Coach Milan 26 November 01:40 to 01:41: + Add a step, the app's outlined button, between steps and after the last;
+// + Step here goes. One editor (StepsEditor) writes the steps in Edit recipe
 // and in the publish sheet. Before: main, 0.3.196 (BEFORE_ROOT, this repo, built). New: one scratch build of main with the
 // change (/home/claude/work/b348, not committed).
 const path = require("node:path"), fs = require("node:fs"), { spawn } = require("node:child_process");
@@ -42,8 +43,8 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
       return { y: a.top + scrollY - 12, h: Math.max(e ? e.bottom : a.bottom, ...notes) - a.top + 26 }; }, [from, to]);
     await p.screenshot({ path: `${R}/${name}.png`, fullPage: true, clip: { x: 0, y: Math.max(0, r.y), width: 390, height: r.h } }); console.log(name, Math.round(r.h)); };
   const ED = "section.rq-steps";
-  const LAST = "JS:document.querySelector('section.rq-steps .st-add, section.rq-steps .st-after')";
-  const BETWEEN = "JS:[...document.querySelectorAll('section.rq-steps .st-between:not(.st-after)')]";
+  const LAST = "JS:[...document.querySelectorAll('section.rq-steps .st-add, section.rq-steps .st-after')].pop()";
+  const BETWEEN = "JS:[...document.querySelectorAll('section.rq-steps .st-between')]";
   const runs = [["1", OLD_ROOT, "3727"], ["2", NEW_ROOT, "3728"]];
   for (const [row, root, port] of runs) {
     const isNew = row === "2"; let s;
@@ -51,16 +52,16 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
       s = await serve(root, port);
       const p = await open(port);
       await p.getByRole("button", { name: "Edit recipe", exact: true }).click(); await sleep(900);
-      console.log(await note(p, "JS:document.querySelector('section.rq-steps .st-between:not(.st-after)')", isNew
-        ? "<b>No change:</b> + Step here between two steps."
-        : "Between two steps: <b>+ Step here</b>, a dashed button.", [BETWEEN]));
+      console.log(await note(p, "JS:document.querySelector('section.rq-steps .st-between')", isNew
+        ? "<b>New:</b> between two steps, the same button as after the last step: <b>+ Add a step</b>, white with a blue border and 14 px corners, like every action button (D9). Its screen reader label still says where: Add a step between step 1 and step 2."
+        : "Between two steps: <b>+ Step here</b>, a dashed button, fully round like a chip.", [BETWEEN]));
       console.log(await note(p, LAST, isNew
-        ? "<b>New:</b> after the last step, the same button: <b>+ Step here</b>. + Add a step goes. One kind of button for one job. I tap it."
-        : "After the last step: <b>+ Add a step</b>, a filled button of another kind, for the same job. I tap it.", [LAST]));
+        ? "<b>New:</b> + Add a step after the last step keeps its words and look; it is now 44 px high (D10) and sits under the step like the others, and its screen reader label says Add a step after step 2. One kind of button for one job. I tap it."
+        : "After the last step: <b>+ Add a step</b>, a button of another kind (white, blue border, 14 px corners, 36 px high), for the same job. I tap it.", [LAST]));
       await shot(p, `48-${row}a`, ED, ED); await clean(p);
-      await p.locator(LAST.slice(3).includes("st-add") ? "section.rq-steps .st-add, section.rq-steps .st-after" : "").first().click(); await sleep(600);
+      await p.locator("section.rq-steps .st-add").last().click(); await sleep(600);
       console.log(await note(p, "JS:[...document.querySelectorAll('section.rq-steps .st-row')].pop()", isNew
-        ? "<b>No change:</b> step 3 opens, empty, ready to write. Below it, + Step here again."
+        ? "<b>No change:</b> step 3 opens, empty, ready to write. + Add a step between 2 and 3, and below step 3."
         : "Step 3 opens, empty, ready to write. Below it, + Add a step again.", ["JS:[...document.querySelectorAll('section.rq-steps .st-row')].pop()"]));
       await shot(p, `48-${row}b`, ED, ED); await clean(p);
       // the publish sheet writes steps with the same editor
@@ -68,9 +69,9 @@ const serve = async (root, port) => { const s = spawn(process.execPath, ["dist/s
       await p.evaluate(() => { const st = document.createElement("style"); st.textContent = "header, .topbar, .bottom-nav, nav { position: static !important; } .bottom-nav, .chat-fab { display: none !important; }"; document.head.append(st); });
       await p.locator(".rq-pub").getByRole("button", { name: /^(Publish|Continue)$/ }).click(); await sleep(900);
       const SH = "JS:document.querySelector('.publish-sheet .st')";
-      const SLAST = "JS:document.querySelector('.publish-sheet .st-add, .publish-sheet .st-after')";
-      console.log(await note(p, SLAST, isNew ? "<b>New:</b> the publish sheet writes steps with the same editor, so it changes the same way: + Step here after the last step."
-        : "The publish sheet writes the steps with the same editor: + Step here between, + Add a step after the last.", [SLAST, "JS:[...document.querySelectorAll('.publish-sheet .st-between:not(.st-after)')]"]));
+      const SLAST = "JS:[...document.querySelectorAll('.publish-sheet .st-add')].pop()";
+      console.log(await note(p, SLAST, isNew ? "<b>New:</b> the publish sheet writes steps with the same editor, so it changes the same way: + Add a step between and after."
+        : "The publish sheet writes the steps with the same editor: + Step here between, + Add a step after the last.", [SLAST, "JS:[...document.querySelectorAll('.publish-sheet .st-between')]"]));
       await p.setViewportSize({ width: 390, height: 1800 }); await sleep(400);
       await p.evaluate(() => document.querySelector(".publish-sheet .st").scrollIntoView({ block: "start" })); await sleep(400); await p.mouse.move(2, 2);
       const r = await p.evaluate(() => { const a = document.querySelector(".publish-sheet .st").closest("section, .card, div").getBoundingClientRect(); const z = [...document.querySelectorAll(".board-note")].map((n) => n.getBoundingClientRect().bottom); return { y: a.top - 12, h: Math.max(a.bottom, ...z) - a.top + 26 }; });
