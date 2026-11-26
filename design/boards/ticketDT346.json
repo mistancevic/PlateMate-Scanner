@@ -1,0 +1,18 @@
+{
+  "id": "DT346",
+  "title": "Editing a recipe and making a new one look different",
+  "boardTitle": "DT346: editing a recipe, a recipe's copy on the Plate and a new dish look different",
+  "opportunity": {
+    "from": "Coach Milan's own look, 23 November 2026, 19:03, after making a recipe of his own, Lazy Burek.",
+    "job": "Change a recipe, or cook a changed version of it once, and know which of the two he is doing.",
+    "kind": "Did not find it or did not understand it: the three states look alike, so it is not clear where a change goes.",
+    "why_now": "In Now with the Recipes batch (Coach Milan 26 November 10:32), with the design rules D10, D15 and D16 applied to what it touches."
+  },
+  "problem": "Changing the recipe itself, changing a copy of it on the Plate, and making a new dish on the Plate look almost the same. Nothing says where a change goes: to the recipe, to this meal only, or to a new recipe. On the Plate the answer comes at the end, at Eat, and for a recipe that says how many servings it makes it never comes.",
+  "story": "When I change the foods of a recipe, I want to see at once whether I am changing the recipe or only what I cook now, so I never change it by mistake and never lose a change I meant to keep.",
+  "now": "In main, 0.3.200, four rows below. <b>DT346.1</b> Edit recipe changes the recipe in place; the only sign is the small tag Editing the recipe. <b>DT346.2</b> Put it on the Plate, a recipe that makes 4 servings: the Plate says From your screenshot, and Eat says the recipe is in My recipes already; the change stays on that meal and the recipe keeps 375 g. <b>DT346.3</b> Put it on the Plate, a recipe for one plate: From My recipes, and Eat asks Update my recipe, Save as a new recipe or Only this time. <b>DT346.4</b> a new dish: Name it, or keep the foods' name, and Save in My recipes at Eat. 3b and 4b are the same screen but for one line.",
+  "found": "Found while drawing, all in main 0.3.200: 1. the second state is two: a recipe with servings and one without behave differently (DT346.2, DT346.3). 2. A recipe made by hand that says how many servings it makes is called From your screenshot on the Plate (DT346.2b). 3. A change on the Plate to such a recipe never reaches it, and nothing asks (DT346.2e, 2f). 4. Save it to My recipes shows on the Plate for a recipe that is in My recipes already (DT346.3b). 5. The design rules: Cancel in Edit recipe has 12 px corners, not 14 (D16, DT346.1b); Eat's choices, Update my recipe and Yes, save it, are 34 px high, under 44 (D10, DT346.3e, 4e); the main buttons sit 6 px apart on the Plate (Prepare it, Save it to My recipes), 22 px apart in Edit recipe.",
+  "proposed": "Not yet. Next: choose how each state looks, on this board.",
+  "looked_at": "Nothing yet.",
+  "decision": "Scope, Coach Milan 26 November 14:25: draw the states as they are in main first; make them look clearly different, with the design rules (D10, D15, D16, type weights 400, 600, 700, 900) applied to what it touches. Out: cook mode, a member's recipe page, Plan. No look chosen yet."
+}
