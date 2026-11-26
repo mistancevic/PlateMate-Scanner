@@ -64,7 +64,7 @@ const card = { id: "c1", meal: { ...sandwich }, recipeId: "m-s", status: "eaten"
     ok(await page.getByRole("textbox", { name: "Step 1" }).locator("[data-item]").count() === 1 && /^✓/.test((await page.locator(".st-chip").filter({ hasText: "Roggen" }).textContent()).trim()), "(6) the bread is in the step; its button says ✓");
     await page.locator(".st-chip").filter({ hasText: "Roggen" }).click(); await page.waitForTimeout(200);
     ok(await page.getByRole("textbox", { name: "Step 1" }).locator("[data-item]").count() === 0 && /^\+/.test((await page.locator(".st-chip").filter({ hasText: "Roggen" }).textContent()).trim()), "(6) a tap on ✓ takes it out of the step; the button says + again");
-    await page.getByRole("button", { name: "+ Add a step" }).click(); await page.waitForTimeout(200);
+    await page.getByRole("button", { name: /^Add a step after step \d+$/ }).click(); /* DT348 (0.3.197): its label says where */ await page.waitForTimeout(200);
     await page.locator(".st-chip").filter({ hasText: "Eggs" }).click(); await page.waitForTimeout(200);
     await page.locator(".st-chip").filter({ hasText: /eggs/ }).click(); await page.waitForTimeout(200);
     ok(await page.locator("[data-item]").count() === 0, "(6) a food in a step is never put in a second time by its ✓ button");

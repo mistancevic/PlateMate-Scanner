@@ -140,7 +140,8 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
     <div className="st">
       {rows.map((key, k) => (<div key={key}>
         {/* DT345 (0.3.188, board Stories289; Go 23 November 2026, 20:36): a step can go between two steps */}
-        {k > 0 && <button type="button" className="st-between" aria-label={w("steps.addBetween", { a: k, b: k + 1 })} onMouseDown={(e) => e.preventDefault()} onClick={() => addRow(k - 1)}>{w("steps.stepHere")}</button>}
+        {/* DT348 (0.3.197): one button to add a step, + Add a step, the round outlined button, between steps and after the last */}
+        {k > 0 && <button type="button" className="pill pill-small pill-action st-step st-between" aria-label={w("steps.addBetween", { a: k, b: k + 1 })} onMouseDown={(e) => e.preventDefault()} onClick={() => addRow(k - 1)}>{w("steps.addAStep")}</button>}
         <div className="st-row">
           <span className="st-n">{k + 1}</span>
           <div className="st-field" role="textbox" aria-label={w("steps.stepN", { n: k + 1 })} aria-multiline="false" contentEditable suppressContentEditableWarning
@@ -152,7 +153,7 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
             data-placeholder={k === 0 ? w("steps.whiskTheEggsWithThe") : ""} />
         </div>
       </div>))}
-      <button type="button" className="pill pill-small pill-action st-add" onClick={() => addRow(rows.length - 1)}>{w("steps.addAStep")}</button>
+      <button type="button" className="pill pill-small pill-action st-step st-add" aria-label={w("steps.addAfter", { n: rows.length })} onMouseDown={(e) => e.preventDefault()} onClick={() => addRow(rows.length - 1)}>{w("steps.addAStep")}</button>
       {shown.length > 0 && (
         <div className="st-foods">
           <small>{w("steps.tapAFoodToPut")}</small>

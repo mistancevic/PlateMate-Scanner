@@ -6463,7 +6463,7 @@
     "other": "{n} meals eaten before keep their foods: what you ate stays as it was."
   },
   "recipechange.and": "and",
-  "steps.stepHere": "+ Step here",
   "steps.addBetween": "Add a step between step {a} and step {b}",
+  "steps.addAfter": "Add a step after step {n}",
   "recipe.otherPart": "Other"
 }

@@ -42,7 +42,7 @@ const PORT = "3613", U = `http://127.0.0.1:${PORT}`;
     ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals[0].items.map((i) => i.food.id).join(" "))) === "q p s e se f o", "B162: nothing stored changes");
     await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(500);
     const between = page.getByRole("button", { name: /^Add a step between step \d and step \d$/ });
-    ok(await between.count() === 4, "DT345: + Step here between each two of five steps: " + await between.count());
+    ok(await between.count() === 4, "DT345: a button between each two of five steps (+ Add a step since DT348, 0.3.197): " + await between.count());
     ok(await between.first().evaluate((e) => e.getBoundingClientRect().height >= 44), "DT345: 44 px or more");
     await page.getByRole("button", { name: "Add a step between step 3 and step 4" }).click(); await page.waitForTimeout(400);
     const focused = await page.evaluate(() => document.activeElement?.getAttribute("aria-label"));

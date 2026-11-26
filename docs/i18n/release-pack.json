@@ -1,6 +1,6 @@
 {
-  "release": "0.3.195",
-  "at": "2026-11-25T16:31:04.648Z",
+  "release": "0.3.197",
+  "at": "2026-11-26T07:04:32.034Z",
   "rows": [
     {
       "id": "screen.make.connectionLostHelp",
@@ -52868,23 +52868,6 @@
       "at": "2026-11-23T19:10:51.914Z"
     },
     {
-      "id": "screen.steps.stepHere",
-      "kind": "screen",
-      "key": "steps.stepHere",
-      "en": "+ Step here",
-      "forms": "plain",
-      "slots": [],
-      "area": "Recipes",
-      "where": "Recipes",
-      "sr": "+ Korak ovde",
-      "de": "+ Schritt hier",
-      "checked": true,
-      "beta": true,
-      "release": "0.3.188",
-      "order": 900000,
-      "at": "2026-11-23T19:37:18.930Z"
-    },
-    {
       "id": "screen.steps.addBetween",
       "kind": "screen",
       "key": "steps.addBetween",
@@ -53353,6 +53336,25 @@
       "release": "0.3.195",
       "order": 900001,
       "at": "2026-11-25T16:31:04.648Z"
+    },
+    {
+      "id": "screen.steps.addAfter",
+      "kind": "screen",
+      "key": "steps.addAfter",
+      "en": "Add a step after step {n}",
+      "forms": "plain",
+      "slots": [
+        "n"
+      ],
+      "area": "Recipes",
+      "where": "Recipes",
+      "sr": "Dodaj korak posle koraka {n}",
+      "de": "Einen Schritt nach Schritt {n} einfügen",
+      "checked": true,
+      "beta": true,
+      "release": "0.3.197",
+      "order": 900000,
+      "at": "2026-11-26T07:04:32.034Z"
     }
   ]
 }
