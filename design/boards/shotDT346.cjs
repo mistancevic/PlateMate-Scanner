@@ -4,8 +4,10 @@
 // servings it makes. So four rows: DT346.1 Edit recipe, DT346.2 Put it on the Plate with servings (Lazy Burek, 4),
 // DT346.3 Put it on the Plate for one plate (Feta omelette), DT346.4 a new dish on the Plate. Nothing in the app changes.
 const path = require("node:path"), fs = require("node:fs"), { spawn } = require("node:child_process");
-const ROOT = process.env.BEFORE_ROOT || path.resolve(__dirname, "../..");
-const { chromium } = require(ROOT + "/node_modules/playwright");
+// ROWS=new shoots DT346.5 and DT346.6 on a scratch build of main with the change (BOARD_ROOT, /home/claude/work/b346, not committed)
+const NEW = process.env.ROWS === "new";
+const ROOT = NEW ? (process.env.BOARD_ROOT || "/home/claude/work/b346") : (process.env.BEFORE_ROOT || path.resolve(__dirname, "../.."));
+const { chromium } = require(path.resolve(__dirname, "../../node_modules/playwright"));
 const R = process.env.BOARDS_SHOTS || "/home/claude/boards/rs346"; fs.mkdirSync(R, { recursive: true });
 const seed = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/flows/seed.json"), "utf8")); seed.items = [];
 const food = (id, name, calories, protein, carbs, fats, fiber, extra = {}) => ({ ...seed.foods[0], id, name, brand: "", source: "label", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, table: undefined, icon: undefined, places: [], ...extra });
@@ -31,7 +33,7 @@ const M = {};
       localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" }));
       localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z", aiConfirmedAt: "2026-10-06T09:00:00Z" }));
       localStorage.setItem("seeded", "1"); }, { ...seed, foods: [...seed.foods, Q, P, E, F], meals: [burek, omelette], feedback: [] });
-    await require(path.join(ROOT, "tests/flows/adult.cjs"))(p);
+    await require(path.resolve(__dirname, "../../tests/flows/adult.cjs"))(p);
     await p.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
     await p.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "A Balkan pie.", around: "", better_as: "" }) }));
     await p.goto(`http://127.0.0.1:${PORT}${url}`); await sleep(1800);
@@ -60,6 +62,7 @@ const M = {};
   const grams = (p, re, g) => p.getByLabel(re).first().fill(String(g)).then(() => p.getByLabel(re).first().press("Enter")).then(() => sleep(700));
   const tap = async (p, name) => { await p.getByRole("button", { name }).first().click(); await sleep(1000); };
   try {
+    if (!NEW) {
     // ---- DT346.1 Edit recipe on the recipe page ----
     let p = await open("/my-recipes/m-burek");
     const edit = "JS:[...document.querySelectorAll('.rq button')].find((b) => b.innerText.trim() === 'Edit recipe')";
@@ -157,5 +160,40 @@ const M = {};
     console.log(await note(p, sv, `Eat: <b>Save in My recipes</b>, with <b>Yes, save it</b>, <b>Not this one</b> and It makes more than one. The chips are ${px(m13)}.`, [sv]));
     await shot(p, "46-4e"); await clean(p);
     await p.context().close();
+    }
+    if (NEW) {
+    const eatSave = require(path.resolve(__dirname, "../../tests/flows/eat-save.cjs"));
+    const toEat = async (p, tag) => { await tap(p, "Prepare it ›"); await shot(p, `46-${tag}c`); await tap(p, "Lock it and cook ›"); await shot(p, `46-${tag}d`); await tap(p, "Cooked. Next: Eat ›"); await tap(p, "DaaM good"); };
+    for (const [tag, id, title, re, from, to] of [["5", "m-burek", "Lazy Burek", /Grams of Frischer/, 375, 300], ["6", "m-om", "Feta omelette", /Grams of Feta/, 50, 80]]) {
+      let p = await open(`/my-recipes/${id}`);
+      console.log(await note(p, ".rq-actions", `<b>No change:</b> ${title}'s page, What do you do with it?, the line: the recipe stays as it is. I tap Put it on the Plate.`, []));
+      await shot(p, `46-${tag}a`, ".rq-actions", ".rq-actions"); await clean(p);
+      await tap(p, "Put it on the Plate");
+      await grams(p, re, to);
+      const head = "JS:[...document.querySelectorAll('p, small, span, div')].find((e) => e.childElementCount === 0 && /^From My recipes/.test(e.innerText))";
+      const prep = "JS:[...document.querySelectorAll('button')].find((b) => b.innerText.trim() === 'Prepare it ›')";
+      const mc = await measure(p, `changed${tag}`, ".copy-changed"), mp = await measure(p, `prep${tag}`, prep);
+      if (tag === "5") console.log(await note(p, head, "<b>New:</b> a recipe I made says <b>From My recipes</b>, servings or not; <b>The whole recipe.</b> in place of as you mapped it, and the line under the chips says The whole recipe: 4 portions. From your screenshot stays for a recipe read from a screenshot.", [head]));
+      console.log(await note(p, ".copy-changed", `<b>New:</b> at the first change, under the title: <b>Changed from ${title}:</b> ${title === "Lazy Burek" ? "Frischer Blätterteig" : "Feta Leicht"} ${from} to ${to} g. The recipe stays as it is; Eat asks whether the change goes back to it. ${mc ? mc.h + " px, type 14 px, weights 400 and 700." : ""} It is not there before a change.`, [".copy-changed"]));
+      if (tag === "5") console.log(await note(p, prep, `<b>New:</b> after a change the main step is <b>Prepare it ›</b>, no longer Prepare it as it is (${px(mp)}). I tap it.`, [prep]));
+      else console.log(await note(p, prep, "<b>No change:</b> Prepare it › and Save it to My recipes, as in main. I tap Prepare it ›.", []));
+      await shot(p, `46-${tag}b`); await clean(p);
+      await toEat(p, tag);
+      await p.locator(".changed-ask").getByRole("button", { name: "Update my recipe" }).click(); await sleep(400);
+      const mk = await measure(p, `ask${tag}`, ".changed-ask .choice");
+      console.log(await note(p, ".changed-ask", tag === "5"
+        ? `<b>New:</b> Eat asks for a recipe with servings too: <b>Changed from your recipe Lazy Burek</b>, Frischer Blätterteig 375 to 300 g; <b>Update my recipe</b>, <b>Save as a new recipe</b>, <b>Only this time</b>, the default. The chips are ${px(mk)} (D10). I tap Update my recipe, then Save. With One portion on the plate, the change is scaled back: 94 to 70 g there makes 280 g in the recipe.`
+        : `<b>New:</b> the same question as before; the chips are ${px(mk)} (D10). I tap Update my recipe, then Save.`, [".changed-ask"]));
+      await shot(p, `46-${tag}e`); await clean(p);
+      await eatSave(p); await sleep(1200);
+      const st = await stored(p, id);
+      await p.goto(`http://127.0.0.1:${PORT}/my-recipes/${id}`); await sleep(1500);
+      await p.evaluate(() => { const st = document.createElement("style"); st.textContent = "header, .topbar, .bottom-nav, nav { position: static !important; } .bottom-nav, .chat-fab { display: none !important; }"; document.head.append(st); });
+      const g = st.items.find((i) => re.test("Grams of " + i.food.name)).grams;
+      console.log(await note(p, ".rq-foods", `<b>New:</b> back in Recipes, ${title} has ${g} g: Update my recipe changed the recipe.`, [".rq-foods"]));
+      await shot(p, `46-${tag}f`, ".rq-foods", ".rq-foods"); await clean(p);
+      await p.context().close();
+    }
+    }
   } catch (e) { console.log("ERR", e.message.slice(0, 500)); } finally { fs.writeFileSync(`${R}/measures.json`, JSON.stringify(M, null, 1)); await b.close(); s.kill(); }
 })();
