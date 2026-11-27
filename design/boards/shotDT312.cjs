@@ -114,14 +114,14 @@ const M = {};
     await tap(p, "Write my own"); await p.getByLabel(/Your steps/).fill("Fry the salmon for 3 minutes on each side.\nScramble the egg next to it."); await sleep(300);
     console.log(await note(p, ".plate-steps", "<b>New:</b> the steps are written on the Plate: <b>Write my own</b> opens here, one step per line, Keep my steps. Chef Mealan's draft lands in the same card. I tap Keep my steps.", [".plate-steps"]));
     await shot(p, "12-4a"); await clean(p); await tap(p, "Keep my steps");
-    console.log(await note(p, btn("Start cooking ›"), "<b>New:</b> the steps stay in view, Change the steps opens them again here. The Plate ends with <b>Start cooking ›</b> and Save it to My recipes.", [btn("Start cooking ›"), ".plate-steps"]));
+    console.log(await note(p, btn("Start cooking ›"), "<b>New:</b> the steps stay in view; Change the steps opens them again here. The Plate ends with <b>Start cooking ›</b>, filled: the one filled button, the main step (D1, D6; Coach Milan 16:01). Chef Mealan's first way, Add a protein base, is outlined with his hat; Save it to My recipes stays outlined.", [btn("Start cooking ›"), ".plate-steps"]));
     await shot(p, "12-4b"); await clean(p); await tap(p, "Start cooking ›");
     await shot(p, "12-4c"); await tap(p, "Cooked ›");
     await strip(p, "12-4d", "Eggs &amp; Salmon"); await how(p, "12-4e", "Save in My recipes is asked here, as before."); await p.context().close();
     // ---- DT312.6 a plate that is ready to eat, new ----
     p = await open("/plate"); await addFood(p, "Skyr"); await addFood(p, "Banana");
     const m3 = await measure(p, "eatIt", btn("Eat it ›"));
-    console.log(await note(p, btn("Eat it ›"), `<b>New:</b> nothing to cook, so the Plate ends with <b>Eat it ›</b> (${px(m3)}): no Prep, no Make. The three ways of How do you want to eat it? (DT312.5b) go away: they were the first mocked step of the flow, and the Plate builds much more now (Coach Milan 27 November 15:44).`, [btn("Eat it ›")]));
+    console.log(await note(p, btn("Eat it ›"), `<b>New:</b> nothing to cook, so the Plate ends with <b>Eat it ›</b>, filled (${px(m3)}): no Prep, no Make. The three ways of How do you want to eat it? (DT312.5b) go away: they were the first mocked step of the flow, and the Plate builds much more now (Coach Milan 27 November 15:44).`, [btn("Eat it ›")]));
     await shot(p, "12-6a"); await clean(p); await tap(p, "Eat it ›");
     await strip(p, "12-6b", "Skyr &amp; Banana"); await how(p, "12-6c", "Back leads to the plate."); await p.context().close();
     }
