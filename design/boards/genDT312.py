@@ -1,8 +1,8 @@
 # Board DT312 (27 November 2026; Coach Milan 14:29 and 14:33: pull it into Now, widen it, draw it; 16:16 and 16:17: one logic,
 # redraw). Left band, as in main 0.3.200: DT312.1 a recipe's copy from the Plate, DT312.3 a new dish, DT312.5 a ready plate,
 # DT312.7 from a recipe's page. Right band, new (a scratch build of main with the change): DT312.8 the ways in, DT312.9 the
-# one cook, DT312.10 after Cooked. The first drawing's rows DT312.2, DT312.4 and DT312.6 are replaced by these. Two bands
-# keep the board under 8000 px. No agreement block yet. Pictures from shotDT312.cjs.
+# one cook, DT312.10 after Cooked. The first drawing's rows DT312.2, DT312.4 and DT312.6 are replaced by these. Three bands
+# keep the board under 8000 px (DT312.12 and DT312.13 are the third). No agreement block yet. Pictures from shotDT312.cjs.
 import json, os, base64
 HERE = os.path.dirname(os.path.abspath(__file__))
 src = open(f"{HERE}/genDT308d.py").read(); exec(src[:src.index("\nstart(4)")])
@@ -28,9 +28,10 @@ def shot(x, y, name, title, status, note):
 CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.200")}
 B = Board()
 BG = 150; W2 = SX + 4 * (PW + G) - G + BG
-W = W2 + 5 * (PW + G) - G + 40
+W3 = W2 + 5 * (PW + G) - G + BG
+W = W3 + 4 * (PW + G) - G + 40
 parts = [("Ticket", "DT312. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT312, canvas Page 6."),
-  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> Left band, as in main 0.3.200, four ways through: DT312.1 a recipe's copy from the Plate, DT312.3 a new dish I cook, DT312.5 a plate that is ready to eat, DT312.7 from a recipe's page. Right band, new, one logic in three parts: <b>DT312.8 the ways in</b>, side by side, not a sequence; <b>DT312.9 the one cook</b>, the same for every way in; <b>DT312.10 after Cooked</b>, the endings side by side; <b>DT312.11</b> the same with a meal set on the Plate; <b>DT312.12</b> the Plate's main step pinned, as the phone shows it; <b>DT312.13</b> Chef Mealan's one question for a cooked meal that waits, with the time on each screen (between 13a and 13b no tap: time passes). The first drawing's rows DT312.2, DT312.4 and DT312.6 are replaced by DT312.8 to DT312.10. A blue outline marks what each yellow note is about; the sizes are measured on the page. The AI is off in this run, so the steps are written by hand."),
+  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> Left band, as in main 0.3.200, four ways through: DT312.1 a recipe's copy from the Plate, DT312.3 a new dish I cook, DT312.5 a plate that is ready to eat, DT312.7 from a recipe's page. Right band, new, one logic in three parts: <b>DT312.8 the ways in</b>, side by side, not a sequence; <b>DT312.9 the one cook</b>, the same for every way in; <b>DT312.10 after Cooked</b> with no meal set; <b>DT312.11</b> the same with a meal set on the Plate. Third band: <b>DT312.12</b> the Plate's main step pinned, as the phone shows it; <b>DT312.13</b> Chef Mealan's one question for a cooked meal that waits, with the time on each screen (between 13a and 13b no tap: time passes). The first drawing's rows DT312.2, DT312.4 and DT312.6 are replaced by DT312.8 to DT312.10. A blue outline marks what each yellow note is about; the sizes are measured on the page. The AI is off in this run, so the steps are written by hand."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
   ("In Coach Milan's words", "27 November 16:12, on the first drawing: cooking is starting with preparing ingredients first; which flow is here, why is there a difference from the other cooking flow? 16:16: it is important to have one logic. The mid process should be the same, only the inputs and what to do with the output should differ. That gives us a system that can be reused all over again, and users get used to the flows. 16:17: yes. 15:44: the three ways should go away. 15:50: Today is the place where we manage actions out of the Plate and from the Plan. 16:01: yes, filled. Before, 14:29: I think Prepare it is misleading. For me preparation sounds like go for it. While I am on the Plate I am crafting the recipe. I am redirected to a preparation page which is empty, no info from the Plate, but the steps to cook and lock it. Either we craft the cooking steps on the Plate page or we solve it differently. And especially three steps that are independent in the process. Cooking and later giving feedback on how it was is kind of a separate process: I am supposed to give feedback on the meal while I am about to start eating it, because that is the expected step after Make. 14:33: yes, definitely. Before: 18 November 10:05, the three ways were a chip solution with a fixed set, to get through the process quickly; the flow should be reconstructed to fit today's app."),
@@ -98,31 +99,34 @@ y = row(y, "DT312.9", "New: the one cook", NEW + ": the same for every way in", 
   ("12-9b", "The steps, one at a time", "same", "Voice or buttons; a photo on any step."),
   ("12-9c", "Done", "changed", "The meal's photo, How did the cooking go?, Cooked.")],
   ["tap<br>Step 1 ›", "tap Next ›<br>to the end"], 5)
-y = row(y, "DT312.10", "New: after Cooked", NEW + ": always the same; the last question depends on the way in", [
+y = row(y, "DT312.10", "New: after Cooked, no meal set", NEW + ": I ate it logs at once; How was it? is on the meal's card", [
   ("12-10a", "Today", "changed", "Ready to eat, I ate it."),
-  ("12-10b", "How was it? A recipe", "changed", "Nothing more asked; a changed copy: DT346."),
-  ("12-10c", "How was it? A new dish", "changed", "Save in My recipes."),
-  ("12-10d", "The Plate, ready to eat", "changed", "Eat it › skips the cook, leads to the strip."),
-  ("12-10e", "How was it? A ready plate", "changed", "The same page.")],
-  ["later, tap<br>I ate it", None, None, "tap Eat it,<br>later<br>I ate it"])
+  ("12-10b", "Which meal was it?", "changed", "Only when no meal was set."),
+  ("12-10c", "Today, logged", "changed", "In Today's meals; How was it? on the card."),
+  ("12-10d", "How was it?", "changed", "The meal's own page."),
+  ("12-10e", "The Plate, ready to eat", "changed", "Eat it › skips the cook, leads to DT312.10a.")],
+  ["later, tap<br>I ate it", "tap<br>Lunch", "tap How<br>was it?", None])
 y = row(y, "DT312.11", "New: with a meal set on the Plate", NEW + ": the meal sits in its place on Today", [
   ("12-11a", "The Plate, Lunch set", "same", "Meal and day: Lunch, 13:45."),
   ("12-11b", "Today, while cooking", "changed", "In Lunch's place: Cooking now, Go on."),
   ("12-11c", "Today, after Cooked", "changed", "In Lunch's place: I ate it."),
-  ("12-11d", "How was it?", "changed", "No Which meal is it?")],
+  ("12-11d", "Today, logged", "changed", "One tap; Lunch in Today's meals; How was it? on the card.")],
   ["tap Start<br>cooking,<br>Step 1,<br>✕ Close", "tap Go on,<br>Next to the<br>end, Cooked", "later, tap<br>I ate it"], 5)
+yM = y
+X0 = W3; y = 30
+B.html.append(f'<div style="position:absolute;left:{W3 - BG // 2 - 2}px;top:20px;width:4px;height:{max(yL, yM) - 40}px;background:#d1dcf0;border-radius:2px"></div>')
 y = row(y, "DT312.12", "New: the main step stays in view", NEW + ": the phone's screen, the button pinned above the tab bar", [
   ("12-12a", "The Plate, a recipe's copy", "changed", "Start cooking › pinned."),
   ("12-12b", "The Plate, a new dish", "changed", "The same place."),
   ("12-12c", "The Plate, ready to eat", "changed", "Eat it › in the same place.")],
-  [None, None], 5)
+  [None, None], 4)
 y = row(y, "DT312.13", "New: a cooked meal that waits", NEW + ": Chef Mealan asks once, after 30 minutes; the time is on each screen", [
   ("12-13a", "Today, 12:10", "same", "Cooked for lunch; it waits."),
   ("12-13b", "Today, 14:20", "changed", "Did you eat your Lazy Burek?"),
   ("12-13c", "Today, after Not yet", "changed", "It waits; no question again today."),
   ("12-13d", "Today, 12:45, no meal set", "changed", "The question in the strip's place.")],
-  [None, "tap<br>Not yet", None], 5)
-y = max(y, yL)
+  [None, "tap<br>Not yet", None], 4)
+y = max(y, yL, yM)
 Hc = max(y, 30 + HT.get("card", 2600) + 60)
 board("Stories302.dc.html", t["boardTitle"], "Drawn 27 November 2026, 15:10; redrawn 16:50 as one logic (Coach Milan 16:16 and 16:17). Ticket DT312, Kanban column Now; DT355 is merged into it. Left: four ways through as in main 0.3.200. Right, new: the ways in, the one cook, after Cooked. Pictures from the real app: main 0.3.200, and a scratch build of main with the change. Nothing in the app is changed yet. DT346 waits for this.", B, W, Hc, "Stories301.dc.html")
 print("DT312", W, Hc + 230)

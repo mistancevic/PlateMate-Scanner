@@ -107,7 +107,6 @@ const M = {};
     await shot(p, "12-7d"); await p.context().close();
     }
     if (NEW) {
-    const HOW = async (p, name, text, marks = []) => { console.log(await note(p, HEAD, text, [HEAD, ...marks])); await shot(p, name); await clean(p); };
     const cookThrough = async (p) => { await p.getByRole("button", { name: "Buttons only" }).click().catch(() => {}); await sleep(400); await p.getByRole("button", { name: /Step 1 ›/ }).first().click(); await sleep(600);
       for (let i = 0; i < 25 && !(await p.locator(".cook-to-eat").count()); i++) { await p.locator(".cook-mode").getByRole("button", { name: /^Next ›|^Done/ }).first().click(); await sleep(350); } };
     // ---- DT312.8 the ways in, side by side; DT312.9 the one cook; DT312.10 after Cooked ----
@@ -134,10 +133,7 @@ const M = {};
     const mc = await measure(p, "cooked", ".cook-to-eat");
     console.log(await note(p, ".cook-went", "<b>New, moved:</b> <b>How did the cooking go?</b> comes from the Make page onto the cook's last screen, with the photo of the meal.", [".cook-went"]));
     console.log(await note(p, ".cook-waits", `<b>New:</b> the cook ends with <b>Cooked ›</b> (${px(mc)}) and the line under it. The Make page is gone: its ticks, step photos, the meal's photo and the question are all in the cook. I tap Cooked ›.`, [".cook-to-eat"]));
-    await shot(p, "12-9c"); await clean(p); await p.locator(".cook-to-eat").click(); await sleep(1300);
-    console.log(await note(p, ".cook-strip", "<b>New:</b> after Cooked, always the same: <b>Ready to eat · Lazy Burek · I ate it ›</b>, on Today and on every page. Nothing is asked before I have eaten.", [".cook-strip"]));
-    await topShot(p, "12-10a"); await clean(p); await p.locator(".cs-main").click(); await sleep(1200);
-    await HOW(p, "12-10b", "<b>New:</b> <b>How was it?</b> opens from I ate it; no bar; Later today is gone. For <b>a recipe as it is</b> nothing more is asked: the card points at the recipe. For a changed copy the question of DT346 comes here: Update my recipe, Save as a new recipe, Only this time.");
+    await shot(p, "12-9c"); await clean(p);
     await p.context().close();
     // 8c, 8d a new dish on the Plate; 10c its ending
     p = await open("/plate"); await p.getByRole("button", { name: /Add/ }).nth(7).click(); await sleep(600); await addFood(p, "Salmon");
@@ -145,15 +141,23 @@ const M = {};
     console.log(await note(p, ".plate-steps", "<b>New:</b> the steps are written on the Plate: <b>Write my own</b> opens here, one step per line. Chef Mealan's draft lands in the same card. I tap Keep my steps.", [".plate-steps"]));
     await shot(p, "12-8c"); await clean(p); await tap(p, "Keep my steps");
     console.log(await note(p, btn("Start cooking ›"), "<b>New:</b> a new dish has the same <b>Start cooking ›</b>, filled, pinned on the phone (DT312.12b), and hands over the same three things. Chef Mealan's first way is outlined with his hat; Save it to My recipes stays outlined.", [btn("Start cooking ›"), ".plate-steps"]));
-    await shot(p, "12-8d"); await clean(p); await tap(p, "Start cooking ›"); await cookThrough(p); await p.locator(".cook-to-eat").click(); await sleep(1300); await p.locator(".cs-main").click(); await sleep(1200);
-    await HOW(p, "12-10c", "<b>A new dish:</b> the same page; its last question is <b>Save in My recipes</b>.", [".save-recipe"]);
+    await shot(p, "12-8d"); await clean(p); await tap(p, "Start cooking ›"); await cookThrough(p); await p.locator(".cook-to-eat").click(); await sleep(1300);
+    // ---- DT312.10 after Cooked, no meal set: I ate it logs at once (Coach Milan 18:55 and 19:00: the same experience for the same outcome) ----
+    console.log(await note(p, ".cook-strip", "<b>New:</b> after Cooked, always the same: <b>Ready to eat · Eggs &amp; Salmon · I ate it ›</b>, on Today and on every page. Nothing is asked before I have eaten. <b>I ate it</b> means what it means everywhere in the app: one tap, and the meal is logged.", [".cook-strip"]));
+    await topShot(p, "12-10a"); await clean(p); await p.locator(".cs-main").click(); await sleep(1500);
+    console.log(await note(p, ".eat-cal-only", "<b>New:</b> no meal was set on the Plate, so one thing is asked: <b>Which meal was your Eggs &amp; Salmon?</b> The calendar is the app's own, the meal by the clock marked. With a meal set this screen does not come (DT312.11d). I tap Lunch.", [".eat-cal-only"]));
+    await shot(p, "12-10b"); await clean(p); await p.locator(".eat-cal .pcal-row").filter({ hasText: /Lunch/ }).first().click(); await sleep(1800);
+    const mh = await measure(p, "howBtn", ".meal-how");
+    console.log(await note(p, ".log-card", `<b>New:</b> logged at once: Eggs &amp; Salmon is in <b>Today's meals</b>, as lunch, and the day counts it. The strip now waits for the 30 minutes question, as before. The card carries <b>How was it? ›</b> (${px(mh)}), the same button a planned meal gets after its I ate it. A new dish is not saved to My recipes by itself: the card's Save in My recipes does that, as on any meal.`, [".log-card"]));
+    await topShot(p, "12-10c"); await clean(p); await p.getByRole("button", { name: "How was it? ›" }).first().click(); await sleep(900);
+    console.log(await note(p, ".pm-form-title", "<b>New:</b> <b>How was it?</b> is the meal's own page, the one Change or delete opens today: how much, how it was, my words, a photo. One page for every logged meal, cooked or planned. The Eat page of main is gone. <b>Open:</b> more than one portion, It makes N for a new dish, and the recipe question of DT346 need a place here.", [".pm-form"]));
+    await shot(p, "12-10d"); await clean(p);
     await p.context().close();
     // 10d, 10e a plate with nothing to cook skips the middle
     p = await open("/plate"); await addFood(p, "Skyr"); await addFood(p, "Banana");
     const m3 = await measure(p, "eatIt", btn("Eat it ›"));
-    console.log(await note(p, btn("Eat it ›"), `<b>New:</b> nothing to cook, so the Plate ends with <b>Eat it ›</b>, filled (${px(m3)}), pinned on the phone (DT312.12c), and skips the cook. It leads to the same strip on Today: Ready to eat · Skyr &amp; Banana · I ate it ›. The three ways of How do you want to eat it? go away (Coach Milan 15:44).`, [btn("Eat it ›")]));
-    await shot(p, "12-10d"); await clean(p); await tap(p, "Eat it ›"); await p.locator(".cs-main").click(); await sleep(1200);
-    await HOW(p, "12-10e", "<b>A plate that was ready to eat:</b> the same page, the same questions; Back leads to the plate.");
+    console.log(await note(p, btn("Eat it ›"), `<b>New:</b> nothing to cook, so the Plate ends with <b>Eat it ›</b>, filled (${px(m3)}), pinned on the phone (DT312.12c), and skips the cook. It leads to the same strip on Today (DT312.10a): Ready to eat · Skyr &amp; Banana · I ate it ›, then the same logging. The three ways of How do you want to eat it? go away (Coach Milan 15:44).`, [btn("Eat it ›")]));
+    await shot(p, "12-10e"); await clean(p);
     await p.context().close();
     // ---- DT312.13 a cooked meal that waits: Chef Mealan asks once, 30 minutes after the later of the mealtime and Cooked ----
     const STY = "header, .topbar, .bottom-nav, nav { position: static !important; } .bottom-nav, .chat-fab { display: none !important; } .toast, .snack { display: none !important; } *:has(> .cook-mode) > *:not(.cook-mode), body:has(.cook-mode) header, body:has(.cook-mode) .topbar { display: none !important; } .cook-mode { position: static !important; overflow: visible !important; } .plate-card > .plate-end > .prepare-it.pill-primary, .plate-card > .ways-out-col > .pill-primary { position: static !important; box-shadow: none !important; width: 100% !important; } main { padding-bottom: 24px !important; }";
@@ -168,11 +172,11 @@ const M = {};
     const ma = await measure(p, "eatAsk", ".eat-ask-acts .pill");
     console.log(await note(p, ".next-cook", `<b>New:</b> 14:20, I open the app: 30 minutes after the later of the mealtime (13:45) and Cooked (12:10). Chef Mealan asks once, in the meal's place: <b>Did you eat your Lazy Burek?</b> with <b>Not after all</b>, <b>Not yet</b> and <b>I ate it ›</b> (${px(ma)}). Nothing is logged by itself, however long it waits.`, [".eat-ask"]));
     await topShot(p, "12-13b"); await clean(p); await p.getByRole("button", { name: "Not yet" }).click(); await sleep(700);
-    console.log(await note(p, ".next-cook", "<b>New:</b> after <b>Not yet</b>: the meal goes on waiting with I ate it ›, and the question does not come again today. I ate it › opens How was it? (DT312.11d). Not after all ends it; nothing is logged.", [".next-cook"]));
+    console.log(await note(p, ".next-cook", "<b>New:</b> after <b>Not yet</b>: the meal goes on waiting with I ate it ›, and the question does not come again today. I ate it › logs it (DT312.11d). Not after all ends it; nothing is logged.", [".next-cook"]));
     await topShot(p, "12-13c"); await p.context().close();
     p = await open("/plate"); await p.getByRole("button", { name: /Add/ }).nth(7).click(); await sleep(600); await addFood(p, "Salmon");
     await tap(p, "Start cooking ›"); await cookThrough(p); await p.locator(".cook-to-eat").click(); await sleep(1300); await later(p, "12:45");
-    console.log(await note(p, ".eat-ask-card", "<b>New, without a meal set:</b> 30 minutes after Cooked (12:10), the question takes the strip's place on Today. I ate it › then asks which meal it was, as Save does now.", [".eat-ask-card"]));
+    console.log(await note(p, ".eat-ask-card", "<b>New, without a meal set:</b> 30 minutes after Cooked (12:10), the question takes the strip's place on Today. I ate it › then asks which meal it was (DT312.10b).", [".eat-ask-card"]));
     await topShot(p, "12-13d"); await p.context().close();
     // ---- DT312.12 the main step stays in view: the phone's screen as it is, the tab bar and Chef Mealan's button in place ----
     const pinned = (t) => `JS:[...document.querySelectorAll('.plate-card button')].find((b) => b.innerText.trim() === ${JSON.stringify(t)})`;
@@ -210,8 +214,9 @@ const M = {};
     await p.locator(".cook-to-eat").click(); await sleep(1300);
     const mi = await measure(p, "slotAte", ".next-cook .pill");
     console.log(await note(p, ".next-cook", `<b>New:</b> after Cooked, the same place: <b>Lunch, 13:45 · Lazy Burek · Cooked, ready to eat · I ate it ›</b> (${px(mi)}). Without a meal set, the strip of DT312.10a stays.`, [".next-cook"]));
-    await topShot(p, "12-11c"); await clean(p); await p.getByRole("button", { name: "I ate it ›" }).click(); await sleep(1200);
-    await HOW(p, "12-11d", "<b>New:</b> How was it? for lunch. The meal is known, so Save asks no Which meal is it?; it is logged as Lunch.");
+    await topShot(p, "12-11c"); await clean(p); await p.getByRole("button", { name: "I ate it ›" }).click(); await sleep(2000);
+    console.log(await note(p, ".log-card", "<b>New:</b> one tap, logged: Lazy Burek is in Today's meals as <b>Lunch</b>, one portion of the four, 549 kcal; no question about the meal, it was set. Next is dinner. <b>How was it? ›</b> waits on the card; Open the recipe › and Change or delete › as on any meal.", [".log-card"]));
+    await topShot(p, "12-11d");
     await p.context().close();
     }
   } catch (e) { console.log("ERR", e.message.slice(0, 500)); } finally { fs.writeFileSync(`${R}/measures-${NEW ? "new" : "main"}.json`, JSON.stringify(M, null, 1)); await b.close(); s.kill(); }
