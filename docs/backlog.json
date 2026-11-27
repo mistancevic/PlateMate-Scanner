@@ -4708,6 +4708,13 @@
       "why": "Coach Milan 26 November 2026, 08:46: when I want to cook by the recipe and use the voice assistant, getting there is complex and I am lost on the way; I can imagine how hard it is for other users; it needs a general approach. 10:28: I started from the recipe, because that was the path that would for sure have cooking with voice; draw all the possible scenarios related to cooking with voice, then we analyse the process and the possibilities; a ticket for Next. Found 08:50 in main 0.3.197, from a recipe: Recipes, the recipe, Start cooking (at the bottom of the Steps card, under Add photos to the steps; the page's actions are Plan it and Put it on the Plate), then cook mode on the Plate (Back to making it) asks Turn voice on or Buttons only. Other ways in to draw: the Plate (Prep, Make), a planned meal on Today and in Plan, a member's recipe, an idea from Chef Mealan, Voice settings in the Menu. Near: DT252 (voice through the kitchen flow, later), VO1 (AI voices, later). Not drawn."
     },
     {
+      "id": "DT356",
+      "title": "The Plate's warnings say what they judge: a meal, my portion, or a whole recipe",
+      "epic": "plate",
+      "state": "next",
+      "why": "Coach Milan 27 November 2026, 16:01, on the DT312 board: we need to distinguish between the meal and the portion in the warning messages for the listed foods; on a plate I am creating, or with a recipe that came from another place, the message may be misleading. 16:08: yes, a ticket in Next. Found in main 0.3.200: the warnings (src/gates.ts, gateOn in src/screens/JourneyScreen.tsx) are off while the plate is a recipe as opened; any other plate is judged as one meal and the words say this meal with its grams (More than half of this meal's energy is fat: 58 percent, 30 g), also for a whole recipe I changed, a new dish that makes several servings (asked only at the end, It makes more than one), and a recipe from a member or a link once it is changed. The shares (fat, supplement protein, carbs) are the same for the whole and for one serving; the word meal, the grams and the size check (sizeOf, against one of my meals) are not. Proposed: the warning names what it judges, this recipe with its servings or my portion (nutrition rule N17), and a new dish can say on the Plate how many servings it makes. After DT312. Not drawn."
+    },
+    {
       "id": "B171",
       "title": "Testers' first names in the public repo: invented names instead",
       "epic": "trust",
