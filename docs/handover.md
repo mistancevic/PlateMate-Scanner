@@ -69,6 +69,10 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
+## State, 27 November 2026, 17:35
+
+- DT312, Coach Milan 17:27: yes to Chef Mealan's one question for a cooked meal that waits past its mealtime, never logged by itself. Not drawn yet (DT312.13); asked him when it should ask: proposed an hour after the mealtime, or two hours after Cooked when no meal is set; answers I ate it, Not yet, Not after all. The app's existing asks to build on: staleCook (a cook left open over a day) and Did you eat it? for an old plate.
+
 ## State, 27 November 2026, 17:30
 
 - DT312.12 drawn (Coach Milan 17:04 and 17:06): the board is now h 6262. Scratch b312, src/index.css: .plate-card > .plate-end > .prepare-it.pill-primary and .plate-card > .ways-out-col > .pill-primary are position fixed, left 16 px, right 82 px (beside the chat button), bottom 82 px, 48 px high; main gets 150 px padding at its end. Measured: 10 px from Chef Mealan's button, 7 px above the tab bar. The row's three pictures are the phone's screen (390 x 844), not tall pictures; the tall pictures lay the button out at the end (a board style). To check in the build: the planning buttons (Put it in ...) share the selector and get pinned too; a keyboard open over the pinned button. Asked, no answer yet: one question from Chef Mealan for a cooked meal that waits past its mealtime (risk 1 of the UX answer).
