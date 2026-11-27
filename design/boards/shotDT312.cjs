@@ -150,7 +150,7 @@ const M = {};
     const mh = await measure(p, "howBtn", ".meal-how");
     console.log(await note(p, ".log-card", `<b>New:</b> logged at once: Eggs &amp; Salmon is in <b>Today's meals</b>, as lunch, and the day counts it. The strip now waits for the 30 minutes question, as before. The card carries <b>How was it? ›</b> (${px(mh)}), the same button a planned meal gets after its I ate it. A new dish is not saved to My recipes by itself: the card's Save in My recipes does that, as on any meal.`, [".log-card"]));
     await topShot(p, "12-10c"); await clean(p); await p.getByRole("button", { name: "How was it? ›" }).first().click(); await sleep(900);
-    console.log(await note(p, ".pm-form-title", "<b>New:</b> <b>How was it?</b> is the meal's own page, the one Change or delete opens today: how much, how it was, my words, a photo. One page for every logged meal, cooked or planned. The Eat page of main is gone. <b>Open:</b> more than one portion, It makes N for a new dish, and the recipe question of DT346 need a place here.", [".pm-form"]));
+    console.log(await note(p, ".pm-form-title", "<b>New:</b> <b>How was it?</b> is the meal's own page, the one Change or delete opens today: how much, how it was, my words, a photo. One page for every logged meal, cooked or planned. The Eat page of main is gone; what it asked is here (DT312.14). For a new dish the last block is Save in My recipes.", [".pm-form"]));
     await shot(p, "12-10d"); await clean(p);
     await p.context().close();
     // 10d, 10e a plate with nothing to cook skips the middle
@@ -178,6 +178,22 @@ const M = {};
     await tap(p, "Start cooking ›"); await cookThrough(p); await p.locator(".cook-to-eat").click(); await sleep(1300); await later(p, "12:45");
     console.log(await note(p, ".eat-ask-card", "<b>New, without a meal set:</b> 30 minutes after Cooked (12:10), the question takes the strip's place on Today. I ate it › then asks which meal it was (DT312.10b).", [".eat-ask-card"]));
     await topShot(p, "12-13d"); await p.context().close();
+    // ---- DT312.14 the meal's page, How was it?: what the Eat page asked, moved as it was (Coach Milan 19:17) ----
+    const setLunch = async (q) => { await q.getByRole("button", { name: "Change what this plate is" }).click(); await sleep(700); await q.locator(".pcal-row").filter({ hasText: /Lunch/ }).first().click(); await sleep(600); await q.getByRole("button", { name: "Close" }).first().click().catch(() => {}); await sleep(400); };
+    const toHow = async (q) => { await tap(q, "Start cooking ›"); await cookThrough(q); await q.locator(".cook-to-eat").click(); await sleep(1300); await q.getByRole("button", { name: "I ate it ›" }).click(); await sleep(2000); await q.getByRole("button", { name: "How was it? ›" }).first().click(); await sleep(900); };
+    p = await open("/my-recipes/m-burek"); await tap(p, "Put it on the Plate"); await setLunch(p); await toHow(p);
+    await p.getByRole("button", { name: "One portion more" }).click(); await sleep(300);
+    const mq = await measure(p, "count", ".pm-count .pill");
+    console.log(await note(p, ".pm-portions", `<b>Moved from the Eat page:</b> for a recipe that makes several portions, <b>You made 4 portions. How many did you eat?</b> with − and + (${px(mq)}) and the numbers of what I ate. One portion was logged at I ate it; here I set 2: 1,097 kcal. Save changes puts that into the day.`, [".pm-portions"]));
+    await shot(p, "12-14a"); await p.context().close();
+    p = await open("/my-recipes/m-om"); await tap(p, "Put it on the Plate"); await setLunch(p); await grams(p, /Grams of Feta/, 80); await toHow(p);
+    const mr = await measure(p, "recipeChoice", ".pm-recipe .choice");
+    console.log(await note(p, ".pm-recipe", `<b>Moved from the Eat page, as main has it:</b> a recipe for one plate that I changed: <b>Changed from your recipe Feta omelette</b>, Feta Leicht 50 to 80 g; <b>Update my recipe</b>, <b>Save as a new recipe</b>, <b>Only this time</b>, the default (${px(mr)}). The same question for a recipe with servings, and the line on the Plate, are DT346.`, [".pm-recipe"]));
+    await shot(p, "12-14b"); await p.context().close();
+    p = await open("/plate"); await p.getByRole("button", { name: /Add/ }).nth(7).click(); await sleep(600); await addFood(p, "Salmon"); await setLunch(p); await toHow(p);
+    await p.getByRole("button", { name: "Yes, save it" }).click(); await p.getByRole("button", { name: "It makes more than one" }).click(); await sleep(300);
+    console.log(await note(p, ".pm-recipe", "<b>Moved from the Eat page:</b> a new dish: <b>Save in My recipes</b>, Yes, save it or Not this one, and <b>It makes</b> a number of portions. Not this one is the default: nothing is saved to My recipes by itself. Saying how many servings a dish makes already on the Plate is DT356.", [".pm-recipe"]));
+    await shot(p, "12-14c"); await p.context().close();
     // ---- DT312.12 the main step stays in view: the phone's screen as it is, the tab bar and Chef Mealan's button in place ----
     const pinned = (t) => `JS:[...document.querySelectorAll('.plate-card button')].find((b) => b.innerText.trim() === ${JSON.stringify(t)})`;
     const phone = async (url) => { const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, timezoneId: "Europe/Berlin" }); const q = await ctx.newPage();
