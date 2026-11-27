@@ -69,6 +69,10 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
+## State, 27 November 2026, 19:55
+
+- DT312, Coach Milan 19:27: one portion is the default at I ate it for a recipe with servings. He asked what else needs clarifying; listed in chat: the words (Cooked, Ready to eat, I ate it; Save changes on the meal's page), a dish with no steps (the button says Step 1), the pinned place for the planning buttons, one release or two, then the checks (Full proposed). Asked first: the words.
+
 ## State, 27 November 2026, 19:50
 
 - DT312.14 drawn (Coach Milan 19:13 and 19:17: DT312 moves what the Eat page does; new behaviour stays in DT346 and DT356). The board keeps w 4890, h 6191; row 14 is in the third band. Scratch b312, src/components/PastMeal.tsx: ChangeMeal gets pm-portions (a recipe with makes of 2 or more: You made N portions, how many did you eat, − and +, the numbers; the items are the recipe's at k of N), pm-recipe for a changed recipe for one plate (changedFrom: the recipe found for the card, no makes, no recipeId on the card, other foods or grams; Update my recipe writes the eaten items into the recipe, Save as a new recipe adds one with basedOn and points the card at it, Only this time is the default), and pm-recipe for a new dish (Yes, save it calls saveCardAsRecipe, It makes N sets makes on it; Not this one is the default); the after work is done in PastMeal's save. Checked on the scratch: 2 portions of Lazy Burek log 449 g; Feta omelette becomes 122 and 80 g with Update my recipe; Eggs and Salmon is saved with makes 2. Seen: the page's button still says Save changes; the kcal in the counter has no thousands comma. Next: the open points (the words; a dish with no steps; one portion as the default), then the agreement block with criteria and checks.
