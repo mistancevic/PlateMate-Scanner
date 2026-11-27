@@ -121,7 +121,7 @@ const M = {};
     // ---- DT312.6 a plate that is ready to eat, new ----
     p = await open("/plate"); await addFood(p, "Skyr"); await addFood(p, "Banana");
     const m3 = await measure(p, "eatIt", btn("Eat it ›"));
-    console.log(await note(p, btn("Eat it ›"), `<b>New:</b> nothing to cook, so the Plate ends with <b>Eat it ›</b> (${px(m3)}): no Prep, no Make. <b>Open:</b> the three ways of How do you want to eat it? are not in this flow. Where do they go: a card on the Plate, or away?`, [btn("Eat it ›")]));
+    console.log(await note(p, btn("Eat it ›"), `<b>New:</b> nothing to cook, so the Plate ends with <b>Eat it ›</b> (${px(m3)}): no Prep, no Make. The three ways of How do you want to eat it? (DT312.5b) go away: they were the first mocked step of the flow, and the Plate builds much more now (Coach Milan 27 November 15:44).`, [btn("Eat it ›")]));
     await shot(p, "12-6a"); await clean(p); await tap(p, "Eat it ›");
     await strip(p, "12-6b", "Skyr &amp; Banana"); await how(p, "12-6c", "Back leads to the plate."); await p.context().close();
     }
