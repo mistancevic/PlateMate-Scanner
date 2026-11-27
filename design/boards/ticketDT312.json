@@ -1,0 +1,18 @@
+{
+  "id": "DT312",
+  "title": "From the Plate to cooking and eating: no Prep page, and How was it? after I ate",
+  "boardTitle": "DT312: the Plate ends with Start cooking or Eat it; no Prep page; How was it? comes after I ate",
+  "opportunity": {
+    "from": "Coach Milan's own look, 27 November 2026, 14:29, while reading the DT346 board; first raised 18 November 10:05 (the three ways were a quick fixed set), and agreed in outline on 24 October (DT214: a cook is its own session).",
+    "job": "Finish a dish on the Plate, cook it, eat it, and say how it was once I have eaten.",
+    "kind": "Too many steps, and did not understand it: Prepare it sounds like go for it but opens one more page; that page shows nothing of the Plate; Eat's questions come before the meal is eaten.",
+    "why_now": "DT346's question at Eat (Update my recipe) depends on where Eat ends up, so this is drawn before DT346 gets its Go."
+  },
+  "problem": "The Plate is where I make the dish, yet it ends with Prepare it, which opens Prep: a page without the Plate's numbers, with the steps once more and Lock it and cook. Prep, Make and Eat are tied into one chain by a bar, so Eat opens the moment I tap Cooked and asks how much I ate and how it tasted while the meal is still uneaten. A plate with nothing to cook goes through the same three pages.",
+  "story": "When my plate is ready, I want to start cooking or eat straight from the Plate, and be asked how it was only after I have eaten, so each part of the meal happens when it really happens.",
+  "now": "In main, 0.3.200: DT312.1 a recipe, DT312.3 a new dish I cook, DT312.5 a plate that is ready to eat. Each goes Plate, Prepare it, Prep, Make, Cooked. Next: Eat, Eat. Prep is How to make it with Lock it and cook, or for a ready plate How do you want to eat it? with three fixed ways.",
+  "proposed": "Drawn 27 November 15:10 as DT312.2, DT312.4 and DT312.6, each under its row. 1. The Prep page goes. What you make moves onto the Plate; the steps are read, written and changed in the Plate's Steps card. 2. The Plate ends with Start cooking, or Eat it when nothing needs cooking, at the end of the page. 3. Make ends with Cooked; the meal then waits on every page as Ready to eat, I ate it. 4. How was it? opens from I ate it; Later today goes, because the strip is the wait. 5. The Prep, Make, Eat bar goes. Kept as it is: cook mode inside Make (DT355), the questions on How was it?, Save in My recipes, the 30 minutes question.",
+  "looked_at": "Keeping Prep as a page of its own with a better name: not chosen, it stays one more page without the Plate's numbers. Logging the meal at Cooked: not chosen, how much was eaten is not known yet.",
+  "decision": "Coach Milan 27 November 14:33: yes, definitely: pull DT312 into Now, widen it, draw it before DT346's Go. No Go yet.",
+  "open": "1. A ready plate's three ways (All in one, Topped, Protein first), DT312.5b: a card on the Plate, or gone. 2. Eat it leads to Today with the strip: right, or should it stay on the Plate. 3. On a plain plate Start cooking is an outlined button; filled as the main step? 4. Words: Ready to eat, I ate it, Cooked."
+}

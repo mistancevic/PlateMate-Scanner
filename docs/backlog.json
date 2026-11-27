@@ -1511,10 +1511,21 @@
     },
     {
       "id": "DT312",
-      "title": "Prep rebuilt to fit today's app: How do you want to eat it? was a quick fixed set of ways",
+      "title": "From the Plate to cooking and eating: no Prep page, and How was it? after I ate",
       "epic": "cook",
-      "state": "later",
-      "why": "Coach Milan 18 November 10:05, on DT308.11o: the three ways (All in one, Topped, Protein first) were a chip solution with a fixed set, to get through the process quickly. The flow should be reconstructed to fit today's app. Not part of 0.3.157; the meal question at Save on Eat does not depend on it. With Opus 5.5, together with Prepare it."
+      "state": "now",
+      "why": "Coach Milan 18 November 10:05, on DT308.11o: the three ways (All in one, Topped, Protein first) were a chip solution with a fixed set, to get through the process quickly. The flow should be reconstructed to fit today's app. Not part of 0.3.157; the meal question at Save on Eat does not depend on it. With Opus 5.5, together with Prepare it. 27 November 2026, 14:29 (Coach Milan, on the DT346 board): Prepare it is misleading, it sounds like go for it; the Prep page has nothing of the Plate, only the steps and Lock it; the three steps are independent; feedback on the meal is asked while I am about to start eating. 14:33: yes, definitely: into Now, widened, drawn before DT346's Go. Drawn 15:10: the Plate ends with Start cooking or Eat it, no Prep page, What you make and the steps on the Plate, Cooked ends Make, Ready to eat and I ate it on every page, then How was it?",
+      "problem": "The Plate is where I make the dish, yet it ends with Prepare it, which opens Prep: a page without the Plate's numbers, with the steps once more and Lock it and cook. Prep, Make and Eat are tied into one chain by a bar, so Eat opens the moment I tap Cooked and asks how much I ate and how it tasted while the meal is still uneaten. A plate with nothing to cook goes through the same three pages.",
+      "story": "When my plate is ready, I want to start cooking or eat straight from the Plate, and be asked how it was only after I have eaten, so each part of the meal happens when it really happens.",
+      "board": "Stories302",
+      "where": "Page 6",
+      "open": [
+        "Go, with the criteria and the checks (proposed Full: the Plate, cook and Eat are shared by most walkthroughs).",
+        "The three ways of How do you want to eat it? (DT312.5b): a card on the Plate, or gone.",
+        "Eat it leads to Today with the strip, or stays on the Plate.",
+        "Start cooking on a plain plate: outlined as now, or filled.",
+        "Words: Ready to eat, I ate it, Cooked."
+      ]
     },
     {
       "id": "DT304",
@@ -4436,6 +4447,7 @@
       "state": "now",
       "why": "Coach Milan 23 November 2026, 19:03, after making a recipe (Lazy Burek): confusing when the recipe is in edit mode and when the Plate is not editing it but making a new recipe. Coach Milan 26 November 2026, 10:32: Now, as one batch for the Recipes area, with the design rules (D10, D15, D16 of DT354) applied to the parts it touches. 26 November 14:04 to 14:05 (Coach Milan: the scope, for the next chat). Found in main 0.3.200, three states that look alike: 1. Edit recipe on the recipe page changes the recipe itself, in place; the only sign is the small tag Editing the recipe (rq-editing, src/components/RecipePage.tsx). 2. Put it on the Plate: the Plate holds a copy under From My recipes. Change what you like (plate.fromMyRecipes); at the end the changed plate asks Update my recipe, Save as a new recipe or Only this time (ChangedAsk and save-recipe changed-ask in src/screens/JourneyScreen.tsx). 3. A new dish on the Plate, no recipe behind it, ends with Save in My recipes. Proposed scope: the three look clearly different; the design rules (D10, D15, D16, weights 400, 600, 700, 900) applied to what it touches. Out: cook mode, a member's recipe page, Plan. Next: draw the three states as they are in main, then choose how each looks. 26 November 14:25 (Coach Milan: pull main, draw the three states as they are in main). Drawn 14:40 as four rows, because in main the second state is two: a recipe with servings and one without. 27 November 10:45 (Coach Milan: yes): one rule for every recipe of mine on the Plate, servings or not; the change said at once under the title; Eat asks once (Update my recipe scaled back to the whole recipe); From My recipes for a recipe I made. Drawn 10:50 as DT346.5 and DT346.6.",
       "open": [
+        "Waits for DT312: where Eat's question (Update my recipe) sits depends on it.",
         "Go, with the criteria and the checks.",
         "Edit recipe (DT346.1) and a new dish (DT346.4): how they look, after the copy is agreed.",
         "Save it to My recipes on the Plate for a recipe already in My recipes (DT346.3b): keep or drop.",
