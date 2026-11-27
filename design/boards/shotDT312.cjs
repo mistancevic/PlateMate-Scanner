@@ -155,6 +155,22 @@ const M = {};
     await shot(p, "12-10d"); await clean(p); await tap(p, "Eat it ›"); await p.locator(".cs-main").click(); await sleep(1200);
     await HOW(p, "12-10e", "<b>A plate that was ready to eat:</b> the same page, the same questions; Back leads to the plate.");
     await p.context().close();
+    // ---- DT312.11 with a meal set on the Plate: the meal sits in its place on Today (Coach Milan 16:42) ----
+    p = await open("/my-recipes/m-burek"); await tap(p, "Put it on the Plate");
+    await p.getByRole("button", { name: "Change what this plate is" }).click(); await sleep(700); await p.locator(".pcal-row").filter({ hasText: /Lunch/ }).first().click(); await sleep(600); await p.getByRole("button", { name: "Close" }).first().click().catch(() => {}); await sleep(400);
+    console.log(await note(p, ".meal-line", "<b>No change:</b> on the Plate, Meal and day says <b>Lunch, Thursday, 26 November, 13:45</b>. The cook takes the meal with it. I tap Start cooking ›, cook step 1, then ✕ Close.", [".meal-line"]));
+    await shot(p, "12-11a", ".step-head", ".pd-card"); await clean(p);
+    await tap(p, "Start cooking ›"); await p.getByRole("button", { name: "Buttons only" }).click(); await sleep(300); await p.getByRole("button", { name: /Step 1 ›/ }).first().click(); await sleep(500);
+    await p.getByRole("button", { name: "✕ Close" }).click(); await sleep(1200);
+    console.log(await note(p, ".next-cook", "<b>New:</b> the meal sits in its place on Today: <b>Lunch, 13:45 · Lazy Burek · Cooking now · step 1 of 3 · Go on ›</b>. No blue strip on Today; on the other pages the strip stays, to come back from anywhere.", [".next-cook"]));
+    await topShot(p, "12-11b"); await clean(p); await p.getByRole("button", { name: "Go on ›" }).click(); await sleep(1200);
+    for (let i = 0; i < 25 && !(await p.locator(".cook-to-eat").count()); i++) { const s1 = p.getByRole("button", { name: /Step 1 ›/ }).first(); if (await s1.count()) await s1.click(); else await p.locator(".cook-mode").getByRole("button", { name: /^Next ›|^Done/ }).first().click(); await sleep(350); }
+    await p.locator(".cook-to-eat").click(); await sleep(1300);
+    const mi = await measure(p, "slotAte", ".next-cook .pill");
+    console.log(await note(p, ".next-cook", `<b>New:</b> after Cooked, the same place: <b>Lunch, 13:45 · Lazy Burek · Cooked, ready to eat · I ate it ›</b> (${px(mi)}). Without a meal set, the strip of DT312.10a stays.`, [".next-cook"]));
+    await topShot(p, "12-11c"); await clean(p); await p.getByRole("button", { name: "I ate it ›" }).click(); await sleep(1200);
+    await HOW(p, "12-11d", "<b>New:</b> How was it? for lunch. The meal is known, so Save asks no Which meal is it?; it is logged as Lunch.");
+    await p.context().close();
     }
   } catch (e) { console.log("ERR", e.message.slice(0, 500)); } finally { fs.writeFileSync(`${R}/measures-${NEW ? "new" : "main"}.json`, JSON.stringify(M, null, 1)); await b.close(); s.kill(); }
 })();
