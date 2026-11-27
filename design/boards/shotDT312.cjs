@@ -155,6 +155,25 @@ const M = {};
     await shot(p, "12-10d"); await clean(p); await tap(p, "Eat it ›"); await p.locator(".cs-main").click(); await sleep(1200);
     await HOW(p, "12-10e", "<b>A plate that was ready to eat:</b> the same page, the same questions; Back leads to the plate.");
     await p.context().close();
+    // ---- DT312.13 a cooked meal that waits: Chef Mealan asks once, 30 minutes after the later of the mealtime and Cooked ----
+    const STY = "header, .topbar, .bottom-nav, nav { position: static !important; } .bottom-nav, .chat-fab { display: none !important; } .toast, .snack { display: none !important; } *:has(> .cook-mode) > *:not(.cook-mode), body:has(.cook-mode) header, body:has(.cook-mode) .topbar { display: none !important; } .cook-mode { position: static !important; overflow: visible !important; } .plate-card > .plate-end > .prepare-it.pill-primary, .plate-card > .ways-out-col > .pill-primary { position: static !important; box-shadow: none !important; width: 100% !important; } main { padding-bottom: 24px !important; }";
+    const restyle = (q) => q.evaluate((t) => { const st = document.createElement("style"); st.textContent = t; document.head.append(st); }, STY);
+    const stamp = (q, text) => q.evaluate((text) => { document.querySelectorAll(".board-stamp").forEach((n) => n.remove()); const d = document.createElement("div"); d.className = "board-stamp"; d.style.cssText = "background:#fff8d6;border-bottom:2px solid #2a72d9;color:#172742;font:700 14px Nunito,system-ui,sans-serif;padding:8px 16px;text-align:center"; d.textContent = text; document.body.prepend(d); }, text);
+    const later = async (q, hm) => { await q.clock.setFixedTime(new Date(`2026-11-26T${hm}:00+01:00`)); await q.reload(); await sleep(1800); await restyle(q); await stamp(q, `Thursday, 26 November, ${hm}`); };
+    p = await open("/my-recipes/m-burek"); await tap(p, "Put it on the Plate");
+    await p.getByRole("button", { name: "Change what this plate is" }).click(); await sleep(700); await p.locator(".pcal-row").filter({ hasText: /Lunch/ }).first().click(); await sleep(600); await p.getByRole("button", { name: "Close" }).first().click().catch(() => {}); await sleep(400);
+    await tap(p, "Start cooking ›"); await cookThrough(p); await p.locator(".cook-to-eat").click(); await sleep(1300); await stamp(p, "Thursday, 26 November, 12:10");
+    console.log(await note(p, ".next-cook", "<b>As DT312.11c:</b> cooked at 12:10 for lunch at 13:45. The meal waits in Lunch's place with I ate it ›. Nothing is counted yet.", [".next-cook"]));
+    await topShot(p, "12-13a"); await clean(p); await later(p, "14:20");
+    const ma = await measure(p, "eatAsk", ".eat-ask-acts .pill");
+    console.log(await note(p, ".next-cook", `<b>New:</b> 14:20, I open the app: 30 minutes after the later of the mealtime (13:45) and Cooked (12:10). Chef Mealan asks once, in the meal's place: <b>Did you eat your Lazy Burek?</b> with <b>Not after all</b>, <b>Not yet</b> and <b>I ate it ›</b> (${px(ma)}). Nothing is logged by itself, however long it waits.`, [".eat-ask"]));
+    await topShot(p, "12-13b"); await clean(p); await p.getByRole("button", { name: "Not yet" }).click(); await sleep(700);
+    console.log(await note(p, ".next-cook", "<b>New:</b> after <b>Not yet</b>: the meal goes on waiting with I ate it ›, and the question does not come again today. I ate it › opens How was it? (DT312.11d). Not after all ends it; nothing is logged.", [".next-cook"]));
+    await topShot(p, "12-13c"); await p.context().close();
+    p = await open("/plate"); await p.getByRole("button", { name: /Add/ }).nth(7).click(); await sleep(600); await addFood(p, "Salmon");
+    await tap(p, "Start cooking ›"); await cookThrough(p); await p.locator(".cook-to-eat").click(); await sleep(1300); await later(p, "12:45");
+    console.log(await note(p, ".eat-ask-card", "<b>New, without a meal set:</b> 30 minutes after Cooked (12:10), the question takes the strip's place on Today. I ate it › then asks which meal it was, as Save does now.", [".eat-ask-card"]));
+    await topShot(p, "12-13d"); await p.context().close();
     // ---- DT312.12 the main step stays in view: the phone's screen as it is, the tab bar and Chef Mealan's button in place ----
     const pinned = (t) => `JS:[...document.querySelectorAll('.plate-card button')].find((b) => b.innerText.trim() === ${JSON.stringify(t)})`;
     const phone = async (url) => { const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, timezoneId: "Europe/Berlin" }); const q = await ctx.newPage();
