@@ -1,0 +1,391 @@
+{
+ "a1": {
+  "title": "Lazy Burek, the recipe",
+  "h": 3547,
+  "spots": [
+   {
+    "x": 35,
+    "y": 2695,
+    "w": 320,
+    "h": 48,
+    "to": "a2"
+   },
+   {
+    "x": 35,
+    "y": 2428,
+    "w": 320,
+    "h": 48,
+    "to": "a3"
+   }
+  ]
+ },
+ "a2": {
+  "title": "The Plate, lunch set",
+  "h": 2367,
+  "spots": [],
+  "pin": {
+   "label": "Start cooking ›",
+   "to": "a3"
+  }
+ },
+ "a3": {
+  "title": "The cook: get it ready",
+  "h": 1014,
+  "spots": [
+   {
+    "x": 265,
+    "y": 149,
+    "w": 77,
+    "h": 44,
+    "to": "a4"
+   },
+   {
+    "x": 242,
+    "y": 482,
+    "w": 114,
+    "h": 58,
+    "to": "a4"
+   },
+   {
+    "x": 34,
+    "y": 22,
+    "w": 78,
+    "h": 44,
+    "to": "a3x"
+   }
+  ]
+ },
+ "a4": {
+  "title": "The cook: step 1 of 3",
+  "h": 1089,
+  "spots": [
+   {
+    "x": 242,
+    "y": 557,
+    "w": 114,
+    "h": 58,
+    "to": "a5"
+   },
+   {
+    "x": 34,
+    "y": 22,
+    "w": 78,
+    "h": 44,
+    "to": "a3x"
+   }
+  ]
+ },
+ "a3x": {
+  "title": "Today, while cooking",
+  "h": 1405,
+  "spots": [
+   {
+    "x": 31,
+    "y": 672,
+    "w": 328,
+    "h": 44,
+    "to": "a4"
+   }
+  ]
+ },
+ "a5": {
+  "title": "The cook: done",
+  "h": 911,
+  "spots": [
+   {
+    "x": 34,
+    "y": 690,
+    "w": 322,
+    "h": 52,
+    "to": "a6"
+   }
+  ]
+ },
+ "a6": {
+  "title": "Today, cooked",
+  "h": 1405,
+  "spots": [
+   {
+    "x": 31,
+    "y": 672,
+    "w": 328,
+    "h": 44,
+    "to": "a7"
+   }
+  ]
+ },
+ "a6q": {
+  "title": "Today, 14:20: it still waits",
+  "h": 1531,
+  "spots": [
+   {
+    "x": 255,
+    "y": 798,
+    "w": 104,
+    "h": 44,
+    "to": "a7"
+   },
+   {
+    "x": 143,
+    "y": 798,
+    "w": 104,
+    "h": 44,
+    "to": "a6"
+   }
+  ]
+ },
+ "a7": {
+  "title": "Today, logged as lunch",
+  "h": 2036,
+  "spots": [
+   {
+    "x": 233,
+    "y": 1249,
+    "w": 122,
+    "h": 48,
+    "to": "a8"
+   }
+  ]
+ },
+ "a8": {
+  "title": "How was it?",
+  "h": 1121,
+  "spots": [
+   {
+    "x": 48,
+    "y": 943,
+    "w": 294,
+    "h": 48,
+    "to": "a9"
+   },
+   {
+    "x": 48,
+    "y": 1011,
+    "w": 41,
+    "h": 44,
+    "to": "a7"
+   }
+  ]
+ },
+ "a9": {
+  "title": "Today, the end of this path",
+  "h": 2036,
+  "spots": []
+ },
+ "b1": {
+  "title": "The Plate, empty",
+  "h": 1370,
+  "spots": [
+   {
+    "x": 280,
+    "y": 1156,
+    "w": 75,
+    "h": 36,
+    "to": "b2"
+   }
+  ]
+ },
+ "b2": {
+  "title": "The Plate, eggs and salmon",
+  "h": 1613,
+  "spots": [
+   {
+    "x": 199,
+    "y": 1052,
+    "w": 139,
+    "h": 59,
+    "to": "b3"
+   }
+  ],
+  "pin": {
+   "label": "Start cooking ›",
+   "to": "b5"
+  }
+ },
+ "b3": {
+  "title": "The Plate, writing the steps",
+  "h": 1775,
+  "spots": [
+   {
+    "x": 199,
+    "y": 1236,
+    "w": 139,
+    "h": 36,
+    "to": "b4"
+   }
+  ],
+  "pin": {
+   "label": "Start cooking ›",
+   "to": "b5"
+  }
+ },
+ "b4": {
+  "title": "The Plate, steps kept",
+  "h": 1636,
+  "spots": [],
+  "pin": {
+   "label": "Start cooking ›",
+   "to": "b5"
+  }
+ },
+ "b5": {
+  "title": "The cook: get it ready",
+  "h": 900,
+  "spots": [
+   {
+    "x": 265,
+    "y": 149,
+    "w": 77,
+    "h": 44,
+    "to": "b6"
+   },
+   {
+    "x": 242,
+    "y": 364,
+    "w": 114,
+    "h": 58,
+    "to": "b6"
+   }
+  ]
+ },
+ "b6": {
+  "title": "The cook: done",
+  "h": 900,
+  "spots": [
+   {
+    "x": 34,
+    "y": 648,
+    "w": 322,
+    "h": 52,
+    "to": "b7"
+   }
+  ]
+ },
+ "b7": {
+  "title": "Today, ready to eat",
+  "h": 1484,
+  "spots": [
+   {
+    "x": 19,
+    "y": 565,
+    "w": 294,
+    "h": 51,
+    "to": "b8"
+   }
+  ]
+ },
+ "b8": {
+  "title": "Which meal was it?",
+  "h": 900,
+  "spots": [
+   {
+    "x": 27,
+    "y": 298,
+    "w": 336,
+    "h": 48,
+    "to": "b9"
+   }
+  ]
+ },
+ "b9": {
+  "title": "Today, logged as lunch",
+  "h": 2076,
+  "spots": [
+   {
+    "x": 233,
+    "y": 1243,
+    "w": 122,
+    "h": 48,
+    "to": "b10"
+   }
+  ]
+ },
+ "b10": {
+  "title": "How was it?",
+  "h": 1170,
+  "spots": [
+   {
+    "x": 48,
+    "y": 992,
+    "w": 294,
+    "h": 48,
+    "to": "b9"
+   },
+   {
+    "x": 48,
+    "y": 1060,
+    "w": 41,
+    "h": 44,
+    "to": "b9"
+   }
+  ]
+ },
+ "c1": {
+  "title": "The Plate, skyr and a banana",
+  "h": 1160,
+  "spots": [],
+  "pin": {
+   "label": "Eat it ›",
+   "to": "c2"
+  }
+ },
+ "c2": {
+  "title": "Today, ready to eat",
+  "h": 1484,
+  "spots": [
+   {
+    "x": 19,
+    "y": 565,
+    "w": 294,
+    "h": 51,
+    "to": "c3"
+   }
+  ]
+ },
+ "c3": {
+  "title": "Which meal was it?",
+  "h": 900,
+  "spots": [
+   {
+    "x": 27,
+    "y": 298,
+    "w": 336,
+    "h": 48,
+    "to": "c4"
+   }
+  ]
+ },
+ "c4": {
+  "title": "Today, logged as lunch",
+  "h": 2076,
+  "spots": [
+   {
+    "x": 233,
+    "y": 1243,
+    "w": 122,
+    "h": 48,
+    "to": "c5"
+   }
+  ]
+ },
+ "c5": {
+  "title": "How was it?",
+  "h": 1170,
+  "spots": [
+   {
+    "x": 48,
+    "y": 992,
+    "w": 294,
+    "h": 48,
+    "to": "c4"
+   },
+   {
+    "x": 48,
+    "y": 1060,
+    "w": 41,
+    "h": 44,
+    "to": "c4"
+   }
+  ]
+ }
+}

@@ -69,6 +69,13 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
+## State, 27 November 2026, 20:35
+
+- DT312 prototype (Coach Milan 20:20: the screens are hard to follow for a change this big, make a prototype). On the canvas, Page 6, x 0, y 136061: the artboard ProtoDT312.dc.html, 390 by 844, is_interactive true, so it has a Play button; link https://claude.ai/artifact/VSNwRoRQqpi7S6NXdCnFhe#play-ProtoDT312. It is the first artboard that plays, and it was not looked at after publishing (the Design type says not to render it): ask Coach Milan if it plays on his phone. Next board at y 136961.
+- How it is made: design/boards/protoDT312.cjs takes 26 clean pictures from the scratch build b312 (no notes; the tab bar and the pinned button hidden) and writes the taps of each screen with where they lead; screensProtoDT312.json and assetsProtoDT312.json hold them; genProtoDT312.py writes the one artboard: a menu with three paths (A a recipe, lunch set; B a new dish, no meal set; C a plate that is ready to eat), a top strip with Back and Paths, the picture with blue ringed buttons, the pinned Start cooking or Eat it drawn by the artboard, and on a6 a yellow control "30 minutes pass, not eaten" that leads to the waiting question.
+- Found while making it: after a reload the swapped-out cook loses the Plate's meal (Lunch), so Today asks Which meal was it?. On DT312's open list, to mend in the build.
+- Still open with Coach Milan, one at a time: the words (Cooked, Ready to eat, I ate it; Save on the meal's page), the no-steps button, pinning the planning buttons, one release or two, the checks (Full proposed). Then the agreement block on the board, then his Go.
+
 ## State, 27 November 2026, 19:55
 
 - DT312, Coach Milan 19:27: one portion is the default at I ate it for a recipe with servings. He asked what else needs clarifying; listed in chat: the words (Cooked, Ready to eat, I ate it; Save changes on the meal's page), a dish with no steps (the button says Step 1), the pinned place for the planning buttons, one release or two, then the checks (Full proposed). Asked first: the words.
@@ -271,7 +278,8 @@ ps -eo pid,etime,args | grep "dist/server.cjs" | grep -v grep
 - Stories297 B170 at y 105944, Stories298 DT348 at y 110422, Stories299 B164 at y 113535, Stories300 DT347 at y 118527, h 4151.
 - Stories301 DT346 at x 0, y 122798, w 4150, h 6832.
 - Stories302 DT312 at x 0, y 129750, w 4890, h 6191.
-- The next board on Page 6 goes at x 0, y 136061.
+- ProtoDT312 (the DT312 prototype, plays) at x 0, y 136061, w 390, h 844.
+- The next board on Page 6 goes at x 0, y 136961 (under the DT312 prototype at y 136061).
 - A sheet that scrolls is drawn as one tall picture: shotDT339.cjs unroll() opens its scroll boxes at their real width.
 - Board tools: design/boards/genDT336.py, shotDT336.cjs, ticketDT336.json; the generator writes the board to /home/claude/canvas/project/. DT336 is built, so its board pictures can now come from main itself.
 - The Srpski table (0dce7ed4-62b8-4680-a346-bf82e221710a) has app-sr.json and release-pack.json of 0.3.193; the Deutsch table (b6e9715c-288c-4a19-bd6c-f8ac5a396aec) has release-pack.json of 0.3.193. 19 new or changed lines in 0.3.193, Srpski confirmed by Claude, German in Beta.
