@@ -37,7 +37,7 @@ const M = {};
     await p.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
     await p.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "A Balkan pie.", around: "", better_as: "" }) }));
     await p.goto(`http://127.0.0.1:${PORT}${url}`); await sleep(1800);
-    await p.evaluate(() => { const st = document.createElement("style"); st.textContent = "header, .topbar, .bottom-nav, nav { position: static !important; } .bottom-nav, .chat-fab { display: none !important; } .toast, .snack { display: none !important; }"; document.head.append(st); });
+    await p.evaluate(() => { const st = document.createElement("style"); st.textContent = "header, .topbar, .bottom-nav, nav { position: static !important; } .bottom-nav, .chat-fab { display: none !important; } .toast, .snack { display: none !important; } *:has(> .cook-mode) > *:not(.cook-mode), body:has(.cook-mode) header, body:has(.cook-mode) .topbar { display: none !important; } .cook-mode { position: static !important; overflow: visible !important; }"; document.head.append(st); });
     return p;
   };
   // q: a CSS selector, or JS: an expression that gives elements
@@ -94,36 +94,67 @@ const M = {};
     await shot(p, "12-5b"); await clean(p); await p.locator(".way").first().click(); await sleep(300); await tap(p, "Make it this way ›");
     console.log(await note(p, HEAD, "<b>Make</b> for a bowl of skyr: Start cooking, steps to tick, How did the cooking go?, Cooked. Next: Eat ›.", [HEAD]));
     await shot(p, "12-5c"); await clean(p); await tap(p, "Cooked. Next: Eat ›"); await shot(p, "12-5d"); await p.context().close();
+    // ---- DT312.7 from a recipe's page, in main: the other cooking flow ----
+    p = await open("/my-recipes/m-burek");
+    const sc = "JS:[...document.querySelectorAll('.rq-steps button')].find((b) => b.innerText.trim() === 'Start cooking')";
+    console.log(await note(p, sc, "The other way in: <b>Start cooking</b> on the recipe's page, at the end of Steps. It skips the Plate, Prep and the Make page.", [sc]));
+    await shot(p, "12-7a", ".rq-steps", ".rq-steps"); await clean(p); await p.locator(".rq-steps").getByRole("button", { name: "Start cooking" }).click(); await sleep(1500);
+    console.log(await note(p, ".cook-top", "<b>Cook mode</b> opens at once, on <b>Get it ready</b>: put out what you need, each food with its amount; then one step at a time, read aloud. From the Plate this is one more tap away, behind a second Start cooking on the Make page (DT312.1c).", [".cook-ready-top, .cook-count"]));
+    await shot(p, "12-7b"); await clean(p); await p.getByRole("button", { name: "Buttons only" }).click(); await sleep(400); await p.getByRole("button", { name: /Step 1 ›/ }).first().click(); await sleep(600);
+    for (let i = 0; i < 25 && !(await p.locator(".cook-to-eat").count()); i++) { await p.locator(".cook-mode").getByRole("button", { name: /^Next ›|^Done/ }).first().click(); await sleep(350); }
+    console.log(await note(p, ".cook-to-eat", "Cook mode's last screen: the photo of the meal and <b>Cooked. Next: Eat ›</b>. How did the cooking go? is not here: it is on the Make page, behind the link Make: step photos and notes ›.", [".cook-to-eat", ".cook-done-links"]));
+    await shot(p, "12-7c"); await clean(p); await p.locator(".cook-to-eat").click(); await sleep(1200);
+    await shot(p, "12-7d"); await p.context().close();
     }
     if (NEW) {
-    const strip = async (p, name, title) => { console.log(await note(p, ".cook-strip", `<b>New:</b> cooking is over. On Today, and on every page: <b>Ready to eat · ${title} · I ate it ›</b>. Nothing is asked before I have eaten. The ✕ ends it without answers.`, [".cook-strip"])); await topShot(p, name); await clean(p); await p.locator(".cs-main").click(); await sleep(1200); };
-    const how = async (p, name, extra) => { console.log(await note(p, HEAD, `<b>New:</b> opens from I ate it. The title is <b>How was it?</b>, no bar. Later today is gone: the strip is the wait. ${extra}`, [HEAD])); await shot(p, name); };
-    // ---- DT312.2 a recipe, new ----
-    let p = await open("/my-recipes/m-burek"); await tap(p, "Put it on the Plate");
-    const m1 = await measure(p, "start2", btn("Start cooking ›")), mk = await measure(p, "whatYouMake", ".mk-on-plate");
-    console.log(await note(p, ".mk-on-plate", "<b>New, moved:</b> <b>What you make</b> comes from Prep onto the Plate, above the steps, next to the numbers it belongs to.", [".mk-on-plate"]));
-    console.log(await note(p, btn("Start cooking ›"), `<b>New:</b> the Plate ends with <b>Start cooking ›</b> (${px(m1)}), at the end of the page: after the foods, What you make and the steps. No Prep page, no Lock it and cook.`, [btn("Start cooking ›")]));
-    await shot(p, "12-2a"); await clean(p); await tap(p, "Start cooking ›");
-    const m2 = await measure(p, "cooked", btn("Cooked ›"));
-    console.log(await note(p, ".step-head", "<b>New:</b> no Prep, Make, Eat bar; Back to the plate.", []));
-    console.log(await note(p, btn("Cooked ›"), `<b>New:</b> Make ends with <b>Cooked ›</b> (${px(m2)}) and the line: Enjoy it. It waits on every page: tap I ate it when you have eaten. I tap Cooked ›.`, [btn("Cooked ›")]));
-    await shot(p, "12-2b"); await clean(p); await tap(p, "Cooked ›");
-    await strip(p, "12-2c", "Lazy Burek"); await how(p, "12-2d", "The questions are the same."); await p.context().close();
-    // ---- DT312.4 a new dish I cook, new ----
+    const HOW = async (p, name, text, marks = []) => { console.log(await note(p, HEAD, text, [HEAD, ...marks])); await shot(p, name); await clean(p); };
+    const cookThrough = async (p) => { await p.getByRole("button", { name: "Buttons only" }).click().catch(() => {}); await sleep(400); await p.getByRole("button", { name: /Step 1 ›/ }).first().click(); await sleep(600);
+      for (let i = 0; i < 25 && !(await p.locator(".cook-to-eat").count()); i++) { await p.locator(".cook-mode").getByRole("button", { name: /^Next ›|^Done/ }).first().click(); await sleep(350); } };
+    // ---- DT312.8 the ways in, side by side; DT312.9 the one cook; DT312.10 after Cooked ----
+    // 8a a recipe's page
+    let p = await open("/my-recipes/m-burek");
+    const sc = "JS:[...document.querySelectorAll('.rq-steps button')].find((b) => b.innerText.trim() === 'Start cooking')";
+    console.log(await note(p, sc, "<b>No change:</b> a recipe's page, <b>Start cooking</b>. It hands the cook the name, the foods with their amounts and the steps.", [sc]));
+    await shot(p, "12-8a", ".rq-steps", ".rq-steps"); await p.context().close();
+    // 8b a recipe's copy on the Plate, then the cook (9a to 9c), then after Cooked (10a, 10b)
+    p = await open("/my-recipes/m-burek"); await tap(p, "Put it on the Plate");
+    const m1 = await measure(p, "start8", btn("Start cooking ›"));
+    console.log(await note(p, ".mk-on-plate", "<b>New, moved:</b> <b>What you make</b> comes from Prep onto the Plate, above the steps.", [".mk-on-plate"]));
+    console.log(await note(p, btn("Start cooking ›"), `<b>New:</b> the Plate ends with <b>Start cooking ›</b> (${px(m1)}), the one filled button, after the foods, What you make and the steps. It hands the cook the same three things as the recipe's page: the name, the foods, the steps. No Prep page, no Lock it and cook.`, [btn("Start cooking ›")]));
+    await shot(p, "12-8b"); await clean(p); await tap(p, "Start cooking ›");
+    console.log(await note(p, ".cook-top", "<b>New for the Plate, as from a recipe's page:</b> the cook opens at once on <b>Get it ready</b>: put out what you need, each food with its amount. The first time it asks: voice or buttons. No Make page in between, no second Start cooking.", [".cook-top"]));
+    await shot(p, "12-9a"); await clean(p); await p.getByRole("button", { name: "Buttons only" }).click(); await sleep(400); await p.getByRole("button", { name: /Step 1 ›/ }).first().click(); await sleep(600);
+    console.log(await note(p, ".cook-top", "<b>No change:</b> the steps, one at a time, with voice or buttons, and a photo on any step. ✕ Close leaves in the middle: the strip then says Cooking now, Go on › (DT312.8e).", []));
+    await shot(p, "12-9b"); await clean(p);
+    // leave in the middle: the strip, the fifth way in
+    await p.getByRole("button", { name: "✕ Close" }).click(); await sleep(1200);
+    console.log(await note(p, ".cook-strip", "<b>New:</b> ✕ Close in the middle leads here, not to a Make page. <b>Cooking now · Lazy Burek · step 1 of 3 · Go on ›</b>, on every page, opens the cook again where I left it.", [".cook-strip"]));
+    await topShot(p, "12-8e"); await clean(p); await p.locator(".cs-main").click(); await sleep(1200);
+    for (let i = 0; i < 25 && !(await p.locator(".cook-to-eat").count()); i++) { const s1 = p.getByRole("button", { name: /Step 1 ›/ }).first(); if (await s1.count()) await s1.click(); else await p.locator(".cook-mode").getByRole("button", { name: /^Next ›|^Done/ }).first().click(); await sleep(350); }
+    const mc = await measure(p, "cooked", ".cook-to-eat");
+    console.log(await note(p, ".cook-went", "<b>New, moved:</b> <b>How did the cooking go?</b> comes from the Make page onto the cook's last screen, with the photo of the meal.", [".cook-went"]));
+    console.log(await note(p, ".cook-waits", `<b>New:</b> the cook ends with <b>Cooked ›</b> (${px(mc)}) and the line under it. The Make page is gone: its ticks, step photos, the meal's photo and the question are all in the cook. I tap Cooked ›.`, [".cook-to-eat"]));
+    await shot(p, "12-9c"); await clean(p); await p.locator(".cook-to-eat").click(); await sleep(1300);
+    console.log(await note(p, ".cook-strip", "<b>New:</b> after Cooked, always the same: <b>Ready to eat · Lazy Burek · I ate it ›</b>, on Today and on every page. Nothing is asked before I have eaten.", [".cook-strip"]));
+    await topShot(p, "12-10a"); await clean(p); await p.locator(".cs-main").click(); await sleep(1200);
+    await HOW(p, "12-10b", "<b>New:</b> <b>How was it?</b> opens from I ate it; no bar; Later today is gone. For <b>a recipe as it is</b> nothing more is asked: the card points at the recipe. For a changed copy the question of DT346 comes here: Update my recipe, Save as a new recipe, Only this time.");
+    await p.context().close();
+    // 8c, 8d a new dish on the Plate; 10c its ending
     p = await open("/plate"); await p.getByRole("button", { name: /Add/ }).nth(7).click(); await sleep(600); await addFood(p, "Salmon");
     await tap(p, "Write my own"); await p.getByLabel(/Your steps/).fill("Fry the salmon for 3 minutes on each side.\nScramble the egg next to it."); await sleep(300);
-    console.log(await note(p, ".plate-steps", "<b>New:</b> the steps are written on the Plate: <b>Write my own</b> opens here, one step per line, Keep my steps. Chef Mealan's draft lands in the same card. I tap Keep my steps.", [".plate-steps"]));
-    await shot(p, "12-4a"); await clean(p); await tap(p, "Keep my steps");
-    console.log(await note(p, btn("Start cooking ›"), "<b>New:</b> the steps stay in view; Change the steps opens them again here. The Plate ends with <b>Start cooking ›</b>, filled: the one filled button, the main step (D1, D6; Coach Milan 16:01). Chef Mealan's first way, Add a protein base, is outlined with his hat; Save it to My recipes stays outlined.", [btn("Start cooking ›"), ".plate-steps"]));
-    await shot(p, "12-4b"); await clean(p); await tap(p, "Start cooking ›");
-    await shot(p, "12-4c"); await tap(p, "Cooked ›");
-    await strip(p, "12-4d", "Eggs &amp; Salmon"); await how(p, "12-4e", "Save in My recipes is asked here, as before."); await p.context().close();
-    // ---- DT312.6 a plate that is ready to eat, new ----
+    console.log(await note(p, ".plate-steps", "<b>New:</b> the steps are written on the Plate: <b>Write my own</b> opens here, one step per line. Chef Mealan's draft lands in the same card. I tap Keep my steps.", [".plate-steps"]));
+    await shot(p, "12-8c"); await clean(p); await tap(p, "Keep my steps");
+    console.log(await note(p, btn("Start cooking ›"), "<b>New:</b> a new dish ends with the same <b>Start cooking ›</b>, filled, and hands over the same three things. Chef Mealan's first way is outlined with his hat; Save it to My recipes stays outlined.", [btn("Start cooking ›"), ".plate-steps"]));
+    await shot(p, "12-8d"); await clean(p); await tap(p, "Start cooking ›"); await cookThrough(p); await p.locator(".cook-to-eat").click(); await sleep(1300); await p.locator(".cs-main").click(); await sleep(1200);
+    await HOW(p, "12-10c", "<b>A new dish:</b> the same page; its last question is <b>Save in My recipes</b>.", [".save-recipe"]);
+    await p.context().close();
+    // 10d, 10e a plate with nothing to cook skips the middle
     p = await open("/plate"); await addFood(p, "Skyr"); await addFood(p, "Banana");
     const m3 = await measure(p, "eatIt", btn("Eat it ›"));
-    console.log(await note(p, btn("Eat it ›"), `<b>New:</b> nothing to cook, so the Plate ends with <b>Eat it ›</b>, filled (${px(m3)}): no Prep, no Make. The three ways of How do you want to eat it? (DT312.5b) go away: they were the first mocked step of the flow, and the Plate builds much more now (Coach Milan 27 November 15:44).`, [btn("Eat it ›")]));
-    await shot(p, "12-6a"); await clean(p); await tap(p, "Eat it ›");
-    await strip(p, "12-6b", "Skyr &amp; Banana"); await how(p, "12-6c", "Back leads to the plate."); await p.context().close();
+    console.log(await note(p, btn("Eat it ›"), `<b>New:</b> nothing to cook, so the Plate ends with <b>Eat it ›</b>, filled (${px(m3)}), and skips the cook. It leads to the same strip on Today: Ready to eat · Skyr &amp; Banana · I ate it ›. The three ways of How do you want to eat it? go away (Coach Milan 15:44).`, [btn("Eat it ›")]));
+    await shot(p, "12-10d"); await clean(p); await tap(p, "Eat it ›"); await p.locator(".cs-main").click(); await sleep(1200);
+    await HOW(p, "12-10e", "<b>A plate that was ready to eat:</b> the same page, the same questions; Back leads to the plate.");
+    await p.context().close();
     }
   } catch (e) { console.log("ERR", e.message.slice(0, 500)); } finally { fs.writeFileSync(`${R}/measures-${NEW ? "new" : "main"}.json`, JSON.stringify(M, null, 1)); await b.close(); s.kill(); }
 })();

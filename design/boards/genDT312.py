@@ -1,7 +1,8 @@
-# Board DT312 (27 November 2026; Coach Milan 14:29 and 14:33: pull it into Now, widen it, draw it). Three kinds of plate, each as
-# in main 0.3.200 with the new flow under it (a scratch build of main with the change). Left band: a recipe (DT312.1, DT312.2)
-# and a new dish I cook (DT312.3, DT312.4). Right band: a plate that is ready to eat (DT312.5, DT312.6). Two bands keep the
-# board under 8000 px. No agreement block yet. Pictures from shotDT312.cjs.
+# Board DT312 (27 November 2026; Coach Milan 14:29 and 14:33: pull it into Now, widen it, draw it; 16:16 and 16:17: one logic,
+# redraw). Left band, as in main 0.3.200: DT312.1 a recipe's copy from the Plate, DT312.3 a new dish, DT312.5 a ready plate,
+# DT312.7 from a recipe's page. Right band, new (a scratch build of main with the change): DT312.8 the ways in, DT312.9 the
+# one cook, DT312.10 after Cooked. The first drawing's rows DT312.2, DT312.4 and DT312.6 are replaced by these. Two bands
+# keep the board under 8000 px. No agreement block yet. Pictures from shotDT312.cjs.
 import json, os, base64
 HERE = os.path.dirname(os.path.abspath(__file__))
 src = open(f"{HERE}/genDT308d.py").read(); exec(src[:src.index("\nstart(4)")])
@@ -26,13 +27,13 @@ def shot(x, y, name, title, status, note):
     return y + 140 + h
 CHIP = {**CHIP, "draft": (CHIP["draft"][0], CHIP["draft"][1], "In main, 0.3.200")}
 B = Board()
-BG = 150; W2 = SX + 5 * (PW + G) - G + BG
-W = W2 + 4 * (PW + G) - G + 40
+BG = 150; W2 = SX + 4 * (PW + G) - G + BG
+W = W2 + 5 * (PW + G) - G + 40
 parts = [("Ticket", "DT312. This board is the ticket: everything about it is here. On the canvas page Kanban it is one short card with the label Board: DT312, canvas Page 6."),
-  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> Three kinds of plate, each as in main 0.3.200 and new right under it. Left band: DT312.1 and DT312.2 a recipe (Lazy Burek); DT312.3 and DT312.4 a new dish I cook (Eggs and Salmon). Right band: DT312.5 and DT312.6 a plate that is ready to eat (Skyr and Banana). A blue outline marks what each yellow note is about; the sizes are measured on the page. The AI is off in this run, so the steps are written by hand."),
+  ("How to read this board", "<b>As a prototype, left to right; each arrow is a tap.</b> Left band, as in main 0.3.200, four ways through: DT312.1 a recipe's copy from the Plate, DT312.3 a new dish I cook, DT312.5 a plate that is ready to eat, DT312.7 from a recipe's page. Right band, new, one logic in three parts: <b>DT312.8 the ways in</b>, side by side, not a sequence; <b>DT312.9 the one cook</b>, the same for every way in; <b>DT312.10 after Cooked</b>, the endings side by side. The first drawing's rows DT312.2, DT312.4 and DT312.6 are replaced by DT312.8 to DT312.10. A blue outline marks what each yellow note is about; the sizes are measured on the page. The AI is off in this run, so the steps are written by hand."),
   ("1. The request", ""), ("Opportunity, why we act", f'<b>Where it comes from:</b> {o["from"]}<br><b>The job:</b> {o["job"]}<br><b>What stood in the way:</b> {o["kind"]}<br><b>Why now:</b> {o["why_now"]}'),
   ("Problem", t["problem"]), ("Story", t["story"]),
-  ("In Coach Milan's words", "27 November 14:29: I think Prepare it is misleading. For me preparation sounds like go for it. While I am on the Plate I am crafting the recipe. I am redirected to a preparation page which is empty, no info from the Plate, but the steps to cook and lock it. Either we craft the cooking steps on the Plate page or we solve it differently. And especially three steps that are independent in the process. Cooking and later giving feedback on how it was is kind of a separate process: I am supposed to give feedback on the meal while I am about to start eating it, because that is the expected step after Make. 14:33: yes, definitely. Before: 18 November 10:05, the three ways were a chip solution with a fixed set, to get through the process quickly; the flow should be reconstructed to fit today's app."),
+  ("In Coach Milan's words", "27 November 16:12, on the first drawing: cooking is starting with preparing ingredients first; which flow is here, why is there a difference from the other cooking flow? 16:16: it is important to have one logic. The mid process should be the same, only the inputs and what to do with the output should differ. That gives us a system that can be reused all over again, and users get used to the flows. 16:17: yes. 15:44: the three ways should go away. 15:50: Today is the place where we manage actions out of the Plate and from the Plan. 16:01: yes, filled. Before, 14:29: I think Prepare it is misleading. For me preparation sounds like go for it. While I am on the Plate I am crafting the recipe. I am redirected to a preparation page which is empty, no info from the Plate, but the steps to cook and lock it. Either we craft the cooking steps on the Plate page or we solve it differently. And especially three steps that are independent in the process. Cooking and later giving feedback on how it was is kind of a separate process: I am supposed to give feedback on the meal while I am about to start eating it, because that is the expected step after Make. 14:33: yes, definitely. Before: 18 November 10:05, the three ways were a chip solution with a fixed set, to get through the process quickly; the flow should be reconstructed to fit today's app."),
   ("2. The solution and the decision", ""), ("Now", t["now"]), ("Proposed", t["proposed"]), ("Looked at, not chosen", t["looked_at"]),
   ("Open, to decide on this board", t["open"]), ("Decision", t["decision"]), ("3. The agreement", "Empty until the Go: the criteria and the checks come with it.")]
 n0 = len(B.html); storyCard(B, 30, "DT312", t["title"], parts, 350); B.html[n0] = B.html[n0].replace("<div style=", "<div data-card style=", 1)
@@ -51,47 +52,60 @@ def row(y, rid, text, sub, screens, taps, n=None):
     for i, tp in enumerate(taps): arrow(i, y + 220, tp)
     return max(ends) + 70
 MAIN = "In main, 0.3.200"; NEW = "New, drawn for your approval"
+def row(y, rid, text, sub, screens, taps, n=None):
+    label(y, f"{rid} {text}", sub, n or len(screens)); y += 60
+    ends = [shot(X(i), y, nm, f"{rid}{chr(97 + i)} {ti}", st, no) for i, (nm, ti, st, no) in enumerate(screens)]
+    for i, tp in enumerate(taps):
+        if tp: arrow(i, y + 220, tp)
+    return max(ends) + 70
 y = 30
-y = row(y, "DT312.1", "A recipe", MAIN + ": Plate, Prep, Make, Eat in one chain", [
+y = row(y, "DT312.1", "A recipe's copy, from the Plate", MAIN + ": Plate, Prep, the Make page, Eat", [
   ("12-1a", "The Plate", "draft", "Ends with Prepare it as it is."),
   ("12-1b", "Prep", "draft", "No numbers; the steps again; Lock it and cook."),
-  ("12-1c", "Make", "draft", "Ends with Cooked. Next: Eat."),
+  ("12-1c", "The Make page", "draft", "A checklist; a second Start cooking; Cooked. Next: Eat."),
   ("12-1d", "Eat", "draft", "Asked before I have eaten.")],
-  ["tap<br>Prepare it<br>as it is", "tap Lock it<br>and cook", "tap Cooked.<br>Next: Eat"], 5)
-y = row(y, "DT312.2", "New: a recipe", NEW + ": the Plate, cooking, then I ate it", [
-  ("12-2a", "The Plate", "changed", "What you make and the steps, then Start cooking."),
-  ("12-2b", "Make", "changed", "No bar; ends with Cooked."),
-  ("12-2c", "Today", "changed", "Ready to eat, I ate it."),
-  ("12-2d", "How was it?", "changed", "After I ate.")],
-  ["tap Start<br>cooking", "tap<br>Cooked", "later, tap<br>I ate it"], 5)
+  ["tap<br>Prepare it<br>as it is", "tap Lock it<br>and cook", "tap Cooked.<br>Next: Eat"])
 y = row(y, "DT312.3", "A new dish I cook", MAIN, [
   ("12-3a", "The Plate", "draft", "Prepare it; Write my own jumps away."),
   ("12-3b", "Prep", "draft", "Only the place for steps, and Lock it and cook."),
-  ("12-3c", "Make", "draft", "Cooked. Next: Eat."),
+  ("12-3c", "The Make page", "draft", "Cooked. Next: Eat."),
   ("12-3d", "Eat", "draft", "Asked before I have eaten.")],
-  ["tap<br>Prepare it", "tap Lock it<br>and cook", "tap Cooked.<br>Next: Eat"], 5)
-y = row(y, "DT312.4", "New: a new dish I cook", NEW + ": the steps are written on the Plate", [
-  ("12-4a", "The Plate, writing the steps", "changed", "Write my own opens in the Steps card."),
-  ("12-4b", "The Plate, steps kept", "changed", "Ends with Start cooking."),
-  ("12-4c", "Make", "changed", "No bar; my steps; Cooked."),
-  ("12-4d", "Today", "changed", "Ready to eat, I ate it."),
-  ("12-4e", "How was it?", "changed", "After I ate; Save in My recipes.")],
-  ["tap Keep<br>my steps", "tap Start<br>cooking", "tap<br>Cooked", "later, tap<br>I ate it"])
+  ["tap<br>Prepare it", "tap Lock it<br>and cook", "tap Cooked.<br>Next: Eat"])
+y = row(y, "DT312.5", "A plate that is ready to eat", MAIN + ": the same pages", [
+  ("12-5a", "The Plate", "draft", "Nothing to cook; Prepare it."),
+  ("12-5b", "Prep", "draft", "How do you want to eat it? Three fixed ways."),
+  ("12-5c", "The Make page", "draft", "Start cooking, for skyr and a banana."),
+  ("12-5d", "Eat", "draft", "Asked before I have eaten.")],
+  ["tap<br>Prepare it", "pick a way,<br>tap Make it<br>this way", "tap Cooked.<br>Next: Eat"])
+y = row(y, "DT312.7", "From a recipe's page", MAIN + ": the other cooking flow", [
+  ("12-7a", "Lazy Burek's page, Steps", "draft", "Start cooking."),
+  ("12-7b", "Cook mode, Get it ready", "draft", "Opens at once; put out what you need."),
+  ("12-7c", "Cook mode, done", "draft", "Cooked. Next: Eat; no How did the cooking go?"),
+  ("12-7d", "Eat", "draft", "Asked before I have eaten.")],
+  ["tap Start<br>cooking", "Step 1,<br>then Next<br>to the end", "tap Cooked.<br>Next: Eat"])
 yL = y
 X0 = W2; y = 30
 B.html.append(f'<div style="position:absolute;left:{W2 - BG // 2 - 2}px;top:20px;width:4px;height:{yL - 40}px;background:#d1dcf0;border-radius:2px"></div>')
-y = row(y, "DT312.5", "A plate that is ready to eat", MAIN + ": the same three pages", [
-  ("12-5a", "The Plate", "draft", "Nothing to cook; Prepare it."),
-  ("12-5b", "Prep", "draft", "How do you want to eat it? Three fixed ways."),
-  ("12-5c", "Make", "draft", "Start cooking, for skyr and a banana."),
-  ("12-5d", "Eat", "draft", "Asked before I have eaten.")],
-  ["tap<br>Prepare it", "pick a way,<br>tap Make it<br>this way", "tap Cooked.<br>Next: Eat"])
-y = row(y, "DT312.6", "New: a plate that is ready to eat", NEW + ": Eat it, then I ate it", [
-  ("12-6a", "The Plate", "changed", "Ends with Eat it."),
-  ("12-6b", "Today", "changed", "Ready to eat, I ate it."),
-  ("12-6c", "How was it?", "changed", "After I ate.")],
-  ["tap<br>Eat it", "later, tap<br>I ate it"], 4)
+y = row(y, "DT312.8", "New: the ways in, side by side", NEW + ": each hands the cook a name, the foods, the steps", [
+  ("12-8a", "A recipe's page", "same", "Start cooking leads to DT312.9a."),
+  ("12-8b", "The Plate, a recipe's copy", "changed", "Start cooking › leads to DT312.9a."),
+  ("12-8c", "The Plate, a new dish: writing the steps", "changed", "Write my own opens in the Steps card."),
+  ("12-8d", "The Plate, a new dish", "changed", "Start cooking › leads to DT312.9a."),
+  ("12-8e", "The strip, Cooking now", "changed", "Go on › opens the cook where I left it.")],
+  [None, None, "tap Keep<br>my steps", None])
+y = row(y, "DT312.9", "New: the one cook", NEW + ": the same for every way in", [
+  ("12-9a", "Get it ready", "changed", "Put out what you need."),
+  ("12-9b", "The steps, one at a time", "same", "Voice or buttons; a photo on any step."),
+  ("12-9c", "Done", "changed", "The meal's photo, How did the cooking go?, Cooked.")],
+  ["tap<br>Step 1 ›", "tap Next ›<br>to the end"], 5)
+y = row(y, "DT312.10", "New: after Cooked", NEW + ": always the same; the last question depends on the way in", [
+  ("12-10a", "Today", "changed", "Ready to eat, I ate it."),
+  ("12-10b", "How was it? A recipe", "changed", "Nothing more asked; a changed copy: DT346."),
+  ("12-10c", "How was it? A new dish", "changed", "Save in My recipes."),
+  ("12-10d", "The Plate, ready to eat", "changed", "Eat it › skips the cook, leads to the strip."),
+  ("12-10e", "How was it? A ready plate", "changed", "The same page.")],
+  ["later, tap<br>I ate it", None, None, "tap Eat it,<br>later<br>I ate it"])
 y = max(y, yL)
 Hc = max(y, 30 + HT.get("card", 2600) + 60)
-board("Stories302.dc.html", t["boardTitle"], "Drawn 27 November 2026, 15:10 (Coach Milan 14:33: yes, definitely). Ticket DT312, Kanban column Now. Each kind of plate as in main 0.3.200, and new right under it. Pictures from the real app: main 0.3.200, and a scratch build of main with the change. Nothing in the app is changed yet. DT346 waits for this.", B, W, Hc, "Stories301.dc.html")
+board("Stories302.dc.html", t["boardTitle"], "Drawn 27 November 2026, 15:10; redrawn 16:50 as one logic (Coach Milan 16:16 and 16:17). Ticket DT312, Kanban column Now; DT355 is merged into it. Left: four ways through as in main 0.3.200. Right, new: the ways in, the one cook, after Cooked. Pictures from the real app: main 0.3.200, and a scratch build of main with the change. Nothing in the app is changed yet. DT346 waits for this.", B, W, Hc, "Stories301.dc.html")
 print("DT312", W, Hc + 230)
