@@ -69,6 +69,14 @@ Commit trailer:
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 ```
 
+## State, 28 November 2026, 15:25
+
+- Coach Milan 14:55: the DT312 prototype plays; he needs more time to check it. No word yet on the five open DT312 points.
+- Brainstorm, 14:55 to 15:21, agreed model (his words 15:18 and 15:21): two tools, one logic. Recipe builder in My recipes makes one dish: name, portions, foods, steps, numbers for one portion, ends with Save and Share. Meal prep on the Plate makes my meal today: it can hold a recipe's portion plus a side or a drink, numbers judged against my day, ends with Start cooking or Eat it, and Plan it. One shared builder piece (foods, amounts, steps) gives both the same look and feel. Two links: a recipe can be added to the Plate for a meal; a meal can be saved as a recipe. Today keeps the eating (DT312).
+- Why it matters to him: Recipe builder is one possible pitch for the app and a possible tier (with a Social Media package). My take given: sell the Share and Give endings, keep Save free.
+- Tickets: DT312 stays as drawn. DT346 is to be redrawn on this model after DT312 (recorded in its why). DT356 gets simpler (a recipe is judged by one portion, a meal by my day). Nothing drawn or built for this yet.
+- Asked, open: does a recipe on the Plate stay one block (1 portion of Lazy Burek) or open into its foods to change for this meal.
+
 ## State, 27 November 2026, 20:35
 
 - DT312 prototype (Coach Milan 20:20: the screens are hard to follow for a change this big, make a prototype). On the canvas, Page 6, x 0, y 136061: the artboard ProtoDT312.dc.html, 390 by 844, is_interactive true, so it has a Play button; link https://claude.ai/artifact/VSNwRoRQqpi7S6NXdCnFhe#play-ProtoDT312. It is the first artboard that plays, and it was not looked at after publishing (the Design type says not to render it): ask Coach Milan if it plays on his phone. Next board at y 136961.
